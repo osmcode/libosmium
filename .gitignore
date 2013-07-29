@@ -1,0 +1,5 @@
+core
+doc
+check-includes
+*.swp
+test/tests
