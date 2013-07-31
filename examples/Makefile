@@ -19,6 +19,13 @@ CXXFLAGS += -O3
 CXXFLAGS += -std=c++11 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64
 CXXFLAGS += -I../include -I/usr/include/libshp
 
+OS:=$(shell uname -s)
+ifeq ($(OS),Darwin)
+  # atomic_bool workaround is a libc++ bug in current lib: http://stackoverflow.com/questions/14136128/clang-doesnt-know-stdatomic-bool-but-xcode-does
+	CXXFLAGS += -stdlib=libc++ -D"atomic_bool=atomic<bool>"
+	LDFLAGS += -stdlib=libc++
+endif
+
 # remove this if you do not want debugging to be compiled in
 CXXFLAGS += -DOSMIUM_WITH_DEBUG
 
