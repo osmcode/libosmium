@@ -22,6 +22,10 @@ if [ -z "$CXXFLAGS" ]; then
     CXXFLAGS="-g -std=c++11"
 fi
 
+if [ `uname -s` = 'Darwin' ]; then
+    CXXFLAGS="${CXXFLAGS} -stdlib=libc++"
+fi
+
 COMPILE="$CXX -I../include -I. $CXXFLAGS $CXXFLAGS_WARNINGS -o tests"
 
 if [ "x$1" = "x-v" ]; then
