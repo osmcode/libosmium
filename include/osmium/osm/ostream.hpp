@@ -37,6 +37,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/memory/item_type.hpp>
 #include <osmium/osm/types.hpp>
+#include <osmium/osm/tag.hpp>
 #include <osmium/osm/location.hpp>
 
 namespace osmium {
@@ -60,6 +61,11 @@ namespace osmium {
         } else {
             out << "(invalid, invalid)";
         }
+        return out;
+    }
+
+    inline std::ostream& operator<<(std::ostream& out, const Tag& tag) {
+        out << tag.key() << '=' << tag.value();
         return out;
     }
 
