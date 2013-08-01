@@ -101,8 +101,7 @@ More complete outlines of real .osm.pbf files can be created using the osmpbf-ou
 
 #include <osmium/io/output.hpp>
 #include <osmium/io/pbf.hpp>
-#include <osmium/utils/stringtable.hpp>
-#include <osmium/utils/delta.hpp>
+#include <osmium/io/pbf_stringtable.hpp>
 
 namespace osmium {
 
@@ -248,7 +247,7 @@ namespace osmium {
             uint32_t primitive_block_size;
 
             // StringTable management
-            osmium::StringTable string_table;
+            StringTable string_table;
 
             /// Buffer used while compressing blobs.
             std::unique_ptr<unsigned char[]> m_compression_buffer;
