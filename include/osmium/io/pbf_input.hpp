@@ -35,6 +35,7 @@ DEALINGS IN THE SOFTWARE.
 
 
 #include <algorithm>
+#include <atomic>
 #include <chrono>
 #include <sstream>
 #include <stdexcept>
@@ -571,7 +572,7 @@ namespace osmium {
             queue_type m_queue;
             const size_t m_max_queue_size;
             osmium::thread::Pool m_thread_pool;
-            std::atomic_bool m_done;
+            std::atomic<bool> m_done;
             std::thread m_reader;
 
             void parse_osm_data() {

@@ -35,6 +35,7 @@ DEALINGS IN THE SOFTWARE.
 
 #define OSMIUM_LINK_WITH_LIBS_EXPAT -lexpat
 
+#include <atomic>
 #include <chrono>
 #include <cstdio>
 #include <cstdlib>
@@ -436,7 +437,7 @@ namespace osmium {
             static constexpr size_t m_max_queue_size = 100;
 
             osmium::thread::Queue<osmium::memory::Buffer> m_queue;
-            std::atomic_bool m_done;
+            std::atomic<bool> m_done;
             std::thread m_reader;
             std::promise<osmium::io::Meta> m_meta_promise;
 

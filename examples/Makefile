@@ -21,8 +21,7 @@ CXXFLAGS += -I../include -I/usr/include/libshp
 
 OS:=$(shell uname -s)
 ifeq ($(OS),Darwin)
-  # atomic_bool workaround is a libc++ bug in current lib: http://stackoverflow.com/questions/14136128/clang-doesnt-know-stdatomic-bool-but-xcode-does
-	CXXFLAGS += -stdlib=libc++ -D"atomic_bool=atomic<bool>"
+	CXXFLAGS += -stdlib=libc++
 	LDFLAGS += -stdlib=libc++
 endif
 

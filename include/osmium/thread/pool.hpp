@@ -72,7 +72,7 @@ namespace osmium {
 
             };
 
-            std::atomic_bool m_done;
+            std::atomic<bool> m_done;
             osmium::thread::Queue<std::function<void()>> m_work_queue;
             std::vector<std::thread> m_threads;
             thread_joiner m_joiner;
