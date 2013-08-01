@@ -49,7 +49,7 @@ check-includes: $(INCLUDE_FILES)
 	for FILE in $(INCLUDE_FILES); do \
         flags=`./get_options.sh --cflags $${FILE}`; \
         eval eflags=$${flags}; \
-        compile="$(CXX) $(WARNINGFLAGS) -I include $${eflags} $${FILE}"; \
+        compile="$(CXX) $(CXXFLAGS) $(WARNINGFLAGS) -I include $${eflags} $${FILE}"; \
         echo "\n======== $${FILE}\n$${compile}" >>check-includes; \
         if `$${compile} 2>>check-includes`; then \
             echo "[OK] $${FILE}"; \
