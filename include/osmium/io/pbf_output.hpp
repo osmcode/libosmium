@@ -111,6 +111,34 @@ namespace osmium {
         class PBFOutput : public osmium::io::Output, public osmium::handler::Handler<PBFOutput> {
 
             /**
+            * This class models a variable that keeps track of the value
+            * it was last set to and returns the delta between old and
+            * new value from the update() call.
+            */
+            template <typename T>
+            class Delta {
+
+                T m_value;
+
+            public:
+
+                Delta() :
+                    m_value(0) {
+                }
+
+                void clear() {
+                    m_value = 0;
+                }
+
+                T update(T new_value) {
+                    using std::swap;
+                    swap(m_value, new_value);
+                    return m_value - new_value;
+                }
+
+            }; // class Delta
+
+            /**
              * Maximum number of items in a primitive block.
              *
              * The uncompressed length of a Blob *should* be less
