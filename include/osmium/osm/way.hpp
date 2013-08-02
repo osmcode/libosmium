@@ -114,7 +114,7 @@ namespace osmium {
             return m_location;
         }
 
-        void location(const Location location) {
+        void location(const Location& location) {
             m_location = location;
         }
 

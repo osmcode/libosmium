@@ -44,6 +44,7 @@ DEALINGS IN THE SOFTWARE.
 #include <utility>
 #include <vector>
 
+#include <osmium/io/utils.hpp>
 #include <osmium/io/input.hpp>
 #include <osmium/io/pbf.hpp>
 #include <osmium/osm/builder.hpp>
@@ -375,34 +376,16 @@ namespace osmium {
 
         namespace {
 
-            inline void read_from_fd(const int fd, unsigned char* input_buffer, const size_t size) {
-                size_t offset = 0;
-                while (offset < size) {
-                    ssize_t nread = ::read(fd, input_buffer + offset, size - offset);
-                    if (nread < 1) {
-                        throw std::runtime_error("read error");
-                    }
-                    offset += nread;
-                }
-            }
-
             /**
              * Read blob header by first reading the size and then the header
              *
              * @returns false for EOF, true otherwise
              */
             inline std::unique_ptr<OSMPBF::BlobHeader> read_blob_header(const int fd) {
-                uint32_t size_in_network_byte_order = 0;
-                uint32_t offset = 0;
+                uint32_t size_in_network_byte_order;
 
-                while (offset < sizeof(size_in_network_byte_order)) {
-                    ssize_t nread = ::read(fd, reinterpret_cast<char*>(&size_in_network_byte_order) + offset, sizeof(size_in_network_byte_order) - offset);
-                    if (nread < 0) {
-                        throw std::runtime_error("read error");
-                    } else if (nread == 0) {
-                        return nullptr; // EOF
-                    }
-                    offset += nread;
+                if (! osmium::io::detail::reliable_read(fd, reinterpret_cast<unsigned char*>(&size_in_network_byte_order), sizeof(size_in_network_byte_order))) {
+                    return nullptr; // EOF
                 }
 
                 uint32_t size = ntohl(size_in_network_byte_order);
@@ -413,7 +396,10 @@ namespace osmium {
                 }
 
                 std::unique_ptr<unsigned char[]> input_buffer(new unsigned char[size]);
-                read_from_fd(fd, input_buffer.get(), size);
+                if (! osmium::io::detail::reliable_read(fd, input_buffer.get(), size)) {
+                    // EOF
+                    throw std::runtime_error("read error (EOF)");
+                }
 
                 std::unique_ptr<OSMPBF::BlobHeader> pbf_blob_header { new OSMPBF::BlobHeader };
                 if (!pbf_blob_header->ParseFromArray(input_buffer.get(), size)) {
@@ -449,7 +435,10 @@ namespace osmium {
                     errmsg << "invalid blob size: " << size;
                     throw std::runtime_error(errmsg.str());
                 }
-                read_from_fd(fd, m_input_buffer, size);
+                if (! osmium::io::detail::reliable_read(fd, m_input_buffer, size)) {
+                    // EOF
+                    throw std::runtime_error("read error (EOF)");
+                }
             }
 
         public:
