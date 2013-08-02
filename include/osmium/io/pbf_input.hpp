@@ -374,43 +374,6 @@ namespace osmium {
 
         }; // class PBFPrimitiveBlockParser
 
-        namespace {
-
-            /**
-             * Read blob header by first reading the size and then the header
-             *
-             * @returns false for EOF, true otherwise
-             */
-            inline std::unique_ptr<OSMPBF::BlobHeader> read_blob_header(const int fd) {
-                uint32_t size_in_network_byte_order;
-
-                if (! osmium::io::detail::reliable_read(fd, reinterpret_cast<unsigned char*>(&size_in_network_byte_order), sizeof(size_in_network_byte_order))) {
-                    return nullptr; // EOF
-                }
-
-                uint32_t size = ntohl(size_in_network_byte_order);
-                if (size > static_cast<uint32_t>(OSMPBF::max_blob_header_size)) {
-                    std::ostringstream errmsg;
-                    errmsg << "BlobHeader size invalid:" << size;
-                    throw std::runtime_error(errmsg.str());
-                }
-
-                std::unique_ptr<unsigned char[]> input_buffer(new unsigned char[size]);
-                if (! osmium::io::detail::reliable_read(fd, input_buffer.get(), size)) {
-                    // EOF
-                    throw std::runtime_error("read error (EOF)");
-                }
-
-                std::unique_ptr<OSMPBF::BlobHeader> pbf_blob_header { new OSMPBF::BlobHeader };
-                if (!pbf_blob_header->ParseFromArray(input_buffer.get(), size)) {
-                    throw std::runtime_error("failed to parse BlobHeader");
-                }
-
-                return std::move(pbf_blob_header);
-            }
-
-        } // anonymous namespace
-
         typedef osmium::thread::SortedQueue<osmium::memory::Buffer> queue_type;
 
         template <class TDerived>
@@ -551,9 +514,6 @@ namespace osmium {
 
         /**
          * Class for parsing PBF files.
-         *
-         * Generally you are not supposed to instantiate this class yourself.
-         * Use the osmium::input::read() function instead.
          */
         class PBFInput : public osmium::io::Input {
 
@@ -563,15 +523,49 @@ namespace osmium {
             osmium::thread::Pool m_thread_pool;
             std::atomic<bool> m_done;
             std::thread m_reader;
+            OSMPBF::BlobHeader m_blob_header;
+            unsigned char m_blob_header_buffer[OSMPBF::max_blob_header_size];
+
+            /**
+             * Read BlobHeader by first reading the size and then the BlobHeader.
+             * The BlobHeader contains a type field (which is checked against
+             * the expected type) and a size field.
+             *
+             * @param fd File descriptor to read from.
+             * @param expected_type Expected type of data ("OSMHeader" or "OSMData").
+             * @return Size of the data read from BlobHeader (0 on EOF).
+             */
+            size_t read_blob_header(const int fd, const char* expected_type) {
+                uint32_t size_in_network_byte_order;
+
+                if (! osmium::io::detail::reliable_read(fd, reinterpret_cast<unsigned char*>(&size_in_network_byte_order), sizeof(size_in_network_byte_order))) {
+                    return 0; // EOF
+                }
+
+                uint32_t size = ntohl(size_in_network_byte_order);
+                if (size > static_cast<uint32_t>(OSMPBF::max_blob_header_size)) {
+                    throw std::runtime_error("Invalid BlobHeader size");
+                }
+
+                if (! osmium::io::detail::reliable_read(fd, m_blob_header_buffer, size)) {
+                    throw std::runtime_error("Read error.");
+                }
+
+                if (!m_blob_header.ParseFromArray(m_blob_header_buffer, size)) {
+                    throw std::runtime_error("Failed to parse BlobHeader.");
+                }
+
+                if (std::strcmp(m_blob_header.type().c_str(), expected_type)) {
+                    throw std::runtime_error("Blob does not have expected type (OSMHeader in first Blob, OSMData in following Blobs).");
+                }
+
+                return m_blob_header.datasize();
+            }
 
             void parse_osm_data() {
                 int n=0;
-                while (std::unique_ptr<OSMPBF::BlobHeader> pbf_blob_header = read_blob_header(fd())) {
-                    if (pbf_blob_header->type() != "OSMData") {
-                        throw std::runtime_error("Blob not OSMData");
-                    }
-
-                    DataBlobParser data_blob_parser(m_queue, pbf_blob_header->datasize(), n, fd());
+                while (size_t size = read_blob_header(fd(), "OSMData")) {
+                    DataBlobParser data_blob_parser(m_queue, size, n, fd());
 
                     if (m_num_threads == 0) {
                         // if there are no threads in the thread pool, we parse in this thread
@@ -620,13 +614,10 @@ namespace osmium {
             osmium::io::Meta read() override {
 
                 // handle OSMHeader
-                std::unique_ptr<OSMPBF::BlobHeader> pbf_blob_header = read_blob_header(fd());
-                if (pbf_blob_header->type() != "OSMHeader") {
-                    throw std::runtime_error("First Blob not OSMHeader");
-                }
+                size_t size = read_blob_header(fd(), "OSMHeader");
 
                 {
-                    HeaderBlobParser header_blob_parser(m_queue, pbf_blob_header->datasize(), fd(), meta());
+                    HeaderBlobParser header_blob_parser(m_queue, size, fd(), meta());
                     header_blob_parser();
                 }
 
