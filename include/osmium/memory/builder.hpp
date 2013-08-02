@@ -149,6 +149,13 @@ namespace osmium {
 
             ObjectBuilder(Buffer& buffer, Builder* parent=nullptr) :
                 Builder(buffer, parent, sizeof(T), item_traits<T>::itemtype) {
+
+                // First we initialize an empty object of class T in the buffer using its constructor.
+                // This will initialize everything in there thats specific to type T.
+                new (&item()) T();
+
+                // Then we initialize an Item on top of that with the right size and item_type.
+                new (&item()) osmium::memory::Item(sizeof(T), item_traits<T>::itemtype);
             }
 
             T& object() {
