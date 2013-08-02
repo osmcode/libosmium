@@ -28,21 +28,17 @@ void print_help() {
               << "  pbf     binary PBF encoding\n" \
               << "\nOptions:\n" \
               << "  -h, --help                This help message\n" \
-              << "  -d, --debug               Enable debugging output\n" \
               << "  -f, --from-format=FORMAT  Input format\n" \
               << "  -t, --to-format=FORMAT    Output format\n";
 }
 
 int main(int argc, char* argv[]) {
     static struct option long_options[] = {
-        {"debug",       no_argument, 0, 'd'},
         {"help",        no_argument, 0, 'h'},
         {"from-format", required_argument, 0, 'f'},
         {"to-format",   required_argument, 0, 't'},
         {0, 0, 0, 0}
     };
-
-    bool debug = false;
 
     std::string input_format;
     std::string output_format;
@@ -54,9 +50,6 @@ int main(int argc, char* argv[]) {
         }
 
         switch (c) {
-            case 'd':
-                debug = true;
-                break;
             case 'h':
                 print_help();
                 exit(0);
@@ -113,7 +106,6 @@ int main(int argc, char* argv[]) {
     }
 
     osmium::io::Writer writer(outfile);
-//    out.set_debug_level(debug ? 1 : 0);
     writer.set_generator("osmium_convert");
 
     osmium::io::Reader reader(infile);
