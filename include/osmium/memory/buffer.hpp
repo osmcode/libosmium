@@ -98,6 +98,14 @@ namespace osmium {
                 }
             }
 
+            Buffer(const Buffer&) = delete;
+            Buffer& operator=(const Buffer&) = delete;
+
+            Buffer(Buffer&&) = default;
+            Buffer& operator=(Buffer&&) = default;
+
+            ~Buffer() = default;
+
             char* data() const {
                 return m_data;
             }

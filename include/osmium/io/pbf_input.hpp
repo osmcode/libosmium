@@ -544,7 +544,7 @@ namespace osmium {
             void handle_blob(const void* data, const size_t size) {
                 PBFPrimitiveBlockParser parser(data, size);
                 osmium::memory::Buffer buffer = parser();
-                m_queue.push(buffer, m_blob_num);
+                m_queue.push(std::move(buffer), m_blob_num);
                 while (m_queue.full()) {
                     std::this_thread::sleep_for(std::chrono::milliseconds(10));
                 }

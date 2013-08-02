@@ -371,7 +371,7 @@ namespace osmium {
                         case context::top:
                             if (!strcmp(element, "osm") || !strcmp(element, "osmChange")) {
                                 m_context = context::root;
-                                m_queue.push(m_buffer);
+                                m_queue.push(std::move(m_buffer));
                                 m_queue.push(osmium::memory::Buffer()); // empty buffer to signify eof
                             } else if (!strcmp(element, "delete")) {
                                 m_in_delete_section = false;
@@ -420,7 +420,7 @@ namespace osmium {
 
             void flush_buffer() {
                 if (m_buffer.size() - m_buffer.committed() < 1000 * 1000) {
-                    m_queue.push(m_buffer);
+                    m_queue.push(std::move(m_buffer));
                     osmium::memory::Buffer buffer(new char[buffer_size], buffer_size, 0);
                     std::swap(m_buffer, buffer);
 
@@ -464,7 +464,7 @@ namespace osmium {
             osmium::io::Meta read() override {
                 XMLParser parser(fd(), m_queue, m_meta_promise);
 
-                m_reader = std::thread(parser);
+                m_reader = std::thread(std::move(parser));
 
                 // wait for meta
                 return m_meta_promise.get_future().get();
