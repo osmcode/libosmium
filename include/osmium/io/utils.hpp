@@ -34,6 +34,7 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <unistd.h>
+#include <stdexcept>
 
 namespace osmium {
 
