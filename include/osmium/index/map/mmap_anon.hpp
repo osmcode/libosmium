@@ -65,7 +65,7 @@ namespace osmium {
             * efficiently.
             */
             template <typename TValue>
-            class MmapAnon : public osmium::index::map::Base<TValue> {
+            class MmapAnon : public osmium::index::map::Map<TValue> {
 
                 uint64_t m_size;
 
@@ -80,7 +80,7 @@ namespace osmium {
                 * @exception std::bad_alloc Thrown when there is not enough memory.
                 */
                 MmapAnon() :
-                    Base<TValue>(),
+                    Map<TValue>(),
                     m_size(size_increment) {
                     m_items = static_cast<TValue*>(mmap(NULL, sizeof(TValue) * m_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0));
                     if (m_items == MAP_FAILED) {

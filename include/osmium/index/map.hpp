@@ -64,15 +64,15 @@ namespace osmium {
             * that much memory!
             */
             template <typename TValue>
-            class Base {
+            class Map {
 
-                Base(const Base&) = delete;
-                Base& operator=(const Base&) = delete;
+                Map(const Map&) = delete;
+                Map& operator=(const Map&) = delete;
 
             public:
 
-                Base() = default;
-                virtual ~Base() = default;
+                Map() = default;
+                virtual ~Map() = default;
 
                 /// The "value" type, usually a coordinates class or similar.
                 typedef TValue value_type;
@@ -106,7 +106,7 @@ namespace osmium {
                 */
                 virtual void clear() = 0;
 
-            }; // class Base
+            }; // class Map
 
         } // namespace map
 

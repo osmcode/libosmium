@@ -60,7 +60,7 @@ namespace osmium {
             * substantial amounts of memory for this to work efficiently.
             */
             template <typename TValue>
-            class MmapFile : public osmium::index::map::Base<TValue> {
+            class MmapFile : public osmium::index::map::Map<TValue> {
 
                 uint64_t m_size;
 
@@ -90,7 +90,7 @@ namespace osmium {
                 * @exception std::bad_alloc Thrown when there is not enough memory or some other problem.
                 */
                 MmapFile(const std::string& filename="", bool remove=true) :
-                    Base<TValue>(),
+                    Map<TValue>(),
                     m_size(1) {
                     if (filename == "") {
                         FILE* file = tmpfile();

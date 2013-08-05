@@ -55,7 +55,7 @@ namespace osmium {
             * This has very low memory overhead for small OSM datasets.
             */
             template <typename TValue>
-            class Vector : public osmium::index::map::Base<TValue> {
+            class Vector : public osmium::index::map::Map<TValue> {
 
                 struct item_t {
                     object_id_type id;
@@ -87,7 +87,7 @@ namespace osmium {
             public:
 
                 Vector() :
-                    Base<TValue>(),
+                    Map<TValue>(),
                     m_items() {
                 }
 

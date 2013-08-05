@@ -64,7 +64,7 @@ namespace osmium {
             * that much memory!
             */
             template <typename TValue>
-            class FixedArray : public osmium::index::map::Base<TValue> {
+            class FixedArray : public osmium::index::map::Map<TValue> {
 
                 uint64_t m_size;
 
@@ -79,7 +79,7 @@ namespace osmium {
                 * @exception std::bad_alloc Thrown when there is not enough memory.
                 */
                 FixedArray(const uint64_t max_id) :
-                    Base<TValue>(),
+                    Map<TValue>(),
                     m_size(max_id) {
                     m_items = static_cast<TValue*>(malloc(sizeof(TValue) * max_id));
                     if (!m_items) {

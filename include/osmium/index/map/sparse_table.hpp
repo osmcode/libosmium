@@ -53,7 +53,7 @@ namespace osmium {
             * country extracts).
             */
             template <typename TValue>
-            class SparseTable : public osmium::index::map::Base<TValue> {
+            class SparseTable : public osmium::index::map::Map<TValue> {
 
                 uint64_t m_grow_size;
 
@@ -69,7 +69,7 @@ namespace osmium {
                 *                  every time it runs out of space.
                 */
                 SparseTable(const uint64_t grow_size=10000) :
-                    Base<TValue>(),
+                    Map<TValue>(),
                     m_grow_size(grow_size),
                     m_items(grow_size) {
                 }
