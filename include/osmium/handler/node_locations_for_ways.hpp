@@ -1,5 +1,5 @@
-#ifndef OSMIUM_HANDLER_COORDINATES_FOR_WAYS_HPP
-#define OSMIUM_HANDLER_COORDINATES_FOR_WAYS_HPP
+#ifndef OSMIUM_HANDLER_NODE_LOCATIONS_FOR_WAYS_HPP
+#define OSMIUM_HANDLER_NODE_LOCATIONS_FOR_WAYS_HPP
 
 /*
 
@@ -48,7 +48,7 @@ namespace osmium {
          * @tparam TStorageNegIDs Same but for negative IDs.
          */
         template <class TStoragePosIDs, class TStorageNegIDs>
-        class CoordinatesForWays : public osmium::handler::Handler<CoordinatesForWays<TStoragePosIDs, TStorageNegIDs>> {
+        class NodeLocationsForWays : public osmium::handler::Handler<NodeLocationsForWays<TStoragePosIDs, TStorageNegIDs>> {
 
             /// Object that handles the actual storage of the node locations (with positive IDs).
             TStoragePosIDs& m_storage_pos;
@@ -58,17 +58,22 @@ namespace osmium {
 
         public:
 
-            CoordinatesForWays(TStoragePosIDs& storage_pos,
-                               TStorageNegIDs& storage_neg) :
+            NodeLocationsForWays(TStoragePosIDs& storage_pos,
+                                 TStorageNegIDs& storage_neg) :
                 m_storage_pos(storage_pos),
                 m_storage_neg(storage_neg) {
             }
+
+            NodeLocationsForWays(const NodeLocationsForWays&) = delete;
+            NodeLocationsForWays& operator=(const NodeLocationsForWays&) = delete;
+
+            ~NodeLocationsForWays() noexcept = default;
 
             /**
              * Store the location of the node in the storage.
              */
             void node(const osmium::Node& node) {
-                const int64_t id = node.id();
+                const osmium::object_id_type id = node.id();
                 if (id >= 0) {
                     m_storage_pos.set(id, node.location());
                 } else {
@@ -81,7 +86,10 @@ namespace osmium {
                 m_storage_neg.sort();
             }
 
-            osmium::Location get_node_location(const int64_t id) const {
+            /**
+             * Get location of node with given id.
+             */
+            osmium::Location get_node_location(const osmium::object_id_type id) const {
                 return id >= 0 ? m_storage_pos.get(id) : m_storage_neg.get(-id);
             }
 
@@ -95,10 +103,10 @@ namespace osmium {
                 }
             }
 
-        }; // class CoordinatesForWays
+        }; // class NodeLocationsForWays
 
     } // namespace handler
 
 } // namespace osmium
 
-#endif // OSMIUM_HANDLER_COORDINATES_FOR_WAYS_HPP
+#endif // OSMIUM_HANDLER_NODE_LOCATIONS_FOR_WAYS_HPP

@@ -22,7 +22,7 @@
 #include <osmium/index/map/std_map.hpp>
 #include <osmium/index/map/vector.hpp>
 
-#include <osmium/handler/coordinates_for_ways.hpp>
+#include <osmium/handler/node_locations_for_ways.hpp>
 
 #include <osmium/geom/ogr.hpp>
 #include <osmium/io/any_input.hpp>
@@ -30,7 +30,7 @@
 typedef osmium::index::map::Dummy<osmium::object_id_type, osmium::Location> index_neg_type;
 typedef osmium::index::map::SparseTable<osmium::object_id_type, osmium::Location> index_pos_type;
 
-typedef osmium::handler::CoordinatesForWays<index_pos_type, index_neg_type> cfw_handler_type;
+typedef osmium::handler::NodeLocationsForWays<index_pos_type, index_neg_type> location_handler_type;
 
 class MyOGRHandler : public osmium::handler::Handler<MyOGRHandler> {
 
@@ -258,14 +258,14 @@ int main(int argc, char* argv[]) {
 
     index_pos_type index_pos;
     index_neg_type index_neg;
-    cfw_handler_type cfw(index_pos, index_neg);
+    location_handler_type location_handler(index_pos, index_neg);
 
-    MyOGRHandler ogr(output_format, output_filename);
+    MyOGRHandler ogr_handler(output_format, output_filename);
 
-    reader.push(cfw, ogr);
+    reader.push(location_handler, ogr_handler);
 /*    while (osmium::memory::Buffer buffer = reader.read()) {
-        cfw(buffer);
-        ogr(buffer);
+        location_handler(buffer);
+        ogr_handler(buffer);
         delete[] buffer.data();
     }*/
 
