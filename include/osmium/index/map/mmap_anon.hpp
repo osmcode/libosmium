@@ -88,11 +88,11 @@ namespace osmium {
                     }
                 }
 
-                ~MmapAnon() {
+                ~MmapAnon() override final {
                     clear();
                 }
 
-                void set(const uint64_t id, const TValue value) {
+                void set(const uint64_t id, const TValue value) override final {
                     if (id >= m_size) {
                         uint64_t new_size = id + size_increment;
 
@@ -105,19 +105,19 @@ namespace osmium {
                     m_items[id] = value;
                 }
 
-                const TValue operator[](const uint64_t id) const {
+                const TValue operator[](const uint64_t id) const override final {
                     return m_items[id];
                 }
 
-                uint64_t size() const {
+                size_t size() const override final {
                     return m_size;
                 }
 
-                uint64_t used_memory() const {
+                size_t used_memory() const override final {
                     return m_size * sizeof(TValue);
                 }
 
-                void clear() {
+                void clear() override final {
                     munmap(m_items, sizeof(TValue) * m_size);
                 }
 

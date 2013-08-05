@@ -33,6 +33,7 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <cstddef>
 #include <cstdint>
 
 namespace osmium {
@@ -69,9 +70,15 @@ namespace osmium {
                 Map(const Map&) = delete;
                 Map& operator=(const Map&) = delete;
 
+            protected:
+
+                Map(Map&&) = default;
+                Map& operator=(Map&&) = default;
+
             public:
 
                 Map() = default;
+
                 virtual ~Map() = default;
 
                 /// The "value" type, usually a coordinates class or similar.
@@ -89,7 +96,7 @@ namespace osmium {
                 * accurate. You can not use this to find out how much memory the
                 * storage uses. Use used_memory() for that.
                 */
-                virtual uint64_t size() const = 0;
+                virtual size_t size() const = 0;
 
                 /**
                 * Get the memory used for this storage in bytes. Note that this
@@ -98,7 +105,7 @@ namespace osmium {
                 * the main memory used, for storage classes storing data on disk
                 * this is the memory used on disk.
                 */
-                virtual uint64_t used_memory() const = 0;
+                virtual size_t used_memory() const = 0;
 
                 /**
                 * Clear memory used for this storage. After this you can not

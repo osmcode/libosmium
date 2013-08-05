@@ -1,5 +1,5 @@
-#ifndef OSMIUM_INDEX_MAP_SPARSE_TABLE_HPP
-#define OSMIUM_INDEX_MAP_SPARSE_TABLE_HPP
+#ifndef OSMIUM_INDEX_MAP_STD_MAP_HPP
+#define OSMIUM_INDEX_MAP_STD_MAP_HPP
 
 /*
 
@@ -33,7 +33,7 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <google/sparsetable>
+#include <map>
 
 #include <osmium/index/map.hpp>
 
@@ -44,65 +44,48 @@ namespace osmium {
         namespace map {
 
             /**
-            * The SparseTable store stores items in a Google sparsetable,
-            * a data structure that can hold sparsly filled tables in a
-            * very space efficient way. It will resize automatically.
-            *
-            * Use this node location store if the ID space is only sparsly
-            * populated, such as when working with smaller OSM files (like
-            * country extracts).
-            */
+             * This implementation uses std::map internally. It uses rather a
+             * lot of memory, but might make sense for small maps.
+             */
             template <typename TValue>
-            class SparseTable : public osmium::index::map::Map<TValue> {
+            class StdMap : public osmium::index::map::Map<TValue> {
 
-                uint64_t m_grow_size;
+                // this is a rough estimate (pointers to left, right, and parent
+                // plus some overhead for color of red-black-tree or similar.)
+                static constexpr size_t element_overhead = sizeof(void*) * 4;
 
-                google::sparsetable<TValue> m_items;
+                std::map<uint64_t, TValue> m_map;
 
             public:
 
-                /**
-                * Constructor.
-                *
-                * @param grow_size The initial size of the storage (in items).
-                *                  The storage will grow by at least this size
-                *                  every time it runs out of space.
-                */
-                SparseTable(const uint64_t grow_size=10000) :
-                    Map<TValue>(),
-                    m_grow_size(grow_size),
-                    m_items(grow_size) {
+                StdMap() :
+                    Map<TValue>() {
                 }
 
-                ~SparseTable() override final {
+                ~StdMap() override final {
                 }
 
-                void set(const uint64_t id, const TValue value) override final {
-                    if (id >= m_items.size()) {
-                        m_items.resize(id + m_grow_size);
-                    }
-                    m_items[id] = value;
+                void set(const uint64_t id, const TValue value) const override final {
+                    m_map[id] = value;
                 }
 
                 const TValue operator[](const uint64_t id) const override final {
-                    return m_items[id];
+                    return m_map.at(id);
                 }
 
                 size_t size() const override final {
-                    return m_items.size();
+                    return m_map.size();
                 }
 
                 size_t used_memory() const override final {
-                    // unused items use 1 bit, used items sizeof(TValue) bytes
-                    // http://google-sparsehash.googlecode.com/svn/trunk/doc/sparsetable.html
-                    return (m_items.size() / 8) + (m_items.num_nonempty() * sizeof(TValue));
+                    return (sizeof(uint64_t) + sizeof(TValue) + element_overhead) * m_map.size();
                 }
 
-                void clear() override final {
-                    m_items.clear();
+                void clear() const override final {
+                    m_map.clear();
                 }
 
-            }; // class SparseTable
+            }; // class StdMap
 
         } // namespace map
 
@@ -110,4 +93,4 @@ namespace osmium {
 
 } // namespace osmium
 
-#endif // OSMIUM_INDEX_BYID_SPARSE_TABLE_HPP
+#endif // OSMIUM_INDEX_MAP_STD_MAP_HPP

@@ -34,7 +34,9 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <cstdlib>
+#include <memory>
 #include <new>
+#include <stdexcept>
 
 #include <osmium/index/map.hpp>
 
@@ -47,17 +49,16 @@ namespace osmium {
             /**
             * The FixedArray storage stores location in a huge array. The size of
             * the array is given when initializing the object, it must be large
-            * enough to hold all items.
+            * enough to hold all items. It is not possible to resize the array
+            * later.
             *
             * Only use this store when you know beforehand how many IDs there are.
-            * It is mainly provided for cases where the more flexible Mmap storage
-            * class does not work.
-            *
-            * There is no range checking on accessing the store.
+            * It is mainly provided for cases where the more flexible MmapAnon
+            * storage class does not work.
             *
             * If you are storing node coordinates, you'll need 8 bytes for each node.
-            * At the time of writing this, the largest node ID is about 1.3 billion,
-            * so you'll need about 10 GB of memory.
+            * At the time of writing this, the largest node ID is about 2.4 billion,
+            * so you'll need about 20 GB of memory.
             *
             * Note that this storage class will only work on 64 bit systems if
             * used for storing node coordinates. 32 bit systems just can't address
@@ -66,9 +67,9 @@ namespace osmium {
             template <typename TValue>
             class FixedArray : public osmium::index::map::Map<TValue> {
 
-                uint64_t m_size;
+                size_t m_size;
 
-                TValue* m_items;
+                std::unique_ptr<TValue[]> m_items;
 
             public:
 
@@ -80,36 +81,37 @@ namespace osmium {
                 */
                 FixedArray(const uint64_t max_id) :
                     Map<TValue>(),
-                    m_size(max_id) {
-                    m_items = static_cast<TValue*>(malloc(sizeof(TValue) * max_id));
-                    if (!m_items) {
-                        throw std::bad_alloc();
+                    m_size(max_id),
+                    m_items(new TValue[max_id]) {
+                }
+
+                ~FixedArray() override final {
+                }
+
+                void set(const uint64_t id, const TValue value) override final {
+                    if (id >= m_items) {
+                        throw std::out_of_range("ID outside of allowed range");
                     }
-                }
-
-                ~FixedArray() {
-                    clear();
-                }
-
-                void set(const uint64_t id, const TValue value) {
                     m_items[id] = value;
                 }
 
-                const TValue operator[](const uint64_t id) const {
+                const TValue operator[](const uint64_t id) const override final {
+                    if (id >= m_items) {
+                        throw std::out_of_range("ID outside of allowed range");
+                    }
                     return m_items[id];
                 }
 
-                uint64_t size() const {
+                size_t size() const override final {
                     return m_size;
                 }
 
-                uint64_t used_memory() const {
+                size_t used_memory() const override final {
                     return m_size * sizeof(TValue);
                 }
 
-                void clear() {
-                    free(m_items);
-                    m_items = NULL;
+                void clear() override final {
+                    m_items = nullptr;
                 }
 
             }; // class FixedArray

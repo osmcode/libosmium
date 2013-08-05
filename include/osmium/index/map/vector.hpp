@@ -91,11 +91,14 @@ namespace osmium {
                     m_items() {
                 }
 
-                void set(const uint64_t id, const TValue value) {
+                ~Vector() override final {
+                }
+
+                void set(const uint64_t id, const TValue value) override final {
                     m_items.push_back(item_t(id, value));
                 }
 
-                const TValue operator[](const uint64_t id) const {
+                const TValue operator[](const uint64_t id) const override final {
                     const item_t item(id);
                     const item_vector_it_t result = std::lower_bound(m_items.begin(), m_items.end(), item);
                     if (result == m_items.end() || *result != item) {
@@ -105,15 +108,15 @@ namespace osmium {
                     }
                 }
 
-                uint64_t size() const {
+                size_t size() const override final {
                     return m_items.size();
                 }
 
-                uint64_t used_memory() const {
+                size_t used_memory() const override final {
                     return size() * sizeof(item_t);
                 }
 
-                void clear() {
+                void clear() override final {
                     item_vector_t().swap(m_items);
                 }
 
