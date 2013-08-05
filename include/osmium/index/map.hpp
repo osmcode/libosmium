@@ -46,25 +46,32 @@ namespace osmium {
         namespace map {
 
             /**
-            * This abstract class defines an interface to storage classes
-            * intended for storing small pieces of data (such as coordinates)
-            * indexed by a positive object ID. The storage must be very
-            * space efficient and able to scale to billions of objects.
-            *
-            * Subclasses have different implementations that will store the
-            * data in different ways in memory and/or on disk. Some storage
-            * classes are better suited when working with the whole planet,
-            * some are better for data extracts.
-            *
-            * Note that these classes are not required to track "empty" fields.
-            * When reading data you have to be sure you have put something in
-            * there before.
-            *
-            * This storage class will only work on 64 bit systems if used for
-            * storing node coordinates. 32 bit systems just can't address
-            * that much memory!
-            */
-            template <typename TValue>
+             * This abstract class defines an interface to storage classes
+             * intended for storing small pieces of data (such as coordinates)
+             * indexed by a positive integer (such as an object ID). The
+             * storage must be very space efficient and able to scale to billions
+             * of objects.
+             *
+             * Subclasses have different implementations that store the
+             * data in different ways in memory and/or on disk. Some storage
+             * classes are better suited when working with the whole planet,
+             * some are better for data extracts.
+             *
+             * Note that these classes are not required to track "empty" fields.
+             * When reading data you have to be sure you have put something in
+             * there before.
+             *
+             * A typical use for this and derived classes is storage of node
+             * locations indexed by node ID. These indexes will only work
+             * on 64 bit systems if used in this case. 32 bit systems just
+             * can't address that much memory!
+             *
+             * @tparam TKey Key type, usually osmium::object_id_type, must be
+             *              an integral type.
+             * @tparam TValue Value type, usually osmium::Location or size_t.
+             *                Copied by value, so must be small type.
+             */
+            template <typename TKey, typename TValue>
             class Map {
 
                 Map(const Map&) = delete;
@@ -79,39 +86,47 @@ namespace osmium {
 
                 Map() = default;
 
-                virtual ~Map() = default;
+                virtual ~Map() noexcept = default;
 
                 /// The "value" type, usually a coordinates class or similar.
                 typedef TValue value_type;
 
                 /// Set the field with id to value.
-                virtual void set(const uint64_t id, const TValue value) = 0;
+                virtual void set(const TKey id, const TValue value) = 0;
 
                 /// Retrieve value by key. Does not check for overflow or empty fields.
-                virtual const TValue operator[](const uint64_t id) const = 0;
+                virtual const TValue get(const TKey id) const = 0;
 
                 /**
-                * Get the approximate number of items in the storage. The storage
-                * might allocate memory in blocks, so this size might not be
-                * accurate. You can not use this to find out how much memory the
-                * storage uses. Use used_memory() for that.
-                */
+                 * Get the approximate number of items in the storage. The storage
+                 * might allocate memory in blocks, so this size might not be
+                 * accurate. You can not use this to find out how much memory the
+                 * storage uses. Use used_memory() for that.
+                 */
                 virtual size_t size() const = 0;
 
                 /**
-                * Get the memory used for this storage in bytes. Note that this
-                * is not necessarily entirely accurate but an approximation.
-                * For storage classes that store the data in memory, this is
-                * the main memory used, for storage classes storing data on disk
-                * this is the memory used on disk.
-                */
+                 * Get the memory used for this storage in bytes. Note that this
+                 * is not necessarily entirely accurate but an approximation.
+                 * For storage classes that store the data in memory, this is
+                 * the main memory used, for storage classes storing data on disk
+                 * this is the memory used on disk.
+                 */
                 virtual size_t used_memory() const = 0;
 
                 /**
-                * Clear memory used for this storage. After this you can not
-                * use the storage container any more.
-                */
+                 * Clear memory used for this storage. After this you can not
+                 * use the storage container any more.
+                 */
                 virtual void clear() = 0;
+
+                /**
+                 * Sort data in map. Call this after writing all data and
+                 * before reading. Not all implementations need this.
+                 */
+                virtual void sort() {
+                    // default implementation is empty
+                }
 
             }; // class Map
 

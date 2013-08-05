@@ -33,6 +33,8 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <stdexcept>
+
 #include <google/sparsetable>
 
 #include <osmium/index/map.hpp>
@@ -52,10 +54,10 @@ namespace osmium {
             * populated, such as when working with smaller OSM files (like
             * country extracts).
             */
-            template <typename TValue>
-            class SparseTable : public osmium::index::map::Map<TValue> {
+            template <typename TKey, typename TValue>
+            class SparseTable : public osmium::index::map::Map<TKey, TValue> {
 
-                uint64_t m_grow_size;
+                TKey m_grow_size;
 
                 google::sparsetable<TValue> m_items;
 
@@ -68,23 +70,28 @@ namespace osmium {
                 *                  The storage will grow by at least this size
                 *                  every time it runs out of space.
                 */
-                SparseTable(const uint64_t grow_size=10000) :
-                    Map<TValue>(),
+                SparseTable(const TKey grow_size=10000) :
                     m_grow_size(grow_size),
                     m_items(grow_size) {
                 }
 
-                ~SparseTable() override final {
+                ~SparseTable() noexcept override final {
                 }
 
-                void set(const uint64_t id, const TValue value) override final {
-                    if (id >= m_items.size()) {
+                void set(const TKey id, const TValue value) override final {
+                    if (static_cast<size_t>(id) >= m_items.size()) {
                         m_items.resize(id + m_grow_size);
                     }
                     m_items[id] = value;
                 }
 
-                const TValue operator[](const uint64_t id) const override final {
+                const TValue get(const TKey id) const override final {
+                    if (static_cast<size_t>(id) >= m_items.size()) {
+                        throw std::out_of_range("Unknown ID");
+                    }
+                    if (m_items[id] == TValue()) {
+                        throw std::out_of_range("Unknown ID");
+                    }
                     return m_items[id];
                 }
 

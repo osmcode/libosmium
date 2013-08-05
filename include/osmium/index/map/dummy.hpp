@@ -48,23 +48,20 @@ namespace osmium {
              * Use this class if you don't need a map, but you
              * need an object that behaves like one.
              */
-            template <typename TValue>
-            class Dummy : public osmium::index::map::Map<TValue> {
+            template <typename TKey, typename TValue>
+            class Dummy : public osmium::index::map::Map<TKey, TValue> {
 
             public:
 
-                Dummy() :
-                    Map<TValue>() {
-                }
+                Dummy() = default;
 
-                ~Dummy() override final {
-                }
+                ~Dummy() noexcept override final = default;
 
-                void set(const uint64_t, const TValue) const override final {
+                void set(const TKey, const TValue) override final {
                     // intentionally left blank
                 }
 
-                const TValue operator[](const uint64_t id) const override final {
+                const TValue get(const TKey) const override final {
                     throw std::out_of_range("ID doesn't exist");
                 }
 
@@ -76,11 +73,11 @@ namespace osmium {
                     return 0;
                 }
 
-                void clear() const override final {
+                void clear() override final {
                 }
 
             }; // class Dummy
-    
+
         } // namespace map
 
     } // namespace index

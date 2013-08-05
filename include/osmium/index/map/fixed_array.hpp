@@ -64,8 +64,8 @@ namespace osmium {
             * used for storing node coordinates. 32 bit systems just can't address
             * that much memory!
             */
-            template <typename TValue>
-            class FixedArray : public osmium::index::map::Map<TValue> {
+            template <typename TKey, typename TValue>
+            class FixedArray : public osmium::index::map::Map<TKey, TValue> {
 
                 size_t m_size;
 
@@ -79,25 +79,27 @@ namespace osmium {
                 * @param max_id One larger than the largest ID you will ever have.
                 * @exception std::bad_alloc Thrown when there is not enough memory.
                 */
-                FixedArray(const uint64_t max_id) :
-                    Map<TValue>(),
+                FixedArray(const size_t max_id) :
                     m_size(max_id),
                     m_items(new TValue[max_id]) {
                 }
 
-                ~FixedArray() override final {
+                ~FixedArray() noexcept override final {
                 }
 
-                void set(const uint64_t id, const TValue value) override final {
-                    if (id >= m_items) {
+                void set(const TKey id, const TValue value) override final {
+                    if (static_cast<size_t>(id) >= m_size) {
                         throw std::out_of_range("ID outside of allowed range");
                     }
                     m_items[id] = value;
                 }
 
-                const TValue operator[](const uint64_t id) const override final {
-                    if (id >= m_items) {
+                const TValue get(const TKey id) const override final {
+                    if (static_cast<size_t>(id) >= m_size) {
                         throw std::out_of_range("ID outside of allowed range");
+                    }
+                    if (m_items[id] == TValue()) {
+                        throw std::out_of_range("Unknown ID");
                     }
                     return m_items[id];
                 }
@@ -112,6 +114,7 @@ namespace osmium {
 
                 void clear() override final {
                     m_items = nullptr;
+                    m_size = 0;
                 }
 
             }; // class FixedArray

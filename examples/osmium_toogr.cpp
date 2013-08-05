@@ -13,18 +13,24 @@
 #include <ogr_api.h>
 #include <ogrsf_frmts.h>
 
+// usually you only need one or two of these
+#include <osmium/index/map/dummy.hpp>
+#include <osmium/index/map/fixed_array.hpp>
+#include <osmium/index/map/mmap_anon.hpp>
+#include <osmium/index/map/mmap_file.hpp>
 #include <osmium/index/map/sparse_table.hpp>
-//#include <osmium/index/map/mmap_file.hpp>
+#include <osmium/index/map/std_map.hpp>
+#include <osmium/index/map/vector.hpp>
 
 #include <osmium/handler/coordinates_for_ways.hpp>
 
 #include <osmium/geom/ogr.hpp>
 #include <osmium/io/any_input.hpp>
 
-typedef osmium::index::map::SparseTable<osmium::Location> index_type;
-//typedef osmium::index::map::MmapFile<osmium::Location> index_type;
+typedef osmium::index::map::Dummy<osmium::object_id_type, osmium::Location> index_neg_type;
+typedef osmium::index::map::SparseTable<osmium::object_id_type, osmium::Location> index_pos_type;
 
-typedef osmium::handler::CoordinatesForWays<index_type, index_type> cfw_handler_type;
+typedef osmium::handler::CoordinatesForWays<index_pos_type, index_neg_type> cfw_handler_type;
 
 class MyOGRHandler : public osmium::handler::Handler<MyOGRHandler> {
 
@@ -78,7 +84,7 @@ public:
 
         /* Transactions might make things faster, then again they might not.
            Feel free to experiment and benchmark and report back. */
-//        m_layer_point->StartTransaction();
+        m_layer_point->StartTransaction();
 
         m_layer_linestring = m_data_source->CreateLayer("roads", &sparef, wkbLineString, NULL);
         if (m_layer_linestring == NULL) {
@@ -102,7 +108,7 @@ public:
             exit(1);
         }
 
-//        m_layer_linestring->StartTransaction();
+        m_layer_linestring->StartTransaction();
     }
 
     ~MyOGRHandler() {
@@ -128,11 +134,9 @@ public:
         }
     }
 
-#if 0
     void after_nodes() {
-//        m_layer_point->CommitTransaction();
+        m_layer_point->CommitTransaction();
     }
-#endif
 
     void way(const osmium::Way& way) {
         const char* highway = way.tags().get_value_by_key("highway");
@@ -158,11 +162,9 @@ public:
         }
     }
 
-#if 0
-//    void after_ways() {
-//        m_layer_linestring->CommitTransaction();
-//    }
-#endif
+    void after_ways() {
+        m_layer_linestring->CommitTransaction();
+    }
 
     void init() const {
         std::cerr << "init\n";
@@ -254,8 +256,8 @@ int main(int argc, char* argv[]) {
     osmium::io::Reader reader(input_filename);
     osmium::io::Meta meta = reader.open();
 
-    index_type index_pos;
-    index_type index_neg;
+    index_pos_type index_pos;
+    index_neg_type index_neg;
     cfw_handler_type cfw(index_pos, index_neg);
 
     MyOGRHandler ogr(output_format, output_filename);

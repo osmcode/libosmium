@@ -40,6 +40,7 @@ DEALINGS IN THE SOFTWARE.
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <stdexcept>
 #include <string>
 
 #include <osmium/index/map.hpp>
@@ -59,8 +60,8 @@ namespace osmium {
             * data to persist, use this version. Note that in any case you need
             * substantial amounts of memory for this to work efficiently.
             */
-            template <typename TValue>
-            class MmapFile : public osmium::index::map::Map<TValue> {
+            template <typename TKey, typename TValue>
+            class MmapFile : public osmium::index::map::Map<TKey, TValue> {
 
                 uint64_t m_size;
 
@@ -90,7 +91,6 @@ namespace osmium {
                 * @exception std::bad_alloc Thrown when there is not enough memory or some other problem.
                 */
                 MmapFile(const std::string& filename="", bool remove=true) :
-                    Map<TValue>(),
                     m_size(1) {
                     if (filename == "") {
                         FILE* file = tmpfile();
@@ -125,14 +125,14 @@ namespace osmium {
                     if (m_items == MAP_FAILED) {
                         throw std::bad_alloc();
                     }
+                    new (m_items) TValue[m_size];
                 }
 
-                ~MmapFile() override final {
-                    clear();
+                ~MmapFile() noexcept override final {
                 }
 
-                void set(const uint64_t id, const TValue value) override final {
-                    if (id >= m_size) {
+                void set(const TKey id, const TValue value) override final {
+                    if (static_cast<size_t>(id) >= m_size) {
                         uint64_t new_size = id + size_increment;
 
                         // if the file backing this mmap is smaller than needed, increase its size
@@ -149,12 +149,19 @@ namespace osmium {
                         if (m_items == MAP_FAILED) {
                             throw std::bad_alloc();
                         }
+                        new (m_items + m_size) TValue[new_size - m_size];
                         m_size = new_size;
                     }
                     m_items[id] = value;
                 }
 
-                const TValue operator[](const uint64_t id) const override final {
+                const TValue get(const TKey id) const override final {
+                    if (static_cast<size_t>(id) >= m_size) {
+                        throw std::out_of_range("ID outside of allowed range");
+                    }
+                    if (m_items[id] == TValue()) {
+                        throw std::out_of_range("Unknown ID");
+                    }
                     return m_items[id];
                 }
 
@@ -168,6 +175,8 @@ namespace osmium {
 
                 void clear() override final {
                     munmap(m_items, sizeof(TValue) * m_size);
+                    m_items = nullptr;
+                    m_size = 0;
                 }
 
             }; // class MmapFile

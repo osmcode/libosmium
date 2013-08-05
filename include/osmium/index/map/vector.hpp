@@ -34,6 +34,7 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <algorithm>
+#include <stdexcept>
 #include <utility>
 #include <vector>
 
@@ -47,15 +48,17 @@ namespace osmium {
         namespace map {
 
             /**
-            * This class uses a vector of ID/Value pairs to store the
+            * This class uses a vector of TKey/TValue pairs to store the
             * data. The vector must be filled ordered by ID (OSM files
-            * are generally ordered that way, so thats usually not a
-            * problem). Lookup uses a binary search.
+            * are generally ordered that way, so that is usually not a
+            * problem). If the vector is not filled in order, the sort()
+            * method must be called before reading values back. Lookup
+            * uses a binary search.
             *
             * This has very low memory overhead for small OSM datasets.
             */
-            template <typename TValue>
-            class Vector : public osmium::index::map::Map<TValue> {
+            template <typename TKey, typename TValue>
+            class Vector : public osmium::index::map::Map<TKey, TValue> {
 
                 struct item_t {
                     object_id_type id;
@@ -86,23 +89,19 @@ namespace osmium {
 
             public:
 
-                Vector() :
-                    Map<TValue>(),
-                    m_items() {
-                }
+                Vector() = default;
 
-                ~Vector() override final {
-                }
+                ~Vector() noexcept override final = default;
 
-                void set(const uint64_t id, const TValue value) override final {
+                void set(const TKey id, const TValue value) override final {
                     m_items.push_back(item_t(id, value));
                 }
 
-                const TValue operator[](const uint64_t id) const override final {
+                const TValue get(const TKey id) const override final {
                     const item_t item(id);
                     const item_vector_it_t result = std::lower_bound(m_items.begin(), m_items.end(), item);
                     if (result == m_items.end() || *result != item) {
-                        return TValue(); // nothing found
+                        throw std::out_of_range("Unknown ID");
                     } else {
                         return result->value;
                     }
@@ -117,7 +116,12 @@ namespace osmium {
                 }
 
                 void clear() override final {
-                    item_vector_t().swap(m_items);
+                    m_items.clear();
+                    m_items.shrink_to_fit();
+                }
+
+                void sort() override final {
+                    std::sort(m_items.begin(), m_items.end());
                 }
 
             }; // class Vector

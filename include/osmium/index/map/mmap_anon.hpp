@@ -38,6 +38,7 @@ DEALINGS IN THE SOFTWARE.
 #include <cstdlib>
 #include <fcntl.h>
 #include <new>
+#include <stdexcept>
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -64,48 +65,54 @@ namespace osmium {
             * case you need substantial amounts of memory for this to work
             * efficiently.
             */
-            template <typename TValue>
-            class MmapAnon : public osmium::index::map::Map<TValue> {
+            template <typename TKey, typename TValue>
+            class MmapAnon : public osmium::index::map::Map<TKey, TValue> {
 
-                uint64_t m_size;
+                size_t m_size;
 
                 TValue* m_items;
 
             public:
 
-                static const uint64_t size_increment = 10 * 1024 * 1024;
+                static constexpr size_t size_increment = 10 * 1024 * 1024;
 
                 /**
                 * Create anonymous mapping without a backing file.
                 * @exception std::bad_alloc Thrown when there is not enough memory.
                 */
                 MmapAnon() :
-                    Map<TValue>(),
                     m_size(size_increment) {
                     m_items = static_cast<TValue*>(mmap(NULL, sizeof(TValue) * m_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0));
                     if (m_items == MAP_FAILED) {
                         throw std::bad_alloc();
                     }
+                    new (m_items) TValue[m_size];
                 }
 
-                ~MmapAnon() override final {
-                    clear();
+                ~MmapAnon() noexcept override final {
                 }
 
-                void set(const uint64_t id, const TValue value) override final {
-                    if (id >= m_size) {
-                        uint64_t new_size = id + size_increment;
+                void set(const TKey id, const TValue value) override final {
+                    if (static_cast<size_t>(id) >= m_size) {
+                        size_t new_size = id + size_increment;
 
                         m_items = static_cast<TValue*>(mremap(m_items, sizeof(TValue) * m_size, sizeof(TValue) * new_size, MREMAP_MAYMOVE));
                         if (m_items == MAP_FAILED) {
                             throw std::bad_alloc();
                         }
+                        new (m_items + m_size) TValue[new_size - m_size];
                         m_size = new_size;
                     }
                     m_items[id] = value;
                 }
 
-                const TValue operator[](const uint64_t id) const override final {
+                const TValue get(const TKey id) const override final {
+                    if (static_cast<size_t>(id) >= m_size) {
+                        throw std::out_of_range("ID outside of allowed range");
+                    }
+                    if (m_items[id] == TValue()) {
+                        throw std::out_of_range("Unknown ID");
+                    }
                     return m_items[id];
                 }
 
@@ -119,6 +126,8 @@ namespace osmium {
 
                 void clear() override final {
                     munmap(m_items, sizeof(TValue) * m_size);
+                    m_items = nullptr;
+                    m_size = 0;
                 }
 
             }; // class MmapAnon

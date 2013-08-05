@@ -43,8 +43,8 @@ namespace osmium {
          * Handler to retrieve locations from nodes and add them to ways.
          *
          * @tparam TStoragePosIDs Class that handles the actual storage of the node locations
-         *                        (for positive IDs). It must support the set(id, value) method
-         *                        and operator[] for reading a value.
+         *                        (for positive IDs). It must support the set(id, value) and
+         *                        get(id) methods.
          * @tparam TStorageNegIDs Same but for negative IDs.
          */
         template <class TStoragePosIDs, class TStorageNegIDs>
@@ -76,8 +76,13 @@ namespace osmium {
                 }
             }
 
+            void after_nodes() {
+                m_storage_pos.sort();
+                m_storage_neg.sort();
+            }
+
             osmium::Location get_node_location(const int64_t id) const {
-                return id >= 0 ? m_storage_pos[id] : m_storage_neg[-id];
+                return id >= 0 ? m_storage_pos.get(id) : m_storage_neg.get(-id);
             }
 
             /**

@@ -47,29 +47,28 @@ namespace osmium {
              * This implementation uses std::map internally. It uses rather a
              * lot of memory, but might make sense for small maps.
              */
-            template <typename TValue>
-            class StdMap : public osmium::index::map::Map<TValue> {
+            template <typename TKey, typename TValue>
+            class StdMap : public osmium::index::map::Map<TKey, TValue> {
 
-                // this is a rough estimate (pointers to left, right, and parent
-                // plus some overhead for color of red-black-tree or similar.)
-                static constexpr size_t element_overhead = sizeof(void*) * 4;
+                // This is a rough estimate for the memory needed for each
+                // element in the map (key + value + pointers to left, right,
+                // and parent plus some overhead for color of red-black-tree
+                // or similar).
+                static constexpr size_t element_size = sizeof(TKey) + sizeof(TValue) + sizeof(void*) * 4;
 
-                std::map<uint64_t, TValue> m_map;
+                std::map<TKey, TValue> m_map;
 
             public:
 
-                StdMap() :
-                    Map<TValue>() {
-                }
+                StdMap() = default;
 
-                ~StdMap() override final {
-                }
+                ~StdMap() noexcept override final = default;
 
-                void set(const uint64_t id, const TValue value) const override final {
+                void set(const TKey id, const TValue value) override final {
                     m_map[id] = value;
                 }
 
-                const TValue operator[](const uint64_t id) const override final {
+                const TValue get(const TKey id) const override final {
                     return m_map.at(id);
                 }
 
@@ -78,10 +77,10 @@ namespace osmium {
                 }
 
                 size_t used_memory() const override final {
-                    return (sizeof(uint64_t) + sizeof(TValue) + element_overhead) * m_map.size();
+                    return element_size * m_map.size();
                 }
 
-                void clear() const override final {
+                void clear() override final {
                     m_map.clear();
                 }
 
