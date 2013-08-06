@@ -34,8 +34,10 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <map>
+#include <vector>
 
 #include <osmium/index/map.hpp>
+#include <osmium/io/utils.hpp>
 
 namespace osmium {
 
@@ -56,7 +58,7 @@ namespace osmium {
                 // or similar).
                 static constexpr size_t element_size = sizeof(TKey) + sizeof(TValue) + sizeof(void*) * 4;
 
-                std::map<TKey, TValue> m_map;
+                std::map<TKey, TValue> m_elements;
 
             public:
 
@@ -65,23 +67,30 @@ namespace osmium {
                 ~StdMap() noexcept override final = default;
 
                 void set(const TKey id, const TValue value) override final {
-                    m_map[id] = value;
+                    m_elements[id] = value;
                 }
 
                 const TValue get(const TKey id) const override final {
-                    return m_map.at(id);
+                    return m_elements.at(id);
                 }
 
                 size_t size() const override final {
-                    return m_map.size();
+                    return m_elements.size();
                 }
 
                 size_t used_memory() const override final {
-                    return element_size * m_map.size();
+                    return element_size * m_elements.size();
                 }
 
                 void clear() override final {
-                    m_map.clear();
+                    m_elements.clear();
+                }
+
+                void dump_as_list(const int fd) const {
+                    typedef typename std::map<TKey, TValue>::value_type t;
+                    std::vector<t> v;
+                    std::copy(m_elements.begin(), m_elements.end(), std::back_inserter(v));
+                    osmium::io::detail::reliable_write(fd, reinterpret_cast<const char*>(v.data()), sizeof(t) * v.size());
                 }
 
             }; // class StdMap

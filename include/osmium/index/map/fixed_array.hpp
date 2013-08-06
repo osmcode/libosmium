@@ -39,6 +39,7 @@ DEALINGS IN THE SOFTWARE.
 #include <stdexcept>
 
 #include <osmium/index/map.hpp>
+#include <osmium/io/utils.hpp>
 
 namespace osmium {
 
@@ -115,6 +116,10 @@ namespace osmium {
                 void clear() override final {
                     m_items = nullptr;
                     m_size = 0;
+                }
+
+                void dump_as_array(const int fd) const {
+                    osmium::io::detail::reliable_write(fd, m_items, sizeof(TValue) * m_size);
                 }
 
             }; // class FixedArray

@@ -29,6 +29,8 @@
 
 typedef osmium::index::map::Dummy<osmium::object_id_type, osmium::Location> index_neg_type;
 typedef osmium::index::map::SparseTable<osmium::object_id_type, osmium::Location> index_pos_type;
+//typedef osmium::index::map::StdMap<osmium::object_id_type, osmium::Location> index_pos_type;
+//typedef osmium::index::map::Vector<osmium::object_id_type, osmium::Location> index_pos_type;
 
 typedef osmium::handler::NodeLocationsForWays<index_pos_type, index_neg_type> location_handler_type;
 
@@ -270,5 +272,12 @@ int main(int argc, char* argv[]) {
     }*/
 
     google::protobuf::ShutdownProtobufLibrary();
+
+    int locations_fd = open("locations.dump", O_WRONLY | O_CREAT, 0644);
+    if (locations_fd < 0) {
+        throw std::system_error(errno, std::system_category(), "Open failed");
+    }
+    index_pos.dump_as_list(locations_fd);
+    close(locations_fd);
 }
 

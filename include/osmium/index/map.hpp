@@ -84,6 +84,9 @@ namespace osmium {
 
             public:
 
+                typedef TKey key_type;
+                typedef TValue mapped_type;
+
                 Map() = default;
 
                 virtual ~Map() noexcept = default;

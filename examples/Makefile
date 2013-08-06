@@ -44,6 +44,7 @@ LIB_XML2   := $(shell xml2-config --libs)
 PROGRAMS := \
     osmium_convert \
     osmium_debug \
+    osmium_index \
     osmium_read \
     osmium_toogr
 #    osmium_find_bbox \
@@ -71,6 +72,9 @@ osmium_convert: osmium_convert.cpp
 
 osmium_debug: osmium_debug.cpp
 	$(CXX) $(CXXFLAGS) $(CXXFLAGS_WARNINGS) -o $@ $< $(LDFLAGS) $(LIB_EXPAT) $(LIB_PBF)
+
+osmium_index: osmium_index.cpp
+	$(CXX) $(CXXFLAGS) $(CXXFLAGS_WARNINGS) -o $@ $< $(LDFLAGS) -lboost_program_options
 
 osmium_read: osmium_read.cpp
 	$(CXX) $(CXXFLAGS) $(CXXFLAGS_WARNINGS) -o $@ $< $(LDFLAGS) $(LIB_EXPAT) $(LIB_PBF)

@@ -34,10 +34,12 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <stdexcept>
+#include <vector>
 
 #include <google/sparsetable>
 
 #include <osmium/index/map.hpp>
+#include <osmium/io/utils.hpp>
 
 namespace osmium {
 
@@ -59,7 +61,7 @@ namespace osmium {
 
                 TKey m_grow_size;
 
-                google::sparsetable<TValue> m_items;
+                google::sparsetable<TValue> m_elements;
 
             public:
 
@@ -72,41 +74,53 @@ namespace osmium {
                 */
                 SparseTable(const TKey grow_size=10000) :
                     m_grow_size(grow_size),
-                    m_items(grow_size) {
+                    m_elements(grow_size) {
                 }
 
                 ~SparseTable() noexcept override final {
                 }
 
                 void set(const TKey id, const TValue value) override final {
-                    if (static_cast<size_t>(id) >= m_items.size()) {
-                        m_items.resize(id + m_grow_size);
+                    if (static_cast<size_t>(id) >= m_elements.size()) {
+                        m_elements.resize(id + m_grow_size);
                     }
-                    m_items[id] = value;
+                    m_elements[id] = value;
                 }
 
                 const TValue get(const TKey id) const override final {
-                    if (static_cast<size_t>(id) >= m_items.size()) {
+                    if (static_cast<size_t>(id) >= m_elements.size()) {
                         throw std::out_of_range("Unknown ID");
                     }
-                    if (m_items[id] == TValue()) {
+                    if (m_elements[id] == TValue()) {
                         throw std::out_of_range("Unknown ID");
                     }
-                    return m_items[id];
+                    return m_elements[id];
                 }
 
                 size_t size() const override final {
-                    return m_items.size();
+                    return m_elements.size();
                 }
 
                 size_t used_memory() const override final {
                     // unused items use 1 bit, used items sizeof(TValue) bytes
                     // http://google-sparsehash.googlecode.com/svn/trunk/doc/sparsetable.html
-                    return (m_items.size() / 8) + (m_items.num_nonempty() * sizeof(TValue));
+                    return (m_elements.size() / 8) + (m_elements.num_nonempty() * sizeof(TValue));
                 }
 
                 void clear() override final {
-                    m_items.clear();
+                    m_elements.clear();
+                }
+
+                void dump_as_list(const int fd) const {
+                    std::vector<std::pair<TKey, TValue>> v;
+                    int n=0;
+                    for (const TValue value : m_elements) {
+                        if (value != TValue()) {
+                            v.push_back(std::make_pair(n, value));
+                        }
+                        ++n;
+                    }
+                    osmium::io::detail::reliable_write(fd, reinterpret_cast<const char*>(v.data()), sizeof(std::pair<TKey, TValue>) * v.size());
                 }
 
             }; // class SparseTable

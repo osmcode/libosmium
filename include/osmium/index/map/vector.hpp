@@ -40,6 +40,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/osm/types.hpp>
 #include <osmium/index/map.hpp>
+#include <osmium/io/utils.hpp>
 
 namespace osmium {
 
@@ -60,32 +61,29 @@ namespace osmium {
             template <typename TKey, typename TValue>
             class Vector : public osmium::index::map::Map<TKey, TValue> {
 
-                struct item_t {
-                    object_id_type id;
+                struct element_type {
+                    TKey id;
                     TValue value;
 
-                    item_t(object_id_type i, TValue v = TValue()) :
+                    element_type(TKey i, TValue v = TValue()) :
                         id(i),
                         value(v) {
                     }
 
-                    bool operator<(const item_t& other) const {
+                    bool operator<(const element_type& other) const {
                         return this->id < other.id;
                     }
 
-                    bool operator==(const item_t& other) const {
+                    bool operator==(const element_type& other) const {
                         return this->id == other.id;
                     }
 
-                    bool operator!=(const item_t& other) const {
+                    bool operator!=(const element_type& other) const {
                         return !(*this == other);
                     }
                 };
 
-                typedef std::vector<item_t> item_vector_t;
-                typedef typename item_vector_t::const_iterator item_vector_it_t;
-
-                item_vector_t m_items;
+                std::vector<element_type> m_elements;
 
             public:
 
@@ -94,13 +92,13 @@ namespace osmium {
                 ~Vector() noexcept override final = default;
 
                 void set(const TKey id, const TValue value) override final {
-                    m_items.push_back(item_t(id, value));
+                    m_elements.push_back(element_type(id, value));
                 }
 
                 const TValue get(const TKey id) const override final {
-                    const item_t item(id);
-                    const item_vector_it_t result = std::lower_bound(m_items.begin(), m_items.end(), item);
-                    if (result == m_items.end() || *result != item) {
+                    const element_type item(id);
+                    const auto result = std::lower_bound(m_elements.begin(), m_elements.end(), item);
+                    if (result == m_elements.end() || *result != item) {
                         throw std::out_of_range("Unknown ID");
                     } else {
                         return result->value;
@@ -108,20 +106,24 @@ namespace osmium {
                 }
 
                 size_t size() const override final {
-                    return m_items.size();
+                    return m_elements.size();
                 }
 
                 size_t used_memory() const override final {
-                    return size() * sizeof(item_t);
+                    return size() * sizeof(element_type);
                 }
 
                 void clear() override final {
-                    m_items.clear();
-                    m_items.shrink_to_fit();
+                    m_elements.clear();
+                    m_elements.shrink_to_fit();
                 }
 
                 void sort() override final {
-                    std::sort(m_items.begin(), m_items.end());
+                    std::sort(m_elements.begin(), m_elements.end());
+                }
+
+                void dump_as_list(const int fd) const {
+                    osmium::io::detail::reliable_write(fd, reinterpret_cast<const char*>(m_elements.data()), sizeof(element_type) * m_elements.size());
                 }
 
             }; // class Vector
