@@ -34,7 +34,7 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <unistd.h>
-#include <stdexcept>
+#include <system_error>
 
 namespace osmium {
 
@@ -43,15 +43,21 @@ namespace osmium {
         namespace detail {
 
             /**
-             * Reads the given number of bytes into the input buffer. Throws on error.
-             * Returns true when everything was okay, returns false on EOF.
+             * Reads the given number of bytes into the input buffer. 
+             * This is basically just a wrapper around read(2).
+             *
+             * @param fd File descriptor.
+             * @param input_buffer Buffer with data of at least size.
+             * @param size Number of bytes to be written.
+             * @return True when read was successful, false on EOF.
+             * @exception std::system_error On error.
              */
             inline bool reliable_read(const int fd, unsigned char* input_buffer, const size_t size) {
                 size_t offset = 0;
                 while (offset < size) {
                     ssize_t nread = ::read(fd, input_buffer + offset, size - offset);
                     if (nread < 0) {
-                        throw std::runtime_error("read error");
+                        throw std::system_error(errno, std::system_category(), "Read failed");
                     }
                     if (nread == 0) {
                         return false;
@@ -59,6 +65,26 @@ namespace osmium {
                     offset += nread;
                 }
                 return true;
+            }
+
+            /**
+             * Writes the given number of bytes from the output_buffer to the file descriptor.
+             * This is just a wrapper around write(2).
+             *
+             * @param fd File descriptor.
+             * @param output_buffer Buffer where data is written. Must be at least size bytes long.
+             * @param size Number of bytes to be read.
+             * @exception std::system_error On error.
+             */
+            inline void reliable_write(const int fd, const char* output_buffer, const size_t size) {
+                size_t offset = 0;
+                do {
+                    ssize_t length = ::write(fd, output_buffer + offset, size - offset);
+                    if (length < 0) {
+                        throw std::system_error(errno, std::system_category(), "Write failed");
+                    }
+                    offset += length;
+                } while (offset < size);
             }
 
         } // namespace detail
