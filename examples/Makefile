@@ -40,6 +40,7 @@ LIB_GEOS   := $(shell geos-config --libs)
 LIB_OGR    := $(shell gdal-config --libs)
 LIB_SHAPE  := -lshp $(LIB_GEOS)
 LIB_XML2   := $(shell xml2-config --libs)
+LIB_PRGOPT := -static -lboost_program_options
 
 PROGRAMS := \
     osmium_convert \
@@ -74,7 +75,7 @@ osmium_debug: osmium_debug.cpp
 	$(CXX) $(CXXFLAGS) $(CXXFLAGS_WARNINGS) -o $@ $< $(LDFLAGS) $(LIB_EXPAT) $(LIB_PBF)
 
 osmium_index: osmium_index.cpp
-	$(CXX) $(CXXFLAGS) $(CXXFLAGS_WARNINGS) -o $@ $< $(LDFLAGS) -lboost_program_options
+	$(CXX) $(CXXFLAGS) $(CXXFLAGS_WARNINGS) -o $@ $< $(LDFLAGS) $(LIB_PRGOPT)
 
 osmium_read: osmium_read.cpp
 	$(CXX) $(CXXFLAGS) $(CXXFLAGS_WARNINGS) -o $@ $< $(LDFLAGS) $(LIB_EXPAT) $(LIB_PBF)

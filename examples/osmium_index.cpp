@@ -14,10 +14,21 @@
 #include <osmium/osm/types.hpp>
 #include <osmium/osm/ostream.hpp>
 
-namespace po = boost::program_options;
+template <typename T>
+void dump_array(void* ptr, size_t size) {
+    T* data = reinterpret_cast<T*>(ptr);
+    size_t count = size / sizeof(T);
+
+    std::cout << std::fixed << std::setprecision(7);
+    for (size_t i = 0; i < count; ++i) {
+        if (data[i] != T()) {
+            std::cout << i << " " << data[i] << "\n";
+        }
+    }
+}
 
 template <typename T>
-void dump(void* ptr, size_t size) {
+void dump_list(void* ptr, size_t size) {
     T* data = reinterpret_cast<T*>(ptr);
     size_t count = size / sizeof(T);
 
@@ -28,7 +39,29 @@ void dump(void* ptr, size_t size) {
 }
 
 template <typename T>
-bool search(void* ptr, size_t size, osmium::object_id_type id) {
+bool search_array(void* ptr, size_t size, osmium::object_id_type id) {
+    T* data = reinterpret_cast<T*>(ptr);
+    size_t count = size / sizeof(T);
+
+    if (id >= count) {
+        return false;
+    }
+
+    T found = data[id];
+
+    std::cout << std::fixed << std::setprecision(7);
+
+    if (found == T()) {
+        return false;
+    } else {
+        std::cout << id << " " << found << std::endl;
+    }
+
+    return true;
+}
+
+template <typename T>
+bool search_list(void* ptr, size_t size, osmium::object_id_type id) {
     T* data = reinterpret_cast<T*>(ptr);
     size_t count = size / sizeof(T);
 
@@ -56,7 +89,9 @@ enum return_type : int {
     fatal = 3
 };
 
-po::variables_map parse_options(int argc, char* argv[]) {
+boost::program_options::variables_map parse_options(int argc, char* argv[]) {
+    namespace po = boost::program_options;
+
     try {
         po::options_description desc("Allowed options");
         desc.add_options()
@@ -98,7 +133,7 @@ typedef std::pair<osmium::object_id_type, size_t> id2offset_type;
 int main(int argc, char* argv[]) {
     std::ios_base::sync_with_stdio(false);
 
-    po::variables_map vm = parse_options(argc, argv);
+    auto vm = parse_options(argc, argv);
 
     std::string filename;
     bool array_format = false;
@@ -125,7 +160,11 @@ int main(int argc, char* argv[]) {
     }
 
     if (vm.count("dump")) {
-        dump<id2loc_type>(ptr, file_stat.st_size);
+        if (array_format) {
+            dump_array<osmium::Location>(ptr, file_stat.st_size);
+        } else {
+            dump_list<id2loc_type>(ptr, file_stat.st_size);
+        }
     }
 
     if (vm.count("search")) {
@@ -133,7 +172,8 @@ int main(int argc, char* argv[]) {
 
         bool found = true;
         for (const auto id : ids) {
-            if (!search<id2loc_type>(ptr, file_stat.st_size, id)) {
+            bool okay = array_format ? search_array<osmium::Location>(ptr, file_stat.st_size, id) : search_list<id2loc_type>(ptr, file_stat.st_size, id);
+            if (!okay) {
                 found = false;
                 std::cout << id << " not found\n";
             }
