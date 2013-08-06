@@ -44,6 +44,7 @@ DEALINGS IN THE SOFTWARE.
 #include <string>
 
 #include <osmium/index/map.hpp>
+#include <osmium/detail/typed_mmap.hpp>
 
 namespace osmium {
 
@@ -68,15 +69,6 @@ namespace osmium {
                 TValue* m_items;
 
                 int m_fd;
-
-                /// Get file size in bytes.
-                uint64_t get_file_size() const {
-                    struct stat s;
-                    if (fstat(m_fd, &s) < 0) {
-                        throw std::bad_alloc();
-                    }
-                    return s.st_size;
-                }
 
             public:
 
@@ -115,16 +107,9 @@ namespace osmium {
                     }
 
                     // make sure the file is at least as large as the initial size
-                    if (get_file_size() < sizeof(TValue) * m_size) {
-                        if (ftruncate(m_fd, sizeof(TValue) * m_size) < 0) {
-                            throw std::bad_alloc();
-                        }
-                    }
+                    osmium::detail::typed_mmap<TValue>::grow_file(m_size, m_fd);
 
-                    m_items = static_cast<TValue*>(mmap(NULL, sizeof(TValue) * m_size, PROT_READ | PROT_WRITE, MAP_SHARED, m_fd, 0));
-                    if (m_items == MAP_FAILED) {
-                        throw std::bad_alloc();
-                    }
+                    m_items = osmium::detail::typed_mmap<TValue>::map(m_size, m_fd, true);
                     new (m_items) TValue[m_size];
                 }
 
@@ -136,19 +121,9 @@ namespace osmium {
                         uint64_t new_size = id + size_increment;
 
                         // if the file backing this mmap is smaller than needed, increase its size
-                        if (get_file_size() < sizeof(TValue) * new_size) {
-                            if (ftruncate(m_fd, sizeof(TValue) * new_size) < 0) {
-                                throw std::bad_alloc();
-                            }
-                        }
-
-                        if (munmap(m_items, sizeof(TValue) * m_size) < 0) {
-                            throw std::bad_alloc();
-                        }
-                        m_items = static_cast<TValue*>(mmap(NULL, sizeof(TValue) * new_size, PROT_READ | PROT_WRITE, MAP_SHARED, m_fd, 0));
-                        if (m_items == MAP_FAILED) {
-                            throw std::bad_alloc();
-                        }
+                        osmium::detail::typed_mmap<TValue>::grow_file(new_size, m_fd);
+                        osmium::detail::typed_mmap<TValue>::unmap(m_items, m_size);
+                        m_items = osmium::detail::typed_mmap<TValue>::map(new_size, m_fd, true);
                         new (m_items + m_size) TValue[new_size - m_size];
                         m_size = new_size;
                     }
@@ -174,7 +149,7 @@ namespace osmium {
                 }
 
                 void clear() override final {
-                    munmap(m_items, sizeof(TValue) * m_size);
+                    osmium::detail::typed_mmap<TValue>::unmap(m_items, m_size);
                     m_items = nullptr;
                     m_size = 0;
                 }

@@ -46,6 +46,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/index/map.hpp>
 #include <osmium/io/utils.hpp>
+#include <osmium/detail/typed_mmap.hpp>
 
 namespace osmium {
 
@@ -82,11 +83,8 @@ namespace osmium {
                 * @exception std::bad_alloc Thrown when there is not enough memory.
                 */
                 MmapAnon() :
-                    m_size(size_increment) {
-                    m_items = static_cast<TValue*>(mmap(NULL, sizeof(TValue) * m_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0));
-                    if (m_items == MAP_FAILED) {
-                        throw std::bad_alloc();
-                    }
+                    m_size(size_increment),
+                    m_items(osmium::detail::typed_mmap<TValue>::map(m_size)) {
                     new (m_items) TValue[m_size];
                 }
 
@@ -97,10 +95,7 @@ namespace osmium {
                     if (static_cast<size_t>(id) >= m_size) {
                         size_t new_size = id + size_increment;
 
-                        m_items = static_cast<TValue*>(mremap(m_items, sizeof(TValue) * m_size, sizeof(TValue) * new_size, MREMAP_MAYMOVE));
-                        if (m_items == MAP_FAILED) {
-                            throw std::bad_alloc();
-                        }
+                        m_items = osmium::detail::typed_mmap<TValue>::remap(m_items, m_size, new_size);
                         new (m_items + m_size) TValue[new_size - m_size];
                         m_size = new_size;
                     }
@@ -126,7 +121,7 @@ namespace osmium {
                 }
 
                 void clear() override final {
-                    munmap(m_items, sizeof(TValue) * m_size);
+                    osmium::detail::typed_mmap<TValue>::unmap(m_items, m_size);
                     m_items = nullptr;
                     m_size = 0;
                 }
