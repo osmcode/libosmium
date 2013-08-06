@@ -140,7 +140,7 @@ namespace osmium {
              * Release memory from map() call.
              *
              * Note that no destructor is called for the objects in this memory!
-             * 
+             *
              * @tparam T Type of objects stored in this memory
              * @param data Pointer to the data
              * @param size Number of objects of type T stored

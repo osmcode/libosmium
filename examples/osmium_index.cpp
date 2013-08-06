@@ -104,7 +104,7 @@ boost::program_options::variables_map parse_options(int argc, char* argv[]) {
 
         po::variables_map vm;
         po::store(po::parse_command_line(argc, argv, desc), vm);
-        po::notify(vm);    
+        po::notify(vm);
 
         if (vm.count("help")) {
             std::cout << desc << "\n";
@@ -137,7 +137,7 @@ int main(int argc, char* argv[]) {
 
     std::string filename;
     bool array_format = false;
-    
+
     if (vm.count("array")) {
         filename = vm["array"].as<std::string>();
         array_format = true;

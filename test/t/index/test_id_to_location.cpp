@@ -27,11 +27,11 @@ void test_func_all(TIndex& index) {
     osmium::object_id_type id2 = 3;
     osmium::Location loc1(1.2, 4.5);
     osmium::Location loc2(3.5, -7.2);
-    
+
     BOOST_CHECK_THROW(index.get(id1), std::out_of_range);
 
-    index.set(id1, loc1); 
-    index.set(id2, loc2); 
+    index.set(id1, loc1);
+    index.set(id2, loc2);
 
     index.sort();
 
@@ -45,9 +45,9 @@ void test_func_real(TIndex& index) {
     osmium::object_id_type id2 = 3;
     osmium::Location loc1(1.2, 4.5);
     osmium::Location loc2(3.5, -7.2);
-    
-    index.set(id1, loc1); 
-    index.set(id2, loc2); 
+
+    index.set(id1, loc1);
+    index.set(id2, loc2);
 
     index.sort();
 
@@ -98,7 +98,7 @@ BOOST_AUTO_TEST_CASE(MmapAnon) {
 
 BOOST_AUTO_TEST_CASE(MmapFile) {
     typedef osmium::index::map::MmapFile<osmium::object_id_type, osmium::Location> index_type;
-    
+
     index_type index1;
     test_func_all<index_type>(index1);
 
@@ -108,7 +108,7 @@ BOOST_AUTO_TEST_CASE(MmapFile) {
 
 BOOST_AUTO_TEST_CASE(SparseTable) {
     typedef osmium::index::map::SparseTable<osmium::object_id_type, osmium::Location> index_type;
-    
+
     index_type index1;
     test_func_all<index_type>(index1);
 
@@ -118,7 +118,7 @@ BOOST_AUTO_TEST_CASE(SparseTable) {
 
 BOOST_AUTO_TEST_CASE(StdMap) {
     typedef osmium::index::map::StdMap<osmium::object_id_type, osmium::Location> index_type;
-    
+
     index_type index1;
     test_func_all<index_type>(index1);
 
@@ -128,7 +128,7 @@ BOOST_AUTO_TEST_CASE(StdMap) {
 
 BOOST_AUTO_TEST_CASE(Vector) {
     typedef osmium::index::map::Vector<osmium::object_id_type, osmium::Location> index_type;
-    
+
     index_type index1;
 
     BOOST_CHECK_EQUAL(0, index1.size());

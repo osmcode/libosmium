@@ -43,7 +43,7 @@ namespace osmium {
         namespace detail {
 
             /**
-             * Reads the given number of bytes into the input buffer. 
+             * Reads the given number of bytes into the input buffer.
              * This is basically just a wrapper around read(2).
              *
              * @param fd File descriptor.
