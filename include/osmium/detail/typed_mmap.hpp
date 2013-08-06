@@ -58,12 +58,6 @@ namespace osmium {
         template <typename T>
         class typed_mmap {
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-            /// Return value for failed mmap(2) and mremap(2) calls.
-            static constexpr void* map_failed = MAP_FAILED;
-#pragma GCC diagnostic pop
-
         public:
 
             /**
@@ -78,12 +72,13 @@ namespace osmium {
              * @exception std::system_error If mmap(2) failed
              */
             static T* map(size_t size) {
-                static_assert(sizeof(T) == alignof(T), "Wrong alignment for typed_mmap");
-
                 void* addr = ::mmap(nullptr, sizeof(T) * size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-                if (addr == map_failed) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+                if (addr == MAP_FAILED) {
                     throw std::system_error(errno, std::system_category(), "mmap failed");
                 }
+#pragma GCC diagnostic pop
                 return reinterpret_cast<T*>(addr);
             }
 
@@ -102,16 +97,17 @@ namespace osmium {
              * @exception std::system_error If mmap(2) failed
              */
             static T* map(size_t size, int fd, bool write = false) {
-                static_assert(sizeof(T) == alignof(T), "Wrong alignment for typed_mmap");
-
                 int prot = PROT_READ;
                 if (write) {
                     prot |= PROT_WRITE;
                 }
                 void* addr = ::mmap(nullptr, sizeof(T) * size, prot, MAP_SHARED, fd, 0);
-                if (addr == map_failed) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+                if (addr == MAP_FAILED) {
                     throw std::system_error(errno, std::system_category(), "mmap failed");
                 }
+#pragma GCC diagnostic pop
                 return reinterpret_cast<T*>(addr);
             }
 
@@ -129,12 +125,13 @@ namespace osmium {
              * @exception std::system_error If mremap(2) call failed
              */
             static T* remap(T* data, size_t old_size, size_t new_size) {
-                static_assert(sizeof(T) == alignof(T), "Wrong alignment for typed_mmap");
-
                 void* addr = ::mremap(reinterpret_cast<void*>(data), sizeof(T) * old_size, sizeof(T) * new_size, MREMAP_MAYMOVE);
-                if (addr == map_failed) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+                if (addr == MAP_FAILED) {
                     throw std::system_error(errno, std::system_category(), "mremap failed");
                 }
+#pragma GCC diagnostic pop
                 return reinterpret_cast<T*>(addr);
             }
 #endif
@@ -150,8 +147,6 @@ namespace osmium {
              * @exception std::system_error If munmap(2) call failed
              */
             static void unmap(T* data, size_t size) {
-                static_assert(sizeof(T) == alignof(T), "Wrong alignment for typed_mmap");
-
                 if (::munmap(reinterpret_cast<void*>(data), sizeof(T) * size) != 0) {
                     throw std::system_error(errno, std::system_category(), "munmap failed");
                 }
@@ -167,8 +162,6 @@ namespace osmium {
              * @exception std::length_error If size of the file isn't a multiple of sizeof(T)
              */
             static size_t file_size(int fd) {
-                static_assert(sizeof(T) == alignof(T), "Wrong alignment for typed_mmap");
-
                 struct stat s;
                 if (fstat(fd, &s) < 0) {
                     throw std::system_error(errno, std::system_category(), "fstat failed");

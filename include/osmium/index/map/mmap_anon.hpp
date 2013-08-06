@@ -127,7 +127,7 @@ namespace osmium {
                 }
 
                 void dump_as_array(const int fd) const {
-                    osmium::io::detail::reliable_write(fd, m_items, sizeof(TValue) * m_size);
+                    osmium::io::detail::reliable_write(fd, reinterpret_cast<const char*>(m_items), sizeof(TValue) * m_size);
                 }
 
             }; // class MmapAnon
