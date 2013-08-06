@@ -45,6 +45,9 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
+    /**
+     * @brief Namespace for everything related to geometry.
+     */
     namespace geom {
 
         inline std::unique_ptr<OGRPoint> create_ogr_point(const osmium::Location& location) {

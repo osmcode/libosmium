@@ -48,6 +48,9 @@ namespace osmium {
             return (length + align_bytes - 1) & ~(align_bytes - 1);
         }
 
+        /**
+         * @brief Internal namespace.
+         */
         namespace detail {
 
             /**

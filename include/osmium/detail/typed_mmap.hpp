@@ -42,6 +42,9 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
+    /**
+     * @brief Internal namespace.
+     */
     namespace detail {
 
         /**

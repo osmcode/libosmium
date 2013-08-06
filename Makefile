@@ -30,10 +30,8 @@ check:
 install: doc
 	install -m 755 -g root -o root -d $(DESTDIR)/usr/include
 	install -m 755 -g root -o root -d $(DESTDIR)/usr/share/doc/libosmium-dev
-	install -m 644 -g root -o root README $(DESTDIR)/usr/share/doc/libosmium-dev/README
-	install -m 644 -g root -o root include/osmium.hpp $(DESTDIR)/usr/include
+	install -m 644 -g root -o root README.md $(DESTDIR)/usr/share/doc/libosmium-dev/README.md
 	cp --recursive include/osmium $(DESTDIR)/usr/include
-	cp --recursive doc/html $(DESTDIR)/usr/share/doc/libosmium-dev
 
 WARNINGFLAGS := -Wall -Wextra -Wredundant-decls -Wdisabled-optimization -pedantic -Wctor-dtor-privacy -Wnon-virtual-dtor -Woverloaded-virtual -Wsign-promo -Wno-long-long -Winline -Wold-style-cast
 #WARNINGFLAGS += -Weffc++ 
@@ -69,10 +67,14 @@ indent:
 	astyle --style=java --indent-namespaces --indent-switches --pad-header --lineend=linux --suffix=none --recursive include/\*.hpp examples/\*.cpp test/\*.cpp
 #	astyle --style=java --indent-namespaces --indent-switches --pad-header --unpad-paren --align-pointer=type --lineend=linux --suffix=none --recursive include/\*.hpp examples/\*.cpp test/\*.cpp
 
-doc: doc/html/files.html Doxyfile
+doc: doc/html/files.html
+	doxygen doc/Doxyfile >/dev/null
 
-doc/html/files.html: $(INCLUDE_FILES)
-	doxygen >/dev/null
+doc/html/files.html: $(INCLUDE_FILES) doc/Doxyfile doc/doc.txt doc/osmium.css
+
+install-doc: doc
+	install -m 755 -g root -o root -d $(DESTDIR)/usr/share/doc/libosmium-dev
+	cp --recursive doc/html $(DESTDIR)/usr/share/doc/libosmium-dev
 
 deb:
 	debuild -I -us -uc
