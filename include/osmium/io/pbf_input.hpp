@@ -44,7 +44,7 @@ DEALINGS IN THE SOFTWARE.
 #include <utility>
 #include <vector>
 
-#include <osmium/io/utils.hpp>
+#include <osmium/io/detail/read_write.hpp>
 #include <osmium/io/input.hpp>
 #include <osmium/io/pbf.hpp>
 #include <osmium/osm/builder.hpp>

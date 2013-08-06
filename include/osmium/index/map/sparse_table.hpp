@@ -39,7 +39,7 @@ DEALINGS IN THE SOFTWARE.
 #include <google/sparsetable>
 
 #include <osmium/index/map.hpp>
-#include <osmium/io/utils.hpp>
+#include <osmium/io/detail/read_write.hpp>
 
 namespace osmium {
 

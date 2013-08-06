@@ -45,7 +45,7 @@ DEALINGS IN THE SOFTWARE.
 #include <unistd.h>
 
 #include <osmium/index/map.hpp>
-#include <osmium/io/utils.hpp>
+#include <osmium/io/detail/read_write.hpp>
 #include <osmium/detail/typed_mmap.hpp>
 
 namespace osmium {

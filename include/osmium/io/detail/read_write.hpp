@@ -1,5 +1,5 @@
-#ifndef OSMIUM_IO_UTILS_HPP
-#define OSMIUM_IO_UTILS_HPP
+#ifndef OSMIUM_IO_DETAIL_READ_WRITE_HPP
+#define OSMIUM_IO_DETAIL_READ_WRITE_HPP
 
 /*
 
@@ -40,6 +40,9 @@ namespace osmium {
 
     namespace io {
 
+        /**
+         * @brief Internal namespace.
+         */
         namespace detail {
 
             /**
@@ -93,4 +96,4 @@ namespace osmium {
 
 } // namespace osmium
 
-#endif // OSMIUM_IO_UTILS_HPP
+#endif // OSMIUM_IO_DETAIL_READ_WRITE_HPP
