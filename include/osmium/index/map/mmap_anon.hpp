@@ -72,7 +72,7 @@ namespace osmium {
 
                 size_t m_size;
 
-                TValue* m_items;
+                TValue* m_elements;
 
             public:
 
@@ -84,8 +84,8 @@ namespace osmium {
                 */
                 MmapAnon() :
                     m_size(size_increment),
-                    m_items(osmium::detail::typed_mmap<TValue>::map(m_size)) {
-                    new (m_items) TValue[m_size];
+                    m_elements(osmium::detail::typed_mmap<TValue>::map(m_size)) {
+                    new (m_elements) TValue[m_size];
                 }
 
                 ~MmapAnon() noexcept override final {
@@ -95,21 +95,21 @@ namespace osmium {
                     if (static_cast<size_t>(id) >= m_size) {
                         size_t new_size = id + size_increment;
 
-                        m_items = osmium::detail::typed_mmap<TValue>::remap(m_items, m_size, new_size);
-                        new (m_items + m_size) TValue[new_size - m_size];
+                        m_elements = osmium::detail::typed_mmap<TValue>::remap(m_elements, m_size, new_size);
+                        new (m_elements + m_size) TValue[new_size - m_size];
                         m_size = new_size;
                     }
-                    m_items[id] = value;
+                    m_elements[id] = value;
                 }
 
                 const TValue get(const TKey id) const override final {
                     if (static_cast<size_t>(id) >= m_size) {
                         throw std::out_of_range("ID outside of allowed range");
                     }
-                    if (m_items[id] == TValue()) {
+                    if (m_elements[id] == TValue()) {
                         throw std::out_of_range("Unknown ID");
                     }
-                    return m_items[id];
+                    return m_elements[id];
                 }
 
                 size_t size() const override final {
@@ -121,13 +121,13 @@ namespace osmium {
                 }
 
                 void clear() override final {
-                    osmium::detail::typed_mmap<TValue>::unmap(m_items, m_size);
-                    m_items = nullptr;
+                    osmium::detail::typed_mmap<TValue>::unmap(m_elements, m_size);
+                    m_elements = nullptr;
                     m_size = 0;
                 }
 
                 void dump_as_array(const int fd) const {
-                    osmium::io::detail::reliable_write(fd, reinterpret_cast<const char*>(m_items), sizeof(TValue) * m_size);
+                    osmium::io::detail::reliable_write(fd, reinterpret_cast<const char*>(m_elements), sizeof(TValue) * m_size);
                 }
 
             }; // class MmapAnon

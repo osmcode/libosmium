@@ -66,7 +66,7 @@ namespace osmium {
 
                 uint64_t m_size;
 
-                TValue* m_items;
+                TValue* m_elements;
 
                 int m_fd;
 
@@ -109,8 +109,8 @@ namespace osmium {
                     // make sure the file is at least as large as the initial size
                     osmium::detail::typed_mmap<TValue>::grow_file(m_size, m_fd);
 
-                    m_items = osmium::detail::typed_mmap<TValue>::map(m_size, m_fd, true);
-                    new (m_items) TValue[m_size];
+                    m_elements = osmium::detail::typed_mmap<TValue>::map(m_size, m_fd, true);
+                    new (m_elements) TValue[m_size];
                 }
 
                 ~MmapFile() noexcept override final {
@@ -122,22 +122,22 @@ namespace osmium {
 
                         // if the file backing this mmap is smaller than needed, increase its size
                         osmium::detail::typed_mmap<TValue>::grow_file(new_size, m_fd);
-                        osmium::detail::typed_mmap<TValue>::unmap(m_items, m_size);
-                        m_items = osmium::detail::typed_mmap<TValue>::map(new_size, m_fd, true);
-                        new (m_items + m_size) TValue[new_size - m_size];
+                        osmium::detail::typed_mmap<TValue>::unmap(m_elements, m_size);
+                        m_elements = osmium::detail::typed_mmap<TValue>::map(new_size, m_fd, true);
+                        new (m_elements + m_size) TValue[new_size - m_size];
                         m_size = new_size;
                     }
-                    m_items[id] = value;
+                    m_elements[id] = value;
                 }
 
                 const TValue get(const TKey id) const override final {
                     if (static_cast<size_t>(id) >= m_size) {
                         throw std::out_of_range("ID outside of allowed range");
                     }
-                    if (m_items[id] == TValue()) {
+                    if (m_elements[id] == TValue()) {
                         throw std::out_of_range("Unknown ID");
                     }
-                    return m_items[id];
+                    return m_elements[id];
                 }
 
                 size_t size() const override final {
@@ -149,8 +149,8 @@ namespace osmium {
                 }
 
                 void clear() override final {
-                    osmium::detail::typed_mmap<TValue>::unmap(m_items, m_size);
-                    m_items = nullptr;
+                    osmium::detail::typed_mmap<TValue>::unmap(m_elements, m_size);
+                    m_elements = nullptr;
                     m_size = 0;
                 }
 

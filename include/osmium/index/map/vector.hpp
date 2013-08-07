@@ -96,9 +96,9 @@ namespace osmium {
                 }
 
                 const TValue get(const TKey id) const override final {
-                    const element_type item(id);
-                    const auto result = std::lower_bound(m_elements.begin(), m_elements.end(), item);
-                    if (result == m_elements.end() || *result != item) {
+                    const element_type element(id);
+                    const auto result = std::lower_bound(m_elements.begin(), m_elements.end(), element);
+                    if (result == m_elements.end() || *result != element) {
                         throw std::out_of_range("Unknown ID");
                     } else {
                         return result->value;

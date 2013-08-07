@@ -48,11 +48,11 @@ namespace osmium {
         namespace map {
 
             /**
-            * The SparseTable store stores items in a Google sparsetable,
+            * The SparseTable index stores elements in a Google sparsetable,
             * a data structure that can hold sparsly filled tables in a
             * very space efficient way. It will resize automatically.
             *
-            * Use this node location store if the ID space is only sparsly
+            * Use this index if the ID space is only sparsly
             * populated, such as when working with smaller OSM files (like
             * country extracts).
             */
@@ -68,7 +68,8 @@ namespace osmium {
                 /**
                 * Constructor.
                 *
-                * @param grow_size The initial size of the storage (in items).
+                * @param grow_size The initial size of the index (ie number of
+                *                  elements that fit into the index).
                 *                  The storage will grow by at least this size
                 *                  every time it runs out of space.
                 */
@@ -102,7 +103,7 @@ namespace osmium {
                 }
 
                 size_t used_memory() const override final {
-                    // unused items use 1 bit, used items sizeof(TValue) bytes
+                    // unused elements use 1 bit, used elements sizeof(TValue) bytes
                     // http://google-sparsehash.googlecode.com/svn/trunk/doc/sparsetable.html
                     return (m_elements.size() / 8) + (m_elements.num_nonempty() * sizeof(TValue));
                 }

@@ -50,7 +50,7 @@ namespace osmium {
             /**
             * The FixedArray storage stores location in a huge array. The size of
             * the array is given when initializing the object, it must be large
-            * enough to hold all items. It is not possible to resize the array
+            * enough to hold all elements. It is not possible to resize the array
             * later.
             *
             * Only use this store when you know beforehand how many IDs there are.
@@ -70,7 +70,7 @@ namespace osmium {
 
                 size_t m_size;
 
-                std::unique_ptr<TValue[]> m_items;
+                std::unique_ptr<TValue[]> m_elements;
 
             public:
 
@@ -82,7 +82,7 @@ namespace osmium {
                 */
                 FixedArray(const size_t max_id) :
                     m_size(max_id),
-                    m_items(new TValue[max_id]) {
+                    m_elements(new TValue[max_id]) {
                 }
 
                 ~FixedArray() noexcept override final {
@@ -92,17 +92,17 @@ namespace osmium {
                     if (static_cast<size_t>(id) >= m_size) {
                         throw std::out_of_range("ID outside of allowed range");
                     }
-                    m_items[id] = value;
+                    m_elements[id] = value;
                 }
 
                 const TValue get(const TKey id) const override final {
                     if (static_cast<size_t>(id) >= m_size) {
                         throw std::out_of_range("ID outside of allowed range");
                     }
-                    if (m_items[id] == TValue()) {
+                    if (m_elements[id] == TValue()) {
                         throw std::out_of_range("Unknown ID");
                     }
-                    return m_items[id];
+                    return m_elements[id];
                 }
 
                 size_t size() const override final {
@@ -114,12 +114,12 @@ namespace osmium {
                 }
 
                 void clear() override final {
-                    m_items = nullptr;
+                    m_elements = nullptr;
                     m_size = 0;
                 }
 
                 void dump_as_array(const int fd) const {
-                    osmium::io::detail::reliable_write(fd, m_items, sizeof(TValue) * m_size);
+                    osmium::io::detail::reliable_write(fd, m_elements, sizeof(TValue) * m_size);
                 }
 
             }; // class FixedArray
