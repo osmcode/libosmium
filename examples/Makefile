@@ -47,6 +47,7 @@ PROGRAMS := \
     osmium_debug \
     osmium_index \
     osmium_read \
+    osmium_serdump \
     osmium_toogr
 #    osmium_find_bbox \
 #    osmium_mpdump \
@@ -55,7 +56,6 @@ PROGRAMS := \
 #    osmium_relation_members \
 #    osmium_sizeof \
 #    osmium_serdebug \
-#    osmium_serdump \
 #    osmium_serget \
 #    osmium_store_and_debug \
 #    osmium_time \

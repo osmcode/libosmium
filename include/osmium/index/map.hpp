@@ -35,6 +35,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <cstddef>
 #include <cstdint>
+#include <stdexcept>
 
 namespace osmium {
 
@@ -120,7 +121,11 @@ namespace osmium {
                 virtual void set(const TKey id, const TValue value) = 0;
 
                 /// Retrieve value by key. Does not check for overflow or empty fields.
-                virtual const TValue get(const TKey id) const = 0;
+                // XXX no get() for multimap type classes, need to sort this out
+                //virtual const TValue get(const TKey id) const = 0;
+                virtual const TValue get(const TKey) const {
+                    throw std::logic_error("XXX");
+                }
 
                 /**
                  * Get the approximate number of items in the storage. The storage
