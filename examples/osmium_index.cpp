@@ -17,65 +17,108 @@
 #include <osmium/index/map/mmap_file.hpp>
 
 template <typename TKey, typename TValue>
-void dump_array(int fd) {
-    osmium::index::map::MmapFile<TKey, TValue> index(fd);
+class IndexSearch {
 
-    for (size_t i = 0; i < index.size(); ++i) {
-        if (index.get(i) != TValue()) {
-            std::cout << i << " " << index.get(i) << "\n";
+    typedef typename osmium::index::map::MmapFile<TKey, TValue> array_index_type;
+    typedef typename osmium::index::map::MmapList<TKey, TValue> list_index_type;
+
+    int m_fd;
+    bool m_array_format;
+
+    void dump_array() {
+        array_index_type index(m_fd);
+
+        for (size_t i = 0; i < index.size(); ++i) {
+            if (index.get(i) != TValue()) {
+                std::cout << i << " " << index.get(i) << "\n";
+            }
         }
     }
-}
 
-template <typename TKey, typename TValue>
-void dump_list(int fd) {
-    osmium::index::map::MmapList<TKey, TValue> index(fd);
+    void dump_list() {
+        list_index_type index(m_fd);
 
-    for (auto& element : index) {
-        std::cout << element.key << " " << element.value << "\n";
-    }
-}
-
-template <typename TKey, typename TValue>
-bool search_array(int fd, TKey id) {
-    typedef typename osmium::index::map::MmapFile<TKey, TValue> index_type;
-    index_type index(fd);
-
-    try {
-        TValue found = index.get(id);
-        std::cout << id << " " << found << std::endl;
-    } catch (...) {
-        return false;
+        for (auto& element : index) {
+            std::cout << element.key << " " << element.value << "\n";
+        }
     }
 
-    return true;
-}
+    bool search_array(TKey key) {
+        array_index_type index(m_fd);
 
-template <typename TKey, typename TValue>
-bool search_list(int fd, TKey id) {
-    typedef typename osmium::index::map::MmapList<TKey, TValue> index_type;
-    index_type index(fd);
+        try {
+            TValue value = index.get(key);
+            std::cout << key << " " << value << std::endl;
+        } catch (...) {
+            std::cout << key << " not found" << std::endl;
+            return false;
+        }
 
-    typename index_type::element_type elem {id, TValue()};
-    auto positions = std::equal_range(index.begin(), index.end(), elem, [](const typename index_type::element_type& lhs, const typename index_type::element_type& rhs) {
-        return lhs.key < rhs.key;
-    });
-    if (positions.first == positions.second) {
-        return false;
+        return true;
     }
 
-    for (auto& it = positions.first; it != positions.second; ++it) {
-        std::cout << it->key << " " << it->value << "\n";
+    bool search_list(TKey key) {
+        typedef typename list_index_type::element_type element_type;
+        list_index_type index(m_fd);
+
+        element_type elem {key, TValue()};
+        auto positions = std::equal_range(index.begin(), index.end(), elem, [](const element_type& lhs, const element_type& rhs) {
+            return lhs.key < rhs.key;
+        });
+        if (positions.first == positions.second) {
+            std::cout << key << " not found" << std::endl;
+            return false;
+        }
+
+        for (auto& it = positions.first; it != positions.second; ++it) {
+            std::cout << it->key << " " << it->value << "\n";
+        }
+
+        return true;
     }
 
-    return true;
-}
+public:
 
-enum return_type : int {
-    okay = 0,
+    IndexSearch(int fd, bool array_format) :
+        m_fd(fd),
+        m_array_format(array_format) {
+    }
+
+    void dump() {
+        if (m_array_format) {
+            dump_array();
+        } else {
+            dump_list();
+        }
+    }
+
+    bool search(TKey key) {
+        if (m_array_format) {
+            return search_array(key);
+        } else {
+            return search_list(key);
+        }
+    }
+
+    bool search(std::vector<TKey> keys) {
+        bool found_all = true;
+
+        for (const auto key : keys) {
+            if (!search(key)) {
+                found_all = false;
+            }
+        }
+
+        return found_all;
+    }
+
+}; // class IndexSearch
+
+enum return_code : int {
+    okay      = 0,
     not_found = 1,
-    error = 2,
-    fatal = 3
+    error     = 2,
+    fatal     = 3
 };
 
 boost::program_options::variables_map parse_options(int argc, char* argv[]) {
@@ -98,34 +141,34 @@ boost::program_options::variables_map parse_options(int argc, char* argv[]) {
 
         if (vm.count("help")) {
             std::cout << desc << "\n";
-            exit(return_type::okay);
+            exit(return_code::okay);
         }
 
         if (vm.count("array") && vm.count("list")) {
             std::cerr << "Only option --array or --list allowed." << std::endl;
-            exit(return_type::fatal);
+            exit(return_code::fatal);
         }
 
         if (!vm.count("array") && !vm.count("list")) {
             std::cerr << "Need one of option --array or --list." << std::endl;
-            exit(return_type::fatal);
+            exit(return_code::fatal);
         }
 
         if (!vm.count("type")) {
             std::cerr << "Need --type argument." << std::endl;
-            exit(return_type::fatal);
+            exit(return_code::fatal);
         }
 
         const std::string& type = vm["type"].as<std::string>();
         if (type != "location" && type != "offset") {
             std::cerr << "Unknown type '" << type << "'. Must be 'location' or 'offset'." << std::endl;
-            exit(return_type::fatal);
+            exit(return_code::fatal);
         }
 
         return vm;
     } catch (boost::program_options::error& e) {
         std::cerr << "Error parsing command line: " << e.what() << std::endl;
-        exit(return_type::fatal);
+        exit(return_code::fatal);
     }
 }
 
@@ -148,42 +191,30 @@ int main(int argc, char* argv[]) {
     std::cout << std::fixed << std::setprecision(7);
     int fd = open(filename.c_str(), O_RDONLY);
 
-    if (vm.count("dump")) {
-        if (array_format) {
-            if (vm["type"].as<std::string>() == "location") {
-                dump_array<osmium::object_id_type, osmium::Location>(fd);
-            } else {
-                dump_array<osmium::object_id_type, size_t>(fd);
-            }
-        } else {
-            if (vm["type"].as<std::string>() == "location") {
-                dump_list<osmium::object_id_type, osmium::Location>(fd);
-            } else {
-                dump_list<osmium::object_id_type, size_t>(fd);
-            }
+    bool okay = true;
+
+    if (vm["type"].as<std::string>() == "location") {
+        IndexSearch<osmium::object_id_type, osmium::Location> is(fd, array_format);
+
+        if (vm.count("dump")) {
+            is.dump();
+        }
+
+        if (vm.count("search")) {
+            okay = is.search(vm["search"].as<std::vector<osmium::object_id_type>>());
+        }
+    } else {
+        IndexSearch<osmium::object_id_type, size_t> is(fd, array_format);
+
+        if (vm.count("dump")) {
+            is.dump();
+        }
+
+        if (vm.count("search")) {
+            okay = is.search(vm["search"].as<std::vector<osmium::object_id_type>>());
         }
     }
 
-    if (vm.count("search")) {
-        std::vector<osmium::object_id_type> ids = vm["search"].as<std::vector<osmium::object_id_type>>();
-
-        bool found = true;
-        for (const auto id : ids) {
-            bool okay = array_format ? (vm["type"].as<std::string>() == "location" ? search_array<osmium::object_id_type, osmium::Location>(fd, id)
-                                                                                   : search_array<osmium::object_id_type, size_t>(fd, id))
-                                     : (vm["type"].as<std::string>() == "location" ? search_list<osmium::object_id_type, osmium::Location>(fd, id)
-                                                                                   : search_list<osmium::object_id_type, size_t>(fd, id));
-            if (!okay) {
-                found = false;
-                std::cout << id << " not found\n";
-            }
-        }
-
-        if (found) {
-            exit(return_type::okay);
-        } else {
-            exit(return_type::not_found);
-        }
-    }
+    exit(okay ? return_code::okay : return_code::not_found);
 }
 
