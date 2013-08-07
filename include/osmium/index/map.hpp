@@ -87,6 +87,28 @@ namespace osmium {
                 typedef TKey key_type;
                 typedef TValue mapped_type;
 
+                struct element_type {
+                    TKey key;
+                    TValue value;
+
+                    element_type(TKey i, TValue v = TValue()) :
+                        key(i),
+                        value(v) {
+                    }
+
+                    bool operator<(const element_type& other) const {
+                        return this->key < other.key;
+                    }
+
+                    bool operator==(const element_type& other) const {
+                        return this->key == other.key;
+                    }
+
+                    bool operator!=(const element_type& other) const {
+                        return !(*this == other);
+                    }
+                };
+
                 Map() = default;
 
                 virtual ~Map() noexcept = default;

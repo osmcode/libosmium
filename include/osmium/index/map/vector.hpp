@@ -61,27 +61,7 @@ namespace osmium {
             template <typename TKey, typename TValue>
             class Vector : public osmium::index::map::Map<TKey, TValue> {
 
-                struct element_type {
-                    TKey id;
-                    TValue value;
-
-                    element_type(TKey i, TValue v = TValue()) :
-                        id(i),
-                        value(v) {
-                    }
-
-                    bool operator<(const element_type& other) const {
-                        return this->id < other.id;
-                    }
-
-                    bool operator==(const element_type& other) const {
-                        return this->id == other.id;
-                    }
-
-                    bool operator!=(const element_type& other) const {
-                        return !(*this == other);
-                    }
-                };
+                typedef typename osmium::index::map::Map<TKey, TValue>::element_type element_type;
 
                 std::vector<element_type> m_elements;
 
