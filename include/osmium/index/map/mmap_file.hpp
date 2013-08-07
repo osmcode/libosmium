@@ -113,6 +113,11 @@ namespace osmium {
                     new (m_elements) TValue[m_size];
                 }
 
+                MmapFile(int fd) :
+                    m_size(osmium::detail::typed_mmap<TValue>::file_size(fd)),
+                    m_elements(osmium::detail::typed_mmap<TValue>::map(m_size, fd)) {
+                }
+
                 ~MmapFile() noexcept override final {
                 }
 
