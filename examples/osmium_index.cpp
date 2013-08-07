@@ -13,70 +13,59 @@
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/types.hpp>
 #include <osmium/osm/ostream.hpp>
+#include <osmium/index/map/mmap_list.hpp>
+#include <osmium/index/map/mmap_file.hpp>
 
-template <typename T>
-void dump_array(void* ptr, size_t size) {
-    T* data = reinterpret_cast<T*>(ptr);
-    size_t count = size / sizeof(T);
+template <typename TKey, typename TValue>
+void dump_array(int fd) {
+    osmium::index::map::MmapFile<TKey, TValue> index(fd);
 
-    std::cout << std::fixed << std::setprecision(7);
-    for (size_t i = 0; i < count; ++i) {
-        if (data[i] != T()) {
-            std::cout << i << " " << data[i] << "\n";
+    for (size_t i = 0; i < index.size(); ++i) {
+        if (index.get(i) != TValue()) {
+            std::cout << i << " " << index.get(i) << "\n";
         }
     }
 }
 
-template <typename T>
-void dump_list(void* ptr, size_t size) {
-    T* data = reinterpret_cast<T*>(ptr);
-    size_t count = size / sizeof(T);
+template <typename TKey, typename TValue>
+void dump_list(int fd) {
+    osmium::index::map::MmapList<TKey, TValue> index(fd);
 
-    std::cout << std::fixed << std::setprecision(7);
-    for (size_t i = 0; i < count; ++i) {
-        std::cout << data[i].first << " " << data[i].second << "\n";
+    for (auto& element : index) {
+        std::cout << element.key << " " << element.value << "\n";
     }
 }
 
-template <typename T>
-bool search_array(void* ptr, size_t size, osmium::object_id_type id) {
-    T* data = reinterpret_cast<T*>(ptr);
-    size_t count = size / sizeof(T);
+template <typename TKey, typename TValue>
+bool search_array(int fd, TKey id) {
+    typedef typename osmium::index::map::MmapFile<TKey, TValue> index_type;
+    index_type index(fd);
 
-    if (id >= count) {
-        return false;
-    }
-
-    T found = data[id];
-
-    std::cout << std::fixed << std::setprecision(7);
-
-    if (found == T()) {
-        return false;
-    } else {
+    try {
+        TValue found = index.get(id);
         std::cout << id << " " << found << std::endl;
+    } catch (...) {
+        return false;
     }
 
     return true;
 }
 
-template <typename T>
-bool search_list(void* ptr, size_t size, osmium::object_id_type id) {
-    T* data = reinterpret_cast<T*>(ptr);
-    size_t count = size / sizeof(T);
+template <typename TKey, typename TValue>
+bool search_list(int fd, TKey id) {
+    typedef typename osmium::index::map::MmapList<TKey, TValue> index_type;
+    index_type index(fd);
 
-    T elem {id, osmium::Location()};
-    auto positions = std::equal_range(data, data+count, elem, [](const T& lhs, const T& rhs) {
-        return lhs.first < rhs.first;
+    typename index_type::element_type elem {id, TValue()};
+    auto positions = std::equal_range(index.begin(), index.end(), elem, [](const typename index_type::element_type& lhs, const typename index_type::element_type& rhs) {
+        return lhs.key < rhs.key;
     });
     if (positions.first == positions.second) {
         return false;
     }
 
-    std::cout << std::fixed << std::setprecision(7);
-
     for (auto& it = positions.first; it != positions.second; ++it) {
-        std::cout << it->first << " " << it->second << "\n";
+        std::cout << it->key << " " << it->value << "\n";
     }
 
     return true;
@@ -100,6 +89,7 @@ boost::program_options::variables_map parse_options(int argc, char* argv[]) {
             ("list,l", po::value<std::string>(), "Read given index file in list format")
             ("dump,d", "Dump contents of index file to STDOUT")
             ("search,s", po::value<std::vector<osmium::object_id_type>>(), "Search for given id (Option can appear multiple times)")
+            ("type,t", po::value<std::string>(), "Type of value ('location' or 'offset')")
         ;
 
         po::variables_map vm;
@@ -120,15 +110,24 @@ boost::program_options::variables_map parse_options(int argc, char* argv[]) {
             std::cerr << "Need one of option --array or --list." << std::endl;
             exit(return_type::fatal);
         }
+
+        if (!vm.count("type")) {
+            std::cerr << "Need --type argument." << std::endl;
+            exit(return_type::fatal);
+        }
+
+        const std::string& type = vm["type"].as<std::string>();
+        if (type != "location" && type != "offset") {
+            std::cerr << "Unknown type '" << type << "'. Must be 'location' or 'offset'." << std::endl;
+            exit(return_type::fatal);
+        }
+
         return vm;
     } catch (boost::program_options::error& e) {
         std::cerr << "Error parsing command line: " << e.what() << std::endl;
         exit(return_type::fatal);
     }
 }
-
-typedef std::pair<osmium::object_id_type, osmium::Location> id2loc_type;
-typedef std::pair<osmium::object_id_type, size_t> id2offset_type;
 
 int main(int argc, char* argv[]) {
     std::ios_base::sync_with_stdio(false);
@@ -146,24 +145,22 @@ int main(int argc, char* argv[]) {
         filename = vm["list"].as<std::string>();
     }
 
+    std::cout << std::fixed << std::setprecision(7);
     int fd = open(filename.c_str(), O_RDONLY);
-    struct stat file_stat;
-    if (::fstat(fd, &file_stat) < 0) {
-        std::cerr << "Can not stat index file" << std::endl;
-        exit(return_type::error);
-    }
-
-    void* ptr = mmap(NULL, file_stat.st_size, PROT_READ, MAP_SHARED, fd, 0);
-    if (ptr == MAP_FAILED) {
-        std::cerr << "Mmap failed" << std::endl;
-        exit(return_type::error);
-    }
 
     if (vm.count("dump")) {
         if (array_format) {
-            dump_array<osmium::Location>(ptr, file_stat.st_size);
+            if (vm["type"].as<std::string>() == "location") {
+                dump_array<osmium::object_id_type, osmium::Location>(fd);
+            } else {
+                dump_array<osmium::object_id_type, size_t>(fd);
+            }
         } else {
-            dump_list<id2loc_type>(ptr, file_stat.st_size);
+            if (vm["type"].as<std::string>() == "location") {
+                dump_list<osmium::object_id_type, osmium::Location>(fd);
+            } else {
+                dump_list<osmium::object_id_type, size_t>(fd);
+            }
         }
     }
 
@@ -172,7 +169,10 @@ int main(int argc, char* argv[]) {
 
         bool found = true;
         for (const auto id : ids) {
-            bool okay = array_format ? search_array<osmium::Location>(ptr, file_stat.st_size, id) : search_list<id2loc_type>(ptr, file_stat.st_size, id);
+            bool okay = array_format ? (vm["type"].as<std::string>() == "location" ? search_array<osmium::object_id_type, osmium::Location>(fd, id)
+                                                                                   : search_array<osmium::object_id_type, size_t>(fd, id))
+                                     : (vm["type"].as<std::string>() == "location" ? search_list<osmium::object_id_type, osmium::Location>(fd, id)
+                                                                                   : search_list<osmium::object_id_type, size_t>(fd, id));
             if (!okay) {
                 found = false;
                 std::cout << id << " not found\n";
