@@ -121,97 +121,111 @@ enum return_code : int {
     fatal     = 3
 };
 
-boost::program_options::variables_map parse_options(int argc, char* argv[]) {
-    namespace po = boost::program_options;
+namespace po = boost::program_options;
 
-    try {
-        po::options_description desc("Allowed options");
-        desc.add_options()
-            ("help,h", "Print this help message")
-            ("array,a", po::value<std::string>(), "Read given index file in array format")
-            ("list,l", po::value<std::string>(), "Read given index file in list format")
-            ("dump,d", "Dump contents of index file to STDOUT")
-            ("search,s", po::value<std::vector<osmium::object_id_type>>(), "Search for given id (Option can appear multiple times)")
-            ("type,t", po::value<std::string>(), "Type of value ('location' or 'offset')")
-        ;
+class Options {
 
-        po::variables_map vm;
-        po::store(po::parse_command_line(argc, argv, desc), vm);
-        po::notify(vm);
+    po::variables_map vm;
 
-        if (vm.count("help")) {
-            std::cout << desc << "\n";
-            exit(return_code::okay);
-        }
+public:
 
-        if (vm.count("array") && vm.count("list")) {
-            std::cerr << "Only option --array or --list allowed." << std::endl;
+    Options(int argc, char* argv[]) {
+        try {
+            po::options_description desc("Allowed options");
+            desc.add_options()
+                ("help,h", "Print this help message")
+                ("array,a", po::value<std::string>(), "Read given index file in array format")
+                ("list,l", po::value<std::string>(), "Read given index file in list format")
+                ("dump,d", "Dump contents of index file to STDOUT")
+                ("search,s", po::value<std::vector<osmium::object_id_type>>(), "Search for given id (Option can appear multiple times)")
+                ("type,t", po::value<std::string>(), "Type of value ('location' or 'offset')")
+            ;
+
+            po::store(po::parse_command_line(argc, argv, desc), vm);
+            po::notify(vm);
+
+            if (vm.count("help")) {
+                std::cout << desc << "\n";
+                exit(return_code::okay);
+            }
+
+            if (vm.count("array") && vm.count("list")) {
+                std::cerr << "Only option --array or --list allowed." << std::endl;
+                exit(return_code::fatal);
+            }
+
+            if (!vm.count("array") && !vm.count("list")) {
+                std::cerr << "Need one of option --array or --list." << std::endl;
+                exit(return_code::fatal);
+            }
+
+            if (!vm.count("type")) {
+                std::cerr << "Need --type argument." << std::endl;
+                exit(return_code::fatal);
+            }
+
+            const std::string& type = vm["type"].as<std::string>();
+            if (type != "location" && type != "offset") {
+                std::cerr << "Unknown type '" << type << "'. Must be 'location' or 'offset'." << std::endl;
+                exit(return_code::fatal);
+            }
+        } catch (boost::program_options::error& e) {
+            std::cerr << "Error parsing command line: " << e.what() << std::endl;
             exit(return_code::fatal);
         }
-
-        if (!vm.count("array") && !vm.count("list")) {
-            std::cerr << "Need one of option --array or --list." << std::endl;
-            exit(return_code::fatal);
-        }
-
-        if (!vm.count("type")) {
-            std::cerr << "Need --type argument." << std::endl;
-            exit(return_code::fatal);
-        }
-
-        const std::string& type = vm["type"].as<std::string>();
-        if (type != "location" && type != "offset") {
-            std::cerr << "Unknown type '" << type << "'. Must be 'location' or 'offset'." << std::endl;
-            exit(return_code::fatal);
-        }
-
-        return vm;
-    } catch (boost::program_options::error& e) {
-        std::cerr << "Error parsing command line: " << e.what() << std::endl;
-        exit(return_code::fatal);
     }
-}
+
+    const std::string& filename() const {
+        if (vm.count("array")) {
+            return vm["array"].as<std::string>();
+        } else {
+            return vm["list"].as<std::string>();
+        }
+    }
+
+    bool array_format() const {
+        return vm.count("array");
+    }
+
+    bool do_dump() const {
+        return vm.count("dump");
+    }
+
+    std::vector<osmium::object_id_type> search_keys() const {
+        return vm["search"].as<std::vector<osmium::object_id_type>>();
+    }
+
+    bool type_is(const char* type) const {
+        return vm["type"].as<std::string>() == type;
+    }
+
+}; // class Options
 
 int main(int argc, char* argv[]) {
     std::ios_base::sync_with_stdio(false);
 
-    auto vm = parse_options(argc, argv);
-
-    std::string filename;
-    bool array_format = false;
-
-    if (vm.count("array")) {
-        filename = vm["array"].as<std::string>();
-        array_format = true;
-    }
-    if (vm.count("list")) {
-        filename = vm["list"].as<std::string>();
-    }
+    Options options(argc, argv);
 
     std::cout << std::fixed << std::setprecision(7);
-    int fd = open(filename.c_str(), O_RDONLY);
+    int fd = open(options.filename().c_str(), O_RDONLY);
 
     bool okay = true;
 
-    if (vm["type"].as<std::string>() == "location") {
-        IndexSearch<osmium::object_id_type, osmium::Location> is(fd, array_format);
+    if (options.type_is("location")) {
+        IndexSearch<osmium::object_id_type, osmium::Location> is(fd, options.array_format());
 
-        if (vm.count("dump")) {
+        if (options.do_dump()) {
             is.dump();
-        }
-
-        if (vm.count("search")) {
-            okay = is.search(vm["search"].as<std::vector<osmium::object_id_type>>());
+        } else {
+            okay = is.search(options.search_keys());
         }
     } else {
-        IndexSearch<osmium::object_id_type, size_t> is(fd, array_format);
+        IndexSearch<osmium::object_id_type, size_t> is(fd, options.array_format());
 
-        if (vm.count("dump")) {
+        if (options.do_dump()) {
             is.dump();
-        }
-
-        if (vm.count("search")) {
-            okay = is.search(vm["search"].as<std::vector<osmium::object_id_type>>());
+        } else {
+            okay = is.search(options.search_keys());
         }
     }
 
