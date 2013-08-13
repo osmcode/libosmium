@@ -1,26 +1,21 @@
 
-#include <algorithm>
-#include <iomanip>
-#include <iostream>
-#include <unistd.h>
-#include <sys/mman.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <fcntl.h>
+#include <iomanip>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 #include <boost/program_options.hpp>
 
+#include <osmium/index/map/mmap_vector_file.hpp>
 #include <osmium/osm/location.hpp>
-#include <osmium/osm/types.hpp>
 #include <osmium/osm/ostream.hpp>
-#include <osmium/index/map/mmap_list.hpp>
-#include <osmium/index/map/mmap_file.hpp>
+#include <osmium/osm/types.hpp>
 
 template <typename TKey, typename TValue>
 class IndexSearch {
 
-    typedef typename osmium::index::map::MmapFile<TKey, TValue> array_index_type;
-    typedef typename osmium::index::map::MmapList<TKey, TValue> list_index_type;
+    typedef typename osmium::index::map::DenseMapFile<TKey, TValue> array_index_type;
+    typedef typename osmium::index::map::SparseMapFile<TKey, TValue> list_index_type;
 
     int m_fd;
     bool m_array_format;

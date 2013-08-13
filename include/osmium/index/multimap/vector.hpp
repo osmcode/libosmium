@@ -1,5 +1,5 @@
-#ifndef OSMIUM_INDEX_MAP_VECTOR_HPP
-#define OSMIUM_INDEX_MAP_VECTOR_HPP
+#ifndef OSMIUM_INDEX_MULTIMAP_VECTOR_HPP
+#define OSMIUM_INDEX_MULTIMAP_VECTOR_HPP
 
 /*
 
@@ -36,8 +36,11 @@ DEALINGS IN THE SOFTWARE.
 #include <algorithm>
 #include <stdexcept>
 #include <utility>
+#include <vector>
 
-#include <osmium/index/map.hpp>
+#include <osmium/index/multimap.hpp>
+#include <osmium/detail/mmap_vector_anon.hpp>
+#include <osmium/detail/mmap_vector_file.hpp>
 #include <osmium/index/detail/element_type.hpp>
 #include <osmium/io/detail/read_write.hpp>
 
@@ -45,62 +48,10 @@ namespace osmium {
 
     namespace index {
 
-        namespace map {
-
-            template <class TVector, typename TKey, typename TValue>
-            class VectorBasedDenseMap : public Map<TKey, TValue> {
-
-                TVector m_vector;
-
-            public:
-
-                VectorBasedDenseMap() :
-                    m_vector() {
-                }
-
-                VectorBasedDenseMap(int fd) :
-                    m_vector(fd) {
-                }
-
-                ~VectorBasedDenseMap() noexcept = default;
-
-                void reserve(const size_t size) override final {
-                    m_vector.reserve(size);
-                }
-
-                void set(const TKey key, const TValue value) override final {
-                    if (size() <= key) {
-                        m_vector.resize(key+1);
-                    }
-                    m_vector[key] = value;
-                }
-
-                const TValue get(const TKey key) const override final {
-                    const TValue& value = m_vector.at(key);
-                    if (value == TValue{}) {
-                        throw std::out_of_range("out of range");
-                    }
-                    return value;
-                }
-
-                size_t size() const override final {
-                    return m_vector.size();
-                }
-
-                size_t used_memory() const override final {
-                    return sizeof(TValue) * size();
-                }
-
-                void clear() override final {
-                    m_vector.clear();
-                    m_vector.shrink_to_fit();
-                }
-
-            }; // class VectorBasedDenseMap
-
+        namespace multimap {
 
             template <typename TKey, typename TValue, template<typename...> class TVector>
-            class VectorBasedSparseMap : public Map<TKey, TValue> {
+            class VectorBasedSparseMultimap : public Multimap<TKey, TValue> {
 
             public:
 
@@ -115,29 +66,15 @@ namespace osmium {
 
             public:
 
-                VectorBasedSparseMap() :
-                    m_vector() {
-                }
-
-                VectorBasedSparseMap(int fd) :
-                    m_vector(fd) {
-                }
-
-                ~VectorBasedSparseMap() noexcept = default;
-
                 void set(const TKey key, const TValue value) override final {
                     m_vector.push_back(element_type(key, value));
                 }
-
-                const TValue get(const TKey key) const override final {
+/*
+                std::pair<iterator, iterator> get_all(const TKey key) const override final {
                     const element_type element(key);
-                    const auto result = std::lower_bound(m_vector.begin(), m_vector.end(), element);
-                    if (result == m_vector.end() || *result != element) {
-                        throw std::out_of_range("Unknown ID");
-                    } else {
-                        return result->value;
-                    }
+                    return std::equal_range(m_vector.begin(), m_vector.end(), element);
                 }
+                */
 
                 size_t size() const override final {
                     return m_vector.size();
@@ -164,36 +101,12 @@ namespace osmium {
                     osmium::io::detail::reliable_write(fd, reinterpret_cast<const char*>(m_vector.data()), byte_size());
                 }
 
-                iterator begin() {
-                    return m_vector.begin();
-                }
+            }; // class VectorBasedSparseMultimap
 
-                iterator end() {
-                    return m_vector.end();
-                }
-
-                const_iterator cbegin() const {
-                    return m_vector.cbegin();
-                }
-
-                const_iterator cend() const {
-                    return m_vector.cend();
-                }
-
-                const_iterator begin() const {
-                    return m_vector.cbegin();
-                }
-
-                const_iterator end() const {
-                    return m_vector.cend();
-                }
-
-            }; // class VectorBasedSparseMap
-
-        } // namespace map
+        } // namespace multimap
 
     } // namespace index
 
 } // namespace osmium
 
-#endif // OSMIUM_INDEX_MAP_VECTOR_HPP
+#endif // OSMIUM_INDEX_MULTIMAP_VECTOR_HPP

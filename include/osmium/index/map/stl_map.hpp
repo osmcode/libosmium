@@ -1,5 +1,5 @@
-#ifndef OSMIUM_INDEX_MAP_STD_MAP_HPP
-#define OSMIUM_INDEX_MAP_STD_MAP_HPP
+#ifndef OSMIUM_INDEX_MAP_STL_MAP_HPP
+#define OSMIUM_INDEX_MAP_STL_MAP_HPP
 
 /*
 
@@ -50,7 +50,7 @@ namespace osmium {
              * lot of memory, but might make sense for small maps.
              */
             template <typename TKey, typename TValue>
-            class StdMap : public osmium::index::map::Map<TKey, TValue> {
+            class StlMap : public osmium::index::map::Map<TKey, TValue> {
 
                 // This is a rough estimate for the memory needed for each
                 // element in the map (key + value + pointers to left, right,
@@ -62,9 +62,9 @@ namespace osmium {
 
             public:
 
-                StdMap() = default;
+                StlMap() = default;
 
-                ~StdMap() noexcept override final = default;
+                ~StlMap() noexcept override final = default;
 
                 void set(const TKey id, const TValue value) override final {
                     m_elements[id] = value;
@@ -93,7 +93,7 @@ namespace osmium {
                     osmium::io::detail::reliable_write(fd, reinterpret_cast<const char*>(v.data()), sizeof(t) * v.size());
                 }
 
-            }; // class StdMap
+            }; // class StlMap
 
         } // namespace map
 
@@ -101,4 +101,4 @@ namespace osmium {
 
 } // namespace osmium
 
-#endif // OSMIUM_INDEX_MAP_STD_MAP_HPP
+#endif // OSMIUM_INDEX_MAP_STL_MAP_HPP

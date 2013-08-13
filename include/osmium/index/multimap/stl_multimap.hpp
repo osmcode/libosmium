@@ -1,5 +1,5 @@
-#ifndef OSMIUM_INDEX_MAP_STD_MULTIMAP_HPP
-#define OSMIUM_INDEX_MAP_STD_MULTIMAP_HPP
+#ifndef OSMIUM_INDEX_MULTIMAP_STL_MULTIMAP_HPP
+#define OSMIUM_INDEX_MULTIMAP_STL_MULTIMAP_HPP
 
 /*
 
@@ -37,21 +37,22 @@ DEALINGS IN THE SOFTWARE.
 #include <map>
 #include <vector>
 
-#include <osmium/index/map.hpp>
+#include <osmium/index/multimap.hpp>
 #include <osmium/io/detail/read_write.hpp>
+#include <osmium/index/detail/element_type.hpp>
 
 namespace osmium {
 
     namespace index {
 
-        namespace map {
+        namespace multimap {
 
             /**
              * This implementation uses std::multimap internally. It uses rather a
              * lot of memory, but might make sense for small maps.
              */
             template <typename TKey, typename TValue>
-            class StdMultiMap : public osmium::index::map::Map<TKey, TValue> {
+            class StlMultimap : public osmium::index::multimap::Multimap<TKey, TValue> {
 
                 // This is a rough estimate for the memory needed for each
                 // element in the map (key + value + pointers to left, right,
@@ -63,8 +64,10 @@ namespace osmium {
 
                 typedef typename std::multimap<const TKey, TValue> collection_type;
                 typedef typename collection_type::iterator iterator;
+                typedef typename collection_type::const_iterator const_iterator;
                 typedef typename collection_type::value_type value_type;
-                typedef typename osmium::index::map::Map<TKey, TValue>::element_type element_type;
+
+                typedef typename osmium::index::detail::element_type<TKey, TValue> element_type;
 
             private:
 
@@ -72,15 +75,15 @@ namespace osmium {
 
             public:
 
-                StdMultiMap() = default;
+                StlMultimap() = default;
 
-                ~StdMultiMap() noexcept override final = default;
+                ~StlMultimap() noexcept override final = default;
 
                 void set(const TKey key, const TValue value) override final {
                     m_elements.insert(std::make_pair(key, value));
                 }
 
-                std::pair<iterator, iterator> get_all(const TKey key) const {
+                std::pair<const_iterator, const_iterator> get_all(const TKey key) const override final {
                     return m_elements.equal_range(key);
                 }
 
@@ -124,12 +127,12 @@ namespace osmium {
                     osmium::io::detail::reliable_write(fd, reinterpret_cast<const char*>(v.data()), sizeof(element_type) * v.size());
                 }
 
-            }; // class StdMultiMap
+            }; // class StlMultimap
 
-        } // namespace map
+        } // namespace multimap
 
     } // namespace index
 
 } // namespace osmium
 
-#endif // OSMIUM_INDEX_MAP_STD_MULTIMAP_HPP
+#endif // OSMIUM_INDEX_MULTIMAP_STL_MULTIMAP_HPP

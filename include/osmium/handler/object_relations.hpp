@@ -35,7 +35,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/handler.hpp>
 #include <osmium/io/detail/read_write.hpp>
-#include <osmium/index/map.hpp>
+#include <osmium/index/multimap.hpp>
 
 namespace osmium {
 
@@ -46,7 +46,7 @@ namespace osmium {
          */
         class ObjectRelations : public osmium::handler::Handler<ObjectRelations> {
 
-            typedef osmium::index::map::Map<object_id_type, object_id_type> index_type;
+            typedef osmium::index::multimap::Multimap<object_id_type, object_id_type> index_type;
 
             index_type& m_index_n2w;
             index_type& m_index_n2r;

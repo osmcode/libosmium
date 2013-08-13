@@ -15,12 +15,9 @@
 
 // usually you only need one or two of these
 #include <osmium/index/map/dummy.hpp>
-#include <osmium/index/map/fixed_array.hpp>
-#include <osmium/index/map/mmap_anon.hpp>
-#include <osmium/index/map/mmap_file.hpp>
 #include <osmium/index/map/sparse_table.hpp>
-#include <osmium/index/map/std_map.hpp>
-#include <osmium/index/map/vector.hpp>
+#include <osmium/index/map/stl_map.hpp>
+#include <osmium/index/map/mmap_vector_anon.hpp>
 
 #include <osmium/handler/node_locations_for_ways.hpp>
 
@@ -28,9 +25,10 @@
 #include <osmium/io/any_input.hpp>
 
 typedef osmium::index::map::Dummy<osmium::object_id_type, osmium::Location> index_neg_type;
-typedef osmium::index::map::SparseTable<osmium::object_id_type, osmium::Location> index_pos_type;
-//typedef osmium::index::map::StdMap<osmium::object_id_type, osmium::Location> index_pos_type;
-//typedef osmium::index::map::Vector<osmium::object_id_type, osmium::Location> index_pos_type;
+
+typedef osmium::index::map::StlMap<osmium::object_id_type, osmium::Location> index_pos_type;
+//typedef osmium::index::map::SparseMapMmap<osmium::object_id_type, osmium::Location> index_pos_type;
+//typedef osmium::index::map::SparseTable<osmium::object_id_type, osmium::Location> index_pos_type;
 
 typedef osmium::handler::NodeLocationsForWays<index_pos_type, index_neg_type> location_handler_type;
 
@@ -166,38 +164,6 @@ public:
 
     void after_ways() {
         m_layer_linestring->CommitTransaction();
-    }
-
-    void init() const {
-        std::cerr << "init\n";
-    }
-
-    void before_nodes() const {
-        std::cerr << "before_nodes\n";
-    }
-
-    void after_nodes() const {
-        std::cerr << "after_nodes\n";
-    }
-
-    void before_ways() const {
-        std::cerr << "before_ways\n";
-    }
-
-    void after_ways() const {
-        std::cerr << "after_ways\n";
-    }
-
-    void before_relations() const {
-        std::cerr << "before_relations\n";
-    }
-
-    void after_relations() const {
-        std::cerr << "after_relations\n";
-    }
-
-    void done() const {
-        std::cerr << "done\n";
     }
 
 };

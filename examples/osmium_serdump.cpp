@@ -19,21 +19,26 @@
 #include <osmium/io/xml_input.hpp>
 #include <osmium/handler/disk_store.hpp>
 #include <osmium/handler/object_relations.hpp>
-#include <osmium/index/map/vector.hpp>
-#include <osmium/index/map/std_multimap.hpp>
+
+#include <osmium/index/map/stl_vector.hpp>
+#include <osmium/index/multimap/stl_multimap.hpp>
+#include <osmium/index/multimap/stl_vector.hpp>
 
 // ==============================================================================
 // Choose the following depending on the size of the input OSM files:
 // ==============================================================================
 // for smaller OSM files (extracts)
-typedef osmium::index::map::Vector<osmium::object_id_type, size_t> offset_index_type;
-typedef osmium::index::map::StdMultiMap<osmium::object_id_type, osmium::object_id_type> map_type;
-//typedef osmium::index::map::Hybrid<osmium::object_id_type, osmium::object_id_type> map_type;
+typedef osmium::index::map::SparseMapMem<osmium::object_id_type, size_t> offset_index_type;
+//typedef osmium::index::map::SparseMapMmap<osmium::object_id_type, size_t> offset_index_type;
+//typedef osmium::index::map::SparseMapFile<osmium::object_id_type, size_t> offset_index_type;
+typedef osmium::index::multimap::SparseMultimapMem<osmium::object_id_type, osmium::object_id_type> map_type;
+//typedef osmium::index::multimap::StlMultimap<osmium::object_id_type, osmium::object_id_type> map_type;
+//typedef osmium::index::multimap::Hybrid<osmium::object_id_type, osmium::object_id_type> map_type;
 
 // ==============================================================================
 // for very large OSM files (planet)
-//typedef osmium::index::map::MmapAnon<osmium::object_id_type, size_t> offset_index_type;
-//typedef osmium::index::map::Vector map_type;
+//typedef osmium::index::map::DenseMapMmap<osmium::object_id_type, size_t> offset_index_type;
+//typedef osmium::index::map::DenseMapMem map_type;
 // ==============================================================================
 
 void print_help() {
@@ -144,6 +149,7 @@ int main(int argc, char* argv[]) {
     }
 
     {
+        map_node2way.sort();
         std::string index_file(dir + "/node2way.map");
         int fd = ::open(index_file.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0666);
         if (fd < 0) {
@@ -155,6 +161,7 @@ int main(int argc, char* argv[]) {
     }
 
     {
+        map_node2relation.sort();
         std::string index_file(dir + "/node2rel.map");
         int fd = ::open(index_file.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0666);
         if (fd < 0) {
@@ -166,6 +173,7 @@ int main(int argc, char* argv[]) {
     }
 
     {
+        map_way2relation.sort();
         std::string index_file(dir + "/way2rel.map");
         int fd = ::open(index_file.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0666);
         if (fd < 0) {
@@ -177,6 +185,7 @@ int main(int argc, char* argv[]) {
     }
 
     {
+        map_relation2relation.sort();
         std::string index_file(dir + "/rel2rel.map");
         int fd = ::open(index_file.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0666);
         if (fd < 0) {
