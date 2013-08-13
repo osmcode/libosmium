@@ -33,6 +33,7 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <cstdlib>
 #include <system_error>
 
 #include <sys/mman.h>
@@ -191,6 +192,19 @@ namespace osmium {
                         throw std::system_error(errno, std::system_category(), "ftruncate failed");
                     }
                 }
+            }
+
+            /**
+             * Grow file to given size (if it is smaller) and mmap it.
+             *
+             * @tparam T Type of objects stored in this file
+             * @param size Number of objects of type T that should fit into this file
+             * @param fd File descriptor
+             * @exception Errors thrown by grow_file() or map()
+             */
+            static T* grow_and_map(size_t size, int fd) {
+                grow_file(size, fd);
+                return map(size, fd, true);
             }
 
         }; // class typed_mmap
