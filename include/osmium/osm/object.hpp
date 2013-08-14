@@ -50,13 +50,11 @@ namespace osmium {
     class Object : public osmium::memory::Item, boost::less_than_comparable<Object> {
 
         object_id_type      m_id;
-        object_version_type m_deleted_and_version;
+        bool                m_deleted : 1;
+        object_version_type m_version : 31;
         timestamp_type      m_timestamp;
         user_id_type        m_uid;
         changeset_id_type   m_changeset;
-
-        static constexpr int deleted_bit = sizeof(object_version_type) * 8 - 1;
-        static constexpr object_version_type deleted_bit_mask = 1 << deleted_bit;
 
         size_t sizeof_object() const {
             return sizeof(Object) + (type() == item_type::node ? sizeof(osmium::Location) : 0);
@@ -112,7 +110,8 @@ namespace osmium {
 
         Object() :
             m_id(0),
-            m_deleted_and_version(0),
+            m_deleted(false),
+            m_version(0),
             m_timestamp(0),
             m_uid(0),
             m_changeset(0) {
@@ -132,11 +131,11 @@ namespace osmium {
         }
 
         object_version_type version() const {
-            return m_deleted_and_version & (~deleted_bit_mask);
+            return m_version;
         }
 
         bool deleted() const {
-            return m_deleted_and_version & deleted_bit_mask;
+            return m_deleted;
         }
 
         bool visible() const {
@@ -144,7 +143,7 @@ namespace osmium {
         }
 
         Object& version(object_version_type version) {
-            m_deleted_and_version = (m_deleted_and_version & deleted_bit_mask) | (version & (~deleted_bit_mask));
+            m_version = version;
             return *this;
         }
 
@@ -153,12 +152,12 @@ namespace osmium {
         }
 
         Object& deleted(bool deleted) {
-            m_deleted_and_version = (m_deleted_and_version & (~deleted_bit_mask)) | ((deleted ? 1 : 0) << deleted_bit);
+            m_deleted = deleted;
             return *this;
         }
 
         Object& visible(bool visible) {
-            m_deleted_and_version = (m_deleted_and_version & (~deleted_bit_mask)) | ((visible ? 0 : 1) << deleted_bit);
+            m_deleted = !visible;
             return *this;
         }
 
