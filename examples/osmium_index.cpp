@@ -14,14 +14,14 @@
 template <typename TKey, typename TValue>
 class IndexSearch {
 
-    typedef typename osmium::index::map::DenseMapFile<TKey, TValue> array_index_type;
-    typedef typename osmium::index::map::SparseMapFile<TKey, TValue> list_index_type;
+    typedef typename osmium::index::map::DenseMapFile<TKey, TValue> dense_index_type;
+    typedef typename osmium::index::map::SparseMapFile<TKey, TValue> sparse_index_type;
 
     int m_fd;
-    bool m_array_format;
+    bool m_dense_format;
 
-    void dump_array() {
-        array_index_type index(m_fd);
+    void dump_dense() {
+        dense_index_type index(m_fd);
 
         for (size_t i = 0; i < index.size(); ++i) {
             if (index.get(i) != TValue()) {
@@ -30,16 +30,16 @@ class IndexSearch {
         }
     }
 
-    void dump_list() {
-        list_index_type index(m_fd);
+    void dump_sparse() {
+        sparse_index_type index(m_fd);
 
         for (auto& element : index) {
             std::cout << element.key << " " << element.value << "\n";
         }
     }
 
-    bool search_array(TKey key) {
-        array_index_type index(m_fd);
+    bool search_dense(TKey key) {
+        dense_index_type index(m_fd);
 
         try {
             TValue value = index.get(key);
@@ -52,9 +52,9 @@ class IndexSearch {
         return true;
     }
 
-    bool search_list(TKey key) {
-        typedef typename list_index_type::element_type element_type;
-        list_index_type index(m_fd);
+    bool search_sparse(TKey key) {
+        typedef typename sparse_index_type::element_type element_type;
+        sparse_index_type index(m_fd);
 
         element_type elem {key, TValue()};
         auto positions = std::equal_range(index.begin(), index.end(), elem, [](const element_type& lhs, const element_type& rhs) {
@@ -74,24 +74,24 @@ class IndexSearch {
 
 public:
 
-    IndexSearch(int fd, bool array_format) :
+    IndexSearch(int fd, bool dense_format) :
         m_fd(fd),
-        m_array_format(array_format) {
+        m_dense_format(dense_format) {
     }
 
     void dump() {
-        if (m_array_format) {
-            dump_array();
+        if (m_dense_format) {
+            dump_dense();
         } else {
-            dump_list();
+            dump_sparse();
         }
     }
 
     bool search(TKey key) {
-        if (m_array_format) {
-            return search_array(key);
+        if (m_dense_format) {
+            return search_dense(key);
         } else {
-            return search_list(key);
+            return search_sparse(key);
         }
     }
 
@@ -178,7 +178,7 @@ public:
         }
     }
 
-    bool array_format() const {
+    bool dense_format() const {
         return vm.count("array");
     }
 
@@ -207,7 +207,7 @@ int main(int argc, char* argv[]) {
     bool okay = true;
 
     if (options.type_is("location")) {
-        IndexSearch<osmium::unsigned_object_id_type, osmium::Location> is(fd, options.array_format());
+        IndexSearch<osmium::unsigned_object_id_type, osmium::Location> is(fd, options.dense_format());
 
         if (options.do_dump()) {
             is.dump();
@@ -215,7 +215,7 @@ int main(int argc, char* argv[]) {
             okay = is.search(options.search_keys());
         }
     } else {
-        IndexSearch<osmium::unsigned_object_id_type, size_t> is(fd, options.array_format());
+        IndexSearch<osmium::unsigned_object_id_type, size_t> is(fd, options.dense_format());
 
         if (options.do_dump()) {
             is.dump();
