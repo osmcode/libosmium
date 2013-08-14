@@ -147,23 +147,23 @@ namespace osmium {
             iterator begin() {
                 return m_data;
             }
-            
+
             iterator end() {
                 return m_data + m_size;
             }
-            
+
             const_iterator begin() const {
                 return m_data;
             }
-            
+
             const_iterator end() const {
                 return m_data + m_size;
             }
-            
+
             const_iterator cbegin() {
                 return m_data;
             }
-            
+
             const_iterator cend() {
                 return m_data + m_size;
             }

@@ -77,7 +77,7 @@ namespace osmium {
 
                 const TValue get(const TKey key) const override final {
                     const TValue& value = m_vector.at(key);
-                    if (value == TValue{}) {
+                    if (value == TValue {}) {
                         throw std::out_of_range("out of range");
                     }
                     return value;
