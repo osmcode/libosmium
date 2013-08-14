@@ -98,7 +98,7 @@ namespace osmium {
             void add_padding() {
                 size_t padding = align_bytes - (size() % align_bytes);
                 if (padding != align_bytes) {
-                    m_buffer.get_space(padding);
+                    memset(m_buffer.get_space(padding), 0, padding);
                     if (m_parent) {
                         m_parent->add_size(padding);
                         assert(m_parent->size() % align_bytes == 0);
@@ -134,7 +134,7 @@ namespace osmium {
 
                 size_t padding = align_bytes - (len % align_bytes);
                 if (padding != align_bytes) {
-                    m_buffer.get_space(padding);
+                    memset(m_buffer.get_space(padding), 0, padding);
                     add_size(padding);
                 }
                 assert(m_buffer.is_aligned());
