@@ -49,7 +49,7 @@ namespace osmium {
          * on it's own. Use the derived classes mmap_vector_anon or
          * mmap_vector_file.
          */
-        template <class T, class TDerived>
+        template <typename T, template <typename> class TDerived>
         class mmap_vector_base {
 
         protected:
@@ -136,7 +136,7 @@ namespace osmium {
 
             void resize(size_t new_size) {
                 if (new_size > this->capacity()) {
-                    static_cast<TDerived*>(this)->reserve(new_size + osmium::detail::mmap_vector_size_increment);
+                    static_cast<TDerived<T>*>(this)->reserve(new_size + osmium::detail::mmap_vector_size_increment);
                 }
                 if (new_size > this->size()) {
                     new (this->data() + this->size()) T[new_size - this->size()];

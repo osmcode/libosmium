@@ -44,13 +44,13 @@ namespace osmium {
         /**
         * This class looks and behaves like STL vector, but uses mmap internally.
         */
-        template <class T>
-        class mmap_vector_anon : public mmap_vector_base<T, mmap_vector_anon<T>> {
+        template <typename T>
+        class mmap_vector_anon : public mmap_vector_base<T, mmap_vector_anon> {
 
         public:
 
             mmap_vector_anon() :
-                mmap_vector_base<T, mmap_vector_anon<T>>(
+                mmap_vector_base<T, osmium::detail::mmap_vector_anon>(
                         -1,
                         osmium::detail::mmap_vector_size_increment,
                         0,

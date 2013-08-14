@@ -43,20 +43,20 @@ namespace osmium {
         /**
         * This class looks and behaves like STL vector, but mmap's a file internally.
         */
-        template <class T>
-        class mmap_vector_file : public mmap_vector_base<T, mmap_vector_file<T>> {
+        template <typename T>
+        class mmap_vector_file : public mmap_vector_base<T, mmap_vector_file> {
 
         public:
 
             mmap_vector_file() :
-                mmap_vector_base<T, mmap_vector_file<T>>(
+                mmap_vector_base<T, osmium::detail::mmap_vector_file>(
                         osmium::detail::create_tmp_file(),
                         osmium::detail::mmap_vector_size_increment,
                         0) {
             }
 
             mmap_vector_file(int fd) :
-                mmap_vector_base<T, mmap_vector_file<T>>(
+                mmap_vector_base<T, osmium::detail::mmap_vector_file>(
                         fd,
                         osmium::detail::typed_mmap<T>::file_size(fd) == 0 ? osmium::detail::mmap_vector_size_increment : osmium::detail::typed_mmap<T>::file_size(fd),
                         osmium::detail::typed_mmap<T>::file_size(fd)) {
