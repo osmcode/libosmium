@@ -202,7 +202,7 @@ int main(int argc, char* argv[]) {
     Options options(argc, argv);
 
     std::cout << std::fixed << std::setprecision(7);
-    int fd = open(options.filename().c_str(), O_RDONLY);
+    int fd = open(options.filename().c_str(), O_RDWR);
 
     bool okay = true;
 
