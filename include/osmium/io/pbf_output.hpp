@@ -300,10 +300,13 @@ namespace osmium {
                 z.zfree     = Z_NULL;
                 z.opaque    = Z_NULL;
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"
                 // initiate the compression
                 if (deflateInit(&z, Z_DEFAULT_COMPRESSION) != Z_OK) {
                     throw std::runtime_error("failed to init zlib stream");
                 }
+#pragma GCC diagnostic pop
 
                 // compress
                 if (deflate(&z, Z_FINISH) != Z_STREAM_END) {

@@ -54,11 +54,19 @@ namespace osmium {
 
         namespace {
 
-            void check_for_error(int count) {
+            inline xmlChar* cast_to_xmlchar(const char* str) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+                return BAD_CAST str;
+#pragma GCC diagnostic pop
+            }
+
+            inline void check_for_error(int count) {
                 if (count < 0) {
                     throw XMLWriteError();
                 }
             }
+
         }
 
         class XMLOutput : public osmium::io::Output, public osmium::handler::Handler<XMLOutput> {
@@ -85,23 +93,23 @@ namespace osmium {
 
             void set_meta(osmium::io::Meta& meta) override {
                 check_for_error(xmlTextWriterSetIndent(m_xml_writer, 1));
-                check_for_error(xmlTextWriterSetIndentString(m_xml_writer, BAD_CAST "  "));
+                check_for_error(xmlTextWriterSetIndentString(m_xml_writer, cast_to_xmlchar("  ")));
                 check_for_error(xmlTextWriterStartDocument(m_xml_writer, NULL, NULL, NULL)); // <?xml .. ?>
 
                 if (this->m_file.type() == osmium::io::FileType::Change()) {
-                    check_for_error(xmlTextWriterStartElement(m_xml_writer, BAD_CAST "osmChange"));  // <osmChange>
+                    check_for_error(xmlTextWriterStartElement(m_xml_writer, cast_to_xmlchar("osmChange")));  // <osmChange>
                 } else {
-                    check_for_error(xmlTextWriterStartElement(m_xml_writer, BAD_CAST "osm"));  // <osm>
+                    check_for_error(xmlTextWriterStartElement(m_xml_writer, cast_to_xmlchar("osm")));  // <osm>
                 }
-                check_for_error(xmlTextWriterWriteAttribute(m_xml_writer, BAD_CAST "version", BAD_CAST "0.6"));
-                check_for_error(xmlTextWriterWriteAttribute(m_xml_writer, BAD_CAST "generator", BAD_CAST this->m_generator.c_str()));
+                check_for_error(xmlTextWriterWriteAttribute(m_xml_writer, cast_to_xmlchar("version"), cast_to_xmlchar("0.6")));
+                check_for_error(xmlTextWriterWriteAttribute(m_xml_writer, cast_to_xmlchar("generator"), cast_to_xmlchar(this->m_generator.c_str())));
                 if (meta.bounds().defined()) {
-                    check_for_error(xmlTextWriterStartElement(m_xml_writer, BAD_CAST "bounds")); // <bounds>
+                    check_for_error(xmlTextWriterStartElement(m_xml_writer, cast_to_xmlchar("bounds"))); // <bounds>
 
-                    check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, BAD_CAST "minlon", "%.7f", meta.bounds().bottom_left().lon()));
-                    check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, BAD_CAST "minlat", "%.7f", meta.bounds().bottom_left().lat()));
-                    check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, BAD_CAST "maxlon", "%.7f", meta.bounds().top_right().lon()));
-                    check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, BAD_CAST "maxlat", "%.7f", meta.bounds().top_right().lat()));
+                    check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, cast_to_xmlchar("minlon"), "%.7f", meta.bounds().bottom_left().lon()));
+                    check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, cast_to_xmlchar("minlat"), "%.7f", meta.bounds().bottom_left().lat()));
+                    check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, cast_to_xmlchar("maxlon"), "%.7f", meta.bounds().top_right().lon()));
+                    check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, cast_to_xmlchar("maxlat"), "%.7f", meta.bounds().top_right().lat()));
 
                     check_for_error(xmlTextWriterEndElement(m_xml_writer)); // </bounds>
                 }
@@ -111,13 +119,13 @@ namespace osmium {
                 if (this->m_file.type() == osmium::io::FileType::Change()) {
                     open_close_op_tag(node.visible() ? (node.version() == 1 ? 'c' : 'm') : 'd');
                 }
-                check_for_error(xmlTextWriterStartElement(m_xml_writer, BAD_CAST "node")); // <node>
+                check_for_error(xmlTextWriterStartElement(m_xml_writer, cast_to_xmlchar("node"))); // <node>
 
                 write_meta(node);
 
                 if (node.location().defined()) {
-                    check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, BAD_CAST "lat", "%.7f", node.location().lat()));
-                    check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, BAD_CAST "lon", "%.7f", node.location().lon()));
+                    check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, cast_to_xmlchar("lat"), "%.7f", node.location().lat()));
+                    check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, cast_to_xmlchar("lon"), "%.7f", node.location().lon()));
                 }
 
                 write_tags(node.tags());
@@ -129,13 +137,13 @@ namespace osmium {
                 if (this->m_file.type() == osmium::io::FileType::Change()) {
                     open_close_op_tag(way.visible() ? (way.version() == 1 ? 'c' : 'm') : 'd');
                 }
-                check_for_error(xmlTextWriterStartElement(m_xml_writer, BAD_CAST "way")); // <way>
+                check_for_error(xmlTextWriterStartElement(m_xml_writer, cast_to_xmlchar("way"))); // <way>
 
                 write_meta(way);
 
                 for (auto& way_node : way.nodes()) {
-                    check_for_error(xmlTextWriterStartElement(m_xml_writer, BAD_CAST "nd")); // <nd>
-                    check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, BAD_CAST "ref", "%" PRId64, way_node.ref()));
+                    check_for_error(xmlTextWriterStartElement(m_xml_writer, cast_to_xmlchar("nd"))); // <nd>
+                    check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, cast_to_xmlchar("ref"), "%" PRId64, way_node.ref()));
                     check_for_error(xmlTextWriterEndElement(m_xml_writer)); // </nd>
                 }
 
@@ -148,16 +156,16 @@ namespace osmium {
                 if (this->m_file.type() == osmium::io::FileType::Change()) {
                     open_close_op_tag(relation.visible() ? (relation.version() == 1 ? 'c' : 'm') : 'd');
                 }
-                check_for_error(xmlTextWriterStartElement(m_xml_writer, BAD_CAST "relation")); // <relation>
+                check_for_error(xmlTextWriterStartElement(m_xml_writer, cast_to_xmlchar("relation"))); // <relation>
 
                 write_meta(relation);
 
                 for (auto& member : relation.members()) {
-                    check_for_error(xmlTextWriterStartElement(m_xml_writer, BAD_CAST "member")); // <member>
+                    check_for_error(xmlTextWriterStartElement(m_xml_writer, cast_to_xmlchar("member"))); // <member>
 
-                    check_for_error(xmlTextWriterWriteAttribute(m_xml_writer, BAD_CAST "type", BAD_CAST item_type_to_name(member.type())));
-                    check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, BAD_CAST "ref", "%" PRId64, member.ref()));
-                    check_for_error(xmlTextWriterWriteAttribute(m_xml_writer, BAD_CAST "role", BAD_CAST member.role()));
+                    check_for_error(xmlTextWriterWriteAttribute(m_xml_writer, cast_to_xmlchar("type"), cast_to_xmlchar(item_type_to_name(member.type()))));
+                    check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, cast_to_xmlchar("ref"), "%" PRId64, member.ref()));
+                    check_for_error(xmlTextWriterWriteAttribute(m_xml_writer, cast_to_xmlchar("role"), cast_to_xmlchar(member.role())));
 
                     check_for_error(xmlTextWriterEndElement(m_xml_writer)); // </member>
                 }
@@ -183,34 +191,34 @@ namespace osmium {
             char m_last_op;
 
             void write_meta(const osmium::Object& object) {
-                check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, BAD_CAST "id", "%" PRId64, object.id()));
+                check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, cast_to_xmlchar("id"), "%" PRId64, object.id()));
                 if (object.version()) {
-                    check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, BAD_CAST "version", "%d", object.version()));
+                    check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, cast_to_xmlchar("version"), "%d", object.version()));
                 }
                 if (object.timestamp()) {
-                    check_for_error(xmlTextWriterWriteAttribute(m_xml_writer, BAD_CAST "timestamp", BAD_CAST osmium::timestamp::to_iso(object.timestamp()).c_str()));
+                    check_for_error(xmlTextWriterWriteAttribute(m_xml_writer, cast_to_xmlchar("timestamp"), cast_to_xmlchar(osmium::timestamp::to_iso(object.timestamp()).c_str())));
                 }
 
                 // uid <= 0 -> anonymous
                 if (object.uid() > 0) {
-                    check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, BAD_CAST "uid", "%d", object.uid()));
-                    check_for_error(xmlTextWriterWriteAttribute(m_xml_writer, BAD_CAST "user", BAD_CAST object.user()));
+                    check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, cast_to_xmlchar("uid"), "%d", object.uid()));
+                    check_for_error(xmlTextWriterWriteAttribute(m_xml_writer, cast_to_xmlchar("user"), cast_to_xmlchar(object.user())));
                 }
 
                 if (object.changeset()) {
-                    check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, BAD_CAST "changeset", "%d", object.changeset()));
+                    check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, cast_to_xmlchar("changeset"), "%d", object.changeset()));
                 }
 
                 if (this->m_file.has_multiple_object_versions() && this->m_file.type() != osmium::io::FileType::Change()) {
-                    check_for_error(xmlTextWriterWriteAttribute(m_xml_writer, BAD_CAST "visible", object.visible() ? BAD_CAST "true" : BAD_CAST "false"));
+                    check_for_error(xmlTextWriterWriteAttribute(m_xml_writer, cast_to_xmlchar("visible"), object.visible() ? cast_to_xmlchar("true") : cast_to_xmlchar("false")));
                 }
             }
 
             void write_tags(const osmium::TagList& tags) {
                 for (auto& tag : tags) {
-                    check_for_error(xmlTextWriterStartElement(m_xml_writer, BAD_CAST "tag")); // <tag>
-                    check_for_error(xmlTextWriterWriteAttribute(m_xml_writer, BAD_CAST "k", BAD_CAST tag.key()));
-                    check_for_error(xmlTextWriterWriteAttribute(m_xml_writer, BAD_CAST "v", BAD_CAST tag.value()));
+                    check_for_error(xmlTextWriterStartElement(m_xml_writer, cast_to_xmlchar("tag"))); // <tag>
+                    check_for_error(xmlTextWriterWriteAttribute(m_xml_writer, cast_to_xmlchar("k"), cast_to_xmlchar(tag.key())));
+                    check_for_error(xmlTextWriterWriteAttribute(m_xml_writer, cast_to_xmlchar("v"), cast_to_xmlchar(tag.value())));
                     check_for_error(xmlTextWriterEndElement(m_xml_writer)); // </tag>
                 }
             }
@@ -226,13 +234,13 @@ namespace osmium {
 
                 switch (op) {
                     case 'c':
-                        check_for_error(xmlTextWriterStartElement(m_xml_writer, BAD_CAST "create"));
+                        check_for_error(xmlTextWriterStartElement(m_xml_writer, cast_to_xmlchar("create")));
                         break;
                     case 'm':
-                        check_for_error(xmlTextWriterStartElement(m_xml_writer, BAD_CAST "modify"));
+                        check_for_error(xmlTextWriterStartElement(m_xml_writer, cast_to_xmlchar("modify")));
                         break;
                     case 'd':
-                        check_for_error(xmlTextWriterStartElement(m_xml_writer, BAD_CAST "delete"));
+                        check_for_error(xmlTextWriterStartElement(m_xml_writer, cast_to_xmlchar("delete")));
                         break;
                 }
 
