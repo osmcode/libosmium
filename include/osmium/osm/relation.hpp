@@ -98,6 +98,10 @@ namespace osmium {
             return m_ref;
         }
 
+        unsigned_object_id_type positive_ref() const {
+            return abs(m_ref);
+        }
+
         item_type type() const {
             return m_type;
         }

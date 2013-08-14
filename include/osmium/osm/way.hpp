@@ -62,6 +62,10 @@ namespace osmium {
             return m_ref;
         }
 
+        unsigned_object_id_type positive_ref() const {
+            return abs(m_ref);
+        }
+
     }; // class WayNodeRefOnly
 
     inline bool operator<(const WayNodeRefOnly& lhs, const WayNodeRefOnly& rhs) {

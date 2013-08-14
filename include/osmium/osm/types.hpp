@@ -40,14 +40,15 @@ namespace osmium {
 
     /*
     * The following typedefs are chosen so that they can represent all needed
-    * numbers and still be reasonably space efficient. As the %OSM database is
-    * growing rapidly, 64 bit IDs are used.
+    * numbers and still be reasonably space efficient. As the OSM database
+    * needs 64 bit IDs for nodes, this size is used for all object IDs.
     */
-    typedef int64_t  object_id_type;      ///< type for %OSM object (node, way, or relation) IDs
-    typedef uint32_t object_version_type; ///< type for %OSM object version number
-    typedef uint32_t timestamp_type;      ///< type for OSM timestamps
-    typedef uint32_t changeset_id_type;   ///< type for %OSM changeset IDs
-    typedef uint32_t user_id_type;        ///< type for %OSM user IDs
+    typedef int64_t  object_id_type;          ///< type for OSM object (node, way, or relation) IDs
+    typedef uint64_t unsigned_object_id_type; ///< type for OSM object (node, way, or relation) IDs where we only allow positive IDs
+    typedef uint32_t object_version_type;     ///< type for OSM object version number
+    typedef uint32_t timestamp_type;          ///< type for OSM timestamps
+    typedef uint32_t changeset_id_type;       ///< type for OSM changeset IDs
+    typedef uint32_t user_id_type;            ///< type for OSM user IDs
 
 #ifdef _MSC_VER
 # define atoll(x) (_atoi64(x))

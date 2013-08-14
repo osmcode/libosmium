@@ -117,102 +117,178 @@ namespace osmium {
             m_changeset(0) {
         }
 
+        /// Get ID of this object.
         object_id_type id() const {
             return m_id;
         }
 
+        /// Get absolute value of the ID of this object.
+        unsigned_object_id_type positive_id() const {
+            return abs(m_id);
+        }
+
+        /**
+         * Set ID of this object.
+         *
+         * @return Reference to object to make calls chainable.
+         */
         Object& id(object_id_type id) {
             m_id = id;
             return *this;
         }
 
+        /**
+         * Set ID of this object.
+         *
+         * @return Reference to object to make calls chainable.
+         */
         Object& id(const char* id) {
             return this->id(osmium::string_to_object_id(id));
         }
 
-        object_version_type version() const {
-            return m_version;
-        }
-
+        /// Is this object marked as deleted?
         bool deleted() const {
             return m_deleted;
         }
 
+        /// Is this object marked visible (ie not deleted)?
         bool visible() const {
             return !deleted();
         }
 
-        Object& version(object_version_type version) {
-            m_version = version;
-            return *this;
-        }
-
-        Object& version(const char* version) {
-            return this->version(string_to_object_version(version));
-        }
-
+        /**
+         * Mark this object as deleted (or not).
+         *
+         * @return Reference to object to make calls chainable.
+         */
         Object& deleted(bool deleted) {
             m_deleted = deleted;
             return *this;
         }
 
+        /**
+         * Mark this object as visible (ie not deleted) (or not).
+         *
+         * @return Reference to object to make calls chainable.
+         */
         Object& visible(bool visible) {
             m_deleted = !visible;
             return *this;
         }
 
+        /**
+         * Mark this object as visible (ie not deleted) or deleted.
+         *
+         * @param visible Either "true" or "false"
+         * @return Reference to object to make calls chainable.
+         */
         Object& visible(const char* visible) {
             if (!strcmp("true", visible)) {
                 this->visible(true);
             } else if (!strcmp("false", visible)) {
                 this->visible(false);
             } else {
-                throw std::runtime_error("unknown value for visible attribute");
+                throw std::runtime_error("Unknown value for visible attribute (allowed is 'true' or 'false')");
             }
             return *this;
         }
 
+        /// Get version of this object.
+        object_version_type version() const {
+            return m_version;
+        }
+
+        /**
+         * Set object version.
+         *
+         * @return Reference to object to make calls chainable.
+         */
+        Object& version(object_version_type version) {
+            m_version = version;
+            return *this;
+        }
+
+        /**
+         * Set object version.
+         *
+         * @return Reference to object to make calls chainable.
+         */
+        Object& version(const char* version) {
+            return this->version(string_to_object_version(version));
+        }
+
+        /// Get changeset id of this object.
         changeset_id_type changeset() const {
             return m_changeset;
         }
 
+        /**
+         * Set changeset id of this object.
+         *
+         * @return Reference to object to make calls chainable.
+         */
         Object& changeset(changeset_id_type changeset) {
             m_changeset = changeset;
             return *this;
         }
 
+        /**
+         * Set changeset id of this object.
+         *
+         * @return Reference to object to make calls chainable.
+         */
         Object& changeset(const char* changeset) {
             return this->changeset(string_to_changeset_id(changeset));
         }
 
+        /// Get user id of this object.
         user_id_type uid() const {
             return m_uid;
         }
 
+        /**
+         * Set user id of this object.
+         *
+         * @return Reference to object to make calls chainable.
+         */
         Object& uid(user_id_type uid) {
             m_uid = uid;
             return *this;
         }
 
+        /**
+         * Set user id of this object.
+         * Sets uid to 0 (anonymous) if the given uid is smaller than 0.
+         *
+         * @return Reference to object to make calls chainable.
+         */
         Object& uid_from_signed(int32_t uid) {
             m_uid = uid < 0 ? 0 : uid;
             return *this;
         }
 
+        /**
+         * Set user id of this object.
+         *
+         * @return Reference to object to make calls chainable.
+         */
         Object& uid(const char* uid) {
             return this->uid(string_to_user_id(uid));
         }
 
+        /// Is this user anonymous?
         bool user_is_anonymous() const {
             return m_uid == 0;
         }
 
+        /// Get timestamp when this object last changed.
         time_t timestamp() const {
             return m_timestamp;
         }
 
         /**
          * Set the timestamp when this object last changed.
+         *
          * @param timestamp Time in seconds since epoch.
          * @return Reference to object to make calls chainable.
          */
@@ -221,25 +297,35 @@ namespace osmium {
             return *this;
         }
 
+        /**
+         * Set the timestamp when this object last changed.
+         *
+         * @param timestamp Time as ISO string.
+         * @return Reference to object to make calls chainable.
+         */
         Object& timestamp(const char* timestamp) {
             m_timestamp = osmium::timestamp::parse_iso(timestamp);
             return *this;
         }
 
+        /// Get user name for this object.
         const char* user() const {
             return self() + sizeof_object() + sizeof(size_t);
         }
 
+        /// Get the list of tags for this object.
         TagList& tags() {
             return subitem_of_type<TagList>();
         }
 
+        /// Get the list of tags for this object.
         const TagList& tags() const {
             return subitem_of_type<const TagList>();
         }
 
         /**
          * Set named attribute.
+         *
          * @param attr Name of the attribute (must be one of "id", "version", "changeset", "timestamp", "uid", "visible")
          * @param value Value of the attribute
          */
