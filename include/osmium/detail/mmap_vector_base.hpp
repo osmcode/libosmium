@@ -70,7 +70,7 @@ namespace osmium {
                 m_fd(fd),
                 m_capacity(capacity),
                 m_size(size),
-                m_data(osmium::detail::typed_mmap<T>::grow_and_map(osmium::detail::mmap_vector_size_increment, m_fd)) {
+                m_data(osmium::detail::typed_mmap<T>::grow_and_map(capacity, m_fd)) {
             }
 
         public:
