@@ -64,17 +64,20 @@ namespace osmium {
 
                 vector_type m_vector;
 
+                static bool is_removed(element_type& element) {
+                    return element.value == 0;
+                }
+
             public:
 
                 void set(const TKey key, const TValue value) override final {
                     m_vector.push_back(element_type(key, value));
                 }
-/*
-                std::pair<iterator, iterator> get_all(const TKey key) const override final {
+
+                std::pair<iterator, iterator> get_all(const TKey key) {
                     const element_type element(key);
                     return std::equal_range(m_vector.begin(), m_vector.end(), element);
                 }
-                */
 
                 size_t size() const override final {
                     return m_vector.size();
@@ -95,6 +98,23 @@ namespace osmium {
 
                 void sort() override final {
                     std::sort(m_vector.begin(), m_vector.end());
+                }
+
+                void remove(const TKey key, const TValue value) {
+                    auto r = get_all(key);
+                    for (auto it = r.first; it != r.second; ++it) {
+                        if (it->second == value) {
+                            it->second = 0;
+                            return;
+                        }
+                    }
+                }
+
+                void erase_removed() {
+                    m_vector.erase(
+                        std::remove_if(m_vector.begin(), m_vector.end(), is_removed),
+                        m_vector.end()
+                    );
                 }
 
                 void dump_as_list(int fd) const {

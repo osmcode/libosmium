@@ -83,7 +83,7 @@ namespace osmium {
                     m_elements.insert(std::make_pair(key, value));
                 }
 
-                std::pair<const_iterator, const_iterator> get_all(const TKey key) const override final {
+                std::pair<const_iterator, const_iterator> get_all(const TKey key) const {
                     return m_elements.equal_range(key);
                 }
 
