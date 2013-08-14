@@ -43,10 +43,12 @@ namespace osmium {
 
         /**
          *
+         * Note: This handler will only work if either all object IDs are
+         *       positive or all object IDs are negative.
          */
         class DiskStore : public osmium::handler::Handler<DiskStore> {
 
-            typedef osmium::index::map::Map<object_id_type, size_t> offset_index_type;
+            typedef osmium::index::map::Map<unsigned_object_id_type, size_t> offset_index_type;
 
             size_t m_offset = 0;
             int m_data_fd;
@@ -70,17 +72,17 @@ namespace osmium {
             ~DiskStore() noexcept = default;
 
             void node(const osmium::Node& node) {
-                m_node_index.set(node.id(), m_offset);
+                m_node_index.set(node.positive_id(), m_offset);
                 m_offset += node.size();
             }
 
             void way(const osmium::Way& way) {
-                m_way_index.set(way.id(), m_offset);
+                m_way_index.set(way.positive_id(), m_offset);
                 m_offset += way.size();
             }
 
             void relation(const osmium::Relation& relation) {
-                m_relation_index.set(relation.id(), m_offset);
+                m_relation_index.set(relation.positive_id(), m_offset);
                 m_offset += relation.size();
             }
 

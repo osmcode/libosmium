@@ -82,14 +82,14 @@ namespace osmium {
                 }
 
                 void set(const TKey id, const TValue value) override final {
-                    if (static_cast<size_t>(id) >= m_elements.size()) {
+                    if (id >= m_elements.size()) {
                         m_elements.resize(id + m_grow_size);
                     }
                     m_elements[id] = value;
                 }
 
                 const TValue get(const TKey id) const override final {
-                    if (static_cast<size_t>(id) >= m_elements.size()) {
+                    if (id >= m_elements.size()) {
                         throw std::out_of_range("Unknown ID");
                     }
                     if (m_elements[id] == TValue()) {

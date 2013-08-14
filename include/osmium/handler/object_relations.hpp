@@ -43,10 +43,12 @@ namespace osmium {
 
         /**
          *
+         * Note: This handler will only work if either all object IDs are
+         *       positive or all object IDs are negative.
          */
         class ObjectRelations : public osmium::handler::Handler<ObjectRelations> {
 
-            typedef osmium::index::multimap::Multimap<object_id_type, object_id_type> index_type;
+            typedef osmium::index::multimap::Multimap<unsigned_object_id_type, unsigned_object_id_type> index_type;
 
             index_type& m_index_n2w;
             index_type& m_index_n2r;
@@ -69,7 +71,7 @@ namespace osmium {
 
             void way(const osmium::Way& way) {
                 for (auto& wn : way.nodes()) {
-                    m_index_n2w.set(wn.ref(), way.id());
+                    m_index_n2w.set(wn.positive_ref(), way.positive_id());
                 }
             }
 
@@ -77,13 +79,13 @@ namespace osmium {
                 for (auto& member : relation.members()) {
                     switch (member.type()) {
                         case osmium::item_type::node:
-                            m_index_n2r.set(member.ref(), relation.id());
+                            m_index_n2r.set(member.positive_ref(), relation.positive_id());
                             break;
                         case osmium::item_type::way:
-                            m_index_w2r.set(member.ref(), relation.id());
+                            m_index_w2r.set(member.positive_ref(), relation.positive_id());
                             break;
                         case osmium::item_type::relation:
-                            m_index_r2r.set(member.ref(), relation.id());
+                            m_index_r2r.set(member.positive_ref(), relation.positive_id());
                             break;
                         default:
                             break;

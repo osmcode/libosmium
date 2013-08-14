@@ -34,6 +34,7 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <cstddef>
+#include <type_traits>
 
 #include <osmium/index/detail/element_type.hpp>
 
@@ -45,6 +46,9 @@ namespace osmium {
 
             template <typename TKey, typename TValue>
             class Multimap {
+
+                static_assert(std::is_integral<TKey>::value && std::is_unsigned<TKey>::value,
+                              "TKey template parameter for class Multimap must be unsigned integral type");
 
                 typedef typename osmium::index::detail::element_type<TKey, TValue> element_type;
 

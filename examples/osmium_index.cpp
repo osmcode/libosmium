@@ -132,7 +132,7 @@ public:
                 ("array,a", po::value<std::string>(), "Read given index file in array format")
                 ("list,l", po::value<std::string>(), "Read given index file in list format")
                 ("dump,d", "Dump contents of index file to STDOUT")
-                ("search,s", po::value<std::vector<osmium::object_id_type>>(), "Search for given id (Option can appear multiple times)")
+                ("search,s", po::value<std::vector<osmium::unsigned_object_id_type>>(), "Search for given id (Option can appear multiple times)")
                 ("type,t", po::value<std::string>(), "Type of value ('location' or 'offset')")
             ;
 
@@ -186,8 +186,8 @@ public:
         return vm.count("dump");
     }
 
-    std::vector<osmium::object_id_type> search_keys() const {
-        return vm["search"].as<std::vector<osmium::object_id_type>>();
+    std::vector<osmium::unsigned_object_id_type> search_keys() const {
+        return vm["search"].as<std::vector<osmium::unsigned_object_id_type>>();
     }
 
     bool type_is(const char* type) const {
@@ -207,7 +207,7 @@ int main(int argc, char* argv[]) {
     bool okay = true;
 
     if (options.type_is("location")) {
-        IndexSearch<osmium::object_id_type, osmium::Location> is(fd, options.array_format());
+        IndexSearch<osmium::unsigned_object_id_type, osmium::Location> is(fd, options.array_format());
 
         if (options.do_dump()) {
             is.dump();
@@ -215,7 +215,7 @@ int main(int argc, char* argv[]) {
             okay = is.search(options.search_keys());
         }
     } else {
-        IndexSearch<osmium::object_id_type, size_t> is(fd, options.array_format());
+        IndexSearch<osmium::unsigned_object_id_type, size_t> is(fd, options.array_format());
 
         if (options.do_dump()) {
             is.dump();

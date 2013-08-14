@@ -34,6 +34,7 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <cstddef>
+#include <type_traits>
 
 namespace osmium {
 
@@ -72,6 +73,9 @@ namespace osmium {
              */
             template <typename TKey, typename TValue>
             class Map {
+
+                static_assert(std::is_integral<TKey>::value && std::is_unsigned<TKey>::value,
+                              "TKey template parameter for class Map must be unsigned integral type");
 
                 Map(const Map&) = delete;
                 Map& operator=(const Map&) = delete;

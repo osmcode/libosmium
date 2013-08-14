@@ -66,7 +66,7 @@ void test_func_real(TIndex& index) {
 }
 
 BOOST_AUTO_TEST_CASE(Dummy) {
-    typedef osmium::index::map::Dummy<osmium::object_id_type, osmium::Location> index_type;
+    typedef osmium::index::map::Dummy<osmium::unsigned_object_id_type, osmium::Location> index_type;
 
     index_type index1;
 
@@ -80,7 +80,7 @@ BOOST_AUTO_TEST_CASE(Dummy) {
 }
 
 BOOST_AUTO_TEST_CASE(DenseMapMem) {
-    typedef osmium::index::map::DenseMapMem<osmium::object_id_type, osmium::Location> index_type;
+    typedef osmium::index::map::DenseMapMem<osmium::unsigned_object_id_type, osmium::Location> index_type;
 
     index_type index1;
     index1.reserve(1000);
@@ -92,7 +92,7 @@ BOOST_AUTO_TEST_CASE(DenseMapMem) {
 }
 
 BOOST_AUTO_TEST_CASE(DenseMapMmap) {
-    typedef osmium::index::map::DenseMapMmap<osmium::object_id_type, osmium::Location> index_type;
+    typedef osmium::index::map::DenseMapMmap<osmium::unsigned_object_id_type, osmium::Location> index_type;
 
     index_type index1;
     test_func_all<index_type>(index1);
@@ -102,7 +102,7 @@ BOOST_AUTO_TEST_CASE(DenseMapMmap) {
 }
 
 BOOST_AUTO_TEST_CASE(DenseMapFile) {
-    typedef osmium::index::map::DenseMapFile<osmium::object_id_type, osmium::Location> index_type;
+    typedef osmium::index::map::DenseMapFile<osmium::unsigned_object_id_type, osmium::Location> index_type;
 
     index_type index1;
     test_func_all<index_type>(index1);
@@ -112,7 +112,7 @@ BOOST_AUTO_TEST_CASE(DenseMapFile) {
 }
 
 BOOST_AUTO_TEST_CASE(SparseTable) {
-    typedef osmium::index::map::SparseTable<osmium::object_id_type, osmium::Location> index_type;
+    typedef osmium::index::map::SparseTable<osmium::unsigned_object_id_type, osmium::Location> index_type;
 
     index_type index1;
     test_func_all<index_type>(index1);
@@ -122,7 +122,7 @@ BOOST_AUTO_TEST_CASE(SparseTable) {
 }
 
 BOOST_AUTO_TEST_CASE(StlMap) {
-    typedef osmium::index::map::StlMap<osmium::object_id_type, osmium::Location> index_type;
+    typedef osmium::index::map::StlMap<osmium::unsigned_object_id_type, osmium::Location> index_type;
 
     index_type index1;
     test_func_all<index_type>(index1);
@@ -132,7 +132,7 @@ BOOST_AUTO_TEST_CASE(StlMap) {
 }
 
 BOOST_AUTO_TEST_CASE(SparseMapMem) {
-    typedef osmium::index::map::SparseMapMem<osmium::object_id_type, osmium::Location> index_type;
+    typedef osmium::index::map::SparseMapMem<osmium::unsigned_object_id_type, osmium::Location> index_type;
 
     index_type index1;
 

@@ -28,16 +28,16 @@
 // Choose the following depending on the size of the input OSM files:
 // ==============================================================================
 // for smaller OSM files (extracts)
-typedef osmium::index::map::SparseMapMem<osmium::object_id_type, size_t> offset_index_type;
-//typedef osmium::index::map::SparseMapMmap<osmium::object_id_type, size_t> offset_index_type;
-//typedef osmium::index::map::SparseMapFile<osmium::object_id_type, size_t> offset_index_type;
-typedef osmium::index::multimap::SparseMultimapMem<osmium::object_id_type, osmium::object_id_type> map_type;
-//typedef osmium::index::multimap::StlMultimap<osmium::object_id_type, osmium::object_id_type> map_type;
-//typedef osmium::index::multimap::Hybrid<osmium::object_id_type, osmium::object_id_type> map_type;
+typedef osmium::index::map::SparseMapMem<osmium::unsigned_object_id_type, size_t> offset_index_type;
+//typedef osmium::index::map::SparseMapMmap<osmium::unsigned_object_id_type, size_t> offset_index_type;
+//typedef osmium::index::map::SparseMapFile<osmium::unsigned_object_id_type, size_t> offset_index_type;
+typedef osmium::index::multimap::SparseMultimapMem<osmium::unsigned_object_id_type, osmium::unsigned_object_id_type> map_type;
+//typedef osmium::index::multimap::StlMultimap<osmium::unsigned_object_id_type, osmium::unsigned_object_id_type> map_type;
+//typedef osmium::index::multimap::Hybrid<osmium::unsigned_object_id_type, osmium::unsigned_object_id_type> map_type;
 
 // ==============================================================================
 // for very large OSM files (planet)
-//typedef osmium::index::map::DenseMapMmap<osmium::object_id_type, size_t> offset_index_type;
+//typedef osmium::index::map::DenseMapMmap<osmium::unsigned_object_id_type, size_t> offset_index_type;
 //typedef osmium::index::map::DenseMapMem map_type;
 // ==============================================================================
 
