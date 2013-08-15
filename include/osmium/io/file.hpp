@@ -40,6 +40,7 @@ DEALINGS IN THE SOFTWARE.
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <cstdlib>
 
 #include <osmium/io/encoding.hpp>
 #include <osmium/io/file_type.hpp>
