@@ -33,6 +33,8 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#ifdef __linux__
+
 #include <osmium/index/multimap/vector.hpp>
 #include <osmium/detail/mmap_vector_anon.hpp>
 
@@ -50,5 +52,7 @@ namespace osmium {
     } // namespace index
 
 } // namespace osmium
+
+#endif // __linux__
 
 #endif // OSMIUM_INDEX_MULTIMAP_MMAP_VECTOR_ANON_HPP
