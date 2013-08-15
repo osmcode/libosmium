@@ -41,6 +41,11 @@ DEALINGS IN THE SOFTWARE.
 #include <sys/types.h>
 #include <unistd.h>
 
+// for bsd systems
+#ifndef MAP_ANONYMOUS
+# define MAP_ANONYMOUS MAP_ANON
+#endif
+
 namespace osmium {
 
     /**

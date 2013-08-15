@@ -91,6 +91,7 @@ BOOST_AUTO_TEST_CASE(DenseMapMem) {
     test_func_real<index_type>(index2);
 }
 
+#ifdef __linux__
 BOOST_AUTO_TEST_CASE(DenseMapMmap) {
     typedef osmium::index::map::DenseMapMmap<osmium::unsigned_object_id_type, osmium::Location> index_type;
 
@@ -100,6 +101,7 @@ BOOST_AUTO_TEST_CASE(DenseMapMmap) {
     index_type index2;
     test_func_real<index_type>(index2);
 }
+#endif
 
 BOOST_AUTO_TEST_CASE(DenseMapFile) {
     typedef osmium::index::map::DenseMapFile<osmium::unsigned_object_id_type, osmium::Location> index_type;
