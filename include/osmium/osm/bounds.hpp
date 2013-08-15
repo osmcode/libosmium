@@ -34,6 +34,7 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <osmium/osm/location.hpp>
+#include <ostream>
 
 namespace osmium {
 
