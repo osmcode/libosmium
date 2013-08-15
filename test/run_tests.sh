@@ -18,15 +18,13 @@ if [ -z "$CXXFLAGS_WARNINGS" ]; then
     CXXFLAGS_WARNINGS="-Wall -Wextra -Wredundant-decls -Wdisabled-optimization -pedantic -Wctor-dtor-privacy -Wnon-virtual-dtor -Woverloaded-virtual -Wsign-promo -Wno-long-long"
 fi
 
-if [ -z "$CXXFLAGS" ]; then
-    CXXFLAGS="-g -std=c++11"
-fi
+CXXFLAGS+=" -g -std=c++11"
 
 if [ `uname -s` = 'Darwin' ]; then
     CXXFLAGS="${CXXFLAGS} -stdlib=libc++"
 fi
 
-COMPILE="$CXX -I../include -I. $CXXFLAGS $CXXFLAGS_WARNINGS -o tests"
+COMPILE="$CXX -I../include -I. $CXXFLAGS $CXXFLAGS_WARNINGS -o tests $LDFLAGS"
 
 if [ "x$1" = "x-v" ]; then
     VALGRIND="valgrind --leak-check=full --show-reachable=yes"
