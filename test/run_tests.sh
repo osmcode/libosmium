@@ -18,7 +18,7 @@ if [ -z "$CXXFLAGS_WARNINGS" ]; then
     CXXFLAGS_WARNINGS="-Wall -Wextra -Wredundant-decls -Wdisabled-optimization -pedantic -Wctor-dtor-privacy -Wnon-virtual-dtor -Woverloaded-virtual -Wsign-promo -Wno-long-long"
 fi
 
-CXXFLAGS+=" -g -std=c++11"
+CXXFLAGS="$CXXFLAGS -g -std=c++11"
 
 if [ `uname -s` = 'Darwin' ]; then
     CXXFLAGS="${CXXFLAGS} -stdlib=libc++"
