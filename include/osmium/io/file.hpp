@@ -148,24 +148,24 @@ namespace osmium {
          * An exception of a subclass of this class is thrown when the type of
          * a file is not what you expected.
          */
-        struct FileTypeError {
+        class FileTypeError : public std::exception {
         };
 
         /**
          * This exception is thrown when you wanted to read a normal OSM file,
          * but the file opened had a different type.
          */
-        struct FileTypeOSMExpected : public FileTypeError {
+        class FileTypeOSMExpected : public FileTypeError {
         };
 
         /**
          * This exception is thrown when you wanted to read an OSM file with
          * historic information, but the file opened had a different type.
          */
-        struct FileTypeHistoryExpected : public FileTypeError {
+        class FileTypeHistoryExpected : public FileTypeError {
         };
 
-        class FileEncodingNotSupported {
+        class FileEncodingNotSupported : public std::exception {
         };
 
     private:
