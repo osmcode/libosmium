@@ -33,6 +33,7 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <string>
 #include <osmium/osm/bounds.hpp>
 
 namespace osmium {

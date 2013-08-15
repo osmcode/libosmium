@@ -34,6 +34,7 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <iterator>
+#include <ostream>
 
 #include <osmium/memory/item.hpp>
 

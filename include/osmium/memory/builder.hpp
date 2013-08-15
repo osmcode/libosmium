@@ -34,7 +34,7 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <cstring>
-
+#include <new>
 #include <osmium/memory/buffer.hpp>
 
 namespace osmium {
