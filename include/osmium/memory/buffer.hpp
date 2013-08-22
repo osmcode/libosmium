@@ -34,6 +34,7 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <cassert>
+#include <cstring>
 #include <stdexcept>
 
 #include <osmium/memory/item.hpp>
@@ -155,6 +156,17 @@ namespace osmium {
             template <class T>
             T& get(const size_t offset) const {
                 return *reinterpret_cast<T*>(&m_data[offset]);
+            }
+
+            /**
+             * Add an item to the buffer. The size of the item is stored inside
+             * the item, so we know how much memory to copy.
+             */
+            template <class T>
+            T& add_item(const T& item) {
+                char* ptr = get_space(item.padded_size());
+                std::memcpy(ptr, &item, item.padded_size());
+                return *reinterpret_cast<T*>(ptr);
             }
 
             /**
