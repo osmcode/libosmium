@@ -33,6 +33,8 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <utility>
+
 #include <osmium/index/multimap/stl_vector.hpp>
 #include <osmium/index/multimap/stl_multimap.hpp>
 
@@ -48,7 +50,7 @@ namespace osmium {
                 typedef SparseMultimapMem<TKey, TValue> main_map_type;
                 typedef StlMultimap<TKey, TValue> extra_map_type;
 
-                typedef osmium::index::detail::element_type<TKey, TValue> element_type;
+                typedef typename std::pair<TKey, TValue> element_type;
 
                 typename main_map_type::iterator m_begin_main;
                 typename main_map_type::iterator m_end_main;
@@ -72,7 +74,7 @@ namespace osmium {
                         ++m_begin_extra;
                     } else {
                         ++m_begin_main;
-                        while (m_begin_main != m_end_main && m_begin_main->second == 0) { // ignore removed elements
+                        while (m_begin_main != m_end_main && m_begin_main->second == TValue {}) { // ignore removed elements
                             ++m_begin_main;
                         }
                     }

@@ -34,7 +34,7 @@ class IndexSearch {
         sparse_index_type index(m_fd);
 
         for (auto& element : index) {
-            std::cout << element.key << " " << element.value << "\n";
+            std::cout << element.first << " " << element.second << "\n";
         }
     }
 
@@ -58,7 +58,7 @@ class IndexSearch {
 
         element_type elem {key, TValue()};
         auto positions = std::equal_range(index.begin(), index.end(), elem, [](const element_type& lhs, const element_type& rhs) {
-            return lhs.key < rhs.key;
+            return lhs.first < rhs.first;
         });
         if (positions.first == positions.second) {
             std::cout << key << " not found" << std::endl;
@@ -66,7 +66,7 @@ class IndexSearch {
         }
 
         for (auto& it = positions.first; it != positions.second; ++it) {
-            std::cout << it->key << " " << it->value << "\n";
+            std::cout << it->first << " " << it->second << "\n";
         }
 
         return true;

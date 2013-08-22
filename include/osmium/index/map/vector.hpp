@@ -38,7 +38,6 @@ DEALINGS IN THE SOFTWARE.
 #include <utility>
 
 #include <osmium/index/map.hpp>
-#include <osmium/index/detail/element_type.hpp>
 #include <osmium/io/detail/read_write.hpp>
 
 namespace osmium {
@@ -104,7 +103,7 @@ namespace osmium {
 
             public:
 
-                typedef typename osmium::index::detail::element_type<TKey, TValue> element_type;
+                typedef typename std::pair<TKey, TValue> element_type;
                 typedef TVector<element_type> vector_type;
                 typedef typename vector_type::iterator iterator;
                 typedef typename vector_type::const_iterator const_iterator;
@@ -130,12 +129,14 @@ namespace osmium {
                 }
 
                 const TValue get(const TKey key) const override final {
-                    const element_type element(key);
-                    const auto result = std::lower_bound(m_vector.begin(), m_vector.end(), element);
-                    if (result == m_vector.end() || *result != element) {
+                    const element_type element {key, TValue {}};
+                    const auto result = std::lower_bound(m_vector.begin(), m_vector.end(), element, [](const element_type& a, const element_type& b) {
+                        return a.first < b.first;
+                    });
+                    if (result == m_vector.end() || result->first != key) {
                         throw std::out_of_range("Unknown ID");
                     } else {
-                        return result->value;
+                        return result->second;
                     }
                 }
 

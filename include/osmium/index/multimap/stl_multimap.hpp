@@ -35,11 +35,11 @@ DEALINGS IN THE SOFTWARE.
 
 #include <algorithm>
 #include <map>
+#include <utility>
 #include <vector>
 
 #include <osmium/index/multimap.hpp>
 #include <osmium/io/detail/read_write.hpp>
-#include <osmium/index/detail/element_type.hpp>
 
 namespace osmium {
 
@@ -67,7 +67,7 @@ namespace osmium {
                 typedef typename collection_type::const_iterator const_iterator;
                 typedef typename collection_type::value_type value_type;
 
-                typedef typename osmium::index::detail::element_type<TKey, TValue> element_type;
+                typedef typename std::pair<TKey, TValue> element_type;
 
             private:
 
@@ -79,8 +79,16 @@ namespace osmium {
 
                 ~StlMultimap() noexcept override final = default;
 
+                void unsorted_set(const TKey key, const TValue value) {
+                    m_elements.insert(std::make_pair(key, value));
+                }
+
                 void set(const TKey key, const TValue value) override final {
                     m_elements.insert(std::make_pair(key, value));
+                }
+
+                std::pair<iterator, iterator> get_all(const TKey key) {
+                    return m_elements.equal_range(key);
                 }
 
                 std::pair<const_iterator, const_iterator> get_all(const TKey key) const {
@@ -115,6 +123,10 @@ namespace osmium {
 
                 void clear() override final {
                     m_elements.clear();
+                }
+
+                void consolidate() {
+                    // intentionally left blank
                 }
 
                 void dump_as_list(const int fd) const {

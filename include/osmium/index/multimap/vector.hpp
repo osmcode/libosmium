@@ -41,7 +41,6 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/index/multimap.hpp>
 #include <osmium/detail/mmap_vector_anon.hpp>
 #include <osmium/detail/mmap_vector_file.hpp>
-#include <osmium/index/detail/element_type.hpp>
 #include <osmium/io/detail/read_write.hpp>
 
 namespace osmium {
@@ -55,7 +54,7 @@ namespace osmium {
 
             public:
 
-                typedef typename osmium::index::detail::element_type<TKey, TValue> element_type;
+                typedef typename std::pair<TKey, TValue> element_type;
                 typedef TVector<element_type> vector_type;
                 typedef typename vector_type::iterator iterator;
                 typedef typename vector_type::const_iterator const_iterator;
@@ -65,7 +64,7 @@ namespace osmium {
                 vector_type m_vector;
 
                 static bool is_removed(element_type& element) {
-                    return element.value == 0;
+                    return element.second == TValue {};
                 }
 
             public:
@@ -74,9 +73,15 @@ namespace osmium {
                     m_vector.push_back(element_type(key, value));
                 }
 
+                void unsorted_set(const TKey key, const TValue value) {
+                    m_vector.push_back(element_type(key, value));
+                }
+
                 std::pair<iterator, iterator> get_all(const TKey key) {
-                    const element_type element(key);
-                    return std::equal_range(m_vector.begin(), m_vector.end(), element);
+                    const element_type element {key, TValue {}};
+                    return std::equal_range(m_vector.begin(), m_vector.end(), element, [](const element_type& a, const element_type& b) {
+                        return a.first < b.first;
+                    });
                 }
 
                 size_t size() const override final {
@@ -108,6 +113,10 @@ namespace osmium {
                             return;
                         }
                     }
+                }
+
+                void consolidate() {
+                    std::sort(m_vector.begin(), m_vector.end());
                 }
 
                 void erase_removed() {
