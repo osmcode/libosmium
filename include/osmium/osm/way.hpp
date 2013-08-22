@@ -146,6 +146,18 @@ namespace osmium {
             return subitem_of_type<const WayNodeList>();
         }
 
+        /**
+         * Update all nodes in a way with the ID of the given WayNode with the
+         * location of the given WayNode.
+         */
+        void update_node_location(const WayNode& new_wn) {
+            for (auto& wn : nodes()) {
+                if (wn.ref() == new_wn.ref()) {
+                    wn.location(new_wn.location());
+                }
+            }
+        }
+
     }; // class Way
 
     static_assert(sizeof(Way) % osmium::memory::align_bytes == 0, "Class osmium::Way has wrong size to be aligned properly!");
