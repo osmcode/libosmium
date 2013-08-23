@@ -79,17 +79,6 @@ namespace osmium {
                 }
             }
 
-        public:
-
-            uint32_t size() const {
-                return m_item->size();
-            }
-
-            void add_item(const osmium::memory::Item* item) {
-                std::memcpy(m_buffer.reserve_space(item->padded_size()), item, item->padded_size());
-                add_size(item->padded_size());
-            }
-
             /**
              * Add padding if needed.
              *
@@ -104,6 +93,17 @@ namespace osmium {
                         assert(m_parent->size() % align_bytes == 0);
                     }
                 }
+            }
+
+        public:
+
+            uint32_t size() const {
+                return m_item->size();
+            }
+
+            void add_item(const osmium::memory::Item* item) {
+                std::memcpy(m_buffer.reserve_space(item->padded_size()), item, item->padded_size());
+                add_size(item->padded_size());
             }
 
             /**

@@ -340,7 +340,6 @@ namespace osmium {
 
             void close_tl_builder() {
                 if (m_tl_builder) {
-                    m_tl_builder->add_padding();
                     delete m_tl_builder;
                     m_tl_builder = nullptr;
                 }
@@ -348,7 +347,6 @@ namespace osmium {
 
             void close_wnl_builder() {
                 if (m_wnl_builder) {
-                    m_wnl_builder->add_padding();
                     delete m_wnl_builder;
                     m_wnl_builder = nullptr;
                 }
@@ -356,7 +354,6 @@ namespace osmium {
 
             void close_rml_builder() {
                 if (m_rml_builder) {
-                    m_rml_builder->add_padding();
                     delete m_rml_builder;
                     m_rml_builder = nullptr;
                 }

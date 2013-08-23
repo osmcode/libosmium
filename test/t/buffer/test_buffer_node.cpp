@@ -107,7 +107,6 @@ BOOST_AUTO_TEST_CASE(buffer_node) {
             osmium::memory::TagListBuilder tag_builder(buffer, &node_builder);
             tag_builder.add_tag("amenity", "bank");
             tag_builder.add_tag("name", "OSM Savings");
-            tag_builder.add_padding();
         }
 
         buffer.commit();

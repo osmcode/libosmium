@@ -52,6 +52,10 @@ namespace osmium {
                 Builder(buffer, parent, sizeof(TagList), item_type::tag_list) {
             }
 
+            ~TagListBuilder() {
+                add_padding();
+            }
+
             TagList& object() {
                 return static_cast<TagList&>(item());
             }
@@ -68,6 +72,10 @@ namespace osmium {
 
             WayNodeListBuilder(Buffer& buffer, Builder* parent=nullptr) :
                 Builder(buffer, parent, sizeof(WayNodeList), item_type::way_node_list) {
+            }
+
+            ~WayNodeListBuilder() {
+                add_padding();
             }
 
             WayNodeList& object() {
@@ -91,6 +99,10 @@ namespace osmium {
 
             RelationMemberListBuilder(Buffer& buffer, Builder* parent=nullptr) :
                 Builder(buffer, parent, sizeof(RelationMemberList), item_type::relation_member_list) {
+            }
+
+            ~RelationMemberListBuilder() {
+                add_padding();
             }
 
             RelationMemberList& object() {

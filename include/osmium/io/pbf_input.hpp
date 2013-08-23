@@ -158,7 +158,6 @@ namespace osmium {
                                     tl_builder.add_tag(m_stringtable->s(pbf_node.keys(tag)).data(),
                                                        m_stringtable->s(pbf_node.vals(tag)).data());
                                 }
-                                tl_builder.add_padding();
                             }
 
                             node.location(osmium::Location(
@@ -204,7 +203,6 @@ namespace osmium {
                                     ref += pbf_way.refs(i);
                                     wnl_builder.add_way_node(ref);
                                 }
-                                wnl_builder.add_padding();
                             }
 
                             if (pbf_way.keys_size() > 0) {
@@ -213,7 +211,6 @@ namespace osmium {
                                     tl_builder.add_tag(m_stringtable->s(pbf_way.keys(tag)).data(),
                                                        m_stringtable->s(pbf_way.vals(tag)).data());
                                 }
-                                tl_builder.add_padding();
                             }
 
                             m_buffer.commit();
@@ -255,7 +252,6 @@ namespace osmium {
                                     ref += pbf_relation.memids(i);
                                     rml_builder.add_member(osmpbf_membertype_to_item_type(pbf_relation.types(i)), ref, m_stringtable->s(pbf_relation.roles_sid(i)).data());
                                 }
-                                rml_builder.add_padding();
                             }
 
                             if (pbf_relation.keys_size() > 0) {
@@ -264,7 +260,6 @@ namespace osmium {
                                     tl_builder.add_tag(m_stringtable->s(pbf_relation.keys(tag)).data(),
                                                        m_stringtable->s(pbf_relation.vals(tag)).data());
                                 }
-                                tl_builder.add_padding();
                             }
 
                             m_buffer.commit();
@@ -301,8 +296,6 @@ namespace osmium {
 
                     ++n;
                 }
-
-                tl_builder.add_padding();
 
                 return n;
             }
