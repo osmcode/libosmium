@@ -51,10 +51,10 @@ namespace osmium {
 
             mmap_vector_anon() :
                 mmap_vector_base<T, osmium::detail::mmap_vector_anon>(
-                        -1,
-                        osmium::detail::mmap_vector_size_increment,
-                        0,
-                        osmium::detail::typed_mmap<T>::map(osmium::detail::mmap_vector_size_increment)) {
+                    -1,
+                    osmium::detail::mmap_vector_size_increment,
+                    0,
+                    osmium::detail::typed_mmap<T>::map(osmium::detail::mmap_vector_size_increment)) {
             }
 
             void reserve(size_t new_capacity) {

@@ -63,10 +63,10 @@ namespace osmium {
                                typename main_map_type::iterator end_main,
                                typename extra_map_type::iterator begin_extra,
                                typename extra_map_type::iterator end_extra) :
-                     m_begin_main(begin_main),
-                     m_end_main(end_main),
-                     m_begin_extra(begin_extra),
-                     m_end_extra(end_extra) {
+                    m_begin_main(begin_main),
+                    m_end_main(end_main),
+                    m_begin_extra(begin_extra),
+                    m_end_extra(end_extra) {
                 }
 
                 HybridIterator& operator++() {
