@@ -197,7 +197,6 @@ namespace osmium {
                 osmium::item_type type = osmium::item_type::undefined;
                 while (osmium::memory::Buffer buffer = read()) {
                     type = push_helper(buffer, type, handlers...);
-                    delete[] buffer.data();
                 }
                 push_helper(type, handlers...);
             }

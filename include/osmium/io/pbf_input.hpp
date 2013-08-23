@@ -87,7 +87,7 @@ namespace osmium {
                 m_lat_offset(0),
                 m_date_factor(1000),
                 m_granularity(100),
-                m_buffer(new char[initial_buffer_size], initial_buffer_size, 0) {
+                m_buffer(initial_buffer_size) {
             }
 
             ~PBFPrimitiveBlockParser() = default;
@@ -126,12 +126,7 @@ namespace osmium {
         private:
 
             void grow_buffer() {
-                const size_t new_size = m_buffer.capacity() * buffer_growth_factor;
-                char* data = new char[new_size];
-                osmium::memory::Buffer new_buffer(data, new_size, m_buffer.committed());
-                memcpy(data, m_buffer.data(), m_buffer.committed());
-                swap(m_buffer, new_buffer);
-                delete[] new_buffer.data();
+                m_buffer.grow(m_buffer.capacity() * buffer_growth_factor);
             }
 
             void parse_node_group(const OSMPBF::PrimitiveGroup& group) {

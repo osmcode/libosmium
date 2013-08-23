@@ -114,7 +114,6 @@ int main(int argc, char* argv[]) {
     writer.open(meta);
     while (osmium::memory::Buffer buffer = reader.read()) {
         writer(buffer);
-        delete[] buffer.data();
     }
     writer.close();
 

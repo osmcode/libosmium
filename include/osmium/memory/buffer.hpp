@@ -36,6 +36,7 @@ DEALINGS IN THE SOFTWARE.
 #include <cassert>
 #include <cstring>
 #include <stdexcept>
+#include <vector>
 
 #include <osmium/memory/item.hpp>
 #include <osmium/memory/collection.hpp>
@@ -54,19 +55,28 @@ namespace osmium {
         class BufferIsFull : public std::exception {};
 
         /**
-         * A memory area for storing OSM and other objects. It is initialized
-         * with a memory pointer, a capacity, and, optionally, the number of bytes
-         * already committed to this buffer. OSM objects can be created in one
-         * of these buffers with the Builder classes.
-         *
-         * Buffers have a fixed capacity, they can not grow.
+         * A memory area for storing OSM objects and other items. Each item stored
+         * has a type and a length. See the Item class for details.
          *
          * Data can be added to a buffer piece by piece using reserve_space() and
-         * add_item(). After all data that belongs together is added, it must
-         * be committed using the commit() call.
+         * add_item(). After all data that together forms an item is added, it must
+         * be committed using the commit() call. Usually this is done through the
+         * Builder class and its derived classes.
+         *
+         * You can iterate over all items in a buffer using the iterators returned
+         * by begin(), end(), cbegin(), and cend().
+         *
+         * Buffers exist in two flavours, those with external memory management and
+         * those with internal memory management. If you already have some memory
+         * with data in it (for instance read from disk), you create a Buffer with
+         * external memory managment. It is your job then to free the memory once
+         * the buffer isn't used any more. If you don't have memory already, you can
+         * create a Buffer object and have it manage the memory internally. It will
+         * dynamically allocate memory and free it again after use.
          */
         class Buffer {
 
+            std::vector<char> m_memory;
             char* m_data;
             size_t m_capacity;
             size_t m_written;
@@ -80,6 +90,7 @@ namespace osmium {
              * associated with it. It can be used to signify end-of-input.
              */
             Buffer() :
+                m_memory(),
                 m_data(nullptr),
                 m_capacity(0),
                 m_written(0),
@@ -87,13 +98,15 @@ namespace osmium {
             }
 
             /**
-             * Constructs a full buffer with the given size.
+             * Constructs an externally memory-managed buffer using the given
+             * memory and size.
              *
              * @param data A pointer to some already initialized data.
              * @param size The size of the initialized data.
-             * @exception std::invalid_argument When the size isn't a multiple of the aligment.
+             * @exception std::invalid_argument When the size isn't a multiple of the alignment.
              */
             Buffer(char* data, size_t size) :
+                m_memory(),
                 m_data(data),
                 m_capacity(size),
                 m_written(size),
@@ -104,15 +117,16 @@ namespace osmium {
             }
 
             /**
-             * Constructs a buffer with the given capacity that already contains
-             * 'committed' bytes of data.
+             * Constructs an externally memory-managed buffer with the given
+             * capacity that already contains 'committed' bytes of data.
              *
              * @param data A pointer to some (possibly initialized) data.
              * @param capacity The size of the memory for this buffer.
              * @param committed The size of the initialized data. If this is 0, the buffer startes out empty.
-             * @exception std::invalid_argument When the capacity or committed isn't a multiple of the aligment.
+             * @exception std::invalid_argument When the capacity or committed isn't a multiple of the alignment.
              */
             Buffer(char* data, size_t capacity, size_t committed) :
+                m_memory(),
                 m_data(data),
                 m_capacity(capacity),
                 m_written(committed),
@@ -122,6 +136,23 @@ namespace osmium {
                 }
                 if (committed % align_bytes != 0) {
                     throw std::invalid_argument("buffer parameter 'committed' needs to be multiple of alignment");
+                }
+            }
+
+            /**
+             * Create an internally memory-managed buffer with the given capacity.
+             * different in that it internally gets dynamic memory of the
+             * required size. The dynamic memory will be automatically
+             * freed when the Buffer is destroyed.
+             */
+            Buffer(size_t capacity) :
+                m_memory(capacity),
+                m_data(m_memory.data()),
+                m_capacity(capacity),
+                m_written(0),
+                m_committed(0) {
+                if (capacity % align_bytes != 0) {
+                    throw std::invalid_argument("buffer capacity needs to be multiple of alignment");
                 }
             }
 
@@ -162,6 +193,29 @@ namespace osmium {
              */
             bool is_aligned() const {
                 return (m_written % align_bytes == 0) && (m_committed % align_bytes == 0);
+            }
+
+            /**
+             * Grow capacity of this buffer to the given size.
+             * This works only with internally memory-managed buffers.
+             * If the given size is not larger than the current capacity, nothing is done.
+             * Already written but not committed data is discarded.
+             *
+             * @param size New capacity.
+             */
+            void grow(size_t size) {
+                if (m_memory.empty()) {
+                    throw std::logic_error("Can't grow Buffer if it doesn't use internal memory management.");
+                }
+                if (m_capacity < size) {
+                    if (size % align_bytes != 0) {
+                        throw std::invalid_argument("buffer capacity needs to be multiple of alignment");
+                    }
+                    m_memory.resize(size);
+                    m_data = m_memory.data();
+                    m_capacity = size;
+                    m_written = m_committed;
+                }
             }
 
             /**
@@ -280,6 +334,7 @@ namespace osmium {
             friend void swap(Buffer& lhs, Buffer& rhs) {
                 using std::swap;
 
+                swap(lhs.m_memory, rhs.m_memory);
                 swap(lhs.m_data, rhs.m_data);
                 swap(lhs.m_capacity, rhs.m_capacity);
                 swap(lhs.m_written, rhs.m_written);

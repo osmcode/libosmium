@@ -234,7 +234,6 @@ int main(int argc, char* argv[]) {
 /*    while (osmium::memory::Buffer buffer = reader.read()) {
         location_handler(buffer);
         ogr_handler(buffer);
-        delete[] buffer.data();
     }*/
 
     google::protobuf::ShutdownProtobufLibrary();

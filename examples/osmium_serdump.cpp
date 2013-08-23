@@ -114,7 +114,6 @@ int main(int argc, char* argv[]) {
     while (osmium::memory::Buffer buffer = reader.read()) {
         disk_store_handler(buffer);
         object_relations_handler(buffer);
-        delete[] buffer.data();
     }
 
     {

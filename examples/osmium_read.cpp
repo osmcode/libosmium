@@ -24,7 +24,6 @@ int main(int argc, char* argv[]) {
 
     while (osmium::memory::Buffer buffer = reader.read()) {
         // do nothing
-        delete[] buffer.data();
     }
 
     google::protobuf::ShutdownProtobufLibrary();

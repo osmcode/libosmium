@@ -107,7 +107,7 @@ namespace osmium {
                 m_in_delete_section(false),
                 m_fd(fd),
                 m_meta(),
-                m_buffer(new char[buffer_size], buffer_size, 0),
+                m_buffer(buffer_size),
                 m_node_builder(nullptr),
                 m_way_builder(nullptr),
                 m_relation_builder(nullptr),
@@ -421,7 +421,7 @@ namespace osmium {
             void flush_buffer() {
                 if (m_buffer.capacity() - m_buffer.committed() < 1000 * 1000) {
                     m_queue.push(std::move(m_buffer));
-                    osmium::memory::Buffer buffer(new char[buffer_size], buffer_size, 0);
+                    osmium::memory::Buffer buffer(buffer_size);
                     std::swap(m_buffer, buffer);
 
                     while (m_queue.size() > m_max_queue_size) {
