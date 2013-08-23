@@ -42,10 +42,12 @@ DEALINGS IN THE SOFTWARE.
 #include <cstring>
 #include <future>
 #include <iostream>
+#include <memory>
 #include <sstream>
 #include <stdexcept>
 #include <string>
 #include <utility>
+
 #include <expat.h>
 
 #include <osmium/io/input.hpp>
@@ -88,9 +90,10 @@ namespace osmium {
             osmium::memory::NodeBuilder*               m_node_builder;
             osmium::memory::WayBuilder*                m_way_builder;
             osmium::memory::RelationBuilder*           m_relation_builder;
-            osmium::memory::TagListBuilder*            m_tl_builder;
-            osmium::memory::WayNodeListBuilder*        m_wnl_builder;
-            osmium::memory::RelationMemberListBuilder* m_rml_builder;
+
+            std::unique_ptr<osmium::memory::TagListBuilder>            m_tl_builder;
+            std::unique_ptr<osmium::memory::WayNodeListBuilder>        m_wnl_builder;
+            std::unique_ptr<osmium::memory::RelationMemberListBuilder> m_rml_builder;
 
             osmium::thread::Queue<osmium::memory::Buffer>& m_queue;
             std::promise<osmium::io::Meta>& m_meta_promise;
@@ -111,9 +114,9 @@ namespace osmium {
                 m_node_builder(nullptr),
                 m_way_builder(nullptr),
                 m_relation_builder(nullptr),
-                m_tl_builder(nullptr),
-                m_wnl_builder(nullptr),
-                m_rml_builder(nullptr),
+                m_tl_builder(),
+                m_wnl_builder(),
+                m_rml_builder(),
                 m_queue(queue),
                 m_meta_promise(meta_promise),
                 m_promise_fulfilled(false),
@@ -193,8 +196,8 @@ namespace osmium {
 
             void check_tag(osmium::memory::Builder* builder, const XML_Char* element, const XML_Char** attrs) {
                 if (!strcmp(element, "tag")) {
-                    close_wnl_builder();
-                    close_rml_builder();
+                    m_wnl_builder.reset();
+                    m_rml_builder.reset();
 
                     const char* key = "";
                     const char* value = "";
@@ -207,7 +210,7 @@ namespace osmium {
                         }
                     }
                     if (!m_tl_builder) {
-                        m_tl_builder = new osmium::memory::TagListBuilder(m_buffer, builder);
+                        m_tl_builder = std::unique_ptr<osmium::memory::TagListBuilder>(new osmium::memory::TagListBuilder(m_buffer, builder));
                     }
                     m_tl_builder->add_tag(key, value);
                 }
@@ -231,7 +234,7 @@ namespace osmium {
                             m_context = context::top;
                             break;
                         case context::top:
-                            assert(m_tl_builder == nullptr);
+                            assert(!m_tl_builder);
                             if (!strcmp(element, "node")) {
                                 if (!m_promise_fulfilled) {
                                     m_meta_promise.set_value(m_meta);
@@ -284,10 +287,10 @@ namespace osmium {
                             m_last_context = context::way;
                             m_context = context::in_object;
                             if (!strcmp(element, "nd")) {
-                                close_tl_builder();
+                                m_tl_builder.reset();
 
                                 if (!m_wnl_builder) {
-                                    m_wnl_builder = new osmium::memory::WayNodeListBuilder(m_buffer, m_way_builder);
+                                    m_wnl_builder = std::unique_ptr<osmium::memory::WayNodeListBuilder>(new osmium::memory::WayNodeListBuilder(m_buffer, m_way_builder));
                                 }
 
                                 for (int count = 0; attrs[count]; count += 2) {
@@ -303,10 +306,10 @@ namespace osmium {
                             m_last_context = context::relation;
                             m_context = context::in_object;
                             if (!strcmp(element, "member")) {
-                                close_tl_builder();
+                                m_tl_builder.reset();
 
                                 if (!m_rml_builder) {
-                                    m_rml_builder = new osmium::memory::RelationMemberListBuilder(m_buffer, m_relation_builder);
+                                    m_rml_builder = std::unique_ptr<osmium::memory::RelationMemberListBuilder>(new osmium::memory::RelationMemberListBuilder(m_buffer, m_relation_builder));
                                 }
 
                                 char type = 'x';
@@ -338,27 +341,6 @@ namespace osmium {
                 }
             }
 
-            void close_tl_builder() {
-                if (m_tl_builder) {
-                    delete m_tl_builder;
-                    m_tl_builder = nullptr;
-                }
-            }
-
-            void close_wnl_builder() {
-                if (m_wnl_builder) {
-                    delete m_wnl_builder;
-                    m_wnl_builder = nullptr;
-                }
-            }
-
-            void close_rml_builder() {
-                if (m_rml_builder) {
-                    delete m_rml_builder;
-                    m_rml_builder = nullptr;
-                }
-            }
-
             void end_element(const XML_Char* element) {
                 try {
                     switch (m_context) {
@@ -376,7 +358,7 @@ namespace osmium {
                             break;
                         case context::node:
                             assert(!strcmp(element, "node"));
-                            close_tl_builder();
+                            m_tl_builder.reset();
                             m_buffer.commit();
                             delete m_node_builder;
                             m_node_builder = nullptr;
@@ -385,8 +367,8 @@ namespace osmium {
                             break;
                         case context::way:
                             assert(!strcmp(element, "way"));
-                            close_tl_builder();
-                            close_wnl_builder();
+                            m_tl_builder.reset();
+                            m_wnl_builder.reset();
                             m_buffer.commit();
                             delete m_way_builder;
                             m_way_builder = nullptr;
@@ -395,8 +377,8 @@ namespace osmium {
                             break;
                         case context::relation:
                             assert(!strcmp(element, "relation"));
-                            close_tl_builder();
-                            close_rml_builder();
+                            m_tl_builder.reset();
+                            m_rml_builder.reset();
                             m_buffer.commit();
                             delete m_relation_builder;
                             m_relation_builder = nullptr;
