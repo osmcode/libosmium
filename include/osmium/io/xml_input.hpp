@@ -87,9 +87,9 @@ namespace osmium {
 
             osmium::memory::Buffer m_buffer;
 
-            osmium::memory::NodeBuilder*               m_node_builder;
-            osmium::memory::WayBuilder*                m_way_builder;
-            osmium::memory::RelationBuilder*           m_relation_builder;
+            std::unique_ptr<osmium::memory::NodeBuilder>               m_node_builder;
+            std::unique_ptr<osmium::memory::WayBuilder>                m_way_builder;
+            std::unique_ptr<osmium::memory::RelationBuilder>           m_relation_builder;
 
             std::unique_ptr<osmium::memory::TagListBuilder>            m_tl_builder;
             std::unique_ptr<osmium::memory::WayNodeListBuilder>        m_wnl_builder;
@@ -111,9 +111,9 @@ namespace osmium {
                 m_fd(fd),
                 m_meta(),
                 m_buffer(buffer_size),
-                m_node_builder(nullptr),
-                m_way_builder(nullptr),
-                m_relation_builder(nullptr),
+                m_node_builder(),
+                m_way_builder(),
+                m_relation_builder(),
                 m_tl_builder(),
                 m_wnl_builder(),
                 m_rml_builder(),
@@ -191,7 +191,6 @@ namespace osmium {
                 if (!user_set) {
                     builder->add_string("");
                 }
-//                std::cerr << "node id=" << object.id() << std::endl;
             }
 
             void check_tag(osmium::memory::Builder* builder, const XML_Char* element, const XML_Char** attrs) {
@@ -240,24 +239,24 @@ namespace osmium {
                                     m_meta_promise.set_value(m_meta);
                                     m_promise_fulfilled = true;
                                 }
-                                m_node_builder = new osmium::memory::NodeBuilder(m_buffer);
-                                init_object(m_node_builder, m_node_builder->object(), attrs);
+                                m_node_builder = std::unique_ptr<osmium::memory::NodeBuilder>(new osmium::memory::NodeBuilder(m_buffer));
+                                init_object(m_node_builder.get(), m_node_builder->object(), attrs);
                                 m_context = context::node;
                             } else if (!strcmp(element, "way")) {
                                 if (!m_promise_fulfilled) {
                                     m_meta_promise.set_value(m_meta);
                                     m_promise_fulfilled = true;
                                 }
-                                m_way_builder = new osmium::memory::WayBuilder(m_buffer);
-                                init_object(m_way_builder, m_way_builder->object(), attrs);
+                                m_way_builder = std::unique_ptr<osmium::memory::WayBuilder>(new osmium::memory::WayBuilder(m_buffer));
+                                init_object(m_way_builder.get(), m_way_builder->object(), attrs);
                                 m_context = context::way;
                             } else if (!strcmp(element, "relation")) {
                                 if (!m_promise_fulfilled) {
                                     m_meta_promise.set_value(m_meta);
                                     m_promise_fulfilled = true;
                                 }
-                                m_relation_builder = new osmium::memory::RelationBuilder(m_buffer);
-                                init_object(m_relation_builder, m_relation_builder->object(), attrs);
+                                m_relation_builder = std::unique_ptr<osmium::memory::RelationBuilder>(new osmium::memory::RelationBuilder(m_buffer));
+                                init_object(m_relation_builder.get(), m_relation_builder->object(), attrs);
                                 m_context = context::relation;
                             } else if (!strcmp(element, "bounds")) {
                                 osmium::Location min;
@@ -281,7 +280,7 @@ namespace osmium {
                         case context::node:
                             m_last_context = context::node;
                             m_context = context::in_object;
-                            check_tag(m_node_builder, element, attrs);
+                            check_tag(m_node_builder.get(), element, attrs);
                             break;
                         case context::way:
                             m_last_context = context::way;
@@ -290,7 +289,7 @@ namespace osmium {
                                 m_tl_builder.reset();
 
                                 if (!m_wnl_builder) {
-                                    m_wnl_builder = std::unique_ptr<osmium::memory::WayNodeListBuilder>(new osmium::memory::WayNodeListBuilder(m_buffer, m_way_builder));
+                                    m_wnl_builder = std::unique_ptr<osmium::memory::WayNodeListBuilder>(new osmium::memory::WayNodeListBuilder(m_buffer, m_way_builder.get()));
                                 }
 
                                 for (int count = 0; attrs[count]; count += 2) {
@@ -299,7 +298,7 @@ namespace osmium {
                                     }
                                 }
                             } else {
-                                check_tag(m_way_builder, element, attrs);
+                                check_tag(m_way_builder.get(), element, attrs);
                             }
                             break;
                         case context::relation:
@@ -309,7 +308,7 @@ namespace osmium {
                                 m_tl_builder.reset();
 
                                 if (!m_rml_builder) {
-                                    m_rml_builder = std::unique_ptr<osmium::memory::RelationMemberListBuilder>(new osmium::memory::RelationMemberListBuilder(m_buffer, m_relation_builder));
+                                    m_rml_builder = std::unique_ptr<osmium::memory::RelationMemberListBuilder>(new osmium::memory::RelationMemberListBuilder(m_buffer, m_relation_builder.get()));
                                 }
 
                                 char type = 'x';
@@ -327,7 +326,7 @@ namespace osmium {
                                 // XXX assert type, ref, role are set
                                 m_rml_builder->add_member(char_to_item_type(type), ref, role);
                             } else {
-                                check_tag(m_relation_builder, element, attrs);
+                                check_tag(m_relation_builder.get(), element, attrs);
                             }
                             break;
                         case context::in_object:
@@ -359,9 +358,8 @@ namespace osmium {
                         case context::node:
                             assert(!strcmp(element, "node"));
                             m_tl_builder.reset();
+                            m_node_builder.reset();
                             m_buffer.commit();
-                            delete m_node_builder;
-                            m_node_builder = nullptr;
                             m_context = context::top;
                             flush_buffer();
                             break;
@@ -369,9 +367,8 @@ namespace osmium {
                             assert(!strcmp(element, "way"));
                             m_tl_builder.reset();
                             m_wnl_builder.reset();
+                            m_way_builder.reset();
                             m_buffer.commit();
-                            delete m_way_builder;
-                            m_way_builder = nullptr;
                             m_context = context::top;
                             flush_buffer();
                             break;
@@ -379,9 +376,8 @@ namespace osmium {
                             assert(!strcmp(element, "relation"));
                             m_tl_builder.reset();
                             m_rml_builder.reset();
+                            m_relation_builder.reset();
                             m_buffer.commit();
-                            delete m_relation_builder;
-                            m_relation_builder = nullptr;
                             m_context = context::top;
                             flush_buffer();
                             break;
