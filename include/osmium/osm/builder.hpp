@@ -75,7 +75,7 @@ namespace osmium {
             }
 
             void add_way_node(const WayNode& way_node) {
-                new (get_space_for<osmium::WayNode>()) osmium::WayNode(way_node);
+                new (reserve_space_for<osmium::WayNode>()) osmium::WayNode(way_node);
                 add_size(sizeof(osmium::WayNode));
             }
 
@@ -98,7 +98,7 @@ namespace osmium {
             }
 
             void add_member(osmium::item_type type, object_id_type ref, const char* role, const osmium::Object* full_member = nullptr) {
-                new (get_space_for<osmium::RelationMember>()) osmium::RelationMember(ref, type, full_member != nullptr);
+                new (reserve_space_for<osmium::RelationMember>()) osmium::RelationMember(ref, type, full_member != nullptr);
                 add_size(sizeof(RelationMember));
                 add_string(role);
                 if (full_member) {

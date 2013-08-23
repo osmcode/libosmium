@@ -58,7 +58,7 @@ namespace osmium {
             Builder(Buffer& buffer, Builder* parent, size_t size, item_type item_type) :
                 m_buffer(buffer),
                 m_parent(parent),
-                m_item(reinterpret_cast<osmium::memory::Item*>(m_buffer.get_space(size))) {
+                m_item(reinterpret_cast<osmium::memory::Item*>(m_buffer.reserve_space(size))) {
                 assert(buffer.is_aligned());
                 new (m_item) osmium::memory::Item(size, item_type);
                 if (m_parent) {
@@ -86,7 +86,7 @@ namespace osmium {
             }
 
             void add_item(const osmium::memory::Item* item) {
-                std::memcpy(m_buffer.get_space(item->padded_size()), item, item->padded_size());
+                std::memcpy(m_buffer.reserve_space(item->padded_size()), item, item->padded_size());
                 add_size(item->padded_size());
             }
 
@@ -98,7 +98,7 @@ namespace osmium {
             void add_padding() {
                 size_t padding = align_bytes - (size() % align_bytes);
                 if (padding != align_bytes) {
-                    memset(m_buffer.get_space(padding), 0, padding);
+                    memset(m_buffer.reserve_space(padding), 0, padding);
                     if (m_parent) {
                         m_parent->add_size(padding);
                         assert(m_parent->size() % align_bytes == 0);
@@ -111,10 +111,10 @@ namespace osmium {
              * pointer to it.
              */
             template <class T>
-            T* get_space_for() {
+            T* reserve_space_for() {
                 assert(m_buffer.is_aligned());
                 assert(sizeof(T) % align_bytes == 0);
-                return reinterpret_cast<T*>(m_buffer.get_space(sizeof(T)));
+                return reinterpret_cast<T*>(m_buffer.reserve_space(sizeof(T)));
             }
 
             /**
@@ -122,19 +122,19 @@ namespace osmium {
              */
             size_t append(const char* str) {
                 size_t length = std::strlen(str) + 1;
-                std::memcpy(m_buffer.get_space(length), str, length);
+                std::memcpy(m_buffer.reserve_space(length), str, length);
                 return length;
             }
 
             void add_string(const char* str) {
                 size_t len = std::strlen(str) + 1;
-                *get_space_for<size_t>() = len;
+                *reserve_space_for<size_t>() = len;
                 append(str);
                 add_size(sizeof(size_t) + len);
 
                 size_t padding = align_bytes - (len % align_bytes);
                 if (padding != align_bytes) {
-                    memset(m_buffer.get_space(padding), 0, padding);
+                    memset(m_buffer.reserve_space(padding), 0, padding);
                     add_size(padding);
                 }
                 assert(m_buffer.is_aligned());

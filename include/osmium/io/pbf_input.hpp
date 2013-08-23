@@ -126,7 +126,7 @@ namespace osmium {
         private:
 
             void grow_buffer() {
-                const size_t new_size = m_buffer.size() * buffer_growth_factor;
+                const size_t new_size = m_buffer.capacity() * buffer_growth_factor;
                 char* data = new char[new_size];
                 osmium::memory::Buffer new_buffer(data, new_size, m_buffer.committed());
                 memcpy(data, m_buffer.data(), m_buffer.committed());

@@ -419,7 +419,7 @@ namespace osmium {
             }
 
             void flush_buffer() {
-                if (m_buffer.size() - m_buffer.committed() < 1000 * 1000) {
+                if (m_buffer.capacity() - m_buffer.committed() < 1000 * 1000) {
                     m_queue.push(std::move(m_buffer));
                     osmium::memory::Buffer buffer(new char[buffer_size], buffer_size, 0);
                     std::swap(m_buffer, buffer);

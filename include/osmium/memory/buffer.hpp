@@ -55,30 +55,47 @@ namespace osmium {
 
         /**
          * A memory area for storing OSM and other objects. It is initialized
-         * with a memory pointer, a size, and, optionally, the number of bytes
-         * already committed to this buffer. OSM objects can't be just created
-         * anywhere because they have varying sizes, they need this buffer to
-         * live in.
+         * with a memory pointer, a capacity, and, optionally, the number of bytes
+         * already committed to this buffer. OSM objects can be created in one
+         * of these buffers with the Builder classes.
+         *
+         * Buffers have a fixed capacity, they can not grow.
+         *
+         * Data can be added to a buffer piece by piece using reserve_space() and
+         * add_item(). After all data that belongs together is added, it must
+         * be committed using the commit() call.
          */
         class Buffer {
 
             char* m_data;
-            size_t m_size;
+            size_t m_capacity;
             size_t m_written;
             size_t m_committed;
 
         public:
 
+            /**
+             * The constructor without any parameters creates a non-initialized
+             * buffer, ie an empty hull of a buffer that has no actual memory
+             * associated with it. It can be used to signify end-of-input.
+             */
             Buffer() :
                 m_data(nullptr),
-                m_size(0),
+                m_capacity(0),
                 m_written(0),
                 m_committed(0) {
             }
 
+            /**
+             * Constructs a full buffer with the given size.
+             *
+             * @param data A pointer to some already initialized data.
+             * @param size The size of the initialized data.
+             * @exception std::invalid_argument When the size isn't a multiple of the aligment.
+             */
             Buffer(char* data, size_t size) :
                 m_data(data),
-                m_size(size),
+                m_capacity(size),
                 m_written(size),
                 m_committed(size) {
                 if (size % align_bytes != 0) {
@@ -86,66 +103,117 @@ namespace osmium {
                 }
             }
 
-            Buffer(char* data, size_t size, size_t committed) :
+            /**
+             * Constructs a buffer with the given capacity that already contains
+             * 'committed' bytes of data.
+             *
+             * @param data A pointer to some (possibly initialized) data.
+             * @param capacity The size of the memory for this buffer.
+             * @param committed The size of the initialized data. If this is 0, the buffer startes out empty.
+             * @exception std::invalid_argument When the capacity or committed isn't a multiple of the aligment.
+             */
+            Buffer(char* data, size_t capacity, size_t committed) :
                 m_data(data),
-                m_size(size),
+                m_capacity(capacity),
                 m_written(committed),
                 m_committed(committed) {
-                if (size % align_bytes != 0) {
-                    throw std::invalid_argument("buffer size needs to be multiple of alignment");
+                if (capacity % align_bytes != 0) {
+                    throw std::invalid_argument("buffer capacity needs to be multiple of alignment");
                 }
                 if (committed % align_bytes != 0) {
-                    throw std::invalid_argument("buffer size needs to be multiple of alignment");
+                    throw std::invalid_argument("buffer parameter 'committed' needs to be multiple of alignment");
                 }
             }
 
+            // buffers can not be copied
             Buffer(const Buffer&) = delete;
             Buffer& operator=(const Buffer&) = delete;
 
+            // buffers can be moved
             Buffer(Buffer&&) = default;
             Buffer& operator=(Buffer&&) = default;
 
             ~Buffer() = default;
 
+            /**
+             * Return a pointer to data inside the buffer.
+             */
             char* data() const {
                 return m_data;
             }
 
-            size_t size() const {
-                return m_size;
+            /**
+             * Returns the capacity of the buffer, ie how many bytes it can contain.
+             */
+            size_t capacity() const {
+                return m_capacity;
             }
 
+            /**
+             * Returns the number of bytes already filled in this buffer.
+             */
             size_t committed() const {
                 return m_committed;
             }
 
             /**
              * This tests if the current state of the buffer is aligned
-             * properly. Only used for asserts.
+             * properly. Can be used for asserts.
              */
             bool is_aligned() const {
                 return (m_written % align_bytes == 0) && (m_committed % align_bytes == 0);
             }
 
+            /**
+             * Mark currently written bytes in the buffer as committed.
+             *
+             * @return Last number of committed bytes before this commit.
+             */
             size_t commit() {
                 assert(is_aligned());
-                size_t offset = m_committed;
+
+                const size_t offset = m_committed;
                 m_committed = m_written;
                 return offset;
             }
 
+            /**
+             * Clear the buffer.
+             *
+             * @return Number of bytes in the buffer before it was cleared.
+             */
             size_t clear() {
-                size_t committed = m_committed;
+                const size_t committed = m_committed;
                 m_written = 0;
                 m_committed = 0;
                 return committed;
             }
 
             /**
-             * Reserve space of given size in buffer and return pointer to it.
+             * Get the data in the buffer at the given offset.
+             *
+             * @tparam T Type we want to the data to be interpreted as.
+             * @return Reference of given type pointing to the data in the buffer.
              */
-            char* get_space(size_t size) {
-                if (m_written + size > m_size) {
+            template <class T>
+            T& get(const size_t offset) const {
+                return *reinterpret_cast<T*>(&m_data[offset]);
+            }
+
+            /**
+             * Reserve space of given size in buffer and return pointer to it.
+             * This is the main way of adding data to the buffer. You reserve
+             * the space and fill it.
+             *
+             * Note that you have to eventually call commit() to actually
+             * commit this data.
+             *
+             * @param size Number of bytes to reserve.
+             * @return Pointer to reserved space.
+             * @throw BufferIsFull If there is not enough space in the buffer to fulfill the reservation.
+             */
+            char* reserve_space(const size_t size) {
+                if (m_written + size > m_capacity) {
                     throw BufferIsFull();
                 }
                 char* data = &m_data[m_written];
@@ -153,18 +221,20 @@ namespace osmium {
                 return data;
             }
 
-            template <class T>
-            T& get(const size_t offset) const {
-                return *reinterpret_cast<T*>(&m_data[offset]);
-            }
-
             /**
              * Add an item to the buffer. The size of the item is stored inside
              * the item, so we know how much memory to copy.
+             *
+             * Note that you have to eventually call commit() to actually
+             * commit this data.
+             *
+             * @tparam T Class of the item to be copied.
+             * @param item Reference to the item to be copied.
+             * @return Reference to newly copied data in the buffer.
              */
             template <class T>
             T& add_item(const T& item) {
-                char* ptr = get_space(item.padded_size());
+                char* ptr = reserve_space(item.padded_size());
                 std::memcpy(ptr, &item, item.padded_size());
                 return *reinterpret_cast<T*>(ptr);
             }
@@ -200,7 +270,10 @@ namespace osmium {
                 return cend();
             }
 
-            operator bool() const {
+            /**
+             * In a bool context any initialized buffer is true.
+             */
+            explicit operator bool() const {
                 return m_data != nullptr;
             }
 
@@ -208,12 +281,20 @@ namespace osmium {
                 using std::swap;
 
                 swap(lhs.m_data, rhs.m_data);
-                swap(lhs.m_size, rhs.m_size);
+                swap(lhs.m_capacity, rhs.m_capacity);
                 swap(lhs.m_written, rhs.m_written);
                 swap(lhs.m_committed, rhs.m_committed);
             }
 
         }; // class Buffer
+
+        bool operator==(const Buffer& lhs, const Buffer& rhs) {
+            return lhs.data() == rhs.data() && lhs.capacity() == rhs.capacity() && lhs.committed() == rhs.committed();
+        }
+
+        bool operator!=(const Buffer& lhs, const Buffer& rhs) {
+            return ! (lhs == rhs);
+        }
 
     } // namespace memory
 
