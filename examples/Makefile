@@ -17,7 +17,7 @@
 CXXFLAGS += -O3
 #CXXFLAGS += -g
 CXXFLAGS += -std=c++11 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64
-CXXFLAGS += -I../include -I/usr/include/libshp
+CXXFLAGS += -I../include
 
 OS:=$(shell uname -s)
 ifeq ($(OS),Darwin)
@@ -40,7 +40,7 @@ LIB_GEOS   := $(shell geos-config --libs)
 LIB_OGR    := $(shell gdal-config --libs)
 LIB_SHAPE  := -lshp $(LIB_GEOS)
 LIB_XML2   := $(shell xml2-config --libs)
-LIB_PRGOPT := -static -lboost_program_options
+LIB_PRGOPT := -Bstatic -lboost_program_options -Bdynamic
 
 PROGRAMS := \
     osmium_convert \
