@@ -343,11 +343,11 @@ namespace osmium {
 
         }; // class Buffer
 
-        bool operator==(const Buffer& lhs, const Buffer& rhs) {
+        inline bool operator==(const Buffer& lhs, const Buffer& rhs) {
             return lhs.data() == rhs.data() && lhs.capacity() == rhs.capacity() && lhs.committed() == rhs.committed();
         }
 
-        bool operator!=(const Buffer& lhs, const Buffer& rhs) {
+        inline bool operator!=(const Buffer& lhs, const Buffer& rhs) {
             return ! (lhs == rhs);
         }
 
