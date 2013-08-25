@@ -15,7 +15,7 @@ if [ -z "$CXX" ]; then
 fi
 
 if [ -z "$CXXFLAGS_WARNINGS" ]; then
-    CXXFLAGS_WARNINGS="-Wall -Wextra -Wredundant-decls -Wdisabled-optimization -pedantic -Wctor-dtor-privacy -Wnon-virtual-dtor -Woverloaded-virtual -Wsign-promo -Wno-long-long"
+    CXXFLAGS_WARNINGS="-Wall -Wextra -Wredundant-decls -Wdisabled-optimization -pedantic -Wctor-dtor-privacy -Wnon-virtual-dtor -Woverloaded-virtual -Wsign-promo"
 fi
 
 CXXFLAGS="$CXXFLAGS -g -std=c++11"
