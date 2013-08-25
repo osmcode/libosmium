@@ -94,7 +94,7 @@ namespace osmium {
             void set_meta(osmium::io::Meta& meta) override {
                 check_for_error(xmlTextWriterSetIndent(m_xml_writer, 1));
                 check_for_error(xmlTextWriterSetIndentString(m_xml_writer, cast_to_xmlchar("  ")));
-                check_for_error(xmlTextWriterStartDocument(m_xml_writer, NULL, NULL, NULL)); // <?xml .. ?>
+                check_for_error(xmlTextWriterStartDocument(m_xml_writer, NULL, "UTF-8", NULL)); // <?xml .. ?>
 
                 if (this->m_file.type() == osmium::io::FileType::Change()) {
                     check_for_error(xmlTextWriterStartElement(m_xml_writer, cast_to_xmlchar("osmChange")));  // <osmChange>
