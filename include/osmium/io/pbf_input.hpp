@@ -510,6 +510,7 @@ namespace osmium {
             const size_t m_max_queue_size;
             osmium::thread::Pool m_thread_pool;
             std::atomic<bool> m_done;
+            int m_pending_jobs;
             std::thread m_reader;
             OSMPBF::BlobHeader m_blob_header;
             unsigned char m_blob_header_buffer[OSMPBF::max_blob_header_size];
@@ -555,6 +556,7 @@ namespace osmium {
                 while (size_t size = read_blob_header(fd(), "OSMData")) {
                     DataBlobParser data_blob_parser(m_queue, size, n, fd());
 
+                    ++m_pending_jobs;
                     if (m_num_threads == 0) {
                         // if there are no threads in the thread pool, we parse in this thread
                         data_blob_parser();
@@ -586,7 +588,8 @@ namespace osmium {
                 m_queue(),
                 m_max_queue_size(num_threads * 4),
                 m_thread_pool(num_threads),
-                m_done(false) {
+                m_done(false),
+                m_pending_jobs(0) {
                 GOOGLE_PROTOBUF_VERIFY_VERSION;
             }
 
@@ -621,10 +624,11 @@ namespace osmium {
              */
             osmium::memory::Buffer next_buffer() override {
                 osmium::memory::Buffer buffer;
-                if (m_done && m_thread_pool.work_queue_empty() && m_queue.empty()) {
+                if (m_done && m_thread_pool.work_queue_empty() && m_queue.empty() && m_pending_jobs==0) {
                     return buffer;
                 }
                 m_queue.wait_and_pop(buffer);
+                --m_pending_jobs;
                 return std::move(buffer);
             }
 
