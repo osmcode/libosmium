@@ -45,6 +45,10 @@ Expat (for parsing XML files)
     Debian/Ubuntu: libexpat1-dev
     openSUSE: libexpat-devel
 
+libxml2 (for writing XML files)
+    http://xmlsoft.org/
+    Debian/Ubuntu: libxml2-dev
+
 GEOS (for assembling multipolygons etc.)
     http://trac.osgeo.org/geos/
     Debian/Ubuntu: libgeos++-dev
