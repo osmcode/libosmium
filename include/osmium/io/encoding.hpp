@@ -52,24 +52,33 @@ namespace osmium {
         class Encoding {
 
             const std::string m_suffix;
+            const std::string m_description;
             const std::string m_compress;
             const std::string m_decompress;
-            const bool m_pbf;
 
-            Encoding(const std::string& suffix, const std::string& compress, const std::string& decompress, bool pbf) :
+            Encoding(const std::string& suffix, const std::string& description, const std::string& compress = "", const std::string& decompress = "") :
                 m_suffix(suffix),
+                m_description(description),
                 m_compress(compress),
-                m_decompress(decompress),
-                m_pbf(pbf) {
+                m_decompress(decompress) {
             }
+
+            ~Encoding() = default;
 
             Encoding(const Encoding&) = delete;
             Encoding& operator=(const Encoding&) = delete;
+
+            Encoding(Encoding&&) = delete;
+            Encoding& operator=(Encoding&&) = delete;
 
         public:
 
             const std::string& suffix() const {
                 return m_suffix;
+            }
+
+            const std::string& description() const {
+                return m_description;
             }
 
             const std::string& compress() const {
@@ -80,15 +89,11 @@ namespace osmium {
                 return m_decompress;
             }
 
-            bool is_pbf() const {
-                return m_pbf;
-            }
-
             /**
-             * Encoding in PBF.
+             * PBF encoding.
              */
             static Encoding* PBF() {
-                static Encoding instance(".pbf", "", "", true);
+                static Encoding instance(".pbf", "PBF");
                 return &instance;
             }
 
@@ -96,7 +101,7 @@ namespace osmium {
              * XML encoding, uncompressed.
              */
             static Encoding* XML() {
-                static Encoding instance("", "", "", false);
+                static Encoding instance("", "XML (uncompressed)");
                 return &instance;
             }
 
@@ -104,7 +109,7 @@ namespace osmium {
              * XML encoding, compressed with gzip.
              */
             static Encoding* XMLgz() {
-                static Encoding instance(".gz", "gzip", "zcat", false);
+                static Encoding instance(".gz", "XML (compressed with gzip)", "gzip", "zcat");
                 return &instance;
             }
 
@@ -112,7 +117,7 @@ namespace osmium {
              * XML encoding, compressed with bzip2.
              */
             static Encoding* XMLbz2() {
-                static Encoding instance(".bz2", "bzip2", "bzcat", false);
+                static Encoding instance(".bz2", "XML (compressed with bzip2)", "bzip2", "bzcat");
                 return &instance;
             }
 
@@ -120,7 +125,7 @@ namespace osmium {
              * OPL encoding, uncompressed.
              */
             static Encoding* OPL() {
-                static Encoding instance(".opl", "", "", false);
+                static Encoding instance(".opl", "OPL (uncompressed)");
                 return &instance;
             }
 
@@ -128,7 +133,7 @@ namespace osmium {
              * OPL encoding, compressed with gzip.
              */
             static Encoding* OPLgz() {
-                static Encoding instance(".opl.gz", "gzip", "zcat", false);
+                static Encoding instance(".opl.gz", "OPL (compressed with gzip)", "gzip", "zcat");
                 return &instance;
             }
 
@@ -136,7 +141,7 @@ namespace osmium {
              * OPL encoding, compressed with bzip2.
              */
             static Encoding* OPLbz2() {
-                static Encoding instance(".opl.bz2", "bzip2", "bzcat", false);
+                static Encoding instance(".opl.bz2", "OPL (compressed with bzip2)", "bzip2", "bzcat");
                 return &instance;
             }
 

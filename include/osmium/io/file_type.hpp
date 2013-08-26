@@ -48,15 +48,22 @@ namespace osmium {
         class FileType {
 
             const std::string m_suffix;
+            const std::string m_description;
             const bool m_has_multiple_object_versions;
 
-            FileType(const std::string& suffix, const bool has_multiple_object_versions) :
+            FileType(const std::string& suffix, const std::string& description, const bool has_multiple_object_versions) :
                 m_suffix(suffix),
+                m_description(description),
                 m_has_multiple_object_versions(has_multiple_object_versions) {
             }
 
+            ~FileType() = default;
+
             FileType(const FileType&) = delete;
             FileType& operator=(const FileType&) = delete;
+
+            FileType(FileType&&) = delete;
+            FileType& operator=(FileType&&) = delete;
 
         public:
 
@@ -64,23 +71,27 @@ namespace osmium {
                 return m_suffix;
             }
 
+            std::string description() const {
+                return m_description;
+            }
+
             bool has_multiple_object_versions() const {
                 return m_has_multiple_object_versions;
             }
 
             /**
-             * Normal OSM file without history.
+             * OSM data file without history.
              */
             static FileType* OSM() {
-                static FileType instance(".osm", false);
+                static FileType instance(".osm", "OSM data file without history", false);
                 return &instance;
             }
 
             /**
-             * OSM file with history.
+             * OSM data file with history.
              */
             static FileType* History() {
-                static FileType instance(".osh", true);
+                static FileType instance(".osh", "OSM data file with history", true);
                 return &instance;
             }
 
@@ -88,7 +99,7 @@ namespace osmium {
              * OSM change file.
              */
             static FileType* Change() {
-                static FileType instance(".osc", true);
+                static FileType instance(".osc", "OSM change file", true);
                 return &instance;
             }
 
