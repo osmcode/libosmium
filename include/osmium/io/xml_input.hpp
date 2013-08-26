@@ -435,9 +435,9 @@ namespace osmium {
             /**
              * Instantiate XML Parser
              *
-             * @param file OSMFile instance.
+             * @param file osmium::io::File instance.
              */
-            XMLInput(const OSMFile& file) :
+            XMLInput(const osmium::io::File& file) :
                 osmium::io::Input(file),
                 m_queue(),
                 m_done(false),
@@ -476,7 +476,7 @@ namespace osmium {
                 osmium::io::Encoding::XML(),
                 osmium::io::Encoding::XMLgz(),
                 osmium::io::Encoding::XMLbz2()
-            }, [](const osmium::OSMFile& file) {
+            }, [](const osmium::io::File& file) {
                 return new osmium::io::XMLInput(file);
             });
 

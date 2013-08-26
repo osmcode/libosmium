@@ -763,9 +763,9 @@ namespace osmium {
         public:
 
             /**
-             * Create PBFOutput object from OSMFile.
+             * Create PBFOutput object from File.
              */
-            PBFOutput(const osmium::OSMFile& file) :
+            PBFOutput(const osmium::io::File& file) :
                 Output(file),
                 pbf_blob(),
                 pbf_blob_header(),
@@ -1010,7 +1010,7 @@ namespace osmium {
 
             const bool registered_pbf_output = osmium::io::OutputFactory::instance().register_output_format({
                 osmium::io::Encoding::PBF()
-            }, [](const osmium::OSMFile& file) {
+            }, [](const osmium::io::File& file) {
                 return new osmium::io::PBFOutput(file);
             });
 

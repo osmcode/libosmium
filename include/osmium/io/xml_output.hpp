@@ -77,7 +77,7 @@ namespace osmium {
 
         public:
 
-            XMLOutput(const osmium::OSMFile& file) :
+            XMLOutput(const osmium::io::File& file) :
                 Output(file),
                 m_xml_output_buffer(xmlOutputBufferCreateFd(this->fd(), NULL)),
                 m_xml_writer(xmlNewTextWriter(m_xml_output_buffer)),
@@ -255,7 +255,7 @@ namespace osmium {
                 osmium::io::Encoding::XML(),
                 osmium::io::Encoding::XMLgz(),
                 osmium::io::Encoding::XMLbz2()
-            }, [](const osmium::OSMFile& file) {
+            }, [](const osmium::io::File& file) {
                 return new osmium::io::XMLOutput(file);
             });
 

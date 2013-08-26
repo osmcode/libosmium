@@ -52,7 +52,7 @@ namespace osmium {
          */
         class Input {
 
-            osmium::OSMFile m_file;
+            osmium::io::File m_file;
 
             osmium::io::Meta m_meta;
 
@@ -73,7 +73,7 @@ namespace osmium {
 
         protected:
 
-            Input(const osmium::OSMFile& file) :
+            Input(const osmium::io::File& file) :
                 m_file(file) {
                 m_meta.has_multiple_object_versions(m_file.has_multiple_object_versions());
                 m_file.open_for_input();
@@ -84,7 +84,7 @@ namespace osmium {
                 return m_meta;
             }
 
-            const osmium::OSMFile& file() const {
+            const osmium::io::File& file() const {
                 return m_file;
             }
 
@@ -98,7 +98,7 @@ namespace osmium {
 
         public:
 
-            typedef std::function<osmium::io::Input*(const osmium::OSMFile&)> create_input_type;
+            typedef std::function<osmium::io::Input*(const osmium::io::File&)> create_input_type;
 
         private:
 
@@ -130,21 +130,21 @@ namespace osmium {
                 return m_callbacks.erase(encoding) == 1;
             }
 
-            std::unique_ptr<osmium::io::Input> create_input(const osmium::OSMFile& file) {
+            std::unique_ptr<osmium::io::Input> create_input(const osmium::io::File& file) {
                 encoding2create_type::iterator it = m_callbacks.find(file.encoding());
 
                 if (it != m_callbacks.end()) {
                     return std::unique_ptr<osmium::io::Input>((it->second)(file));
                 }
 
-                throw osmium::OSMFile::FileEncodingNotSupported();
+                throw osmium::io::File::FileEncodingNotSupported();
             }
 
         }; // class InputFactory
 
         class Reader {
 
-            osmium::OSMFile m_file;
+            osmium::io::File m_file;
             std::unique_ptr<Input> m_input;
 
             Reader(const Reader&) = delete;
@@ -174,7 +174,7 @@ namespace osmium {
 
         public:
 
-            Reader(const osmium::OSMFile& file) :
+            Reader(const osmium::io::File& file) :
                 m_file(file),
                 m_input(InputFactory::instance().create_input(m_file)) {
             }

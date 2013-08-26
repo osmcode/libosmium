@@ -77,21 +77,21 @@ int main(int argc, char* argv[]) {
         input =  argv[optind];
     }
 
-    osmium::OSMFile infile(input);
+    osmium::io::File infile(input);
     if (!input_format.empty()) {
         try {
             infile.set_type_and_encoding(input_format);
-        } catch (osmium::OSMFile::ArgumentError& e) {
+        } catch (osmium::io::File::ArgumentError& e) {
             std::cerr << "Unknown format for input: " << e.value() << std::endl;
             exit(1);
         }
     }
 
-    osmium::OSMFile outfile(output);
+    osmium::io::File outfile(output);
     if (!output_format.empty()) {
         try {
             outfile.set_type_and_encoding(output_format);
-        } catch (osmium::OSMFile::ArgumentError& e) {
+        } catch (osmium::io::File::ArgumentError& e) {
             std::cerr << "Unknown format for output: " << e.value() << std::endl;
             exit(1);
         }

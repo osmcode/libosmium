@@ -58,7 +58,7 @@ namespace osmium {
 
         public:
 
-            OPLOutput(const osmium::OSMFile& file) :
+            OPLOutput(const osmium::io::File& file) :
                 Output(file),
                 m_out() {
             }
@@ -185,7 +185,7 @@ namespace osmium {
                 osmium::io::Encoding::OPL(),
                 osmium::io::Encoding::OPLgz(),
                 osmium::io::Encoding::OPLbz2()
-            }, [](const osmium::OSMFile& file) {
+            }, [](const osmium::io::File& file) {
                 return new osmium::io::OPLOutput(file);
             });
 

@@ -449,10 +449,10 @@ namespace osmium {
 #if 0
                 const osmium::io::FileType* expected_file_type = this->file().type();
                 if (expected_file_type == osmium::io::FileType::OSM() && has_historical_information_feature) {
-                    throw osmium::OSMFile::FileTypeOSMExpected();
+                    throw osmium::io::File::FileTypeOSMExpected();
                 }
                 if (expected_file_type == osmium::io::FileType::History() && !has_historical_information_feature) {
-                    throw osmium::OSMFile::FileTypeHistoryExpected();
+                    throw osmium::io::File::FileTypeHistoryExpected();
                 }
 #endif
 
@@ -580,9 +580,9 @@ namespace osmium {
             /**
              * Instantiate PBF Parser
              *
-             * @param file OSMFile instance.
+             * @param file osmium::io::File instance.
              */
-            PBFInput(const OSMFile& file, const size_t num_threads=2) :
+            PBFInput(const osmium::io::File& file, const size_t num_threads=2) :
                 osmium::io::Input(file),
                 m_num_threads(num_threads),
                 m_queue(),
@@ -640,7 +640,7 @@ namespace osmium {
 
             const bool registered_pbf_input = osmium::io::InputFactory::instance().register_input_format({
                 osmium::io::Encoding::PBF()
-            }, [](const osmium::OSMFile& file) {
+            }, [](const osmium::io::File& file) {
                 return new osmium::io::PBFInput(file);
             });
 

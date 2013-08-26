@@ -18,7 +18,7 @@ int main(int argc, char* argv[]) {
         exit(1);
     }
 
-    osmium::OSMFile infile(argv[1]);
+    osmium::io::File infile(argv[1]);
     osmium::io::Reader reader(infile);
     osmium::io::Meta meta = reader.open();
 

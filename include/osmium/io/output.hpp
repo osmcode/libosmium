@@ -52,7 +52,7 @@ namespace osmium {
 
         protected:
 
-            osmium::OSMFile m_file;
+            osmium::io::File m_file;
             std::string m_generator;
 
             int fd() {
@@ -67,7 +67,7 @@ namespace osmium {
 
         public:
 
-            Output(const osmium::OSMFile& file) :
+            Output(const osmium::io::File& file) :
                 m_file(file),
                 m_generator("Osmium (http://wiki.openstreetmap.org/wiki/Osmium)") {
                 m_file.open_for_output();
@@ -95,7 +95,7 @@ namespace osmium {
 
         public:
 
-            typedef std::function<osmium::io::Output*(const osmium::OSMFile&)> create_output_type;
+            typedef std::function<osmium::io::Output*(const osmium::io::File&)> create_output_type;
 
         private:
 
@@ -128,21 +128,21 @@ namespace osmium {
                 return m_callbacks.erase(encoding) == 1;
             }
 
-            std::unique_ptr<osmium::io::Output> create_output(const osmium::OSMFile& file) {
+            std::unique_ptr<osmium::io::Output> create_output(const osmium::io::File& file) {
                 encoding2create_type::iterator it = m_callbacks.find(file.encoding());
 
                 if (it != m_callbacks.end()) {
                     return std::unique_ptr<osmium::io::Output>((it->second)(file));
                 }
 
-                throw osmium::OSMFile::FileEncodingNotSupported();
+                throw osmium::io::File::FileEncodingNotSupported();
             }
 
         }; // class OutputFactory
 
         class Writer : osmium::handler::Handler<Writer> {
 
-            osmium::OSMFile m_file;
+            osmium::io::File m_file;
             std::unique_ptr<Output> m_output;
 
             Writer(const Writer&) = delete;
@@ -150,7 +150,7 @@ namespace osmium {
 
         public:
 
-            Writer(const osmium::OSMFile& file) :
+            Writer(const osmium::io::File& file) :
                 m_file(file),
                 m_output(OutputFactory::instance().create_output(m_file)) {
             }
