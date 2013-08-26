@@ -1,5 +1,5 @@
-#ifndef OSMIUM_IO_META_HPP
-#define OSMIUM_IO_META_HPP
+#ifndef OSMIUM_IO_HEADER_HPP
+#define OSMIUM_IO_HEADER_HPP
 
 /*
 
@@ -43,7 +43,7 @@ namespace osmium {
         /**
         * Meta information from the header of an OSM file.
         */
-        class Meta {
+        class Header {
 
             Bounds m_bounds;
 
@@ -58,13 +58,13 @@ namespace osmium {
 
         public:
 
-            Meta() :
+            Header() :
                 m_bounds(),
                 m_has_multiple_object_versions(false),
                 m_generator() {
             }
 
-            Meta(const Bounds& bounds) :
+            Header(const Bounds& bounds) :
                 m_bounds(bounds),
                 m_has_multiple_object_versions(false),
                 m_generator() {
@@ -82,7 +82,7 @@ namespace osmium {
                 return m_has_multiple_object_versions;
             }
 
-            Meta& has_multiple_object_versions(bool h) {
+            Header& has_multiple_object_versions(bool h) {
                 m_has_multiple_object_versions = h;
                 return *this;
             }
@@ -91,15 +91,15 @@ namespace osmium {
                 return m_generator;
             }
 
-            Meta& generator(const std::string& generator) {
+            Header& generator(const std::string& generator) {
                 m_generator = generator;
                 return *this;
             }
 
-        }; // class Meta
+        }; // class Header
 
     } // namespace io
 
 } // namespace osmium
 
-#endif // OSMIUM_IO_META_HPP
+#endif // OSMIUM_IO_HEADER_HPP

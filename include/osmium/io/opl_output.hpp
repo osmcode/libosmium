@@ -67,7 +67,7 @@ namespace osmium {
                 this->operator()(begin, end);
             }
 
-            void set_meta(osmium::io::Meta&) override {
+            void set_header(osmium::io::Header&) override {
             }
 
             void node(const osmium::Node& node) {

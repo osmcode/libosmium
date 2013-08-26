@@ -422,7 +422,7 @@ namespace osmium {
 
         class HeaderBlobParser : public BlobParser<HeaderBlobParser> {
 
-            osmium::io::Meta& m_meta;
+            osmium::io::Header& m_header;
 
             void handle_blob(const void* data, const size_t size) {
                 OSMPBF::HeaderBlock pbf_header_block;
@@ -457,14 +457,14 @@ namespace osmium {
 #endif
 
                 if (pbf_header_block.has_writingprogram()) {
-                    m_meta.generator(pbf_header_block.writingprogram());
+                    m_header.generator(pbf_header_block.writingprogram());
                 }
 
                 if (pbf_header_block.has_bbox()) {
                     const OSMPBF::HeaderBBox& bbox = pbf_header_block.bbox();
                     const int64_t resolution_convert = OSMPBF::lonlat_resolution / osmium::coordinate_precision;
-                    m_meta.bounds().extend(osmium::Location(bbox.left()  / resolution_convert, bbox.bottom() / resolution_convert));
-                    m_meta.bounds().extend(osmium::Location(bbox.right() / resolution_convert, bbox.top()    / resolution_convert));
+                    m_header.bounds().extend(osmium::Location(bbox.left()  / resolution_convert, bbox.bottom() / resolution_convert));
+                    m_header.bounds().extend(osmium::Location(bbox.right() / resolution_convert, bbox.top()    / resolution_convert));
                 }
             }
 
@@ -472,9 +472,9 @@ namespace osmium {
 
             friend class BlobParser;
 
-            HeaderBlobParser(queue_type& queue, const int size, const int fd, osmium::io::Meta& meta) :
+            HeaderBlobParser(queue_type& queue, const int size, const int fd, osmium::io::Header& header) :
                 BlobParser(queue, size, 0, fd),
-                m_meta(meta) {
+                m_header(header) {
             }
 
         }; // class HeaderBlobParser
@@ -602,13 +602,13 @@ namespace osmium {
             /**
              * Read PBF file.
              */
-            osmium::io::Meta read(bool header_only) override {
+            osmium::io::Header read(bool header_only) override {
 
                 // handle OSMHeader
                 size_t size = read_blob_header(fd(), "OSMHeader");
 
                 {
-                    HeaderBlobParser header_blob_parser(m_queue, size, fd(), meta());
+                    HeaderBlobParser header_blob_parser(m_queue, size, fd(), header());
                     header_blob_parser();
                 }
 
@@ -616,7 +616,7 @@ namespace osmium {
                     m_reader = std::thread(&PBFInput::parse_osm_data, this);
                 }
 
-                return meta();
+                return header();
             }
 
             /**

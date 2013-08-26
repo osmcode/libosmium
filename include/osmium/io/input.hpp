@@ -40,7 +40,7 @@ DEALINGS IN THE SOFTWARE.
 #include <vector>
 
 #include <osmium/io/file.hpp>
-#include <osmium/io/meta.hpp>
+#include <osmium/io/header.hpp>
 #include <osmium/memory/buffer.hpp>
 
 namespace osmium {
@@ -54,7 +54,7 @@ namespace osmium {
 
             osmium::io::File m_file;
 
-            osmium::io::Meta m_meta;
+            osmium::io::Header m_header;
 
             Input(const Input&) = delete;
             Input(Input&&) = delete;
@@ -67,7 +67,7 @@ namespace osmium {
             virtual ~Input() {
             }
 
-            virtual osmium::io::Meta read(bool header_only) = 0;
+            virtual osmium::io::Header read(bool header_only) = 0;
 
             virtual osmium::memory::Buffer next_buffer() = 0;
 
@@ -75,13 +75,13 @@ namespace osmium {
 
             Input(const osmium::io::File& file) :
                 m_file(file) {
-                m_meta.has_multiple_object_versions(m_file.has_multiple_object_versions());
+                m_header.has_multiple_object_versions(m_file.has_multiple_object_versions());
                 m_file.open_for_input();
 
             }
 
-            osmium::io::Meta& meta() {
-                return m_meta;
+            osmium::io::Header& header() {
+                return m_header;
             }
 
             const osmium::io::File& file() const {
@@ -184,7 +184,7 @@ namespace osmium {
                 m_input(InputFactory::instance().create_input(m_file)) {
             }
 
-            osmium::io::Meta open(bool header_only=false) {
+            osmium::io::Header open(bool header_only=false) {
                 return m_input->read(header_only);
             }
 

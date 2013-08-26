@@ -39,7 +39,7 @@ DEALINGS IN THE SOFTWARE.
 #include <vector>
 
 #include <osmium/io/file.hpp>
-#include <osmium/io/meta.hpp>
+#include <osmium/io/header.hpp>
 #include <osmium/memory/buffer.hpp>
 #include <osmium/osm.hpp>
 #include <osmium/handler.hpp>
@@ -76,7 +76,7 @@ namespace osmium {
             virtual ~Output() {
             }
 
-            virtual void set_meta(osmium::io::Meta&) = 0;
+            virtual void set_header(osmium::io::Header&) = 0;
             virtual void handle_collection(osmium::memory::Buffer::const_iterator, osmium::memory::Buffer::const_iterator) = 0;
             virtual void close() = 0;
 
@@ -165,8 +165,8 @@ namespace osmium {
                 return *this;
             }
 
-            Writer& open(osmium::io::Meta& meta) {
-                m_output->set_meta(meta);
+            Writer& open(osmium::io::Header& header) {
+                m_output->set_header(header);
                 return *this;
             }
 

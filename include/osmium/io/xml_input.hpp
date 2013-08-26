@@ -86,7 +86,7 @@ namespace osmium {
 
             int m_fd;
 
-            osmium::io::Meta m_meta;
+            osmium::io::Header m_header;
 
             osmium::memory::Buffer m_buffer;
 
@@ -99,7 +99,7 @@ namespace osmium {
             std::unique_ptr<osmium::memory::RelationMemberListBuilder> m_rml_builder;
 
             osmium::thread::Queue<osmium::memory::Buffer>& m_queue;
-            std::promise<osmium::io::Meta>& m_meta_promise;
+            std::promise<osmium::io::Header>& m_header_promise;
 
             bool m_promise_fulfilled;
             bool m_header_only;
@@ -108,12 +108,12 @@ namespace osmium {
 
         public:
 
-            XMLParser(int fd, osmium::thread::Queue<osmium::memory::Buffer>& queue, std::promise<osmium::io::Meta>& meta_promise, bool header_only) :
+            XMLParser(int fd, osmium::thread::Queue<osmium::memory::Buffer>& queue, std::promise<osmium::io::Header>& header_promise, bool header_only) :
                 m_context(context::root),
                 m_last_context(context::root),
                 m_in_delete_section(false),
                 m_fd(fd),
-                m_meta(),
+                m_header(),
                 m_buffer(buffer_size),
                 m_node_builder(),
                 m_way_builder(),
@@ -122,7 +122,7 @@ namespace osmium {
                 m_wnl_builder(),
                 m_rml_builder(),
                 m_queue(queue),
-                m_meta_promise(meta_promise),
+                m_header_promise(header_promise),
                 m_promise_fulfilled(false),
                 m_header_only(header_only),
                 m_max_queue_size(100) {
@@ -225,7 +225,7 @@ namespace osmium {
             }
 
             void header_is_done() {
-                m_meta_promise.set_value(m_meta);
+                m_header_promise.set_value(m_header);
                 if (m_header_only) {
                     throw ParserIsDone();
                 }
@@ -243,7 +243,7 @@ namespace osmium {
                                             throw std::runtime_error("can only read version 0.6 files");
                                         }
                                     } else if (!strcmp(attrs[count], "generator")) {
-                                        m_meta.generator(attrs[count+1]);
+                                        m_header.generator(attrs[count+1]);
                                     }
                                 }
                             }
@@ -286,7 +286,7 @@ namespace osmium {
                                         max.lat(atof(attrs[count+1]));
                                     }
                                 }
-                                m_meta.bounds().extend(min).extend(max);
+                                m_header.bounds().extend(min).extend(max);
                             } else if (!strcmp(element, "delete")) {
                                 m_in_delete_section = true;
                             }
@@ -428,7 +428,7 @@ namespace osmium {
             osmium::thread::Queue<osmium::memory::Buffer> m_queue;
             std::atomic<bool> m_done;
             std::thread m_reader;
-            std::promise<osmium::io::Meta> m_meta_promise;
+            std::promise<osmium::io::Header> m_header_promise;
 
         public:
 
@@ -450,13 +450,13 @@ namespace osmium {
                 }
             }
 
-            osmium::io::Meta read(bool header_only) override {
-                XMLParser parser(fd(), m_queue, m_meta_promise, header_only);
+            osmium::io::Header read(bool header_only) override {
+                XMLParser parser(fd(), m_queue, m_header_promise, header_only);
 
                 m_reader = std::thread(std::move(parser));
 
-                // wait for meta
-                return m_meta_promise.get_future().get();
+                // wait for header
+                return m_header_promise.get_future().get();
             }
 
             osmium::memory::Buffer next_buffer() override {

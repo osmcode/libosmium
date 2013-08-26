@@ -91,7 +91,7 @@ namespace osmium {
                 this->operator()(begin, end);
             }
 
-            void set_meta(osmium::io::Meta& meta) override {
+            void set_header(osmium::io::Header& header) override {
                 check_for_error(xmlTextWriterSetIndent(m_xml_writer, 1));
                 check_for_error(xmlTextWriterSetIndentString(m_xml_writer, cast_to_xmlchar("  ")));
                 check_for_error(xmlTextWriterStartDocument(m_xml_writer, NULL, "UTF-8", NULL)); // <?xml .. ?>
@@ -103,13 +103,13 @@ namespace osmium {
                 }
                 check_for_error(xmlTextWriterWriteAttribute(m_xml_writer, cast_to_xmlchar("version"), cast_to_xmlchar("0.6")));
                 check_for_error(xmlTextWriterWriteAttribute(m_xml_writer, cast_to_xmlchar("generator"), cast_to_xmlchar(this->m_generator.c_str())));
-                if (meta.bounds().defined()) {
+                if (header.bounds().defined()) {
                     check_for_error(xmlTextWriterStartElement(m_xml_writer, cast_to_xmlchar("bounds"))); // <bounds>
 
-                    check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, cast_to_xmlchar("minlon"), "%.7f", meta.bounds().bottom_left().lon()));
-                    check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, cast_to_xmlchar("minlat"), "%.7f", meta.bounds().bottom_left().lat()));
-                    check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, cast_to_xmlchar("maxlon"), "%.7f", meta.bounds().top_right().lon()));
-                    check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, cast_to_xmlchar("maxlat"), "%.7f", meta.bounds().top_right().lat()));
+                    check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, cast_to_xmlchar("minlon"), "%.7f", header.bounds().bottom_left().lon()));
+                    check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, cast_to_xmlchar("minlat"), "%.7f", header.bounds().bottom_left().lat()));
+                    check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, cast_to_xmlchar("maxlon"), "%.7f", header.bounds().top_right().lon()));
+                    check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, cast_to_xmlchar("maxlat"), "%.7f", header.bounds().top_right().lat()));
 
                     check_for_error(xmlTextWriterEndElement(m_xml_writer)); // </bounds>
                 }

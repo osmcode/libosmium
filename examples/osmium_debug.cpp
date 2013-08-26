@@ -20,10 +20,10 @@ int main(int argc, char* argv[]) {
     }
 
     osmium::io::Reader reader(argv[1]);
-    osmium::io::Meta meta = reader.open();
+    osmium::io::Header header = reader.open();
 
-    std::cout << "META:\n  generator=" << meta.generator() << "\n";
-    std::cout << "  bounds=" << meta.bounds() << "\n";
+    std::cout << "HEADER:\n  generator=" << header.generator() << "\n";
+    std::cout << "  bounds=" << header.bounds() << "\n";
 
     osmium::osm::Dump dump(std::cout);
     while (osmium::memory::Buffer buffer = reader.read()) {

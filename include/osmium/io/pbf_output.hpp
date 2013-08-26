@@ -886,9 +886,9 @@ namespace osmium {
              * This initializes the header-block, sets the required-features and
              * the writing-program and adds the obligatory StringTable-Index 0.
              */
-            void set_meta(osmium::io::Meta& meta) override {
+            void set_header(osmium::io::Header& header) override {
                 if (debug && has_debug_level(1)) {
-                    std::cerr << "pbf write set_meta" << std::endl;
+                    std::cerr << "pbf write set_header" << std::endl;
                 }
 
                 // add the schema version as required feature to the HeaderBlock
@@ -908,12 +908,12 @@ namespace osmium {
                 // set the writing program
                 pbf_header_block.set_writingprogram(this->m_generator);
 
-                if (meta.bounds().defined()) {
+                if (header.bounds().defined()) {
                     OSMPBF::HeaderBBox* bbox = pbf_header_block.mutable_bbox();
-                    bbox->set_left(meta.bounds().bottom_left().lon() * OSMPBF::lonlat_resolution);
-                    bbox->set_bottom(meta.bounds().bottom_left().lat() * OSMPBF::lonlat_resolution);
-                    bbox->set_right(meta.bounds().top_right().lon() * OSMPBF::lonlat_resolution);
-                    bbox->set_top(meta.bounds().top_right().lat() * OSMPBF::lonlat_resolution);
+                    bbox->set_left(header.bounds().bottom_left().lon() * OSMPBF::lonlat_resolution);
+                    bbox->set_bottom(header.bounds().bottom_left().lat() * OSMPBF::lonlat_resolution);
+                    bbox->set_right(header.bounds().top_right().lon() * OSMPBF::lonlat_resolution);
+                    bbox->set_top(header.bounds().top_right().lat() * OSMPBF::lonlat_resolution);
                 }
 
                 store_header_block();
