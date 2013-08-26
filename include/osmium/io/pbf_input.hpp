@@ -602,7 +602,7 @@ namespace osmium {
             /**
              * Read PBF file.
              */
-            osmium::io::Meta read() override {
+            osmium::io::Meta read(bool header_only) override {
 
                 // handle OSMHeader
                 size_t size = read_blob_header(fd(), "OSMHeader");
@@ -612,7 +612,9 @@ namespace osmium {
                     header_blob_parser();
                 }
 
-                m_reader = std::thread(&PBFInput::parse_osm_data, this);
+                if (!header_only) {
+                    m_reader = std::thread(&PBFInput::parse_osm_data, this);
+                }
 
                 return meta();
             }

@@ -58,6 +58,9 @@ namespace osmium {
 
     namespace io {
 
+        class ParserIsDone : std::exception {
+        };
+
         class XMLParser {
 
             static constexpr int xml_buffer_size = 10240;
@@ -99,12 +102,13 @@ namespace osmium {
             std::promise<osmium::io::Meta>& m_meta_promise;
 
             bool m_promise_fulfilled;
+            bool m_header_only;
 
             size_t m_max_queue_size;
 
         public:
 
-            XMLParser(int fd, osmium::thread::Queue<osmium::memory::Buffer>& queue, std::promise<osmium::io::Meta>& meta_promise) :
+            XMLParser(int fd, osmium::thread::Queue<osmium::memory::Buffer>& queue, std::promise<osmium::io::Meta>& meta_promise, bool header_only) :
                 m_context(context::root),
                 m_last_context(context::root),
                 m_in_delete_section(false),
@@ -120,6 +124,7 @@ namespace osmium {
                 m_queue(queue),
                 m_meta_promise(meta_promise),
                 m_promise_fulfilled(false),
+                m_header_only(header_only),
                 m_max_queue_size(100) {
             }
 
@@ -134,29 +139,33 @@ namespace osmium {
                 XML_SetElementHandler(parser, start_element_wrapper, end_element_wrapper);
 
                 int done;
-                do {
-                    void* buffer = XML_GetBuffer(parser, xml_buffer_size);
-                    if (buffer == nullptr) {
-                        throw std::runtime_error("out of memory");
-                    }
+                try {
+                    do {
+                        void* buffer = XML_GetBuffer(parser, xml_buffer_size);
+                        if (buffer == nullptr) {
+                            throw std::runtime_error("out of memory");
+                        }
 
-                    ssize_t result = ::read(m_fd, buffer, xml_buffer_size);
-                    if (result < 0) {
-                        throw std::runtime_error("read error");
-                    }
-                    done = (result == 0);
-                    if (XML_ParseBuffer(parser, result, done) == XML_STATUS_ERROR) {
-                        XML_Error errorCode = XML_GetErrorCode(parser);
-                        long errorLine = XML_GetCurrentLineNumber(parser);
-                        long errorCol = XML_GetCurrentColumnNumber(parser);
-                        const XML_LChar* errorString = XML_ErrorString(errorCode);
+                        ssize_t result = ::read(m_fd, buffer, xml_buffer_size);
+                        if (result < 0) {
+                            throw std::runtime_error("read error");
+                        }
+                        done = (result == 0);
+                        if (XML_ParseBuffer(parser, result, done) == XML_STATUS_ERROR) {
+                            XML_Error errorCode = XML_GetErrorCode(parser);
+                            long errorLine = XML_GetCurrentLineNumber(parser);
+                            long errorCol = XML_GetCurrentColumnNumber(parser);
+                            const XML_LChar* errorString = XML_ErrorString(errorCode);
 
-                        std::stringstream errorDesc;
-                        errorDesc << "XML parsing error at line " << errorLine << ":" << errorCol;
-                        errorDesc << ": " << errorString;
-                        throw std::runtime_error(errorDesc.str());
-                    }
-                } while (!done);
+                            std::stringstream errorDesc;
+                            errorDesc << "XML parsing error at line " << errorLine << ":" << errorCol;
+                            errorDesc << ": " << errorString;
+                            throw std::runtime_error(errorDesc.str());
+                        }
+                    } while (!done);
+                } catch (ParserIsDone&) {
+                    // intentionally left blank
+                }
                 XML_ParserFree(parser);
             }
 
@@ -215,6 +224,14 @@ namespace osmium {
                 }
             }
 
+            void header_is_done() {
+                m_meta_promise.set_value(m_meta);
+                if (m_header_only) {
+                    throw ParserIsDone();
+                }
+                m_promise_fulfilled = true;
+            }
+
             void start_element(const XML_Char* element, const XML_Char** attrs) {
                 try {
                     switch (m_context) {
@@ -236,24 +253,21 @@ namespace osmium {
                             assert(!m_tl_builder);
                             if (!strcmp(element, "node")) {
                                 if (!m_promise_fulfilled) {
-                                    m_meta_promise.set_value(m_meta);
-                                    m_promise_fulfilled = true;
+                                    header_is_done();
                                 }
                                 m_node_builder = std::unique_ptr<osmium::memory::NodeBuilder>(new osmium::memory::NodeBuilder(m_buffer));
                                 init_object(m_node_builder.get(), m_node_builder->object(), attrs);
                                 m_context = context::node;
                             } else if (!strcmp(element, "way")) {
                                 if (!m_promise_fulfilled) {
-                                    m_meta_promise.set_value(m_meta);
-                                    m_promise_fulfilled = true;
+                                    header_is_done();
                                 }
                                 m_way_builder = std::unique_ptr<osmium::memory::WayBuilder>(new osmium::memory::WayBuilder(m_buffer));
                                 init_object(m_way_builder.get(), m_way_builder->object(), attrs);
                                 m_context = context::way;
                             } else if (!strcmp(element, "relation")) {
                                 if (!m_promise_fulfilled) {
-                                    m_meta_promise.set_value(m_meta);
-                                    m_promise_fulfilled = true;
+                                    header_is_done();
                                 }
                                 m_relation_builder = std::unique_ptr<osmium::memory::RelationBuilder>(new osmium::memory::RelationBuilder(m_buffer));
                                 init_object(m_relation_builder.get(), m_relation_builder->object(), attrs);
@@ -436,8 +450,8 @@ namespace osmium {
                 }
             }
 
-            osmium::io::Meta read() override {
-                XMLParser parser(fd(), m_queue, m_meta_promise);
+            osmium::io::Meta read(bool header_only) override {
+                XMLParser parser(fd(), m_queue, m_meta_promise, header_only);
 
                 m_reader = std::thread(std::move(parser));
 

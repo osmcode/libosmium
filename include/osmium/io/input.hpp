@@ -67,7 +67,7 @@ namespace osmium {
             virtual ~Input() {
             }
 
-            virtual osmium::io::Meta read() = 0;
+            virtual osmium::io::Meta read(bool header_only) = 0;
 
             virtual osmium::memory::Buffer next_buffer() = 0;
 
@@ -184,8 +184,8 @@ namespace osmium {
                 m_input(InputFactory::instance().create_input(m_file)) {
             }
 
-            osmium::io::Meta open() {
-                return m_input->read();
+            osmium::io::Meta open(bool header_only=false) {
+                return m_input->read(header_only);
             }
 
             osmium::memory::Buffer read() {
