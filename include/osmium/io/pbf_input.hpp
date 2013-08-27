@@ -430,14 +430,16 @@ namespace osmium {
                     throw std::runtime_error("Failed to parse HeaderBlock.");
                 }
 
-                bool has_historical_information_feature = false;
                 for (int i=0; i < pbf_header_block.required_features_size(); ++i) {
                     const std::string& feature = pbf_header_block.required_features(i);
 
                     if (feature == "OsmSchema-V0.6") continue;
-                    if (feature == "DenseNodes") continue;
+                    if (feature == "DenseNodes") {
+                        m_header.pbf_has_dense_nodes(true);
+                        continue;
+                    }
                     if (feature == "HistoricalInformation") {
-                        has_historical_information_feature = true;
+                        m_header.has_multiple_object_versions(true);
                         continue;
                     }
 
@@ -445,16 +447,6 @@ namespace osmium {
                     errmsg << "Required feature not supported: " << feature;
                     throw std::runtime_error(errmsg.str());
                 }
-
-#if 0
-                const osmium::io::FileType* expected_file_type = this->file().type();
-                if (expected_file_type == osmium::io::FileType::OSM() && has_historical_information_feature) {
-                    throw osmium::io::File::FileTypeOSMExpected();
-                }
-                if (expected_file_type == osmium::io::FileType::History() && !has_historical_information_feature) {
-                    throw osmium::io::File::FileTypeHistoryExpected();
-                }
-#endif
 
                 if (pbf_header_block.has_writingprogram()) {
                     m_header.generator(pbf_header_block.writingprogram());

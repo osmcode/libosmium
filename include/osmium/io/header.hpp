@@ -45,30 +45,35 @@ namespace osmium {
         */
         class Header {
 
+            /// Bounding box
             Bounds m_bounds;
 
             /**
             * Are there possibly multiple versions of the same object in this stream of objects?
             * This is true for history files and for change files, but not for normal OSM files.
             */
-            bool m_has_multiple_object_versions;
+            bool m_has_multiple_object_versions = false;
 
             /// Program that generated this file.
             std::string m_generator;
 
+            /**
+             * Are nodes in the PBF files encoded in "Dense" format.
+             * This is only valid for PBF files.
+             */
+            bool m_pbf_has_dense_nodes = false;
+
         public:
 
-            Header() :
-                m_bounds(),
-                m_has_multiple_object_versions(false),
-                m_generator() {
-            }
+            Header() = default;
 
-            Header(const Bounds& bounds) :
-                m_bounds(bounds),
-                m_has_multiple_object_versions(false),
-                m_generator() {
-            }
+            Header(const Header&) = default;
+            Header& operator=(const Header&) = default;
+
+            Header(Header&&) = default;
+            Header& operator=(Header&&) = default;
+
+            ~Header() = default;
 
             Bounds& bounds() {
                 return m_bounds;
@@ -76,6 +81,11 @@ namespace osmium {
 
             const Bounds& bounds() const {
                 return m_bounds;
+            }
+
+            Header& bounds(const Bounds& bounds) {
+                m_bounds = bounds;
+                return *this;
             }
 
             bool has_multiple_object_versions() const {
@@ -93,6 +103,15 @@ namespace osmium {
 
             Header& generator(const std::string& generator) {
                 m_generator = generator;
+                return *this;
+            }
+
+            bool pbf_has_dense_nodes() const {
+                return m_pbf_has_dense_nodes;
+            }
+
+            Header& pbf_has_dense_nodes(bool h) {
+                m_pbf_has_dense_nodes = h;
                 return *this;
             }
 
