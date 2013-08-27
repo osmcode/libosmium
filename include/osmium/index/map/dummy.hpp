@@ -55,7 +55,7 @@ namespace osmium {
 
                 Dummy() = default;
 
-                ~Dummy() noexcept override final = default;
+                ~Dummy() override final = default;
 
                 void set(const TKey, const TValue) override final {
                     // intentionally left blank

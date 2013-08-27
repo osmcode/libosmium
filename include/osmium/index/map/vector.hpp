@@ -61,7 +61,7 @@ namespace osmium {
                     m_vector(fd) {
                 }
 
-                ~VectorBasedDenseMap() noexcept = default;
+                ~VectorBasedDenseMap() {}
 
                 void reserve(const size_t size) override final {
                     m_vector.reserve(size);
@@ -122,7 +122,7 @@ namespace osmium {
                     m_vector(fd) {
                 }
 
-                ~VectorBasedSparseMap() noexcept = default;
+                ~VectorBasedSparseMap() override final = default;
 
                 void set(const TKey key, const TValue value) override final {
                     m_vector.push_back(element_type(key, value));

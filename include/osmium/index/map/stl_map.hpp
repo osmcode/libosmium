@@ -64,7 +64,7 @@ namespace osmium {
 
                 StlMap() = default;
 
-                ~StlMap() noexcept override final = default;
+                ~StlMap() override final = default;
 
                 void set(const TKey id, const TValue value) override final {
                     m_elements[id] = value;
