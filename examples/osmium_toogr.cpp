@@ -10,8 +10,12 @@
 #include <iostream>
 #include <getopt.h>
 
-#include <ogr_api.h>
-#include <ogrsf_frmts.h>
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#pragma GCC diagnostic ignored "-Wredundant-decls"
+# include <ogr_api.h>
+# include <ogrsf_frmts.h>
+#pragma GCC diagnostic pop
 
 // usually you only need one or two of these
 #include <osmium/index/map/dummy.hpp>

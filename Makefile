@@ -33,7 +33,7 @@ install: doc
 	install -m 644 -g root -o root README.md $(DESTDIR)/usr/share/doc/libosmium-dev/README.md
 	cp --recursive include/osmium $(DESTDIR)/usr/include
 
-WARNINGFLAGS := -Wall -Wextra -Wredundant-decls -Wdisabled-optimization -pedantic -Wctor-dtor-privacy -Wnon-virtual-dtor -Woverloaded-virtual -Wsign-promo -Winline -Wold-style-cast
+WARNINGFLAGS := -Wall -Wextra -pedantic -Wredundant-decls -Wdisabled-optimization -Wctor-dtor-privacy -Wnon-virtual-dtor -Woverloaded-virtual -Wsign-promo -Winline -Wold-style-cast
 #WARNINGFLAGS += -Weffc++ 
 
 # This will try to compile each include file on its own to detect missing

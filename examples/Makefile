@@ -31,7 +31,7 @@ CXXFLAGS += -DOSMIUM_WITH_DEBUG
 CXXFLAGS_GEOS     := $(shell geos-config --cflags)
 CXXFLAGS_LIBXML2  := $(shell xml2-config --cflags)
 CXXFLAGS_OGR      := $(shell gdal-config --cflags)
-CXXFLAGS_WARNINGS := -Wall -Wextra -Wdisabled-optimization -pedantic -Wctor-dtor-privacy -Wnon-virtual-dtor -Woverloaded-virtual -Wsign-promo
+CXXFLAGS_WARNINGS := -Wall -Wextra -pedantic -Wredundant-decls -Wdisabled-optimization -Wctor-dtor-privacy -Wnon-virtual-dtor -Woverloaded-virtual -Wsign-promo -Wold-style-cast
 
 LIB_EXPAT  := -lexpat
 LIB_PBF    := -lz -lpthread -lprotobuf-lite -losmpbf
