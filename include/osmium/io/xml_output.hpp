@@ -79,7 +79,7 @@ namespace osmium {
 
             XMLOutput(const osmium::io::File& file) :
                 Output(file),
-                m_xml_output_buffer(xmlOutputBufferCreateFd(this->fd(), NULL)),
+                m_xml_output_buffer(xmlOutputBufferCreateFd(this->fd(), nullptr)),
                 m_xml_writer(xmlNewTextWriter(m_xml_output_buffer)),
                 m_last_op('\0') {
                 if (!m_xml_output_buffer || !m_xml_writer) {
@@ -94,7 +94,7 @@ namespace osmium {
             void set_header(osmium::io::Header& header) override {
                 check_for_error(xmlTextWriterSetIndent(m_xml_writer, 1));
                 check_for_error(xmlTextWriterSetIndentString(m_xml_writer, cast_to_xmlchar("  ")));
-                check_for_error(xmlTextWriterStartDocument(m_xml_writer, NULL, "UTF-8", NULL)); // <?xml .. ?>
+                check_for_error(xmlTextWriterStartDocument(m_xml_writer, nullptr, "UTF-8", nullptr)); // <?xml .. ?>
 
                 if (this->m_file.type() == osmium::io::FileType::Change()) {
                     check_for_error(xmlTextWriterStartElement(m_xml_writer, cast_to_xmlchar("osmChange")));  // <osmChange>

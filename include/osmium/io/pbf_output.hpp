@@ -597,10 +597,10 @@ namespace osmium {
                 primitive_block_contents = 0;
                 primitive_block_size = 0;
 
-                // reset the node/way/relation pointers to NULL
-                pbf_nodes = NULL;
-                pbf_ways = NULL;
-                pbf_relations = NULL;
+                // reset the node/way/relation pointers to nullptr
+                pbf_nodes = nullptr;
+                pbf_ways = nullptr;
+                pbf_relations = nullptr;
             }
 
             /**
@@ -771,9 +771,9 @@ namespace osmium {
                 pbf_blob_header(),
                 pbf_header_block(),
                 pbf_primitive_block(),
-                pbf_nodes(NULL),
-                pbf_ways(NULL),
-                pbf_relations(NULL),
+                pbf_nodes(nullptr),
+                pbf_ways(nullptr),
+                pbf_relations(nullptr),
                 m_location_granularity(pbf_primitive_block.granularity()),
                 m_date_granularity(pbf_primitive_block.date_granularity()),
                 m_use_dense_format(true),

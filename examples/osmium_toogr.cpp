@@ -49,23 +49,23 @@ public:
         OGRRegisterAll();
 
         OGRSFDriver* driver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(driver_name.c_str());
-        if (driver == NULL) {
+        if (!driver) {
             std::cerr << driver_name << " driver not available.\n";
             exit(1);
         }
 
         CPLSetConfigOption("OGR_SQLITE_SYNCHRONOUS", "FALSE");
-        const char* options[] = { "SPATIALITE=TRUE", NULL };
+        const char* options[] = { "SPATIALITE=TRUE", nullptr };
         m_data_source = driver->CreateDataSource(filename.c_str(), const_cast<char**>(options));
-        if (m_data_source == NULL) {
+        if (!m_data_source) {
             std::cerr << "Creation of output file failed.\n";
             exit(1);
         }
 
         OGRSpatialReference sparef;
         sparef.SetWellKnownGeogCS("WGS84");
-        m_layer_point = m_data_source->CreateLayer("postboxes", &sparef, wkbPoint, NULL);
-        if (m_layer_point == NULL) {
+        m_layer_point = m_data_source->CreateLayer("postboxes", &sparef, wkbPoint, nullptr);
+        if (!m_layer_point) {
             std::cerr << "Layer creation failed.\n";
             exit(1);
         }
@@ -90,8 +90,8 @@ public:
            Feel free to experiment and benchmark and report back. */
         m_layer_point->StartTransaction();
 
-        m_layer_linestring = m_data_source->CreateLayer("roads", &sparef, wkbLineString, NULL);
-        if (m_layer_linestring == NULL) {
+        m_layer_linestring = m_data_source->CreateLayer("roads", &sparef, wkbLineString, nullptr);
+        if (!m_layer_linestring) {
             std::cerr << "Layer creation failed.\n";
             exit(1);
         }

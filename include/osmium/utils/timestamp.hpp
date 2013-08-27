@@ -84,7 +84,7 @@ namespace osmium {
         inline time_t parse_iso(const char* timestamp) {
 #ifndef WIN32
             struct tm tm = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-            if (strptime(timestamp, timestamp_format(), &tm) == NULL) {
+            if (strptime(timestamp, timestamp_format(), &tm) == nullptr) {
                 throw std::invalid_argument("can't parse timestamp");
             }
             return timegm(&tm);
