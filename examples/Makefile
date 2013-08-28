@@ -40,7 +40,11 @@ LIB_GEOS   := $(shell geos-config --libs)
 LIB_OGR    := $(shell gdal-config --libs)
 LIB_SHAPE  := -lshp $(LIB_GEOS)
 LIB_XML2   := $(shell xml2-config --libs)
-LIB_PRGOPT := -Bstatic -lboost_program_options -Bdynamic
+
+# this links libboost_program_options statically, because for some reason
+# it always wants the exact version which might not be available on a
+# different host
+LIB_PRGOPT := -Wl,-Bstatic -lboost_program_options -Wl,-Bdynamic
 
 PROGRAMS := \
     osmium_convert \
