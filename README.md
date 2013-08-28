@@ -105,6 +105,10 @@ Call "make clean" to clean up.
 
 To build the examples go to the "examples" directory and type "make".
 
+For Mac users: If you have clang 3.2 or newer, use the system compiler.
+If not you have to build the compiler yourself. See the instructions
+on http://clang.llvm.org/ .
+
 
 TESTING
 =======
