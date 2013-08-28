@@ -53,7 +53,6 @@ namespace osmium {
         protected:
 
             osmium::io::File m_file;
-            std::string m_generator;
 
             int fd() {
                 return m_file.fd();
@@ -68,8 +67,7 @@ namespace osmium {
         public:
 
             Output(const osmium::io::File& file) :
-                m_file(file),
-                m_generator("Osmium (http://wiki.openstreetmap.org/wiki/Osmium)") {
+                m_file(file) {
                 m_file.open_for_output();
             }
 
@@ -79,10 +77,6 @@ namespace osmium {
             virtual void set_header(osmium::io::Header&) = 0;
             virtual void handle_collection(osmium::memory::Buffer::const_iterator, osmium::memory::Buffer::const_iterator) = 0;
             virtual void close() = 0;
-
-            void set_generator(const std::string& generator) {
-                m_generator = generator;
-            }
 
         }; // class Output
 
@@ -158,11 +152,6 @@ namespace osmium {
             Writer(const std::string& filename = "") :
                 m_file(filename),
                 m_output(OutputFactory::instance().create_output(m_file)) {
-            }
-
-            Writer& set_generator(const char* generator) {
-                m_output->set_generator(generator);
-                return *this;
             }
 
             Writer& open(osmium::io::Header& header) {

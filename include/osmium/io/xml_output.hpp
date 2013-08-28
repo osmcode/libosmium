@@ -102,7 +102,7 @@ namespace osmium {
                     check_for_error(xmlTextWriterStartElement(m_xml_writer, cast_to_xmlchar("osm")));  // <osm>
                 }
                 check_for_error(xmlTextWriterWriteAttribute(m_xml_writer, cast_to_xmlchar("version"), cast_to_xmlchar("0.6")));
-                check_for_error(xmlTextWriterWriteAttribute(m_xml_writer, cast_to_xmlchar("generator"), cast_to_xmlchar(this->m_generator.c_str())));
+                check_for_error(xmlTextWriterWriteAttribute(m_xml_writer, cast_to_xmlchar("generator"), cast_to_xmlchar(header.generator().c_str())));
                 if (header.bounds().defined()) {
                     check_for_error(xmlTextWriterStartElement(m_xml_writer, cast_to_xmlchar("bounds"))); // <bounds>
 

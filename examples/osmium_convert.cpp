@@ -106,11 +106,11 @@ int main(int argc, char* argv[]) {
     }
 
     osmium::io::Writer writer(outfile);
-    writer.set_generator("osmium_convert");
 
     osmium::io::Reader reader(infile);
     osmium::io::Header header = reader.open();
 
+    header.generator("osmium_convert");
     writer.open(header);
     while (osmium::memory::Buffer buffer = reader.read()) {
         writer(buffer);

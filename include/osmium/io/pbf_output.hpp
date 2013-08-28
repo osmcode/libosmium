@@ -906,7 +906,7 @@ namespace osmium {
                 }
 
                 // set the writing program
-                pbf_header_block.set_writingprogram(this->m_generator);
+                pbf_header_block.set_writingprogram(header.generator());
 
                 if (header.bounds().defined()) {
                     OSMPBF::HeaderBBox* bbox = pbf_header_block.mutable_bbox();
