@@ -13,8 +13,8 @@
 
 int main(int argc, char* argv[]) {
 
-    if (argc != 3) {
-        std::cerr << "Usage: " << argv[0] << " OSMFILE THREADS\n";
+    if (argc != 2) {
+        std::cerr << "Usage: " << argv[0] << " OSMFILE\n";
         exit(1);
     }
 
