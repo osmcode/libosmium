@@ -34,10 +34,15 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <osmium/handler.hpp>
+#include <osmium/index/map/dummy.hpp>
 
 namespace osmium {
 
     namespace handler {
+
+        namespace {
+            typedef osmium::index::map::Dummy<osmium::unsigned_object_id_type, osmium::Location> dummy_type;
+        }
 
         /**
          * Handler to retrieve locations from nodes and add them to ways.
@@ -47,7 +52,7 @@ namespace osmium {
          *                        get(id) methods.
          * @tparam TStorageNegIDs Same but for negative IDs.
          */
-        template <class TStoragePosIDs, class TStorageNegIDs>
+        template <class TStoragePosIDs, class TStorageNegIDs = dummy_type>
         class NodeLocationsForWays : public osmium::handler::Handler<NodeLocationsForWays<TStoragePosIDs, TStorageNegIDs>> {
 
             /// Object that handles the actual storage of the node locations (with positive IDs).
@@ -56,10 +61,17 @@ namespace osmium {
             /// Object that handles the actual storage of the node locations (with negative IDs).
             TStorageNegIDs& m_storage_neg;
 
+            // It is okay to have this static dummy instance, even when using several threads,
+            // because it is read-only.
+            static dummy_type& get_dummy() {
+                static dummy_type instance;
+                return instance;
+            }
+
         public:
 
             NodeLocationsForWays(TStoragePosIDs& storage_pos,
-                                 TStorageNegIDs& storage_neg) :
+                                 TStorageNegIDs& storage_neg = get_dummy()) :
                 m_storage_pos(storage_pos),
                 m_storage_neg(storage_neg) {
             }
