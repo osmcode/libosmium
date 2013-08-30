@@ -67,7 +67,7 @@ namespace osmium {
             virtual ~Input() {
             }
 
-            virtual osmium::io::Header read(bool header_only) = 0;
+            virtual osmium::io::Header read(item_flags_type read_types) = 0;
 
             virtual osmium::memory::Buffer next_buffer() = 0;
 
@@ -146,6 +146,7 @@ namespace osmium {
 
             osmium::io::File m_file;
             std::unique_ptr<Input> m_input;
+            osmium::item_flags_type m_read_types;
 
             Reader(const Reader&) = delete;
             Reader& operator=(const Reader&) = delete;
@@ -184,11 +185,17 @@ namespace osmium {
                 m_input(InputFactory::instance().create_input(m_file)) {
             }
 
-            osmium::io::Header open(bool header_only=false) {
-                return m_input->read(header_only);
+            osmium::io::Header open(osmium::item_flags_type read_types = osmium::item_flags_type::all) {
+                m_read_types = read_types;
+                return m_input->read(read_types);
             }
 
             osmium::memory::Buffer read() {
+                if (m_read_types == osmium::item_flags_type::nothing) {
+                    // If the caller didn't want anything but the header, it will
+                    // always get an empty buffer here.
+                    return osmium::memory::Buffer();
+                }
                 return m_input->next_buffer();
             }
 

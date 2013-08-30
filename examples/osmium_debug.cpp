@@ -12,15 +12,26 @@
 #include <osmium/osm/dump.hpp>
 
 int main(int argc, char* argv[]) {
-//    std::ios_base::sync_with_stdio(false);
+    std::ios_base::sync_with_stdio(false);
 
-    if (argc != 2) {
-        std::cerr << "Usage: " << argv[0] << " OSMFILE\n";
+    if (argc < 2 || argc > 3) {
+        std::cerr << "Usage: " << argv[0] << " OSMFILE [TYPES]\n";
+        std::cerr << "TYPES can be any combination of 'n', 'w', and 'r' to indicate what types of objects you want (default: all).\n";
         exit(1);
     }
 
+    osmium::item_flags_type read_types = osmium::item_flags_type::all;
+
+    if (argc == 3) {
+        read_types = osmium::item_flags_type::nothing;
+        std::string types = argv[2];
+        if (types.find('n') != std::string::npos) read_types |= osmium::item_flags_type::node;
+        if (types.find('w') != std::string::npos) read_types |= osmium::item_flags_type::way;
+        if (types.find('r') != std::string::npos) read_types |= osmium::item_flags_type::relation;
+    }
+
     osmium::io::Reader reader(argv[1]);
-    osmium::io::Header header = reader.open();
+    osmium::io::Header header = reader.open(read_types);
 
     std::cout << "HEADER:\n  generator=" << header.generator() << "\n";
     std::cout << "  bounds=" << header.bounds() << "\n";

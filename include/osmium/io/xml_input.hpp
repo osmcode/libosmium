@@ -72,6 +72,9 @@ namespace osmium {
                 node,
                 way,
                 relation,
+                ignored_node,
+                ignored_way,
+                ignored_relation,
                 in_object
             };
 
@@ -102,13 +105,14 @@ namespace osmium {
             std::promise<osmium::io::Header>& m_header_promise;
 
             bool m_promise_fulfilled;
-            bool m_header_only;
+
+            osmium::item_flags_type m_read_types;
 
             size_t m_max_queue_size;
 
         public:
 
-            XMLParser(int fd, osmium::thread::Queue<osmium::memory::Buffer>& queue, std::promise<osmium::io::Header>& header_promise, bool header_only) :
+            XMLParser(int fd, osmium::thread::Queue<osmium::memory::Buffer>& queue, std::promise<osmium::io::Header>& header_promise, osmium::item_flags_type read_types) :
                 m_context(context::root),
                 m_last_context(context::root),
                 m_in_delete_section(false),
@@ -124,7 +128,7 @@ namespace osmium {
                 m_queue(queue),
                 m_header_promise(header_promise),
                 m_promise_fulfilled(false),
-                m_header_only(header_only),
+                m_read_types(read_types),
                 m_max_queue_size(100) {
             }
 
@@ -226,7 +230,7 @@ namespace osmium {
 
             void header_is_done() {
                 m_header_promise.set_value(m_header);
-                if (m_header_only) {
+                if (m_read_types == osmium::item_flags_type::nothing) {
                     throw ParserIsDone();
                 }
                 m_promise_fulfilled = true;
@@ -255,23 +259,35 @@ namespace osmium {
                                 if (!m_promise_fulfilled) {
                                     header_is_done();
                                 }
-                                m_node_builder = std::unique_ptr<osmium::memory::NodeBuilder>(new osmium::memory::NodeBuilder(m_buffer));
-                                init_object(m_node_builder.get(), m_node_builder->object(), attrs);
-                                m_context = context::node;
+                                if (m_read_types & osmium::item_flags_type::node) {
+                                    m_node_builder = std::unique_ptr<osmium::memory::NodeBuilder>(new osmium::memory::NodeBuilder(m_buffer));
+                                    init_object(m_node_builder.get(), m_node_builder->object(), attrs);
+                                    m_context = context::node;
+                                } else {
+                                    m_context = context::ignored_node;
+                                }
                             } else if (!strcmp(element, "way")) {
                                 if (!m_promise_fulfilled) {
                                     header_is_done();
                                 }
-                                m_way_builder = std::unique_ptr<osmium::memory::WayBuilder>(new osmium::memory::WayBuilder(m_buffer));
-                                init_object(m_way_builder.get(), m_way_builder->object(), attrs);
-                                m_context = context::way;
+                                if (m_read_types & osmium::item_flags_type::way) {
+                                    m_way_builder = std::unique_ptr<osmium::memory::WayBuilder>(new osmium::memory::WayBuilder(m_buffer));
+                                    init_object(m_way_builder.get(), m_way_builder->object(), attrs);
+                                    m_context = context::way;
+                                } else {
+                                    m_context = context::ignored_way;
+                                }
                             } else if (!strcmp(element, "relation")) {
                                 if (!m_promise_fulfilled) {
                                     header_is_done();
                                 }
-                                m_relation_builder = std::unique_ptr<osmium::memory::RelationBuilder>(new osmium::memory::RelationBuilder(m_buffer));
-                                init_object(m_relation_builder.get(), m_relation_builder->object(), attrs);
-                                m_context = context::relation;
+                                if (m_read_types & osmium::item_flags_type::way) {
+                                    m_relation_builder = std::unique_ptr<osmium::memory::RelationBuilder>(new osmium::memory::RelationBuilder(m_buffer));
+                                    init_object(m_relation_builder.get(), m_relation_builder->object(), attrs);
+                                    m_context = context::relation;
+                                } else {
+                                    m_context = context::ignored_relation;
+                                }
                             } else if (!strcmp(element, "bounds")) {
                                 osmium::Location min;
                                 osmium::Location max;
@@ -343,6 +359,10 @@ namespace osmium {
                                 check_tag(m_relation_builder.get(), element, attrs);
                             }
                             break;
+                        case context::ignored_node:
+                        case context::ignored_way:
+                        case context::ignored_relation:
+                            break;
                         case context::in_object:
                             // fallthrough
                         default:
@@ -398,6 +418,21 @@ namespace osmium {
                         case context::in_object:
                             m_context = m_last_context;
                             break;
+                        case context::ignored_node:
+                            if (!strcmp(element, "node")) {
+                                m_context = context::top;
+                            }
+                            break;
+                        case context::ignored_way:
+                            if (!strcmp(element, "way")) {
+                                m_context = context::top;
+                            }
+                            break;
+                        case context::ignored_relation:
+                            if (!strcmp(element, "relation")) {
+                                m_context = context::top;
+                            }
+                            break;
                         default:
                             assert(false); // should never be here
                     }
@@ -450,8 +485,8 @@ namespace osmium {
                 }
             }
 
-            osmium::io::Header read(bool header_only) override {
-                XMLParser parser(fd(), m_queue, m_header_promise, header_only);
+            osmium::io::Header read(osmium::item_flags_type read_types) override {
+                XMLParser parser(fd(), m_queue, m_header_promise, read_types);
 
                 m_reader = std::thread(std::move(parser));
 
