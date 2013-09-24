@@ -41,6 +41,17 @@ namespace osmium {
 
     namespace thread {
 
+        /**
+         * This implements a sorted queue. It is a bit like a priority
+         * queue. We have n worker threads pushing items into the queue
+         * and one thread pulling them out again "in order". The order
+         * is defined by the monotonically increasing "num" parameter
+         * to the push() method. The wait_and_pop() and try_pop() methods
+         * will only give out the next numbered item. This way several
+         * workers can work in their own time on different pieces of
+         * some incoming data, but it all gets serialized properly again
+         * after the workers have done their work.
+         */
         template <typename T>
         class SortedQueue {
 
@@ -52,6 +63,7 @@ namespace osmium {
 
             size_type m_offset;
 
+            // this method expects that we already have the lock
             bool empty_intern() const {
                 return m_queue.front() == T();
             }
@@ -65,6 +77,13 @@ namespace osmium {
                 m_offset(0) {
             }
 
+            /**
+             * Push an item into the queue.
+             *
+             * @param value The item to push into the queue.
+             * @param num Number to describe ordering for the items.
+             *            It must increase monotonically.
+             */
             void push(T value, size_type num) {
                 std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -77,6 +96,10 @@ namespace osmium {
                 m_data_available.notify_one();
             }
 
+            /**
+             * Wait until the next item becomes available and make it
+             * available through value.
+             */
             void wait_and_pop(T& value) {
                 std::unique_lock<std::mutex> lock(m_mutex);
 
@@ -88,6 +111,10 @@ namespace osmium {
                 ++m_offset;
             }
 
+            /**
+             * Get next item if it is available and return true. Or
+             * return false otherwise.
+             */
             bool try_pop(T& value) {
                 std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -100,21 +127,26 @@ namespace osmium {
                 return true;
             }
 
+            /**
+             * The queue is empty. This means try_pop() would fail if called.
+             * It does not mean that there is nothing on the queue. Because
+             * the queue is sorted, it could mean that the next item in the
+             * queue is not available, but other items are.
+             */
             bool empty() const {
                 std::lock_guard<std::mutex> lock(m_mutex);
 
                 return empty_intern();
             }
 
-            bool full() const {
+            /**
+             * Returns the number of items in the queue, regardless of whether
+             * they can be accessed. If this is =0 it
+             * implies empty()==true, but not the other way around.
+             */
+            size_t size() const {
                 std::lock_guard<std::mutex> lock(m_mutex);
-
-                // XXX theoretically this could deadlock when the next buffer that needs to be read is not available!
-                if (m_queue.size() < 20) {
-                    return false;
-                }
-
-                return true;
+                return m_queue.size();
             }
 
         }; // class SortedQueue

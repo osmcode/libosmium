@@ -484,9 +484,6 @@ namespace osmium {
                 PBFPrimitiveBlockParser parser(data, size, m_read_types);
                 osmium::memory::Buffer buffer = parser();
                 m_queue.push(std::move(buffer), m_blob_num);
-                while (m_queue.full()) {
-                    std::this_thread::sleep_for(std::chrono::milliseconds(10));
-                }
             }
 
         public:
@@ -505,12 +502,13 @@ namespace osmium {
          */
         class PBFInput : public osmium::io::Input {
 
-            const size_t m_num_threads;
+            const int m_num_threads;
             queue_type m_queue;
-            const size_t m_max_queue_size;
+            const size_t m_max_work_queue_size;
+            const size_t m_max_buffer_queue_size;
             osmium::thread::Pool m_thread_pool;
             std::atomic<bool> m_done;
-            int m_pending_jobs;
+            std::atomic<int> m_pending_jobs;
             std::thread m_reader;
             OSMPBF::BlobHeader m_blob_header;
             unsigned char m_blob_header_buffer[OSMPBF::max_blob_header_size];
@@ -562,15 +560,20 @@ namespace osmium {
                         data_blob_parser();
                     } else {
                         // otherwise we submit the parser to the work queue
-                        size_t size = m_thread_pool.submit(std::move(data_blob_parser));
+                        size_t work_queue_size = m_thread_pool.submit(std::move(data_blob_parser));
 
-                        // if the work queue is getting too large wait for a while
-                        while (size >= m_max_queue_size) {
+                        // if the work queue is getting too large, wait for a while
+                        while (work_queue_size >= m_max_work_queue_size) {
                             std::this_thread::sleep_for(std::chrono::milliseconds(10));
-                            size = m_thread_pool.queue_size();
+                            work_queue_size = m_thread_pool.queue_size();
                         }
                     }
                     ++n;
+
+                    // wait if the backlog of buffers with parsed data is too large
+                    while (m_queue.size() > m_max_buffer_queue_size) {
+                        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+                    }
                 }
                 m_done = true;
             }
@@ -582,11 +585,12 @@ namespace osmium {
              *
              * @param file osmium::io::File instance.
              */
-            PBFInput(const osmium::io::File& file, const size_t num_threads=2) :
+            PBFInput(const osmium::io::File& file, const int num_threads=2) :
                 osmium::io::Input(file),
                 m_num_threads(num_threads),
                 m_queue(),
-                m_max_queue_size(num_threads * 4),
+                m_max_work_queue_size(num_threads * 4),
+                m_max_buffer_queue_size(10 + num_threads * 10),
                 m_thread_pool(num_threads),
                 m_done(false),
                 m_pending_jobs(0) {
@@ -626,7 +630,7 @@ namespace osmium {
              */
             osmium::memory::Buffer next_buffer() override {
                 osmium::memory::Buffer buffer;
-                if (m_done && m_thread_pool.work_queue_empty() && m_queue.empty() && m_pending_jobs==0) {
+                if (m_done && m_pending_jobs==0) {
                     return buffer;
                 }
                 m_queue.wait_and_pop(buffer);
