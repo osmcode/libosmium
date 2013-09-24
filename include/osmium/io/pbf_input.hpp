@@ -405,7 +405,8 @@ namespace osmium {
 
                 std::unique_ptr<unsigned char[]> input_buffer { m_input_buffer };
                 if (pbf_blob.has_raw()) {
-                    return static_cast<TDerived*>(this)->handle_blob(pbf_blob.raw().data(), pbf_blob.raw().size());
+                    static_cast<TDerived*>(this)->handle_blob(pbf_blob.raw().data(), pbf_blob.raw().size());
+                    return;
                 } else if (pbf_blob.has_zlib_data()) {
                     unsigned long raw_size = pbf_blob.raw_size();
                     assert(raw_size <= static_cast<unsigned long>(OSMPBF::max_uncompressed_blob_size));
@@ -413,7 +414,8 @@ namespace osmium {
                     if (uncompress(unpack_buffer.get(), &raw_size, reinterpret_cast<const unsigned char*>(pbf_blob.zlib_data().data()), pbf_blob.zlib_data().size()) != Z_OK || pbf_blob.raw_size() != static_cast<long>(raw_size)) {
                         throw std::runtime_error("zlib error");
                     }
-                    return static_cast<TDerived*>(this)->handle_blob(unpack_buffer.get(), raw_size);
+                    static_cast<TDerived*>(this)->handle_blob(unpack_buffer.get(), raw_size);
+                    return;
                 } else if (pbf_blob.has_lzma_data()) {
                     throw std::runtime_error("lzma blobs not implemented");
                 } else {
