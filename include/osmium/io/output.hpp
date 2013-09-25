@@ -74,7 +74,9 @@ namespace osmium {
             virtual ~Output() {
             }
 
-            virtual void set_header(osmium::io::Header&) = 0;
+            virtual void set_header(osmium::io::Header&) {
+            }
+
             virtual void handle_collection(osmium::memory::Buffer::const_iterator, osmium::memory::Buffer::const_iterator) = 0;
             virtual void close() = 0;
 

@@ -36,10 +36,10 @@ DEALINGS IN THE SOFTWARE.
 #define __STDC_FORMAT_MACROS
 #include <inttypes.h>
 
-#include <sstream>
-#include <iomanip>
+#include <cstdio>
 
 #include <osmium/io/output.hpp>
+#include <osmium/io/detail/read_write.hpp>
 #include <osmium/handler.hpp>
 #include <osmium/utils/timestamp.hpp>
 
@@ -49,9 +49,17 @@ namespace osmium {
 
         class OPLOutput : public osmium::io::Output, public osmium::handler::Handler<OPLOutput> {
 
-            // XXX it is very inefficient to use a stringstream here and write it out after each line,
-            // but currently this is the easiest way to make it work with bz2/gz compression.
-            std::stringstream m_out;
+            // size of the output buffer, there is one system call for each
+            // time this is flushed, so it shouldn't be too small
+            static const int output_buffer_size = 1024*1024;
+
+            // temporary buffer for writing out IDs and other numbers, must
+            // be big enough to always hold them
+            static const int tmp_buffer_size = 100;
+
+            std::string m_out;
+
+            char tmp_buffer[tmp_buffer_size+1];
 
             OPLOutput(const OPLOutput&) = delete;
             OPLOutput& operator=(const OPLOutput&) = delete;
@@ -61,120 +69,126 @@ namespace osmium {
             OPLOutput(const osmium::io::File& file) :
                 Output(file),
                 m_out() {
+                m_out.reserve(output_buffer_size * 2);
             }
 
             void handle_collection(osmium::memory::Buffer::const_iterator begin, osmium::memory::Buffer::const_iterator end) override {
                 this->operator()(begin, end);
             }
 
-            void set_header(osmium::io::Header&) override {
-            }
-
             void node(const osmium::Node& node) {
-                m_out << "n";
+                m_out += 'n';
                 write_meta(node);
-                m_out << " x"
-                      << node.lon()
-                      << " y"
-                      << node.lat();
+
+                snprintf(tmp_buffer, tmp_buffer_size, " x%.7f y%.7f", node.lon(), node.lat());
+                m_out += tmp_buffer;
+
                 write_tags(node.tags());
-                m_out << "\n";
-                ::write(this->fd(), m_out.str().c_str(), m_out.str().size());
-                m_out.str("");
+
+                if (m_out.size() > output_buffer_size) {
+                    flush();
+                }
             }
 
             void way(const osmium::Way& way) {
-                m_out << "w";
+                m_out += 'w';
                 write_meta(way);
 
-                m_out << " N";
-                int n=0;
+                m_out += " N";
+                bool first = true;
                 for (const auto& wn : way.nodes()) {
-                    if (n++ != 0) {
-                        m_out << ",";
+                    if (first) {
+                        first = false;
+                    } else {
+                        m_out += ',';
                     }
-                    m_out << "n"
-                          << wn.ref();
+                    snprintf(tmp_buffer, tmp_buffer_size, "n%" PRId64, wn.ref());
+                    m_out += tmp_buffer;
                 }
 
                 write_tags(way.tags());
-                m_out << "\n";
-                ::write(this->fd(), m_out.str().c_str(), m_out.str().size());
-                m_out.str("");
+
+                if (m_out.size() > output_buffer_size) {
+                    flush();
+                }
             }
 
             void relation(const osmium::Relation& relation) {
-                m_out << "r";
+                m_out += 'r';
                 write_meta(relation);
 
-                m_out << " M";
-                int n=0;
+                m_out += " M";
+                bool first = true;
                 for (const auto& member : relation.members()) {
-                    if (n++ != 0) {
-                        m_out << ",";
+                    if (first) {
+                        first = false;
+                    } else {
+                        m_out += ',';
                     }
-                    m_out << item_type_to_char(member.type())
-                          << member.ref()
-                          << "!"
-                          << member.role();
+                    m_out += item_type_to_char(member.type());
+                    snprintf(tmp_buffer, tmp_buffer_size, "%" PRId64 "!", member.ref());
+                    m_out += tmp_buffer;
+                    m_out += member.role();
                 }
 
                 write_tags(relation.tags());
-                m_out << "\n";
-                ::write(this->fd(), m_out.str().c_str(), m_out.str().size());
-                m_out.str("");
+
+                if (m_out.size() > output_buffer_size) {
+                    flush();
+                }
             }
 
             void close() override {
+                flush();
             }
 
         private:
 
-            std::string encode(const std::string& data) const {
+            void flush() {
+                osmium::io::detail::reliable_write(this->fd(), m_out.c_str(), m_out.size());
+                m_out.clear();
+            }
+
+            void append_encoded_string(const std::string& data) {
                 static constexpr char hex[] = "0123456789abcdef";
 
-                std::string buffer;
-                buffer.reserve(data.size());
-                for (size_t pos = 0; pos != data.size(); ++pos) {
-                    char c = data[pos];
+                for (char c : data) {
                     if (isalnum(c) || c == '-' || c == '_' || c == '.' || c == ':' || c == ';') {
-                        buffer.append(1, c);
+                        m_out += c;
                     } else {
-                        buffer.append(1, '%');
-                        buffer.append(1, hex[(c & 0xf0) >> 4]);
-                        buffer.append(1, hex[c & 0x0f]);
+                        m_out += '%';
+                        m_out += hex[(c & 0xf0) >> 4];
+                        m_out += hex[c & 0x0f];
                     }
                 }
-                return std::move(buffer);
             }
 
             void write_meta(const osmium::Object& object) {
-                m_out << object.id()
-                      << " v"
-                      << object.version()
-                      << " V"
-                      << (object.visible() ? 't' : 'f')
-                      << " c"
-                      << object.changeset()
-                      << " t"
-                      << timestamp::to_iso(object.timestamp())
-                      << " i"
-                      << object.uid()
-                      << " u"
-                      << encode(object.user());
+                snprintf(tmp_buffer, tmp_buffer_size, "%" PRId64 " v%d d", object.id(), object.version());
+                m_out += tmp_buffer;
+                m_out += (object.visible() ? 'V' : 'D');
+                snprintf(tmp_buffer, tmp_buffer_size, " c%d t", object.changeset());
+                m_out += tmp_buffer;
+                m_out += timestamp::to_iso(object.timestamp());
+                snprintf(tmp_buffer, tmp_buffer_size, " i%d u", object.uid());
+                m_out += tmp_buffer;
+                append_encoded_string(object.user());
             }
 
             void write_tags(const osmium::TagList& tags) {
-                m_out << " T";
-                int n=0;
+                m_out += " T";
+                bool first = true;
                 for (auto& tag : tags) {
-                    if (n++ != 0) {
-                        m_out << ",";
+                    if (first) {
+                        first = false;
+                    } else {
+                        m_out += ',';
                     }
-                    m_out << encode(tag.key())
-                          << "="
-                          << encode(tag.value());
+                    append_encoded_string(tag.key());
+                    m_out += '=';
+                    append_encoded_string(tag.value());
                 }
+                m_out += '\n';
             }
 
         }; // class OPLOutput
