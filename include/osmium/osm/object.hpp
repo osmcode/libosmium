@@ -377,13 +377,67 @@ namespace osmium {
     static_assert(sizeof(Object) % osmium::memory::align_bytes == 0, "Class osmium::Object has wrong size to be aligned properly!");
 
     /**
-     * Objects can be ordered by id and version.
+     * Objects can be ordered by type, id and version.
      * Note that we use the absolute value of the id for a
      * better ordering of objects with negative id.
      */
     inline bool operator<(const Object& lhs, const Object& rhs) {
-        return (lhs.id() == rhs.id() && lhs.version() < rhs.version()) || abs(lhs.id()) < abs(rhs.id());
+        if (lhs.type() != rhs.type()) {
+            return lhs.type() < rhs.type();
+        }
+        return (lhs.id() == rhs.id() && lhs.version() < rhs.version()) ||
+               abs(lhs.id()) < abs(rhs.id());
     }
+
+    /**
+     * Objects are equal if their type, id, and version are equal.
+     */
+    inline bool operator==(const Object& lhs, const Object& rhs) {
+        return lhs.type() == rhs.type() &&
+               lhs.id() == rhs.id() &&
+               lhs.version() == rhs.version();
+    }
+
+    namespace osm {
+
+        struct object_equal_type_id_version {
+
+            bool operator()(const Object& lhs, const Object& rhs) {
+                return lhs == rhs;
+            }
+
+        };
+
+        struct object_equal_type_id {
+
+            bool operator()(const Object& lhs, const Object& rhs) {
+                return lhs.type() == rhs.type() &&
+                    lhs.id() == rhs.id();
+            }
+
+        };
+
+        struct object_order_type_id_version {
+
+            bool operator()(const Object& lhs, const Object& rhs) {
+                return lhs < rhs;
+            }
+
+        };
+
+        struct object_order_type_id_reverse_version {
+
+            bool operator()(const Object& lhs, const Object& rhs) {
+                if (lhs.type() != rhs.type()) {
+                    return lhs.type() < rhs.type();
+                }
+                return (lhs.id() == rhs.id() && lhs.version() > rhs.version()) ||
+                    abs(lhs.id()) < abs(rhs.id());
+            }
+
+        };
+
+    } // namespace osm
 
 } // namespace osmium
 
