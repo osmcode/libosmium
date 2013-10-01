@@ -42,12 +42,6 @@ DEALINGS IN THE SOFTWARE.
  */
 namespace osmium {
 
-    /**
-     * @brief Namespace for basic OSM objects.
-     */
-    namespace osm {
-    } // namespace osm
-
 } // namespace osmium
 
 #endif // OSMIUM_OSM_HPP
