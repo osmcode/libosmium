@@ -35,6 +35,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <cassert>
 #include <cstring>
+#include <functional>
 #include <stdexcept>
 #include <vector>
 
@@ -73,6 +74,10 @@ namespace osmium {
          * the buffer isn't used any more. If you don't have memory already, you can
          * create a Buffer object and have it manage the memory internally. It will
          * dynamically allocate memory and free it again after use.
+         *
+         * By default, if a buffer gets full it will throw a BufferIsFull exception.
+         * You can use the set_full_callback() method to set a callback functor
+         * which will be called instead of throwing an exception.
          */
         class Buffer {
 
@@ -81,8 +86,11 @@ namespace osmium {
             size_t m_capacity;
             size_t m_written;
             size_t m_committed;
+            std::function<void(Buffer&)> m_full {};
 
         public:
+
+            typedef Item value_type;
 
             /**
              * The constructor without any parameters creates a non-initialized
@@ -196,6 +204,14 @@ namespace osmium {
             }
 
             /**
+             * Set functor to be called whenever the buffer is full
+             * instead of throwing BufferIsFull.
+             */
+            void set_full_callback(std::function<void(Buffer&)> full) {
+                m_full = full;
+            }
+
+            /**
              * Grow capacity of this buffer to the given size.
              * This works only with internally memory-managed buffers.
              * If the given size is not larger than the current capacity, nothing is done.
@@ -262,13 +278,23 @@ namespace osmium {
              * Note that you have to eventually call commit() to actually
              * commit this data.
              *
+             * Calls functor set by set_full_callback() when the buffer doesn't
+             * have enough space.
+             *
              * @param size Number of bytes to reserve.
              * @return Pointer to reserved space.
-             * @throw BufferIsFull If there is not enough space in the buffer to fulfill the reservation.
+             * @throw BufferIsFull If there is not enough space in the buffer
+             *                     to fulfill the reservation and m_full is
+             *                     not defined.
              */
             char* reserve_space(const size_t size) {
                 if (m_written + size > m_capacity) {
-                    throw BufferIsFull();
+                    if (m_full) {
+                        m_full(*this);
+                        clear();
+                    } else {
+                        throw BufferIsFull();
+                    }
                 }
                 char* data = &m_data[m_written];
                 m_written += size;
@@ -291,6 +317,12 @@ namespace osmium {
                 char* ptr = reserve_space(item.padded_size());
                 std::memcpy(ptr, &item, item.padded_size());
                 return *reinterpret_cast<T*>(ptr);
+            }
+
+            template <class T>
+            void push_back(const T& item) {
+                add_item(item);
+                commit();
             }
 
             /**
