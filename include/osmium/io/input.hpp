@@ -34,14 +34,17 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <functional>
+#include <iterator>
 #include <map>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <osmium/io/file.hpp>
 #include <osmium/io/header.hpp>
 #include <osmium/memory/buffer.hpp>
+#include <osmium/osm/object.hpp>
 
 namespace osmium {
 
@@ -147,6 +150,7 @@ namespace osmium {
             osmium::io::File m_file;
             std::unique_ptr<Input> m_input;
             osmium::item_flags_type m_read_types;
+            osmium::memory::Buffer m_buffer {};
 
             Reader(const Reader&) = delete;
             Reader& operator=(const Reader&) = delete;
@@ -206,6 +210,80 @@ namespace osmium {
                     type = push_helper(buffer, type, handlers...);
                 }
                 push_helper(type, handlers...);
+            }
+
+            typedef std::pair<osmium::memory::Buffer::iterator, osmium::memory::Buffer::iterator> buffer_iterator_pair;
+
+            buffer_iterator_pair get_next_iter() {
+                m_buffer = read();
+                return std::make_pair(m_buffer.begin(), m_buffer.end());
+            }
+
+            /**
+             * This iterator class allows you to iterate over all items in a file.
+             * It hides all the buffer handling and makes the contents of an
+             * OSM file accessible as a normal STL input iterator.
+             */
+            class iterator : public std::iterator<std::input_iterator_tag, const osmium::Object> {
+
+                Reader* m_reader;
+                buffer_iterator_pair m_iterators;
+
+            public:
+
+                iterator(Reader* reader, buffer_iterator_pair iterators) :
+                    m_reader(reader),
+                    m_iterators(iterators) {
+                }
+
+                // end iterator
+                iterator(Reader* reader) :
+                    m_reader(reader),
+                    m_iterators(std::make_pair(nullptr, nullptr)) {
+                }
+
+                iterator& operator++() {
+                    assert(m_iterators.first != nullptr);
+                    ++m_iterators.first;
+                    if (m_iterators.first == m_iterators.second) {
+                        m_iterators = m_reader->get_next_iter();
+                    }
+                    return *this;
+                }
+
+                iterator operator++(int) {
+                    iterator tmp(*this);
+                    operator++();
+                    return tmp;
+                }
+
+                bool operator==(const iterator& rhs) const {
+                    return m_reader == rhs.m_reader &&
+                           m_iterators == rhs.m_iterators;
+                }
+
+                bool operator!=(const iterator& rhs) const {
+                    return !(*this == rhs);
+                }
+
+                reference operator*() const {
+                    assert(m_iterators.first != nullptr);
+                    return static_cast<reference>(*m_iterators.first);
+                }
+
+                pointer operator->() const {
+                    assert(m_iterators.first != nullptr);
+                    return &static_cast<reference>(*m_iterators.first);
+                }
+
+            }; // class iterator
+
+            iterator begin() {
+                return iterator { this, get_next_iter() };
+            }
+
+            iterator end() {
+                return iterator { this };
             }
 
         }; // class Reader
