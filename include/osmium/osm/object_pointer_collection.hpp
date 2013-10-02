@@ -81,12 +81,13 @@ namespace osmium {
                 m_objects.push_back(&object);
             }
 
-            void sort_by_type_id_version() {
-                std::sort(m_objects.begin(), m_objects.end(), osmium::osm::object_order_type_id_version());
-            }
-
-            void sort_by_type_id_reverse_version() {
-                std::sort(m_objects.begin(), m_objects.end(), osmium::osm::object_order_type_id_reverse_version());
+            /**
+             * Sort objects according to the order functor given as template
+             * parameter.
+             */
+            template <class T>
+            void sort() {
+                std::sort(m_objects.begin(), m_objects.end(), T());
             }
 
             iterator begin() {
