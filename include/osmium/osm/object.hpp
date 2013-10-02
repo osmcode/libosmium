@@ -34,6 +34,7 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <cstdint>
+#include <cstdlib>
 
 #include <boost/operators.hpp>
 
@@ -124,7 +125,7 @@ namespace osmium {
 
         /// Get absolute value of the ID of this object.
         unsigned_object_id_type positive_id() const {
-            return abs(m_id);
+            return std::abs(m_id);
         }
 
         /**

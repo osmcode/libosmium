@@ -63,7 +63,7 @@ namespace osmium {
         }
 
         unsigned_object_id_type positive_ref() const {
-            return abs(m_ref);
+            return std::abs(m_ref);
         }
 
     }; // class WayNodeRefOnly

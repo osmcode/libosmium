@@ -18,6 +18,7 @@ BOOST_AUTO_TEST_CASE(object) {
     o.timestamp(123);
 
     BOOST_CHECK_EQUAL(17, o.id());
+    BOOST_CHECK_EQUAL(17, o.positive_id());
     BOOST_CHECK_EQUAL(3, o.version());
     BOOST_CHECK_EQUAL(true, o.visible());
     BOOST_CHECK_EQUAL(333, o.changeset());
@@ -36,13 +37,14 @@ BOOST_AUTO_TEST_CASE(object) {
 BOOST_AUTO_TEST_CASE(object_from_string) {
     osmium::Object o;
 
-    o.id("17");
+    o.id("-17");
     o.version("3");
     o.visible(true);
     o.changeset("333");
     o.uid("21");
 
-    BOOST_CHECK_EQUAL(17, o.id());
+    BOOST_CHECK_EQUAL(-17, o.id());
+    BOOST_CHECK_EQUAL(17, o.positive_id());
     BOOST_CHECK_EQUAL(3, o.version());
     BOOST_CHECK_EQUAL(true, o.visible());
     BOOST_CHECK_EQUAL(333, o.changeset());
@@ -56,27 +58,18 @@ BOOST_AUTO_TEST_CASE(instantiation_with_default_parameters) {
     BOOST_CHECK_EQUAL(0, object.uid());
 }
 
-BOOST_AUTO_TEST_CASE(order) {
-    osmium::Object object1;
-    osmium::Object object2;
-    object1.id(10);
-    object1.version(1);
-    object2.id(15);
-    object2.version(2);
-    BOOST_CHECK_EQUAL(true, object1 < object2);
-    BOOST_CHECK_EQUAL(false, object1 > object2);
-    object1.id(20);
-    object1.version(1);
-    object2.id(20);
-    object2.version(2);
-    BOOST_CHECK_EQUAL(true, object1 < object2);
-    BOOST_CHECK_EQUAL(false, object1 > object2);
-    object1.id(-10);
-    object1.version(2);
-    object2.id(-15);
-    object2.version(1);
-    BOOST_CHECK_EQUAL(true, object1 < object2);
-    BOOST_CHECK_EQUAL(false, object1 > object2);
+BOOST_AUTO_TEST_CASE(large_id) {
+    osmium::Object o;
+
+    int64_t id = 3000000000l;
+    o.id(id);
+
+    BOOST_CHECK_EQUAL(id, o.id());
+    BOOST_CHECK_EQUAL(id, o.positive_id());
+
+    o.id(-id);
+    BOOST_CHECK_EQUAL(-id, o.id());
+    BOOST_CHECK_EQUAL(id, o.positive_id());
 }
 
 BOOST_AUTO_TEST_SUITE_END()
