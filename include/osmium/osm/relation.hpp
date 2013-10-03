@@ -133,6 +133,12 @@ namespace osmium {
 
     class Relation : public Object {
 
+        friend class osmium::memory::ObjectBuilder<osmium::Relation>;
+
+        Relation() :
+            Object() {
+        }
+
     public:
 
         RelationMemberList& members() {

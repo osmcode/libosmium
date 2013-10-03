@@ -5,23 +5,31 @@
 
 #include <osmium/osm/way.hpp>
 
+#include "helper.hpp"
+
 BOOST_AUTO_TEST_SUITE(Basic_Way)
 
-BOOST_AUTO_TEST_CASE(way) {
-    osmium::Way way;
+BOOST_AUTO_TEST_CASE(way_builder) {
+    osmium::memory::Buffer buffer(10000);
 
-    way.id(17);
-    way.version(3);
-    way.visible(true);
-    way.changeset(333);
-    way.uid(21);
-    way.timestamp(123);
+    osmium::Way& way = buffer_add_way(buffer,
+        "foo",
+        {{"highway", "residential"}, {"name", "High Street"}},
+        {1, 3, 2});
+
+    way.id(17)
+        .version(3)
+        .visible(true)
+        .changeset(333)
+        .uid(21)
+        .timestamp(123);
 
     BOOST_CHECK_EQUAL(17, way.id());
     BOOST_CHECK_EQUAL(3, way.version());
     BOOST_CHECK_EQUAL(true, way.visible());
     BOOST_CHECK_EQUAL(333, way.changeset());
     BOOST_CHECK_EQUAL(21, way.uid());
+    BOOST_CHECK(!strcmp("foo", way.user()));
     BOOST_CHECK_EQUAL(123, way.timestamp());
 }
 

@@ -45,6 +45,10 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
+    namespace memory {
+        template <class T> class ObjectBuilder;
+    }
+
     /**
      * OSM Object (Node, Way, or Relation).
      */

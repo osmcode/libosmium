@@ -136,6 +136,12 @@ namespace osmium {
 
     class Way : public Object {
 
+        friend class osmium::memory::ObjectBuilder<osmium::Way>;
+
+        Way() :
+            Object() {
+        }
+
     public:
 
         WayNodeList& nodes() {

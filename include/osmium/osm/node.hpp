@@ -39,7 +39,13 @@ namespace osmium {
 
     class Node : public Object {
 
-        osmium::Location m_location;
+        friend class osmium::memory::ObjectBuilder<osmium::Node>;
+
+        osmium::Location m_location{};
+
+        Node() :
+            Object() {
+        }
 
     public:
 
