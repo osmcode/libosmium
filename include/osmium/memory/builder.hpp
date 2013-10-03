@@ -45,7 +45,7 @@ namespace osmium {
 
             Buffer& m_buffer;
             Builder* m_parent;
-            osmium::memory::Item* m_item;
+            size_t m_item_offset;
 
             Builder(const Builder&) = delete;
             Builder(Builder&&) = delete;
@@ -58,9 +58,10 @@ namespace osmium {
             Builder(Buffer& buffer, Builder* parent, size_t size, item_type item_type) :
                 m_buffer(buffer),
                 m_parent(parent),
-                m_item(reinterpret_cast<osmium::memory::Item*>(m_buffer.reserve_space(size))) {
+                m_item_offset(buffer.written()) {
+                osmium::memory::Item* item = reinterpret_cast<osmium::memory::Item*>(m_buffer.reserve_space(size));
                 assert(buffer.is_aligned());
-                new (m_item) osmium::memory::Item(size, item_type);
+                new (item) osmium::memory::Item(size, item_type);
                 if (m_parent) {
                     m_parent->add_size(size);
                 }
@@ -68,12 +69,12 @@ namespace osmium {
 
             ~Builder() = default;
 
-            osmium::memory::Item& item() {
-                return *m_item;
+            osmium::memory::Item& item() const {
+                return *reinterpret_cast<Item*>(m_buffer.data() + m_item_offset);
             }
 
             void add_size(uint32_t size) {
-                m_item->add_size(size);
+                item().add_size(size);
                 if (m_parent) {
                     m_parent->add_size(size);
                 }
@@ -87,7 +88,7 @@ namespace osmium {
             void add_padding() {
                 size_t padding = align_bytes - (size() % align_bytes);
                 if (padding != align_bytes) {
-                    memset(m_buffer.reserve_space(padding), 0, padding);
+                    std::memset(m_buffer.reserve_space(padding), 0, padding);
                     if (m_parent) {
                         m_parent->add_size(padding);
                         assert(m_parent->size() % align_bytes == 0);
@@ -98,7 +99,7 @@ namespace osmium {
         public:
 
             uint32_t size() const {
-                return m_item->size();
+                return item().size();
             }
 
             void add_item(const osmium::memory::Item* item) {
@@ -134,7 +135,7 @@ namespace osmium {
 
                 size_t padding = align_bytes - (len % align_bytes);
                 if (padding != align_bytes) {
-                    memset(m_buffer.reserve_space(padding), 0, padding);
+                    std::memset(m_buffer.reserve_space(padding), 0, padding);
                     add_size(padding);
                 }
                 assert(m_buffer.is_aligned());

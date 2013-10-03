@@ -196,6 +196,14 @@ namespace osmium {
             }
 
             /**
+             * Returns the number of bytes currently filled in this buffer that
+             * are not yet committed.
+             */
+            size_t written() const {
+                return m_written;
+            }
+
+            /**
              * This tests if the current state of the buffer is aligned
              * properly. Can be used for asserts.
              */
@@ -230,7 +238,6 @@ namespace osmium {
                     m_memory.resize(size);
                     m_data = m_memory.data();
                     m_capacity = size;
-                    m_written = m_committed;
                 }
             }
 
@@ -292,6 +299,13 @@ namespace osmium {
                     if (m_full) {
                         m_full(*this);
                         clear();
+                    } else if (!m_memory.empty()) {
+                        // double buffer size until there is enough space
+                        size_t new_capacity = m_capacity * 2;
+                        while (m_written + size > new_capacity) {
+                            new_capacity *= 2;
+                        }
+                        grow(new_capacity);
                     } else {
                         throw BufferIsFull();
                     }

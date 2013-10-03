@@ -58,7 +58,6 @@ namespace osmium {
         class PBFPrimitiveBlockParser {
 
             static constexpr size_t initial_buffer_size = 10 * 1000 * 1000;
-            static constexpr size_t buffer_growth_factor = 2;
 
             const void* m_data;
             const size_t m_size;
@@ -128,152 +127,130 @@ namespace osmium {
 
         private:
 
-            void grow_buffer() {
-                m_buffer.grow(m_buffer.capacity() * buffer_growth_factor);
-            }
-
             void parse_node_group(const OSMPBF::PrimitiveGroup& group) {
                 for (int i=0; i < group.nodes_size(); ++i) {
-                    while (true) {
-                        try {
-                            osmium::osm::NodeBuilder builder(m_buffer);
-                            osmium::Node& node = builder.object();
+                    osmium::osm::NodeBuilder builder(m_buffer);
+                    osmium::Node& node = builder.object();
 
-                            const OSMPBF::Node& pbf_node = group.nodes(i);
-                            node.id(pbf_node.id());
+                    const OSMPBF::Node& pbf_node = group.nodes(i);
+                    node.id(pbf_node.id());
+                    node.location(osmium::Location(
+                                        (pbf_node.lon() * m_granularity + m_lon_offset) / (OSMPBF::lonlat_resolution / osmium::coordinate_precision),
+                                        (pbf_node.lat() * m_granularity + m_lat_offset) / (OSMPBF::lonlat_resolution / osmium::coordinate_precision)));
 
-                            if (pbf_node.has_info()) {
-                                node.version(pbf_node.info().version())
-                                .changeset(pbf_node.info().changeset())
-                                .timestamp(pbf_node.info().timestamp() * m_date_factor)
-                                .uid_from_signed(pbf_node.info().uid());
-                                if (pbf_node.info().has_visible()) {
-                                    node.visible(pbf_node.info().visible());
-                                } else {
-                                    node.visible(true);
-                                }
-                                builder.add_string(m_stringtable->s(pbf_node.info().user_sid()).data());
-                            }
+                    if (pbf_node.has_info()) {
+                        node.version(pbf_node.info().version())
+                        .changeset(pbf_node.info().changeset())
+                        .timestamp(pbf_node.info().timestamp() * m_date_factor)
+                        .uid_from_signed(pbf_node.info().uid());
+                        if (pbf_node.info().has_visible()) {
+                            node.visible(pbf_node.info().visible());
+                        } else {
+                            node.visible(true);
+                        }
+                        builder.add_string(m_stringtable->s(pbf_node.info().user_sid()).data());
+                    } else {
+                        builder.add_string("");
+                    }
 
-                            if (pbf_node.keys_size() > 0) {
-                                osmium::osm::TagListBuilder tl_builder(m_buffer, &builder);
-                                for (int tag=0; tag < pbf_node.keys_size(); ++tag) {
-                                    tl_builder.add_tag(m_stringtable->s(pbf_node.keys(tag)).data(),
-                                                       m_stringtable->s(pbf_node.vals(tag)).data());
-                                }
-                            }
-
-                            node.location(osmium::Location(
-                                              (pbf_node.lon() * m_granularity + m_lon_offset) / (OSMPBF::lonlat_resolution / osmium::coordinate_precision),
-                                              (pbf_node.lat() * m_granularity + m_lat_offset) / (OSMPBF::lonlat_resolution / osmium::coordinate_precision)));
-
-                            m_buffer.commit();
-                            break;
-                        } catch (osmium::memory::BufferIsFull&) {
-                            grow_buffer();
+                    if (pbf_node.keys_size() > 0) {
+                        osmium::osm::TagListBuilder tl_builder(m_buffer, &builder);
+                        for (int tag=0; tag < pbf_node.keys_size(); ++tag) {
+                            tl_builder.add_tag(m_stringtable->s(pbf_node.keys(tag)).data(),
+                                               m_stringtable->s(pbf_node.vals(tag)).data());
                         }
                     }
+
+                    m_buffer.commit();
                 }
             }
 
             void parse_way_group(const OSMPBF::PrimitiveGroup& group) {
                 for (int i=0; i < group.ways_size(); ++i) {
-                    while (true) {
-                        try {
-                            osmium::osm::WayBuilder builder(m_buffer);
-                            osmium::Way& way = builder.object();
+                    osmium::osm::WayBuilder builder(m_buffer);
+                    osmium::Way& way = builder.object();
 
-                            const OSMPBF::Way& pbf_way = group.ways(i);
-                            way.id(pbf_way.id());
+                    const OSMPBF::Way& pbf_way = group.ways(i);
+                    way.id(pbf_way.id());
 
-                            if (pbf_way.has_info()) {
-                                way.version(pbf_way.info().version())
-                                .changeset(pbf_way.info().changeset())
-                                .timestamp(pbf_way.info().timestamp() * m_date_factor)
-                                .uid_from_signed(pbf_way.info().uid());
-                                if (pbf_way.info().has_visible()) {
-                                    way.visible(pbf_way.info().visible());
-                                } else {
-                                    way.visible(true);
-                                }
-                                builder.add_string(m_stringtable->s(pbf_way.info().user_sid()).data());
-                            }
+                    if (pbf_way.has_info()) {
+                        way.version(pbf_way.info().version())
+                        .changeset(pbf_way.info().changeset())
+                        .timestamp(pbf_way.info().timestamp() * m_date_factor)
+                        .uid_from_signed(pbf_way.info().uid());
+                        if (pbf_way.info().has_visible()) {
+                            way.visible(pbf_way.info().visible());
+                        } else {
+                            way.visible(true);
+                        }
+                        builder.add_string(m_stringtable->s(pbf_way.info().user_sid()).data());
+                    } else {
+                        builder.add_string("");
+                    }
 
-                            if (pbf_way.refs_size() > 0) {
-                                osmium::osm::WayNodeListBuilder wnl_builder(m_buffer, &builder);
-                                uint64_t ref = 0;
-                                for (int i=0; i < pbf_way.refs_size(); ++i) {
-                                    ref += pbf_way.refs(i);
-                                    wnl_builder.add_way_node(ref);
-                                }
-                            }
-
-                            if (pbf_way.keys_size() > 0) {
-                                osmium::osm::TagListBuilder tl_builder(m_buffer, &builder);
-                                for (int tag=0; tag < pbf_way.keys_size(); ++tag) {
-                                    tl_builder.add_tag(m_stringtable->s(pbf_way.keys(tag)).data(),
-                                                       m_stringtable->s(pbf_way.vals(tag)).data());
-                                }
-                            }
-
-                            m_buffer.commit();
-                            break;
-                        } catch (osmium::memory::BufferIsFull&) {
-                            grow_buffer();
+                    if (pbf_way.refs_size() > 0) {
+                        osmium::osm::WayNodeListBuilder wnl_builder(m_buffer, &builder);
+                        uint64_t ref = 0;
+                        for (int i=0; i < pbf_way.refs_size(); ++i) {
+                            ref += pbf_way.refs(i);
+                            wnl_builder.add_way_node(ref);
                         }
                     }
+
+                    if (pbf_way.keys_size() > 0) {
+                        osmium::osm::TagListBuilder tl_builder(m_buffer, &builder);
+                        for (int tag=0; tag < pbf_way.keys_size(); ++tag) {
+                            tl_builder.add_tag(m_stringtable->s(pbf_way.keys(tag)).data(),
+                                               m_stringtable->s(pbf_way.vals(tag)).data());
+                        }
+                    }
+
+                    m_buffer.commit();
                 }
             }
 
             void parse_relation_group(const OSMPBF::PrimitiveGroup& group) {
                 for (int i=0; i < group.relations_size(); ++i) {
-                    while (true) {
-                        try {
-                            osmium::osm::RelationBuilder builder(m_buffer);
-                            osmium::Relation& relation = builder.object();
+                    osmium::osm::RelationBuilder builder(m_buffer);
+                    osmium::Relation& relation = builder.object();
 
-                            const OSMPBF::Relation& pbf_relation = group.relations(i);
-                            relation.id(pbf_relation.id());
+                    const OSMPBF::Relation& pbf_relation = group.relations(i);
+                    relation.id(pbf_relation.id());
 
-                            if (pbf_relation.has_info()) {
-                                relation.version(pbf_relation.info().version())
-                                .changeset(pbf_relation.info().changeset())
-                                .timestamp(pbf_relation.info().timestamp() * m_date_factor)
-                                .uid_from_signed(pbf_relation.info().uid());
-                                if (pbf_relation.info().has_visible()) {
-                                    relation.visible(pbf_relation.info().visible());
-                                } else {
-                                    relation.visible(true);
-                                }
-                                builder.add_string(m_stringtable->s(pbf_relation.info().user_sid()).data());
-                            }
+                    if (pbf_relation.has_info()) {
+                        relation.version(pbf_relation.info().version())
+                        .changeset(pbf_relation.info().changeset())
+                        .timestamp(pbf_relation.info().timestamp() * m_date_factor)
+                        .uid_from_signed(pbf_relation.info().uid());
+                        if (pbf_relation.info().has_visible()) {
+                            relation.visible(pbf_relation.info().visible());
+                        } else {
+                            relation.visible(true);
+                        }
+                        builder.add_string(m_stringtable->s(pbf_relation.info().user_sid()).data());
+                    } else {
+                        builder.add_string("");
+                    }
 
-                            if (pbf_relation.types_size() > 0) {
-                                osmium::osm::RelationMemberListBuilder rml_builder(m_buffer, &builder);
-                                uint64_t ref = 0;
-                                for (int i=0; i < pbf_relation.types_size(); ++i) {
-                                    ref += pbf_relation.memids(i);
-                                    rml_builder.add_member(osmpbf_membertype_to_item_type(pbf_relation.types(i)), ref, m_stringtable->s(pbf_relation.roles_sid(i)).data());
-                                }
-                            }
-
-                            if (pbf_relation.keys_size() > 0) {
-                                osmium::osm::TagListBuilder tl_builder(m_buffer, &builder);
-                                for (int tag=0; tag < pbf_relation.keys_size(); ++tag) {
-                                    tl_builder.add_tag(m_stringtable->s(pbf_relation.keys(tag)).data(),
-                                                       m_stringtable->s(pbf_relation.vals(tag)).data());
-                                }
-                            }
-
-                            m_buffer.commit();
-
-                            break;
-                        } catch (osmium::memory::BufferIsFull&) {
-                            grow_buffer();
+                    if (pbf_relation.types_size() > 0) {
+                        osmium::osm::RelationMemberListBuilder rml_builder(m_buffer, &builder);
+                        uint64_t ref = 0;
+                        for (int i=0; i < pbf_relation.types_size(); ++i) {
+                            ref += pbf_relation.memids(i);
+                            rml_builder.add_member(osmpbf_membertype_to_item_type(pbf_relation.types(i)), ref, m_stringtable->s(pbf_relation.roles_sid(i)).data());
                         }
                     }
-                }
 
+                    if (pbf_relation.keys_size() > 0) {
+                        osmium::osm::TagListBuilder tl_builder(m_buffer, &builder);
+                        for (int tag=0; tag < pbf_relation.keys_size(); ++tag) {
+                            tl_builder.add_tag(m_stringtable->s(pbf_relation.keys(tag)).data(),
+                                               m_stringtable->s(pbf_relation.vals(tag)).data());
+                        }
+                    }
+
+                    m_buffer.commit();
+                }
             }
 
             int add_tags(const OSMPBF::DenseNodes& dense, int n, osmium::osm::NodeBuilder* builder) {
@@ -332,34 +309,27 @@ namespace osmium {
                         }
                     }
 
-                    while (true) {
-                        try {
-                            osmium::osm::NodeBuilder builder(m_buffer);
-                            osmium::Node& node = builder.object();
+                    osmium::osm::NodeBuilder builder(m_buffer);
+                    osmium::Node& node = builder.object();
 
-                            node.id(last_dense_id);
+                    node.id(last_dense_id);
+                    node.location(osmium::Location(
+                                        (last_dense_longitude * m_granularity + m_lon_offset) / (OSMPBF::lonlat_resolution / osmium::coordinate_precision),
+                                        (last_dense_latitude  * m_granularity + m_lat_offset) / (OSMPBF::lonlat_resolution / osmium::coordinate_precision)));
 
-                            if (dense.has_denseinfo()) {
-                                node.version(dense.denseinfo().version(i));
-                                node.changeset(last_dense_changeset);
-                                node.timestamp(last_dense_timestamp * m_date_factor);
-                                node.uid_from_signed(last_dense_uid);
-                                node.visible(visible);
-                                builder.add_string(m_stringtable->s(last_dense_user_sid).data());
-                            }
-
-                            node.location(osmium::Location(
-                                              (last_dense_longitude * m_granularity + m_lon_offset) / (OSMPBF::lonlat_resolution / osmium::coordinate_precision),
-                                              (last_dense_latitude  * m_granularity + m_lat_offset) / (OSMPBF::lonlat_resolution / osmium::coordinate_precision)));
-
-                            int provisional_last_dense_tag = add_tags(dense, last_dense_tag, &builder);
-                            m_buffer.commit();
-                            last_dense_tag = provisional_last_dense_tag;
-                            break;
-                        } catch (osmium::memory::BufferIsFull&) {
-                            grow_buffer();
-                        }
+                    if (dense.has_denseinfo()) {
+                        node.version(dense.denseinfo().version(i));
+                        node.changeset(last_dense_changeset);
+                        node.timestamp(last_dense_timestamp * m_date_factor);
+                        node.uid_from_signed(last_dense_uid);
+                        node.visible(visible);
+                        builder.add_string(m_stringtable->s(last_dense_user_sid).data());
+                    } else {
+                        builder.add_string("");
                     }
+
+                    last_dense_tag = add_tags(dense, last_dense_tag, &builder);
+                    m_buffer.commit();
                 }
             }
 
