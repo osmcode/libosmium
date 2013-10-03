@@ -279,26 +279,33 @@ namespace osmium {
 
             /**
              * Reserve space of given size in buffer and return pointer to it.
-             * This is the main way of adding data to the buffer. You reserve
-             * the space and fill it.
+             * This is the only way of adding data to the buffer. You reserve
+             * the space and then fill it.
              *
              * Note that you have to eventually call commit() to actually
              * commit this data.
              *
-             * Calls functor set by set_full_callback() when the buffer doesn't
-             * have enough space.
+             * If there isn't enough space in the buffer, one of three things
+             * can happen:
+             *
+             * * If you have set a callback with set_full_callback(), it is
+             *   called. After the call returns, you must have either grown
+             *   the buffer or cleared it by calling buffer.clear().
+             * * If no callback is defined and this buffer uses internal
+             *   memory management, the buffers capacity is grown, so that
+             *   the new data will fit.
+             * * Else the BufferIsFull exception is thrown.
              *
              * @param size Number of bytes to reserve.
-             * @return Pointer to reserved space.
-             * @throw BufferIsFull If there is not enough space in the buffer
-             *                     to fulfill the reservation and m_full is
-             *                     not defined.
+             * @return Pointer to reserved space. Note that this pointer is
+             *         only guaranteed to be valid until the next call to
+             *         reserve_space().
+             * @throw BufferIsFull Might be thrown if the buffer is full.
              */
             char* reserve_space(const size_t size) {
                 if (m_written + size > m_capacity) {
                     if (m_full) {
                         m_full(*this);
-                        clear();
                     } else if (!m_memory.empty()) {
                         // double buffer size until there is enough space
                         size_t new_capacity = m_capacity * 2;
