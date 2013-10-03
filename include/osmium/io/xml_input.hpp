@@ -93,13 +93,13 @@ namespace osmium {
 
             osmium::memory::Buffer m_buffer;
 
-            std::unique_ptr<osmium::memory::NodeBuilder>               m_node_builder;
-            std::unique_ptr<osmium::memory::WayBuilder>                m_way_builder;
-            std::unique_ptr<osmium::memory::RelationBuilder>           m_relation_builder;
+            std::unique_ptr<osmium::osm::NodeBuilder>               m_node_builder;
+            std::unique_ptr<osmium::osm::WayBuilder>                m_way_builder;
+            std::unique_ptr<osmium::osm::RelationBuilder>           m_relation_builder;
 
-            std::unique_ptr<osmium::memory::TagListBuilder>            m_tl_builder;
-            std::unique_ptr<osmium::memory::WayNodeListBuilder>        m_wnl_builder;
-            std::unique_ptr<osmium::memory::RelationMemberListBuilder> m_rml_builder;
+            std::unique_ptr<osmium::osm::TagListBuilder>            m_tl_builder;
+            std::unique_ptr<osmium::osm::WayNodeListBuilder>        m_wnl_builder;
+            std::unique_ptr<osmium::osm::RelationMemberListBuilder> m_rml_builder;
 
             osmium::thread::Queue<osmium::memory::Buffer>& m_queue;
             std::promise<osmium::io::Header>& m_header_promise;
@@ -222,7 +222,7 @@ namespace osmium {
                         }
                     }
                     if (!m_tl_builder) {
-                        m_tl_builder = std::unique_ptr<osmium::memory::TagListBuilder>(new osmium::memory::TagListBuilder(m_buffer, builder));
+                        m_tl_builder = std::unique_ptr<osmium::osm::TagListBuilder>(new osmium::osm::TagListBuilder(m_buffer, builder));
                     }
                     m_tl_builder->add_tag(key, value);
                 }
@@ -260,7 +260,7 @@ namespace osmium {
                                     header_is_done();
                                 }
                                 if (m_read_types & osmium::item_flags_type::node) {
-                                    m_node_builder = std::unique_ptr<osmium::memory::NodeBuilder>(new osmium::memory::NodeBuilder(m_buffer));
+                                    m_node_builder = std::unique_ptr<osmium::osm::NodeBuilder>(new osmium::osm::NodeBuilder(m_buffer));
                                     init_object(m_node_builder.get(), m_node_builder->object(), attrs);
                                     m_context = context::node;
                                 } else {
@@ -271,7 +271,7 @@ namespace osmium {
                                     header_is_done();
                                 }
                                 if (m_read_types & osmium::item_flags_type::way) {
-                                    m_way_builder = std::unique_ptr<osmium::memory::WayBuilder>(new osmium::memory::WayBuilder(m_buffer));
+                                    m_way_builder = std::unique_ptr<osmium::osm::WayBuilder>(new osmium::osm::WayBuilder(m_buffer));
                                     init_object(m_way_builder.get(), m_way_builder->object(), attrs);
                                     m_context = context::way;
                                 } else {
@@ -282,7 +282,7 @@ namespace osmium {
                                     header_is_done();
                                 }
                                 if (m_read_types & osmium::item_flags_type::way) {
-                                    m_relation_builder = std::unique_ptr<osmium::memory::RelationBuilder>(new osmium::memory::RelationBuilder(m_buffer));
+                                    m_relation_builder = std::unique_ptr<osmium::osm::RelationBuilder>(new osmium::osm::RelationBuilder(m_buffer));
                                     init_object(m_relation_builder.get(), m_relation_builder->object(), attrs);
                                     m_context = context::relation;
                                 } else {
@@ -319,7 +319,7 @@ namespace osmium {
                                 m_tl_builder.reset();
 
                                 if (!m_wnl_builder) {
-                                    m_wnl_builder = std::unique_ptr<osmium::memory::WayNodeListBuilder>(new osmium::memory::WayNodeListBuilder(m_buffer, m_way_builder.get()));
+                                    m_wnl_builder = std::unique_ptr<osmium::osm::WayNodeListBuilder>(new osmium::osm::WayNodeListBuilder(m_buffer, m_way_builder.get()));
                                 }
 
                                 for (int count = 0; attrs[count]; count += 2) {
@@ -338,7 +338,7 @@ namespace osmium {
                                 m_tl_builder.reset();
 
                                 if (!m_rml_builder) {
-                                    m_rml_builder = std::unique_ptr<osmium::memory::RelationMemberListBuilder>(new osmium::memory::RelationMemberListBuilder(m_buffer, m_relation_builder.get()));
+                                    m_rml_builder = std::unique_ptr<osmium::osm::RelationMemberListBuilder>(new osmium::osm::RelationMemberListBuilder(m_buffer, m_relation_builder.get()));
                                 }
 
                                 char type = 'x';

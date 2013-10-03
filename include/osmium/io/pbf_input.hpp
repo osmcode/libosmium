@@ -136,7 +136,7 @@ namespace osmium {
                 for (int i=0; i < group.nodes_size(); ++i) {
                     while (true) {
                         try {
-                            osmium::memory::NodeBuilder builder(m_buffer);
+                            osmium::osm::NodeBuilder builder(m_buffer);
                             osmium::Node& node = builder.object();
 
                             const OSMPBF::Node& pbf_node = group.nodes(i);
@@ -156,7 +156,7 @@ namespace osmium {
                             }
 
                             if (pbf_node.keys_size() > 0) {
-                                osmium::memory::TagListBuilder tl_builder(m_buffer, &builder);
+                                osmium::osm::TagListBuilder tl_builder(m_buffer, &builder);
                                 for (int tag=0; tag < pbf_node.keys_size(); ++tag) {
                                     tl_builder.add_tag(m_stringtable->s(pbf_node.keys(tag)).data(),
                                                        m_stringtable->s(pbf_node.vals(tag)).data());
@@ -180,7 +180,7 @@ namespace osmium {
                 for (int i=0; i < group.ways_size(); ++i) {
                     while (true) {
                         try {
-                            osmium::memory::WayBuilder builder(m_buffer);
+                            osmium::osm::WayBuilder builder(m_buffer);
                             osmium::Way& way = builder.object();
 
                             const OSMPBF::Way& pbf_way = group.ways(i);
@@ -200,7 +200,7 @@ namespace osmium {
                             }
 
                             if (pbf_way.refs_size() > 0) {
-                                osmium::memory::WayNodeListBuilder wnl_builder(m_buffer, &builder);
+                                osmium::osm::WayNodeListBuilder wnl_builder(m_buffer, &builder);
                                 uint64_t ref = 0;
                                 for (int i=0; i < pbf_way.refs_size(); ++i) {
                                     ref += pbf_way.refs(i);
@@ -209,7 +209,7 @@ namespace osmium {
                             }
 
                             if (pbf_way.keys_size() > 0) {
-                                osmium::memory::TagListBuilder tl_builder(m_buffer, &builder);
+                                osmium::osm::TagListBuilder tl_builder(m_buffer, &builder);
                                 for (int tag=0; tag < pbf_way.keys_size(); ++tag) {
                                     tl_builder.add_tag(m_stringtable->s(pbf_way.keys(tag)).data(),
                                                        m_stringtable->s(pbf_way.vals(tag)).data());
@@ -229,7 +229,7 @@ namespace osmium {
                 for (int i=0; i < group.relations_size(); ++i) {
                     while (true) {
                         try {
-                            osmium::memory::RelationBuilder builder(m_buffer);
+                            osmium::osm::RelationBuilder builder(m_buffer);
                             osmium::Relation& relation = builder.object();
 
                             const OSMPBF::Relation& pbf_relation = group.relations(i);
@@ -249,7 +249,7 @@ namespace osmium {
                             }
 
                             if (pbf_relation.types_size() > 0) {
-                                osmium::memory::RelationMemberListBuilder rml_builder(m_buffer, &builder);
+                                osmium::osm::RelationMemberListBuilder rml_builder(m_buffer, &builder);
                                 uint64_t ref = 0;
                                 for (int i=0; i < pbf_relation.types_size(); ++i) {
                                     ref += pbf_relation.memids(i);
@@ -258,7 +258,7 @@ namespace osmium {
                             }
 
                             if (pbf_relation.keys_size() > 0) {
-                                osmium::memory::TagListBuilder tl_builder(m_buffer, &builder);
+                                osmium::osm::TagListBuilder tl_builder(m_buffer, &builder);
                                 for (int tag=0; tag < pbf_relation.keys_size(); ++tag) {
                                     tl_builder.add_tag(m_stringtable->s(pbf_relation.keys(tag)).data(),
                                                        m_stringtable->s(pbf_relation.vals(tag)).data());
@@ -276,7 +276,7 @@ namespace osmium {
 
             }
 
-            int add_tags(const OSMPBF::DenseNodes& dense, int n, osmium::memory::NodeBuilder* builder) {
+            int add_tags(const OSMPBF::DenseNodes& dense, int n, osmium::osm::NodeBuilder* builder) {
                 if (n >= dense.keys_vals_size()) {
                     return n;
                 }
@@ -285,7 +285,7 @@ namespace osmium {
                     return n+1;
                 }
 
-                osmium::memory::TagListBuilder tl_builder(m_buffer, builder);
+                osmium::osm::TagListBuilder tl_builder(m_buffer, builder);
 
                 while (n < dense.keys_vals_size()) {
                     int tag_key_pos = dense.keys_vals(n++);
@@ -334,7 +334,7 @@ namespace osmium {
 
                     while (true) {
                         try {
-                            osmium::memory::NodeBuilder builder(m_buffer);
+                            osmium::osm::NodeBuilder builder(m_buffer);
                             osmium::Node& node = builder.object();
 
                             node.id(last_dense_id);

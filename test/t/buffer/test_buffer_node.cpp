@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE(buffer_node) {
 
     {
         // add node 1
-        osmium::memory::ObjectBuilder<osmium::Node> node_builder(buffer);
+        osmium::osm::NodeBuilder node_builder(buffer);
         osmium::Node& node = node_builder.object();
         BOOST_CHECK_EQUAL(osmium::item_type::node, node.type());
 
@@ -89,7 +89,7 @@ BOOST_AUTO_TEST_CASE(buffer_node) {
 
     {
         // add node 2
-        osmium::memory::ObjectBuilder<osmium::Node> node_builder(buffer);
+        osmium::osm::NodeBuilder node_builder(buffer);
         osmium::Node& node = node_builder.object();
         BOOST_CHECK_EQUAL(osmium::item_type::node, node.type());
 
@@ -104,7 +104,7 @@ BOOST_AUTO_TEST_CASE(buffer_node) {
         node_builder.add_string("testuser");
 
         {
-            osmium::memory::TagListBuilder tag_builder(buffer, &node_builder);
+            osmium::osm::TagListBuilder tag_builder(buffer, &node_builder);
             tag_builder.add_tag("amenity", "bank");
             tag_builder.add_tag("name", "OSM Savings");
         }

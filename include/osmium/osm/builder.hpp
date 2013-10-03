@@ -38,18 +38,18 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
-    namespace memory {
+    namespace osm {
 
-        typedef ObjectBuilder<Node> NodeBuilder;
-        typedef ObjectBuilder<Way> WayBuilder;
-        typedef ObjectBuilder<Relation> RelationBuilder;
+        typedef osmium::memory::ObjectBuilder<osmium::Node> NodeBuilder;
+        typedef osmium::memory::ObjectBuilder<osmium::Way> WayBuilder;
+        typedef osmium::memory::ObjectBuilder<osmium::Relation> RelationBuilder;
 
-        class TagListBuilder : public Builder {
+        class TagListBuilder : public osmium::memory::Builder {
 
         public:
 
-            TagListBuilder(Buffer& buffer, Builder* parent=nullptr) :
-                Builder(buffer, parent, sizeof(TagList), item_type::tag_list) {
+            TagListBuilder(osmium::memory::Buffer& buffer, Builder* parent=nullptr) :
+                osmium::memory::Builder(buffer, parent, sizeof(TagList), item_type::tag_list) {
             }
 
             ~TagListBuilder() {
@@ -66,12 +66,12 @@ namespace osmium {
 
         }; // class TagListBuilder
 
-        class WayNodeListBuilder : public Builder {
+        class WayNodeListBuilder : public osmium::memory::Builder {
 
         public:
 
-            WayNodeListBuilder(Buffer& buffer, Builder* parent=nullptr) :
-                Builder(buffer, parent, sizeof(WayNodeList), item_type::way_node_list) {
+            WayNodeListBuilder(osmium::memory::Buffer& buffer, Builder* parent=nullptr) :
+                osmium::memory::Builder(buffer, parent, sizeof(WayNodeList), item_type::way_node_list) {
             }
 
             ~WayNodeListBuilder() {
@@ -93,12 +93,12 @@ namespace osmium {
 
         }; // class WayNodeListBuilder
 
-        class RelationMemberListBuilder : public Builder {
+        class RelationMemberListBuilder : public osmium::memory::Builder {
 
         public:
 
-            RelationMemberListBuilder(Buffer& buffer, Builder* parent=nullptr) :
-                Builder(buffer, parent, sizeof(RelationMemberList), item_type::relation_member_list) {
+            RelationMemberListBuilder(osmium::memory::Buffer& buffer, Builder* parent=nullptr) :
+                osmium::memory::Builder(buffer, parent, sizeof(RelationMemberList), item_type::relation_member_list) {
             }
 
             ~RelationMemberListBuilder() {
@@ -120,7 +120,7 @@ namespace osmium {
 
         }; // class RelationMemberListBuilder
 
-    } // namespace memory
+    } // namespace osm
 
 } // namespace osmium
 
