@@ -533,7 +533,7 @@ namespace osmium {
                         size_t work_queue_size = m_thread_pool.submit(std::move(data_blob_parser));
 
                         // if the work queue is getting too large, wait for a while
-                        while (work_queue_size >= m_max_work_queue_size) {
+                        while (!m_done && work_queue_size >= m_max_work_queue_size) {
                             std::this_thread::sleep_for(std::chrono::milliseconds(10));
                             work_queue_size = m_thread_pool.queue_size();
                         }
@@ -541,8 +541,12 @@ namespace osmium {
                     ++n;
 
                     // wait if the backlog of buffers with parsed data is too large
-                    while (m_queue.size() > m_max_buffer_queue_size) {
+                    while (!m_done && m_queue.size() > m_max_buffer_queue_size) {
                         std::this_thread::sleep_for(std::chrono::milliseconds(10));
+                    }
+
+                    if (m_done) {
+                        return;
                     }
                 }
                 m_done = true;
@@ -568,6 +572,7 @@ namespace osmium {
             }
 
             ~PBFInput() {
+                m_done = true;
                 if (m_reader.joinable()) {
                     m_reader.join();
                 }
