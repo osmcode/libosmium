@@ -225,7 +225,7 @@ namespace osmium {
                     if (input == 0) {
                         ::open("/dev/null", O_RDONLY); // stdin
                         ::open("/dev/null", O_WRONLY); // stderr
-                        if (::execlp(command.c_str(), command.c_str(), m_filename.c_str(), NULL) < 0) {
+                        if (::execlp(command.c_str(), command.c_str(), m_filename.c_str(), nullptr) < 0) {
                             exit(1);
                         }
                     } else {
@@ -233,7 +233,7 @@ namespace osmium {
                             exit(1);
                         }
                         ::open("/dev/null", O_WRONLY); // stderr
-                        if (::execlp(command.c_str(), command.c_str(), 0, NULL) < 0) {
+                        if (::execlp(command.c_str(), command.c_str(), nullptr) < 0) {
                             exit(1);
                         }
                     }
