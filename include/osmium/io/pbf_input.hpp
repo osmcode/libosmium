@@ -135,8 +135,8 @@ namespace osmium {
                     const OSMPBF::Node& pbf_node = group.nodes(i);
                     node.id(pbf_node.id());
                     node.location(osmium::Location(
-                                        (pbf_node.lon() * m_granularity + m_lon_offset) / (OSMPBF::lonlat_resolution / osmium::coordinate_precision),
-                                        (pbf_node.lat() * m_granularity + m_lat_offset) / (OSMPBF::lonlat_resolution / osmium::coordinate_precision)));
+                                      (pbf_node.lon() * m_granularity + m_lon_offset) / (OSMPBF::lonlat_resolution / osmium::coordinate_precision),
+                                      (pbf_node.lat() * m_granularity + m_lat_offset) / (OSMPBF::lonlat_resolution / osmium::coordinate_precision)));
 
                     if (pbf_node.has_info()) {
                         node.version(pbf_node.info().version())
@@ -314,8 +314,8 @@ namespace osmium {
 
                     node.id(last_dense_id);
                     node.location(osmium::Location(
-                                        (last_dense_longitude * m_granularity + m_lon_offset) / (OSMPBF::lonlat_resolution / osmium::coordinate_precision),
-                                        (last_dense_latitude  * m_granularity + m_lat_offset) / (OSMPBF::lonlat_resolution / osmium::coordinate_precision)));
+                                      (last_dense_longitude * m_granularity + m_lon_offset) / (OSMPBF::lonlat_resolution / osmium::coordinate_precision),
+                                      (last_dense_latitude  * m_granularity + m_lat_offset) / (OSMPBF::lonlat_resolution / osmium::coordinate_precision)));
 
                     if (dense.has_denseinfo()) {
                         node.version(dense.denseinfo().version(i));

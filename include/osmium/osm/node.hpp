@@ -41,7 +41,7 @@ namespace osmium {
 
         friend class osmium::memory::ObjectBuilder<osmium::Node>;
 
-        osmium::Location m_location{};
+        osmium::Location m_location {};
 
         Node() :
             Object() {

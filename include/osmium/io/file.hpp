@@ -132,7 +132,7 @@ namespace osmium {
             public:
 
                 ArgumentError(const std::string& whatarg,
-                            const std::string& value="") :
+                              const std::string& value="") :
                     std::runtime_error(whatarg),
                     m_value(value) {
                 }
