@@ -156,25 +156,25 @@ namespace osmium {
             Reader& operator=(const Reader&) = delete;
 
             template <class THandler>
-            osmium::item_type push_helper(osmium::memory::Buffer& buffer, osmium::item_type type, THandler& handler) {
+            osmium::item_type apply_helper(osmium::memory::Buffer& buffer, osmium::item_type type, THandler& handler) {
                 return handler(buffer, type);
             }
 
             template <class THead, class ...TTail>
-            osmium::item_type push_helper(osmium::memory::Buffer& buffer, osmium::item_type type, THead& handler, TTail&... more) {
+            osmium::item_type apply_helper(osmium::memory::Buffer& buffer, osmium::item_type type, THead& handler, TTail&... more) {
                 handler(buffer, type);
-                return push_helper(buffer, type, more...);
+                return apply_helper(buffer, type, more...);
             }
 
             template <class THandler>
-            void push_helper(osmium::item_type type, THandler& handler) {
+            void apply_helper(osmium::item_type type, THandler& handler) {
                 handler(type);
             }
 
             template <class THead, class ...TTail>
-            void push_helper(osmium::item_type type, THead& handler, TTail&... more) {
+            void apply_helper(osmium::item_type type, THead& handler, TTail&... more) {
                 handler(type);
-                push_helper(type, more...);
+                apply_helper(type, more...);
             }
 
         public:
@@ -204,12 +204,12 @@ namespace osmium {
             }
 
             template <class ...THandlers>
-            void push(THandlers&... handlers) {
+            void apply(THandlers&... handlers) {
                 osmium::item_type type = osmium::item_type::undefined;
                 while (osmium::memory::Buffer buffer = read()) {
-                    type = push_helper(buffer, type, handlers...);
+                    type = apply_helper(buffer, type, handlers...);
                 }
-                push_helper(type, handlers...);
+                apply_helper(type, handlers...);
             }
 
             typedef std::pair<osmium::memory::Buffer::iterator, osmium::memory::Buffer::iterator> buffer_iterator_pair;
