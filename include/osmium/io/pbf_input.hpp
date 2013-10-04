@@ -605,12 +605,13 @@ namespace osmium {
              */
             osmium::memory::Buffer next_buffer() override {
                 osmium::memory::Buffer buffer;
-                if (m_done && m_pending_jobs==0) {
-                    return buffer;
+
+                if (!m_done || m_pending_jobs != 0) {
+                    m_queue.wait_and_pop(buffer);
+                    --m_pending_jobs;
                 }
-                m_queue.wait_and_pop(buffer);
-                --m_pending_jobs;
-                return std::move(buffer);
+
+                return buffer;
             }
 
         }; // class PBFInput

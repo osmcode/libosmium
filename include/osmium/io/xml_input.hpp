@@ -500,11 +500,12 @@ namespace osmium {
 
             osmium::memory::Buffer next_buffer() override {
                 osmium::memory::Buffer buffer;
-                if (m_done && m_queue.empty()) {
-                    return buffer;
+
+                if (!m_done || !m_queue.empty()) {
+                    m_queue.wait_and_pop(buffer);
                 }
-                m_queue.wait_and_pop(buffer);
-                return std::move(buffer);
+
+                return buffer;
             }
 
         }; // class XMLInput
