@@ -87,6 +87,15 @@ namespace osmium {
 
     protected:
 
+        Object() :
+            m_id(0),
+            m_deleted(false),
+            m_version(0),
+            m_timestamp(0),
+            m_uid(0),
+            m_changeset(0) {
+        }
+
         template <class T>
         T& subitem_of_type() {
             for (iterator it = begin(); it != end(); ++it) {
@@ -112,15 +121,6 @@ namespace osmium {
         }
 
     public:
-
-        Object() :
-            m_id(0),
-            m_deleted(false),
-            m_version(0),
-            m_timestamp(0),
-            m_uid(0),
-            m_changeset(0) {
-        }
 
         /// Get ID of this object.
         object_id_type id() const {

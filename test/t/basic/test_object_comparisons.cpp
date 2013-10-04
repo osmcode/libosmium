@@ -11,26 +11,44 @@
 BOOST_AUTO_TEST_SUITE(Object_Comparisons)
 
 BOOST_AUTO_TEST_CASE(order) {
-    osmium::Object object1;
-    osmium::Object object2;
-    object1.id(10);
-    object1.version(1);
-    object2.id(15);
-    object2.version(2);
-    BOOST_CHECK_EQUAL(true, object1 < object2);
-    BOOST_CHECK_EQUAL(false, object1 > object2);
-    object1.id(20);
-    object1.version(1);
-    object2.id(20);
-    object2.version(2);
-    BOOST_CHECK_EQUAL(true, object1 < object2);
-    BOOST_CHECK_EQUAL(false, object1 > object2);
-    object1.id(-10);
-    object1.version(2);
-    object2.id(-15);
-    object2.version(1);
-    BOOST_CHECK_EQUAL(true, object1 < object2);
-    BOOST_CHECK_EQUAL(false, object1 > object2);
+    osmium::memory::Buffer buffer(10 * 1000);
+
+    {
+        // add node 1
+        osmium::memory::ObjectBuilder<osmium::Node> node_builder(buffer);
+        node_builder.add_string("testuser");
+        buffer.commit();
+    }
+
+    {
+        // add node 2
+        osmium::memory::ObjectBuilder<osmium::Node> node_builder(buffer);
+        node_builder.add_string("testuser");
+        buffer.commit();
+    }
+
+    auto it = buffer.begin();
+    osmium::Node& node1 = static_cast<osmium::Node&>(*it);
+    osmium::Node& node2 = static_cast<osmium::Node&>(*(++it));
+
+    node1.id(10);
+    node1.version(1);
+    node2.id(15);
+    node2.version(2);
+    BOOST_CHECK_EQUAL(true, node1 < node2);
+    BOOST_CHECK_EQUAL(false, node1 > node2);
+    node1.id(20);
+    node1.version(1);
+    node2.id(20);
+    node2.version(2);
+    BOOST_CHECK_EQUAL(true, node1 < node2);
+    BOOST_CHECK_EQUAL(false, node1 > node2);
+    node1.id(-10);
+    node1.version(2);
+    node2.id(-15);
+    node2.version(1);
+    BOOST_CHECK_EQUAL(true, node1 < node2);
+    BOOST_CHECK_EQUAL(false, node1 > node2);
 }
 
 BOOST_AUTO_TEST_CASE(order_types) {
