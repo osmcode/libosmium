@@ -110,9 +110,11 @@ namespace osmium {
 
             size_t m_max_queue_size;
 
+            std::atomic<bool>& m_done;
+
         public:
 
-            XMLParser(int fd, osmium::thread::Queue<osmium::memory::Buffer>& queue, std::promise<osmium::io::Header>& header_promise, osmium::item_flags_type read_types) :
+            XMLParser(int fd, osmium::thread::Queue<osmium::memory::Buffer>& queue, std::promise<osmium::io::Header>& header_promise, osmium::item_flags_type read_types, std::atomic<bool>& done) :
                 m_context(context::root),
                 m_last_context(context::root),
                 m_in_delete_section(false),
@@ -129,7 +131,8 @@ namespace osmium {
                 m_header_promise(header_promise),
                 m_promise_fulfilled(false),
                 m_read_types(read_types),
-                m_max_queue_size(100) {
+                m_max_queue_size(100),
+                m_done(done) {
             }
 
             void operator()() {
@@ -166,7 +169,7 @@ namespace osmium {
                             errorDesc << ": " << errorString;
                             throw std::runtime_error(errorDesc.str());
                         }
-                    } while (!done);
+                    } while (!done && !m_done);
                 } catch (ParserIsDone&) {
                     // intentionally left blank
                 }
@@ -480,13 +483,14 @@ namespace osmium {
             }
 
             ~XMLInput() {
+                m_done = true;
                 if (m_reader.joinable()) {
                     m_reader.join();
                 }
             }
 
             osmium::io::Header read(osmium::item_flags_type read_types) override {
-                XMLParser parser(fd(), m_queue, m_header_promise, read_types);
+                XMLParser parser(fd(), m_queue, m_header_promise, read_types, m_done);
 
                 m_reader = std::thread(std::move(parser));
 
