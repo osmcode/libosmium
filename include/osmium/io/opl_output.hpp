@@ -51,11 +51,11 @@ namespace osmium {
 
             // size of the output buffer, there is one system call for each
             // time this is flushed, so it shouldn't be too small
-            static const int output_buffer_size = 1024*1024;
+            static const size_t output_buffer_size = 1024*1024;
 
             // temporary buffer for writing out IDs and other numbers, must
             // be big enough to always hold them
-            static const int tmp_buffer_size = 100;
+            static const size_t tmp_buffer_size = 100;
 
             std::string m_out;
 
