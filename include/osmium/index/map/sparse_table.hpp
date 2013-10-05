@@ -55,6 +55,8 @@ namespace osmium {
             * Use this index if the ID space is only sparsly
             * populated, such as when working with smaller OSM files (like
             * country extracts).
+            *
+            * This will only work on 64 bit machines.
             */
             template <typename TKey, typename TValue>
             class SparseTable : public osmium::index::map::Map<TKey, TValue> {
@@ -62,6 +64,8 @@ namespace osmium {
                 TKey m_grow_size;
 
                 google::sparsetable<TValue> m_elements;
+
+                static_assert(sizeof(typename google::sparsetable<TValue>::size_type) >= 8, "google::sparsetable needs 64bit machine");
 
             public:
 
