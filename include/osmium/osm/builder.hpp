@@ -49,7 +49,8 @@ namespace osmium {
         public:
 
             TagListBuilder(osmium::memory::Buffer& buffer, Builder* parent=nullptr) :
-                osmium::memory::Builder(buffer, parent, sizeof(TagList), item_type::tag_list) {
+                osmium::memory::Builder(buffer, parent, sizeof(TagList)) {
+                new (&item()) TagList();
             }
 
             ~TagListBuilder() {
@@ -71,7 +72,8 @@ namespace osmium {
         public:
 
             WayNodeListBuilder(osmium::memory::Buffer& buffer, Builder* parent=nullptr) :
-                osmium::memory::Builder(buffer, parent, sizeof(WayNodeList), item_type::way_node_list) {
+                osmium::memory::Builder(buffer, parent, sizeof(WayNodeList)) {
+                new (&item()) WayNodeList();
             }
 
             ~WayNodeListBuilder() {
@@ -98,7 +100,8 @@ namespace osmium {
         public:
 
             RelationMemberListBuilder(osmium::memory::Buffer& buffer, Builder* parent=nullptr) :
-                osmium::memory::Builder(buffer, parent, sizeof(RelationMemberList), item_type::relation_member_list) {
+                osmium::memory::Builder(buffer, parent, sizeof(RelationMemberList)) {
+                new (&item()) RelationMemberList();
             }
 
             ~RelationMemberListBuilder() {

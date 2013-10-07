@@ -88,6 +88,8 @@ namespace osmium {
 
     public:
 
+        static constexpr item_type collection_type = item_type::relation_member_list;
+
         RelationMember(const object_id_type ref=0, const item_type type=item_type(), const bool full=false) :
             m_ref(ref),
             m_type(type),
@@ -136,7 +138,7 @@ namespace osmium {
         friend class osmium::memory::ObjectBuilder<osmium::Relation>;
 
         Relation() :
-            Object() {
+            Object(sizeof(Relation), osmium::item_type::relation) {
         }
 
     public:

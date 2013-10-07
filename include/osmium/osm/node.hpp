@@ -44,7 +44,7 @@ namespace osmium {
         osmium::Location m_location {};
 
         Node() :
-            Object() {
+            Object(sizeof(Node), osmium::item_type::node) {
         }
 
     public:

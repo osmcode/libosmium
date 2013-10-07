@@ -119,10 +119,6 @@ namespace osmium {
         }
     }
 
-    inline item_type item_type_for_collection_of(item_type type) {
-        return static_cast<item_type>(static_cast<uint32_t>(type) | static_cast<uint32_t>(item_type::collection));
-    }
-
 } // namespace osmium
 
 #endif // OSMIUM_MEMORY_ITEM_TYPE_HPP

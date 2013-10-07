@@ -55,13 +55,12 @@ namespace osmium {
 
         protected:
 
-            Builder(Buffer& buffer, Builder* parent, size_t size, item_type item_type) :
+            Builder(Buffer& buffer, Builder* parent, size_t size) :
                 m_buffer(buffer),
                 m_parent(parent),
                 m_item_offset(buffer.written()) {
-                osmium::memory::Item* item = reinterpret_cast<osmium::memory::Item*>(m_buffer.reserve_space(size));
+                m_buffer.reserve_space(size);
                 assert(buffer.is_aligned());
-                new (item) osmium::memory::Item(size, item_type);
                 if (m_parent) {
                     m_parent->add_size(size);
                 }
@@ -149,14 +148,8 @@ namespace osmium {
         public:
 
             ObjectBuilder(Buffer& buffer, Builder* parent=nullptr) :
-                Builder(buffer, parent, sizeof(T), item_traits<T>::itemtype) {
-
-                // First we initialize an empty object of class T in the buffer using its constructor.
-                // This will initialize everything in there thats specific to type T.
+                Builder(buffer, parent, sizeof(T)) {
                 new (&item()) T();
-
-                // Then we initialize an Item on top of that with the right size and item_type.
-                new (&item()) osmium::memory::Item(sizeof(T), item_traits<T>::itemtype);
             }
 
             T& object() {

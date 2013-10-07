@@ -63,6 +63,8 @@ namespace osmium {
 
     public:
 
+        static constexpr item_type collection_type = item_type::tag_list;
+
         const char* key() const {
             return self();
         }

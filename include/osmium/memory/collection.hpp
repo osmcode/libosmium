@@ -102,7 +102,7 @@ namespace osmium {
             typedef TMember value_type;
 
             Collection() :
-                Item(sizeof(Collection<TMember>), item_type_for_collection_of(item_traits<TMember>::itemtype)) {
+                Item(sizeof(Collection<TMember>), TMember::collection_type) {
             }
 
             bool empty() const {

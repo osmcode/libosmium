@@ -109,6 +109,8 @@ namespace osmium {
 
     public:
 
+        static constexpr item_type collection_type = item_type::way_node_list;
+
         WayNodeWithLocation(const object_id_type ref=0, const Location& location=Location()) :
             WayNodeRefOnly(ref),
             m_location(location) {
@@ -139,7 +141,7 @@ namespace osmium {
         friend class osmium::memory::ObjectBuilder<osmium::Way>;
 
         Way() :
-            Object() {
+            Object(sizeof(Way), osmium::item_type::way) {
         }
 
     public:

@@ -87,7 +87,8 @@ namespace osmium {
 
     protected:
 
-        Object() :
+        Object(osmium::memory::item_size_type size, osmium::item_type type) :
+            Item(size, type),
             m_id(0),
             m_deleted(false),
             m_version(0),

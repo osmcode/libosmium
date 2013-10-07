@@ -115,7 +115,7 @@ namespace osmium {
                 return *this;
             }
 
-        public:
+        protected:
 
             Item(item_size_type size=0, item_type type=item_type()) :
                 m_size(size),
@@ -127,6 +127,8 @@ namespace osmium {
 
             Item& operator=(const Item&) = delete;
             Item& operator=(Item&&) = delete;
+
+        public:
 
             item_size_type size() const {
                 return m_size;
