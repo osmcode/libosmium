@@ -59,7 +59,7 @@ namespace osmium {
 
             std::string m_out;
 
-            char tmp_buffer[tmp_buffer_size+1];
+            char m_tmp_buffer[tmp_buffer_size+1];
 
             OPLOutput(const OPLOutput&) = delete;
             OPLOutput& operator=(const OPLOutput&) = delete;
@@ -68,7 +68,8 @@ namespace osmium {
 
             OPLOutput(const osmium::io::File& file) :
                 Output(file),
-                m_out() {
+                m_out(),
+                m_tmp_buffer() {
                 m_out.reserve(output_buffer_size * 2);
             }
 
@@ -80,8 +81,8 @@ namespace osmium {
                 m_out += 'n';
                 write_meta(node);
 
-                snprintf(tmp_buffer, tmp_buffer_size, " x%.7f y%.7f", node.lon(), node.lat());
-                m_out += tmp_buffer;
+                snprintf(m_tmp_buffer, tmp_buffer_size, " x%.7f y%.7f", node.lon(), node.lat());
+                m_out += m_tmp_buffer;
 
                 write_tags(node.tags());
 
@@ -102,8 +103,8 @@ namespace osmium {
                     } else {
                         m_out += ',';
                     }
-                    snprintf(tmp_buffer, tmp_buffer_size, "n%" PRId64, wn.ref());
-                    m_out += tmp_buffer;
+                    snprintf(m_tmp_buffer, tmp_buffer_size, "n%" PRId64, wn.ref());
+                    m_out += m_tmp_buffer;
                 }
 
                 write_tags(way.tags());
@@ -126,8 +127,8 @@ namespace osmium {
                         m_out += ',';
                     }
                     m_out += item_type_to_char(member.type());
-                    snprintf(tmp_buffer, tmp_buffer_size, "%" PRId64 "!", member.ref());
-                    m_out += tmp_buffer;
+                    snprintf(m_tmp_buffer, tmp_buffer_size, "%" PRId64 "!", member.ref());
+                    m_out += m_tmp_buffer;
                     m_out += member.role();
                 }
 
@@ -164,14 +165,14 @@ namespace osmium {
             }
 
             void write_meta(const osmium::Object& object) {
-                snprintf(tmp_buffer, tmp_buffer_size, "%" PRId64 " v%d d", object.id(), object.version());
-                m_out += tmp_buffer;
+                snprintf(m_tmp_buffer, tmp_buffer_size, "%" PRId64 " v%d d", object.id(), object.version());
+                m_out += m_tmp_buffer;
                 m_out += (object.visible() ? 'V' : 'D');
-                snprintf(tmp_buffer, tmp_buffer_size, " c%d t", object.changeset());
-                m_out += tmp_buffer;
+                snprintf(m_tmp_buffer, tmp_buffer_size, " c%d t", object.changeset());
+                m_out += m_tmp_buffer;
                 m_out += timestamp::to_iso(object.timestamp());
-                snprintf(tmp_buffer, tmp_buffer_size, " i%d u", object.uid());
-                m_out += tmp_buffer;
+                snprintf(m_tmp_buffer, tmp_buffer_size, " i%d u", object.uid());
+                m_out += m_tmp_buffer;
                 append_encoded_string(object.user());
             }
 

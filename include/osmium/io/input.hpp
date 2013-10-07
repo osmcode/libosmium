@@ -149,7 +149,8 @@ namespace osmium {
 
             osmium::io::File m_file;
             std::unique_ptr<Input> m_input;
-            osmium::item_flags_type m_read_types;
+
+            osmium::item_flags_type m_read_types {osmium::item_flags_type::all};
             osmium::memory::Buffer m_buffer {};
 
             Reader(const Reader&) = delete;

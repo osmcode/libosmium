@@ -204,7 +204,7 @@ int main(int argc, char* argv[]) {
     std::cout << std::fixed << std::setprecision(7);
     int fd = open(options.filename().c_str(), O_RDWR);
 
-    bool okay = true;
+    bool result_okay = true;
 
     if (options.type_is("location")) {
         IndexSearch<osmium::unsigned_object_id_type, osmium::Location> is(fd, options.dense_format());
@@ -212,7 +212,7 @@ int main(int argc, char* argv[]) {
         if (options.do_dump()) {
             is.dump();
         } else {
-            okay = is.search(options.search_keys());
+            result_okay = is.search(options.search_keys());
         }
     } else {
         IndexSearch<osmium::unsigned_object_id_type, size_t> is(fd, options.dense_format());
@@ -220,10 +220,10 @@ int main(int argc, char* argv[]) {
         if (options.do_dump()) {
             is.dump();
         } else {
-            okay = is.search(options.search_keys());
+            result_okay = is.search(options.search_keys());
         }
     }
 
-    exit(okay ? return_code::okay : return_code::not_found);
+    exit(result_okay ? return_code::okay : return_code::not_found);
 }
 

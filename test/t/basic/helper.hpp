@@ -7,7 +7,7 @@
 
 #include <osmium/osm/builder.hpp>
 
-inline void add_tags(osmium::memory::Buffer& buffer, osmium::memory::Builder& builder, const std::vector<std::pair<const char*, const char*>> tags) {
+inline void add_tags(osmium::memory::Buffer& buffer, osmium::memory::Builder& builder, const std::vector<std::pair<const char*, const char*>>& tags) {
     osmium::osm::TagListBuilder tl_builder(buffer, &builder);
     for (auto& tag : tags) {
         tl_builder.add_tag(tag.first, tag.second);

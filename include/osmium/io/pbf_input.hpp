@@ -481,7 +481,6 @@ namespace osmium {
             std::atomic<int> m_pending_jobs;
             std::thread m_reader;
             OSMPBF::BlobHeader m_blob_header;
-            unsigned char m_blob_header_buffer[OSMPBF::max_blob_header_size];
 
             /**
              * Read BlobHeader by first reading the size and then the BlobHeader.
@@ -504,11 +503,12 @@ namespace osmium {
                     throw std::runtime_error("Invalid BlobHeader size");
                 }
 
-                if (! osmium::io::detail::reliable_read(fd, m_blob_header_buffer, size)) {
+                unsigned char blob_header_buffer[OSMPBF::max_blob_header_size];
+                if (! osmium::io::detail::reliable_read(fd, blob_header_buffer, size)) {
                     throw std::runtime_error("Read error.");
                 }
 
-                if (!m_blob_header.ParseFromArray(m_blob_header_buffer, size)) {
+                if (!m_blob_header.ParseFromArray(blob_header_buffer, size)) {
                     throw std::runtime_error("Failed to parse BlobHeader.");
                 }
 

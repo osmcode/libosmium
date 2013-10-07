@@ -145,8 +145,8 @@ namespace osmium {
 
                 XML_SetElementHandler(parser, start_element_wrapper, end_element_wrapper);
 
-                int done;
                 try {
+                    int done;
                     do {
                         void* buffer = XML_GetBuffer(parser, xml_buffer_size);
                         if (buffer == nullptr) {
