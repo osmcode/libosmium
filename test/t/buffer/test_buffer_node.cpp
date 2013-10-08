@@ -64,7 +64,7 @@ void check_node_2(osmium::Node& node) {
 
 BOOST_AUTO_TEST_CASE(buffer_node) {
     constexpr size_t buffer_size = 10000;
-    char data[buffer_size];
+    unsigned char data[buffer_size];
 
     osmium::memory::Buffer buffer(data, buffer_size, 0);
 

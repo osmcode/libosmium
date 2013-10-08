@@ -49,28 +49,28 @@ namespace osmium {
         RelationMember& operator=(const RelationMember&) = delete;
         RelationMember& operator=(RelationMember&&) = delete;
 
-        char* role_position() {
+        unsigned char* role_position() {
             return data() + sizeof(RelationMember);
         }
 
-        const char* role_position() const {
+        const unsigned char* role_position() const {
             return data() + sizeof(RelationMember);
         }
 
-        char* endpos() {
-            char* current = data() + sizeof(RelationMember);
+        unsigned char* endpos() {
+            unsigned char* current = data() + sizeof(RelationMember);
             return current + sizeof(size_t) + osmium::memory::padded_length(*reinterpret_cast<size_t*>(current));
         }
 
-        const char* endpos() const {
-            const char* current = data() + sizeof(RelationMember);
+        const unsigned char* endpos() const {
+            const unsigned char* current = data() + sizeof(RelationMember);
             return current + sizeof(size_t) + osmium::memory::padded_length(*reinterpret_cast<const size_t*>(current));
         }
 
         template <class TMember>
         friend class osmium::memory::CollectionIterator;
 
-        char* next() {
+        unsigned char* next() {
             if (full_member()) {
                 return endpos() + reinterpret_cast<osmium::memory::Item*>(endpos())->size();
             } else {
@@ -78,7 +78,7 @@ namespace osmium {
             }
         }
 
-        const char* next() const {
+        unsigned const char* next() const {
             if (full_member()) {
                 return endpos() + reinterpret_cast<const osmium::memory::Item*>(endpos())->size();
             } else {
@@ -113,7 +113,7 @@ namespace osmium {
         }
 
         const char* role() const {
-            return role_position() + sizeof(size_t);
+            return reinterpret_cast<const char*>(role_position() + sizeof(size_t));
         }
 
         Object& get_object() {

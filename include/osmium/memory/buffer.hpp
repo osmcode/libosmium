@@ -81,8 +81,8 @@ namespace osmium {
          */
         class Buffer {
 
-            std::vector<char> m_memory;
-            char* m_data;
+            std::vector<unsigned char> m_memory;
+            unsigned char* m_data;
             size_t m_capacity;
             size_t m_written;
             size_t m_committed;
@@ -113,7 +113,7 @@ namespace osmium {
              * @param size The size of the initialized data.
              * @exception std::invalid_argument When the size isn't a multiple of the alignment.
              */
-            Buffer(char* data, size_t size) :
+            Buffer(unsigned char* data, size_t size) :
                 m_memory(),
                 m_data(data),
                 m_capacity(size),
@@ -133,7 +133,7 @@ namespace osmium {
              * @param committed The size of the initialized data. If this is 0, the buffer startes out empty.
              * @exception std::invalid_argument When the capacity or committed isn't a multiple of the alignment.
              */
-            Buffer(char* data, size_t capacity, size_t committed) :
+            Buffer(unsigned char* data, size_t capacity, size_t committed) :
                 m_memory(),
                 m_data(data),
                 m_capacity(capacity),
@@ -177,7 +177,7 @@ namespace osmium {
             /**
              * Return a pointer to data inside the buffer.
              */
-            char* data() const {
+            unsigned char* data() const {
                 return m_data;
             }
 
@@ -302,7 +302,7 @@ namespace osmium {
              *         reserve_space().
              * @throw BufferIsFull Might be thrown if the buffer is full.
              */
-            char* reserve_space(const size_t size) {
+            unsigned char* reserve_space(const size_t size) {
                 if (m_written + size > m_capacity) {
                     if (m_full) {
                         m_full(*this);
@@ -317,7 +317,7 @@ namespace osmium {
                         throw BufferIsFull();
                     }
                 }
-                char* data = &m_data[m_written];
+                unsigned char* data = &m_data[m_written];
                 m_written += size;
                 return data;
             }
@@ -335,7 +335,7 @@ namespace osmium {
              */
             template <class T>
             T& add_item(const T& item) {
-                char* ptr = reserve_space(item.padded_size());
+                unsigned char* ptr = reserve_space(item.padded_size());
                 std::memcpy(ptr, &item, item.padded_size());
                 return *reinterpret_cast<T*>(ptr);
             }

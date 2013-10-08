@@ -51,16 +51,19 @@ namespace osmium {
         template <class TMember>
         friend class osmium::memory::CollectionIterator;
 
-        template <typename T>
-        static T* after_null(T* ptr) {
-            return std::strchr(ptr, 0) + 1;
+        static unsigned char* after_null(unsigned char* ptr) {
+            return reinterpret_cast<unsigned char*>(std::strchr(reinterpret_cast<char*>(ptr), 0) + 1);
         }
 
-        char* next() {
+        static const unsigned char* after_null(const unsigned char* ptr) {
+            return reinterpret_cast<const unsigned char*>(std::strchr(reinterpret_cast<const char*>(ptr), 0) + 1);
+        }
+
+        unsigned char* next() {
             return after_null(after_null(data()));
         }
 
-        const char* next() const {
+        const unsigned char* next() const {
             return after_null(after_null(data()));
         }
 
@@ -69,11 +72,11 @@ namespace osmium {
         static constexpr item_type collection_type = item_type::tag_list;
 
         const char* key() const {
-            return data();
+            return reinterpret_cast<const char*>(data());
         }
 
         const char* value() const {
-            return after_null(data());
+            return reinterpret_cast<const char*>(after_null(data()));
         }
 
     }; // class Tag

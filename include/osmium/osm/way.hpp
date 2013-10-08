@@ -44,11 +44,11 @@ namespace osmium {
         template <class TMember>
         friend class osmium::memory::CollectionIterator;
 
-        char* next() {
+        unsigned char* next() {
             return data() + sizeof(WayNodeRefOnly);
         }
 
-        const char* next() const {
+        const unsigned char* next() const {
             return data() + sizeof(WayNodeRefOnly);
         }
 
@@ -99,11 +99,11 @@ namespace osmium {
         template <class TMember>
         friend class osmium::memory::CollectionIterator;
 
-        char* next() {
+        unsigned char* next() {
             return data() + sizeof(WayNodeWithLocation);
         }
 
-        const char* next() const {
+        const unsigned char* next() const {
             return data() + sizeof(WayNodeWithLocation);
         }
 

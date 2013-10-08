@@ -79,7 +79,7 @@ namespace osmium {
              * @param size Number of bytes to be read.
              * @exception std::system_error On error.
              */
-            inline void reliable_write(const int fd, const char* output_buffer, const size_t size) {
+            inline void reliable_write(const int fd, const unsigned char* output_buffer, const size_t size) {
                 size_t offset = 0;
                 do {
                     ssize_t length = ::write(fd, output_buffer + offset, size - offset);
@@ -88,6 +88,10 @@ namespace osmium {
                     }
                     offset += length;
                 } while (offset < size);
+            }
+
+            inline void reliable_write(const int fd, const char* output_buffer, const size_t size) {
+                reliable_write(fd, reinterpret_cast<const unsigned char*>(output_buffer), size);
             }
 
         } // namespace detail

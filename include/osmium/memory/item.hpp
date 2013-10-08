@@ -73,12 +73,12 @@ namespace osmium {
 
             public:
 
-                char* data() {
-                    return reinterpret_cast<char*>(this);
+                unsigned char* data() {
+                    return reinterpret_cast<unsigned char*>(this);
                 }
 
-                const char* data() const {
-                    return reinterpret_cast<const char*>(this);
+                const unsigned char* data() const {
+                    return reinterpret_cast<const unsigned char*>(this);
                 }
 
             };
@@ -99,11 +99,11 @@ namespace osmium {
 
             friend class Builder;
 
-            char* next() {
+            unsigned char* next() {
                 return data() + padded_size();
             }
 
-            const char* next() const {
+            const unsigned char* next() const {
                 return data() + padded_size();
             }
 
