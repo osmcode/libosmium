@@ -51,14 +51,17 @@ namespace osmium {
         template <class TMember>
         friend class osmium::memory::CollectionIterator;
 
+        template <typename T>
+        static T* after_null(T* ptr) {
+            return std::strchr(ptr, 0) + 1;
+        }
+
         char* next() {
-            char* value = data() + strlen(data()) + 1;
-            return value + strlen(value) + 1;
+            return after_null(after_null(data()));
         }
 
         const char* next() const {
-            const char* value = data() + strlen(data()) + 1;
-            return value + strlen(value) + 1;
+            return after_null(after_null(data()));
         }
 
     public:
@@ -70,7 +73,7 @@ namespace osmium {
         }
 
         const char* value() const {
-            return data() + strlen(data()) + 1;
+            return after_null(data());
         }
 
     }; // class Tag
