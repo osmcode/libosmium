@@ -73,11 +73,11 @@ namespace osmium {
 
             public:
 
-                char* self() {
+                char* data() {
                     return reinterpret_cast<char*>(this);
                 }
 
-                const char* self() const {
+                const char* data() const {
                     return reinterpret_cast<const char*>(this);
                 }
 
@@ -100,11 +100,11 @@ namespace osmium {
             friend class Builder;
 
             char* next() {
-                return self() + padded_size();
+                return data() + padded_size();
             }
 
             const char* next() const {
-                return self() + padded_size();
+                return data() + padded_size();
             }
 
             Item& add_size(const item_size_type size) {

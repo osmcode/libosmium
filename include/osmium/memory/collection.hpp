@@ -110,19 +110,19 @@ namespace osmium {
             }
 
             iterator begin() {
-                return iterator(self() + sizeof(Collection<TMember>));
+                return iterator(data() + sizeof(Collection<TMember>));
             }
 
             iterator end() {
-                return iterator(self() + size());
+                return iterator(data() + size());
             }
 
             const_iterator cbegin() const {
-                return const_iterator(self() + sizeof(Collection<TMember>));
+                return const_iterator(data() + sizeof(Collection<TMember>));
             }
 
             const_iterator cend() const {
-                return const_iterator(self() + size());
+                return const_iterator(data() + size());
             }
 
             const_iterator begin() const {

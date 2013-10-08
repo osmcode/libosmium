@@ -50,20 +50,20 @@ namespace osmium {
         RelationMember& operator=(RelationMember&&) = delete;
 
         char* role_position() {
-            return self() + sizeof(RelationMember);
+            return data() + sizeof(RelationMember);
         }
 
         const char* role_position() const {
-            return self() + sizeof(RelationMember);
+            return data() + sizeof(RelationMember);
         }
 
         char* endpos() {
-            char* current = self() + sizeof(RelationMember);
+            char* current = data() + sizeof(RelationMember);
             return current + sizeof(size_t) + osmium::memory::padded_length(*reinterpret_cast<size_t*>(current));
         }
 
         const char* endpos() const {
-            const char* current = self() + sizeof(RelationMember);
+            const char* current = data() + sizeof(RelationMember);
             return current + sizeof(size_t) + osmium::memory::padded_length(*reinterpret_cast<const size_t*>(current));
         }
 

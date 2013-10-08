@@ -52,12 +52,12 @@ namespace osmium {
         friend class osmium::memory::CollectionIterator;
 
         char* next() {
-            char* value = self() + strlen(self()) + 1;
+            char* value = data() + strlen(data()) + 1;
             return value + strlen(value) + 1;
         }
 
         const char* next() const {
-            const char* value = self() + strlen(self()) + 1;
+            const char* value = data() + strlen(data()) + 1;
             return value + strlen(value) + 1;
         }
 
@@ -66,11 +66,11 @@ namespace osmium {
         static constexpr item_type collection_type = item_type::tag_list;
 
         const char* key() const {
-            return self();
+            return data();
         }
 
         const char* value() const {
-            return self() + strlen(self()) + 1;
+            return data() + strlen(data()) + 1;
         }
 
     }; // class Tag

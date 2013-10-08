@@ -45,11 +45,11 @@ namespace osmium {
         friend class osmium::memory::CollectionIterator;
 
         char* next() {
-            return self() + sizeof(WayNodeRefOnly);
+            return data() + sizeof(WayNodeRefOnly);
         }
 
         const char* next() const {
-            return self() + sizeof(WayNodeRefOnly);
+            return data() + sizeof(WayNodeRefOnly);
         }
 
     public:
@@ -100,11 +100,11 @@ namespace osmium {
         friend class osmium::memory::CollectionIterator;
 
         char* next() {
-            return self() + sizeof(WayNodeWithLocation);
+            return data() + sizeof(WayNodeWithLocation);
         }
 
         const char* next() const {
-            return self() + sizeof(WayNodeWithLocation);
+            return data() + sizeof(WayNodeWithLocation);
         }
 
     public:

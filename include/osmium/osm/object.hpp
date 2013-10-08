@@ -66,11 +66,11 @@ namespace osmium {
         }
 
         char* user_position() {
-            return self() + sizeof_object();
+            return data() + sizeof_object();
         }
 
         const char* user_position() const {
-            return self() + sizeof_object();
+            return data() + sizeof_object();
         }
 
         size_t user_length() const {
@@ -316,7 +316,7 @@ namespace osmium {
 
         /// Get user name for this object.
         const char* user() const {
-            return self() + sizeof_object() + sizeof(size_t);
+            return data() + sizeof_object() + sizeof(size_t);
         }
 
         /// Get the list of tags for this object.
@@ -359,7 +359,7 @@ namespace osmium {
         }
 
         iterator end() {
-            return iterator(self() + padded_size());
+            return iterator(data() + padded_size());
         }
 
         const_iterator cbegin() const {
@@ -367,7 +367,7 @@ namespace osmium {
         }
 
         const_iterator cend() const {
-            return const_iterator(self() + padded_size());
+            return const_iterator(data() + padded_size());
         }
 
         const_iterator begin() const {
