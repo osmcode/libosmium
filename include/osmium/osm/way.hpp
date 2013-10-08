@@ -109,7 +109,7 @@ namespace osmium {
 
     public:
 
-        static constexpr item_type collection_type = item_type::way_node_list;
+        static constexpr osmium::item_type collection_type = osmium::item_type::way_node_list;
 
         WayNodeWithLocation(const object_id_type ref=0, const Location& location=Location()) :
             WayNodeRefOnly(ref),
@@ -128,12 +128,17 @@ namespace osmium {
 
     typedef WayNodeWithLocation WayNode;
 
-    typedef osmium::memory::Collection<WayNode> WayNodeList;
+    class WayNodeList : public osmium::memory::Collection<WayNode> {
 
-    template <>
-    struct item_traits<WayNodeList> {
-        static constexpr item_type itemtype = item_type::way_node_list;
-    };
+    public:
+
+        static constexpr osmium::item_type itemtype = osmium::item_type::way_node_list;
+
+        WayNodeList():
+            osmium::memory::Collection<WayNode>() {
+        }
+
+    }; // class WayNodeList
 
 
     class Way : public Object {
@@ -145,6 +150,8 @@ namespace osmium {
         }
 
     public:
+
+        static constexpr osmium::item_type itemtype = osmium::item_type::way;
 
         WayNodeList& nodes() {
             return subitem_of_type<WayNodeList>();
@@ -169,11 +176,6 @@ namespace osmium {
     }; // class Way
 
     static_assert(sizeof(Way) % osmium::memory::align_bytes == 0, "Class osmium::Way has wrong size to be aligned properly!");
-
-    template <>
-    struct item_traits<Way> {
-        static constexpr item_type itemtype = item_type::way;
-    };
 
 } // namespace osmium
 

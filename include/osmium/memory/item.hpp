@@ -148,11 +148,6 @@ namespace osmium {
 
     } // namespace memory
 
-    template <class T>
-    struct item_traits {
-        static constexpr item_type itemtype = item_type::undefined;
-    };
-
 } // namespace osmium
 
 #endif // OSMIUM_MEMORY_ITEM_HPP

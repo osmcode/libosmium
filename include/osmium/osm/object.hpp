@@ -100,7 +100,7 @@ namespace osmium {
         template <class T>
         T& subitem_of_type() {
             for (iterator it = begin(); it != end(); ++it) {
-                if (it->type() == item_traits<typename std::remove_const<T>::type>::itemtype) {
+                if (it->type() == T::itemtype) {
                     return reinterpret_cast<T&>(*it);
                 }
             }
@@ -112,12 +112,12 @@ namespace osmium {
         template <class T>
         const T& subitem_of_type() const {
             for (const_iterator it = cbegin(); it != cend(); ++it) {
-                if (it->type() == item_traits<typename std::remove_const<T>::type>::itemtype) {
+                if (it->type() == T::itemtype) {
                     return reinterpret_cast<const T&>(*it);
                 }
             }
 
-            static T subitem;
+            static const T subitem;
             return subitem;
         }
 

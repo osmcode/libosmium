@@ -126,12 +126,18 @@ namespace osmium {
 
     }; // class RelationMember
 
-    typedef osmium::memory::Collection<RelationMember> RelationMemberList;
+    class RelationMemberList : public osmium::memory::Collection<RelationMember> {
 
-    template <>
-    struct item_traits<RelationMemberList> {
-        static constexpr item_type itemtype = item_type::relation_member_list;
-    };
+    public:
+
+        static constexpr osmium::item_type itemtype = osmium::item_type::relation_member_list;
+
+        RelationMemberList() :
+            osmium::memory::Collection<RelationMember>() {
+        }
+
+    }; // class RelationMemberList
+
 
     class Relation : public Object {
 
@@ -142,6 +148,8 @@ namespace osmium {
         }
 
     public:
+
+        static constexpr osmium::item_type itemtype = osmium::item_type::relation;
 
         RelationMemberList& members() {
             return subitem_of_type<RelationMemberList>();
@@ -154,11 +162,6 @@ namespace osmium {
     }; // class Relation
 
     static_assert(sizeof(Relation) % osmium::memory::align_bytes == 0, "Class osmium::Relation has wrong size to be aligned properly!");
-
-    template <>
-    struct item_traits<Relation> {
-        static constexpr item_type itemtype = item_type::relation;
-    };
 
 } // namespace osmium
 

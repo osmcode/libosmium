@@ -49,6 +49,8 @@ namespace osmium {
 
     public:
 
+        static constexpr osmium::item_type itemtype = osmium::item_type::node;
+
         const osmium::Location location() const {
             return m_location;
         }
@@ -75,11 +77,6 @@ namespace osmium {
         }
 
     }; // class Node
-
-    template <>
-    struct item_traits<Node> {
-        static const item_type itemtype = item_type::node;
-    };
 
 } // namespace osmium
 

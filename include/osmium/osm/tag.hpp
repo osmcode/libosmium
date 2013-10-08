@@ -79,6 +79,8 @@ namespace osmium {
 
     public:
 
+        static constexpr osmium::item_type itemtype = osmium::item_type::tag_list;
+
         TagList() :
             osmium::memory::Collection<Tag>() {
         }
@@ -97,11 +99,6 @@ namespace osmium {
     }; // class TagList
 
     static_assert(sizeof(TagList) % osmium::memory::align_bytes == 0, "Class osmium::TagList has wrong size to be aligned properly!");
-
-    template <>
-    struct item_traits<TagList> {
-        static constexpr item_type itemtype = item_type::tag_list;
-    };
 
 } // namespace osmium
 
