@@ -244,6 +244,9 @@ namespace osmium {
                     switch (m_context) {
                         case context::root:
                             if (!strcmp(element, "osm") || !strcmp(element, "osmChange")) {
+                                if (!strcmp(element, "osmChange")) {
+                                    m_header.has_multiple_object_versions(true);
+                                }
                                 for (int count = 0; attrs[count]; count += 2) {
                                     if (!strcmp(attrs[count], "version")) {
                                         if (strcmp(attrs[count+1], "0.6")) {
