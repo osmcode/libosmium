@@ -47,6 +47,17 @@ whether it is visible ("dV"). For normal OSM data files this is always "dV",
 but change files and osm history files can contain deleted objects.
 
 
+Escaping
+--------
+
+Characters other than alphanumerics and a few other like ':', and '_' in user
+names, tags, and roles are written as '%xx' with 'xx' being the hexcode of the
+byte. This makes sure that separator characters such as space, comma,
+exclamation mark, and the equals sign never show up in the data, making parsing
+much easier. But this format doesn't know anything about Unicode and it escapes
+far too many characters of non-latin languages. Ideas for improvements welcome.
+
+
 Format Overview
 ---------------
 
