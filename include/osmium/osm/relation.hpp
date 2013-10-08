@@ -37,7 +37,7 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
-    class RelationMember : private osmium::memory::detail::ItemHelper {
+    class RelationMember : public osmium::memory::detail::ItemHelper {
 
         object_id_type m_ref;
         item_type m_type;

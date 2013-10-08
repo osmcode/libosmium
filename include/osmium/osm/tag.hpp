@@ -40,7 +40,7 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
-    class Tag : private osmium::memory::detail::ItemHelper {
+    class Tag : public osmium::memory::detail::ItemHelper {
 
         Tag(const Tag&) = delete;
         Tag(Tag&&) = delete;

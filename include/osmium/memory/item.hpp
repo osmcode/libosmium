@@ -71,6 +71,8 @@ namespace osmium {
                 ItemHelper& operator=(const ItemHelper&) = default;
                 ItemHelper& operator=(ItemHelper&&) = default;
 
+            public:
+
                 char* self() {
                     return reinterpret_cast<char*>(this);
                 }
@@ -87,7 +89,7 @@ namespace osmium {
 
         typedef uint32_t item_size_type;
 
-        class Item : protected osmium::memory::detail::ItemHelper {
+        class Item : public osmium::memory::detail::ItemHelper {
 
             item_size_type m_size;
             item_type m_type;

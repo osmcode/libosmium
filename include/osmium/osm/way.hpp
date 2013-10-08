@@ -37,7 +37,7 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
-    class WayNodeRefOnly : protected osmium::memory::detail::ItemHelper {
+    class WayNodeRefOnly : public osmium::memory::detail::ItemHelper {
 
         object_id_type m_ref;
 
