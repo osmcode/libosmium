@@ -25,9 +25,6 @@ ifeq ($(OS),Darwin)
 	LDFLAGS += -stdlib=libc++
 endif
 
-# remove this if you do not want debugging to be compiled in
-CXXFLAGS += -DOSMIUM_WITH_DEBUG
-
 CXXFLAGS_GEOS     := $(shell geos-config --cflags)
 CXXFLAGS_LIBXML2  := $(shell xml2-config --cflags)
 CXXFLAGS_OGR      := $(shell gdal-config --cflags)
