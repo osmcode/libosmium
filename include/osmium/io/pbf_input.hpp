@@ -342,14 +342,14 @@ namespace osmium {
 
         protected:
 
-            unsigned char* m_input_buffer;
+            std::shared_ptr<unsigned char> m_input_buffer;
             queue_type& m_queue;
             const int m_size;
             const int m_blob_num;
             const int m_fd;
 
             BlobParser(queue_type& queue, const int size, const int blob_num, const int fd) :
-                m_input_buffer(new unsigned char[size]),
+                m_input_buffer(new unsigned char[size], [](unsigned char* ptr) { delete[] ptr; }),
                 m_queue(queue),
                 m_size(size),
                 m_blob_num(blob_num),
@@ -359,7 +359,7 @@ namespace osmium {
                     errmsg << "invalid blob size: " << size;
                     throw std::runtime_error(errmsg.str());
                 }
-                if (! osmium::io::detail::reliable_read(fd, m_input_buffer, size)) {
+                if (! osmium::io::detail::reliable_read(fd, m_input_buffer.get(), size)) {
                     // EOF
                     throw std::runtime_error("read error (EOF)");
                 }
@@ -369,11 +369,10 @@ namespace osmium {
 
             void operator()() {
                 OSMPBF::Blob pbf_blob;
-                if (!pbf_blob.ParseFromArray(m_input_buffer, m_size)) {
+                if (!pbf_blob.ParseFromArray(m_input_buffer.get(), m_size)) {
                     throw std::runtime_error("failed to parse blob");
                 }
 
-                std::unique_ptr<unsigned char[]> input_buffer { m_input_buffer };
                 if (pbf_blob.has_raw()) {
                     static_cast<TDerived*>(this)->handle_blob(pbf_blob.raw().data(), pbf_blob.raw().size());
                     return;
@@ -530,7 +529,7 @@ namespace osmium {
                         data_blob_parser();
                     } else {
                         // otherwise we submit the parser to the work queue
-                        size_t work_queue_size = m_thread_pool.submit(std::move(data_blob_parser));
+                        size_t work_queue_size = m_thread_pool.submit(data_blob_parser);
 
                         // if the work queue is getting too large, wait for a while
                         while (!m_done && work_queue_size >= m_max_work_queue_size) {

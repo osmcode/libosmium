@@ -34,7 +34,9 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <atomic>
+#include <functional>
 #include <thread>
+#include <utility>
 #include <vector>
 
 #include <osmium/thread/queue.hpp>
@@ -116,9 +118,8 @@ namespace osmium {
                 return m_work_queue.empty();
             }
 
-            template <typename TFunction>
-            size_t submit(TFunction f) {
-                return m_work_queue.push_and_get_size(std::function<void()>(f));
+            size_t submit(std::function<void()>&& func) {
+                return m_work_queue.push_and_get_size(std::forward<std::function<void()>>(func));
             }
 
         };  // Pool

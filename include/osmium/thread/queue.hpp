@@ -36,6 +36,7 @@ DEALINGS IN THE SOFTWARE.
 #include <condition_variable>
 #include <mutex>
 #include <queue>
+#include <utility>
 
 namespace osmium {
 
@@ -65,9 +66,9 @@ namespace osmium {
                 m_data_available.notify_one();
             }
 
-            size_t push_and_get_size(T value) {
+            size_t push_and_get_size(T&& value) {
                 std::lock_guard<std::mutex> lock(m_mutex);
-                m_queue.push(std::move(value));
+                m_queue.push(std::forward<T>(value));
                 m_data_available.notify_one();
                 return m_queue.size();
             }
