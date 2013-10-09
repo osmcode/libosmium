@@ -40,6 +40,9 @@ namespace osmium {
 
     class Bounds {
 
+        osmium::Location m_bottom_left;
+        osmium::Location m_top_right;
+
     public:
 
         Bounds() :
@@ -47,21 +50,39 @@ namespace osmium {
             m_top_right() {
         }
 
+        /**
+         * Extend the bounding box by the given location. If the location
+         * is undefined, the bounding box is unchanged.
+         */
         Bounds& extend(const Location& location) {
-            if (m_bottom_left.defined()) {
-                if (location.x() < m_bottom_left.x()) m_bottom_left.x(location.x());
-                if (location.x() > m_top_right.x()  ) m_top_right.x(location.x());
-                if (location.y() < m_bottom_left.y()) m_bottom_left.y(location.y());
-                if (location.y() > m_top_right.y()  ) m_top_right.y(location.y());
-            } else {
-                m_bottom_left = location;
-                m_top_right = location;
+            if (location) {
+                if (m_bottom_left) {
+                    if (location.x() < m_bottom_left.x()) {
+                        m_bottom_left.x(location.x());
+                    }
+                    if (location.x() > m_top_right.x()) {
+                        m_top_right.x(location.x());
+                    }
+                    if (location.y() < m_bottom_left.y()) {
+                        m_bottom_left.y(location.y());
+                    }
+                    if (location.y() > m_top_right.y()) {
+                        m_top_right.y(location.y());
+                    }
+                } else {
+                    m_bottom_left = location;
+                    m_top_right = location;
+                }
             }
             return *this;
         }
 
-        bool defined() const {
-            return m_bottom_left.defined();
+        explicit operator bool() const noexcept {
+            return static_cast<bool>(m_bottom_left);
+        }
+
+        bool valid() const noexcept {
+            return bottom_left().valid() && top_right().valid();
         }
 
         /**
@@ -78,25 +99,7 @@ namespace osmium {
             return m_top_right;
         }
 
-    private:
-
-        osmium::Location m_bottom_left;
-        osmium::Location m_top_right;
-
     }; // class Bounds
-
-    inline std::ostream& operator<<(std::ostream& out, const Bounds& bounds) {
-        out << '('
-            << bounds.bottom_left().lon()
-            << ','
-            << bounds.bottom_left().lat()
-            << ','
-            << bounds.top_right().lon()
-            << ','
-            << bounds.top_right().lat()
-            << ')';
-        return out;
-    }
 
 } // namespace osmium
 

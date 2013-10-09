@@ -104,18 +104,23 @@ namespace osmium {
             void print_location(const osmium::Node& node) {
                 const osmium::Location& location = node.location();
 
-                m_out << m_prefix
-                      << "  lon="
-                      << std::fixed
-                      << std::setprecision(7)
-                      << location.lon()
-                      << "\n";
-                m_out << m_prefix
-                      << "  lat="
-                      << std::fixed
-                      << std::setprecision(7)
-                      << location.lat()
-                      << "\n";
+                if (location) {
+                    m_out << m_prefix
+                          << "  lon="
+                          << std::fixed
+                          << std::setprecision(7)
+                          << location.lon()
+                          << "\n";
+                    m_out << m_prefix
+                          << "  lat="
+                          << location.lat()
+                          << "\n";
+                } else {
+                    m_out << m_prefix
+                          << "  lon=\n"
+                          << m_prefix
+                          << "  lat=\n";
+                }
             }
 
         public:
@@ -145,7 +150,7 @@ namespace osmium {
                     m_out << m_prefix
                           << "  ref="
                           << wn.ref();
-                    if (wn.location().defined()) {
+                    if (wn.location()) {
                         m_out << " pos="
                               << wn.location();
                     }

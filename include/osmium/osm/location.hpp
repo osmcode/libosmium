@@ -101,8 +101,15 @@ namespace osmium {
             m_y(double_to_fix(lat)) {
         }
 
-        constexpr bool defined() const {
+        explicit operator bool() const noexcept {
             return m_x != invalid_coordinate && m_y != invalid_coordinate;
+        }
+
+        bool valid() const noexcept {
+            return m_x >= -180 * coordinate_precision
+                && m_x <=  180 * coordinate_precision
+                && m_y >=  -90 * coordinate_precision
+                && m_y <=   90 * coordinate_precision;
         }
 
         constexpr int32_t x() const {

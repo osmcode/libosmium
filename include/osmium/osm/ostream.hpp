@@ -39,6 +39,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/types.hpp>
 #include <osmium/osm/tag.hpp>
 #include <osmium/osm/location.hpp>
+#include <osmium/osm/bounds.hpp>
 
 namespace osmium {
 
@@ -49,23 +50,34 @@ namespace osmium {
         return out;
     }
 
-    /*
-        inline std::ostream& operator<<(std::ostream& out, const item_type item_type) {
-            out << item_typeo_char(item_type);
-            return out;
-        }*/
-
     inline std::ostream& operator<<(std::ostream& out, const Location& location) {
-        if (location.defined()) {
+        if (location) {
             out << '(' << location.lon() << ',' << location.lat() << ')';
         } else {
-            out << "(invalid, invalid)";
+            out << "(undefined,undefined)";
         }
         return out;
     }
 
     inline std::ostream& operator<<(std::ostream& out, const Tag& tag) {
         out << tag.key() << '=' << tag.value();
+        return out;
+    }
+
+    inline std::ostream& operator<<(std::ostream& out, const Bounds& bounds) {
+        if (bounds) {
+            out << '('
+                << bounds.bottom_left().lon()
+                << ','
+                << bounds.bottom_left().lat()
+                << ','
+                << bounds.top_right().lon()
+                << ','
+                << bounds.top_right().lat()
+                << ')';
+        } else {
+            out << "(undefined)";
+        }
         return out;
     }
 

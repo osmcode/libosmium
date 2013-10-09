@@ -16,12 +16,12 @@ static_assert(std::is_literal_type<osmium::Location>::value, "osmium::Location n
 
 BOOST_AUTO_TEST_CASE(instantiation_with_default_parameters) {
     osmium::Location loc;
-    BOOST_CHECK(!loc.defined());
+    BOOST_CHECK(!loc);
 }
 
 BOOST_AUTO_TEST_CASE(instantiation_with_double_parameters) {
     osmium::Location loc1(1.2, 4.5);
-    BOOST_CHECK(loc1.defined());
+    BOOST_CHECK(!!loc1);
     BOOST_CHECK_EQUAL(12000000, loc1.x());
     BOOST_CHECK_EQUAL(45000000, loc1.y());
     BOOST_CHECK_EQUAL(1.2, loc1.lon());
@@ -52,6 +52,20 @@ BOOST_AUTO_TEST_CASE(equality) {
     osmium::Location loc3(1.5, 1.5);
     BOOST_CHECK_EQUAL(loc1, loc2);
     BOOST_CHECK(loc1 != loc3);
+}
+
+BOOST_AUTO_TEST_CASE(validity) {
+    BOOST_CHECK(osmium::Location(0.0, 0.0).valid());
+    BOOST_CHECK(osmium::Location(1.2, 4.5).valid());
+    BOOST_CHECK(osmium::Location(-1.2, 4.5).valid());
+    BOOST_CHECK(osmium::Location(-180.0, -90.0).valid());
+    BOOST_CHECK(osmium::Location(180.0, -90.0).valid());
+    BOOST_CHECK(osmium::Location(-180.0, 90.0).valid());
+    BOOST_CHECK(osmium::Location(180.0, 90.0).valid());
+
+    BOOST_CHECK(!osmium::Location(200.0, 4.5).valid());
+    BOOST_CHECK(!osmium::Location(-1.2, -100.0).valid());
+    BOOST_CHECK(!osmium::Location(-180.0, 90.005).valid());
 }
 
 BOOST_AUTO_TEST_CASE(output) {

@@ -908,7 +908,7 @@ namespace osmium {
                 // set the writing program
                 pbf_header_block.set_writingprogram(header.generator());
 
-                if (header.bounds().defined()) {
+                if (header.bounds()) {
                     OSMPBF::HeaderBBox* bbox = pbf_header_block.mutable_bbox();
                     bbox->set_left(header.bounds().bottom_left().lon() * OSMPBF::lonlat_resolution);
                     bbox->set_bottom(header.bounds().bottom_left().lat() * OSMPBF::lonlat_resolution);

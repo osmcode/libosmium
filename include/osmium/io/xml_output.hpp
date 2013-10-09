@@ -103,7 +103,7 @@ namespace osmium {
                 }
                 check_for_error(xmlTextWriterWriteAttribute(m_xml_writer, cast_to_xmlchar("version"), cast_to_xmlchar("0.6")));
                 check_for_error(xmlTextWriterWriteAttribute(m_xml_writer, cast_to_xmlchar("generator"), cast_to_xmlchar(header.generator().c_str())));
-                if (header.bounds().defined()) {
+                if (header.bounds()) {
                     check_for_error(xmlTextWriterStartElement(m_xml_writer, cast_to_xmlchar("bounds"))); // <bounds>
 
                     check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, cast_to_xmlchar("minlon"), "%.7f", header.bounds().bottom_left().lon()));
@@ -123,7 +123,7 @@ namespace osmium {
 
                 write_meta(node);
 
-                if (node.location().defined()) {
+                if (node.location()) {
                     check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, cast_to_xmlchar("lat"), "%.7f", node.location().lat()));
                     check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, cast_to_xmlchar("lon"), "%.7f", node.location().lon()));
                 }
