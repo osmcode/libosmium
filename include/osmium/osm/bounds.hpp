@@ -45,16 +45,26 @@ namespace osmium {
 
     public:
 
-        Bounds() :
+        /**
+         * Create undefined Bounds. Use the extend() function
+         * to add actual bounds.
+         */
+        constexpr Bounds() :
             m_bottom_left(),
             m_top_right() {
         }
 
+        Bounds(const Bounds&) = default;
+        Bounds(Bounds&&) = default;
+        Bounds& operator=(const Bounds&) = default;
+        Bounds& operator=(Bounds&&) = default;
+        ~Bounds() = default;
+
         /**
-         * Extend the bounding box by the given location. If the location
-         * is undefined, the bounding box is unchanged.
+         * Extend the bounding box by the given location. If the
+         * location is undefined, the bounding box is unchanged.
          */
-        Bounds& extend(const Location& location) {
+        Bounds& extend(const Location& location) noexcept {
             if (location) {
                 if (m_bottom_left) {
                     if (location.x() < m_bottom_left.x()) {
@@ -77,29 +87,43 @@ namespace osmium {
             return *this;
         }
 
-        explicit operator bool() const noexcept {
+        /**
+         * Bounds are defined, ie. contains defined coordinates.
+         */
+        explicit constexpr operator bool() const noexcept {
             return static_cast<bool>(m_bottom_left);
         }
 
-        bool valid() const noexcept {
+        /**
+         * Bounds are valid, ie. defined and inside usual bounds
+         * (-180<=lon<=180, -90<=lat<=90).
+         */
+        constexpr bool valid() const noexcept {
             return bottom_left().valid() && top_right().valid();
         }
 
         /**
          * Bottom-left location.
          */
-        Location bottom_left() const {
+        constexpr Location bottom_left() const noexcept {
             return m_bottom_left;
         }
 
         /**
          * Top-right location.
          */
-        Location top_right() const {
+        constexpr Location top_right() const noexcept {
             return m_top_right;
         }
 
     }; // class Bounds
+
+    /**
+     * Bounds are equal if both locations are equal.
+     */
+    inline constexpr bool operator==(const Bounds& lhs, const Bounds& rhs) noexcept {
+        return lhs.bottom_left() == rhs.bottom_left() && lhs.top_right() == rhs.top_right();
+    }
 
 } // namespace osmium
 

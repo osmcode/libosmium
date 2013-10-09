@@ -152,8 +152,8 @@ namespace osmium {
 
                     if (node.visible()) {
                         node.location(osmium::Location(
-                                    (pbf_node.lon() * m_granularity + m_lon_offset) / (OSMPBF::lonlat_resolution / osmium::coordinate_precision),
-                                    (pbf_node.lat() * m_granularity + m_lat_offset) / (OSMPBF::lonlat_resolution / osmium::coordinate_precision)));
+                                    (pbf_node.lon() * m_granularity + m_lon_offset) / (OSMPBF::lonlat_resolution / osmium::Location::coordinate_precision),
+                                    (pbf_node.lat() * m_granularity + m_lat_offset) / (OSMPBF::lonlat_resolution / osmium::Location::coordinate_precision)));
                     }
 
                     if (pbf_node.keys_size() > 0) {
@@ -330,8 +330,8 @@ namespace osmium {
 
                     if (node.visible()) {
                         node.location(osmium::Location(
-                                    (last_dense_longitude * m_granularity + m_lon_offset) / (OSMPBF::lonlat_resolution / osmium::coordinate_precision),
-                                    (last_dense_latitude  * m_granularity + m_lat_offset) / (OSMPBF::lonlat_resolution / osmium::coordinate_precision)));
+                                    (last_dense_longitude * m_granularity + m_lon_offset) / (OSMPBF::lonlat_resolution / osmium::Location::coordinate_precision),
+                                    (last_dense_latitude  * m_granularity + m_lat_offset) / (OSMPBF::lonlat_resolution / osmium::Location::coordinate_precision)));
                     }
 
                     last_dense_tag = add_tags(dense, last_dense_tag, &builder);
@@ -434,7 +434,7 @@ namespace osmium {
 
                 if (pbf_header_block.has_bbox()) {
                     const OSMPBF::HeaderBBox& bbox = pbf_header_block.bbox();
-                    const int64_t resolution_convert = OSMPBF::lonlat_resolution / osmium::coordinate_precision;
+                    const int64_t resolution_convert = OSMPBF::lonlat_resolution / osmium::Location::coordinate_precision;
                     m_header.bounds().extend(osmium::Location(bbox.left()  / resolution_convert, bbox.bottom() / resolution_convert));
                     m_header.bounds().extend(osmium::Location(bbox.right() / resolution_convert, bbox.top()    / resolution_convert));
                 }

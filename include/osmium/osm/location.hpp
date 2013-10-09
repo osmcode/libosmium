@@ -41,20 +41,6 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
-    constexpr int coordinate_precision = 10000000;
-
-    namespace {
-
-        inline int32_t double_to_fix(double c) {
-            return round(c * coordinate_precision);
-        }
-
-        inline constexpr double fix_to_double(int32_t c) {
-            return static_cast<double>(c) / coordinate_precision;
-        }
-
-    }
-
     /**
      * Locations define a place on earth.
      *
@@ -63,10 +49,11 @@ namespace osmium {
      * centimeters, good enough for OSM use. (The main OSM database
      * uses the same scheme.)
      *
-     * An undefined (invalid) Location can be created by calling the
-     * constructor without parameters.
+     * An undefined Location can be created by calling the constructor
+     * without parameters.
      *
      * Coordinates are never checked on whether they are inside bounds.
+     * Call valid() to check this.
      */
     class Location : boost::totally_ordered<Location> {
 
@@ -75,94 +62,131 @@ namespace osmium {
 
     public:
 
-        /// this value is used for a coordinate to mark it as invalid or undefined
-        static constexpr int32_t invalid_coordinate = std::numeric_limits<int32_t>::max();
+        /// this value is used for a coordinate to mark it as undefined
+        static constexpr int32_t undefined_coordinate = std::numeric_limits<int32_t>::max();
+
+        static constexpr int coordinate_precision = 10000000;
+
+        static int32_t double_to_fix(const double c) noexcept {
+            return std::round(c * coordinate_precision);
+        }
+
+        static constexpr double fix_to_double(const int32_t c) noexcept {
+            return static_cast<double>(c) / coordinate_precision;
+        }
 
         /**
          * Create undefined Location.
          */
         explicit constexpr Location() :
-            m_x(invalid_coordinate),
-            m_y(invalid_coordinate) {
+            m_x(undefined_coordinate),
+            m_y(undefined_coordinate) {
         }
 
-        constexpr Location(int32_t x, int32_t y) :
+        /**
+         * Create Location with given x and y coordinates.
+         * Note that these coordinates are coordinate_precision
+         * times larger than the real coordinates.
+         */
+        constexpr Location(const int32_t x, const int32_t y) :
             m_x(x),
             m_y(y) {
         }
 
-        constexpr Location(int64_t x, int64_t y) :
+        /**
+         * Create Location with given x and y coordinates.
+         * Note that these coordinates are coordinate_precision
+         * times larger than the real coordinates.
+         */
+        constexpr Location(const int64_t x, const int64_t y) :
             m_x(x),
             m_y(y) {
         }
 
-        Location(double lon, double lat) :
+        /**
+         * Create Location with given longitude and latitude.
+         */
+        Location(const double lon, const double lat) :
             m_x(double_to_fix(lon)),
             m_y(double_to_fix(lat)) {
         }
 
-        explicit operator bool() const noexcept {
-            return m_x != invalid_coordinate && m_y != invalid_coordinate;
+        Location(const Location&) = default;
+        Location(Location&&) = default;
+        Location& operator=(const Location&) = default;
+        Location& operator=(Location&&) = default;
+        ~Location() = default;
+
+        /**
+         * Check whether the coordinates of this location
+         * are defined.
+         */
+        explicit constexpr operator bool() const noexcept {
+            return m_x != undefined_coordinate && m_y != undefined_coordinate;
         }
 
-        bool valid() const noexcept {
+        /**
+         * Check whether the coordinates are inside the
+         * usual bounds (-180<=lon<=180, -90<=lat<=90).
+         */
+        constexpr bool valid() const noexcept {
             return m_x >= -180 * coordinate_precision
                 && m_x <=  180 * coordinate_precision
                 && m_y >=  -90 * coordinate_precision
                 && m_y <=   90 * coordinate_precision;
         }
 
-        constexpr int32_t x() const {
+        constexpr int32_t x() const noexcept {
             return m_x;
         }
 
-        constexpr int32_t y() const {
+        constexpr int32_t y() const noexcept {
             return m_y;
         }
 
-        Location& x(int32_t x) {
+        Location& x(const int32_t x) noexcept {
             m_x = x;
             return *this;
         }
 
-        Location& y(int32_t y) {
+        Location& y(const int32_t y) noexcept {
             m_y = y;
             return *this;
         }
 
-        constexpr double lon() const {
+        constexpr double lon() const noexcept {
             return fix_to_double(m_x);
         }
 
-        constexpr double lat() const {
+        constexpr double lat() const noexcept {
             return fix_to_double(m_y);
         }
 
-        Location& lon(double lon) {
+        Location& lon(double lon) noexcept {
             m_x = double_to_fix(lon);
             return *this;
         }
 
-        Location& lat(double lat) {
+        Location& lat(double lat) noexcept {
             m_y = double_to_fix(lat);
             return *this;
         }
 
-    };
+    }; // class Location
 
     /**
      * Locations are equal if both coordinates are equal.
      */
-    inline constexpr bool operator==(const Location& lhs, const Location& rhs) {
+    inline constexpr bool operator==(const Location& lhs, const Location& rhs) noexcept {
         return lhs.x() == rhs.x() && lhs.y() == rhs.y();
     }
 
     /**
-     * Compare two locations by comparing first the x and then the
-     * y coordinate.
-     * If the location is invalid the result is undefined.
+     * Compare two locations by comparing first the x and then
+     * the y coordinate. If either of the locations is
+     * undefined the result is undefined.
      */
-    inline constexpr bool operator<(const Location& lhs, const Location& rhs) {
+    inline constexpr bool operator<(const Location& lhs, const Location& rhs) noexcept {
         return (lhs.x() == rhs.x() && lhs.y() < rhs.y()) || lhs.x() < rhs.x();
     }
 
