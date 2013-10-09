@@ -81,8 +81,12 @@ namespace osmium {
                 m_out += 'n';
                 write_meta(node);
 
-                snprintf(m_tmp_buffer, tmp_buffer_size, " x%.7f y%.7f", node.lon(), node.lat());
-                m_out += m_tmp_buffer;
+                if (node.location()) {
+                    snprintf(m_tmp_buffer, tmp_buffer_size, " x%.7f y%.7f", node.lon(), node.lat());
+                    m_out += m_tmp_buffer;
+                } else {
+                    m_out += " x y";
+                }
 
                 write_tags(node.tags());
 
