@@ -134,9 +134,6 @@ namespace osmium {
 
                     const OSMPBF::Node& pbf_node = group.nodes(i);
                     node.id(pbf_node.id());
-                    node.location(osmium::Location(
-                                      (pbf_node.lon() * m_granularity + m_lon_offset) / (OSMPBF::lonlat_resolution / osmium::coordinate_precision),
-                                      (pbf_node.lat() * m_granularity + m_lat_offset) / (OSMPBF::lonlat_resolution / osmium::coordinate_precision)));
 
                     if (pbf_node.has_info()) {
                         node.version(pbf_node.info().version())
@@ -151,6 +148,12 @@ namespace osmium {
                         builder.add_string(m_stringtable->s(pbf_node.info().user_sid()).data());
                     } else {
                         builder.add_string("");
+                    }
+
+                    if (node.visible()) {
+                        node.location(osmium::Location(
+                                    (pbf_node.lon() * m_granularity + m_lon_offset) / (OSMPBF::lonlat_resolution / osmium::coordinate_precision),
+                                    (pbf_node.lat() * m_granularity + m_lat_offset) / (OSMPBF::lonlat_resolution / osmium::coordinate_precision)));
                     }
 
                     if (pbf_node.keys_size() > 0) {
@@ -313,9 +316,6 @@ namespace osmium {
                     osmium::Node& node = builder.object();
 
                     node.id(last_dense_id);
-                    node.location(osmium::Location(
-                                      (last_dense_longitude * m_granularity + m_lon_offset) / (OSMPBF::lonlat_resolution / osmium::coordinate_precision),
-                                      (last_dense_latitude  * m_granularity + m_lat_offset) / (OSMPBF::lonlat_resolution / osmium::coordinate_precision)));
 
                     if (dense.has_denseinfo()) {
                         node.version(dense.denseinfo().version(i));
@@ -326,6 +326,12 @@ namespace osmium {
                         builder.add_string(m_stringtable->s(last_dense_user_sid).data());
                     } else {
                         builder.add_string("");
+                    }
+
+                    if (node.visible()) {
+                        node.location(osmium::Location(
+                                    (last_dense_longitude * m_granularity + m_lon_offset) / (OSMPBF::lonlat_resolution / osmium::coordinate_precision),
+                                    (last_dense_latitude  * m_granularity + m_lat_offset) / (OSMPBF::lonlat_resolution / osmium::coordinate_precision)));
                     }
 
                     last_dense_tag = add_tags(dense, last_dense_tag, &builder);
