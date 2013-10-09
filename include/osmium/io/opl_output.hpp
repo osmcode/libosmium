@@ -131,7 +131,7 @@ namespace osmium {
                         m_out += ',';
                     }
                     m_out += item_type_to_char(member.type());
-                    snprintf(m_tmp_buffer, tmp_buffer_size, "%" PRId64 "!", member.ref());
+                    snprintf(m_tmp_buffer, tmp_buffer_size, "%" PRId64 "@", member.ref());
                     m_out += m_tmp_buffer;
                     m_out += member.role();
                 }
