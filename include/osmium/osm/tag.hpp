@@ -91,6 +91,10 @@ namespace osmium {
             osmium::memory::Collection<Tag>() {
         }
 
+        size_t size() const noexcept {
+            return std::distance(begin(), end());
+        }
+
         const char* get_value_by_key(const char* key) const {
             auto result = std::find_if(cbegin(), cend(), [key](const Tag& tag) {
                 return !strcmp(tag.key(), key);

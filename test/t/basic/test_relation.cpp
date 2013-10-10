@@ -36,6 +36,8 @@ BOOST_AUTO_TEST_CASE(relation_builder) {
     BOOST_CHECK_EQUAL(21, relation.uid());
     BOOST_CHECK(!strcmp("foo", relation.user()));
     BOOST_CHECK_EQUAL(123, relation.timestamp());
+    BOOST_CHECK_EQUAL(2, relation.tags().size());
+    BOOST_CHECK_EQUAL(3, relation.members().size());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

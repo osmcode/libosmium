@@ -33,6 +33,8 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <iterator>
+
 #include <osmium/osm/object.hpp>
 
 namespace osmium {
@@ -134,6 +136,10 @@ namespace osmium {
 
         RelationMemberList() :
             osmium::memory::Collection<RelationMember>() {
+        }
+
+        size_t size() const noexcept {
+            return std::distance(begin(), end());
         }
 
     }; // class RelationMemberList

@@ -138,6 +138,11 @@ namespace osmium {
             osmium::memory::Collection<WayNode>() {
         }
 
+        size_t size() const noexcept {
+            assert((byte_size() - sizeof(WayNodeList)) % sizeof(WayNode) == 0);
+            return (byte_size() - sizeof(WayNodeList)) / sizeof(WayNode);
+        }
+
     }; // class WayNodeList
 
 

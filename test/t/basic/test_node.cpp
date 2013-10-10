@@ -35,6 +35,7 @@ BOOST_AUTO_TEST_CASE(node_builder) {
     BOOST_CHECK(!strcmp("foo", node.user()));
     BOOST_CHECK_EQUAL(123, node.timestamp());
     BOOST_CHECK_EQUAL(osmium::Location(3.5, 4.7), node.location());
+    BOOST_CHECK_EQUAL(2, node.tags().size());
 
     node.visible(false);
     BOOST_CHECK_EQUAL(false, node.visible());
@@ -55,6 +56,7 @@ BOOST_AUTO_TEST_CASE(node_default_attributes) {
     BOOST_CHECK(!strcmp("", node.user()));
     BOOST_CHECK_EQUAL(0, node.timestamp());
     BOOST_CHECK_EQUAL(osmium::Location(), node.location());
+    BOOST_CHECK_EQUAL(0, node.tags().size());
 }
 
 BOOST_AUTO_TEST_CASE(set_node_attributes_from_string) {
