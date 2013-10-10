@@ -33,6 +33,7 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <cassert>
 #include <functional>
 #include <iterator>
 #include <map>

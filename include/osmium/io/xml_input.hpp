@@ -36,6 +36,7 @@ DEALINGS IN THE SOFTWARE.
 #define OSMIUM_LINK_WITH_LIBS_EXPAT -lexpat
 
 #include <atomic>
+#include <cassert>
 #include <chrono>
 #include <cstdio>
 #include <cstdlib>

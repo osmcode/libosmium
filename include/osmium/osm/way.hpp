@@ -33,6 +33,8 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <cassert>
+
 #include <osmium/osm/object.hpp>
 
 namespace osmium {

@@ -33,6 +33,7 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <cassert>
 #include <cstring>
 #include <new>
 #include <osmium/memory/buffer.hpp>

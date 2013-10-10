@@ -38,6 +38,7 @@ DEALINGS IN THE SOFTWARE.
 #define ZLIB_CONST
 #include <zlib.h>
 
+#include <cassert>
 #include <stdexcept>
 
 #include <osmpbf/osmpbf.h>
