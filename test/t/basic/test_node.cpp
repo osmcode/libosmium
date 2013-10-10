@@ -45,7 +45,7 @@ BOOST_AUTO_TEST_CASE(node_builder) {
 BOOST_AUTO_TEST_CASE(node_default_attributes) {
     osmium::memory::Buffer buffer(10000);
 
-    osmium::Node& node = buffer_add_node(buffer, "", {}, {});
+    osmium::Node& node = buffer_add_node(buffer, "", {}, osmium::Location{});
 
     BOOST_CHECK_EQUAL(0, node.id());
     BOOST_CHECK_EQUAL(0, node.positive_id());
@@ -84,7 +84,7 @@ BOOST_AUTO_TEST_CASE(set_node_attributes_from_string) {
 BOOST_AUTO_TEST_CASE(large_id) {
     osmium::memory::Buffer buffer(10000);
 
-    osmium::Node& node = buffer_add_node(buffer, "", {}, {});
+    osmium::Node& node = buffer_add_node(buffer, "", {}, osmium::Location{});
 
     int64_t id = 3000000000l;
     node.id(id);
