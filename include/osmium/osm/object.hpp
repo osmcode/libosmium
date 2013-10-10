@@ -38,10 +38,10 @@ DEALINGS IN THE SOFTWARE.
 
 #include <boost/operators.hpp>
 
-#include <osmium/osm/types.hpp>
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/tag.hpp>
-#include <osmium/utils/timestamp.hpp>
+#include <osmium/osm/timestamp.hpp>
+#include <osmium/osm/types.hpp>
 
 namespace osmium {
 
@@ -57,7 +57,7 @@ namespace osmium {
         object_id_type      m_id;
         bool                m_deleted : 1;
         object_version_type m_version : 31;
-        timestamp_type      m_timestamp;
+        osmium::Timestamp   m_timestamp;
         user_id_type        m_uid;
         changeset_id_type   m_changeset;
 
@@ -92,7 +92,7 @@ namespace osmium {
             m_id(0),
             m_deleted(false),
             m_version(0),
-            m_timestamp(0),
+            m_timestamp(),
             m_uid(0),
             m_changeset(0) {
         }
@@ -288,29 +288,18 @@ namespace osmium {
         }
 
         /// Get timestamp when this object last changed.
-        time_t timestamp() const {
+        osmium::Timestamp timestamp() const {
             return m_timestamp;
         }
 
         /**
          * Set the timestamp when this object last changed.
          *
-         * @param timestamp Time in seconds since epoch.
+         * @param timestamp Timestamp
          * @return Reference to object to make calls chainable.
          */
-        Object& timestamp(time_t timestamp) {
+        Object& timestamp(const osmium::Timestamp timestamp) {
             m_timestamp = timestamp;
-            return *this;
-        }
-
-        /**
-         * Set the timestamp when this object last changed.
-         *
-         * @param timestamp Time as ISO string.
-         * @return Reference to object to make calls chainable.
-         */
-        Object& timestamp(const char* timestamp) {
-            m_timestamp = osmium::timestamp::parse_iso(timestamp);
             return *this;
         }
 
@@ -343,7 +332,7 @@ namespace osmium {
             } else if (!strcmp(attr, "changeset")) {
                 changeset(value);
             } else if (!strcmp(attr, "timestamp")) {
-                timestamp(value);
+                timestamp(osmium::Timestamp(value));
             } else if (!strcmp(attr, "uid")) {
                 uid(value);
             } else if (!strcmp(attr, "visible")) {

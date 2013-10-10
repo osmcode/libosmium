@@ -90,7 +90,7 @@ namespace osmium {
                       << "\n";
                 m_out << m_prefix
                       << "  timestamp="
-                      << osmium::timestamp::to_iso(object.timestamp())
+                      << object.timestamp().to_iso()
                       << "\n";
                 m_out << m_prefix
                       << "  visible="

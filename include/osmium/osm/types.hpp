@@ -46,7 +46,6 @@ namespace osmium {
     typedef int64_t  object_id_type;          ///< type for OSM object (node, way, or relation) IDs
     typedef uint64_t unsigned_object_id_type; ///< type for OSM object (node, way, or relation) IDs where we only allow positive IDs
     typedef uint32_t object_version_type;     ///< type for OSM object version number
-    typedef uint32_t timestamp_type;          ///< type for OSM timestamps
     typedef uint32_t changeset_id_type;       ///< type for OSM changeset IDs
     typedef uint32_t user_id_type;            ///< type for OSM user IDs
 

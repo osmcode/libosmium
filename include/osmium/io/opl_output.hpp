@@ -174,7 +174,7 @@ namespace osmium {
                 m_out += (object.visible() ? 'V' : 'D');
                 snprintf(m_tmp_buffer, tmp_buffer_size, " c%d t", object.changeset());
                 m_out += m_tmp_buffer;
-                m_out += timestamp::to_iso(object.timestamp());
+                m_out += object.timestamp().to_iso();
                 snprintf(m_tmp_buffer, tmp_buffer_size, " i%d u", object.uid());
                 m_out += m_tmp_buffer;
                 append_encoded_string(object.user());

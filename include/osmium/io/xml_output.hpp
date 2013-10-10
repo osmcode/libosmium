@@ -196,7 +196,8 @@ namespace osmium {
                     check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, cast_to_xmlchar("version"), "%d", object.version()));
                 }
                 if (object.timestamp()) {
-                    check_for_error(xmlTextWriterWriteAttribute(m_xml_writer, cast_to_xmlchar("timestamp"), cast_to_xmlchar(osmium::timestamp::to_iso(object.timestamp()).c_str())));
+                    std::string iso { object.timestamp().to_iso() };
+                    check_for_error(xmlTextWriterWriteAttribute(m_xml_writer, cast_to_xmlchar("timestamp"), cast_to_xmlchar(iso.c_str())));
                 }
 
                 // uid <= 0 -> anonymous
