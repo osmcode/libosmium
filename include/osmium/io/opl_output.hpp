@@ -41,7 +41,6 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/io/output.hpp>
 #include <osmium/io/detail/read_write.hpp>
 #include <osmium/handler.hpp>
-#include <osmium/utils/timestamp.hpp>
 
 namespace osmium {
 

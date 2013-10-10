@@ -44,7 +44,6 @@ DEALINGS IN THE SOFTWARE.
 #include <inttypes.h>
 
 #include <osmium/io/output.hpp>
-#include <osmium/utils/timestamp.hpp>
 
 namespace osmium {
 

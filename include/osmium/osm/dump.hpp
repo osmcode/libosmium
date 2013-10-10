@@ -41,7 +41,6 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/types.hpp>
 #include <osmium/osm/ostream.hpp>
 #include <osmium/osm/visitor.hpp>
-#include <osmium/utils/timestamp.hpp>
 
 namespace osmium {
 
