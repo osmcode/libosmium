@@ -73,17 +73,17 @@ namespace osmium {
 
             void node(const osmium::Node& node) {
                 m_node_index.set(node.positive_id(), m_offset);
-                m_offset += node.size();
+                m_offset += node.byte_size();
             }
 
             void way(const osmium::Way& way) {
                 m_way_index.set(way.positive_id(), m_offset);
-                m_offset += way.size();
+                m_offset += way.byte_size();
             }
 
             void relation(const osmium::Relation& relation) {
                 m_relation_index.set(relation.positive_id(), m_offset);
-                m_offset += relation.size();
+                m_offset += relation.byte_size();
             }
 
             void operator()(const osmium::memory::Buffer& buffer) {

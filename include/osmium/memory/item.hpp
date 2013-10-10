@@ -132,7 +132,7 @@ namespace osmium {
 
         public:
 
-            item_size_type size() const {
+            item_size_type byte_size() const {
                 return m_size;
             }
 

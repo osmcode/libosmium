@@ -98,7 +98,7 @@ namespace osmium {
         public:
 
             uint32_t size() const {
-                return item().size();
+                return item().byte_size();
             }
 
             void add_item(const osmium::memory::Item* item) {

@@ -59,7 +59,7 @@ namespace osmium {
 
                 if (m_with_size) {
                     m_out << " ["
-                          << item.size()
+                          << item.byte_size()
                           << "]";
                 }
 

@@ -72,7 +72,7 @@ namespace osmium {
 
         unsigned char* next() {
             if (full_member()) {
-                return endpos() + reinterpret_cast<osmium::memory::Item*>(endpos())->size();
+                return endpos() + reinterpret_cast<osmium::memory::Item*>(endpos())->byte_size();
             } else {
                 return endpos();
             }
@@ -80,7 +80,7 @@ namespace osmium {
 
         unsigned const char* next() const {
             if (full_member()) {
-                return endpos() + reinterpret_cast<const osmium::memory::Item*>(endpos())->size();
+                return endpos() + reinterpret_cast<const osmium::memory::Item*>(endpos())->byte_size();
             } else {
                 return endpos();
             }

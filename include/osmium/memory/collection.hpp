@@ -106,7 +106,7 @@ namespace osmium {
             }
 
             bool empty() const {
-                return sizeof(Collection<TMember>) == size();
+                return sizeof(Collection<TMember>) == byte_size();
             }
 
             iterator begin() {
@@ -114,7 +114,7 @@ namespace osmium {
             }
 
             iterator end() {
-                return iterator(data() + size());
+                return iterator(data() + byte_size());
             }
 
             const_iterator cbegin() const {
@@ -122,7 +122,7 @@ namespace osmium {
             }
 
             const_iterator cend() const {
-                return const_iterator(data() + size());
+                return const_iterator(data() + byte_size());
             }
 
             const_iterator begin() const {
