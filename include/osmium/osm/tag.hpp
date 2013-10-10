@@ -95,12 +95,12 @@ namespace osmium {
             return std::distance(begin(), end());
         }
 
-        const char* get_value_by_key(const char* key) const {
+        const char* get_value_by_key(const char* key, const char* default_value = nullptr) const noexcept {
             auto result = std::find_if(cbegin(), cend(), [key](const Tag& tag) {
                 return !strcmp(tag.key(), key);
             });
             if (result == cend()) {
-                return nullptr;
+                return default_value;
             } else {
                 return result->value();
             }

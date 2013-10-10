@@ -97,4 +97,20 @@ BOOST_AUTO_TEST_CASE(large_id) {
     BOOST_CHECK_EQUAL(id, node.positive_id());
 }
 
+BOOST_AUTO_TEST_CASE(tags) {
+    osmium::memory::Buffer buffer(10000);
+
+    osmium::Node& node = buffer_add_node(buffer,
+        "foo",
+        {{"amenity", "pub"}, {"name", "OSM BAR"}},
+        {3.5, 4.7});
+
+    BOOST_CHECK(nullptr == node.tags().get_value_by_key("fail"));
+    BOOST_CHECK(!strcmp("pub", node.tags().get_value_by_key("amenity")));
+
+    BOOST_CHECK(!strcmp("default", node.tags().get_value_by_key("fail", "default")));
+    BOOST_CHECK(!strcmp("pub", node.tags().get_value_by_key("amenity", "default")));
+}
+
+
 BOOST_AUTO_TEST_SUITE_END()
