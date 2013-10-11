@@ -1,5 +1,5 @@
-#ifndef OSMIUM_GEOM_OGR_HPP
-#define OSMIUM_GEOM_OGR_HPP
+#ifndef OSMIUM_GEOM_WKT_HPP
+#define OSMIUM_GEOM_WKT_HPP
 
 /*
 
@@ -33,12 +33,8 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#define OSMIUM_COMPILE_WITH_CFLAGS_OGR `gdal-config --cflags`
-#define OSMIUM_LINK_WITH_LIBS_OGR `gdal-config --libs`
-
-#include <memory>
-
-#include <ogr_geometry.h>
+#include <cassert>
+#include <string>
 
 #include <osmium/geom/factory.hpp>
 
@@ -46,47 +42,65 @@ namespace osmium {
 
     namespace geom {
 
-        struct ogr_factory_traits {
-            typedef std::unique_ptr<OGRPoint>      point_type;
-            typedef std::unique_ptr<OGRLineString> linestring_type;
-            typedef std::unique_ptr<OGRPolygon>    polygon_type;
+        struct wkt_factory_traits {
+            typedef std::string point_type;
+            typedef std::string linestring_type;
+            typedef std::string polygon_type;
         };
 
-        class OGRFactory : public GeometryFactory<OGRFactory, ogr_factory_traits> {
+        class WKTFactory : public GeometryFactory<WKTFactory, wkt_factory_traits> {
 
             friend class GeometryFactory;
 
         public:
 
-            OGRFactory() :
-                GeometryFactory<OGRFactory, ogr_factory_traits>() {
+            WKTFactory() :
+                GeometryFactory<WKTFactory, wkt_factory_traits>() {
             }
 
         private:
 
-            linestring_type m_linestring;
+            std::string m_str {};
+            int m_points {0};
 
-            point_type make_point(const osmium::Location location) {
-                return std::move(std::unique_ptr<OGRPoint>(new OGRPoint(location.lon(), location.lat())));
+            point_type make_point(const Location location) {
+                std::string str {"POINT("};
+                str += std::to_string(location.lon());
+                str += ' ';
+                str += std::to_string(location.lat());
+                str += ')';
+                return str;
             }
 
             void linestring_start() {
-                m_linestring = std::unique_ptr<OGRLineString>(new OGRLineString());
+                m_str = "LINESTRING(";
+                m_points = 0;
             }
 
-            void linestring_add_location(const osmium::Location location) {
-                assert(!!m_linestring);
-                m_linestring->addPoint(location.lon(), location.lat());
+            void linestring_add_location(const Location location) {
+                m_str += std::to_string(location.lon());
+                m_str += ' ';
+                m_str += std::to_string(location.lat());
+                m_str += ',';
+                ++m_points;
             }
 
             linestring_type linestring_finish() {
-                return std::move(m_linestring);
+                if (m_points < 2) {
+                    throw geometry_error("not enough points for linestring");
+                } else {
+                    assert(!m_str.empty());
+                    std::string str;
+                    std::swap(str, m_str);
+                    str[str.size()-1] = ')';
+                    return str;
+                }
             }
 
-        }; // class OGRFactory
+        }; // class WKTFactory
 
     } // namespace geom
 
 } // namespace osmium
 
-#endif // OSMIUM_GEOM_OGR_HPP
+#endif // OSMIUM_GEOM_WKT_HPP

@@ -42,6 +42,8 @@ class MyOGRHandler : public osmium::handler::Handler<MyOGRHandler> {
     OGRLayer* m_layer_point;
     OGRLayer* m_layer_linestring;
 
+    osmium::geom::OGRFactory m_factory {};
+
 public:
 
     MyOGRHandler(const std::string& driver_name, const std::string& filename) {
@@ -124,7 +126,7 @@ public:
         const char* amenity = node.tags().get_value_by_key("amenity");
         if (amenity && !strcmp(amenity, "post_box")) {
             OGRFeature* feature = OGRFeature::CreateFeature(m_layer_point->GetLayerDefn());
-            std::unique_ptr<OGRPoint> ogr_point = osmium::geom::create_ogr_point(node);
+            std::unique_ptr<OGRPoint> ogr_point = m_factory.create_point(node);
             feature->SetGeometry(ogr_point.get());
             feature->SetField("id", static_cast<double>(node.id()));
             feature->SetField("operator", node.tags().get_value_by_key("operator"));
@@ -145,11 +147,9 @@ public:
     void way(const osmium::Way& way) {
         const char* highway = way.tags().get_value_by_key("highway");
         if (highway) {
-//            try {
-//                Osmium::Geometry::LineString linestring(*way);
-
+            try {
+                std::unique_ptr<OGRLineString> ogr_linestring = m_factory.create_linestring(way);
                 OGRFeature* feature = OGRFeature::CreateFeature(m_layer_linestring->GetLayerDefn());
-                std::unique_ptr<OGRLineString> ogr_linestring = osmium::geom::create_ogr_linestring(way.nodes());
                 feature->SetGeometry(ogr_linestring.get());
                 feature->SetField("id", static_cast<double>(way.id()));
                 feature->SetField("type", highway);
@@ -160,9 +160,9 @@ public:
                 }
 
                 OGRFeature::DestroyFeature(feature);
-/*            } catch (Osmium::Geometry::IllegalGeometry) {
-                std::cerr << "Ignoring illegal geometry for way " << way->id() << ".\n";
-            }*/
+            } catch (osmium::geom::geometry_error&) {
+                std::cerr << "Ignoring illegal geometry for way " << way.id() << ".\n";
+            }
         }
     }
 
