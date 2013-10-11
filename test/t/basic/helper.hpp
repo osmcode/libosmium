@@ -34,6 +34,18 @@ inline osmium::Way& buffer_add_way(osmium::memory::Buffer& buffer, const char* u
     return builder.object();
 }
 
+inline osmium::Way& buffer_add_way(osmium::memory::Buffer& buffer, const char* user, const std::vector<std::pair<const char*, const char*>>& tags, const std::vector<std::pair<osmium::object_id_type, osmium::Location>>& nodes) {
+    osmium::osm::WayBuilder builder(buffer);
+    builder.add_string(user);
+    add_tags(buffer, builder, tags);
+    osmium::osm::WayNodeListBuilder wnl_builder(buffer, &builder);
+    for (auto& p : nodes) {
+        wnl_builder.add_way_node(p.first, p.second);
+    }
+    buffer.commit();
+    return builder.object();
+}
+
 inline osmium::Relation& buffer_add_relation(
         osmium::memory::Buffer& buffer,
         const char* user,
