@@ -145,6 +145,11 @@ namespace osmium {
             return (byte_size() - sizeof(WayNodeList)) / sizeof(WayNode);
         }
 
+        const WayNode& operator[](size_t n) const {
+            const WayNode* wn = &*begin();
+            return wn[n];
+        }
+
     }; // class WayNodeList
 
 

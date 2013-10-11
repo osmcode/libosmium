@@ -33,6 +33,9 @@ BOOST_AUTO_TEST_CASE(way_builder) {
     BOOST_CHECK_EQUAL(123, way.timestamp());
     BOOST_CHECK_EQUAL(2, way.tags().size());
     BOOST_CHECK_EQUAL(3, way.nodes().size());
+    BOOST_CHECK_EQUAL(1, way.nodes()[0].ref());
+    BOOST_CHECK_EQUAL(3, way.nodes()[1].ref());
+    BOOST_CHECK_EQUAL(2, way.nodes()[2].ref());
 }
 
 BOOST_AUTO_TEST_SUITE_END()
