@@ -86,8 +86,7 @@ namespace osmium {
                 } else {
                     m_out += " x y";
                 }
-
-                write_tags(node.tags());
+                m_out += '\n';
 
                 if (m_out.size() > output_buffer_size) {
                     flush();
@@ -109,8 +108,7 @@ namespace osmium {
                     snprintf(m_tmp_buffer, tmp_buffer_size, "n%" PRId64, wn.ref());
                     m_out += m_tmp_buffer;
                 }
-
-                write_tags(way.tags());
+                m_out += '\n';
 
                 if (m_out.size() > output_buffer_size) {
                     flush();
@@ -134,8 +132,7 @@ namespace osmium {
                     m_out += m_tmp_buffer;
                     m_out += member.role();
                 }
-
-                write_tags(relation.tags());
+                m_out += '\n';
 
                 if (m_out.size() > output_buffer_size) {
                     flush();
@@ -177,12 +174,9 @@ namespace osmium {
                 snprintf(m_tmp_buffer, tmp_buffer_size, " i%d u", object.uid());
                 m_out += m_tmp_buffer;
                 append_encoded_string(object.user());
-            }
-
-            void write_tags(const osmium::TagList& tags) {
                 m_out += " T";
                 bool first = true;
-                for (auto& tag : tags) {
+                for (auto& tag : object.tags()) {
                     if (first) {
                         first = false;
                     } else {
@@ -192,7 +186,6 @@ namespace osmium {
                     m_out += '=';
                     append_encoded_string(tag.value());
                 }
-                m_out += '\n';
             }
 
         }; // class OPLOutput

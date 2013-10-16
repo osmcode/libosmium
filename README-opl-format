@@ -35,11 +35,11 @@ c - Changeset ID
 t - Timestamp (ISO Format)
 i - User ID
 u - Username
+T - Tags
 x - Longitude (nodes only)
 y - Latitude (nodes only)
 N - Nodes (ways only)
 M - Members (relations only)
-T - Tags
 
 The N,M, and T fields can be empty. If the user is anonymous, the 'User ID'
 will be 0 and the 'Username' field will be empty: "... i0 u ...". If the
@@ -66,22 +66,22 @@ Format Overview
 ---------------
 
 NODE:
-    n(OBJECT_ID) v(VERSION) d(V|D) c(CHANGESET_ID) t(yyyy-mm-ddThh:mm:ssZ) i(USER_ID) u(USERNAME) x(LONGITUDE) y(LATITUDE) T(TAGS)
+    n(OBJECT_ID) v(VERSION) d(V|D) c(CHANGESET_ID) t(yyyy-mm-ddThh:mm:ssZ) i(USER_ID) u(USERNAME) T(TAGS) x(LONGITUDE) y(LATITUDE)
 
 WAY:
-    w(OBJECT_ID) v(VERSION) d(V|D) c(CHANGESET_ID) t(yyyy-mm-ddThh:mm:ssZ) i(USER_ID) u(USERNAME) N(NODES) T(TAGS)
+    w(OBJECT_ID) v(VERSION) d(V|D) c(CHANGESET_ID) t(yyyy-mm-ddThh:mm:ssZ) i(USER_ID) u(USERNAME) T(TAGS) N(WAY_NODES)
 
 RELATION:
-    r(OBJECT_ID) v(VERSION) d(V|D) c(CHANGESET_ID) t(yyyy-mm-ddThh:mm:ssZ) i(USER_ID) u(USERNAME) M(MEMBERS) T(TAGS)
+    r(OBJECT_ID) v(VERSION) d(V|D) c(CHANGESET_ID) t(yyyy-mm-ddThh:mm:ssZ) i(USER_ID) u(USERNAME) T(TAGS) M(MEMBERS)
 
-NODES:
+TAGS
+    (KEY)=(VALUE),...
+
+WAY_NODES:
     n(NODE_REF),...
 
 MEMBERS:
     [nwr](MEMBER_REF)@(MEMBER_ROLE),...
-
-TAGS
-    (KEY)=(VALUE),...
 
 
 Creating OPL files
@@ -156,5 +156,5 @@ Order by object type, object id and version (ie the usual order for OSM files):
 
 Create statistics on number of nodes in ways:
 
-  egrep '^w' data.osm.opl | cut -d' ' -f8 | tr -dc 'n\n' | awk '{a[length]++} END {for(i=1;i<=2000;++i) { print i, a[i] ? a[i] : 0 } }'
+  egrep '^w' data.osm.opl | cut -d' ' -f9 | tr -dc 'n\n' | awk '{a[length]++} END {for(i=1;i<=2000;++i) { print i, a[i] ? a[i] : 0 } }'
 
