@@ -288,7 +288,7 @@ namespace osmium {
                                 if (!m_promise_fulfilled) {
                                     header_is_done();
                                 }
-                                if (m_read_types & osmium::item_flags_type::way) {
+                                if (m_read_types & osmium::item_flags_type::relation) {
                                     m_relation_builder = std::unique_ptr<osmium::osm::RelationBuilder>(new osmium::osm::RelationBuilder(m_buffer));
                                     init_object(m_relation_builder.get(), m_relation_builder->object(), attrs);
                                     m_context = context::relation;
