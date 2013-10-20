@@ -36,6 +36,7 @@ DEALINGS IN THE SOFTWARE.
 #include <cassert>
 #include <cstring>
 #include <new>
+
 #include <osmium/memory/buffer.hpp>
 
 namespace osmium {
@@ -114,7 +115,6 @@ namespace osmium {
             template <class T>
             T* reserve_space_for() {
                 assert(m_buffer.is_aligned());
-                assert(sizeof(T) % align_bytes == 0);
                 return reinterpret_cast<T*>(m_buffer.reserve_space(sizeof(T)));
             }
 
@@ -128,12 +128,12 @@ namespace osmium {
             }
 
             void add_string(const char* str) {
-                size_t len = std::strlen(str) + 1;
-                *reserve_space_for<size_t>() = len;
+                string_size_type len = std::strlen(str) + 1;
+                *reserve_space_for<string_size_type>() = len;
                 append(str);
-                add_size(sizeof(size_t) + len);
+                add_size(sizeof(string_size_type) + len);
 
-                size_t padding = align_bytes - (len % align_bytes);
+                size_t padding = align_bytes - ((sizeof(string_size_type) + len) % align_bytes);
                 if (padding != align_bytes) {
                     std::memset(m_buffer.reserve_space(padding), 0, padding);
                     add_size(padding);

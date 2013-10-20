@@ -66,16 +66,16 @@ namespace osmium {
             return data() + sizeof(Changeset);
         }
 
-        size_t user_length() const {
-            return *reinterpret_cast<const size_t*>(user_position());
+        string_size_type user_length() const {
+            return *reinterpret_cast<const string_size_type*>(user_position());
         }
 
         unsigned char* subitems_position() {
-            return user_position() + sizeof(size_t) + osmium::memory::padded_length(user_length());
+            return user_position() + osmium::memory::padded_length(sizeof(string_size_type) + user_length());
         }
 
         const unsigned char* subitems_position() const {
-            return user_position() + sizeof(size_t) + osmium::memory::padded_length(user_length());
+            return user_position() + osmium::memory::padded_length(sizeof(string_size_type) + user_length());
         }
 
         Changeset() :
@@ -240,7 +240,7 @@ namespace osmium {
 
         /// Get user name.
         const char* user() const {
-            return reinterpret_cast<const char*>(data() + sizeof(Changeset) + sizeof(size_t));
+            return reinterpret_cast<const char*>(data() + sizeof(Changeset) + sizeof(string_size_type));
         }
 
         /// Get the list of tags.

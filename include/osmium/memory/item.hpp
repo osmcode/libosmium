@@ -39,6 +39,9 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
+    // strings can be up to 2^16 characters long
+    typedef uint16_t string_size_type;
+
     namespace memory {
 
         // align datastructures to this many bytes

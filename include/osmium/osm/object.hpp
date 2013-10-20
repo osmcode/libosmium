@@ -73,16 +73,16 @@ namespace osmium {
             return data() + sizeof_object();
         }
 
-        size_t user_length() const {
-            return *reinterpret_cast<const size_t*>(user_position());
+        string_size_type user_length() const {
+            return *reinterpret_cast<const string_size_type*>(user_position());
         }
 
         unsigned char* subitems_position() {
-            return user_position() + sizeof(size_t) + osmium::memory::padded_length(user_length());
+            return user_position() + osmium::memory::padded_length(sizeof(string_size_type) + user_length());
         }
 
         const unsigned char* subitems_position() const {
-            return user_position() + sizeof(size_t) + osmium::memory::padded_length(user_length());
+            return user_position() + osmium::memory::padded_length(sizeof(string_size_type) + user_length());
         }
 
     protected:
@@ -305,7 +305,7 @@ namespace osmium {
 
         /// Get user name for this object.
         const char* user() const {
-            return reinterpret_cast<const char*>(data() + sizeof_object() + sizeof(size_t));
+            return reinterpret_cast<const char*>(data() + sizeof_object() + sizeof(string_size_type));
         }
 
         /// Get the list of tags for this object.

@@ -59,14 +59,16 @@ namespace osmium {
             return data() + sizeof(RelationMember);
         }
 
+        string_size_type role_length() const {
+            return *reinterpret_cast<const string_size_type*>(role_position());
+        }
+
         unsigned char* endpos() {
-            unsigned char* current = data() + sizeof(RelationMember);
-            return current + sizeof(size_t) + osmium::memory::padded_length(*reinterpret_cast<size_t*>(current));
+            return role_position() + osmium::memory::padded_length(sizeof(string_size_type) + role_length());
         }
 
         const unsigned char* endpos() const {
-            const unsigned char* current = data() + sizeof(RelationMember);
-            return current + sizeof(size_t) + osmium::memory::padded_length(*reinterpret_cast<const size_t*>(current));
+            return role_position() + osmium::memory::padded_length(sizeof(string_size_type) + role_length());
         }
 
         template <class TMember>
@@ -115,7 +117,7 @@ namespace osmium {
         }
 
         const char* role() const {
-            return reinterpret_cast<const char*>(role_position() + sizeof(size_t));
+            return reinterpret_cast<const char*>(role_position() + sizeof(string_size_type));
         }
 
         Object& get_object() {
