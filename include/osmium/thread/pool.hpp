@@ -82,10 +82,9 @@ namespace osmium {
             void worker_thread() {
                 while (!m_done) {
                     std::function<void()> task;
-                    if (m_work_queue.try_pop(task)) {
+                    m_work_queue.wait_and_pop_with_timeout(task);
+                    if (task) {
                         task();
-                    } else {
-                        std::this_thread::yield();
                     }
                 }
             }
