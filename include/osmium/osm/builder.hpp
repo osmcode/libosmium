@@ -45,21 +45,16 @@ namespace osmium {
         typedef osmium::memory::ObjectBuilder<osmium::Relation> RelationBuilder;
         typedef osmium::memory::ObjectBuilder<osmium::Changeset> ChangesetBuilder;
 
-        class TagListBuilder : public osmium::memory::Builder {
+        class TagListBuilder : public osmium::memory::ObjectBuilder<TagList> {
 
         public:
 
             TagListBuilder(osmium::memory::Buffer& buffer, Builder* parent=nullptr) :
-                osmium::memory::Builder(buffer, parent, sizeof(TagList)) {
-                new (&item()) TagList();
+                osmium::memory::ObjectBuilder<TagList>(buffer, parent) {
             }
 
             ~TagListBuilder() {
                 add_padding();
-            }
-
-            TagList& object() {
-                return static_cast<TagList&>(item());
             }
 
             void add_tag(const char* key, const char* value) {
@@ -68,21 +63,16 @@ namespace osmium {
 
         }; // class TagListBuilder
 
-        class WayNodeListBuilder : public osmium::memory::Builder {
+        class WayNodeListBuilder : public osmium::memory::ObjectBuilder<WayNodeList> {
 
         public:
 
             WayNodeListBuilder(osmium::memory::Buffer& buffer, Builder* parent=nullptr) :
-                osmium::memory::Builder(buffer, parent, sizeof(WayNodeList)) {
-                new (&item()) WayNodeList();
+                osmium::memory::ObjectBuilder<WayNodeList>(buffer, parent) {
             }
 
             ~WayNodeListBuilder() {
                 add_padding();
-            }
-
-            WayNodeList& object() {
-                return static_cast<WayNodeList&>(item());
             }
 
             void add_way_node(const WayNode& way_node) {
@@ -96,21 +86,16 @@ namespace osmium {
 
         }; // class WayNodeListBuilder
 
-        class RelationMemberListBuilder : public osmium::memory::Builder {
+        class RelationMemberListBuilder : public osmium::memory::ObjectBuilder<RelationMemberList> {
 
         public:
 
             RelationMemberListBuilder(osmium::memory::Buffer& buffer, Builder* parent=nullptr) :
-                osmium::memory::Builder(buffer, parent, sizeof(RelationMemberList)) {
-                new (&item()) RelationMemberList();
+                osmium::memory::ObjectBuilder<RelationMemberList>(buffer, parent) {
             }
 
             ~RelationMemberListBuilder() {
                 add_padding();
-            }
-
-            RelationMemberList& object() {
-                return static_cast<RelationMemberList&>(item());
             }
 
             void add_member(osmium::item_type type, object_id_type ref, const char* role, const osmium::Object* full_member = nullptr) {
