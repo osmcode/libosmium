@@ -43,6 +43,7 @@ namespace osmium {
         typedef osmium::memory::ObjectBuilder<osmium::Node> NodeBuilder;
         typedef osmium::memory::ObjectBuilder<osmium::Way> WayBuilder;
         typedef osmium::memory::ObjectBuilder<osmium::Relation> RelationBuilder;
+        typedef osmium::memory::ObjectBuilder<osmium::Changeset> ChangesetBuilder;
 
         class TagListBuilder : public osmium::memory::Builder {
 

@@ -79,13 +79,7 @@ namespace osmium {
             void node(const osmium::Node& node) {
                 m_out += 'n';
                 write_meta(node);
-
-                if (node.location()) {
-                    snprintf(m_tmp_buffer, tmp_buffer_size, " x%.7f y%.7f", node.lon(), node.lat());
-                    m_out += m_tmp_buffer;
-                } else {
-                    m_out += " x y";
-                }
+                write_location(node.location(), 'x', 'y');
                 m_out += '\n';
 
                 if (m_out.size() > output_buffer_size) {
@@ -139,6 +133,37 @@ namespace osmium {
                 }
             }
 
+            void changeset(const osmium::Changeset& changeset) {
+                snprintf(m_tmp_buffer, tmp_buffer_size, "c%d k%d s", changeset.id(), changeset.num_changes());
+                m_out += m_tmp_buffer;
+                m_out += changeset.created_at().to_iso();
+                m_out += " e";
+                m_out += changeset.closed_at().to_iso();
+                snprintf(m_tmp_buffer, tmp_buffer_size, " i%d u", changeset.uid());
+                m_out += m_tmp_buffer;
+                append_encoded_string(changeset.user());
+                write_location(changeset.bounds().bottom_left(), 'x', 'y');
+                write_location(changeset.bounds().top_right(), 'X', 'Y');
+                m_out += " T";
+                bool first = true;
+                for (auto& tag : changeset.tags()) {
+                    if (first) {
+                        first = false;
+                    } else {
+                        m_out += ',';
+                    }
+                    append_encoded_string(tag.key());
+                    m_out += '=';
+                    append_encoded_string(tag.value());
+                }
+
+                m_out += '\n';
+
+                if (m_out.size() > output_buffer_size) {
+                    flush();
+                }
+            }
+
             void close() override {
                 flush();
             }
@@ -185,6 +210,18 @@ namespace osmium {
                     append_encoded_string(tag.key());
                     m_out += '=';
                     append_encoded_string(tag.value());
+                }
+            }
+
+            void write_location(const osmium::Location location, const char x, const char y) {
+                if (location) {
+                    snprintf(m_tmp_buffer, tmp_buffer_size, " %c%.7f %c%.7f", x, location.lon(), y, location.lat());
+                    m_out += m_tmp_buffer;
+                } else {
+                    m_out += ' ';
+                    m_out += x;
+                    m_out += ' ';
+                    m_out += y;
                 }
             }
 

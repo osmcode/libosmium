@@ -73,9 +73,11 @@ namespace osmium {
                 node,
                 way,
                 relation,
+                changeset,
                 ignored_node,
                 ignored_way,
                 ignored_relation,
+                ignored_changeset,
                 in_object
             };
 
@@ -97,6 +99,7 @@ namespace osmium {
             std::unique_ptr<osmium::osm::NodeBuilder>               m_node_builder;
             std::unique_ptr<osmium::osm::WayBuilder>                m_way_builder;
             std::unique_ptr<osmium::osm::RelationBuilder>           m_relation_builder;
+            std::unique_ptr<osmium::osm::ChangesetBuilder>          m_changeset_builder;
 
             std::unique_ptr<osmium::osm::TagListBuilder>            m_tl_builder;
             std::unique_ptr<osmium::osm::WayNodeListBuilder>        m_wnl_builder;
@@ -125,6 +128,7 @@ namespace osmium {
                 m_node_builder(),
                 m_way_builder(),
                 m_relation_builder(),
+                m_changeset_builder(),
                 m_tl_builder(),
                 m_wnl_builder(),
                 m_rml_builder(),
@@ -204,6 +208,36 @@ namespace osmium {
                         object.set_attribute(attrs[count], attrs[count+1]);
                     }
                 }
+
+                if (!user_set) {
+                    builder->add_string("");
+                }
+            }
+
+            void init_changeset(osmium::memory::Builder* builder, osmium::Changeset& changeset, const XML_Char** attrs) {
+                bool user_set = false;
+
+                osmium::Location min {};
+                osmium::Location max {};
+                for (int count = 0; attrs[count]; count += 2) {
+                    if (!strcmp(attrs[count], "min_lon")) {
+                        min.lon(atof(attrs[count+1]));
+                    } else if (!strcmp(attrs[count], "min_lat")) {
+                        min.lat(atof(attrs[count+1]));
+                    } else if (!strcmp(attrs[count], "max_lon")) {
+                        max.lon(atof(attrs[count+1]));
+                    } else if (!strcmp(attrs[count], "max_lat")) {
+                        max.lat(atof(attrs[count+1]));
+                    } else if (!strcmp(attrs[count], "user")) {
+                        builder->add_string(attrs[count+1]);
+                        user_set = true;
+                    } else {
+                        changeset.set_attribute(attrs[count], attrs[count+1]);
+                    }
+                }
+
+                changeset.bounds().extend(min);
+                changeset.bounds().extend(max);
 
                 if (!user_set) {
                     builder->add_string("");
@@ -295,6 +329,17 @@ namespace osmium {
                                 } else {
                                     m_context = context::ignored_relation;
                                 }
+                            } else if (!strcmp(element, "changeset")) {
+                                if (!m_promise_fulfilled) {
+                                    header_is_done();
+                                }
+                                if (m_read_types & osmium::item_flags_type::changeset) {
+                                    m_changeset_builder = std::unique_ptr<osmium::osm::ChangesetBuilder>(new osmium::osm::ChangesetBuilder(m_buffer));
+                                    init_changeset(m_changeset_builder.get(), m_changeset_builder->object(), attrs);
+                                    m_context = context::changeset;
+                                } else {
+                                    m_context = context::ignored_changeset;
+                                }
                             } else if (!strcmp(element, "bounds")) {
                                 osmium::Location min;
                                 osmium::Location max;
@@ -366,9 +411,15 @@ namespace osmium {
                                 check_tag(m_relation_builder.get(), element, attrs);
                             }
                             break;
+                        case context::changeset:
+                            m_last_context = context::changeset;
+                            m_context = context::in_object;
+                            check_tag(m_changeset_builder.get(), element, attrs);
+                            break;
                         case context::ignored_node:
                         case context::ignored_way:
                         case context::ignored_relation:
+                        case context::ignored_changeset:
                             break;
                         case context::in_object:
                             // fallthrough
@@ -422,6 +473,14 @@ namespace osmium {
                             m_context = context::top;
                             flush_buffer();
                             break;
+                        case context::changeset:
+                            assert(!strcmp(element, "changeset"));
+                            m_tl_builder.reset();
+                            m_changeset_builder.reset();
+                            m_buffer.commit();
+                            m_context = context::top;
+                            flush_buffer();
+                            break;
                         case context::in_object:
                             m_context = m_last_context;
                             break;
@@ -437,6 +496,11 @@ namespace osmium {
                             break;
                         case context::ignored_relation:
                             if (!strcmp(element, "relation")) {
+                                m_context = context::top;
+                            }
+                            break;
+                        case context::ignored_changeset:
+                            if (!strcmp(element, "changeset")) {
                                 m_context = context::top;
                             }
                             break;

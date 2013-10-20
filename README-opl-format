@@ -18,17 +18,18 @@ they are about the same size.
 File Format
 -----------
 
-Each line of the file contains one OSM object (a node, way, or relation). Fields
-are separated by a space character, lines by a newline character. Fields always
-appear in the same order and are always present, each field is introduced by a
-specific character:
+Each line of the file contains one OSM object (a node, way, or relation) or an
+OSM changeset. Fields are separated by a space character, lines by a newline
+character. Fields always appear in the same order and are always present, each
+field is introduced by a specific character:
 
 One of these fields is always the first:
-n - Node ID
-w - Way ID
-r - Relation ID
+n - Node ID (nodes only)
+w - Way ID (ways only)
+r - Relation ID (relations only)
+c - Changeset ID (changesets only)
 
-Then in the given order:
+Then for OSM objects in the given order:
 v - Version
 d - Deleted flag ('V' - visible or 'D' - deleted)
 c - Changeset ID
@@ -50,6 +51,20 @@ The 'Deleted flag' shows whether an object version has been deleted ("dD") or
 whether it is visible ("dV"). For normal OSM data files this is always "dV",
 but change files and osm history files can contain deleted objects.
 
+For changesets the fields are different:
+k - num_changes
+s - created_at (start) timestamp (ISO Format)
+e - closed_at (end) timestamp (ISO Format)
+i - User ID
+u - Username
+x - Longitude (left bottom corner, min_lon)
+y - Latitude (left bottom corner, min_lat)
+X - Longitude (right top corner, max_lon)
+Y - Latitude (right top corner, max_lat)
+T - Tags
+
+The fields e is empty when the changeset is not closed yet. The fields x, y, X,
+Y can be empty when no bounding box could be derived. The field k can be 0.
 
 Escaping
 --------
@@ -73,6 +88,9 @@ WAY:
 
 RELATION:
     r(OBJECT_ID) v(VERSION) d(V|D) c(CHANGESET_ID) t(yyyy-mm-ddThh:mm:ssZ) i(USER_ID) u(USERNAME) T(TAGS) M(MEMBERS)
+
+CHANGESET:
+    c(CHANGESET_ID) k(NUM_CHANGES) s(yyyy-mm-ddThh:mm:ssZ) e(yyyy-mm-ddThh:mm:ssZ) i(USER_ID) u(USERNAME) x(LONGITUDE) y(LATITUDE) X(LONGITUDE) Y(LATITUDE) T(TAGS)
 
 TAGS
     (KEY)=(VALUE),...

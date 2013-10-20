@@ -174,6 +174,40 @@ namespace osmium {
                 check_for_error(xmlTextWriterEndElement(m_xml_writer)); // </relation>
             }
 
+            void changeset(const osmium::Changeset& changeset) {
+                check_for_error(xmlTextWriterStartElement(m_xml_writer, cast_to_xmlchar("changeset"))); // <changeset>
+
+                check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, cast_to_xmlchar("id"), "%" PRId32, changeset.id()));
+                if (changeset.created_at()) {
+                    std::string iso { changeset.created_at().to_iso() };
+                    check_for_error(xmlTextWriterWriteAttribute(m_xml_writer, cast_to_xmlchar("created_at"), cast_to_xmlchar(iso.c_str())));
+                }
+                check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, cast_to_xmlchar("num_changes"), "%" PRId32, changeset.num_changes()));
+                if (changeset.closed_at()) {
+                    std::string iso { changeset.closed_at().to_iso() };
+                    check_for_error(xmlTextWriterWriteAttribute(m_xml_writer, cast_to_xmlchar("closed_at"), cast_to_xmlchar(iso.c_str())));
+                    check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, cast_to_xmlchar("open"), "false"));
+                } else {
+                    check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, cast_to_xmlchar("open"), "true"));
+                }
+
+                if (changeset.bounds()) {
+                    check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, cast_to_xmlchar("min_lon"), "%.7f", changeset.bounds().bottom_left().lon()));
+                    check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, cast_to_xmlchar("min_lat"), "%.7f", changeset.bounds().bottom_left().lat()));
+                    check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, cast_to_xmlchar("max_lon"), "%.7f", changeset.bounds().top_right().lon()));
+                    check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, cast_to_xmlchar("max_lat"), "%.7f", changeset.bounds().top_right().lat()));
+                }
+
+                if (!changeset.user_is_anonymous()) {
+                    check_for_error(xmlTextWriterWriteAttribute(m_xml_writer, cast_to_xmlchar("user"), cast_to_xmlchar(changeset.user())));
+                    check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, cast_to_xmlchar("uid"), "%d", changeset.uid()));
+                }
+
+                write_tags(changeset.tags());
+
+                check_for_error(xmlTextWriterEndElement(m_xml_writer)); // </changeset>
+            }
+
             void close() override {
                 if (this->m_file.type() == osmium::io::FileType::Change()) {
                     open_close_op_tag('\0');
@@ -199,8 +233,7 @@ namespace osmium {
                     check_for_error(xmlTextWriterWriteAttribute(m_xml_writer, cast_to_xmlchar("timestamp"), cast_to_xmlchar(iso.c_str())));
                 }
 
-                // uid <= 0 -> anonymous
-                if (object.uid() > 0) {
+                if (!object.user_is_anonymous()) {
                     check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, cast_to_xmlchar("uid"), "%d", object.uid()));
                     check_for_error(xmlTextWriterWriteAttribute(m_xml_writer, cast_to_xmlchar("user"), cast_to_xmlchar(object.user())));
                 }

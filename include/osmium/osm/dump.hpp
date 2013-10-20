@@ -191,6 +191,37 @@ namespace osmium {
                 print_meta(relation);
             }
 
+            void operator()(const osmium::Changeset& changeset) {
+                print_title("CHANGESET", changeset);
+                m_out << m_prefix
+                      << "  id="
+                      << changeset.id()
+                      << "\n";
+                m_out << m_prefix
+                      << "  uid="
+                      << changeset.uid()
+                      << "\n";
+                m_out << m_prefix
+                      << "  user=|"
+                      << changeset.user()
+                      << "|\n";
+                m_out << m_prefix
+                      << "  created_at="
+                      << changeset.created_at().to_iso()
+                      << "\n";
+                m_out << m_prefix
+                      << "  closed_at="
+                      << changeset.closed_at().to_iso()
+                      << "\n";
+                m_out << m_prefix
+                      << "  bounds="
+                      << changeset.bounds()
+                      << "\n";
+
+                Dump dump(m_out, m_with_size, m_prefix + "  ");
+                osmium::osm::apply_visitor(dump, changeset.cbegin(), changeset.cend());
+            }
+
         }; // class Dump
 
     } // namespace osm

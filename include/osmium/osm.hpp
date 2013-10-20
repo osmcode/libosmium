@@ -36,6 +36,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/node.hpp>
 #include <osmium/osm/way.hpp>
 #include <osmium/osm/relation.hpp>
+#include <osmium/osm/changeset.hpp>
 
 /**
  * @brief Namespace for everything in the Osmium library.

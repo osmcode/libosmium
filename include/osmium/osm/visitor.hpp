@@ -72,6 +72,9 @@ namespace osmium {
                     case osmium::item_type::relation:
                         visitor(static_cast<MaybeConst<TItem, osmium::Relation>&>(item));
                         break;
+                    case osmium::item_type::changeset:
+                        visitor(static_cast<MaybeConst<TItem, osmium::Changeset>&>(item));
+                        break;
                     case osmium::item_type::tag_list:
                         visitor(static_cast<MaybeConst<TItem, osmium::TagList>&>(item));
                         break;

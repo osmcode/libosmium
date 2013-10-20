@@ -48,6 +48,7 @@ namespace osmium {
     typedef uint32_t object_version_type;     ///< type for OSM object version number
     typedef uint32_t changeset_id_type;       ///< type for OSM changeset IDs
     typedef uint32_t user_id_type;            ///< type for OSM user IDs
+    typedef uint32_t num_changes_type;        ///< type for changeset num_changes
 
 #ifdef _MSC_VER
 # define atoll(x) (_atoi64(x))
@@ -66,6 +67,10 @@ namespace osmium {
     }
 
     inline user_id_type string_to_user_id(const char* string) {
+        return atol(string);
+    }
+
+    inline num_changes_type string_to_num_changes(const char* string) {
         return atol(string);
     }
 

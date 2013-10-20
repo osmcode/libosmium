@@ -48,17 +48,19 @@ namespace osmium {
         way_node_list                          = 0x12,
         way_node_with_location_list            = 0x32,
         relation_member_list                   = 0x13,
-        relation_member_list_with_full_members = 0x33
+        relation_member_list_with_full_members = 0x33,
+        changeset                              = 0x40
 
     }; // enum class item_type
 
     enum item_flags_type {
 
-        nothing  = 0x00,
-        node     = 0x01,
-        way      = 0x02,
-        relation = 0x04,
-        all      = 0x07
+        nothing   = 0x00,
+        node      = 0x01,
+        way       = 0x02,
+        relation  = 0x04,
+        changeset = 0x08,
+        all       = 0x0f
 
     }; // enum item_type_flags
 
@@ -88,6 +90,8 @@ namespace osmium {
                 return item_type::way;
             case 'r':
                 return item_type::relation;
+            case 'c':
+                return item_type::changeset;
             default:
                 return item_type::undefined;
         }
@@ -101,6 +105,8 @@ namespace osmium {
                 return 'w';
             case item_type::relation:
                 return 'r';
+            case item_type::changeset:
+                return 'c';
             default:
                 return '-';
         }
@@ -114,6 +120,8 @@ namespace osmium {
                 return "way";
             case item_type::relation:
                 return "relation";
+            case item_type::changeset:
+                return "changeset";
             default:
                 return "-";
         }

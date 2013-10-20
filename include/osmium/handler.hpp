@@ -98,6 +98,9 @@ namespace osmium {
                         case osmium::item_type::relation:
                             handler.relation(static_cast<MaybeConst<TIterator, osmium::Relation>&>(*it));
                             break;
+                        case osmium::item_type::changeset:
+                            handler.changeset(static_cast<MaybeConst<TIterator, osmium::Changeset>&>(*it));
+                            break;
 #if 0
                         case osmium::item_type::tag_list:
                             handler.tag_list(static_cast<MaybeConst<TIterator, osmium::TagList>&>(*it));
@@ -134,6 +137,9 @@ namespace osmium {
             }
 
             void relation(const osmium::Relation&) const {
+            }
+
+            void changeset(const osmium::Changeset&) const {
             }
 
 #if 0
