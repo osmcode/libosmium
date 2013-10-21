@@ -100,10 +100,6 @@ namespace osmium {
 
     public:
 
-        size_t sizeof_object() const {
-            return sizeof(Changeset);
-        }
-
         /// Get ID of this changeset
         changeset_id_type id() const noexcept {
             return m_id;

@@ -118,7 +118,7 @@ namespace osmium {
                 append(str);
                 add_size(len);
 
-                add_padding_for(sizeof(osmium::RelationMember) + len);
+                add_padding(true);
 
                 assert(m_buffer.is_aligned());
             }

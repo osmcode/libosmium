@@ -80,35 +80,29 @@ namespace osmium {
             }
 
             /**
-             * Add padding if needed.
+             * Add padding to buffer (if needed) to align data properly.
              *
-             * Adds size to parent, but not to self!
+             * This calculates how many padding bytes are needed and adds
+             * as many zero bytes to the buffer. It also adds this number
+             * to the size of the current item (if the "self" param is
+             * true) and recursively to all the parent items.
+             *
+             * @param self If true add number of padding bytes to size
+             *             of current item. Size is always added to
+             *             parent item (if any).
+             *
              */
-            void add_padding() {
+            void add_padding(bool self=false) {
                 size_t padding = align_bytes - (size() % align_bytes);
                 if (padding != align_bytes) {
                     std::memset(m_buffer.reserve_space(padding), 0, padding);
-                    if (m_parent) {
+                    if (self) {
+                        add_size(padding);
+                    } else if (m_parent) {
                         m_parent->add_size(padding);
                         assert(m_parent->size() % align_bytes == 0);
                     }
                 }
-            }
-
-            /**
-             * Add padding to buffer (if needed) to align data of given size
-             * properly.
-             *
-             * @returns number of padding bytes that were added to buffer.
-             */
-            size_t add_padding_for(size_t size) {
-                size_t padding = align_bytes - (size % align_bytes);
-                if (padding != align_bytes) {
-                    std::memset(m_buffer.reserve_space(padding), 0, padding);
-                    add_size(padding);
-                    return padding;
-                }
-                return 0;
             }
 
         public:
@@ -170,7 +164,7 @@ namespace osmium {
                 append(str);
                 add_size(len);
 
-                add_padding_for(object().sizeof_object() + len);
+                add_padding(true);
 
                 assert(m_buffer.is_aligned());
             }
