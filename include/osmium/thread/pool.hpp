@@ -34,12 +34,13 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <atomic>
-#include <functional>
+#include <future>
 #include <thread>
 #include <utility>
 #include <vector>
 
 #include <osmium/thread/queue.hpp>
+#include <osmium/thread/function_wrapper.hpp>
 
 namespace osmium {
 
@@ -73,15 +74,14 @@ namespace osmium {
                 }
 
             };
-
             std::atomic<bool> m_done;
-            osmium::thread::Queue<std::function<void()>> m_work_queue;
+            osmium::thread::Queue<function_wrapper> m_work_queue;
             std::vector<std::thread> m_threads;
             thread_joiner m_joiner;
 
             void worker_thread() {
                 while (!m_done) {
-                    std::function<void()> task;
+                    function_wrapper task;
                     m_work_queue.wait_and_pop_with_timeout(task);
                     if (task) {
                         task();
@@ -89,14 +89,15 @@ namespace osmium {
                 }
             }
 
-        public:
-
-            Pool(unsigned const int thread_count):
+            Pool() :
                 m_done(false),
+                m_work_queue(),
                 m_threads(),
                 m_joiner(m_threads) {
+                const unsigned int thread_count = 2; //std::thread::hardware_concurrency();
+
                 try {
-                    for (unsigned i = 0; i < thread_count; ++i) {
+                    for (unsigned int i=0; i < thread_count; ++i) {
                         m_threads.push_back(std::thread(&Pool::worker_thread, this));
                     }
                 } catch (...) {
@@ -105,8 +106,15 @@ namespace osmium {
                 }
             }
 
+        public:
+
+            static Pool& instance() {
+                static Pool pool;
+                return pool;
+            }
+
             ~Pool() {
-                m_done=true;
+                m_done = true;
             }
 
             size_t queue_size() const {
@@ -117,11 +125,19 @@ namespace osmium {
                 return m_work_queue.empty();
             }
 
-            size_t submit(std::function<void()>&& func) {
-                return m_work_queue.push_and_get_size(std::forward<std::function<void()>>(func));
+            template <typename TFunction>
+            std::future<typename std::result_of<TFunction()>::type> submit(TFunction f) {
+
+                typedef typename std::result_of<TFunction()>::type result_type;
+
+                std::packaged_task<result_type()> task(std::move(f));
+                std::future<result_type> result(task.get_future());
+                m_work_queue.push(std::move(task));
+
+                return result;
             }
 
-        };  // Pool
+        }; // class Pool
 
     } // namespace thread
 

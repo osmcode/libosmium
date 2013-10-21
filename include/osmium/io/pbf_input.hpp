@@ -481,7 +481,6 @@ namespace osmium {
             queue_type m_queue;
             const size_t m_max_work_queue_size;
             const size_t m_max_buffer_queue_size;
-            osmium::thread::Pool m_thread_pool;
             std::atomic<bool> m_done;
             std::atomic<int> m_pending_jobs;
             std::thread m_reader;
@@ -535,12 +534,11 @@ namespace osmium {
                         data_blob_parser();
                     } else {
                         // otherwise we submit the parser to the work queue
-                        size_t work_queue_size = m_thread_pool.submit(data_blob_parser);
+                        osmium::thread::Pool::instance().submit(data_blob_parser);
 
                         // if the work queue is getting too large, wait for a while
-                        while (!m_done && work_queue_size >= m_max_work_queue_size) {
+                        while (!m_done && osmium::thread::Pool::instance().queue_size() >= m_max_work_queue_size) {
                             std::this_thread::sleep_for(std::chrono::milliseconds(10));
-                            work_queue_size = m_thread_pool.queue_size();
                         }
                     }
                     ++n;
@@ -570,7 +568,6 @@ namespace osmium {
                 m_queue(),
                 m_max_work_queue_size(num_threads * 4),
                 m_max_buffer_queue_size(10 + num_threads * 10),
-                m_thread_pool(num_threads),
                 m_done(false),
                 m_pending_jobs(0) {
                 GOOGLE_PROTOBUF_VERIFY_VERSION;
