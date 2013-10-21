@@ -73,11 +73,13 @@ namespace osmium {
                     }
                 }
 
-            };
+            }; // class thread_joiner
+
             std::atomic<bool> m_done;
             osmium::thread::Queue<function_wrapper> m_work_queue;
             std::vector<std::thread> m_threads;
             thread_joiner m_joiner;
+            int m_num_threads;
 
             void worker_thread() {
                 while (!m_done) {
@@ -89,15 +91,15 @@ namespace osmium {
                 }
             }
 
-            Pool() :
+            Pool(int num_threads) :
                 m_done(false),
                 m_work_queue(),
                 m_threads(),
-                m_joiner(m_threads) {
-                const unsigned int thread_count = 2; //std::thread::hardware_concurrency();
+                m_joiner(m_threads),
+                m_num_threads(num_threads) {
 
                 try {
-                    for (unsigned int i=0; i < thread_count; ++i) {
+                    for (int i=0; i < m_num_threads; ++i) {
                         m_threads.push_back(std::thread(&Pool::worker_thread, this));
                     }
                 } catch (...) {
@@ -108,8 +110,10 @@ namespace osmium {
 
         public:
 
+            static const int default_num_threads = 2; //std::thread::hardware_concurrency();
+
             static Pool& instance() {
-                static Pool pool;
+                static Pool pool(default_num_threads);
                 return pool;
             }
 
@@ -121,7 +125,7 @@ namespace osmium {
                 return m_work_queue.size();
             }
 
-            bool work_queue_empty() const {
+            bool queue_empty() const {
                 return m_work_queue.empty();
             }
 
@@ -131,10 +135,10 @@ namespace osmium {
                 typedef typename std::result_of<TFunction()>::type result_type;
 
                 std::packaged_task<result_type()> task(std::move(f));
-                std::future<result_type> result(task.get_future());
+                std::future<result_type> future_result(task.get_future());
                 m_work_queue.push(std::move(task));
 
-                return result;
+                return future_result;
             }
 
         }; // class Pool
