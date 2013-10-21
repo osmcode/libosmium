@@ -341,7 +341,7 @@ namespace osmium {
 
         }; // class PBFPrimitiveBlockParser
 
-        typedef osmium::thread::SortedQueue<osmium::memory::Buffer> queue_type;
+        typedef osmium::thread::Queue<std::future<osmium::memory::Buffer>> queue_type;
 
         template <class TDerived>
         class BlobParser {
@@ -349,14 +349,12 @@ namespace osmium {
         protected:
 
             std::shared_ptr<unsigned char> m_input_buffer;
-            queue_type& m_queue;
             const int m_size;
             const int m_blob_num;
             const int m_fd;
 
-            BlobParser(queue_type& queue, const int size, const int blob_num, const int fd) :
+            BlobParser(const int size, const int blob_num, const int fd) :
                 m_input_buffer(new unsigned char[size], [](unsigned char* ptr) { delete[] ptr; }),
-                m_queue(queue),
                 m_size(size),
                 m_blob_num(blob_num),
                 m_fd(fd) {
@@ -373,7 +371,7 @@ namespace osmium {
 
         public:
 
-            void operator()() {
+            void doit() {
                 OSMPBF::Blob pbf_blob;
                 if (!pbf_blob.ParseFromArray(m_input_buffer.get(), m_size)) {
                     throw std::runtime_error("failed to parse blob");
@@ -391,6 +389,29 @@ namespace osmium {
                     }
                     static_cast<TDerived*>(this)->handle_blob(unpack_buffer.get(), raw_size);
                     return;
+                } else if (pbf_blob.has_lzma_data()) {
+                    throw std::runtime_error("lzma blobs not implemented");
+                } else {
+                    throw std::runtime_error("Blob contains no data");
+                }
+            }
+
+            osmium::memory::Buffer operator()() {
+                OSMPBF::Blob pbf_blob;
+                if (!pbf_blob.ParseFromArray(m_input_buffer.get(), m_size)) {
+                    throw std::runtime_error("failed to parse blob");
+                }
+
+                if (pbf_blob.has_raw()) {
+                    return static_cast<TDerived*>(this)->handle_blob(pbf_blob.raw().data(), pbf_blob.raw().size());
+                } else if (pbf_blob.has_zlib_data()) {
+                    unsigned long raw_size = pbf_blob.raw_size();
+                    assert(raw_size <= static_cast<unsigned long>(OSMPBF::max_uncompressed_blob_size));
+                    std::unique_ptr<unsigned char[]> unpack_buffer(new unsigned char[raw_size]);
+                    if (uncompress(unpack_buffer.get(), &raw_size, reinterpret_cast<const unsigned char*>(pbf_blob.zlib_data().data()), pbf_blob.zlib_data().size()) != Z_OK || pbf_blob.raw_size() != static_cast<long>(raw_size)) {
+                        throw std::runtime_error("zlib error");
+                    }
+                    return static_cast<TDerived*>(this)->handle_blob(unpack_buffer.get(), raw_size);
                 } else if (pbf_blob.has_lzma_data()) {
                     throw std::runtime_error("lzma blobs not implemented");
                 } else {
@@ -444,8 +465,8 @@ namespace osmium {
 
             friend class BlobParser;
 
-            HeaderBlobParser(queue_type& queue, const int size, const int fd, osmium::io::Header& header) :
-                BlobParser(queue, size, 0, fd),
+            HeaderBlobParser(const int size, const int fd, osmium::io::Header& header) :
+                BlobParser(size, 0, fd),
                 m_header(header) {
             }
 
@@ -455,18 +476,17 @@ namespace osmium {
 
             osmium::item_flags_type m_read_types;
 
-            void handle_blob(const void* data, const size_t size) {
+            osmium::memory::Buffer handle_blob(const void* data, const size_t size) {
                 PBFPrimitiveBlockParser parser(data, size, m_read_types);
-                osmium::memory::Buffer buffer = parser();
-                m_queue.push(std::move(buffer), m_blob_num);
+                return std::move(parser());
             }
 
         public:
 
             friend class BlobParser;
 
-            DataBlobParser(queue_type& queue, const int size, const int blob_num, const int fd, osmium::item_flags_type read_types) :
-                BlobParser(queue, size, blob_num, fd),
+            DataBlobParser(const int size, const int blob_num, const int fd, osmium::item_flags_type read_types) :
+                BlobParser(size, blob_num, fd),
                 m_read_types(read_types) {
             }
 
@@ -482,7 +502,6 @@ namespace osmium {
             const size_t m_max_work_queue_size;
             const size_t m_max_buffer_queue_size;
             std::atomic<bool> m_done;
-            std::atomic<int> m_pending_jobs;
             std::thread m_reader;
             OSMPBF::BlobHeader m_blob_header;
 
@@ -526,15 +545,14 @@ namespace osmium {
             void parse_osm_data(osmium::item_flags_type read_types) {
                 int n=0;
                 while (size_t size = read_blob_header(fd(), "OSMData")) {
-                    DataBlobParser data_blob_parser(m_queue, size, n, fd(), read_types);
+                    DataBlobParser data_blob_parser(size, n, fd(), read_types);
 
-                    ++m_pending_jobs;
                     if (m_num_threads == 0) {
                         // if there are no threads in the thread pool, we parse in this thread
                         data_blob_parser();
                     } else {
                         // otherwise we submit the parser to the work queue
-                        osmium::thread::Pool::instance().submit(data_blob_parser);
+                        m_queue.push(osmium::thread::Pool::instance().submit(data_blob_parser));
 
                         // if the work queue is getting too large, wait for a while
                         while (!m_done && osmium::thread::Pool::instance().queue_size() >= m_max_work_queue_size) {
@@ -568,8 +586,7 @@ namespace osmium {
                 m_queue(),
                 m_max_work_queue_size(num_threads * 4),
                 m_max_buffer_queue_size(10 + num_threads * 10),
-                m_done(false),
-                m_pending_jobs(0) {
+                m_done(false) {
                 GOOGLE_PROTOBUF_VERIFY_VERSION;
             }
 
@@ -589,8 +606,8 @@ namespace osmium {
                 size_t size = read_blob_header(fd(), "OSMHeader");
 
                 {
-                    HeaderBlobParser header_blob_parser(m_queue, size, fd(), header());
-                    header_blob_parser();
+                    HeaderBlobParser header_blob_parser(size, fd(), header());
+                    header_blob_parser.doit();
                 }
 
                 if (read_types != osmium::item_flags_type::nothing) {
@@ -606,14 +623,14 @@ namespace osmium {
              * Returns an empty buffer at end of input.
              */
             osmium::memory::Buffer next_buffer() override {
-                osmium::memory::Buffer buffer;
+                std::future<osmium::memory::Buffer> buffer_future;
 
-                if (!m_done || m_pending_jobs != 0) {
-                    m_queue.wait_and_pop(buffer);
-                    --m_pending_jobs;
+                if (!m_done || !m_queue.empty()) {
+                    m_queue.wait_and_pop(buffer_future);
+                    return std::move(buffer_future.get());
                 }
 
-                return buffer;
+                return osmium::memory::Buffer();
             }
 
         }; // class PBFInput
