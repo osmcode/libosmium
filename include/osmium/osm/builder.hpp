@@ -103,14 +103,11 @@ namespace osmium {
         class RelationMemberListBuilder : public osmium::memory::ObjectBuilder<RelationMemberList> {
 
             void add_role(osmium::RelationMember* member, const char* str) {
+                append(str);
                 string_size_type len = std::strlen(str) + 1;
                 member->set_role_size(len);
-                append(str);
                 add_size(len);
-
                 add_padding(true);
-
-                assert(m_buffer.is_aligned());
             }
 
         public:

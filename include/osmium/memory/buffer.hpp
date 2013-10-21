@@ -340,6 +340,10 @@ namespace osmium {
                 return *reinterpret_cast<T*>(ptr);
             }
 
+            /**
+             * Add an item to the buffer. This function is provided so that
+             * you can use std::back_inserter.
+             */
             template <class T>
             void push_back(const T& item) {
                 add_item(item);

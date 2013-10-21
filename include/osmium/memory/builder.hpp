@@ -45,12 +45,7 @@ namespace osmium {
 
         class Builder {
 
-        protected:
-
             Buffer& m_buffer;
-
-        private:
-
             Builder* m_parent;
             size_t m_item_offset;
 
@@ -159,14 +154,11 @@ namespace osmium {
             }
 
             void add_user(const char* str) {
+                append(str);
                 string_size_type len = std::strlen(str) + 1;
                 object().user_size(len);
-                append(str);
                 add_size(len);
-
                 add_padding(true);
-
-                assert(m_buffer.is_aligned());
             }
 
         }; // class ObjectBuilder
