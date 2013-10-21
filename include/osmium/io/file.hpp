@@ -394,7 +394,7 @@ namespace osmium {
                     m_type     = osmium::io::FileType::Change();
                     m_encoding = osmium::io::Encoding::XMLgz();
                 } else {
-                    default_settings_for_file();
+                    throw ArgumentError("Unknown OSM file type or encoding", suffix);
                 }
             }
 
