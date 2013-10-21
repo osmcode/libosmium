@@ -112,17 +112,13 @@ namespace osmium {
                 add_padding();
             }
 
-            void add_string(osmium::RelationMember* member, const char* str) {
+            void add_role(osmium::RelationMember* member, const char* str) {
                 string_size_type len = std::strlen(str) + 1;
                 member->set_role_size(len);
                 append(str);
                 add_size(len);
 
-                size_t padding = osmium::memory::align_bytes - ((sizeof(osmium::RelationMember) + len) % osmium::memory::align_bytes);
-                if (padding != osmium::memory::align_bytes) {
-                    std::memset(m_buffer.reserve_space(padding), 0, padding);
-                    add_size(padding);
-                }
+                add_padding_for(sizeof(osmium::RelationMember) + len);
 
                 assert(m_buffer.is_aligned());
             }
@@ -131,7 +127,7 @@ namespace osmium {
                 osmium::RelationMember* member = reserve_space_for<osmium::RelationMember>();
                 new (member) osmium::RelationMember(ref, type, full_member != nullptr);
                 add_size(sizeof(RelationMember));
-                add_string(member, role);
+                add_role(member, role);
                 if (full_member) {
                     add_item(full_member);
                 }

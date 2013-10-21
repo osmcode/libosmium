@@ -95,6 +95,22 @@ namespace osmium {
                 }
             }
 
+            /**
+             * Add padding to buffer (if needed) to align data of given size
+             * properly.
+             *
+             * @returns number of padding bytes that were added to buffer.
+             */
+            size_t add_padding_for(size_t size) {
+                size_t padding = align_bytes - (size % align_bytes);
+                if (padding != align_bytes) {
+                    std::memset(m_buffer.reserve_space(padding), 0, padding);
+                    add_size(padding);
+                    return padding;
+                }
+                return 0;
+            }
+
         public:
 
             void add_size(uint32_t size) {
@@ -154,11 +170,7 @@ namespace osmium {
                 append(str);
                 add_size(len);
 
-                size_t padding = align_bytes - ((object().sizeof_object() + len) % align_bytes);
-                if (padding != align_bytes) {
-                    std::memset(m_buffer.reserve_space(padding), 0, padding);
-                    add_size(padding);
-                }
+                add_padding_for(object().sizeof_object() + len);
 
                 assert(m_buffer.is_aligned());
             }
