@@ -61,6 +61,10 @@ namespace osmium {
         user_id_type        m_uid;
         changeset_id_type   m_changeset;
 
+        size_t sizeof_object() const {
+            return sizeof(Object) + (type() == item_type::node ? sizeof(osmium::Location) : 0) + sizeof(string_size_type);
+        }
+
         unsigned char* user_position() {
             return data() + sizeof_object() - sizeof(string_size_type);
         }
@@ -122,10 +126,6 @@ namespace osmium {
         }
 
     public:
-
-        size_t sizeof_object() const {
-            return sizeof(Object) + (type() == item_type::node ? sizeof(osmium::Location) : 0) + sizeof(string_size_type);
-        }
 
         /// Get ID of this object.
         object_id_type id() const {
