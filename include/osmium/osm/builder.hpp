@@ -102,16 +102,6 @@ namespace osmium {
 
         class RelationMemberListBuilder : public osmium::memory::ObjectBuilder<RelationMemberList> {
 
-        public:
-
-            RelationMemberListBuilder(osmium::memory::Buffer& buffer, Builder* parent=nullptr) :
-                osmium::memory::ObjectBuilder<RelationMemberList>(buffer, parent) {
-            }
-
-            ~RelationMemberListBuilder() {
-                add_padding();
-            }
-
             void add_role(osmium::RelationMember* member, const char* str) {
                 string_size_type len = std::strlen(str) + 1;
                 member->set_role_size(len);
@@ -121,6 +111,16 @@ namespace osmium {
                 add_padding(true);
 
                 assert(m_buffer.is_aligned());
+            }
+
+        public:
+
+            RelationMemberListBuilder(osmium::memory::Buffer& buffer, Builder* parent=nullptr) :
+                osmium::memory::ObjectBuilder<RelationMemberList>(buffer, parent) {
+            }
+
+            ~RelationMemberListBuilder() {
+                add_padding();
             }
 
             void add_member(osmium::item_type type, object_id_type ref, const char* role, const osmium::Object* full_member = nullptr) {
