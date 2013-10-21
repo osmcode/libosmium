@@ -497,7 +497,7 @@ namespace osmium {
          */
         class PBFInput : public osmium::io::Input {
 
-            const int m_num_threads;
+            bool m_use_thread_pool;
             queue_type m_queue;
             const size_t m_max_work_queue_size;
             const size_t m_max_buffer_queue_size;
@@ -547,17 +547,17 @@ namespace osmium {
                 while (size_t size = read_blob_header(fd(), "OSMData")) {
                     DataBlobParser data_blob_parser(size, n, fd(), read_types);
 
-                    if (m_num_threads == 0) {
-                        // if there are no threads in the thread pool, we parse in this thread
-                        data_blob_parser();
-                    } else {
-                        // otherwise we submit the parser to the work queue
+                    if (m_use_thread_pool) {
                         m_queue.push(osmium::thread::Pool::instance().submit(data_blob_parser));
 
                         // if the work queue is getting too large, wait for a while
                         while (!m_done && osmium::thread::Pool::instance().queue_size() >= m_max_work_queue_size) {
                             std::this_thread::sleep_for(std::chrono::milliseconds(10));
                         }
+                    } else {
+                        std::promise<osmium::memory::Buffer> promise;
+                        m_queue.push(promise.get_future());
+                        promise.set_value(data_blob_parser());
                     }
                     ++n;
 
@@ -580,12 +580,12 @@ namespace osmium {
              *
              * @param file osmium::io::File instance.
              */
-            PBFInput(const osmium::io::File& file, const int num_threads=2) :
+            PBFInput(const osmium::io::File& file, bool use_thread_pool=true) :
                 osmium::io::Input(file),
-                m_num_threads(num_threads),
+                m_use_thread_pool(use_thread_pool),
                 m_queue(),
-                m_max_work_queue_size(num_threads * 4),
-                m_max_buffer_queue_size(10 + num_threads * 10),
+                m_max_work_queue_size(10), // XXX tune these settings
+                m_max_buffer_queue_size(20), // XXX tune these settings
                 m_done(false) {
                 GOOGLE_PROTOBUF_VERIFY_VERSION;
             }
