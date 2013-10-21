@@ -16,7 +16,7 @@ inline void add_tags(osmium::memory::Buffer& buffer, osmium::memory::Builder& bu
 
 inline osmium::Node& buffer_add_node(osmium::memory::Buffer& buffer, const char* user, const std::vector<std::pair<const char*, const char*>>& tags, const osmium::Location& location) {
     osmium::osm::NodeBuilder builder(buffer);
-    builder.add_string(user);
+    builder.add_user(user);
     add_tags(buffer, builder, tags);
     buffer.commit();
     return builder.object().location(location);
@@ -24,7 +24,7 @@ inline osmium::Node& buffer_add_node(osmium::memory::Buffer& buffer, const char*
 
 inline osmium::Way& buffer_add_way(osmium::memory::Buffer& buffer, const char* user, const std::vector<std::pair<const char*, const char*>>& tags, const std::vector<osmium::object_id_type>& nodes) {
     osmium::osm::WayBuilder builder(buffer);
-    builder.add_string(user);
+    builder.add_user(user);
     add_tags(buffer, builder, tags);
     osmium::osm::WayNodeListBuilder wnl_builder(buffer, &builder);
     for (const osmium::object_id_type ref : nodes) {
@@ -36,7 +36,7 @@ inline osmium::Way& buffer_add_way(osmium::memory::Buffer& buffer, const char* u
 
 inline osmium::Way& buffer_add_way(osmium::memory::Buffer& buffer, const char* user, const std::vector<std::pair<const char*, const char*>>& tags, const std::vector<std::pair<osmium::object_id_type, osmium::Location>>& nodes) {
     osmium::osm::WayBuilder builder(buffer);
-    builder.add_string(user);
+    builder.add_user(user);
     add_tags(buffer, builder, tags);
     osmium::osm::WayNodeListBuilder wnl_builder(buffer, &builder);
     for (auto& p : nodes) {
@@ -51,7 +51,7 @@ inline osmium::Relation& buffer_add_relation(
         const char* user,
         const std::vector<std::pair<const char*, const char*>>& tags, const std::vector<std::tuple<char, osmium::object_id_type, const char*>>& members) {
     osmium::osm::RelationBuilder builder(buffer);
-    builder.add_string(user);
+    builder.add_user(user);
     add_tags(buffer, builder, tags);
     osmium::osm::RelationMemberListBuilder rml_builder(buffer, &builder);
     for (const auto& member : members) {

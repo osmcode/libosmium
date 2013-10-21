@@ -228,7 +228,7 @@ namespace osmium {
                     } else if (!strcmp(attrs[count], "max_lat")) {
                         max.lat(atof(attrs[count+1]));
                     } else if (!strcmp(attrs[count], "user")) {
-                        builder->add_string(attrs[count+1]);
+                        builder->add_user(attrs[count+1]);
                         user_set = true;
                     } else {
                         changeset.set_attribute(attrs[count], attrs[count+1]);
@@ -239,7 +239,7 @@ namespace osmium {
                 changeset.bounds().extend(max);
 
                 if (!user_set) {
-                    builder->add_string("");
+                    builder->add_user("");
                 }
             }
 
@@ -301,7 +301,7 @@ namespace osmium {
                                 }
                                 if (m_read_types & osmium::item_flags_type::node) {
                                     m_node_builder = std::unique_ptr<osmium::osm::NodeBuilder>(new osmium::osm::NodeBuilder(m_buffer));
-                                    m_node_builder->add_string(init_object(m_node_builder->object(), attrs));
+                                    m_node_builder->add_user(init_object(m_node_builder->object(), attrs));
                                     m_context = context::node;
                                 } else {
                                     m_context = context::ignored_node;
@@ -312,7 +312,7 @@ namespace osmium {
                                 }
                                 if (m_read_types & osmium::item_flags_type::way) {
                                     m_way_builder = std::unique_ptr<osmium::osm::WayBuilder>(new osmium::osm::WayBuilder(m_buffer));
-                                    m_way_builder->add_string(init_object(m_way_builder->object(), attrs));
+                                    m_way_builder->add_user(init_object(m_way_builder->object(), attrs));
                                     m_context = context::way;
                                 } else {
                                     m_context = context::ignored_way;
@@ -323,7 +323,7 @@ namespace osmium {
                                 }
                                 if (m_read_types & osmium::item_flags_type::relation) {
                                     m_relation_builder = std::unique_ptr<osmium::osm::RelationBuilder>(new osmium::osm::RelationBuilder(m_buffer));
-                                    m_relation_builder->add_string(init_object(m_relation_builder->object(), attrs));
+                                    m_relation_builder->add_user(init_object(m_relation_builder->object(), attrs));
                                     m_context = context::relation;
                                 } else {
                                     m_context = context::ignored_relation;

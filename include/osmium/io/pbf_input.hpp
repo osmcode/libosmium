@@ -145,9 +145,9 @@ namespace osmium {
                         } else {
                             node.visible(true);
                         }
-                        builder.add_string(m_stringtable->s(pbf_node.info().user_sid()).data());
+                        builder.add_user(m_stringtable->s(pbf_node.info().user_sid()).data());
                     } else {
-                        builder.add_string("");
+                        builder.add_user("");
                     }
 
                     if (node.visible()) {
@@ -186,9 +186,9 @@ namespace osmium {
                         } else {
                             way.visible(true);
                         }
-                        builder.add_string(m_stringtable->s(pbf_way.info().user_sid()).data());
+                        builder.add_user(m_stringtable->s(pbf_way.info().user_sid()).data());
                     } else {
-                        builder.add_string("");
+                        builder.add_user("");
                     }
 
                     if (pbf_way.refs_size() > 0) {
@@ -230,9 +230,9 @@ namespace osmium {
                         } else {
                             relation.visible(true);
                         }
-                        builder.add_string(m_stringtable->s(pbf_relation.info().user_sid()).data());
+                        builder.add_user(m_stringtable->s(pbf_relation.info().user_sid()).data());
                     } else {
-                        builder.add_string("");
+                        builder.add_user("");
                     }
 
                     if (pbf_relation.types_size() > 0) {
@@ -323,9 +323,9 @@ namespace osmium {
                         node.timestamp(last_dense_timestamp * m_date_factor);
                         node.uid_from_signed(last_dense_uid);
                         node.visible(visible);
-                        builder.add_string(m_stringtable->s(last_dense_user_sid).data());
+                        builder.add_user(m_stringtable->s(last_dense_user_sid).data());
                     } else {
-                        builder.add_string("");
+                        builder.add_user("");
                     }
 
                     if (node.visible()) {

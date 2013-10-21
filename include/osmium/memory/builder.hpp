@@ -158,7 +158,7 @@ namespace osmium {
                 return static_cast<T&>(item());
             }
 
-            void add_string(const char* str) {
+            void add_user(const char* str) {
                 string_size_type len = std::strlen(str) + 1;
                 object().user_size(len);
                 append(str);

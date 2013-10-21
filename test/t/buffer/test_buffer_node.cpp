@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE(buffer_node) {
         node.timestamp(123);
         node.location(osmium::Location(3.5, 4.7));
 
-        node_builder.add_string("testuser");
+        node_builder.add_user("testuser");
 
         buffer.commit();
     }
@@ -101,7 +101,7 @@ BOOST_AUTO_TEST_CASE(buffer_node) {
         node.timestamp(123);
         node.location(osmium::Location(3.5, 4.7));
 
-        node_builder.add_string("testuser");
+        node_builder.add_user("testuser");
 
         {
             osmium::osm::TagListBuilder tag_builder(buffer, &node_builder);

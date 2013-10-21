@@ -16,14 +16,14 @@ BOOST_AUTO_TEST_CASE(order) {
     {
         // add node 1
         osmium::osm::NodeBuilder node_builder(buffer);
-        node_builder.add_string("testuser");
+        node_builder.add_user("testuser");
         buffer.commit();
     }
 
     {
         // add node 2
         osmium::osm::NodeBuilder node_builder(buffer);
-        node_builder.add_string("testuser");
+        node_builder.add_user("testuser");
         buffer.commit();
     }
 
@@ -62,7 +62,7 @@ BOOST_AUTO_TEST_CASE(order_types) {
 
         node.id(3);
         node.version(3);
-        node_builder.add_string("testuser");
+        node_builder.add_user("testuser");
 
         buffer.commit();
     }
@@ -75,7 +75,7 @@ BOOST_AUTO_TEST_CASE(order_types) {
 
         node.id(3);
         node.version(4);
-        node_builder.add_string("testuser");
+        node_builder.add_user("testuser");
 
         buffer.commit();
     }
@@ -88,7 +88,7 @@ BOOST_AUTO_TEST_CASE(order_types) {
 
         node.id(3);
         node.version(4);
-        node_builder.add_string("testuser");
+        node_builder.add_user("testuser");
 
         buffer.commit();
     }
@@ -101,7 +101,7 @@ BOOST_AUTO_TEST_CASE(order_types) {
 
         way.id(2);
         way.version(2);
-        way_builder.add_string("testuser");
+        way_builder.add_user("testuser");
 
         buffer.commit();
     }
@@ -114,7 +114,7 @@ BOOST_AUTO_TEST_CASE(order_types) {
 
         relation.id(1);
         relation.version(1);
-        relation_builder.add_string("testuser");
+        relation_builder.add_user("testuser");
 
         buffer.commit();
     }
