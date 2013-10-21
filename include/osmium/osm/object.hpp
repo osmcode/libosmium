@@ -61,28 +61,24 @@ namespace osmium {
         user_id_type        m_uid;
         changeset_id_type   m_changeset;
 
-        size_t sizeof_object() const {
-            return sizeof(Object) + (type() == item_type::node ? sizeof(osmium::Location) : 0);
-        }
-
         unsigned char* user_position() {
-            return data() + sizeof_object();
+            return data() + sizeof_object() - sizeof(string_size_type);
         }
 
         const unsigned char* user_position() const {
-            return data() + sizeof_object();
+            return data() + sizeof_object() - sizeof(string_size_type);
         }
 
-        string_size_type user_length() const {
+        string_size_type user_size() const {
             return *reinterpret_cast<const string_size_type*>(user_position());
         }
 
         unsigned char* subitems_position() {
-            return user_position() + osmium::memory::padded_length(sizeof(string_size_type) + user_length());
+            return data() + osmium::memory::padded_length(sizeof_object() + user_size());
         }
 
         const unsigned char* subitems_position() const {
-            return user_position() + osmium::memory::padded_length(sizeof(string_size_type) + user_length());
+            return data() + osmium::memory::padded_length(sizeof_object() + user_size());
         }
 
     protected:
@@ -95,6 +91,10 @@ namespace osmium {
             m_timestamp(),
             m_uid(0),
             m_changeset(0) {
+        }
+
+        void user_size(string_size_type size) {
+            *reinterpret_cast<string_size_type*>(user_position()) = size;
         }
 
         template <class T>
@@ -122,6 +122,10 @@ namespace osmium {
         }
 
     public:
+
+        size_t sizeof_object() const {
+            return sizeof(Object) + (type() == item_type::node ? sizeof(osmium::Location) : 0) + sizeof(string_size_type);
+        }
 
         /// Get ID of this object.
         object_id_type id() const {
@@ -305,7 +309,7 @@ namespace osmium {
 
         /// Get user name for this object.
         const char* user() const {
-            return reinterpret_cast<const char*>(data() + sizeof_object() + sizeof(string_size_type));
+            return reinterpret_cast<const char*>(data() + sizeof_object());
         }
 
         /// Get the list of tags for this object.

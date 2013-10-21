@@ -40,9 +40,23 @@ namespace osmium {
 
     namespace osm {
 
-        typedef osmium::memory::ObjectBuilder<osmium::Node> NodeBuilder;
-        typedef osmium::memory::ObjectBuilder<osmium::Way> WayBuilder;
-        typedef osmium::memory::ObjectBuilder<osmium::Relation> RelationBuilder;
+        template <class T>
+        class OSMObjectBuilder : public osmium::memory::ObjectBuilder<T> {
+
+        public:
+
+            OSMObjectBuilder(osmium::memory::Buffer& buffer, osmium::memory::Builder* parent=nullptr) :
+                osmium::memory::ObjectBuilder<T>(buffer, parent) {
+                static_cast<osmium::memory::Builder*>(this)->reserve_space_for<string_size_type>();
+                static_cast<osmium::memory::Builder*>(this)->add_size(sizeof(string_size_type));
+            }
+
+        }; // class OSMObjectBuilder
+
+        typedef OSMObjectBuilder<osmium::Node> NodeBuilder;
+        typedef OSMObjectBuilder<osmium::Way> WayBuilder;
+        typedef OSMObjectBuilder<osmium::Relation> RelationBuilder;
+
         typedef osmium::memory::ObjectBuilder<osmium::Changeset> ChangesetBuilder;
 
         class TagListBuilder : public osmium::memory::ObjectBuilder<TagList> {
@@ -98,10 +112,26 @@ namespace osmium {
                 add_padding();
             }
 
+            void add_string(osmium::RelationMember* member, const char* str) {
+                string_size_type len = std::strlen(str) + 1;
+                member->set_role_size(len);
+                append(str);
+                add_size(len);
+
+                size_t padding = osmium::memory::align_bytes - ((sizeof(osmium::RelationMember) + len) % osmium::memory::align_bytes);
+                if (padding != osmium::memory::align_bytes) {
+                    std::memset(m_buffer.reserve_space(padding), 0, padding);
+                    add_size(padding);
+                }
+
+                assert(m_buffer.is_aligned());
+            }
+
             void add_member(osmium::item_type type, object_id_type ref, const char* role, const osmium::Object* full_member = nullptr) {
-                new (reserve_space_for<osmium::RelationMember>()) osmium::RelationMember(ref, type, full_member != nullptr);
+                osmium::RelationMember* member = reserve_space_for<osmium::RelationMember>();
+                new (member) osmium::RelationMember(ref, type, full_member != nullptr);
                 add_size(sizeof(RelationMember));
-                add_string(role);
+                add_string(member, role);
                 if (full_member) {
                     add_item(full_member);
                 }

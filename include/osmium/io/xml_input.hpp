@@ -191,8 +191,10 @@ namespace osmium {
                 static_cast<XMLParser*>(data)->end_element(element);
             }
 
-            void init_object(osmium::memory::Builder* builder, osmium::Object& object, const XML_Char** attrs) {
-                bool user_set = false;
+            const char* init_object(osmium::Object& object, const XML_Char** attrs) {
+                static const char* empty = "";
+                const char* user = empty;
+
                 if (m_in_delete_section) {
                     object.visible(false);
                 }
@@ -202,19 +204,16 @@ namespace osmium {
                     } else if (!strcmp(attrs[count], "lat")) {
                         static_cast<osmium::Node&>(object).lat(atof(attrs[count+1])); // XXX
                     } else if (!strcmp(attrs[count], "user")) {
-                        builder->add_string(attrs[count+1]);
-                        user_set = true;
+                        user = attrs[count+1];
                     } else {
                         object.set_attribute(attrs[count], attrs[count+1]);
                     }
                 }
 
-                if (!user_set) {
-                    builder->add_string("");
-                }
+                return user;
             }
 
-            void init_changeset(osmium::memory::Builder* builder, osmium::Changeset& changeset, const XML_Char** attrs) {
+            void init_changeset(osmium::osm::ChangesetBuilder* builder, osmium::Changeset& changeset, const XML_Char** attrs) {
                 bool user_set = false;
 
                 osmium::Location min {};
@@ -302,7 +301,7 @@ namespace osmium {
                                 }
                                 if (m_read_types & osmium::item_flags_type::node) {
                                     m_node_builder = std::unique_ptr<osmium::osm::NodeBuilder>(new osmium::osm::NodeBuilder(m_buffer));
-                                    init_object(m_node_builder.get(), m_node_builder->object(), attrs);
+                                    m_node_builder->add_string(init_object(m_node_builder->object(), attrs));
                                     m_context = context::node;
                                 } else {
                                     m_context = context::ignored_node;
@@ -313,7 +312,7 @@ namespace osmium {
                                 }
                                 if (m_read_types & osmium::item_flags_type::way) {
                                     m_way_builder = std::unique_ptr<osmium::osm::WayBuilder>(new osmium::osm::WayBuilder(m_buffer));
-                                    init_object(m_way_builder.get(), m_way_builder->object(), attrs);
+                                    m_way_builder->add_string(init_object(m_way_builder->object(), attrs));
                                     m_context = context::way;
                                 } else {
                                     m_context = context::ignored_way;
@@ -324,7 +323,7 @@ namespace osmium {
                                 }
                                 if (m_read_types & osmium::item_flags_type::relation) {
                                     m_relation_builder = std::unique_ptr<osmium::osm::RelationBuilder>(new osmium::osm::RelationBuilder(m_buffer));
-                                    init_object(m_relation_builder.get(), m_relation_builder->object(), attrs);
+                                    m_relation_builder->add_string(init_object(m_relation_builder->object(), attrs));
                                     m_context = context::relation;
                                 } else {
                                     m_context = context::ignored_relation;

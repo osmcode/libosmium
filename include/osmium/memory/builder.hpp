@@ -45,7 +45,12 @@ namespace osmium {
 
         class Builder {
 
+        protected:
+
             Buffer& m_buffer;
+
+        private:
+
             Builder* m_parent;
             size_t m_item_offset;
 
@@ -74,13 +79,6 @@ namespace osmium {
                 return *reinterpret_cast<Item*>(m_buffer.data() + m_item_offset);
             }
 
-            void add_size(uint32_t size) {
-                item().add_size(size);
-                if (m_parent) {
-                    m_parent->add_size(size);
-                }
-            }
-
             /**
              * Add padding if needed.
              *
@@ -98,6 +96,13 @@ namespace osmium {
             }
 
         public:
+
+            void add_size(uint32_t size) {
+                item().add_size(size);
+                if (m_parent) {
+                    m_parent->add_size(size);
+                }
+            }
 
             uint32_t size() const {
                 return item().byte_size();
@@ -127,20 +132,6 @@ namespace osmium {
                 return length;
             }
 
-            void add_string(const char* str) {
-                string_size_type len = std::strlen(str) + 1;
-                *reserve_space_for<string_size_type>() = len;
-                append(str);
-                add_size(sizeof(string_size_type) + len);
-
-                size_t padding = align_bytes - ((sizeof(string_size_type) + len) % align_bytes);
-                if (padding != align_bytes) {
-                    std::memset(m_buffer.reserve_space(padding), 0, padding);
-                    add_size(padding);
-                }
-                assert(m_buffer.is_aligned());
-            }
-
         }; // Builder
 
         template <class T>
@@ -155,6 +146,21 @@ namespace osmium {
 
             T& object() {
                 return static_cast<T&>(item());
+            }
+
+            void add_string(const char* str) {
+                string_size_type len = std::strlen(str) + 1;
+                object().user_size(len);
+                append(str);
+                add_size(len);
+
+                size_t padding = align_bytes - ((object().sizeof_object() + len) % align_bytes);
+                if (padding != align_bytes) {
+                    std::memset(m_buffer.reserve_space(padding), 0, padding);
+                    add_size(padding);
+                }
+
+                assert(m_buffer.is_aligned());
             }
 
         }; // class ObjectBuilder

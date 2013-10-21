@@ -39,11 +39,20 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
+    namespace osm {
+
+        class RelationMemberListBuilder;
+
+    } // namespace osm
+
     class RelationMember : public osmium::memory::detail::ItemHelper {
 
-        object_id_type m_ref;
-        item_type m_type;
-        uint32_t m_flags;
+        friend class osmium::osm::RelationMemberListBuilder;
+
+        object_id_type   m_ref;
+        item_type        m_type;
+        uint32_t         m_flags;
+        string_size_type m_role_size;
 
         RelationMember(const RelationMember&) = delete;
         RelationMember(RelationMember&&) = delete;
@@ -51,24 +60,12 @@ namespace osmium {
         RelationMember& operator=(const RelationMember&) = delete;
         RelationMember& operator=(RelationMember&&) = delete;
 
-        unsigned char* role_position() {
-            return data() + sizeof(RelationMember);
-        }
-
-        const unsigned char* role_position() const {
-            return data() + sizeof(RelationMember);
-        }
-
-        string_size_type role_length() const {
-            return *reinterpret_cast<const string_size_type*>(role_position());
-        }
-
         unsigned char* endpos() {
-            return role_position() + osmium::memory::padded_length(sizeof(string_size_type) + role_length());
+            return data() + osmium::memory::padded_length(sizeof(RelationMember) + m_role_size);
         }
 
         const unsigned char* endpos() const {
-            return role_position() + osmium::memory::padded_length(sizeof(string_size_type) + role_length());
+            return data() + osmium::memory::padded_length(sizeof(RelationMember) + m_role_size);
         }
 
         template <class TMember>
@@ -88,6 +85,10 @@ namespace osmium {
             } else {
                 return endpos();
             }
+        }
+
+        void set_role_size(string_size_type size) {
+            m_role_size = size;
         }
 
     public:
@@ -117,7 +118,7 @@ namespace osmium {
         }
 
         const char* role() const {
-            return reinterpret_cast<const char*>(role_position() + sizeof(string_size_type));
+            return reinterpret_cast<const char*>(data() + sizeof(RelationMember));
         }
 
         Object& get_object() {

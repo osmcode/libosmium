@@ -15,14 +15,14 @@ BOOST_AUTO_TEST_CASE(order) {
 
     {
         // add node 1
-        osmium::memory::ObjectBuilder<osmium::Node> node_builder(buffer);
+        osmium::osm::NodeBuilder node_builder(buffer);
         node_builder.add_string("testuser");
         buffer.commit();
     }
 
     {
         // add node 2
-        osmium::memory::ObjectBuilder<osmium::Node> node_builder(buffer);
+        osmium::osm::NodeBuilder node_builder(buffer);
         node_builder.add_string("testuser");
         buffer.commit();
     }
@@ -56,7 +56,7 @@ BOOST_AUTO_TEST_CASE(order_types) {
 
     {
         // add node 1
-        osmium::memory::ObjectBuilder<osmium::Node> node_builder(buffer);
+        osmium::osm::NodeBuilder node_builder(buffer);
         osmium::Node& node = node_builder.object();
         BOOST_CHECK_EQUAL(osmium::item_type::node, node.type());
 
@@ -69,7 +69,7 @@ BOOST_AUTO_TEST_CASE(order_types) {
 
     {
         // add node 2
-        osmium::memory::ObjectBuilder<osmium::Node> node_builder(buffer);
+        osmium::osm::NodeBuilder node_builder(buffer);
         osmium::Node& node = node_builder.object();
         BOOST_CHECK_EQUAL(osmium::item_type::node, node.type());
 
@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE(order_types) {
 
     {
         // add node 3
-        osmium::memory::ObjectBuilder<osmium::Node> node_builder(buffer);
+        osmium::osm::NodeBuilder node_builder(buffer);
         osmium::Node& node = node_builder.object();
         BOOST_CHECK_EQUAL(osmium::item_type::node, node.type());
 
@@ -95,7 +95,7 @@ BOOST_AUTO_TEST_CASE(order_types) {
 
     {
         // add way
-        osmium::memory::ObjectBuilder<osmium::Way> way_builder(buffer);
+        osmium::osm::WayBuilder way_builder(buffer);
         osmium::Way& way = way_builder.object();
         BOOST_CHECK_EQUAL(osmium::item_type::way, way.type());
 
@@ -108,7 +108,7 @@ BOOST_AUTO_TEST_CASE(order_types) {
 
     {
         // add relation
-        osmium::memory::ObjectBuilder<osmium::Relation> relation_builder(buffer);
+        osmium::osm::RelationBuilder relation_builder(buffer);
         osmium::Relation& relation = relation_builder.object();
         BOOST_CHECK_EQUAL(osmium::item_type::relation, relation.type());
 

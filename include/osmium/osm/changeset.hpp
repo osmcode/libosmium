@@ -56,30 +56,22 @@ namespace osmium {
         changeset_id_type m_id {0};
         num_changes_type  m_num_changes {0};
         user_id_type      m_uid {0};
-        uint32_t          m_dummy; // XXX
-
-        unsigned char* user_position() {
-            return data() + sizeof(Changeset);
-        }
-
-        const unsigned char* user_position() const {
-            return data() + sizeof(Changeset);
-        }
-
-        string_size_type user_length() const {
-            return *reinterpret_cast<const string_size_type*>(user_position());
-        }
-
-        unsigned char* subitems_position() {
-            return user_position() + osmium::memory::padded_length(sizeof(string_size_type) + user_length());
-        }
-
-        const unsigned char* subitems_position() const {
-            return user_position() + osmium::memory::padded_length(sizeof(string_size_type) + user_length());
-        }
+        string_size_type  m_user_size;
 
         Changeset() :
             Item(sizeof(Changeset), osmium::item_type::changeset) {
+        }
+
+        void user_size(string_size_type size) {
+            m_user_size = size;
+        }
+
+        unsigned char* subitems_position() {
+            return data() + osmium::memory::padded_length(sizeof(Changeset) + m_user_size);
+        }
+
+        const unsigned char* subitems_position() const {
+            return data() + osmium::memory::padded_length(sizeof(Changeset) + m_user_size);
         }
 
         template <class T>
@@ -107,6 +99,10 @@ namespace osmium {
         }
 
     public:
+
+        size_t sizeof_object() const {
+            return sizeof(Changeset);
+        }
 
         /// Get ID of this changeset
         changeset_id_type id() const noexcept {
@@ -240,7 +236,7 @@ namespace osmium {
 
         /// Get user name.
         const char* user() const {
-            return reinterpret_cast<const char*>(data() + sizeof(Changeset) + sizeof(string_size_type));
+            return reinterpret_cast<const char*>(data() + sizeof(Changeset));
         }
 
         /// Get the list of tags.
@@ -301,8 +297,6 @@ namespace osmium {
         }
 
     }; // Changeset
-
-    static_assert(sizeof(Changeset) % osmium::memory::align_bytes == 0, "Class osmium::Changeset has wrong size to be aligned properly!");
 
 } // namespace osmium
 
