@@ -33,6 +33,7 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <algorithm>
 #include <cmath>
 #include <cstdint>
 #include <limits>
@@ -170,6 +171,38 @@ namespace osmium {
         Location& lat(double lat) noexcept {
             m_y = double_to_fix(lat);
             return *this;
+        }
+
+        static constexpr int coordinate_length =
+            1 + /* sign */
+            3 + /* before . */
+            1 + /* . */
+            7 + /* after . */
+            1; /*  null byte */
+
+        template <typename T>
+        static T coordinate2string(T iterator, double value) {
+            char buffer[coordinate_length];
+
+            int len = snprintf(buffer, coordinate_length, "%.7f", value);
+            while (buffer[len-1] == '0') --len;
+            if (buffer[len-1] == '.') ++len;
+
+            return std::copy_n(buffer, len, iterator);
+        }
+
+        template <typename T>
+        T as_string(T iterator, const char separator) const {
+            if (*this) { // coordinate is defined
+                iterator = coordinate2string(iterator, lon());
+                *iterator++ = separator;
+                return coordinate2string(iterator, lat());
+            } else {
+                static const char undef[] = "undefined";
+                iterator = std::copy_n(undef, sizeof(undef)/sizeof(char) - 1, iterator);
+                *iterator++ = separator;
+                return std::copy_n(undef, sizeof(undef)/sizeof(char) - 1, iterator);
+            }
         }
 
     }; // class Location

@@ -34,6 +34,7 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <cassert>
+#include <iterator>
 #include <string>
 
 #include <osmium/geom/factory.hpp>
@@ -65,9 +66,7 @@ namespace osmium {
 
             point_type make_point(const Location location) {
                 std::string str {"POINT("};
-                str += std::to_string(location.lon());
-                str += ' ';
-                str += std::to_string(location.lat());
+                location.as_string(std::back_inserter(str), ' ');
                 str += ')';
                 return str;
             }
@@ -78,9 +77,7 @@ namespace osmium {
             }
 
             void linestring_add_location(const Location location) {
-                m_str += std::to_string(location.lon());
-                m_str += ' ';
-                m_str += std::to_string(location.lat());
+                location.as_string(std::back_inserter(m_str), ' ');
                 m_str += ',';
                 ++m_points;
             }
