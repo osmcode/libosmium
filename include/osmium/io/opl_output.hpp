@@ -38,6 +38,9 @@ DEALINGS IN THE SOFTWARE.
 
 #include <cstdio>
 
+// UTF8-CPP header-only library
+#include <utf8/unchecked.h>
+
 #include <osmium/io/output.hpp>
 #include <osmium/io/detail/read_write.hpp>
 #include <osmium/handler.hpp>
@@ -176,15 +179,30 @@ namespace osmium {
             }
 
             void append_encoded_string(const std::string& data) {
-                static constexpr char hex[] = "0123456789abcdef";
+                utf8::unchecked::iterator<std::string::const_iterator> it {data.cbegin()};
+                utf8::unchecked::iterator<std::string::const_iterator> end {data.cend()};
 
-                for (char c : data) {
-                    if (isalnum(c) || c == '-' || c == '_' || c == '.' || c == ':' || c == ';') {
-                        m_out += c;
+                for (; it != end; ++it) {
+                    uint32_t c = *it;
+
+                    // This is a list of Unicode code points that we let
+                    // through instead of escaping them. It is incomplete
+                    // and can be extended later.
+                    // Generally we don't want to let through any character
+                    // that has special meaning in the OPL format such as
+                    // space, comma, @, etc. and any non-printing characters.
+                    if ((0x0021 <= c && c <= 0x0024) ||
+                        (0x0026 <= c && c <= 0x002b) ||
+                        (0x002d <= c && c <= 0x003c) ||
+                        (0x003e <= c && c <= 0x003f) ||
+                        (0x0041 <= c && c <= 0x007e) ||
+                        (0x00a1 <= c && c <= 0x00ac) ||
+                        (0x00ae <= c && c <= 0x05ff)) {
+                        utf8::unchecked::append(c, std::back_inserter(m_out));
                     } else {
                         m_out += '%';
-                        m_out += hex[(c & 0xf0) >> 4];
-                        m_out += hex[c & 0x0f];
+                        snprintf(m_tmp_buffer, tmp_buffer_size, "%04x", c);
+                        m_out += m_tmp_buffer;
                     }
                 }
             }

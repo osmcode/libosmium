@@ -77,6 +77,10 @@ OSMPBF (for PBF support)
     https://github.com/scrosby/OSM-binary
     Debian/Ubuntu: libosmpbf-dev
 
+UTF8-CPP (for OPL support)
+    http://utfcpp.sourceforge.net/
+    Debian/Ubuntu: libutfcpp-dev
+
 You need to either install the packages for your distribution or install those
 libraries from source. Most libraries should be available in all distributions.
 

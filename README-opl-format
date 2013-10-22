@@ -66,15 +66,20 @@ T - Tags
 The fields e is empty when the changeset is not closed yet. The fields x, y, X,
 Y can be empty when no bounding box could be derived. The field k can be 0.
 
+
 Escaping
 --------
 
-Characters other than alphanumerics and a few other like ':', and '_' in user
-names, tags, and roles are written as '%xx' with 'xx' being the hexcode of the
-byte. This makes sure that separator characters such as space, comma,
-exclamation mark, and the equals sign never show up in the data, making parsing
-much easier. But this format doesn't know anything about Unicode and it escapes
-far too many characters of non-latin languages. Ideas for improvements welcome.
+User names, tags, and relation member roles can contain any valid Unicode
+character. Any characters that have special meaning in OPL files (' ' (space),
+',' (comma), '=' (equals) and '@') have to be escaped as well as any
+non-printing characters.
+
+Escaped characters are written as '%xxxx', ie a percent sign followed by the
+4-digit hex code of the Unicode code point.
+
+Currently there is a hard-coded list in the code of all the characters that
+don't need escaping. This list is incomplete and subject to change.
 
 
 Format Overview
