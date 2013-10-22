@@ -87,6 +87,7 @@ namespace osmium {
 
             linestring_type linestring_finish() {
                 if (m_points < 2) {
+                    m_str.clear();
                     throw geometry_error("not enough points for linestring");
                 } else {
                     assert(!m_str.empty());

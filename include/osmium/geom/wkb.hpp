@@ -62,6 +62,10 @@ namespace osmium {
                 m_ewkb(ewkb) {
             }
 
+            void set_hex_mode() {
+                m_hex = true;
+            }
+
         private:
 
             /**
@@ -95,12 +99,25 @@ namespace osmium {
             std::string m_data {};
             uint32_t m_points {0};
             bool m_ewkb;
+            bool m_hex {false};
 
             template <typename T>
             void str_push(std::string& str, T data) {
                 size_t size = str.size();
                 str.resize(size + sizeof(T));
                 std::memcpy(const_cast<char *>(&str[size]), reinterpret_cast<char*>(&data), sizeof(data));
+            }
+
+            std::string convert_to_hex(std::string& str) {
+                static const char* lookup_hex = "0123456789abcdef";
+                std::string out;
+
+                for (char c : str) {
+                    out += lookup_hex[(c >> 4) & 0xf];
+                    out += lookup_hex[c & 0xf];
+                }
+
+                return out;
             }
 
             void header(std::string& str, wkbGeometryType type) {
@@ -118,7 +135,12 @@ namespace osmium {
                 header(data, wkbPoint);
                 str_push(data, location.lon());
                 str_push(data, location.lat());
-                return data;
+
+                if (m_hex) {
+                    return convert_to_hex(data);
+                } else {
+                    return data;
+                }
             }
 
             void linestring_start() {
@@ -135,10 +157,20 @@ namespace osmium {
             }
 
             linestring_type linestring_finish() {
-                std::string data;
-                std::swap(data, m_data);
-                memcpy(&data[5], &m_points, sizeof(uint32_t));
-                return data;
+                if (m_points < 2) {
+                    m_data.clear();
+                    throw geometry_error("not enough points for linestring");
+                } else {
+                    std::string data;
+                    std::swap(data, m_data);
+                    memcpy(&data[5], &m_points, sizeof(uint32_t));
+
+                    if (m_hex) {
+                        return convert_to_hex(data);
+                    } else {
+                        return data;
+                    }
+                }
             }
 
         }; // class WKBFactory
