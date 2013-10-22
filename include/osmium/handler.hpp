@@ -60,6 +60,9 @@ namespace osmium {
                     case osmium::item_type::relation:
                         handler.after_relations();
                         break;
+                    case osmium::item_type::changeset:
+                        handler.after_changesets();
+                        break;
                     default:
                         break;
                 }
@@ -75,6 +78,9 @@ namespace osmium {
                         break;
                     case osmium::item_type::relation:
                         handler.before_relations();
+                        break;
+                    case osmium::item_type::changeset:
+                        handler.before_changesets();
                         break;
                     default:
                         break;
@@ -101,21 +107,6 @@ namespace osmium {
                         case osmium::item_type::changeset:
                             handler.changeset(static_cast<MaybeConst<TIterator, osmium::Changeset>&>(*it));
                             break;
-#if 0
-                        case osmium::item_type::tag_list:
-                            handler.tag_list(static_cast<MaybeConst<TIterator, osmium::TagList>&>(*it));
-                            break;
-                        case osmium::item_type::way_node_list:
-                            handler.way_node_list(static_cast<MaybeConst<TIterator, osmium::WayNodeList>&>(*it));
-                            break;
-                        case osmium::item_type::way_node_with_location_list:
-                            handler.way_node_with_location_list(static_cast<MaybeConst<TIterator, osmium::WayNodeWithLocationList>&>(*it));
-                            break;
-                        case osmium::item_type::relation_member_list:
-                        case osmium::item_type::relation_member_list_with_full_members:
-                            handler.relation_member_list(static_cast<MaybeConst<TIterator, osmium::RelationMemberList>&>(*it));
-                            break;
-#endif
                         default:
                             throw std::runtime_error("unknown type");
                     }
@@ -142,19 +133,6 @@ namespace osmium {
             void changeset(const osmium::Changeset&) const {
             }
 
-#if 0
-            void tag_list(const osmium::TagList&) const {
-            }
-
-            void way_node_list(const osmium::WayNodeList&) const {
-            }
-
-            void way_node_with_location_list(const osmium::WayNodeWithLocationList&) const {
-            }
-
-            void relation_member_list(const osmium::RelationMemberList&) const {
-            }
-#endif
             void init() const {
             }
 
@@ -174,6 +152,12 @@ namespace osmium {
             }
 
             void after_relations() const {
+            }
+
+            void before_changesets() const {
+            }
+
+            void after_changesets() const {
             }
 
             void done() const {
