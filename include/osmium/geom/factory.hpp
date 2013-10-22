@@ -72,9 +72,9 @@ namespace osmium {
 
         public:
 
-            typedef typename T::point_type point_type;
+            typedef typename T::point_type      point_type;
             typedef typename T::linestring_type linestring_type;
-            typedef typename T::polygon_type polygon_type;
+            typedef typename T::polygon_type    polygon_type;
 
             point_type create_point(const osmium::Location location) {
                 if (location) {

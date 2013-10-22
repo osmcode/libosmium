@@ -52,10 +52,14 @@ namespace osmium {
 
             friend class GeometryFactory;
 
+            /// OSM data always uses SRID 4326 (WGS84).
+            static constexpr int srid = 4326;
+
         public:
 
-            WKBFactory() :
-                GeometryFactory<WKBFactory, wkb_factory_traits>() {
+            WKBFactory(bool ewkb=false) :
+                GeometryFactory<WKBFactory, wkb_factory_traits>(),
+                m_ewkb(ewkb) {
             }
 
         private:
@@ -90,6 +94,7 @@ namespace osmium {
 
             std::string m_data {};
             uint32_t m_points {0};
+            bool m_ewkb;
 
             template <typename T>
             void str_push(std::string& str, T data) {
@@ -98,10 +103,19 @@ namespace osmium {
                 std::memcpy(const_cast<char *>(&str[size]), reinterpret_cast<char*>(&data), sizeof(data));
             }
 
+            void header(std::string& str, wkbGeometryType type) {
+                str_push(str, wkbNDR);
+                if (m_ewkb) {
+                    str_push(str, type | wkbSRID);
+                    str_push(str, srid);
+                } else {
+                    str_push(str, type);
+                }
+            }
+
             point_type make_point(const Location location) {
                 std::string data;
-                str_push(data, wkbNDR);
-                str_push(data, wkbPoint);
+                header(data, wkbPoint);
                 str_push(data, location.lon());
                 str_push(data, location.lat());
                 return data;
@@ -110,8 +124,7 @@ namespace osmium {
             void linestring_start() {
                 m_data.clear();
                 m_points = 0;
-                str_push(m_data, wkbNDR);
-                str_push(m_data, wkbLineString);
+                header(m_data, wkbLineString);
                 str_push(m_data, static_cast<uint32_t>(0));
             }
 
