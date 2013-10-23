@@ -49,6 +49,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/io/pbf.hpp>
 #include <osmium/osm/builder.hpp>
 #include <osmium/thread/pool.hpp>
+#include <osmium/thread/debug.hpp>
 #include <osmium/thread/sorted_queue.hpp>
 
 namespace osmium {
@@ -543,6 +544,7 @@ namespace osmium {
             }
 
             void parse_osm_data(osmium::item_flags_type read_types) {
+                osmium::thread::set_thread_name("_osmium_pbf_in");
                 int n=0;
                 while (size_t size = read_blob_header(fd(), "OSMData")) {
                     DataBlobParser data_blob_parser(size, n, fd(), read_types);

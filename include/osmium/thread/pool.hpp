@@ -40,6 +40,7 @@ DEALINGS IN THE SOFTWARE.
 #include <vector>
 
 #include <osmium/thread/queue.hpp>
+#include <osmium/thread/debug.hpp>
 #include <osmium/thread/function_wrapper.hpp>
 
 namespace osmium {
@@ -82,6 +83,7 @@ namespace osmium {
             int m_num_threads;
 
             void worker_thread() {
+                osmium::thread::set_thread_name("_osmium_worker");
                 while (!m_done) {
                     function_wrapper task;
                     m_work_queue.wait_and_pop_with_timeout(task);
