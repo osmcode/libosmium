@@ -74,11 +74,53 @@ namespace osmium {
             XMLOutput(const XMLOutput&);
             XMLOutput& operator=(const XMLOutput&);
 
+            std::string m_buffer;
+
+            static int write_callback_wrapper(void* context, const char* buffer, int len) {
+                return static_cast<XMLOutput*>(context)->write_callback(buffer, len);
+            }
+
+            static int close_callback_wrapper(void* context) {
+                return static_cast<XMLOutput*>(context)->close_callback();
+            }
+
+            int write_callback(const char* buffer, int len) {
+                m_buffer.append(buffer, len);
+
+                if (m_buffer.size() > 1024 * 1024) {
+                    std::string data;
+                    std::swap(data, m_buffer);
+                    std::promise<std::string> promise;
+                    m_output_queue.push(promise.get_future());
+                    promise.set_value(std::move(data));
+                    while (m_output_queue.size() > 10) {
+                        std::this_thread::sleep_for(std::chrono::milliseconds(100)); // XXX
+                    }
+                }
+
+                return len;
+            }
+
+            int close_callback() {
+                if (!m_buffer.empty()) {
+                    std::string data;
+                    std::swap(data, m_buffer);
+                    std::promise<std::string> promise;
+                    m_output_queue.push(promise.get_future());
+                    promise.set_value(std::move(data));
+                }
+
+                std::promise<std::string> promise;
+                m_output_queue.push(promise.get_future());
+                promise.set_value(std::string());
+                return 0;
+            }
+
         public:
 
-            XMLOutput(const osmium::io::File& file) :
-                Output(file),
-                m_xml_output_buffer(xmlOutputBufferCreateFd(this->fd(), nullptr)),
+            XMLOutput(const osmium::io::File& file, data_queue_type& output_queue) :
+                Output(file, output_queue),
+                m_xml_output_buffer(xmlOutputBufferCreateIO(write_callback_wrapper, close_callback_wrapper, this, nullptr)),
                 m_xml_writer(xmlNewTextWriter(m_xml_output_buffer)),
                 m_last_op('\0') {
                 if (!m_xml_output_buffer || !m_xml_writer) {
@@ -214,7 +256,7 @@ namespace osmium {
                 }
                 check_for_error(xmlTextWriterEndElement(m_xml_writer)); // </osm> or </osmChange>
                 xmlFreeTextWriter(m_xml_writer);
-                this->m_file.close();
+//                this->m_file.close(); XXX who does close?
             }
 
         private:
@@ -288,8 +330,8 @@ namespace osmium {
                 osmium::io::Encoding::XML(),
                 osmium::io::Encoding::XMLgz(),
                 osmium::io::Encoding::XMLbz2()
-            }, [](const osmium::io::File& file) {
-                return new osmium::io::XMLOutput(file);
+            }, [](const osmium::io::File& file, data_queue_type& output_queue) {
+                return new osmium::io::XMLOutput(file, output_queue);
             });
 
         } // anonymous namespace
