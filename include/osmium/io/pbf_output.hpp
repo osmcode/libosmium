@@ -384,6 +384,7 @@ namespace osmium {
                 uint32_t sz = htonl(blobhead.size());
 
                 // write to the file: the 4-byte BlobHeader-Size followed by the BlobHeader followed by the Blob
+#if 0
                 if (::write(this->fd(), &sz, sizeof(sz)) < 0) {
                     throw std::runtime_error("file error");
                 }
@@ -392,6 +393,19 @@ namespace osmium {
                 }
                 if (::write(this->fd(), data.c_str(), data.size()) < 0) {
                     throw std::runtime_error("file error");
+                }
+#endif
+                std::string out;
+                out.reserve(sizeof(sz) + blobhead.size() + data.size());
+                out.append(reinterpret_cast<const char*>(&sz), sizeof(sz));
+                out.append(blobhead);
+                out.append(data);
+
+                std::promise<std::string> promise;
+                m_output_queue.push(promise.get_future());
+                promise.set_value(out);
+                while (m_output_queue.size() > 10) {
+                    std::this_thread::sleep_for(std::chrono::milliseconds(100)); // XXX
                 }
             }
 
@@ -765,8 +779,8 @@ namespace osmium {
             /**
              * Create PBFOutput object from File.
              */
-            PBFOutput(const osmium::io::File& file) :
-                Output(file),
+            PBFOutput(const osmium::io::File& file, data_queue_type& output_queue) :
+                Output(file, output_queue),
                 pbf_blob(),
                 pbf_blob_header(),
                 pbf_header_block(),
@@ -1001,7 +1015,10 @@ namespace osmium {
                     store_primitive_block();
                 }
 
-                this->m_file.close();
+                std::promise<std::string> promise;
+                m_output_queue.push(promise.get_future());
+                promise.set_value(std::string());
+               // this->m_file.close(); XXX where to we close now?
             }
 
         }; // class PBFOutput
@@ -1010,8 +1027,8 @@ namespace osmium {
 
             const bool registered_pbf_output = osmium::io::OutputFactory::instance().register_output_format({
                 osmium::io::Encoding::PBF()
-            }, [](const osmium::io::File& file) {
-                return new osmium::io::PBFOutput(file);
+            }, [](const osmium::io::File& file, data_queue_type& output_queue) {
+                return new osmium::io::PBFOutput(file, output_queue);
             });
 
         } // anonymous namespace
