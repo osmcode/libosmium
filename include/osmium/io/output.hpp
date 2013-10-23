@@ -34,10 +34,13 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <functional>
+#include <future>
 #include <map>
 #include <memory>
+#include <string>
 #include <vector>
 
+#include <osmium/thread/debug.hpp>
 #include <osmium/io/file.hpp>
 #include <osmium/io/header.hpp>
 #include <osmium/memory/buffer.hpp>
@@ -48,15 +51,14 @@ namespace osmium {
 
     namespace io {
 
+        typedef osmium::thread::Queue<std::future<std::string>> data_queue_type;
+
         class Output {
 
         protected:
 
             osmium::io::File m_file;
-
-            int fd() {
-                return m_file.fd();
-            }
+            data_queue_type& m_output_queue;
 
             Output(const Output&) = delete;
             Output(Output&&) = delete;
@@ -66,9 +68,14 @@ namespace osmium {
 
         public:
 
-            Output(const osmium::io::File& file) :
-                m_file(file) {
+            Output(const osmium::io::File& file, data_queue_type& output_queue) :
+                m_file(file),
+                m_output_queue(output_queue) {
                 m_file.open_for_output();
+            }
+
+            int fd() {
+                return m_file.fd();
             }
 
             virtual ~Output() {
@@ -78,6 +85,7 @@ namespace osmium {
             }
 
             virtual void handle_collection(osmium::memory::Buffer::const_iterator, osmium::memory::Buffer::const_iterator) = 0;
+
             virtual void close() = 0;
 
         }; // class Output
@@ -91,7 +99,7 @@ namespace osmium {
 
         public:
 
-            typedef std::function<osmium::io::Output*(const osmium::io::File&)> create_output_type;
+            typedef std::function<osmium::io::Output*(const osmium::io::File&, data_queue_type&)> create_output_type;
 
         private:
 
@@ -124,11 +132,11 @@ namespace osmium {
                 return m_callbacks.erase(encoding) == 1;
             }
 
-            std::unique_ptr<osmium::io::Output> create_output(const osmium::io::File& file) {
+            std::unique_ptr<osmium::io::Output> create_output(const osmium::io::File& file, data_queue_type& output_queue) {
                 encoding2create_type::iterator it = m_callbacks.find(file.encoding());
 
                 if (it != m_callbacks.end()) {
-                    return std::unique_ptr<osmium::io::Output>((it->second)(file));
+                    return std::unique_ptr<osmium::io::Output>((it->second)(file, output_queue));
                 }
 
                 throw osmium::io::File::FileEncodingNotSupported();
@@ -136,10 +144,37 @@ namespace osmium {
 
         }; // class OutputFactory
 
+        class FileOutput {
+
+            data_queue_type& m_input_queue;
+            int m_fd;
+
+        public:
+
+            FileOutput(data_queue_type& input_queue, int fd) :
+                m_input_queue(input_queue),
+                m_fd(fd) {
+            }
+
+            void operator()() {
+                osmium::thread::set_thread_name("_osmium_output");
+                std::future<std::string> data_future;
+                std::string data;
+                do {
+                    m_input_queue.wait_and_pop(data_future);
+                    data = data_future.get();
+                    osmium::io::detail::reliable_write(m_fd, data.data(), data.size());
+                } while (!data.empty());
+            }
+
+        }; // class FileOutput
+
         class Writer : osmium::handler::Handler<Writer> {
 
             osmium::io::File m_file;
             std::unique_ptr<Output> m_output;
+            data_queue_type m_output_queue;
+            std::thread m_file_output;
 
             Writer(const Writer&) = delete;
             Writer& operator=(const Writer&) = delete;
@@ -148,16 +183,26 @@ namespace osmium {
 
             Writer(const osmium::io::File& file) :
                 m_file(file),
-                m_output(OutputFactory::instance().create_output(m_file)) {
+                m_output(OutputFactory::instance().create_output(m_file, m_output_queue)) {
             }
 
             Writer(const std::string& filename = "") :
                 m_file(filename),
-                m_output(OutputFactory::instance().create_output(m_file)) {
+                m_output(OutputFactory::instance().create_output(m_file, m_output_queue)) {
+            }
+
+            ~Writer() {
+                if (m_file_output.joinable()) {
+                    m_file_output.join();
+                }
             }
 
             Writer& open(osmium::io::Header& header) {
                 m_output->set_header(header);
+
+                FileOutput file_output(m_output_queue, m_output->fd());
+                m_file_output = std::thread(file_output);
+
                 return *this;
             }
 

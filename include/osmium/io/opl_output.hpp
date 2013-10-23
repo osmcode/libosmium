@@ -68,8 +68,8 @@ namespace osmium {
 
         public:
 
-            OPLOutput(const osmium::io::File& file) :
-                Output(file),
+            OPLOutput(const osmium::io::File& file, data_queue_type& output_queue) :
+                Output(file, output_queue),
                 m_out(),
                 m_tmp_buffer() {
                 m_out.reserve(output_buffer_size * 2);
@@ -168,14 +168,23 @@ namespace osmium {
             }
 
             void close() override {
+                if (!m_out.empty()) {
+                    flush();
+                }
                 flush();
             }
 
         private:
 
             void flush() {
-                osmium::io::detail::reliable_write(this->fd(), m_out.c_str(), m_out.size());
-                m_out.clear();
+                std::string out;
+                std::swap(out, m_out);
+                std::promise<std::string> promise;
+                m_output_queue.push(promise.get_future());
+                promise.set_value(out);
+                while (m_output_queue.size() > 10) {
+                    std::this_thread::sleep_for(std::chrono::milliseconds(100)); // XXX
+                }
             }
 
             void append_encoded_string(const std::string& data) {
@@ -251,8 +260,8 @@ namespace osmium {
                 osmium::io::Encoding::OPL(),
                 osmium::io::Encoding::OPLgz(),
                 osmium::io::Encoding::OPLbz2()
-            }, [](const osmium::io::File& file) {
-                return new osmium::io::OPLOutput(file);
+            }, [](const osmium::io::File& file, data_queue_type& output_queue) {
+                return new osmium::io::OPLOutput(file, output_queue);
             });
 
         } // anonymous namespace
