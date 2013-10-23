@@ -41,8 +41,10 @@ DEALINGS IN THE SOFTWARE.
 #include <vector>
 
 #include <osmium/thread/debug.hpp>
+#include <osmium/thread/queue.hpp>
 #include <osmium/io/file.hpp>
 #include <osmium/io/header.hpp>
+#include <osmium/io/detail/read_write.hpp>
 #include <osmium/memory/buffer.hpp>
 #include <osmium/osm.hpp>
 #include <osmium/handler.hpp>
