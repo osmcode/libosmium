@@ -33,17 +33,11 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#define OSMIUM_COMPILE_WITH_CFLAGS_XML2 `xml2-config --cflags`
-#define OSMIUM_LINK_WITH_LIBS_XML2 `xml2-config --libs`
-
-// this is required to allow using libxml's xmlwriter in parallel to expat xml parser under debian
-#undef XMLCALL
-#include <libxml/xmlwriter.h>
-
 #define __STDC_FORMAT_MACROS
 #include <inttypes.h>
 
 #include <osmium/io/output.hpp>
+#include <osmium/thread/pool.hpp>
 
 namespace osmium {
 
@@ -53,248 +47,95 @@ namespace osmium {
 
         namespace {
 
-            inline xmlChar* cast_to_xmlchar(const char* str) {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-                return BAD_CAST str;
-#pragma GCC diagnostic pop
-            }
-
-            inline void check_for_error(int count) {
-                if (count < 0) {
-                    throw XMLWriteError();
-                }
-            }
-
-        }
-
-        class XMLOutput : public osmium::io::Output, public osmium::handler::Handler<XMLOutput> {
-
-            // objects of this class can't be copied
-            XMLOutput(const XMLOutput&);
-            XMLOutput& operator=(const XMLOutput&);
-
-            std::string m_buffer;
-
-            static int write_callback_wrapper(void* context, const char* buffer, int len) {
-                return static_cast<XMLOutput*>(context)->write_callback(buffer, len);
-            }
-
-            static int close_callback_wrapper(void* context) {
-                return static_cast<XMLOutput*>(context)->close_callback();
-            }
-
-            int write_callback(const char* buffer, int len) {
-                m_buffer.append(buffer, len);
-
-                if (m_buffer.size() > 1024 * 1024) {
-                    std::string data;
-                    std::swap(data, m_buffer);
-                    std::promise<std::string> promise;
-                    m_output_queue.push(promise.get_future());
-                    promise.set_value(std::move(data));
-                    while (m_output_queue.size() > 10) {
-                        std::this_thread::sleep_for(std::chrono::milliseconds(100)); // XXX
+            void xml_string(std::string& out, const char* in) {
+                for (; *in != '\0'; ++in) {
+                    switch(*in) {
+                        case '&':  out += "&amp;";  break;
+                        case '\"': out += "&quot;"; break;
+                        case '\'': out += "&apos;"; break;
+                        case '<':  out += "&lt;";   break;
+                        case '>':  out += "&gt;";   break;
+                        default:   out += *in;      break;
                     }
                 }
-
-                return len;
             }
 
-            int close_callback() {
-                if (!m_buffer.empty()) {
-                    std::string data;
-                    std::swap(data, m_buffer);
-                    std::promise<std::string> promise;
-                    m_output_queue.push(promise.get_future());
-                    promise.set_value(std::move(data));
+            const size_t tmp_buffer_size = 100;
+
+            template <typename T>
+            void oprintf(std::string& out, const char* format, T value) {
+                char buffer[tmp_buffer_size+1];
+                snprintf(buffer, sizeof(buffer)/sizeof(char), format, value);
+                out += buffer;
+            }
+
+        } // anonymous namespace
+
+        class XMLOutputBlock : public osmium::handler::Handler<XMLOutputBlock> {
+
+            osmium::memory::Buffer m_input_buffer;
+
+            std::string m_out {};
+
+            char m_last_op {'\0'};
+
+            const bool m_write_visible_flag;
+            const bool m_write_change_ops;
+
+            void write_spaces(int num) {
+                for (; num!=0; --num) {
+                    m_out += ' ';
                 }
-
-                std::promise<std::string> promise;
-                m_output_queue.push(promise.get_future());
-                promise.set_value(std::string());
-                return 0;
             }
 
-        public:
-
-            XMLOutput(const osmium::io::File& file, data_queue_type& output_queue) :
-                Output(file, output_queue),
-                m_xml_output_buffer(xmlOutputBufferCreateIO(write_callback_wrapper, close_callback_wrapper, this, nullptr)),
-                m_xml_writer(xmlNewTextWriter(m_xml_output_buffer)),
-                m_last_op('\0') {
-                if (!m_xml_output_buffer || !m_xml_writer) {
-                    throw XMLWriteError();
-                }
-            }
-
-            void handle_buffer(osmium::memory::Buffer&& buffer) override {
-                this->operator()(buffer.cbegin(), buffer.cend());
-            }
-
-            void set_header(osmium::io::Header& header) override {
-                check_for_error(xmlTextWriterSetIndent(m_xml_writer, 1));
-                check_for_error(xmlTextWriterSetIndentString(m_xml_writer, cast_to_xmlchar("  ")));
-                check_for_error(xmlTextWriterStartDocument(m_xml_writer, nullptr, "UTF-8", nullptr)); // <?xml .. ?>
-
-                if (this->m_file.type() == osmium::io::FileType::Change()) {
-                    check_for_error(xmlTextWriterStartElement(m_xml_writer, cast_to_xmlchar("osmChange")));  // <osmChange>
+            void write_prefix() {
+                if (m_write_change_ops) {
+                    write_spaces(4);
                 } else {
-                    check_for_error(xmlTextWriterStartElement(m_xml_writer, cast_to_xmlchar("osm")));  // <osm>
-                }
-                check_for_error(xmlTextWriterWriteAttribute(m_xml_writer, cast_to_xmlchar("version"), cast_to_xmlchar("0.6")));
-                check_for_error(xmlTextWriterWriteAttribute(m_xml_writer, cast_to_xmlchar("generator"), cast_to_xmlchar(header.generator().c_str())));
-                if (header.bounds()) {
-                    check_for_error(xmlTextWriterStartElement(m_xml_writer, cast_to_xmlchar("bounds"))); // <bounds>
-
-                    check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, cast_to_xmlchar("minlon"), "%.7f", header.bounds().bottom_left().lon()));
-                    check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, cast_to_xmlchar("minlat"), "%.7f", header.bounds().bottom_left().lat()));
-                    check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, cast_to_xmlchar("maxlon"), "%.7f", header.bounds().top_right().lon()));
-                    check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, cast_to_xmlchar("maxlat"), "%.7f", header.bounds().top_right().lat()));
-
-                    check_for_error(xmlTextWriterEndElement(m_xml_writer)); // </bounds>
+                    write_spaces(2);
                 }
             }
-
-            void node(const osmium::Node& node) {
-                if (this->m_file.type() == osmium::io::FileType::Change()) {
-                    open_close_op_tag(node.visible() ? (node.version() == 1 ? 'c' : 'm') : 'd');
-                }
-                check_for_error(xmlTextWriterStartElement(m_xml_writer, cast_to_xmlchar("node"))); // <node>
-
-                write_meta(node);
-
-                if (node.location()) {
-                    check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, cast_to_xmlchar("lat"), "%.7f", node.location().lat()));
-                    check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, cast_to_xmlchar("lon"), "%.7f", node.location().lon()));
-                }
-
-                write_tags(node.tags());
-
-                check_for_error(xmlTextWriterEndElement(m_xml_writer)); // </node>
-            }
-
-            void way(const osmium::Way& way) {
-                if (this->m_file.type() == osmium::io::FileType::Change()) {
-                    open_close_op_tag(way.visible() ? (way.version() == 1 ? 'c' : 'm') : 'd');
-                }
-                check_for_error(xmlTextWriterStartElement(m_xml_writer, cast_to_xmlchar("way"))); // <way>
-
-                write_meta(way);
-
-                for (auto& way_node : way.nodes()) {
-                    check_for_error(xmlTextWriterStartElement(m_xml_writer, cast_to_xmlchar("nd"))); // <nd>
-                    check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, cast_to_xmlchar("ref"), "%" PRId64, way_node.ref()));
-                    check_for_error(xmlTextWriterEndElement(m_xml_writer)); // </nd>
-                }
-
-                write_tags(way.tags());
-
-                check_for_error(xmlTextWriterEndElement(m_xml_writer)); // </way>
-            }
-
-            void relation(const osmium::Relation& relation) {
-                if (this->m_file.type() == osmium::io::FileType::Change()) {
-                    open_close_op_tag(relation.visible() ? (relation.version() == 1 ? 'c' : 'm') : 'd');
-                }
-                check_for_error(xmlTextWriterStartElement(m_xml_writer, cast_to_xmlchar("relation"))); // <relation>
-
-                write_meta(relation);
-
-                for (auto& member : relation.members()) {
-                    check_for_error(xmlTextWriterStartElement(m_xml_writer, cast_to_xmlchar("member"))); // <member>
-
-                    check_for_error(xmlTextWriterWriteAttribute(m_xml_writer, cast_to_xmlchar("type"), cast_to_xmlchar(item_type_to_name(member.type()))));
-                    check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, cast_to_xmlchar("ref"), "%" PRId64, member.ref()));
-                    check_for_error(xmlTextWriterWriteAttribute(m_xml_writer, cast_to_xmlchar("role"), cast_to_xmlchar(member.role())));
-
-                    check_for_error(xmlTextWriterEndElement(m_xml_writer)); // </member>
-                }
-
-                write_tags(relation.tags());
-
-                check_for_error(xmlTextWriterEndElement(m_xml_writer)); // </relation>
-            }
-
-            void changeset(const osmium::Changeset& changeset) {
-                check_for_error(xmlTextWriterStartElement(m_xml_writer, cast_to_xmlchar("changeset"))); // <changeset>
-
-                check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, cast_to_xmlchar("id"), "%" PRId32, changeset.id()));
-                if (changeset.created_at()) {
-                    std::string iso { changeset.created_at().to_iso() };
-                    check_for_error(xmlTextWriterWriteAttribute(m_xml_writer, cast_to_xmlchar("created_at"), cast_to_xmlchar(iso.c_str())));
-                }
-                check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, cast_to_xmlchar("num_changes"), "%" PRId32, changeset.num_changes()));
-                if (changeset.closed_at()) {
-                    std::string iso { changeset.closed_at().to_iso() };
-                    check_for_error(xmlTextWriterWriteAttribute(m_xml_writer, cast_to_xmlchar("closed_at"), cast_to_xmlchar(iso.c_str())));
-                    check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, cast_to_xmlchar("open"), "false"));
-                } else {
-                    check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, cast_to_xmlchar("open"), "true"));
-                }
-
-                if (changeset.bounds()) {
-                    check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, cast_to_xmlchar("min_lon"), "%.7f", changeset.bounds().bottom_left().lon()));
-                    check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, cast_to_xmlchar("min_lat"), "%.7f", changeset.bounds().bottom_left().lat()));
-                    check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, cast_to_xmlchar("max_lon"), "%.7f", changeset.bounds().top_right().lon()));
-                    check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, cast_to_xmlchar("max_lat"), "%.7f", changeset.bounds().top_right().lat()));
-                }
-
-                if (!changeset.user_is_anonymous()) {
-                    check_for_error(xmlTextWriterWriteAttribute(m_xml_writer, cast_to_xmlchar("user"), cast_to_xmlchar(changeset.user())));
-                    check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, cast_to_xmlchar("uid"), "%d", changeset.uid()));
-                }
-
-                write_tags(changeset.tags());
-
-                check_for_error(xmlTextWriterEndElement(m_xml_writer)); // </changeset>
-            }
-
-            void close() override {
-                if (this->m_file.type() == osmium::io::FileType::Change()) {
-                    open_close_op_tag('\0');
-                }
-                check_for_error(xmlTextWriterEndElement(m_xml_writer)); // </osm> or </osmChange>
-                xmlFreeTextWriter(m_xml_writer);
-//                this->m_file.close(); XXX who does close?
-            }
-
-        private:
-
-            xmlOutputBufferPtr m_xml_output_buffer;
-            xmlTextWriterPtr m_xml_writer;
-            char m_last_op;
 
             void write_meta(const osmium::Object& object) {
-                check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, cast_to_xmlchar("id"), "%" PRId64, object.id()));
+                oprintf(m_out, " id=\"%" PRId64 "\"", object.id());
+
                 if (object.version()) {
-                    check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, cast_to_xmlchar("version"), "%d", object.version()));
+                    oprintf(m_out, " version=\"%d\"", object.version());
                 }
+
                 if (object.timestamp()) {
-                    std::string iso { object.timestamp().to_iso() };
-                    check_for_error(xmlTextWriterWriteAttribute(m_xml_writer, cast_to_xmlchar("timestamp"), cast_to_xmlchar(iso.c_str())));
+                    m_out += " timestamp=\"";
+                    m_out += object.timestamp().to_iso();
+                    m_out += "\"";
                 }
 
                 if (!object.user_is_anonymous()) {
-                    check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, cast_to_xmlchar("uid"), "%d", object.uid()));
-                    check_for_error(xmlTextWriterWriteAttribute(m_xml_writer, cast_to_xmlchar("user"), cast_to_xmlchar(object.user())));
+                    oprintf(m_out, " uid=\"%d\" user=\"", object.uid());
+                    xml_string(m_out, object.user());
+                    m_out += "\"";
                 }
 
                 if (object.changeset()) {
-                    check_for_error(xmlTextWriterWriteFormatAttribute(m_xml_writer, cast_to_xmlchar("changeset"), "%d", object.changeset()));
+                    oprintf(m_out, " changeset=\"%d\"", object.changeset());
                 }
 
-                if (this->m_file.has_multiple_object_versions() && this->m_file.type() != osmium::io::FileType::Change()) {
-                    check_for_error(xmlTextWriterWriteAttribute(m_xml_writer, cast_to_xmlchar("visible"), object.visible() ? cast_to_xmlchar("true") : cast_to_xmlchar("false")));
+                if (m_write_visible_flag) {
+                    if (object.visible()) {
+                        m_out += " visible=\"true\"";
+                    } else {
+                        m_out += " visible=\"false\"";
+                    }
                 }
             }
 
             void write_tags(const osmium::TagList& tags) {
                 for (auto& tag : tags) {
-                    check_for_error(xmlTextWriterStartElement(m_xml_writer, cast_to_xmlchar("tag"))); // <tag>
-                    check_for_error(xmlTextWriterWriteAttribute(m_xml_writer, cast_to_xmlchar("k"), cast_to_xmlchar(tag.key())));
-                    check_for_error(xmlTextWriterWriteAttribute(m_xml_writer, cast_to_xmlchar("v"), cast_to_xmlchar(tag.value())));
-                    check_for_error(xmlTextWriterEndElement(m_xml_writer)); // </tag>
+                    write_prefix();
+                    m_out += "  <tag k=\"";
+                    xml_string(m_out, tag.key());
+                    m_out += "\" v=\"";
+                    xml_string(m_out, tag.value());
+                    m_out += "\"/>\n";
                 }
             }
 
@@ -303,23 +144,264 @@ namespace osmium {
                     return;
                 }
 
-                if (m_last_op) {
-                    check_for_error(xmlTextWriterEndElement(m_xml_writer));
+                switch (m_last_op) {
+                    case 'c':
+                        m_out += "  </create>\n";
+                        break;
+                    case 'm':
+                        m_out += "  </modify>\n";
+                        break;
+                    case 'd':
+                        m_out += "  </delete>\n";
+                        break;
+                    default:
+                        break;
                 }
 
                 switch (op) {
                     case 'c':
-                        check_for_error(xmlTextWriterStartElement(m_xml_writer, cast_to_xmlchar("create")));
+                        m_out += "  <create>\n";
                         break;
                     case 'm':
-                        check_for_error(xmlTextWriterStartElement(m_xml_writer, cast_to_xmlchar("modify")));
+                        m_out += "  <modify>\n";
                         break;
                     case 'd':
-                        check_for_error(xmlTextWriterStartElement(m_xml_writer, cast_to_xmlchar("delete")));
+                        m_out += "  <delete>\n";
                         break;
                 }
 
                 m_last_op = op;
+            }
+
+        public:
+
+            XMLOutputBlock(osmium::memory::Buffer&& buffer, bool write_visible_flag, bool write_change_ops) :
+                m_input_buffer(std::move(buffer)),
+                m_write_visible_flag(write_visible_flag && !write_change_ops),
+                m_write_change_ops(write_change_ops) {
+            }
+
+            XMLOutputBlock(const XMLOutputBlock&) = delete;
+            XMLOutputBlock& operator=(const XMLOutputBlock&) = delete;
+
+            XMLOutputBlock(XMLOutputBlock&& other) = default;
+            XMLOutputBlock& operator=(XMLOutputBlock&& other) = default;
+
+            std::string operator()() {
+                osmium::handler::apply_handler(*this, m_input_buffer.cbegin(), m_input_buffer.cend());
+
+                if (m_write_change_ops) {
+                    open_close_op_tag('\0');
+                }
+
+                std::string out;
+                std::swap(out, m_out);
+                return out;
+            }
+
+            void node(const osmium::Node& node) {
+                if (m_write_change_ops) {
+                    open_close_op_tag(node.visible() ? (node.version() == 1 ? 'c' : 'm') : 'd');
+                }
+
+                write_prefix();
+                m_out += "<node";
+
+                write_meta(node);
+
+                if (node.location()) {
+                    m_out += " lat=\"";
+                    osmium::Location::coordinate2string(std::back_inserter(m_out), node.location().lat());
+                    m_out += "\" lon=\"";
+                    osmium::Location::coordinate2string(std::back_inserter(m_out), node.location().lon());
+                    m_out += "\"";
+                }
+
+                if (node.tags().empty()) {
+                    m_out += "/>\n";
+                    return;
+                }
+
+                m_out += ">\n";
+
+                write_tags(node.tags());
+
+                write_prefix();
+                m_out += "</node>\n";
+            }
+
+            void way(const osmium::Way& way) {
+                if (m_write_change_ops) {
+                    open_close_op_tag(way.visible() ? (way.version() == 1 ? 'c' : 'm') : 'd');
+                }
+
+                write_prefix();
+                m_out += "<way";
+                write_meta(way);
+
+                if (way.tags().empty() && way.nodes().empty()) {
+                    m_out += "/>\n";
+                    return;
+                }
+
+                m_out += ">\n";
+
+                for (auto& way_node : way.nodes()) {
+                    write_prefix();
+                    oprintf(m_out, "  <nd ref=\"%" PRId64 "\"/>\n", way_node.ref());
+                }
+
+                write_tags(way.tags());
+
+                write_prefix();
+                m_out += "</way>\n";
+            }
+
+            void relation(const osmium::Relation& relation) {
+                if (m_write_change_ops) {
+                    open_close_op_tag(relation.visible() ? (relation.version() == 1 ? 'c' : 'm') : 'd');
+                }
+
+                write_prefix();
+                m_out += "<relation";
+                write_meta(relation);
+
+                if (relation.tags().empty() && relation.members().empty()) {
+                    m_out += "/>\n";
+                    return;
+                }
+
+                m_out += ">\n";
+
+                for (auto& member : relation.members()) {
+                    write_prefix();
+                    m_out += "  <member type=\"";
+                    m_out += item_type_to_name(member.type());
+                    oprintf(m_out, "\" ref=\"%" PRId64 "\" role=\"", member.ref());
+                    xml_string(m_out, member.role());
+                    m_out += "\"/>\n";
+                }
+
+                write_tags(relation.tags());
+
+                write_prefix();
+                m_out += "</relation>\n";
+            }
+
+            void changeset(const osmium::Changeset& changeset) {
+                write_prefix();
+                m_out += "<changeset";
+
+                oprintf(m_out, " id=\"%" PRId32 "\"", changeset.id());
+
+                if (changeset.created_at()) {
+                    m_out += " created_at=\"";
+                    m_out += changeset.created_at().to_iso();
+                    m_out += "\"";
+                }
+
+                oprintf(m_out, " num_changes=\"%" PRId32 "\"", changeset.num_changes());
+
+                if (changeset.closed_at()) {
+                    m_out += " closed_at=\"";
+                    m_out += changeset.closed_at().to_iso();
+                    m_out += "\" open=\"false\"";
+                } else {
+                    m_out += " open=\"true\"";
+                }
+
+                if (changeset.bounds()) {
+                    oprintf(m_out, " min_lon=\"%.7f\"", changeset.bounds().bottom_left().lon());
+                    oprintf(m_out, " min_lat=\"%.7f\"", changeset.bounds().bottom_left().lat());
+                    oprintf(m_out, " max_lon=\"%.7f\"", changeset.bounds().top_right().lon());
+                    oprintf(m_out, " max_lat=\"%.7f\"", changeset.bounds().top_right().lat());
+                }
+
+                if (!changeset.user_is_anonymous()) {
+                    m_out += " user=\"";
+                    xml_string(m_out, changeset.user());
+                    oprintf(m_out, "\" uid=\"%d\"", changeset.uid());
+                }
+
+                if (changeset.tags().empty()) {
+                    m_out += "/>\n";
+                    return;
+                }
+
+                m_out += ">\n";
+
+                write_tags(changeset.tags());
+
+                write_prefix();
+                m_out += "</changeset>\n";
+            }
+
+        }; // class XMLOutputBlock
+
+        class XMLOutput : public osmium::io::Output, public osmium::handler::Handler<XMLOutput> {
+
+        public:
+
+            XMLOutput(const osmium::io::File& file, data_queue_type& output_queue) :
+                Output(file, output_queue) {
+            }
+
+            XMLOutput(const XMLOutput&) = delete;
+            XMLOutput& operator=(const XMLOutput&) = delete;
+
+            ~XMLOutput() {
+            }
+
+            void handle_buffer(osmium::memory::Buffer&& buffer) override {
+                XMLOutputBlock output_block(std::move(buffer), this->m_file.has_multiple_object_versions(), this->m_file.type() == osmium::io::FileType::Change());
+                m_output_queue.push(osmium::thread::Pool::instance().submit(std::move(output_block)));
+            }
+
+            void set_header(osmium::io::Header& header) override {
+                std::string out = "<?xml version='1.0' encoding='UTF-8'?>\n";
+
+                if (this->m_file.type() == osmium::io::FileType::Change()) {
+                    out += "<osmChange version=\"0.6\" generator=\"";
+                    xml_string(out, header.generator().c_str());
+                    out += "\">\n";
+                } else {
+                    out += "<osm version=\"0.6\" generator=\"";
+                    xml_string(out, header.generator().c_str());
+                    out += "\">\n";
+                }
+
+                if (header.bounds()) {
+                    out += "  <bounds";
+                    oprintf(out, " minlon=\"%.7f\"", header.bounds().bottom_left().lon());
+                    oprintf(out, " minlat=\"%.7f\"", header.bounds().bottom_left().lat());
+                    oprintf(out, " maxlon=\"%.7f\"", header.bounds().top_right().lon());
+                    oprintf(out, " maxlat=\"%.7f\"/>\n", header.bounds().top_right().lat());
+                }
+
+                std::promise<std::string> promise;
+                m_output_queue.push(promise.get_future());
+                promise.set_value(std::move(out));
+            }
+
+            void close() override {
+                {
+                    std::string out;
+                    if (this->m_file.type() == osmium::io::FileType::Change()) {
+                        out += "</osmChange>\n";
+                    } else {
+                        out += "</osm>\n";
+                    }
+
+                    std::promise<std::string> promise;
+                    m_output_queue.push(promise.get_future());
+                    promise.set_value(std::move(out));
+                }
+
+                std::promise<std::string> promise;
+                m_output_queue.push(promise.get_future());
+                promise.set_value(std::string());
+
+//                this->m_file.close(); XXX who does close?
             }
 
         }; // class XMLOutput
