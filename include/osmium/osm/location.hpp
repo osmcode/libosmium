@@ -186,7 +186,7 @@ namespace osmium {
 
             int len = snprintf(buffer, coordinate_length, "%.7f", value);
             while (buffer[len-1] == '0') --len;
-            if (buffer[len-1] == '.') ++len;
+            if (buffer[len-1] == '.') --len;
 
             return std::copy_n(buffer, len, iterator);
         }

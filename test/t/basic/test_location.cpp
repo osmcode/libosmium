@@ -88,12 +88,12 @@ BOOST_AUTO_TEST_CASE(output_to_iterator) {
     {
         osmium::Location loc(0.0, 7.0);
         *loc.as_string(buffer, ' ') = 0;
-        BOOST_CHECK(!strcmp(buffer, "0.0 7.0"));
+        BOOST_CHECK(!strcmp(buffer, "0 7"));
     }
     {
         osmium::Location loc(-179.9999999, -90.0);
         *loc.as_string(buffer, ' ') = 0;
-        BOOST_CHECK(!strcmp(buffer, "-179.9999999 -90.0"));
+        BOOST_CHECK(!strcmp(buffer, "-179.9999999 -90"));
     }
     {
         osmium::Location loc;
@@ -113,13 +113,13 @@ BOOST_AUTO_TEST_CASE(output_to_string) {
     {
         osmium::Location loc(0.0, 7.0);
         loc.as_string(std::back_inserter(s), ' ');
-        BOOST_CHECK_EQUAL(s, "0.0 7.0");
+        BOOST_CHECK_EQUAL(s, "0 7");
     }
     s.clear();
     {
         osmium::Location loc(-179.9999999, -90.0);
         loc.as_string(std::back_inserter(s), ' ');
-        BOOST_CHECK_EQUAL(s, "-179.9999999 -90.0");
+        BOOST_CHECK_EQUAL(s, "-179.9999999 -90");
     }
     s.clear();
     {
