@@ -113,7 +113,7 @@ int main(int argc, char* argv[]) {
     header.generator("osmium_convert");
     writer.open(header);
     while (osmium::memory::Buffer buffer = reader.read()) {
-        writer(buffer);
+        writer(std::move(buffer));
     }
     writer.close();
 

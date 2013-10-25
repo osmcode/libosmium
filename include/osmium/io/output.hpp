@@ -86,7 +86,7 @@ namespace osmium {
             virtual void set_header(osmium::io::Header&) {
             }
 
-            virtual void handle_collection(osmium::memory::Buffer::const_iterator, osmium::memory::Buffer::const_iterator) = 0;
+            virtual void handle_buffer(osmium::memory::Buffer&&) = 0;
 
             virtual void close() = 0;
 
@@ -208,8 +208,8 @@ namespace osmium {
                 return *this;
             }
 
-            void operator()(const osmium::memory::Buffer& buffer) {
-                m_output->handle_collection(buffer.begin(), buffer.end());
+            void operator()(osmium::memory::Buffer&& buffer) {
+                m_output->handle_buffer(std::move(buffer));
             }
 
             void close() {

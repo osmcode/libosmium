@@ -44,148 +44,24 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/io/output.hpp>
 #include <osmium/io/detail/read_write.hpp>
 #include <osmium/handler.hpp>
+#include <osmium/thread/pool.hpp>
 
 namespace osmium {
 
     namespace io {
 
-        class OPLOutput : public osmium::io::Output, public osmium::handler::Handler<OPLOutput> {
+        /**
+         * Writes out one buffer with OSM data in OPL format.
+         */
+        class OPLOutputBlock : public osmium::handler::Handler<OPLOutputBlock> {
 
-            // size of the output buffer, there is one system call for each
-            // time this is flushed, so it shouldn't be too small
-            static const size_t output_buffer_size = 1024*1024;
-
-            // temporary buffer for writing out IDs and other numbers, must
-            // be big enough to always hold them
             static const size_t tmp_buffer_size = 100;
+
+            osmium::memory::Buffer m_input_buffer;
 
             std::string m_out;
 
             char m_tmp_buffer[tmp_buffer_size+1];
-
-            OPLOutput(const OPLOutput&) = delete;
-            OPLOutput& operator=(const OPLOutput&) = delete;
-
-        public:
-
-            OPLOutput(const osmium::io::File& file, data_queue_type& output_queue) :
-                Output(file, output_queue),
-                m_out(),
-                m_tmp_buffer() {
-                m_out.reserve(output_buffer_size * 2);
-            }
-
-            void handle_collection(osmium::memory::Buffer::const_iterator begin, osmium::memory::Buffer::const_iterator end) override {
-                this->operator()(begin, end);
-            }
-
-            void node(const osmium::Node& node) {
-                m_out += 'n';
-                write_meta(node);
-                write_location(node.location(), 'x', 'y');
-                m_out += '\n';
-
-                if (m_out.size() > output_buffer_size) {
-                    flush();
-                }
-            }
-
-            void way(const osmium::Way& way) {
-                m_out += 'w';
-                write_meta(way);
-
-                m_out += " N";
-                bool first = true;
-                for (const auto& wn : way.nodes()) {
-                    if (first) {
-                        first = false;
-                    } else {
-                        m_out += ',';
-                    }
-                    snprintf(m_tmp_buffer, tmp_buffer_size, "n%" PRId64, wn.ref());
-                    m_out += m_tmp_buffer;
-                }
-                m_out += '\n';
-
-                if (m_out.size() > output_buffer_size) {
-                    flush();
-                }
-            }
-
-            void relation(const osmium::Relation& relation) {
-                m_out += 'r';
-                write_meta(relation);
-
-                m_out += " M";
-                bool first = true;
-                for (const auto& member : relation.members()) {
-                    if (first) {
-                        first = false;
-                    } else {
-                        m_out += ',';
-                    }
-                    m_out += item_type_to_char(member.type());
-                    snprintf(m_tmp_buffer, tmp_buffer_size, "%" PRId64 "@", member.ref());
-                    m_out += m_tmp_buffer;
-                    m_out += member.role();
-                }
-                m_out += '\n';
-
-                if (m_out.size() > output_buffer_size) {
-                    flush();
-                }
-            }
-
-            void changeset(const osmium::Changeset& changeset) {
-                snprintf(m_tmp_buffer, tmp_buffer_size, "c%d k%d s", changeset.id(), changeset.num_changes());
-                m_out += m_tmp_buffer;
-                m_out += changeset.created_at().to_iso();
-                m_out += " e";
-                m_out += changeset.closed_at().to_iso();
-                snprintf(m_tmp_buffer, tmp_buffer_size, " i%d u", changeset.uid());
-                m_out += m_tmp_buffer;
-                append_encoded_string(changeset.user());
-                write_location(changeset.bounds().bottom_left(), 'x', 'y');
-                write_location(changeset.bounds().top_right(), 'X', 'Y');
-                m_out += " T";
-                bool first = true;
-                for (auto& tag : changeset.tags()) {
-                    if (first) {
-                        first = false;
-                    } else {
-                        m_out += ',';
-                    }
-                    append_encoded_string(tag.key());
-                    m_out += '=';
-                    append_encoded_string(tag.value());
-                }
-
-                m_out += '\n';
-
-                if (m_out.size() > output_buffer_size) {
-                    flush();
-                }
-            }
-
-            void close() override {
-                if (!m_out.empty()) {
-                    flush();
-                }
-                flush();
-            }
-
-        private:
-
-            void flush() {
-                std::string out;
-                std::swap(out, m_out);
-                std::promise<std::string> promise;
-                m_output_queue.push(promise.get_future());
-                promise.set_value(out);
-                while (m_output_queue.size() > 10) {
-                    std::this_thread::sleep_for(std::chrono::milliseconds(100)); // XXX
-                }
-            }
 
             void append_encoded_string(const std::string& data) {
                 utf8::unchecked::iterator<std::string::const_iterator> it {data.cbegin()};
@@ -250,6 +126,125 @@ namespace osmium {
                     m_out += ' ';
                     m_out += y;
                 }
+            }
+
+        public:
+
+            OPLOutputBlock(osmium::memory::Buffer&& buffer) :
+                m_input_buffer(std::move(buffer)),
+                m_out(),
+                m_tmp_buffer() {
+            }
+
+            OPLOutputBlock(const OPLOutputBlock&) = delete;
+            OPLOutputBlock& operator=(const OPLOutputBlock&) = delete;
+
+            OPLOutputBlock(OPLOutputBlock&& other) = default;
+            OPLOutputBlock& operator=(OPLOutputBlock&& other) = default;
+
+            std::string operator()() {
+                osmium::handler::apply_handler(*this, m_input_buffer.cbegin(), m_input_buffer.cend());
+
+                std::string out;
+                std::swap(out, m_out);
+                return out;
+            }
+
+            void node(const osmium::Node& node) {
+                m_out += 'n';
+                write_meta(node);
+                write_location(node.location(), 'x', 'y');
+                m_out += '\n';
+            }
+
+            void way(const osmium::Way& way) {
+                m_out += 'w';
+                write_meta(way);
+
+                m_out += " N";
+                bool first = true;
+                for (const auto& wn : way.nodes()) {
+                    if (first) {
+                        first = false;
+                    } else {
+                        m_out += ',';
+                    }
+                    snprintf(m_tmp_buffer, tmp_buffer_size, "n%" PRId64, wn.ref());
+                    m_out += m_tmp_buffer;
+                }
+                m_out += '\n';
+            }
+
+            void relation(const osmium::Relation& relation) {
+                m_out += 'r';
+                write_meta(relation);
+
+                m_out += " M";
+                bool first = true;
+                for (const auto& member : relation.members()) {
+                    if (first) {
+                        first = false;
+                    } else {
+                        m_out += ',';
+                    }
+                    m_out += item_type_to_char(member.type());
+                    snprintf(m_tmp_buffer, tmp_buffer_size, "%" PRId64 "@", member.ref());
+                    m_out += m_tmp_buffer;
+                    m_out += member.role();
+                }
+                m_out += '\n';
+            }
+
+            void changeset(const osmium::Changeset& changeset) {
+                snprintf(m_tmp_buffer, tmp_buffer_size, "c%d k%d s", changeset.id(), changeset.num_changes());
+                m_out += m_tmp_buffer;
+                m_out += changeset.created_at().to_iso();
+                m_out += " e";
+                m_out += changeset.closed_at().to_iso();
+                snprintf(m_tmp_buffer, tmp_buffer_size, " i%d u", changeset.uid());
+                m_out += m_tmp_buffer;
+                append_encoded_string(changeset.user());
+                write_location(changeset.bounds().bottom_left(), 'x', 'y');
+                write_location(changeset.bounds().top_right(), 'X', 'Y');
+                m_out += " T";
+                bool first = true;
+                for (auto& tag : changeset.tags()) {
+                    if (first) {
+                        first = false;
+                    } else {
+                        m_out += ',';
+                    }
+                    append_encoded_string(tag.key());
+                    m_out += '=';
+                    append_encoded_string(tag.value());
+                }
+
+                m_out += '\n';
+            }
+
+        }; // OPLOutputBlock
+
+        class OPLOutput : public osmium::io::Output {
+
+            OPLOutput(const OPLOutput&) = delete;
+            OPLOutput& operator=(const OPLOutput&) = delete;
+
+        public:
+
+            OPLOutput(const osmium::io::File& file, data_queue_type& output_queue) :
+                Output(file, output_queue) {
+            }
+
+            void handle_buffer(osmium::memory::Buffer&& buffer) override {
+                OPLOutputBlock output_block(std::move(buffer));
+                m_output_queue.push(osmium::thread::Pool::instance().submit(std::move(output_block)));
+            }
+
+            void close() {
+                std::string out;
+                std::promise<std::string> promise;
+                m_output_queue.push(promise.get_future());
+                promise.set_value(out);
             }
 
         }; // class OPLOutput

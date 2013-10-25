@@ -128,8 +128,8 @@ namespace osmium {
                 }
             }
 
-            void handle_collection(osmium::memory::Buffer::const_iterator begin, osmium::memory::Buffer::const_iterator end) override {
-                this->operator()(begin, end);
+            void handle_buffer(osmium::memory::Buffer&& buffer) override {
+                this->operator()(buffer.cbegin(), buffer.cend());
             }
 
             void set_header(osmium::io::Header& header) override {
