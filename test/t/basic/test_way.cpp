@@ -36,6 +36,18 @@ BOOST_AUTO_TEST_CASE(way_builder) {
     BOOST_CHECK_EQUAL(1, way.nodes()[0].ref());
     BOOST_CHECK_EQUAL(3, way.nodes()[1].ref());
     BOOST_CHECK_EQUAL(2, way.nodes()[2].ref());
+    BOOST_CHECK(! way.is_closed());
+}
+
+BOOST_AUTO_TEST_CASE(closed_way) {
+    osmium::memory::Buffer buffer(10000);
+
+    osmium::Way& way = buffer_add_way(buffer,
+        "foo",
+        {{"highway", "residential"}, {"name", "High Street"}},
+        {1, 3, 1});
+
+    BOOST_CHECK(way.is_closed());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

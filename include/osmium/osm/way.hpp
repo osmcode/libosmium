@@ -150,6 +150,10 @@ namespace osmium {
             return wn[n];
         }
 
+        bool is_closed() const {
+            return operator[](0).ref() == operator[](size()-1).ref();
+        }
+
     }; // class WayNodeList
 
 
@@ -183,6 +187,10 @@ namespace osmium {
                     wn.location(new_wn.location());
                 }
             }
+        }
+
+        bool is_closed() const {
+            return nodes().is_closed();
         }
 
     }; // class Way
