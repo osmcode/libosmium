@@ -35,7 +35,6 @@ DEALINGS IN THE SOFTWARE.
 
 #define OSMIUM_LINK_WITH_LIBS_PBF -pthread -lz -lprotobuf-lite -losmpbf
 
-#define ZLIB_CONST
 #include <zlib.h>
 
 #include <cassert>

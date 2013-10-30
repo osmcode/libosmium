@@ -284,7 +284,7 @@ namespace osmium {
                 z_stream z;
 
                 // next byte to compress
-                z.next_in   = reinterpret_cast<const unsigned char*>(in.c_str());
+                z.next_in   = reinterpret_cast<unsigned char*>(const_cast<char*>(in.c_str()));
 
                 // number of bytes to compress
                 z.avail_in  = in.size();
