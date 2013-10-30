@@ -380,14 +380,14 @@ namespace osmium {
                 }
 
                 if (pbf_blob.has_raw()) {
-                    static_cast<TDerived*>(this)->handle_blob(pbf_blob.raw().data(), pbf_blob.raw().size());
+                    static_cast<TDerived*>(this)->handle_blob(pbf_blob.raw());
                     return;
                 } else if (pbf_blob.has_zlib_data()) {
                     unsigned long raw_size = pbf_blob.raw_size();
                     assert(raw_size <= static_cast<unsigned long>(OSMPBF::max_uncompressed_blob_size));
 
                     std::string unpack_buffer { osmium::io::detail::zlib_uncompress(pbf_blob.zlib_data(), raw_size) };
-                    static_cast<TDerived*>(this)->handle_blob(unpack_buffer.data(), raw_size);
+                    static_cast<TDerived*>(this)->handle_blob(unpack_buffer);
                     return;
                 } else if (pbf_blob.has_lzma_data()) {
                     throw std::runtime_error("lzma blobs not implemented");
@@ -403,13 +403,13 @@ namespace osmium {
                 }
 
                 if (pbf_blob.has_raw()) {
-                    return static_cast<TDerived*>(this)->handle_blob(pbf_blob.raw().data(), pbf_blob.raw().size());
+                    return static_cast<TDerived*>(this)->handle_blob(pbf_blob.raw());
                 } else if (pbf_blob.has_zlib_data()) {
                     unsigned long raw_size = pbf_blob.raw_size();
                     assert(raw_size <= static_cast<unsigned long>(OSMPBF::max_uncompressed_blob_size));
 
                     std::string unpack_buffer { osmium::io::detail::zlib_uncompress(pbf_blob.zlib_data(), raw_size) };
-                    return static_cast<TDerived*>(this)->handle_blob(unpack_buffer.data(), raw_size);
+                    return static_cast<TDerived*>(this)->handle_blob(unpack_buffer);
                 } else if (pbf_blob.has_lzma_data()) {
                     throw std::runtime_error("lzma blobs not implemented");
                 } else {
@@ -423,9 +423,9 @@ namespace osmium {
 
             osmium::io::Header& m_header;
 
-            void handle_blob(const void* data, const size_t size) {
+            void handle_blob(const std::string& data) {
                 OSMPBF::HeaderBlock pbf_header_block;
-                if (!pbf_header_block.ParseFromArray(data, size)) {
+                if (!pbf_header_block.ParseFromArray(data.data(), data.size())) {
                     throw std::runtime_error("Failed to parse HeaderBlock.");
                 }
 
@@ -474,8 +474,8 @@ namespace osmium {
 
             osmium::item_flags_type m_read_types;
 
-            osmium::memory::Buffer handle_blob(const void* data, const size_t size) {
-                PBFPrimitiveBlockParser parser(data, size, m_read_types);
+            osmium::memory::Buffer handle_blob(const std::string& data) {
+                PBFPrimitiveBlockParser parser(data.data(), data.size(), m_read_types);
                 return std::move(parser());
             }
 
