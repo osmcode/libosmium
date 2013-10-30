@@ -35,6 +35,9 @@ DEALINGS IN THE SOFTWARE.
 
 #define OSMIUM_LINK_WITH_LIBS_ZLIB -lz
 
+#include <stdexcept>
+#include <string>
+
 #include <zlib.h>
 
 namespace osmium {
@@ -47,51 +50,21 @@ namespace osmium {
              * Compress data using zlib.
              *
              * @param input Data to compress
-             * @return String Compressed data
+             * @return Compressed data
              */
             std::string zlib_compress(const std::string& input) {
-                std::string output(OSMPBF::max_uncompressed_blob_size, '\0');
+                unsigned long output_size = ::compressBound(input.size());
 
-                // zlib compression context
-                z_stream z;
+                std::string output(output_size, '\0');
 
-                // next byte to compress
-                z.next_in   = reinterpret_cast<unsigned char*>(const_cast<char *>(input.data()));
-
-                // number of bytes to compress
-                z.avail_in  = input.size();
-
-                // place to store compressed bytes
-                z.next_out  = reinterpret_cast<unsigned char*>(const_cast<char *>(output.data()));
-
-                // space for compressed data
-                z.avail_out = OSMPBF::max_uncompressed_blob_size;
-
-                // custom allocator functions - not used
-                z.zalloc    = Z_NULL;
-                z.zfree     = Z_NULL;
-                z.opaque    = Z_NULL;
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-                // initiate the compression
-                if (deflateInit(&z, Z_DEFAULT_COMPRESSION) != Z_OK) {
-                    throw std::runtime_error("failed to init zlib stream");
-                }
-#pragma GCC diagnostic pop
-
-                // compress
-                if (deflate(&z, Z_FINISH) != Z_STREAM_END) {
-                    throw std::runtime_error("failed to deflate zlib stream");
+                if (::compress(reinterpret_cast<unsigned char*>(const_cast<char *>(output.data())),
+                    &output_size,
+                    reinterpret_cast<const unsigned char*>(input.data()),
+                    input.size()) != Z_OK) {
+                    throw std::runtime_error("failed to compress data");
                 }
 
-                // finish compression
-                if (deflateEnd(&z) != Z_OK) {
-                    throw std::runtime_error("failed to deinit zlib stream");
-                }
-
-                // number of compressed bytes
-                output.resize(z.total_out);
+                output.resize(output_size);
 
                 return output;
             }
