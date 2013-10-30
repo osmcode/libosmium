@@ -49,8 +49,8 @@ namespace osmium {
             /**
              * Compress data using zlib.
              *
-             * @param input Data to compress
-             * @return Compressed data
+             * @param input Data to compress.
+             * @return Compressed data.
              */
             std::string zlib_compress(const std::string& input) {
                 unsigned long output_size = ::compressBound(input.size());
@@ -65,6 +65,26 @@ namespace osmium {
                 }
 
                 output.resize(output_size);
+
+                return output;
+            }
+
+            /**
+             * Uncompress data using zlib.
+             *
+             * @param input Compressed input data.
+             * @param raw_size Size of uncompressed data.
+             * @return Uncompressed data.
+             */
+            std::string zlib_uncompress(const std::string& input, unsigned long raw_size) {
+                std::string output(raw_size, '\0');
+
+                if (::uncompress(reinterpret_cast<unsigned char*>(const_cast<char *>(output.data())),
+                    &raw_size,
+                    reinterpret_cast<const unsigned char*>(input.data()),
+                    input.size()) != Z_OK) {
+                    throw std::runtime_error("failed to uncompress data");
+                }
 
                 return output;
             }

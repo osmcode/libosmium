@@ -45,6 +45,7 @@ DEALINGS IN THE SOFTWARE.
 #include <vector>
 
 #include <osmium/io/detail/read_write.hpp>
+#include <osmium/io/detail/zlib.hpp>
 #include <osmium/io/input.hpp>
 #include <osmium/io/pbf.hpp>
 #include <osmium/osm/builder.hpp>
@@ -384,11 +385,9 @@ namespace osmium {
                 } else if (pbf_blob.has_zlib_data()) {
                     unsigned long raw_size = pbf_blob.raw_size();
                     assert(raw_size <= static_cast<unsigned long>(OSMPBF::max_uncompressed_blob_size));
-                    std::unique_ptr<unsigned char[]> unpack_buffer(new unsigned char[raw_size]);
-                    if (uncompress(unpack_buffer.get(), &raw_size, reinterpret_cast<const unsigned char*>(pbf_blob.zlib_data().data()), pbf_blob.zlib_data().size()) != Z_OK || pbf_blob.raw_size() != static_cast<long>(raw_size)) {
-                        throw std::runtime_error("zlib error");
-                    }
-                    static_cast<TDerived*>(this)->handle_blob(unpack_buffer.get(), raw_size);
+
+                    std::string unpack_buffer { osmium::io::detail::zlib_uncompress(pbf_blob.zlib_data(), raw_size) };
+                    static_cast<TDerived*>(this)->handle_blob(unpack_buffer.data(), raw_size);
                     return;
                 } else if (pbf_blob.has_lzma_data()) {
                     throw std::runtime_error("lzma blobs not implemented");
@@ -408,11 +407,9 @@ namespace osmium {
                 } else if (pbf_blob.has_zlib_data()) {
                     unsigned long raw_size = pbf_blob.raw_size();
                     assert(raw_size <= static_cast<unsigned long>(OSMPBF::max_uncompressed_blob_size));
-                    std::unique_ptr<unsigned char[]> unpack_buffer(new unsigned char[raw_size]);
-                    if (uncompress(unpack_buffer.get(), &raw_size, reinterpret_cast<const unsigned char*>(pbf_blob.zlib_data().data()), pbf_blob.zlib_data().size()) != Z_OK || pbf_blob.raw_size() != static_cast<long>(raw_size)) {
-                        throw std::runtime_error("zlib error");
-                    }
-                    return static_cast<TDerived*>(this)->handle_blob(unpack_buffer.get(), raw_size);
+
+                    std::string unpack_buffer { osmium::io::detail::zlib_uncompress(pbf_blob.zlib_data(), raw_size) };
+                    return static_cast<TDerived*>(this)->handle_blob(unpack_buffer.data(), raw_size);
                 } else if (pbf_blob.has_lzma_data()) {
                     throw std::runtime_error("lzma blobs not implemented");
                 } else {
