@@ -162,6 +162,65 @@ namespace osmium {
                 return output;
             }
 
+            /**
+             * Serialize a protobuf-message together into a Blob, optionally apply compression
+             * and return it together with a BlobHeader ready to be written to a file.
+             *
+             * @param type Type-string used in the BlobHeader.
+             * @param msg Protobuf-message.
+             */
+            std::string store_blob(const std::string& type, const google::protobuf::MessageLite& msg, bool use_compression) {
+                // buffer to serialize the protobuf message to
+                std::string data;
+
+                // serialize the protobuf message to the string
+                msg.SerializeToString(&data);
+
+                OSMPBF::Blob pbf_blob;
+                if (use_compression) {
+                    // compress using zlib
+                    std::string output = zlib_compress(data);
+
+                    // set the compressed data on the Blob
+                    pbf_blob.set_zlib_data(output);
+                } else { // no compression
+                    pbf_blob.set_raw(data);
+                }
+
+                // set the size of the uncompressed data on the blob
+                pbf_blob.set_raw_size(data.size());
+
+                // clear the blob string
+                data.clear();
+
+                // serialize and clear the Blob
+                pbf_blob.SerializeToString(&data);
+
+                OSMPBF::BlobHeader pbf_blob_header;
+                // set the header-type to the supplied string on the BlobHeader
+                pbf_blob_header.set_type(type);
+
+                // set the size of the serialized blob on the BlobHeader
+                pbf_blob_header.set_datasize(data.size());
+
+                // a place to serialize the BlobHeader to
+                std::string blobhead;
+
+                // serialize and clear the BlobHeader
+                pbf_blob_header.SerializeToString(&blobhead);
+
+                // the 4-byte size of the BlobHeader, transformed from Host- to Network-Byte-Order
+                uint32_t sz = htonl(blobhead.size());
+
+                // write to the file: the 4-byte BlobHeader-Size followed by the BlobHeader followed by the Blob
+                std::string out;
+                out.reserve(sizeof(sz) + blobhead.size() + data.size());
+                out.append(reinterpret_cast<const char*>(&sz), sizeof(sz));
+                out.append(blobhead);
+                out.append(data);
+                return out;
+            }
+
         } // anonymous namespace
 
         class PBFOutput : public osmium::io::Output, public osmium::handler::Handler<PBFOutput> {
@@ -316,88 +375,6 @@ namespace osmium {
             }
 
             ///// Blob writing /////
-
-            /**
-             * Serialize a protobuf-message together into a Blob, optionally apply compression
-             * and write it together with a BlobHeader to the file.
-             *
-             * @param type Type-string used in the BlobHeader.
-             * @param msg Protobuf-message.
-             */
-            void store_blob(const std::string& type, const google::protobuf::MessageLite& msg) {
-                // buffer to serialize the protobuf message to
-                std::string data;
-
-                // serialize the protobuf message to the string
-                msg.SerializeToString(&data);
-
-                OSMPBF::Blob pbf_blob;
-                if (use_compression()) {
-                    // compress using zlib
-                    std::string output = zlib_compress(data);
-
-                    // set the compressed data on the Blob
-                    pbf_blob.set_zlib_data(output);
-                } else { // no compression
-                    // print debug info about the raw data
-                    if (debug && has_debug_level(1)) {
-                        std::cerr << "store uncompressed " << data.size() << " bytes" << std::endl;
-                    }
-
-                    // just set the raw data on the Blob
-                    pbf_blob.set_raw(data);
-                }
-
-                // set the size of the uncompressed data on the blob
-                pbf_blob.set_raw_size(data.size());
-
-                // clear the blob string
-                data.clear();
-
-                // serialize and clear the Blob
-                pbf_blob.SerializeToString(&data);
-
-                OSMPBF::BlobHeader pbf_blob_header;
-                // set the header-type to the supplied string on the BlobHeader
-                pbf_blob_header.set_type(type);
-
-                // set the size of the serialized blob on the BlobHeader
-                pbf_blob_header.set_datasize(data.size());
-
-                // a place to serialize the BlobHeader to
-                std::string blobhead;
-
-                // serialize and clear the BlobHeader
-                pbf_blob_header.SerializeToString(&blobhead);
-
-                // the 4-byte size of the BlobHeader, transformed from Host- to Network-Byte-Order
-                uint32_t sz = htonl(blobhead.size());
-
-                // write to the file: the 4-byte BlobHeader-Size followed by the BlobHeader followed by the Blob
-#if 0
-                if (::write(this->fd(), &sz, sizeof(sz)) < 0) {
-                    throw std::runtime_error("file error");
-                }
-                if (::write(this->fd(), blobhead.c_str(), blobhead.size()) < 0) {
-                    throw std::runtime_error("file error");
-                }
-                if (::write(this->fd(), data.c_str(), data.size()) < 0) {
-                    throw std::runtime_error("file error");
-                }
-#endif
-                std::string out;
-                out.reserve(sizeof(sz) + blobhead.size() + data.size());
-                out.append(reinterpret_cast<const char*>(&sz), sizeof(sz));
-                out.append(blobhead);
-                out.append(data);
-
-                std::promise<std::string> promise;
-                m_output_queue.push(promise.get_future());
-                promise.set_value(out);
-                while (m_output_queue.size() > 10) {
-                    std::this_thread::sleep_for(std::chrono::milliseconds(100)); // XXX
-                }
-            }
 
             /**
              * Before a PrimitiveBlock gets serialized, all interim StringTable-ids needs to be
@@ -555,7 +532,11 @@ namespace osmium {
                 if (debug && has_debug_level(1)) {
                     std::cerr << "storing header block" << std::endl;
                 }
-                store_blob("OSMHeader", pbf_header_block);
+
+                std::promise<std::string> promise;
+                m_output_queue.push(promise.get_future());
+                promise.set_value(store_blob("OSMHeader", pbf_header_block, use_compression()));
+
                 pbf_header_block.Clear();
             }
 
@@ -579,8 +560,12 @@ namespace osmium {
                 // map all interim string ids to real ids
                 map_string_ids();
 
-                // store the Blob
-                store_blob("OSMData", pbf_primitive_block);
+                std::promise<std::string> promise;
+                m_output_queue.push(promise.get_future());
+                promise.set_value(store_blob("OSMData", pbf_primitive_block, use_compression()));
+                while (m_output_queue.size() > 10) {
+                    std::this_thread::sleep_for(std::chrono::milliseconds(100)); // XXX
+                }
 
                 // clear the PrimitiveBlock struct
                 pbf_primitive_block.Clear();
