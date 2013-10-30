@@ -41,7 +41,8 @@ LIB_XML2   := $(shell xml2-config --libs)
 # this links libboost_program_options statically, because for some reason
 # it always wants the exact version which might not be available on a
 # different host
-LIB_PRGOPT := -Wl,-Bstatic -lboost_program_options -Wl,-Bdynamic
+#LIB_PRGOPT := -Wl,-Bstatic -lboost_program_options -Wl,-Bdynamic
+LIB_PRGOPT := -lboost_program_options
 
 PROGRAMS := \
     osmium_convert \
