@@ -160,16 +160,6 @@ namespace osmium {
             static const int buffer_fill_percent = 95;
 
             /**
-             * protobuf-struct of a Blob
-             */
-            OSMPBF::Blob pbf_blob;
-
-            /**
-             * protobuf-struct of a BlobHeader
-             */
-            OSMPBF::BlobHeader pbf_blob_header;
-
-            /**
              * protobuf-struct of a HeaderBlock
              */
             OSMPBF::HeaderBlock pbf_header_block;
@@ -341,6 +331,7 @@ namespace osmium {
                 // serialize the protobuf message to the string
                 msg.SerializeToString(&data);
 
+                OSMPBF::Blob pbf_blob;
                 if (use_compression()) {
                     // compress using zlib
                     size_t out = zlib_compress(data);
@@ -365,8 +356,8 @@ namespace osmium {
 
                 // serialize and clear the Blob
                 pbf_blob.SerializeToString(&data);
-                pbf_blob.Clear();
 
+                OSMPBF::BlobHeader pbf_blob_header;
                 // set the header-type to the supplied string on the BlobHeader
                 pbf_blob_header.set_type(type);
 
@@ -378,7 +369,6 @@ namespace osmium {
 
                 // serialize and clear the BlobHeader
                 pbf_blob_header.SerializeToString(&blobhead);
-                pbf_blob_header.Clear();
 
                 // the 4-byte size of the BlobHeader, transformed from Host- to Network-Byte-Order
                 uint32_t sz = htonl(blobhead.size());
@@ -781,8 +771,6 @@ namespace osmium {
              */
             PBFOutput(const osmium::io::File& file, data_queue_type& output_queue) :
                 Output(file, output_queue),
-                pbf_blob(),
-                pbf_blob_header(),
                 pbf_header_block(),
                 pbf_primitive_block(),
                 pbf_nodes(nullptr),
