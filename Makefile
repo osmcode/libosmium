@@ -17,6 +17,15 @@ endif
 
 INCLUDE_FILES := $(shell find include -name \*.hpp | sort)
 
+WARNINGFLAGS := -Wall -Wextra -pedantic -Wredundant-decls -Wdisabled-optimization -Wctor-dtor-privacy -Wnon-virtual-dtor -Woverloaded-virtual -Wsign-promo -Winline -Wold-style-cast
+#WARNINGFLAGS += -Weffc++
+
+INSTALL_USER := root
+
+# We use the numeric id 0 here because different systems (Linux vs. BSD)
+# use different names for the "root group".
+INSTALL_GROUP := 0
+
 all:
 
 .PHONY: clean install check test indent
@@ -28,13 +37,10 @@ check:
 	cppcheck --std=c++11 --enable=all -I include $(INCLUDE_FILES) */*.cpp test/t/*/test_*.cpp
 
 install: doc
-	install -m 755 -g root -o root -d $(DESTDIR)/usr/include
-	install -m 755 -g root -o root -d $(DESTDIR)/usr/share/doc/libosmium-dev
-	install -m 644 -g root -o root README.md $(DESTDIR)/usr/share/doc/libosmium-dev/README.md
-	cp --recursive include/osmium $(DESTDIR)/usr/include
-
-WARNINGFLAGS := -Wall -Wextra -pedantic -Wredundant-decls -Wdisabled-optimization -Wctor-dtor-privacy -Wnon-virtual-dtor -Woverloaded-virtual -Wsign-promo -Winline -Wold-style-cast
-#WARNINGFLAGS += -Weffc++ 
+	install -m 755 -g $(INSTALL_GROUP) -o $(INSTALL_USER) -d $(DESTDIR)/usr/include
+	install -m 755 -g $(INSTALL_GROUP) -o $(INSTALL_USER) -d $(DESTDIR)/usr/share/doc/libosmium-dev
+	install -m 644 -g $(INSTALL_GROUP) -o $(INSTALL_USER) README.md $(DESTDIR)/usr/share/doc/libosmium-dev/README.md
+	cp -r include/osmium $(DESTDIR)/usr/include
 
 # This will try to compile each include file on its own to detect missing
 # #include directives. Note that if this reports [OK], it is not enough
@@ -73,8 +79,8 @@ doc: doc/html/files.html
 doc/html/files.html: $(INCLUDE_FILES) doc/Doxyfile doc/doc.txt doc/osmium.css
 
 install-doc: doc
-	install -m 755 -g root -o root -d $(DESTDIR)/usr/share/doc/libosmium-dev
-	cp --recursive doc/html $(DESTDIR)/usr/share/doc/libosmium-dev
+	install -m 755 -g $(INSTALL_GROUP) -o $(INSTALL_USER) -d $(DESTDIR)/usr/share/doc/libosmium-dev
+	cp -r doc/html $(DESTDIR)/usr/share/doc/libosmium-dev
 
 deb:
 	debuild -I -us -uc
