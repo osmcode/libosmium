@@ -102,65 +102,13 @@ More complete outlines of real .osm.pbf files can be created using the osmpbf-ou
 #include <osmium/io/output.hpp>
 #include <osmium/io/pbf.hpp>
 #include <osmium/io/pbf_stringtable.hpp>
+#include <osmium/io/detail/zlib.hpp>
 
 namespace osmium {
 
     namespace io {
 
         namespace {
-
-            /**
-             * Take a string and pack its contents.
-             *
-             * @param in String input.
-             * @return String with compressed data
-             */
-            std::string zlib_compress(const std::string& in) {
-                std::string output(OSMPBF::max_uncompressed_blob_size, '\0');
-
-                // zlib compression context
-                z_stream z;
-
-                // next byte to compress
-                z.next_in   = reinterpret_cast<unsigned char*>(const_cast<char *>(in.data()));
-
-                // number of bytes to compress
-                z.avail_in  = in.size();
-
-                // place to store compressed bytes
-                z.next_out  = reinterpret_cast<unsigned char*>(const_cast<char *>(output.data()));
-
-                // space for compressed data
-                z.avail_out = OSMPBF::max_uncompressed_blob_size;
-
-                // custom allocator functions - not used
-                z.zalloc    = Z_NULL;
-                z.zfree     = Z_NULL;
-                z.opaque    = Z_NULL;
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-                // initiate the compression
-                if (deflateInit(&z, Z_DEFAULT_COMPRESSION) != Z_OK) {
-                    throw std::runtime_error("failed to init zlib stream");
-                }
-#pragma GCC diagnostic pop
-
-                // compress
-                if (deflate(&z, Z_FINISH) != Z_STREAM_END) {
-                    throw std::runtime_error("failed to deflate zlib stream");
-                }
-
-                // finish compression
-                if (deflateEnd(&z) != Z_OK) {
-                    throw std::runtime_error("failed to deinit zlib stream");
-                }
-
-                // number of compressed bytes
-                output.resize(z.total_out);
-
-                return output;
-            }
 
             /**
              * Serialize a protobuf-message together into a Blob, optionally apply compression
@@ -179,7 +127,7 @@ namespace osmium {
                 OSMPBF::Blob pbf_blob;
                 if (use_compression) {
                     // compress using zlib
-                    std::string output = zlib_compress(data);
+                    std::string output = osmium::io::detail::zlib_compress(data);
 
                     // set the compressed data on the Blob
                     pbf_blob.set_zlib_data(output);
