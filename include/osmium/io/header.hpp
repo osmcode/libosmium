@@ -34,6 +34,7 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <string>
+
 #include <osmium/osm/bounds.hpp>
 
 namespace osmium {
@@ -46,7 +47,7 @@ namespace osmium {
         class Header {
 
             /// Bounding box
-            Bounds m_bounds;
+            osmium::Bounds m_bounds;
 
             /**
             * Are there possibly multiple versions of the same object in this stream of objects?
@@ -75,15 +76,15 @@ namespace osmium {
 
             ~Header() = default;
 
-            Bounds& bounds() {
+            osmium::Bounds& bounds() {
                 return m_bounds;
             }
 
-            const Bounds& bounds() const {
+            const osmium::Bounds& bounds() const {
                 return m_bounds;
             }
 
-            Header& bounds(const Bounds& bounds) {
+            Header& bounds(const osmium::Bounds& bounds) {
                 m_bounds = bounds;
                 return *this;
             }
