@@ -82,12 +82,11 @@ namespace osmium {
             }
 
             /**
-             * Sort objects according to the order functor given as template
-             * parameter.
+             * Sort objects according to the given order functor.
              */
-            template <class T>
-            void sort() {
-                std::sort(m_objects.begin(), m_objects.end(), T());
+            template <class TCompare>
+            void sort(TCompare&& compare) {
+                std::sort(m_objects.begin(), m_objects.end(), std::move(compare));
             }
 
             iterator begin() {
