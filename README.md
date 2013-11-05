@@ -29,10 +29,14 @@ you need for the programs you need.
         http://www.boost.org/doc/libs/1_54_0/doc/html/program_options.html
         Debian/Ubuntu: libboost-program-options-dev
 
-    zlib (for PBF support)
+    zlib (for PBF and gzip support)
         http://www.zlib.net/
         Debian/Ubuntu: zlib1g-dev
         openSUSE: zlib-devel
+
+    bz2lib (for bzip2 support)
+        http://www.bzip.org/
+        Debian/Ubuntu: libbz2-dev
 
     GDAL (for OGR support)
         http://gdal.org/

@@ -37,6 +37,7 @@ DEALINGS IN THE SOFTWARE.
 #include <string>
 
 #include <osmium/io/output.hpp>
+#include <osmium/io/compression.hpp>
 
 namespace osmium {
 
@@ -45,24 +46,31 @@ namespace osmium {
         class FileOutput {
 
             data_queue_type& m_input_queue;
-            int m_fd;
+            const std::string& m_compression;
+            const int m_fd;
 
         public:
 
-            FileOutput(data_queue_type& input_queue, int fd) :
+            FileOutput(data_queue_type& input_queue, const std::string& compression, int fd) :
                 m_input_queue(input_queue),
+                m_compression(compression),
                 m_fd(fd) {
             }
 
             void operator()() {
                 osmium::thread::set_thread_name("_osmium_output");
+
+                std::unique_ptr<osmium::io::Compression> compressor = osmium::io::CompressionFactory::instance().create_compression(m_compression, m_fd, true);
+
                 std::future<std::string> data_future;
                 std::string data;
                 do {
                     m_input_queue.wait_and_pop(data_future);
                     data = data_future.get();
-                    osmium::io::detail::reliable_write(m_fd, data.data(), data.size());
+                    compressor->write(data);
                 } while (!data.empty());
+
+                compressor->close();
             }
 
         }; // class FileOutput
@@ -83,8 +91,9 @@ namespace osmium {
                 m_file(file),
                 m_output(osmium::io::OutputFactory::instance().create_output(m_file, m_output_queue)) {
                 m_output->set_header(header);
-                m_file.open_for_output();
-                FileOutput file_output(m_output_queue, m_file.fd());
+
+                int fd = m_file.open_output_file();
+                FileOutput file_output(m_output_queue, m_file.encoding()->compress(), fd);
                 m_file_output = std::thread(file_output);
             }
 

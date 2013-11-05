@@ -266,6 +266,8 @@ namespace osmium {
                 }
             }
 
+        public:
+
             /**
              * Open File for writing. If the file exists, it is truncated, if
              * not it is created.
@@ -288,6 +290,8 @@ namespace osmium {
                     return fd;
                 }
             }
+
+        private:
 
             /**
              * Open File for reading. Handles URLs or normal files. URLs
@@ -567,10 +571,6 @@ namespace osmium {
 
             void open_for_input() {
                 m_fd = m_encoding->decompress() == "" ? open_input_file_or_url() : execute(m_encoding->decompress(), 0);
-            }
-
-            void open_for_output() {
-                m_fd = m_encoding->compress() == "" ? open_output_file() : execute(m_encoding->compress(), 1);
             }
 
         }; // class File
