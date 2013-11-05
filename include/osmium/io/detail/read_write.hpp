@@ -57,7 +57,7 @@ namespace osmium {
              * @return File descriptor of open file.
              * @throws runtime_error if the file can't be opened.
              */
-            int open_for_writing(const std::string& filename) {
+            inline int open_for_writing(const std::string& filename) {
                 if (filename == "" || filename == "-") {
                     return 1; // stdout
                 } else {
