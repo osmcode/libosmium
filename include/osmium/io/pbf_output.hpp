@@ -807,7 +807,7 @@ namespace osmium {
              * This initializes the header-block, sets the required-features and
              * the writing-program and adds the obligatory StringTable-Index 0.
              */
-            void set_header(osmium::io::Header& header) override {
+            void set_header(const osmium::io::Header& header) override {
                 if (debug && has_debug_level(1)) {
                     std::cerr << "pbf write set_header" << std::endl;
                 }

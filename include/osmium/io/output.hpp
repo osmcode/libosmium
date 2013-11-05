@@ -83,7 +83,7 @@ namespace osmium {
             virtual ~Output() {
             }
 
-            virtual void set_header(osmium::io::Header&) {
+            virtual void set_header(const osmium::io::Header&) {
             }
 
             virtual void handle_buffer(osmium::memory::Buffer&&) = 0;
@@ -171,11 +171,11 @@ namespace osmium {
 
         }; // class FileOutput
 
-        class Writer : osmium::handler::Handler<Writer> {
+        class Writer {
 
             osmium::io::File m_file;
             std::unique_ptr<Output> m_output;
-            data_queue_type m_output_queue;
+            data_queue_type m_output_queue {};
             std::thread m_file_output;
 
             Writer(const Writer&) = delete;
@@ -183,29 +183,27 @@ namespace osmium {
 
         public:
 
-            Writer(const osmium::io::File& file) :
+            Writer(const osmium::io::File& file, const osmium::io::Header& header = osmium::io::Header()) :
                 m_file(file),
                 m_output(OutputFactory::instance().create_output(m_file, m_output_queue)) {
+                m_output->set_header(header);
+                FileOutput file_output(m_output_queue, m_output->fd());
+                m_file_output = std::thread(file_output);
             }
 
-            Writer(const std::string& filename = "") :
+            Writer(const std::string& filename = "", const osmium::io::Header& header = osmium::io::Header()) :
                 m_file(filename),
                 m_output(OutputFactory::instance().create_output(m_file, m_output_queue)) {
+                m_output->set_header(header);
+                FileOutput file_output(m_output_queue, m_output->fd());
+                m_file_output = std::thread(file_output);
             }
 
             ~Writer() {
+                close();
                 if (m_file_output.joinable()) {
                     m_file_output.join();
                 }
-            }
-
-            Writer& open(osmium::io::Header& header) {
-                m_output->set_header(header);
-
-                FileOutput file_output(m_output_queue, m_output->fd());
-                m_file_output = std::thread(file_output);
-
-                return *this;
             }
 
             void operator()(osmium::memory::Buffer&& buffer) {

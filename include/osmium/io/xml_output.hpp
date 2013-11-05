@@ -360,7 +360,7 @@ namespace osmium {
                 }
             }
 
-            void set_header(osmium::io::Header& header) override {
+            void set_header(const osmium::io::Header& header) override {
                 std::string out = "<?xml version='1.0' encoding='UTF-8'?>\n";
 
                 if (this->m_file.type() == osmium::io::FileType::Change()) {

@@ -105,13 +105,13 @@ int main(int argc, char* argv[]) {
         std::cerr << "Warning! Source and destination are not of the same type." << std::endl;
     }
 
-    osmium::io::Writer writer(outfile);
 
     osmium::io::Reader reader(infile);
     osmium::io::Header header = reader.open();
 
     header.generator("osmium_convert");
-    writer.open(header);
+
+    osmium::io::Writer writer(outfile, header);
     while (osmium::memory::Buffer buffer = reader.read()) {
         writer(std::move(buffer));
     }
