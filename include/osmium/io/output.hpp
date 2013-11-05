@@ -73,11 +73,6 @@ namespace osmium {
             Output(const osmium::io::File& file, data_queue_type& output_queue) :
                 m_file(file),
                 m_output_queue(output_queue) {
-                m_file.open_for_output();
-            }
-
-            int fd() {
-                return m_file.fd();
             }
 
             virtual ~Output() {

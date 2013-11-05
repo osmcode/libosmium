@@ -83,15 +83,8 @@ namespace osmium {
                 m_file(file),
                 m_output(osmium::io::OutputFactory::instance().create_output(m_file, m_output_queue)) {
                 m_output->set_header(header);
-                FileOutput file_output(m_output_queue, m_output->fd());
-                m_file_output = std::thread(file_output);
-            }
-
-            Writer(const std::string& filename = "", const osmium::io::Header& header = osmium::io::Header()) :
-                m_file(filename),
-                m_output(osmium::io::OutputFactory::instance().create_output(m_file, m_output_queue)) {
-                m_output->set_header(header);
-                FileOutput file_output(m_output_queue, m_output->fd());
+                m_file.open_for_output();
+                FileOutput file_output(m_output_queue, m_file.fd());
                 m_file_output = std::thread(file_output);
             }
 
