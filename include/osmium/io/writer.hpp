@@ -92,7 +92,7 @@ namespace osmium {
                 m_output(osmium::io::OutputFactory::instance().create_output(m_file, m_output_queue)) {
                 m_output->set_header(header);
 
-                int fd = m_file.open_output_file();
+                int fd = osmium::io::detail::open_for_writing(m_file.filename());
                 FileOutput file_output(m_output_queue, m_file.encoding()->compress(), fd);
                 m_file_output = std::thread(file_output);
             }

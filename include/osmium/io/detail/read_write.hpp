@@ -33,8 +33,12 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <unistd.h>
+#include <fcntl.h>
+#include <string>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include <system_error>
+#include <unistd.h>
 
 namespace osmium {
 
@@ -44,6 +48,30 @@ namespace osmium {
          * @brief Internal namespace.
          */
         namespace detail {
+
+            /**
+             * Open file for writing. If the file exists, it is truncated, if
+             * not, it is created. If the file name is empty or "-", no file
+             * is open and the stdout file descriptor (1) is returned.
+             *
+             * @return File descriptor of open file.
+             * @throws runtime_error if the file can't be opened.
+             */
+            int open_for_writing(const std::string& filename) {
+                if (filename == "" || filename == "-") {
+                    return 1; // stdout
+                } else {
+                    int flags = O_WRONLY | O_TRUNC | O_CREAT;
+#ifdef WIN32
+                    flags |= O_BINARY;
+#endif
+                    int fd = ::open(filename.c_str(), flags, 0666);
+                    if (fd < 0) {
+                        throw std::system_error(errno, std::system_category(), "Open failed");
+                    }
+                    return fd;
+                }
+            }
 
             /**
              * Reads the given number of bytes into the input buffer.

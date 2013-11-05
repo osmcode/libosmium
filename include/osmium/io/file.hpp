@@ -266,33 +266,6 @@ namespace osmium {
                 }
             }
 
-        public:
-
-            /**
-             * Open File for writing. If the file exists, it is truncated, if
-             * not it is created.
-             *
-             * @return File descriptor of open file.
-             * @throws IOError if the file can't be opened.
-             */
-            int open_output_file() const {
-                if (m_filename == "") {
-                    return 1; // stdout
-                } else {
-                    int flags = O_WRONLY | O_TRUNC | O_CREAT;
-#ifdef WIN32
-                    flags |= O_BINARY;
-#endif
-                    int fd = ::open(m_filename.c_str(), flags, 0666);
-                    if (fd < 0) {
-                        throw IOError("Open failed", m_filename, errno);
-                    }
-                    return fd;
-                }
-            }
-
-        private:
-
             /**
              * Open File for reading. Handles URLs or normal files. URLs
              * are opened by executing the "curl" program (which must be installed)
