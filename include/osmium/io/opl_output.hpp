@@ -41,7 +41,7 @@ DEALINGS IN THE SOFTWARE.
 // UTF8-CPP header-only library
 #include <utf8/unchecked.h>
 
-#include <osmium/io/output.hpp>
+#include <osmium/io/writer.hpp>
 #include <osmium/io/detail/read_write.hpp>
 #include <osmium/handler.hpp>
 #include <osmium/thread/pool.hpp>

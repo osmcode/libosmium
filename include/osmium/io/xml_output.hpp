@@ -36,7 +36,7 @@ DEALINGS IN THE SOFTWARE.
 #define __STDC_FORMAT_MACROS
 #include <inttypes.h>
 
-#include <osmium/io/output.hpp>
+#include <osmium/io/writer.hpp>
 #include <osmium/thread/pool.hpp>
 
 namespace osmium {

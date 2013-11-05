@@ -46,7 +46,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/io/detail/read_write.hpp>
 #include <osmium/io/detail/zlib.hpp>
-#include <osmium/io/input.hpp>
+#include <osmium/io/reader.hpp>
 #include <osmium/io/pbf.hpp>
 #include <osmium/osm/builder.hpp>
 #include <osmium/thread/pool.hpp>

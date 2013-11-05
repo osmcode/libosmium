@@ -99,7 +99,7 @@ More complete outlines of real .osm.pbf files can be created using the osmpbf-ou
 #include <cmath>
 #include <memory>
 
-#include <osmium/io/output.hpp>
+#include <osmium/io/writer.hpp>
 #include <osmium/io/pbf.hpp>
 #include <osmium/io/pbf_stringtable.hpp>
 #include <osmium/io/detail/zlib.hpp>

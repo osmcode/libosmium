@@ -51,7 +51,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <expat.h>
 
-#include <osmium/io/input.hpp>
+#include <osmium/io/reader.hpp>
 #include <osmium/osm/builder.hpp>
 #include <osmium/thread/queue.hpp>
 
