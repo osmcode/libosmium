@@ -47,14 +47,20 @@ namespace osmium {
          * source. It hides all the buffer handling and makes the contents of a
          * source accessible as a normal STL input iterator.
          */
-        template <class TSource>
-        class Iterator : public std::iterator<std::input_iterator_tag, osmium::memory::Item> {
+        template <class TSource, class TItem>
+        class Iterator {
 
             TSource* m_source;
             osmium::memory::Buffer* m_buffer;
             osmium::memory::Buffer::iterator m_iter;
 
         public:
+
+            typedef std::input_iterator_tag iterator_category;
+            typedef TItem                   value_type;
+            typedef ptrdiff_t               difference_type;
+            typedef TItem*                  pointer;
+            typedef TItem&                  reference;
 
             Iterator(TSource* source, osmium::memory::Buffer* buffer) :
                 m_source(source),
@@ -86,7 +92,7 @@ namespace osmium {
             }
 
             Iterator operator++(int) {
-                iterator tmp(*this);
+                Iterator tmp(*this);
                 operator++();
                 return tmp;
             }

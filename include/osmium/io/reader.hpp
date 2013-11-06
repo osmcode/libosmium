@@ -90,7 +90,8 @@ namespace osmium {
                 return &m_buffer;
             }
 
-            typedef osmium::memory::Iterator<Reader> iterator;
+            typedef osmium::memory::Iterator<Reader, osmium::memory::Item> iterator;
+            //typedef osmium::memory::Iterator<Reader, osmium::Object> iterator;
 
             iterator begin() {
                 return iterator { this, get_buffer() };
