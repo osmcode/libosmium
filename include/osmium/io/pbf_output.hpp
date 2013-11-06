@@ -158,7 +158,7 @@ namespace osmium {
 
         } // anonymous namespace
 
-        class PBFOutput : public osmium::io::Output, public osmium::handler::Handler<PBFOutput> {
+        class PBFOutput : public osmium::io::Output, public osmium::handler::Handler {
 
             /**
             * This class models a variable that keeps track of the value
@@ -718,7 +718,7 @@ namespace osmium {
             }
 
             void handle_buffer(osmium::memory::Buffer&& buffer) override {
-                this->operator()(buffer.cbegin(), buffer.cend());
+                osmium::handler::apply(buffer.cbegin(), buffer.cend(), *this);
             }
 
             /**

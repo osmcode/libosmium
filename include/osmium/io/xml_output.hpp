@@ -71,7 +71,7 @@ namespace osmium {
 
         } // anonymous namespace
 
-        class XMLOutputBlock : public osmium::handler::Handler<XMLOutputBlock> {
+        class XMLOutputBlock : public osmium::handler::Handler {
 
             osmium::memory::Buffer m_input_buffer;
 
@@ -188,7 +188,7 @@ namespace osmium {
             XMLOutputBlock& operator=(XMLOutputBlock&& other) = default;
 
             std::string operator()() {
-                osmium::handler::apply_handler(*this, m_input_buffer.cbegin(), m_input_buffer.cend());
+                osmium::handler::apply(m_input_buffer.cbegin(), m_input_buffer.cend(), *this);
 
                 if (m_write_change_ops) {
                     open_close_op_tag('\0');
@@ -338,7 +338,7 @@ namespace osmium {
 
         }; // class XMLOutputBlock
 
-        class XMLOutput : public osmium::io::Output, public osmium::handler::Handler<XMLOutput> {
+        class XMLOutput : public osmium::io::Output, public osmium::handler::Handler {
 
         public:
 

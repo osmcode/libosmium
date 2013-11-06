@@ -36,6 +36,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/handler.hpp>
 #include <osmium/io/detail/read_write.hpp>
 #include <osmium/index/map.hpp>
+#include <osmium/memory/buffer.hpp>
 
 namespace osmium {
 
@@ -46,7 +47,7 @@ namespace osmium {
          * Note: This handler will only work if either all object IDs are
          *       positive or all object IDs are negative.
          */
-        class DiskStore : public osmium::handler::Handler<DiskStore> {
+        class DiskStore : public osmium::handler::Handler {
 
             typedef osmium::index::map::Map<unsigned_object_id_type, size_t> offset_index_type;
 
@@ -86,10 +87,11 @@ namespace osmium {
                 m_offset += relation.byte_size();
             }
 
+            // XXX
             void operator()(const osmium::memory::Buffer& buffer) {
                 osmium::io::detail::reliable_write(m_data_fd, buffer.data(), buffer.committed());
 
-                apply_handler(*this, buffer.begin(), buffer.end());
+                osmium::handler::apply(buffer.begin(), buffer.end(), *this);
             }
 
         }; // class DiskStore

@@ -34,89 +34,12 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <osmium/osm.hpp>
-#include <osmium/memory/buffer.hpp>
+#include <osmium/memory/item.hpp>
 
 namespace osmium {
 
     namespace handler {
 
-        namespace {
-
-            template <typename T, typename U>
-            using MaybeConst = typename std::conditional<std::is_const<typename T::value_type>::value, typename std::add_const<U>::type, U>::type;
-
-            template <class THandler>
-            inline void call_before_and_after(THandler& handler, osmium::item_type last, osmium::item_type current) {
-                switch (last) {
-                    case osmium::item_type::undefined:
-                        handler.init();
-                        break;
-                    case osmium::item_type::node:
-                        handler.after_nodes();
-                        break;
-                    case osmium::item_type::way:
-                        handler.after_ways();
-                        break;
-                    case osmium::item_type::relation:
-                        handler.after_relations();
-                        break;
-                    case osmium::item_type::changeset:
-                        handler.after_changesets();
-                        break;
-                    default:
-                        break;
-                }
-                switch (current) {
-                    case osmium::item_type::undefined:
-                        handler.done();
-                        break;
-                    case osmium::item_type::node:
-                        handler.before_nodes();
-                        break;
-                    case osmium::item_type::way:
-                        handler.before_ways();
-                        break;
-                    case osmium::item_type::relation:
-                        handler.before_relations();
-                        break;
-                    case osmium::item_type::changeset:
-                        handler.before_changesets();
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-            template <class THandler, typename TIterator>
-            inline osmium::item_type apply_handler(THandler& handler, const TIterator& begin, const TIterator& end, osmium::item_type last_type = osmium::item_type::undefined, bool before_after = false) {
-                for (auto it = begin; it != end; ++it) {
-                    if (before_after && last_type != it->type()) {
-                        call_before_and_after(handler, last_type, it->type());
-                        last_type = it->type();
-                    }
-                    switch (it->type()) {
-                        case osmium::item_type::node:
-                            handler.node(static_cast<MaybeConst<TIterator, osmium::Node>&>(*it));
-                            break;
-                        case osmium::item_type::way:
-                            handler.way(static_cast<MaybeConst<TIterator, osmium::Way>&>(*it));
-                            break;
-                        case osmium::item_type::relation:
-                            handler.relation(static_cast<MaybeConst<TIterator, osmium::Relation>&>(*it));
-                            break;
-                        case osmium::item_type::changeset:
-                            handler.changeset(static_cast<MaybeConst<TIterator, osmium::Changeset>&>(*it));
-                            break;
-                        default:
-                            throw std::runtime_error("unknown type");
-                    }
-                }
-                return last_type;
-            }
-
-        } // anonymous namespace
-
-        template <class THandler>
         class Handler {
 
         public:
@@ -163,47 +86,116 @@ namespace osmium {
             void done() const {
             }
 
-            osmium::item_type operator()(const osmium::memory::Buffer& buffer) {
-                return operator()(buffer.cbegin(), buffer.cend());
-            }
-
-            osmium::item_type operator()(osmium::memory::Buffer& buffer) {
-                return operator()(buffer.begin(), buffer.end());
-            }
-
-
-            osmium::item_type operator()(const osmium::memory::Buffer& buffer, const osmium::item_type type) {
-                return operator()(buffer.cbegin(), buffer.cend(), type);
-            }
-
-            osmium::item_type operator()(osmium::memory::Buffer& buffer, const osmium::item_type type) {
-                return operator()(buffer.begin(), buffer.end(), type);
-            }
-
-
-            osmium::item_type operator()(const osmium::memory::Buffer::const_iterator& begin, const osmium::memory::Buffer::const_iterator& end) {
-                return apply_handler(*static_cast<THandler*>(this), begin, end);
-            }
-
-            osmium::item_type operator()(const osmium::memory::Buffer::iterator& begin, const osmium::memory::Buffer::iterator& end) {
-                return apply_handler(*static_cast<THandler*>(this), begin, end);
-            }
-
-
-            osmium::item_type operator()(const osmium::memory::Buffer::const_iterator& begin, const osmium::memory::Buffer::const_iterator& end, const osmium::item_type type) {
-                return apply_handler(*static_cast<THandler*>(this), begin, end, type, true);
-            }
-
-            osmium::item_type operator()(const osmium::memory::Buffer::iterator& begin, const osmium::memory::Buffer::iterator& end, const osmium::item_type type) {
-                return apply_handler(*static_cast<THandler*>(this), begin, end, type, true);
-            }
-
-
-            void operator()(const osmium::item_type type) {
-                call_before_and_after(*static_cast<THandler*>(this), type, osmium::item_type::undefined);
-            }
-
         }; // class Handler
+
+        namespace {
+
+            template <typename T, typename U>
+            using MaybeConst = typename std::conditional<std::is_const<T>::value, typename std::add_const<U>::type, U>::type;
+
+            template <class THandler>
+            inline void call_before_and_after(THandler& handler, osmium::item_type last, osmium::item_type current) {
+                switch (last) {
+                    case osmium::item_type::undefined:
+                        handler.init();
+                        break;
+                    case osmium::item_type::node:
+                        handler.after_nodes();
+                        break;
+                    case osmium::item_type::way:
+                        handler.after_ways();
+                        break;
+                    case osmium::item_type::relation:
+                        handler.after_relations();
+                        break;
+                    case osmium::item_type::changeset:
+                        handler.after_changesets();
+                        break;
+                    default:
+                        break;
+                }
+                switch (current) {
+                    case osmium::item_type::undefined:
+                        handler.done();
+                        break;
+                    case osmium::item_type::node:
+                        handler.before_nodes();
+                        break;
+                    case osmium::item_type::way:
+                        handler.before_ways();
+                        break;
+                    case osmium::item_type::relation:
+                        handler.before_relations();
+                        break;
+                    case osmium::item_type::changeset:
+                        handler.before_changesets();
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            template <class THandler, class TItem>
+            inline void apply_handler(THandler& handler, TItem* item, osmium::item_type last_type, bool before_after = false) {
+                if (!item) {
+                    if (before_after) {
+                        call_before_and_after(handler, last_type, osmium::item_type::undefined);
+                    }
+                    return;
+                }
+                if (before_after && last_type != item->type()) {
+                    call_before_and_after(handler, last_type, item->type());
+                }
+                switch (item->type()) {
+                    case osmium::item_type::node:
+                        handler.node(static_cast<MaybeConst<TItem, osmium::Node>&>(*item));
+                        break;
+                    case osmium::item_type::way:
+                        handler.way(static_cast<MaybeConst<TItem, osmium::Way>&>(*item));
+                        break;
+                    case osmium::item_type::relation:
+                        handler.relation(static_cast<MaybeConst<TItem, osmium::Relation>&>(*item));
+                        break;
+                    case osmium::item_type::changeset:
+                        handler.changeset(static_cast<MaybeConst<TItem, osmium::Changeset>&>(*item));
+                        break;
+                    default:
+                        throw std::runtime_error("unknown type");
+                }
+            }
+
+            template <class THandler, class TItem>
+            inline void apply_helper(TItem* item, osmium::item_type type, THandler& handler) {
+                apply_handler(handler, item, type, true);
+            }
+
+            template <class THandler, class TItem, class ...TRest>
+            inline void apply_helper(TItem* item, osmium::item_type type, THandler& handler, TRest&... more) {
+                apply_handler(handler, item, type, true);
+                apply_helper(item, type, more...);
+            }
+
+        } // anonymous namespace
+
+        template <class TIterator, class ...THandlers>
+        inline osmium::item_type apply_part(TIterator it, TIterator end, osmium::item_type last_type, THandlers&... handlers) {
+            for (; it != end; ++it) {
+                apply_helper(&*it, last_type, handlers...);
+                last_type = it->type();
+            }
+            return last_type;
+        }
+
+        template <class TIterator, class ...THandlers>
+        inline void apply(TIterator it, TIterator end, THandlers&... handlers) {
+            osmium::item_type type = apply_part(it, end, osmium::item_type::undefined, handlers...);
+            apply_helper(static_cast<typename TIterator::pointer>(nullptr), type, handlers...);
+        }
+
+        template <class TSource, class ...THandlers>
+        inline void apply(TSource& source, THandlers&... handlers) {
+            apply(source.begin(), source.end(), handlers...);
+        }
 
     } // namspace handler
 

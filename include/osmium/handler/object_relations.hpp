@@ -46,7 +46,7 @@ namespace osmium {
          * Note: This handler will only work if either all object IDs are
          *       positive or all object IDs are negative.
          */
-        class ObjectRelations : public osmium::handler::Handler<ObjectRelations> {
+        class ObjectRelations : public osmium::handler::Handler {
 
             typedef osmium::index::multimap::Multimap<unsigned_object_id_type, unsigned_object_id_type> index_type;
 

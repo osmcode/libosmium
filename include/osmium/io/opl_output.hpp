@@ -53,7 +53,7 @@ namespace osmium {
         /**
          * Writes out one buffer with OSM data in OPL format.
          */
-        class OPLOutputBlock : public osmium::handler::Handler<OPLOutputBlock> {
+        class OPLOutputBlock : public osmium::handler::Handler {
 
             static const size_t tmp_buffer_size = 100;
 
@@ -143,7 +143,7 @@ namespace osmium {
             OPLOutputBlock& operator=(OPLOutputBlock&& other) = default;
 
             std::string operator()() {
-                osmium::handler::apply_handler(*this, m_input_buffer.cbegin(), m_input_buffer.cend());
+                osmium::handler::apply(m_input_buffer.cbegin(), m_input_buffer.cend(), *this);
 
                 std::string out;
                 std::swap(out, m_out);

@@ -27,6 +27,7 @@
 
 #include <osmium/geom/ogr.hpp>
 #include <osmium/io/any_input.hpp>
+#include <osmium/handler.hpp>
 
 typedef osmium::index::map::Dummy<osmium::unsigned_object_id_type, osmium::Location> index_neg_type;
 
@@ -36,7 +37,7 @@ typedef osmium::index::map::SparseTable<osmium::unsigned_object_id_type, osmium:
 
 typedef osmium::handler::NodeLocationsForWays<index_pos_type, index_neg_type> location_handler_type;
 
-class MyOGRHandler : public osmium::handler::Handler<MyOGRHandler> {
+class MyOGRHandler : public osmium::handler::Handler {
 
     OGRDataSource* m_data_source;
     OGRLayer* m_layer_point;
@@ -234,7 +235,7 @@ int main(int argc, char* argv[]) {
 
     MyOGRHandler ogr_handler(output_format, output_filename);
 
-    reader.apply(location_handler, ogr_handler);
+    osmium::handler::apply(reader, location_handler, ogr_handler);
 
     google::protobuf::ShutdownProtobufLibrary();
 

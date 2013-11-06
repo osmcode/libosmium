@@ -53,7 +53,7 @@ namespace osmium {
          * @tparam TStorageNegIDs Same but for negative IDs.
          */
         template <class TStoragePosIDs, class TStorageNegIDs = dummy_type>
-        class NodeLocationsForWays : public osmium::handler::Handler<NodeLocationsForWays<TStoragePosIDs, TStorageNegIDs>> {
+        class NodeLocationsForWays : public osmium::handler::Handler {
 
             /// Object that handles the actual storage of the node locations (with positive IDs).
             TStoragePosIDs& m_storage_pos;

@@ -41,6 +41,7 @@ DEALINGS IN THE SOFTWARE.
 #include <utility>
 
 #include <osmium/io/input.hpp>
+#include <osmium/memory/iterator.hpp>
 
 namespace osmium {
 
@@ -57,27 +58,6 @@ namespace osmium {
             Reader(const Reader&) = delete;
             Reader& operator=(const Reader&) = delete;
 
-            template <class THandler>
-            osmium::item_type apply_helper(osmium::memory::Buffer& buffer, osmium::item_type type, THandler& handler) {
-                return handler(buffer, type);
-            }
-
-            template <class THead, class ...TTail>
-            osmium::item_type apply_helper(osmium::memory::Buffer& buffer, osmium::item_type type, THead& handler, TTail&... more) {
-                handler(buffer, type);
-                return apply_helper(buffer, type, more...);
-            }
-
-            template <class THandler>
-            void apply_helper(osmium::item_type type, THandler& handler) {
-                handler(type);
-            }
-
-            template <class THead, class ...TTail>
-            void apply_helper(osmium::item_type type, THead& handler, TTail&... more) {
-                handler(type);
-                apply_helper(type, more...);
-            }
 
         public:
 
@@ -105,83 +85,15 @@ namespace osmium {
                 return m_input->next_buffer();
             }
 
-            template <class ...THandlers>
-            void apply(THandlers&... handlers) {
-                osmium::item_type type = osmium::item_type::undefined;
-                while (osmium::memory::Buffer buffer = read()) {
-                    type = apply_helper(buffer, type, handlers...);
-                }
-                apply_helper(type, handlers...);
-            }
-
-            typedef std::pair<osmium::memory::Buffer::iterator, osmium::memory::Buffer::iterator> buffer_iterator_pair;
-
-            buffer_iterator_pair get_next_iter() {
+            osmium::memory::Buffer* get_buffer() {
                 m_buffer = read();
-                return std::make_pair(m_buffer.begin(), m_buffer.end());
+                return &m_buffer;
             }
 
-            /**
-             * This iterator class allows you to iterate over all items in a file.
-             * It hides all the buffer handling and makes the contents of an
-             * OSM file accessible as a normal STL input iterator.
-             */
-            class iterator : public std::iterator<std::input_iterator_tag, const osmium::Object> {
-
-                Reader* m_reader;
-                buffer_iterator_pair m_iterators;
-
-            public:
-
-                iterator(Reader* reader, buffer_iterator_pair iterators) :
-                    m_reader(reader),
-                    m_iterators(iterators) {
-                }
-
-                // end iterator
-                iterator(Reader* reader) :
-                    m_reader(reader),
-                    m_iterators(std::make_pair(nullptr, nullptr)) {
-                }
-
-                iterator& operator++() {
-                    assert(m_iterators.first != nullptr);
-                    ++m_iterators.first;
-                    if (m_iterators.first == m_iterators.second) {
-                        m_iterators = m_reader->get_next_iter();
-                    }
-                    return *this;
-                }
-
-                iterator operator++(int) {
-                    iterator tmp(*this);
-                    operator++();
-                    return tmp;
-                }
-
-                bool operator==(const iterator& rhs) const {
-                    return m_reader == rhs.m_reader &&
-                           m_iterators == rhs.m_iterators;
-                }
-
-                bool operator!=(const iterator& rhs) const {
-                    return !(*this == rhs);
-                }
-
-                reference operator*() const {
-                    assert(m_iterators.first != nullptr);
-                    return static_cast<reference>(*m_iterators.first);
-                }
-
-                pointer operator->() const {
-                    assert(m_iterators.first != nullptr);
-                    return &static_cast<reference>(*m_iterators.first);
-                }
-
-            }; // class iterator
+            typedef osmium::memory::Iterator<Reader> iterator;
 
             iterator begin() {
-                return iterator { this, get_next_iter() };
+                return iterator { this, get_buffer() };
             }
 
             iterator end() {
