@@ -94,11 +94,11 @@ namespace osmium {
             //typedef osmium::memory::Iterator<Reader, osmium::Object> iterator;
 
             iterator begin() {
-                return iterator { this, get_buffer() };
+                return iterator { this };
             }
 
             iterator end() {
-                return iterator { this };
+                return iterator {};
             }
 
         }; // class Reader

@@ -62,26 +62,28 @@ namespace osmium {
             typedef TItem*                  pointer;
             typedef TItem&                  reference;
 
-            Iterator(TSource* source, osmium::memory::Buffer* buffer) :
+            Iterator(TSource* source) :
                 m_source(source),
-                m_buffer(buffer),
+                m_buffer(source->get_buffer()),
                 m_iter(m_buffer ? m_buffer->begin() : nullptr) {
             }
 
             // end iterator
-            Iterator(TSource* source) :
-                m_source(source),
+            Iterator() :
+                m_source(nullptr),
                 m_buffer(nullptr),
                 m_iter() {
             }
 
             Iterator& operator++() {
+                assert(m_source);
                 assert(m_buffer);
                 assert(m_iter != nullptr);
                 ++m_iter;
                 while (m_iter == m_buffer->end()) {
                     m_buffer = m_source->get_buffer();
                     if (!m_buffer || !*m_buffer) {
+                        m_source = nullptr;
                         m_buffer = nullptr;
                         m_iter = nullptr;
                         return *this;
