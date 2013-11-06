@@ -34,6 +34,7 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <iterator>
+#include <memory>
 
 #include <osmium/memory/buffer.hpp>
 #include <osmium/memory/item.hpp>
@@ -51,8 +52,21 @@ namespace osmium {
         class Iterator {
 
             TSource* m_source;
-            osmium::memory::Buffer* m_buffer;
-            osmium::memory::Buffer::iterator m_iter;
+            std::shared_ptr<osmium::memory::Buffer> m_buffer {};
+            osmium::memory::Buffer::iterator m_iter {};
+
+            void update_buffer() {
+                do {
+                    m_buffer = std::make_shared<osmium::memory::Buffer>(std::move(m_source->read()));
+                    if (!m_buffer || !*m_buffer) { // end of input
+                        m_source = nullptr;
+                        m_buffer.reset();
+                        m_iter = osmium::memory::Buffer::iterator();
+                        return;
+                    }
+                    m_iter = m_buffer->begin();
+                } while (m_iter == m_buffer->end());
+            }
 
         public:
 
@@ -63,16 +77,13 @@ namespace osmium {
             typedef TItem&                  reference;
 
             Iterator(TSource* source) :
-                m_source(source),
-                m_buffer(source->get_buffer()),
-                m_iter(m_buffer ? m_buffer->begin() : nullptr) {
+                m_source(source) {
+                update_buffer();
             }
 
             // end iterator
             Iterator() :
-                m_source(nullptr),
-                m_buffer(nullptr),
-                m_iter() {
+                m_source(nullptr) {
             }
 
             Iterator& operator++() {
@@ -80,15 +91,8 @@ namespace osmium {
                 assert(m_buffer);
                 assert(m_iter != nullptr);
                 ++m_iter;
-                while (m_iter == m_buffer->end()) {
-                    m_buffer = m_source->get_buffer();
-                    if (!m_buffer || !*m_buffer) {
-                        m_source = nullptr;
-                        m_buffer = nullptr;
-                        m_iter = nullptr;
-                        return *this;
-                    }
-                    m_iter = m_buffer->begin();
+                if (m_iter == m_buffer->end()) {
+                    update_buffer();
                 }
                 return *this;
             }
@@ -110,12 +114,12 @@ namespace osmium {
             }
 
             reference operator*() const {
-                assert(m_iter != nullptr);
+                assert(m_iter != osmium::memory::Buffer::iterator());
                 return static_cast<reference>(*m_iter);
             }
 
             pointer operator->() const {
-                assert(m_iter != nullptr);
+                assert(m_iter != osmium::memory::Buffer::iterator());
                 return &static_cast<reference>(*m_iter);
             }
 

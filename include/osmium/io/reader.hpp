@@ -53,7 +53,6 @@ namespace osmium {
             std::unique_ptr<osmium::io::Input> m_input;
 
             osmium::item_flags_type m_read_types {osmium::item_flags_type::all};
-            osmium::memory::Buffer m_buffer {};
 
             Reader(const Reader&) = delete;
             Reader& operator=(const Reader&) = delete;
@@ -83,11 +82,6 @@ namespace osmium {
                     return osmium::memory::Buffer();
                 }
                 return m_input->next_buffer();
-            }
-
-            osmium::memory::Buffer* get_buffer() {
-                m_buffer = read();
-                return &m_buffer;
             }
 
             typedef osmium::memory::Iterator<Reader, osmium::memory::Item> iterator;
