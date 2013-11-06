@@ -60,7 +60,7 @@ namespace osmium {
             using MaybeConst = typename std::conditional<std::is_const<T>::value, typename std::add_const<U>::type, U>::type;
 
             template <class TVisitor, typename TItem>
-            void apply_visitor_impl(TVisitor& visitor, TItem& item) {
+            inline void apply_visitor_impl(TVisitor& visitor, TItem& item) {
 
                 switch (item.type()) {
                     case osmium::item_type::node:
@@ -93,36 +93,36 @@ namespace osmium {
         } // anonymous namespace
 
         template <class TVisitor>
-        void apply_visitor(TVisitor& visitor, const osmium::memory::Item& item) {
+        inline void apply_visitor(TVisitor& visitor, const osmium::memory::Item& item) {
             apply_visitor_impl(visitor, item);
         }
 
         template <class TVisitor>
-        void apply_visitor(TVisitor& visitor, osmium::memory::Item& item) {
+        inline void apply_visitor(TVisitor& visitor, osmium::memory::Item& item) {
             apply_visitor_impl(visitor, item);
         }
 
         template <class TVisitor>
-        void apply_visitor(TVisitor& visitor, const osmium::memory::Buffer::const_iterator& begin, const osmium::memory::Buffer::const_iterator& end) {
+        inline void apply_visitor(TVisitor& visitor, const osmium::memory::Buffer::const_iterator& begin, const osmium::memory::Buffer::const_iterator& end) {
             for (auto it = begin; it != end; ++it) {
                 apply_visitor(visitor, *it);
             }
         }
 
         template <class TVisitor>
-        void apply_visitor(TVisitor& visitor, const osmium::memory::Buffer::iterator& begin, const osmium::memory::Buffer::iterator& end) {
+        inline void apply_visitor(TVisitor& visitor, const osmium::memory::Buffer::iterator& begin, const osmium::memory::Buffer::iterator& end) {
             for (auto it = begin; it != end; ++it) {
                 apply_visitor(visitor, *it);
             }
         }
 
         template <class TVisitor>
-        void apply_visitor(TVisitor& visitor, const osmium::memory::Buffer& buffer) {
+        inline void apply_visitor(TVisitor& visitor, const osmium::memory::Buffer& buffer) {
             apply_visitor(visitor, buffer.cbegin(), buffer.cend());
         }
 
         template <class TVisitor>
-        void apply_visitor(TVisitor& visitor, osmium::memory::Buffer& buffer) {
+        inline void apply_visitor(TVisitor& visitor, osmium::memory::Buffer& buffer) {
             apply_visitor(visitor, buffer.begin(), buffer.end());
         }
 
