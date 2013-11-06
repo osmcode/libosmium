@@ -48,7 +48,7 @@ namespace osmium {
          * source. It hides all the buffer handling and makes the contents of a
          * source accessible as a normal STL input iterator.
          */
-        template <class TSource, class TItem>
+        template <class TSource, class TItem = osmium::memory::Item>
         class Iterator {
 
             TSource* m_source;
@@ -76,8 +76,8 @@ namespace osmium {
             typedef TItem*                  pointer;
             typedef TItem&                  reference;
 
-            Iterator(TSource* source) :
-                m_source(source) {
+            Iterator(TSource& source) :
+                m_source(&source) {
                 update_buffer();
             }
 

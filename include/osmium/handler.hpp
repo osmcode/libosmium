@@ -35,6 +35,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/osm.hpp>
 #include <osmium/memory/item.hpp>
+#include <osmium/memory/iterator.hpp>
 
 namespace osmium {
 
@@ -224,7 +225,14 @@ namespace osmium {
 
         template <class TSource, class ...THandlers>
         inline void apply(TSource& source, THandlers&... handlers) {
-            apply(source.begin(), source.end(), handlers...);
+            apply(osmium::memory::Iterator<TSource>{source},
+                  osmium::memory::Iterator<TSource>{},
+                  handlers...);
+        }
+
+        template <class ...THandlers>
+        inline void apply(osmium::memory::Buffer& buffer, THandlers&... handlers) {
+            apply(buffer.begin(), buffer.end(), handlers...);
         }
 
     } // namspace handler

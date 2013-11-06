@@ -33,15 +33,12 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <cassert>
 #include <functional>
-#include <iterator>
 #include <memory>
 #include <string>
 #include <utility>
 
 #include <osmium/io/input.hpp>
-#include <osmium/memory/iterator.hpp>
 
 namespace osmium {
 
@@ -53,10 +50,6 @@ namespace osmium {
             std::unique_ptr<osmium::io::Input> m_input;
 
             osmium::item_flags_type m_read_types {osmium::item_flags_type::all};
-
-            Reader(const Reader&) = delete;
-            Reader& operator=(const Reader&) = delete;
-
 
         public:
 
@@ -70,6 +63,9 @@ namespace osmium {
                 m_input(osmium::io::InputFactory::instance().create_input(m_file)) {
             }
 
+            Reader(const Reader&) = delete;
+            Reader& operator=(const Reader&) = delete;
+
             osmium::io::Header open(osmium::item_flags_type read_types = osmium::item_flags_type::all) {
                 m_read_types = read_types;
                 return m_input->read(read_types);
@@ -82,17 +78,6 @@ namespace osmium {
                     return osmium::memory::Buffer();
                 }
                 return m_input->next_buffer();
-            }
-
-            typedef osmium::memory::Iterator<Reader, osmium::memory::Item> iterator;
-            //typedef osmium::memory::Iterator<Reader, osmium::Object> iterator;
-
-            iterator begin() {
-                return iterator { this };
-            }
-
-            iterator end() {
-                return iterator {};
             }
 
         }; // class Reader
