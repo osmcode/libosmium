@@ -51,6 +51,8 @@ namespace osmium {
         template <class TSource, class TItem = osmium::memory::Item>
         class Iterator {
 
+            static_assert(std::is_base_of<osmium::memory::Item, TItem>::value, "TItem must derive from osmium::buffer::Item");
+
             TSource* m_source;
             std::shared_ptr<osmium::memory::Buffer> m_buffer {};
             osmium::memory::Buffer::iterator m_iter {};
