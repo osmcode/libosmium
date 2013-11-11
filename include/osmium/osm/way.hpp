@@ -39,25 +39,29 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
-    class WayNodeRefOnly : public osmium::memory::detail::ItemHelper {
+    class WayNode : public osmium::memory::detail::ItemHelper {
 
         object_id_type m_ref;
+        Location m_location;
 
         template <class TMember>
         friend class osmium::memory::CollectionIterator;
 
         unsigned char* next() {
-            return data() + sizeof(WayNodeRefOnly);
+            return data() + sizeof(WayNode);
         }
 
         const unsigned char* next() const {
-            return data() + sizeof(WayNodeRefOnly);
+            return data() + sizeof(WayNode);
         }
 
     public:
 
-        WayNodeRefOnly(const object_id_type ref=0) :
-            m_ref(ref) {
+        static constexpr osmium::item_type collection_type = osmium::item_type::way_node_list;
+
+        WayNode(const object_id_type ref=0, const Location& location=Location()) :
+            m_ref(ref),
+            m_location(location) {
         }
 
         object_id_type ref() const {
@@ -68,56 +72,6 @@ namespace osmium {
             return std::abs(m_ref);
         }
 
-    }; // class WayNodeRefOnly
-
-    inline bool operator<(const WayNodeRefOnly& lhs, const WayNodeRefOnly& rhs) {
-        return lhs.ref() < rhs.ref();
-    }
-
-    inline bool operator>(const WayNodeRefOnly& lhs, const WayNodeRefOnly& rhs) {
-        return lhs.ref() > rhs.ref();
-    }
-
-    inline bool operator<=(const WayNodeRefOnly& lhs, const WayNodeRefOnly& rhs) {
-        return lhs.ref() <= rhs.ref();
-    }
-
-    inline bool operator>=(const WayNodeRefOnly& lhs, const WayNodeRefOnly& rhs) {
-        return lhs.ref() >= rhs.ref();
-    }
-
-    inline bool operator==(const WayNodeRefOnly& lhs, const WayNodeRefOnly& rhs) {
-        return lhs.ref() == rhs.ref();
-    }
-
-    inline bool operator!=(const WayNodeRefOnly& lhs, const WayNodeRefOnly& rhs) {
-        return !(lhs == rhs);
-    }
-
-    class WayNodeWithLocation : public WayNodeRefOnly {
-
-        Location m_location;
-
-        template <class TMember>
-        friend class osmium::memory::CollectionIterator;
-
-        unsigned char* next() {
-            return data() + sizeof(WayNodeWithLocation);
-        }
-
-        const unsigned char* next() const {
-            return data() + sizeof(WayNodeWithLocation);
-        }
-
-    public:
-
-        static constexpr osmium::item_type collection_type = osmium::item_type::way_node_list;
-
-        WayNodeWithLocation(const object_id_type ref=0, const Location& location=Location()) :
-            WayNodeRefOnly(ref),
-            m_location(location) {
-        }
-
         Location location() const {
             return m_location;
         }
@@ -126,9 +80,32 @@ namespace osmium {
             m_location = location;
         }
 
-    }; // class WayNodeWithLocation
+    }; // class WayNode
 
-    typedef WayNodeWithLocation WayNode;
+    inline bool operator<(const WayNode& lhs, const WayNode& rhs) {
+        return lhs.ref() < rhs.ref();
+    }
+
+    inline bool operator>(const WayNode& lhs, const WayNode& rhs) {
+        return lhs.ref() > rhs.ref();
+    }
+
+    inline bool operator<=(const WayNode& lhs, const WayNode& rhs) {
+        return lhs.ref() <= rhs.ref();
+    }
+
+    inline bool operator>=(const WayNode& lhs, const WayNode& rhs) {
+        return lhs.ref() >= rhs.ref();
+    }
+
+    inline bool operator==(const WayNode& lhs, const WayNode& rhs) {
+        return lhs.ref() == rhs.ref();
+    }
+
+    inline bool operator!=(const WayNode& lhs, const WayNode& rhs) {
+        return !(lhs == rhs);
+    }
+
 
     class WayNodeList : public osmium::memory::Collection<WayNode> {
 

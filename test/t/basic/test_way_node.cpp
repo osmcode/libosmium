@@ -28,7 +28,7 @@ BOOST_AUTO_TEST_CASE(equality) {
 }
 
 BOOST_AUTO_TEST_CASE(set_location) {
-    osmium::WayNodeWithLocation wn(7);
+    osmium::WayNode wn(7);
     BOOST_CHECK_EQUAL(wn.location(), osmium::Location());
     wn.location(osmium::Location(13.5, -7.2));
     BOOST_CHECK_EQUAL(wn.location().lon(), 13.5);
