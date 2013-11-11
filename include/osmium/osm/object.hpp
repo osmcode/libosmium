@@ -38,6 +38,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <boost/operators.hpp>
 
+#include <osmium/osm/entity.hpp>
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/tag.hpp>
 #include <osmium/osm/timestamp.hpp>
@@ -52,7 +53,7 @@ namespace osmium {
     /**
      * OSM Object (Node, Way, or Relation).
      */
-    class Object : public osmium::memory::Item, boost::less_than_comparable<Object> {
+    class Object : public osmium::OSMEntity, boost::less_than_comparable<Object> {
 
         object_id_type      m_id;
         bool                m_deleted : 1;
@@ -88,7 +89,7 @@ namespace osmium {
     protected:
 
         Object(osmium::memory::item_size_type size, osmium::item_type type) :
-            Item(size, type),
+            OSMEntity(size, type),
             m_id(0),
             m_deleted(false),
             m_version(0),

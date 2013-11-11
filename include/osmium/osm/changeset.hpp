@@ -36,6 +36,7 @@ DEALINGS IN THE SOFTWARE.
 #include <boost/operators.hpp>
 
 #include <osmium/osm/bounds.hpp>
+#include <osmium/osm/entity.hpp>
 #include <osmium/osm/tag.hpp>
 #include <osmium/osm/timestamp.hpp>
 #include <osmium/osm/types.hpp>
@@ -46,7 +47,7 @@ namespace osmium {
         template <class T> class ObjectBuilder;
     }
 
-    class Changeset : public osmium::memory::Item, boost::less_than_comparable<Changeset> {
+    class Changeset : public osmium::OSMEntity, boost::less_than_comparable<Changeset> {
 
         friend class osmium::memory::ObjectBuilder<osmium::Changeset>;
 
@@ -59,7 +60,7 @@ namespace osmium {
         string_size_type  m_user_size;
 
         Changeset() :
-            Item(sizeof(Changeset), osmium::item_type::changeset) {
+            OSMEntity(sizeof(Changeset), osmium::item_type::changeset) {
         }
 
         void user_size(string_size_type size) {
