@@ -37,6 +37,7 @@ DEALINGS IN THE SOFTWARE.
 #include <cstring>
 
 #include <osmium/memory/collection.hpp>
+#include <osmium/osm/item_type.hpp>
 
 namespace osmium {
 

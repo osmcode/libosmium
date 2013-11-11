@@ -1,5 +1,5 @@
-#ifndef OSMIUM_MEMORY_ITEM_TYPE_HPP
-#define OSMIUM_MEMORY_ITEM_TYPE_HPP
+#ifndef OSMIUM_OSM_ITEM_TYPE_HPP
+#define OSMIUM_OSM_ITEM_TYPE_HPP
 
 /*
 
@@ -129,4 +129,4 @@ namespace osmium {
 
 } // namespace osmium
 
-#endif // OSMIUM_MEMORY_ITEM_TYPE_HPP
+#endif // OSMIUM_OSM_ITEM_TYPE_HPP

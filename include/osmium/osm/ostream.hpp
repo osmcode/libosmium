@@ -35,11 +35,10 @@ DEALINGS IN THE SOFTWARE.
 
 #include <iostream>
 
-#include <osmium/memory/item_type.hpp>
-#include <osmium/osm/types.hpp>
-#include <osmium/osm/tag.hpp>
-#include <osmium/osm/location.hpp>
 #include <osmium/osm/bounds.hpp>
+#include <osmium/osm/location.hpp>
+#include <osmium/osm/tag.hpp>
+#include <osmium/osm/types.hpp>
 
 namespace osmium {
 

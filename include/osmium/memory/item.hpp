@@ -34,10 +34,12 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <cstddef>
-
-#include <osmium/memory/item_type.hpp>
+#include <cstdint>
 
 namespace osmium {
+
+    // forward declaration, see osmium/osm/item_type.hpp for declaration
+    enum class item_type : uint32_t;
 
     // strings can be up to 2^16 characters long
     typedef uint16_t string_size_type;

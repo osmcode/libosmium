@@ -47,7 +47,7 @@ DEALINGS IN THE SOFTWARE.
 # include <winsock2.h>
 #endif
 
-#include <osmium/memory/item_type.hpp>
+#include <osmium/osm/item_type.hpp>
 
 namespace osmium {
 
