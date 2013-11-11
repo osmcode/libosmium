@@ -94,8 +94,74 @@ namespace osmium {
             template <typename T, typename U>
             using MaybeConst = typename std::conditional<std::is_const<T>::value, typename std::add_const<U>::type, U>::type;
 
+            template <class THandler, class TItem>
+            struct handler_type_switch {
+
+                static void switch_on_type(THandler& handler, TItem& item) {
+                    switch (item.type()) {
+                        case osmium::item_type::node:
+                            handler.node(static_cast<MaybeConst<TItem, osmium::Node>&>(item));
+                            break;
+                        case osmium::item_type::way:
+                            handler.way(static_cast<MaybeConst<TItem, osmium::Way>&>(item));
+                            break;
+                        case osmium::item_type::relation:
+                            handler.relation(static_cast<MaybeConst<TItem, osmium::Relation>&>(item));
+                            break;
+                        case osmium::item_type::changeset:
+                            handler.changeset(static_cast<MaybeConst<TItem, osmium::Changeset>&>(item));
+                            break;
+                        default:
+                            throw std::runtime_error("unknown type");
+                    }
+                }
+
+            }; // <THandler, TItem> struct handler_type_switch
+
             template <class THandler>
-            inline void call_before_and_after(THandler& handler, osmium::item_type last, osmium::item_type current) {
+            struct handler_type_switch<THandler, osmium::Object> {
+
+                static void switch_on_type(THandler& handler, osmium::Object& item) {
+                    switch (item.type()) {
+                        case osmium::item_type::node:
+                            handler.node(static_cast<osmium::Node&>(item));
+                            break;
+                        case osmium::item_type::way:
+                            handler.way(static_cast<osmium::Way&>(item));
+                            break;
+                        case osmium::item_type::relation:
+                            handler.relation(static_cast<osmium::Relation&>(item));
+                            break;
+                        default:
+                            throw std::runtime_error("unknown type");
+                    }
+                }
+
+            }; // <THandler, osmium::Object> struct handler_type_switch
+
+            template <class THandler>
+            struct handler_type_switch<THandler, const osmium::Object> {
+
+                static void switch_on_type(THandler& handler, const osmium::Object& item) {
+                    switch (item.type()) {
+                        case osmium::item_type::node:
+                            handler.node(static_cast<const osmium::Node&>(item));
+                            break;
+                        case osmium::item_type::way:
+                            handler.way(static_cast<const osmium::Way&>(item));
+                            break;
+                        case osmium::item_type::relation:
+                            handler.relation(static_cast<const osmium::Relation&>(item));
+                            break;
+                        default:
+                            throw std::runtime_error("unknown type");
+                    }
+                }
+
+            }; // <THandler, const osmium::Object> struct handler_type_switch
+
+            template <class THandler>
+            inline void apply_before_and_after_recurse(osmium::item_type last, osmium::item_type current, THandler& handler) {
                 switch (last) {
                     case osmium::item_type::undefined:
                         handler.init();
@@ -136,91 +202,36 @@ namespace osmium {
                 }
             }
 
-            template <class THandler, class TItem>
-            struct handler_type_switch {
-
-                static void switch_on_type(THandler& handler, TItem* item) {
-                    switch (item->type()) {
-                        case osmium::item_type::node:
-                            handler.node(static_cast<MaybeConst<TItem, osmium::Node>&>(*item));
-                            break;
-                        case osmium::item_type::way:
-                            handler.way(static_cast<MaybeConst<TItem, osmium::Way>&>(*item));
-                            break;
-                        case osmium::item_type::relation:
-                            handler.relation(static_cast<MaybeConst<TItem, osmium::Relation>&>(*item));
-                            break;
-                        case osmium::item_type::changeset:
-                            handler.changeset(static_cast<MaybeConst<TItem, osmium::Changeset>&>(*item));
-                            break;
-                        default:
-                            throw std::runtime_error("unknown type");
-                    }
-                }
-
-            }; // <THandler, TItem> struct handler_type_switch
-
-            template <class THandler>
-            struct handler_type_switch<THandler, osmium::Object> {
-
-                static void switch_on_type(THandler& handler, osmium::Object* item) {
-                    switch (item->type()) {
-                        case osmium::item_type::node:
-                            handler.node(static_cast<MaybeConst<osmium::Object, osmium::Node>&>(*item));
-                            break;
-                        case osmium::item_type::way:
-                            handler.way(static_cast<MaybeConst<osmium::Object, osmium::Way>&>(*item));
-                            break;
-                        case osmium::item_type::relation:
-                            handler.relation(static_cast<MaybeConst<osmium::Object, osmium::Relation>&>(*item));
-                            break;
-                        default:
-                            throw std::runtime_error("unknown type");
-                    }
-                }
-
-            }; // <THandler, osmium::Object> struct handler_type_switch
+            template <class THandler, class ...TRest>
+            inline void apply_before_and_after_recurse(osmium::item_type last, osmium::item_type current, THandler& handler, TRest&... more) {
+                apply_before_and_after_recurse(last, current, handler);
+                apply_before_and_after_recurse(last, current, more...);
+            }
 
             template <class THandler, class TItem>
-            inline void apply_handler(THandler& handler, TItem* item, osmium::item_type last_type, bool before_after = false) {
-                if (!item) {
-                    if (before_after) {
-                        call_before_and_after(handler, last_type, osmium::item_type::undefined);
-                    }
-                    return;
-                }
-                if (before_after && last_type != item->type()) {
-                    call_before_and_after(handler, last_type, item->type());
-                }
+            inline void apply_item_recurse(TItem& item, THandler& handler) {
                 handler_type_switch<THandler, TItem>::switch_on_type(handler, item);
             }
 
-            template <class THandler, class TItem>
-            inline void apply_helper(TItem* item, osmium::item_type type, THandler& handler) {
-                apply_handler(handler, item, type, true);
-            }
-
             template <class THandler, class TItem, class ...TRest>
-            inline void apply_helper(TItem* item, osmium::item_type type, THandler& handler, TRest&... more) {
-                apply_handler(handler, item, type, true);
-                apply_helper(item, type, more...);
+            inline void apply_item_recurse(TItem& item, THandler& handler, TRest&... more) {
+                apply_item_recurse(item, handler);
+                apply_item_recurse(item, more...);
             }
 
         } // namespace detail
 
         template <class TIterator, class ...THandlers>
-        inline osmium::item_type apply_part(TIterator it, TIterator end, osmium::item_type last_type, THandlers&... handlers) {
+        inline void apply(TIterator it, TIterator end, THandlers&... handlers) {
+            osmium::item_type last_type = osmium::item_type::undefined;
             for (; it != end; ++it) {
-                osmium::handler::detail::apply_helper(&*it, last_type, handlers...);
+                if (last_type != it->type()) {
+                    osmium::handler::detail::apply_before_and_after_recurse(last_type, it->type(), handlers...);
+                }
+                osmium::handler::detail::apply_item_recurse(*it, handlers...);
                 last_type = it->type();
             }
-            return last_type;
-        }
-
-        template <class TIterator, class ...THandlers>
-        inline void apply(TIterator it, TIterator end, THandlers&... handlers) {
-            osmium::item_type type = apply_part(it, end, osmium::item_type::undefined, handlers...);
-            osmium::handler::detail::apply_helper(static_cast<typename TIterator::pointer>(nullptr), type, handlers...);
+            osmium::handler::detail::apply_before_and_after_recurse(last_type, osmium::item_type::undefined, handlers...);
         }
 
         template <class TSource, class ...THandlers>
