@@ -74,15 +74,15 @@ namespace osmium {
             return &m_curr == &m_next;
         }
 
-        const osmium::object_id_type id() const {
+        osmium::object_id_type id() const {
             return m_curr.id();
         }
 
-        const osmium::object_version_type version() const {
+        osmium::object_version_type version() const {
             return m_curr.version();
         }
 
-        const osmium::changeset_id_type changeset() const {
+        osmium::changeset_id_type changeset() const {
             return m_curr.changeset();
         }
 

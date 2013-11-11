@@ -33,6 +33,8 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <stdexcept>
+
 #include <osmium/memory/iterator.hpp>
 #include <osmium/osm/diff_object.hpp>
 
