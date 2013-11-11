@@ -91,75 +91,6 @@ namespace osmium {
 
         namespace detail {
 
-            template <typename T, typename U>
-            using MaybeConst = typename std::conditional<std::is_const<T>::value, typename std::add_const<U>::type, U>::type;
-
-            template <class THandler, class TItem>
-            struct handler_type_switch {
-
-                static void switch_on_type(THandler& handler, TItem& item) {
-                    switch (item.type()) {
-                        case osmium::item_type::node:
-                            handler.node(static_cast<MaybeConst<TItem, osmium::Node>&>(item));
-                            break;
-                        case osmium::item_type::way:
-                            handler.way(static_cast<MaybeConst<TItem, osmium::Way>&>(item));
-                            break;
-                        case osmium::item_type::relation:
-                            handler.relation(static_cast<MaybeConst<TItem, osmium::Relation>&>(item));
-                            break;
-                        case osmium::item_type::changeset:
-                            handler.changeset(static_cast<MaybeConst<TItem, osmium::Changeset>&>(item));
-                            break;
-                        default:
-                            throw std::runtime_error("unknown type");
-                    }
-                }
-
-            }; // <THandler, TItem> struct handler_type_switch
-
-            template <class THandler>
-            struct handler_type_switch<THandler, osmium::Object> {
-
-                static void switch_on_type(THandler& handler, osmium::Object& item) {
-                    switch (item.type()) {
-                        case osmium::item_type::node:
-                            handler.node(static_cast<osmium::Node&>(item));
-                            break;
-                        case osmium::item_type::way:
-                            handler.way(static_cast<osmium::Way&>(item));
-                            break;
-                        case osmium::item_type::relation:
-                            handler.relation(static_cast<osmium::Relation&>(item));
-                            break;
-                        default:
-                            throw std::runtime_error("unknown type");
-                    }
-                }
-
-            }; // <THandler, osmium::Object> struct handler_type_switch
-
-            template <class THandler>
-            struct handler_type_switch<THandler, const osmium::Object> {
-
-                static void switch_on_type(THandler& handler, const osmium::Object& item) {
-                    switch (item.type()) {
-                        case osmium::item_type::node:
-                            handler.node(static_cast<const osmium::Node&>(item));
-                            break;
-                        case osmium::item_type::way:
-                            handler.way(static_cast<const osmium::Way&>(item));
-                            break;
-                        case osmium::item_type::relation:
-                            handler.relation(static_cast<const osmium::Relation&>(item));
-                            break;
-                        default:
-                            throw std::runtime_error("unknown type");
-                    }
-                }
-
-            }; // <THandler, const osmium::Object> struct handler_type_switch
-
             template <class THandler>
             inline void apply_before_and_after_recurse(osmium::item_type last, osmium::item_type current, THandler& handler) {
                 switch (last) {
@@ -208,9 +139,66 @@ namespace osmium {
                 apply_before_and_after_recurse(last, current, more...);
             }
 
+            template <typename T, typename U>
+            using MaybeConst = typename std::conditional<std::is_const<T>::value, typename std::add_const<U>::type, U>::type;
+
+            template <class THandler, class TItem>
+            static void switch_on_type(THandler& handler, TItem& item) {
+                switch (item.type()) {
+                    case osmium::item_type::node:
+                        handler.node(static_cast<MaybeConst<TItem, osmium::Node>&>(item));
+                        break;
+                    case osmium::item_type::way:
+                        handler.way(static_cast<MaybeConst<TItem, osmium::Way>&>(item));
+                        break;
+                    case osmium::item_type::relation:
+                        handler.relation(static_cast<MaybeConst<TItem, osmium::Relation>&>(item));
+                        break;
+                    case osmium::item_type::changeset:
+                        handler.changeset(static_cast<MaybeConst<TItem, osmium::Changeset>&>(item));
+                        break;
+                    default:
+                        throw std::runtime_error("unknown type");
+                }
+            }
+
+            template <class THandler>
+            static void switch_on_type(THandler& handler, osmium::Object& item) {
+                switch (item.type()) {
+                    case osmium::item_type::node:
+                        handler.node(static_cast<osmium::Node&>(item));
+                        break;
+                    case osmium::item_type::way:
+                        handler.way(static_cast<osmium::Way&>(item));
+                        break;
+                    case osmium::item_type::relation:
+                        handler.relation(static_cast<osmium::Relation&>(item));
+                        break;
+                    default:
+                        throw std::runtime_error("unknown type");
+                }
+            }
+
+            template <class THandler>
+            static void switch_on_type(THandler& handler, const osmium::Object& item) {
+                switch (item.type()) {
+                    case osmium::item_type::node:
+                        handler.node(static_cast<const osmium::Node&>(item));
+                        break;
+                    case osmium::item_type::way:
+                        handler.way(static_cast<const osmium::Way&>(item));
+                        break;
+                    case osmium::item_type::relation:
+                        handler.relation(static_cast<const osmium::Relation&>(item));
+                        break;
+                    default:
+                        throw std::runtime_error("unknown type");
+                }
+            }
+
             template <class THandler, class TItem>
             inline void apply_item_recurse(TItem& item, THandler& handler) {
-                handler_type_switch<THandler, TItem>::switch_on_type(handler, item);
+                switch_on_type(handler, item);
             }
 
             template <class THandler, class TItem, class ...TRest>
