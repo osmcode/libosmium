@@ -80,8 +80,12 @@ namespace osmium {
         }; // class Decompressor
 
         /**
-         * This factory class is used to register compression algorithms used
-         * for reading and writing OSM files.
+         * This singleton factory class is used to register compression
+         * algorithms used for reading and writing OSM files.
+         *
+         * Each algorithm is identified by a name string and we store
+         * two lambda functions that construct a compressor and decompressor
+         * object, respectively.
          */
         class CompressionFactory {
 
@@ -126,7 +130,10 @@ namespace osmium {
                     return std::unique_ptr<osmium::io::Compressor>((it->second.first)(fd));
                 }
 
-                throw std::runtime_error("compression type not supported"); // XXX output compression type
+                std::string error_message {"compression type '"};
+                error_message += name;
+                error_message += "' not supported";
+                throw std::runtime_error(error_message);
             }
 
             std::unique_ptr<osmium::io::Decompressor> create_decompressor(const std::string& name, int fd) {
@@ -136,7 +143,10 @@ namespace osmium {
                     return std::unique_ptr<osmium::io::Decompressor>((it->second.second)(fd));
                 }
 
-                throw std::runtime_error("decompression type not supported"); // XXX output compression type
+                std::string error_message {"decompression type '"};
+                error_message += name;
+                error_message += "' not supported";
+                throw std::runtime_error(error_message);
             }
 
         }; // class CompressionFactory
