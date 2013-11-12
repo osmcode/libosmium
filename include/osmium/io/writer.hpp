@@ -38,12 +38,13 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/io/output.hpp>
 #include <osmium/io/compression.hpp>
+#include <osmium/thread/debug.hpp>
 
 namespace osmium {
 
     namespace io {
 
-        class FileOutput {
+        class OutputThread {
 
             data_queue_type& m_input_queue;
             const std::string& m_compression;
@@ -51,7 +52,7 @@ namespace osmium {
 
         public:
 
-            FileOutput(data_queue_type& input_queue, const std::string& compression, int fd) :
+            OutputThread(data_queue_type& input_queue, const std::string& compression, int fd) :
                 m_input_queue(input_queue),
                 m_compression(compression),
                 m_fd(fd) {
@@ -73,17 +74,14 @@ namespace osmium {
                 compressor->close();
             }
 
-        }; // class FileOutput
+        }; // class OutputThread
 
         class Writer {
 
             osmium::io::File m_file;
             std::unique_ptr<osmium::io::Output> m_output;
             data_queue_type m_output_queue {};
-            std::thread m_file_output;
-
-            Writer(const Writer&) = delete;
-            Writer& operator=(const Writer&) = delete;
+            std::thread m_output_thread;
 
         public:
 
@@ -93,14 +91,17 @@ namespace osmium {
                 m_output->set_header(header);
 
                 int fd = osmium::io::detail::open_for_writing(m_file.filename());
-                FileOutput file_output(m_output_queue, m_file.encoding()->compress(), fd);
-                m_file_output = std::thread(file_output);
+
+                m_output_thread = std::thread(OutputThread {m_output_queue, m_file.encoding()->compress(), fd});
             }
+
+            Writer(const Writer&) = delete;
+            Writer& operator=(const Writer&) = delete;
 
             ~Writer() {
                 close();
-                if (m_file_output.joinable()) {
-                    m_file_output.join();
+                if (m_output_thread.joinable()) {
+                    m_output_thread.join();
                 }
             }
 
