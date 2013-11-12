@@ -26,6 +26,20 @@ INSTALL_USER := root
 # use different names for the "root group".
 INSTALL_GROUP := 0
 
+CPPCHECK_OPTIONS := --enable=warning,style,performance,portability,information,missingInclude
+
+# cpp doesn't find system includes for some reason, suppress that report
+CPPCHECK_OPTIONS += --suppress=missingIncludeSystem
+
+# temp fix for http://sourceforge.net/apps/trac/cppcheck/ticket/4966
+CPPCHECK_OPTIONS += --suppress=constStatement
+
+# no need to test unit test boilerplate
+CPPCHECK_OPTIONS += -USTAND_ALONE
+
+# optional stricter checks
+#CPPCHECK_OPTIONS += --inconclusive
+
 all:
 
 .PHONY: clean install check test indent
@@ -34,7 +48,7 @@ clean:
 	rm -fr check-includes doc/html test/tests
 
 check:
-	cppcheck --std=c++11 --enable=all -I include $(INCLUDE_FILES) */*.cpp test/t/*/test_*.cpp
+	cppcheck --std=c++11 $(CPPCHECK_OPTIONS) -I include $(INCLUDE_FILES) */*.cpp test/t/*/test_*.cpp
 
 install: doc
 	install -m 755 -g $(INSTALL_GROUP) -o $(INSTALL_USER) -d $(DESTDIR)/usr/include

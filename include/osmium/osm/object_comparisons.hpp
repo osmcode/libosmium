@@ -63,11 +63,11 @@ namespace osmium {
 
         struct object_equal_type_id_version {
 
-            bool operator()(const osmium::Object& lhs, const osmium::Object& rhs) {
+            bool operator()(const osmium::Object& lhs, const osmium::Object& rhs) const {
                 return lhs == rhs;
             }
 
-            bool operator()(const osmium::Object* lhs, const osmium::Object* rhs) {
+            bool operator()(const osmium::Object* lhs, const osmium::Object* rhs) const {
                 return *lhs == *rhs;
             }
 
@@ -75,12 +75,12 @@ namespace osmium {
 
         struct object_equal_type_id {
 
-            bool operator()(const osmium::Object& lhs, const osmium::Object& rhs) {
+            bool operator()(const osmium::Object& lhs, const osmium::Object& rhs) const {
                 return lhs.type() == rhs.type() &&
                        lhs.id() == rhs.id();
             }
 
-            bool operator()(const osmium::Object* lhs, const osmium::Object* rhs) {
+            bool operator()(const osmium::Object* lhs, const osmium::Object* rhs) const {
                 return operator()(*lhs, *rhs);
             }
 
@@ -88,11 +88,11 @@ namespace osmium {
 
         struct object_order_type_id_version {
 
-            bool operator()(const osmium::Object& lhs, const osmium::Object& rhs) {
+            bool operator()(const osmium::Object& lhs, const osmium::Object& rhs) const {
                 return lhs < rhs;
             }
 
-            bool operator()(const osmium::Object* lhs, const osmium::Object* rhs) {
+            bool operator()(const osmium::Object* lhs, const osmium::Object* rhs) const {
                 return *lhs < *rhs;
             }
 
@@ -100,7 +100,7 @@ namespace osmium {
 
         struct object_order_type_id_reverse_version {
 
-            bool operator()(const osmium::Object& lhs, const osmium::Object& rhs) {
+            bool operator()(const osmium::Object& lhs, const osmium::Object& rhs) const {
                 if (lhs.type() != rhs.type()) {
                     return lhs.type() < rhs.type();
                 }
@@ -108,7 +108,7 @@ namespace osmium {
                        lhs.positive_id() < rhs.positive_id();
             }
 
-            bool operator()(const osmium::Object* lhs, const osmium::Object* rhs) {
+            bool operator()(const osmium::Object* lhs, const osmium::Object* rhs) const {
                 return operator()(*lhs, *rhs);
             }
 
