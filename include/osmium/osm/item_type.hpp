@@ -52,36 +52,6 @@ namespace osmium {
 
     }; // enum class item_type
 
-    enum item_flags_type {
-
-        nothing   = 0x00,
-        node      = 0x01,
-        way       = 0x02,
-        relation  = 0x04,
-        area      = 0x08,
-        changeset = 0x10,
-        all       = 0x1f
-
-    }; // enum item_type_flags
-
-    inline item_flags_type operator|(const item_flags_type lhs, const item_flags_type rhs) {
-        return static_cast<item_flags_type>(static_cast<int>(lhs) | static_cast<int> (rhs));
-    }
-
-    inline item_flags_type& operator|=(item_flags_type& lhs, const item_flags_type rhs) {
-        lhs = lhs | rhs;
-        return lhs;
-    }
-
-    inline item_flags_type operator&(const item_flags_type lhs, const item_flags_type rhs) {
-        return static_cast<item_flags_type>(static_cast<int>(lhs) & static_cast<int> (rhs));
-    }
-
-    inline item_flags_type operator&=(item_flags_type& lhs, const item_flags_type rhs) {
-        lhs = lhs & rhs;
-        return lhs;
-    }
-
     inline item_type char_to_item_type(const char c) {
         switch (c) {
             case 'n':

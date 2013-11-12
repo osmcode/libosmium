@@ -49,7 +49,7 @@ namespace osmium {
             osmium::io::File m_file;
             std::unique_ptr<osmium::io::Input> m_input;
 
-            osmium::item_flags_type m_read_types {osmium::item_flags_type::all};
+            osmium::osm_entity::flags m_read_types {osmium::osm_entity::flags::all};
 
         public:
 
@@ -66,13 +66,13 @@ namespace osmium {
             Reader(const Reader&) = delete;
             Reader& operator=(const Reader&) = delete;
 
-            osmium::io::Header open(osmium::item_flags_type read_types = osmium::item_flags_type::all) {
+            osmium::io::Header open(osmium::osm_entity::flags read_types = osmium::osm_entity::flags::all) {
                 m_read_types = read_types;
                 return m_input->read(read_types);
             }
 
             osmium::memory::Buffer read() {
-                if (m_read_types == osmium::item_flags_type::nothing) {
+                if (m_read_types == osmium::osm_entity::flags::nothing) {
                     // If the caller didn't want anything but the header, it will
                     // always get an empty buffer here.
                     return osmium::memory::Buffer();

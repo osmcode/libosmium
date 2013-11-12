@@ -46,6 +46,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/io/header.hpp>
 #include <osmium/memory/buffer.hpp>
 #include <osmium/osm/object.hpp>
+#include <osmium/osm/entity_flags.hpp>
 
 namespace osmium {
 
@@ -71,7 +72,7 @@ namespace osmium {
             virtual ~Input() {
             }
 
-            virtual osmium::io::Header read(item_flags_type read_types) = 0;
+            virtual osmium::io::Header read(osmium::osm_entity::flags read_types) = 0;
 
             virtual osmium::memory::Buffer next_buffer() = 0;
 

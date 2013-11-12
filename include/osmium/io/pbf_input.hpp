@@ -70,7 +70,7 @@ namespace osmium {
             int64_t m_date_factor;
             int32_t m_granularity;
 
-            osmium::item_flags_type m_read_types;
+            osmium::osm_entity::flags m_read_types;
 
             osmium::memory::Buffer m_buffer;
 
@@ -82,7 +82,7 @@ namespace osmium {
 
         public:
 
-            PBFPrimitiveBlockParser(const void* data, const size_t size, osmium::item_flags_type read_types) :
+            PBFPrimitiveBlockParser(const void* data, const size_t size, osmium::osm_entity::flags read_types) :
                 m_data(data),
                 m_size(size),
                 m_stringtable(nullptr),
@@ -112,13 +112,13 @@ namespace osmium {
                     const OSMPBF::PrimitiveGroup& group = pbf_primitive_block.primitivegroup(i);
 
                     if (group.has_dense())  {
-                        if (m_read_types & osmium::item_flags_type::node) parse_dense_node_group(group);
+                        if (m_read_types & osmium::osm_entity::flags::node) parse_dense_node_group(group);
                     } else if (group.ways_size() != 0) {
-                        if (m_read_types & osmium::item_flags_type::way) parse_way_group(group);
+                        if (m_read_types & osmium::osm_entity::flags::way) parse_way_group(group);
                     } else if (group.relations_size() != 0) {
-                        if (m_read_types & osmium::item_flags_type::relation) parse_relation_group(group);
+                        if (m_read_types & osmium::osm_entity::flags::relation) parse_relation_group(group);
                     } else if (group.nodes_size() != 0) {
-                        if (m_read_types & osmium::item_flags_type::node) parse_node_group(group);
+                        if (m_read_types & osmium::osm_entity::flags::node) parse_node_group(group);
                     } else {
                         throw std::runtime_error("Group of unknown type.");
                     }
@@ -472,7 +472,7 @@ namespace osmium {
 
         class DataBlobParser : public BlobParser<DataBlobParser> {
 
-            osmium::item_flags_type m_read_types;
+            osmium::osm_entity::flags m_read_types;
 
             osmium::memory::Buffer handle_blob(const std::string& data) {
                 PBFPrimitiveBlockParser parser(data.data(), data.size(), m_read_types);
@@ -483,7 +483,7 @@ namespace osmium {
 
             friend class BlobParser;
 
-            DataBlobParser(const int size, const int blob_num, const int fd, osmium::item_flags_type read_types) :
+            DataBlobParser(const int size, const int blob_num, const int fd, osmium::osm_entity::flags read_types) :
                 BlobParser(size, blob_num, fd),
                 m_read_types(read_types) {
             }
@@ -540,7 +540,7 @@ namespace osmium {
                 return m_blob_header.datasize();
             }
 
-            void parse_osm_data(osmium::item_flags_type read_types) {
+            void parse_osm_data(osmium::osm_entity::flags read_types) {
                 osmium::thread::set_thread_name("_osmium_pbf_in");
                 int n=0;
                 while (size_t size = read_blob_header(fd(), "OSMData")) {
@@ -599,7 +599,7 @@ namespace osmium {
             /**
              * Read PBF file.
              */
-            osmium::io::Header read(item_flags_type read_types) override {
+            osmium::io::Header read(osmium::osm_entity::flags read_types) override {
 
                 // handle OSMHeader
                 size_t size = read_blob_header(fd(), "OSMHeader");
@@ -609,7 +609,7 @@ namespace osmium {
                     header_blob_parser.doit();
                 }
 
-                if (read_types != osmium::item_flags_type::nothing) {
+                if (read_types != osmium::osm_entity::flags::nothing) {
                     m_reader = std::thread(&PBFInput::parse_osm_data, this, read_types);
                 }
 
