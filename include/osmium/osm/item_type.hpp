@@ -43,13 +43,12 @@ namespace osmium {
         node                                   = 0x01,
         way                                    = 0x02,
         relation                               = 0x03,
-        collection                             = 0x10,
+        area                                   = 0x04,
+        changeset                              = 0x05,
         tag_list                               = 0x11,
         way_node_list                          = 0x12,
-        way_node_with_location_list            = 0x32,
         relation_member_list                   = 0x13,
-        relation_member_list_with_full_members = 0x33,
-        changeset                              = 0x40
+        relation_member_list_with_full_members = 0x23
 
     }; // enum class item_type
 
@@ -59,8 +58,9 @@ namespace osmium {
         node      = 0x01,
         way       = 0x02,
         relation  = 0x04,
-        changeset = 0x08,
-        all       = 0x0f
+        area      = 0x08,
+        changeset = 0x10,
+        all       = 0x1f
 
     }; // enum item_type_flags
 

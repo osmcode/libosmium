@@ -16,7 +16,7 @@ int main(int argc, char* argv[]) {
 
     if (argc < 2 || argc > 3) {
         std::cerr << "Usage: " << argv[0] << " OSMFILE [TYPES]\n";
-        std::cerr << "TYPES can be any combination of 'n', 'w', and 'r' to indicate what types of objects you want (default: all).\n";
+        std::cerr << "TYPES can be any combination of 'n', 'w', 'r', and 'c' to indicate what types of OSM entities you want (default: all).\n";
         exit(1);
     }
 
@@ -28,6 +28,7 @@ int main(int argc, char* argv[]) {
         if (types.find('n') != std::string::npos) read_types |= osmium::item_flags_type::node;
         if (types.find('w') != std::string::npos) read_types |= osmium::item_flags_type::way;
         if (types.find('r') != std::string::npos) read_types |= osmium::item_flags_type::relation;
+        if (types.find('c') != std::string::npos) read_types |= osmium::item_flags_type::changeset;
     }
 
     osmium::io::Reader reader(argv[1]);
