@@ -65,11 +65,11 @@ namespace osmium {
             void operator()() {
                 osmium::thread::set_thread_name("_osmium_input");
 
-                std::unique_ptr<osmium::io::Compression> compressor = osmium::io::CompressionFactory::instance().create_compression(m_compression, m_fd, false);
+                std::unique_ptr<osmium::io::Decompressor> decompressor = osmium::io::CompressionFactory::instance().create_decompressor(m_compression, m_fd);
 
                 bool done = false;
                 while (!done) {
-                    std::string data {compressor->read()};
+                    std::string data {decompressor->read()};
                     if (data.empty()) {
                         done = true;
                     }
@@ -79,7 +79,7 @@ namespace osmium {
                     }
                 }
 
-                compressor->close();
+                decompressor->close();
             }
 
         }; // class InputThread

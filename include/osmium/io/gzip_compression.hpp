@@ -43,33 +43,22 @@ namespace osmium {
 
     namespace io {
 
-        class GzipCompression : public Compression {
+        class GzipCompressor : public Compressor {
 
             gzFile m_gzfile;
 
         public:
 
-            GzipCompression(int fd, bool write) :
-                Compression(),
-                m_gzfile(::gzdopen(fd, write ? "w" : "r")) {
+            GzipCompressor(int fd) :
+                Compressor(),
+                m_gzfile(::gzdopen(fd, "w")) {
                 if (!m_gzfile) {
                     throw std::runtime_error("initialization of gzip compression failed");
                 }
             }
 
-            ~GzipCompression() override final {
+            ~GzipCompressor() override final {
                 this->close();
-            }
-
-            std::string read() override final {
-                std::string buffer(osmium::io::Compression::input_buffer_size, '\0');
-                int nread = ::gzread(m_gzfile, const_cast<char*>(buffer.data()), buffer.size());
-                if (nread < 0) {
-                    throw std::runtime_error("gzip read failed"); // XXX better error detection and reporting
-//                    throw std::system_error(errno, std::system_category(), "Read failed");
-                }
-                buffer.resize(nread);
-                return buffer;
             }
 
             void write(const std::string& data) override final {
@@ -83,14 +72,54 @@ namespace osmium {
                 }
             }
 
-        }; // class GzipCompression
+        }; // class GzipCompressor
+
+        class GzipDecompressor : public Decompressor {
+
+            gzFile m_gzfile;
+
+        public:
+
+            GzipDecompressor(int fd) :
+                Decompressor(),
+                m_gzfile(::gzdopen(fd, "r")) {
+                if (!m_gzfile) {
+                    throw std::runtime_error("initialization of gzip compression failed");
+                }
+            }
+
+            ~GzipDecompressor() override final {
+                this->close();
+            }
+
+            std::string read() override final {
+                std::string buffer(osmium::io::Decompressor::input_buffer_size, '\0');
+                int nread = ::gzread(m_gzfile, const_cast<char*>(buffer.data()), buffer.size());
+                if (nread < 0) {
+                    throw std::runtime_error("gzip read failed"); // XXX better error detection and reporting
+//                    throw std::system_error(errno, std::system_category(), "Read failed");
+                }
+                buffer.resize(nread);
+                return buffer;
+            }
+
+            void close() override final {
+                if (m_gzfile) {
+                    ::gzclose(m_gzfile);
+                    m_gzfile = nullptr;
+                }
+            }
+
+        }; // class GzipDecompressor
 
         namespace {
 
             const bool registered_gzip_compression = osmium::io::CompressionFactory::instance().register_compression({
                 "gzip"
-            }, [](int fd, bool write) {
-                return new osmium::io::GzipCompression(fd, write);
+            }, [](int fd) {
+                return new osmium::io::GzipCompressor(fd);
+            }, [](int fd) {
+                return new osmium::io::GzipDecompressor(fd);
             });
 
         } // anonymous namespace

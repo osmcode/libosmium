@@ -45,7 +45,7 @@ namespace osmium {
 
     namespace io {
 
-        class Bzip2Compression : public Compression {
+        class Bzip2Compressor : public Compressor {
 
             FILE* m_file;
             int m_bzerror;
@@ -53,29 +53,18 @@ namespace osmium {
 
         public:
 
-            Bzip2Compression(int fd, bool write) :
-                Compression(),
-                m_file(fdopen(fd, write ? "w" : "r")),
+            Bzip2Compressor(int fd) :
+                Compressor(),
+                m_file(fdopen(fd, "w")),
                 m_bzerror(BZ_OK),
-                m_bzfile(write ? ::BZ2_bzWriteOpen(&m_bzerror, m_file, 6, 0, 0) : ::BZ2_bzReadOpen(&m_bzerror, m_file, 0, 0, nullptr, 0)) {
+                m_bzfile(::BZ2_bzWriteOpen(&m_bzerror, m_file, 6, 0, 0)) {
                 if (!m_bzfile) {
                     throw std::runtime_error("initialization of bzip2 compression failed");
                 }
             }
 
-            ~Bzip2Compression() override final {
+            ~Bzip2Compressor() override final {
                 this->close();
-            }
-
-            std::string read() override final {
-                std::string buffer(osmium::io::Compression::input_buffer_size, '\0');
-                int error;
-                int nread = ::BZ2_bzRead(&error, m_bzfile, const_cast<char*>(buffer.data()), buffer.size());
-//                if (error != BZ_OK && error != BZ_STREAM_END) {
-//                    throw std::runtime_error("bzip2 read failed"); // XXX better error detection and reporting
-//                }
-                buffer.resize(nread);
-                return buffer;
             }
 
             void write(const std::string& data) override final {
@@ -96,14 +85,63 @@ namespace osmium {
                 }
             }
 
-        }; // class Bzip2Compression
+        }; // class Bzip2Compressor
+
+        class Bzip2Decompressor : public Decompressor {
+
+            FILE* m_file;
+            int m_bzerror;
+            BZFILE* m_bzfile;
+
+        public:
+
+            Bzip2Decompressor(int fd) :
+                Decompressor(),
+                m_file(fdopen(fd, "r")),
+                m_bzerror(BZ_OK),
+                m_bzfile(::BZ2_bzReadOpen(&m_bzerror, m_file, 0, 0, nullptr, 0)) {
+                if (!m_bzfile) {
+                    throw std::runtime_error("initialization of bzip2 compression failed");
+                }
+            }
+
+            ~Bzip2Decompressor() override final {
+                this->close();
+            }
+
+            std::string read() override final {
+                std::string buffer(osmium::io::Decompressor::input_buffer_size, '\0');
+                int error;
+                int nread = ::BZ2_bzRead(&error, m_bzfile, const_cast<char*>(buffer.data()), buffer.size());
+//                if (error != BZ_OK && error != BZ_STREAM_END) {
+//                    throw std::runtime_error("bzip2 read failed"); // XXX better error detection and reporting
+//                }
+                buffer.resize(nread);
+                return buffer;
+            }
+
+            void close() override final {
+                if (m_bzfile) {
+                    int error;
+                    unsigned int nbytes_in_lo32;
+                    unsigned int nbytes_in_hi32;
+                    unsigned int nbytes_out_lo32;
+                    unsigned int nbytes_out_hi32;
+                    ::BZ2_bzWriteClose64(&error, m_bzfile, 0, &nbytes_in_lo32, &nbytes_in_hi32, &nbytes_out_lo32, &nbytes_out_hi32);
+                    m_bzfile = nullptr;
+                }
+            }
+
+        }; // class Bzip2Decompressor
 
         namespace {
 
             const bool registered_bzip2_compression = osmium::io::CompressionFactory::instance().register_compression({
                 "bzip2"
-            }, [](int fd, bool write) {
-                return new osmium::io::Bzip2Compression(fd, write);
+            }, [](int fd) {
+                return new osmium::io::Bzip2Compressor(fd);
+            }, [](int fd) {
+                return new osmium::io::Bzip2Decompressor(fd);
             });
 
         } // anonymous namespace

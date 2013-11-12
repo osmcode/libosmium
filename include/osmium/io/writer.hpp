@@ -61,7 +61,7 @@ namespace osmium {
             void operator()() {
                 osmium::thread::set_thread_name("_osmium_output");
 
-                std::unique_ptr<osmium::io::Compression> compressor = osmium::io::CompressionFactory::instance().create_compression(m_compression, m_fd, true);
+                std::unique_ptr<osmium::io::Compressor> compressor = osmium::io::CompressionFactory::instance().create_compressor(m_compression, m_fd);
 
                 std::future<std::string> data_future;
                 std::string data;
