@@ -213,7 +213,8 @@ namespace osmium {
                 return user;
             }
 
-            void init_changeset(osmium::osm::ChangesetBuilder* builder, osmium::Changeset& changeset, const XML_Char** attrs) {
+            void init_changeset(osmium::osm::ChangesetBuilder* builder, const XML_Char** attrs) {
+                osmium::Changeset& new_changeset = builder->object();
                 bool user_set = false;
 
                 osmium::Location min {};
@@ -231,12 +232,12 @@ namespace osmium {
                         builder->add_user(attrs[count+1]);
                         user_set = true;
                     } else {
-                        changeset.set_attribute(attrs[count], attrs[count+1]);
+                        new_changeset.set_attribute(attrs[count], attrs[count+1]);
                     }
                 }
 
-                changeset.bounds().extend(min);
-                changeset.bounds().extend(max);
+                new_changeset.bounds().extend(min);
+                new_changeset.bounds().extend(max);
 
                 if (!user_set) {
                     builder->add_user("");
@@ -334,7 +335,7 @@ namespace osmium {
                                 }
                                 if (m_read_types & osmium::osm_entity::flags::changeset) {
                                     m_changeset_builder = std::unique_ptr<osmium::osm::ChangesetBuilder>(new osmium::osm::ChangesetBuilder(m_buffer));
-                                    init_changeset(m_changeset_builder.get(), m_changeset_builder->object(), attrs);
+                                    init_changeset(m_changeset_builder.get(), attrs);
                                     m_context = context::changeset;
                                 } else {
                                     m_context = context::ignored_changeset;
