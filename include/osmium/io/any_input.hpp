@@ -33,6 +33,10 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <osmium/io/compression.hpp>
+#include <osmium/io/gzip_compression.hpp>
+#include <osmium/io/bzip2_compression.hpp>
+
 #include <osmium/io/pbf_input.hpp>
 #include <osmium/io/xml_input.hpp>
 
