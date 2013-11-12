@@ -64,7 +64,6 @@ namespace osmium {
 
         class XMLParser {
 
-            static constexpr int xml_buffer_size = 10240;
             static constexpr int buffer_size = 10 * 1000 * 1000;
 
             enum class context {
@@ -90,8 +89,6 @@ namespace osmium {
              */
             bool m_in_delete_section;
 
-            int m_fd;
-
             osmium::io::Header m_header;
 
             osmium::memory::Buffer m_buffer;
@@ -105,6 +102,7 @@ namespace osmium {
             std::unique_ptr<osmium::osm::WayNodeListBuilder>        m_wnl_builder;
             std::unique_ptr<osmium::osm::RelationMemberListBuilder> m_rml_builder;
 
+            osmium::thread::Queue<std::string>& m_input_queue;
             osmium::thread::Queue<osmium::memory::Buffer>& m_queue;
             std::promise<osmium::io::Header>& m_header_promise;
 
@@ -118,11 +116,10 @@ namespace osmium {
 
         public:
 
-            XMLParser(int fd, osmium::thread::Queue<osmium::memory::Buffer>& queue, std::promise<osmium::io::Header>& header_promise, osmium::osm_entity::flags read_types, std::atomic<bool>& done) :
+            XMLParser(osmium::thread::Queue<std::string>& input_queue, osmium::thread::Queue<osmium::memory::Buffer>& queue, std::promise<osmium::io::Header>& header_promise, osmium::osm_entity::flags read_types, std::atomic<bool>& done) :
                 m_context(context::root),
                 m_last_context(context::root),
                 m_in_delete_section(false),
-                m_fd(fd),
                 m_header(),
                 m_buffer(buffer_size),
                 m_node_builder(),
@@ -132,6 +129,7 @@ namespace osmium {
                 m_tl_builder(),
                 m_wnl_builder(),
                 m_rml_builder(),
+                m_input_queue(input_queue),
                 m_queue(queue),
                 m_header_promise(header_promise),
                 m_promise_fulfilled(false),
@@ -153,17 +151,10 @@ namespace osmium {
                 try {
                     int done;
                     do {
-                        void* buffer = XML_GetBuffer(parser, xml_buffer_size);
-                        if (buffer == nullptr) {
-                            throw std::runtime_error("out of memory");
-                        }
-
-                        ssize_t result = ::read(m_fd, buffer, xml_buffer_size);
-                        if (result < 0) {
-                            throw std::runtime_error("read error");
-                        }
-                        done = (result == 0);
-                        if (XML_ParseBuffer(parser, result, done) == XML_STATUS_ERROR) {
+                        std::string data;
+                        m_input_queue.wait_and_pop(data);
+                        done = data.empty();
+                        if (XML_Parse(parser, data.data(), data.size(), done) == XML_STATUS_ERROR) {
                             XML_Error errorCode = XML_GetErrorCode(parser);
                             long errorLine = XML_GetCurrentLineNumber(parser);
                             long errorCol = XML_GetCurrentColumnNumber(parser);
@@ -543,8 +534,8 @@ namespace osmium {
              *
              * @param file osmium::io::File instance.
              */
-            XMLInput(const osmium::io::File& file) :
-                osmium::io::Input(file),
+            XMLInput(const osmium::io::File& file, osmium::thread::Queue<std::string>& input_queue) :
+                osmium::io::Input(file, input_queue),
                 m_queue(),
                 m_done(false),
                 m_reader() {
@@ -558,7 +549,7 @@ namespace osmium {
             }
 
             osmium::io::Header read(osmium::osm_entity::flags read_types) override {
-                XMLParser parser(fd(), m_queue, m_header_promise, read_types, m_done);
+                XMLParser parser(m_input_queue, m_queue, m_header_promise, read_types, m_done);
 
                 m_reader = std::thread(std::move(parser));
 
@@ -584,8 +575,8 @@ namespace osmium {
                 osmium::io::Encoding::XML(),
                 osmium::io::Encoding::XMLgz(),
                 osmium::io::Encoding::XMLbz2()
-            }, [](const osmium::io::File& file) {
-                return new osmium::io::XMLInput(file);
+            }, [](const osmium::io::File& file, osmium::thread::Queue<std::string>& input_queue) {
+                return new osmium::io::XMLInput(file, input_queue);
             });
 
         } // anonymous namespace

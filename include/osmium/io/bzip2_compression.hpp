@@ -55,9 +55,9 @@ namespace osmium {
 
             Bzip2Compression(int fd, bool write) :
                 Compression(),
-                m_file(fdopen(fd, "w")),
+                m_file(fdopen(fd, write ? "w" : "r")),
                 m_bzerror(BZ_OK),
-                m_bzfile(::BZ2_bzWriteOpen(&m_bzerror, m_file, 6, 0, 0)) { // XXX write vs read
+                m_bzfile(write ? ::BZ2_bzWriteOpen(&m_bzerror, m_file, 6, 0, 0) : ::BZ2_bzReadOpen(&m_bzerror, m_file, 0, 0, nullptr, 0)) {
                 if (!m_bzfile) {
                     throw std::runtime_error("initialization of bzip2 compression failed");
                 }
@@ -68,7 +68,14 @@ namespace osmium {
             }
 
             std::string read() override final {
-                // XXX
+                std::string buffer(osmium::io::Compression::input_buffer_size, '\0');
+                int error;
+                int nread = ::BZ2_bzRead(&error, m_bzfile, const_cast<char*>(buffer.data()), buffer.size());
+//                if (error != BZ_OK && error != BZ_STREAM_END) {
+//                    throw std::runtime_error("bzip2 read failed"); // XXX better error detection and reporting
+//                }
+                buffer.resize(nread);
+                return buffer;
             }
 
             void write(const std::string& data) override final {

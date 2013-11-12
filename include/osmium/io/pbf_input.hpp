@@ -345,6 +345,33 @@ namespace osmium {
 
         typedef osmium::thread::Queue<std::future<osmium::memory::Buffer>> queue_type;
 
+        class InputQueueReader {
+
+            osmium::thread::Queue<std::string>& m_queue;
+            std::string m_buffer {};
+
+        public:
+
+            InputQueueReader(osmium::thread::Queue<std::string>& queue) :
+                m_queue(queue) {
+            }
+
+            bool operator()(unsigned char* data, size_t size) {
+                while (m_buffer.size() < size) {
+                    std::string new_data;
+                    m_queue.wait_and_pop(new_data);
+                    if (new_data.empty()) {
+                        return false;
+                    }
+                    m_buffer += new_data;
+                }
+                memcpy(data, m_buffer.data(), size);
+                m_buffer.erase(0, size);
+                return true;
+            }
+
+        };
+
         template <class TDerived>
         class BlobParser {
 
@@ -353,19 +380,19 @@ namespace osmium {
             std::shared_ptr<unsigned char> m_input_buffer;
             const int m_size;
             const int m_blob_num;
-            const int m_fd;
+            InputQueueReader& m_input_queue_reader;
 
-            BlobParser(const int size, const int blob_num, const int fd) :
+            BlobParser(const int size, const int blob_num, InputQueueReader& input_queue_reader) :
                 m_input_buffer(new unsigned char[size], [](unsigned char* ptr) { delete[] ptr; }),
                 m_size(size),
                 m_blob_num(blob_num),
-                m_fd(fd) {
+                m_input_queue_reader(input_queue_reader) {
                 if (size < 0 || size > OSMPBF::max_uncompressed_blob_size) {
                     std::ostringstream errmsg;
                     errmsg << "invalid blob size: " << size;
                     throw std::runtime_error(errmsg.str());
                 }
-                if (! osmium::io::detail::reliable_read(fd, m_input_buffer.get(), size)) {
+                if (! input_queue_reader(m_input_buffer.get(), size)) {
                     // EOF
                     throw std::runtime_error("read error (EOF)");
                 }
@@ -463,8 +490,8 @@ namespace osmium {
 
             friend class BlobParser;
 
-            HeaderBlobParser(const int size, const int fd, osmium::io::Header& header) :
-                BlobParser(size, 0, fd),
+            HeaderBlobParser(const int size, InputQueueReader& input_queue_reader, osmium::io::Header& header) :
+                BlobParser(size, 0, input_queue_reader),
                 m_header(header) {
             }
 
@@ -483,8 +510,8 @@ namespace osmium {
 
             friend class BlobParser;
 
-            DataBlobParser(const int size, const int blob_num, const int fd, osmium::osm_entity::flags read_types) :
-                BlobParser(size, blob_num, fd),
+            DataBlobParser(const int size, const int blob_num, InputQueueReader& input_queue_reader, osmium::osm_entity::flags read_types) :
+                BlobParser(size, blob_num, input_queue_reader),
                 m_read_types(read_types) {
             }
 
@@ -502,20 +529,20 @@ namespace osmium {
             std::atomic<bool> m_done;
             std::thread m_reader;
             OSMPBF::BlobHeader m_blob_header;
+            InputQueueReader m_input_queue_reader;
 
             /**
              * Read BlobHeader by first reading the size and then the BlobHeader.
              * The BlobHeader contains a type field (which is checked against
              * the expected type) and a size field.
              *
-             * @param fd File descriptor to read from.
              * @param expected_type Expected type of data ("OSMHeader" or "OSMData").
              * @return Size of the data read from BlobHeader (0 on EOF).
              */
-            size_t read_blob_header(const int fd, const char* expected_type) {
+            size_t read_blob_header(const char* expected_type) {
                 uint32_t size_in_network_byte_order;
 
-                if (! osmium::io::detail::reliable_read(fd, reinterpret_cast<unsigned char*>(&size_in_network_byte_order), sizeof(size_in_network_byte_order))) {
+                if (! m_input_queue_reader(reinterpret_cast<unsigned char*>(&size_in_network_byte_order), sizeof(size_in_network_byte_order))) {
                     return 0; // EOF
                 }
 
@@ -525,7 +552,7 @@ namespace osmium {
                 }
 
                 unsigned char blob_header_buffer[OSMPBF::max_blob_header_size];
-                if (! osmium::io::detail::reliable_read(fd, blob_header_buffer, size)) {
+                if (! m_input_queue_reader(blob_header_buffer, size)) {
                     throw std::runtime_error("Read error.");
                 }
 
@@ -543,8 +570,8 @@ namespace osmium {
             void parse_osm_data(osmium::osm_entity::flags read_types) {
                 osmium::thread::set_thread_name("_osmium_pbf_in");
                 int n=0;
-                while (size_t size = read_blob_header(fd(), "OSMData")) {
-                    DataBlobParser data_blob_parser(size, n, fd(), read_types);
+                while (size_t size = read_blob_header("OSMData")) {
+                    DataBlobParser data_blob_parser(size, n, m_input_queue_reader, read_types);
 
                     if (m_use_thread_pool) {
                         m_queue.push(osmium::thread::Pool::instance().submit(data_blob_parser));
@@ -579,13 +606,14 @@ namespace osmium {
              *
              * @param file osmium::io::File instance.
              */
-            PBFInput(const osmium::io::File& file, bool use_thread_pool=true) :
-                osmium::io::Input(file),
-                m_use_thread_pool(use_thread_pool),
+            PBFInput(const osmium::io::File& file, osmium::thread::Queue<std::string>& input_queue) :
+                osmium::io::Input(file, input_queue),
+                m_use_thread_pool(true),
                 m_queue(),
                 m_max_work_queue_size(10), // XXX tune these settings
                 m_max_buffer_queue_size(20), // XXX tune these settings
-                m_done(false) {
+                m_done(false),
+                m_input_queue_reader(input_queue) {
                 GOOGLE_PROTOBUF_VERIFY_VERSION;
             }
 
@@ -602,10 +630,10 @@ namespace osmium {
             osmium::io::Header read(osmium::osm_entity::flags read_types) override {
 
                 // handle OSMHeader
-                size_t size = read_blob_header(fd(), "OSMHeader");
+                size_t size = read_blob_header("OSMHeader");
 
                 {
-                    HeaderBlobParser header_blob_parser(size, fd(), header());
+                    HeaderBlobParser header_blob_parser(size, m_input_queue_reader, header());
                     header_blob_parser.doit();
                 }
 
@@ -638,8 +666,8 @@ namespace osmium {
 
             const bool registered_pbf_input = osmium::io::InputFactory::instance().register_input_format({
                 osmium::io::Encoding::PBF()
-            }, [](const osmium::io::File& file) {
-                return new osmium::io::PBFInput(file);
+            }, [](const osmium::io::File& file, osmium::thread::Queue<std::string>& input_queue) {
+                return new osmium::io::PBFInput(file, input_queue);
             });
 
         } // anonymous namespace

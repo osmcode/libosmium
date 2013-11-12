@@ -47,6 +47,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/memory/buffer.hpp>
 #include <osmium/osm/object.hpp>
 #include <osmium/osm/entity_flags.hpp>
+#include <osmium/thread/queue.hpp>
 
 namespace osmium {
 
@@ -57,8 +58,10 @@ namespace osmium {
          */
         class Input {
 
-            osmium::io::File m_file;
+        protected:
 
+            osmium::io::File m_file;
+            osmium::thread::Queue<std::string>& m_input_queue;
             osmium::io::Header m_header;
 
             Input(const Input&) = delete;
@@ -78,23 +81,14 @@ namespace osmium {
 
         protected:
 
-            Input(const osmium::io::File& file) :
-                m_file(file) {
+            Input(const osmium::io::File& file, osmium::thread::Queue<std::string>& input_queue) :
+                m_file(file),
+                m_input_queue(input_queue) {
                 m_header.has_multiple_object_versions(m_file.has_multiple_object_versions());
-                m_file.open_for_input();
-
             }
 
             osmium::io::Header& header() {
                 return m_header;
-            }
-
-            const osmium::io::File& file() const {
-                return m_file;
-            }
-
-            int fd() const {
-                return m_file.fd();
             }
 
         }; // class Input
@@ -103,7 +97,7 @@ namespace osmium {
 
         public:
 
-            typedef std::function<osmium::io::Input*(const osmium::io::File&)> create_input_type;
+            typedef std::function<osmium::io::Input*(const osmium::io::File&, osmium::thread::Queue<std::string>&)> create_input_type;
 
         private:
 
@@ -135,11 +129,11 @@ namespace osmium {
                 return m_callbacks.erase(encoding) == 1;
             }
 
-            std::unique_ptr<osmium::io::Input> create_input(const osmium::io::File& file) {
+            std::unique_ptr<osmium::io::Input> create_input(const osmium::io::File& file, osmium::thread::Queue<std::string>& input_queue) {
                 encoding2create_type::iterator it = m_callbacks.find(file.encoding());
 
                 if (it != m_callbacks.end()) {
-                    return std::unique_ptr<osmium::io::Input>((it->second)(file));
+                    return std::unique_ptr<osmium::io::Input>((it->second)(file, input_queue));
                 }
 
                 throw osmium::io::File::FileEncodingNotSupported();

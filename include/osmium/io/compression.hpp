@@ -48,6 +48,8 @@ namespace osmium {
 
         public:
 
+            static const int input_buffer_size = 256*1024;
+
             Compression() {
             }
 
@@ -129,7 +131,13 @@ namespace osmium {
             }
 
             std::string read() override final {
-                // XXX
+                std::string buffer(osmium::io::Compression::input_buffer_size, '\0');
+                ssize_t nread = ::read(m_fd, const_cast<char*>(buffer.data()), buffer.size());
+                if (nread < 0) {
+                    throw std::system_error(errno, std::system_category(), "Read failed");
+                }
+                buffer.resize(nread);
+                return buffer;
             }
 
             void write(const std::string& data) override final {

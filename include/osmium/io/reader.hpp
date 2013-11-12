@@ -36,35 +36,89 @@ DEALINGS IN THE SOFTWARE.
 #include <functional>
 #include <memory>
 #include <string>
+#include <thread>
 #include <utility>
 
 #include <osmium/io/input.hpp>
+#include <osmium/io/compression.hpp>
+#include <osmium/thread/queue.hpp>
+#include <osmium/thread/debug.hpp>
 
 namespace osmium {
 
     namespace io {
 
+        class InputThread {
+
+            osmium::thread::Queue<std::string>& m_queue;
+            const std::string& m_compression;
+            const int m_fd;
+
+        public:
+
+            InputThread(osmium::thread::Queue<std::string>& queue, const std::string& compression, int fd) :
+                m_queue(queue),
+                m_compression(compression),
+                m_fd(fd) {
+            }
+
+            void operator()() {
+                osmium::thread::set_thread_name("_osmium_input");
+
+                std::unique_ptr<osmium::io::Compression> compressor = osmium::io::CompressionFactory::instance().create_compression(m_compression, m_fd, false);
+
+                bool done = false;
+                while (!done) {
+                    std::string data {compressor->read()};
+                    if (data.empty()) {
+                        done = true;
+                    }
+                    m_queue.push(std::move(data));
+                    while (m_queue.size() > 10) {
+                        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+                    }
+                }
+
+                compressor->close();
+            }
+
+        }; // class InputThread
+
         class Reader {
 
             osmium::io::File m_file;
             std::unique_ptr<osmium::io::Input> m_input;
-
+            osmium::thread::Queue<std::string> m_input_queue {};
+            std::thread m_input_thread;
             osmium::osm_entity::flags m_read_types {osmium::osm_entity::flags::all};
 
         public:
 
-            Reader(const osmium::io::File& file) :
-                m_file(file),
-                m_input(osmium::io::InputFactory::instance().create_input(m_file)) {
+            Reader(osmium::io::File file) :
+                m_file(std::move(file)),
+                m_input(osmium::io::InputFactory::instance().create_input(m_file, m_input_queue)) {
+                int fd = osmium::io::detail::open_for_reading(m_file.filename());
+                m_input_thread = std::thread(InputThread {m_input_queue, m_file.encoding()->compress(), fd});
             }
 
-            Reader(const std::string& filename = "") :
-                m_file(filename),
-                m_input(osmium::io::InputFactory::instance().create_input(m_file)) {
+            Reader(const std::string& filename) :
+                Reader(osmium::io::File(filename)) {
             }
 
             Reader(const Reader&) = delete;
             Reader& operator=(const Reader&) = delete;
+
+            ~Reader() {
+                close();
+                if (m_input_thread.joinable()) {
+                    m_input_thread.join();
+                }
+            }
+
+            void close() {
+                // XXX
+//                m_input->close();
+            }
 
             osmium::io::Header open(osmium::osm_entity::flags read_types = osmium::osm_entity::flags::all) {
                 m_read_types = read_types;

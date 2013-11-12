@@ -55,7 +55,7 @@ namespace osmium {
              * is open and the stdout file descriptor (1) is returned.
              *
              * @return File descriptor of open file.
-             * @throws runtime_error if the file can't be opened.
+             * @throws system_error if the file can't be opened.
              */
             inline int open_for_writing(const std::string& filename) {
                 if (filename == "" || filename == "-") {
@@ -74,12 +74,35 @@ namespace osmium {
             }
 
             /**
+             * Open file for reading. If the file name is empty or "-", no file
+             * is open and the stdin file descriptor (0) is returned.
+             *
+             * @return File descriptor of open file.
+             * @throws system_error if the file can't be opened.
+             */
+            inline int open_for_reading(const std::string& filename) {
+                if (filename == "" || filename == "-") {
+                    return 0; // stdin
+                } else {
+                    int flags = O_RDONLY;
+#ifdef WIN32
+                    flags |= O_BINARY;
+#endif
+                    int fd = ::open(filename.c_str(), flags);
+                    if (fd < 0) {
+                        throw std::system_error(errno, std::system_category(), "Open failed");
+                    }
+                    return fd;
+                }
+            }
+
+            /**
              * Reads the given number of bytes into the input buffer.
              * This is basically just a wrapper around read(2).
              *
              * @param fd File descriptor.
              * @param input_buffer Buffer with data of at least size.
-             * @param size Number of bytes to be written.
+             * @param size Number of bytes to be read.
              * @return True when read was successful, false on EOF.
              * @exception std::system_error On error.
              */

@@ -62,7 +62,14 @@ namespace osmium {
             }
 
             std::string read() override final {
-                // XXX
+                std::string buffer(osmium::io::Compression::input_buffer_size, '\0');
+                int nread = ::gzread(m_gzfile, const_cast<char*>(buffer.data()), buffer.size());
+                if (nread < 0) {
+                    throw std::runtime_error("gzip read failed"); // XXX better error detection and reporting
+//                    throw std::system_error(errno, std::system_category(), "Read failed");
+                }
+                buffer.resize(nread);
+                return buffer;
             }
 
             void write(const std::string& data) override final {

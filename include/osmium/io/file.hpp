@@ -244,6 +244,7 @@ namespace osmium {
                 return pipefd[input];
             }
 
+#if 0
             /**
              * Open File for reading.
              *
@@ -283,6 +284,7 @@ namespace osmium {
                     return open_input_file();
                 }
             }
+#endif
 
         public:
 
@@ -542,9 +544,11 @@ namespace osmium {
                 return filename;
             }
 
+#if 0
             void open_for_input() {
                 m_fd = m_encoding->decompress() == "" ? open_input_file_or_url() : execute(m_encoding->decompress(), 0);
             }
+#endif
 
         }; // class File
 
