@@ -57,13 +57,13 @@ namespace osmium {
                 m_has_multiple_object_versions(has_multiple_object_versions) {
             }
 
-            ~FileType() = default;
-
             FileType(const FileType&) = delete;
             FileType& operator=(const FileType&) = delete;
 
             FileType(FileType&&) = delete;
             FileType& operator=(FileType&&) = delete;
+
+            ~FileType() = default;
 
         public:
 

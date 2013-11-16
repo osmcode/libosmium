@@ -39,6 +39,9 @@ DEALINGS IN THE SOFTWARE.
 #include <system_error>
 #include <thread>
 #include <utility>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
 #include <osmium/io/input.hpp>
 #include <osmium/io/compression.hpp>
@@ -185,7 +188,7 @@ namespace osmium {
 //                m_input->close();
                 if (m_childpid) {
                     int status;
-                    pid_t pid = waitpid(m_childpid, &status, 0);
+                    pid_t pid = ::waitpid(m_childpid, &status, 0);
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wold-style-cast"
                     if (pid < 0 || !WIFEXITED(status) || WEXITSTATUS(status) != 0) {

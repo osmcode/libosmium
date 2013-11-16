@@ -33,14 +33,8 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <cerrno>
-#include <fcntl.h>
 #include <stdexcept>
 #include <string>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <unistd.h>
-#include <cstdlib>
 
 #include <osmium/io/encoding.hpp>
 #include <osmium/io/file_type.hpp>
@@ -51,10 +45,8 @@ namespace osmium {
 
         /**
          * This class describes an OSM file in one of several different formats.
-         * It can be used as factory class for generating input and output OSM files.
          *
-         * If the filename is empty, this means stdin or stdout is used. If you set
-         * the filename to "-" it will be treated the same.
+         * If the filename is empty or "-", this means stdin or stdout is used.
          */
         class File {
 
@@ -110,6 +102,14 @@ namespace osmium {
                 set_type_and_encoding(suffix);
             }
 
+            File(const File& other) = default;
+            File& operator=(const File& other) = default;
+
+            File(File&& other) = default;
+            File& operator=(File&& other) = default;
+
+            ~File() = default;
+
             void set_type_and_encoding(const std::string& suffix) {
                 if (suffix == "pbf" || suffix == "osm.pbf") {
                     m_type     = osmium::io::FileType::OSM();
@@ -157,12 +157,6 @@ namespace osmium {
                     throw std::runtime_error(std::string("Unknown OSM file type or encoding: ") + suffix);
                 }
             }
-
-            File(const File& other) = default;
-            File& operator=(const File& other) = default;
-
-            File(File&& other) = default;
-            File& operator=(File&& other) = default;
 
             /**
              * Set default settings for type and encoding when the filename is
