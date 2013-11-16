@@ -37,6 +37,7 @@ DEALINGS IN THE SOFTWARE.
 #include <map>
 #include <memory>
 #include <string>
+#include <system_error>
 #include <utility>
 
 #include <osmium/io/detail/read_write.hpp>

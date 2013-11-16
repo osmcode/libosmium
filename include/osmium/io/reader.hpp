@@ -36,6 +36,7 @@ DEALINGS IN THE SOFTWARE.
 #include <functional>
 #include <memory>
 #include <string>
+#include <system_error>
 #include <thread>
 #include <utility>
 
@@ -91,13 +92,75 @@ namespace osmium {
             osmium::thread::Queue<std::string> m_input_queue {};
             std::thread m_input_thread;
             osmium::osm_entity::flags m_read_types {osmium::osm_entity::flags::all};
+            int m_childpid {0};
+
+            /**
+             * Fork and execute the given command in the child.
+             * A pipe is created between the child and the parent.
+             * The child writes to the pipe, the parent reads from it.
+             * This function never returns in the child.
+             *
+             * @param command Command to execute in the child.
+             * @param filename Filename to give to command as argument.
+             * @return File descriptor of pipe in the parent.
+             * @throws std::system_error if a system call fails.
+             */
+            int execute(const std::string& command, const std::string& filename) {
+                int pipefd[2];
+                if (pipe(pipefd) < 0) {
+                    throw std::system_error(errno, std::system_category(), "opening pipe failed");
+                }
+                pid_t pid = fork();
+                if (pid < 0) {
+                    throw std::system_error(errno, std::system_category(), "fork failed");
+                }
+                if (pid == 0) { // child
+                    // close all file descriptors except one end of the pipe
+                    for (int i=0; i < 32; ++i) {
+                        if (i != pipefd[1]) {
+                            ::close(i);
+                        }
+                    }
+                    if (dup2(pipefd[1], 1) < 0) { // put end of pipe as stdout/stdin
+                        exit(1);
+                    }
+
+                    ::open("/dev/null", O_RDONLY); // stdin
+                    ::open("/dev/null", O_WRONLY); // stderr
+                    if (::execlp(command.c_str(), command.c_str(), filename.c_str(), nullptr) < 0) {
+                        exit(1);
+                    }
+                }
+                // parent
+                m_childpid = pid;
+                ::close(pipefd[1]);
+                return pipefd[0];
+            }
+
+            /**
+             * Open File for reading. Handles URLs or normal files. URLs
+             * are opened by executing the "curl" program (which must be installed)
+             * and reading from its output.
+             *
+             * @return File descriptor of open file or pipe.
+             * @throws SystemError if a system call fails.
+             * @throws IOError if the file can't be opened.
+             */
+            int open_input_file_or_url(const std::string& filename) {
+                std::string protocol = filename.substr(0, filename.find_first_of(':'));
+                if (protocol == "http" || protocol == "https" || protocol == "ftp" || protocol == "file") {
+                    return execute("curl", filename);
+                } else {
+                    return osmium::io::detail::open_for_reading(filename);
+                }
+            }
 
         public:
 
             Reader(osmium::io::File file) :
                 m_file(std::move(file)),
                 m_input(osmium::io::InputFactory::instance().create_input(m_file, m_input_queue)) {
-                int fd = osmium::io::detail::open_for_reading(m_file.filename());
+                int fd = open_input_file_or_url(m_file.filename());
                 m_input_thread = std::thread(InputThread {m_input_queue, m_file.encoding()->compress(), fd});
             }
 
@@ -118,6 +181,17 @@ namespace osmium {
             void close() {
                 // XXX
 //                m_input->close();
+                if (m_childpid) {
+                    int status;
+                    pid_t pid = waitpid(m_childpid, &status, 0);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+                    if (pid < 0 || !WIFEXITED(status) || WEXITSTATUS(status) != 0) {
+                        throw std::system_error(errno, std::system_category(), "subprocess returned error");
+                    }
+#pragma GCC diagnostic pop
+                    m_childpid = 0;
+                }
             }
 
             osmium::io::Header open(osmium::osm_entity::flags read_types = osmium::osm_entity::flags::all) {

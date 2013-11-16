@@ -181,111 +181,6 @@ namespace osmium {
             /// File name.
             std::string m_filename;
 
-            /// File descriptor. -1 before the file is opened.
-            int m_fd;
-
-            /**
-             * Contains the child process id if a child was
-             * created to uncompress data or for getting a
-             * URL.
-             */
-            pid_t m_childpid;
-
-            /**
-             * Fork and execute the given command in the child.
-             * A pipe is created between the child and the parent.
-             * The child writes to the pipe, the parent reads from it.
-             * This function never returns in the child.
-             *
-             * @param command Command to execute in the child.
-             * @param input 0 for reading from child, 1 for writing to child.
-             * @return File descriptor of pipe in the parent.
-             * @throws SystemError if a system call fails.
-             */
-            int execute(const std::string& command, int input) {
-                int pipefd[2];
-                if (pipe(pipefd) < 0) {
-                    throw SystemError("Can't create pipe", errno);
-                }
-                pid_t pid = fork();
-                if (pid < 0) {
-                    throw SystemError("Can't fork", errno);
-                }
-                if (pid == 0) { // child
-                    // close all file descriptors except one end of the pipe
-                    for (int i=0; i < 32; ++i) {
-                        if (i != pipefd[1-input]) {
-                            ::close(i);
-                        }
-                    }
-                    if (dup2(pipefd[1-input], 1-input) < 0) { // put end of pipe as stdout/stdin
-                        exit(1);
-                    }
-
-                    if (input == 0) {
-                        ::open("/dev/null", O_RDONLY); // stdin
-                        ::open("/dev/null", O_WRONLY); // stderr
-                        if (::execlp(command.c_str(), command.c_str(), m_filename.c_str(), nullptr) < 0) {
-                            exit(1);
-                        }
-                    } else {
-                        if (::open(m_filename.c_str(), O_WRONLY | O_TRUNC | O_CREAT, 0666) != 1) {
-                            exit(1);
-                        }
-                        ::open("/dev/null", O_WRONLY); // stderr
-                        if (::execlp(command.c_str(), command.c_str(), nullptr) < 0) {
-                            exit(1);
-                        }
-                    }
-                }
-                // parent
-                m_childpid = pid;
-                ::close(pipefd[1-input]);
-                return pipefd[input];
-            }
-
-#if 0
-            /**
-             * Open File for reading.
-             *
-             * @return File descriptor of open file.
-             * @throws IOError if the file can't be opened.
-             */
-            int open_input_file() const {
-                if (m_filename == "") {
-                    return 0; // stdin
-                } else {
-                    int flags = O_RDONLY;
-#ifdef WIN32
-                    flags |= O_BINARY;
-#endif
-                    int fd = ::open(m_filename.c_str(), flags);
-                    if (fd < 0) {
-                        throw IOError("Open failed", m_filename, errno);
-                    }
-                    return fd;
-                }
-            }
-
-            /**
-             * Open File for reading. Handles URLs or normal files. URLs
-             * are opened by executing the "curl" program (which must be installed)
-             * and reading from its output.
-             *
-             * @return File descriptor of open file or pipe.
-             * @throws SystemError if a system call fails.
-             * @throws IOError if the file can't be opened.
-             */
-            int open_input_file_or_url() {
-                std::string protocol = m_filename.substr(0, m_filename.find_first_of(':'));
-                if (protocol == "http" || protocol == "https") {
-                    return execute("curl", 0);
-                } else {
-                    return open_input_file();
-                }
-            }
-#endif
-
         public:
 
             /**
@@ -299,9 +194,7 @@ namespace osmium {
             File(const std::string& filename = "") :
                 m_type(osmium::io::FileType::OSM()),
                 m_encoding(osmium::io::Encoding::PBF()),
-                m_filename(filename),
-                m_fd(-1),
-                m_childpid(0) {
+                m_filename(filename) {
 
                 // stdin/stdout
                 if (filename == "" || filename == "-") {
@@ -385,9 +278,7 @@ namespace osmium {
             File(const File& orig) :
                 m_type(orig.type()),
                 m_encoding(orig.encoding()),
-                m_filename(orig.filename()),
-                m_fd(-1),
-                m_childpid(0) {
+                m_filename(orig.filename()) {
             }
 
             /**
@@ -396,8 +287,6 @@ namespace osmium {
              * copied.
              */
             File& operator=(const File& orig) {
-                m_fd       = -1;
-                m_childpid = 0;
                 m_type     = orig.type();
                 m_encoding = orig.encoding();
                 m_filename = orig.filename();
@@ -405,30 +294,6 @@ namespace osmium {
             }
 
             ~File() {
-                try {
-                    close();
-                } catch (...) {
-                    // ignore exceptions
-                }
-            }
-
-            void close() {
-                if (m_fd > 0) {
-                    ::close(m_fd);
-                    m_fd = -1;
-                }
-
-                if (m_childpid) {
-                    int status;
-                    pid_t pid = waitpid(m_childpid, &status, 0);
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-                    if (pid < 0 || !WIFEXITED(status) || WEXITSTATUS(status) != 0) {
-                        throw IOError("Subprocess returned error", "", errno);
-                    }
-#pragma GCC diagnostic pop
-                    m_childpid = 0;
-                }
             }
 
             /**
@@ -459,10 +324,6 @@ namespace osmium {
             void default_settings_for_url() {
                 m_type     = osmium::io::FileType::OSM();
                 m_encoding = osmium::io::Encoding::XML();
-            }
-
-            int fd() const {
-                return m_fd;
             }
 
             osmium::io::FileType* type() const {
@@ -543,12 +404,6 @@ namespace osmium {
                 filename += m_type->suffix() + m_encoding->suffix();
                 return filename;
             }
-
-#if 0
-            void open_for_input() {
-                m_fd = m_encoding->decompress() == "" ? open_input_file_or_url() : execute(m_encoding->decompress(), 0);
-            }
-#endif
 
         }; // class File
 
