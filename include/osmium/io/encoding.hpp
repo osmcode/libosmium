@@ -54,22 +54,20 @@ namespace osmium {
             const std::string m_suffix;
             const std::string m_description;
             const std::string m_compress;
-            const std::string m_decompress;
 
-            Encoding(const std::string& suffix, const std::string& description, const std::string& compress = "", const std::string& decompress = "") :
+            Encoding(const std::string& suffix, const std::string& description, const std::string& compress = "") :
                 m_suffix(suffix),
                 m_description(description),
-                m_compress(compress),
-                m_decompress(decompress) {
+                m_compress(compress) {
             }
-
-            ~Encoding() = default;
 
             Encoding(const Encoding&) = delete;
             Encoding& operator=(const Encoding&) = delete;
 
             Encoding(Encoding&&) = delete;
             Encoding& operator=(Encoding&&) = delete;
+
+            ~Encoding() = default;
 
         public:
 
@@ -83,10 +81,6 @@ namespace osmium {
 
             const std::string& compress() const {
                 return m_compress;
-            }
-
-            const std::string& decompress() const {
-                return m_decompress;
             }
 
             /**
@@ -109,7 +103,7 @@ namespace osmium {
              * XML encoding, compressed with gzip.
              */
             static Encoding* XMLgz() {
-                static Encoding instance(".gz", "XML (compressed with gzip)", "gzip", "zcat");
+                static Encoding instance(".gz", "XML (compressed with gzip)", "gzip");
                 return &instance;
             }
 
@@ -117,7 +111,7 @@ namespace osmium {
              * XML encoding, compressed with bzip2.
              */
             static Encoding* XMLbz2() {
-                static Encoding instance(".bz2", "XML (compressed with bzip2)", "bzip2", "bzcat");
+                static Encoding instance(".bz2", "XML (compressed with bzip2)", "bzip2");
                 return &instance;
             }
 
@@ -133,7 +127,7 @@ namespace osmium {
              * OPL encoding, compressed with gzip.
              */
             static Encoding* OPLgz() {
-                static Encoding instance(".opl.gz", "OPL (compressed with gzip)", "gzip", "zcat");
+                static Encoding instance(".opl.gz", "OPL (compressed with gzip)", "gzip");
                 return &instance;
             }
 
@@ -141,7 +135,7 @@ namespace osmium {
              * OPL encoding, compressed with bzip2.
              */
             static Encoding* OPLbz2() {
-                static Encoding instance(".opl.bz2", "OPL (compressed with bzip2)", "bzip2", "bzcat");
+                static Encoding instance(".opl.bz2", "OPL (compressed with bzip2)", "bzip2");
                 return &instance;
             }
 
