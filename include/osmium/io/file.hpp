@@ -158,31 +158,11 @@ namespace osmium {
                 }
             }
 
-            /**
-             * Copy constructor.
-             * Only attributes not related to the open file will be
-             * copied.
-             */
-            File(const File& orig) :
-                m_type(orig.type()),
-                m_encoding(orig.encoding()),
-                m_filename(orig.filename()) {
-            }
+            File(const File& other) = default;
+            File& operator=(const File& other) = default;
 
-            /**
-             * Assignment operator.
-             * Only attributes not related to the open file will be
-             * copied.
-             */
-            File& operator=(const File& orig) {
-                m_type     = orig.type();
-                m_encoding = orig.encoding();
-                m_filename = orig.filename();
-                return *this;
-            }
-
-            ~File() {
-            }
+            File(File&& other) = default;
+            File& operator=(File&& other) = default;
 
             /**
              * Set default settings for type and encoding when the filename is
