@@ -143,8 +143,7 @@ namespace osmium {
              * and reading from its output.
              *
              * @return File descriptor of open file or pipe.
-             * @throws SystemError if a system call fails.
-             * @throws IOError if the file can't be opened.
+             * @throws std::system_error if a system call fails.
              */
             int open_input_file_or_url(const std::string& filename) {
                 std::string protocol = filename.substr(0, filename.find_first_of(':'));
@@ -160,6 +159,9 @@ namespace osmium {
             Reader(osmium::io::File file) :
                 m_file(std::move(file)),
                 m_input(osmium::io::InputFactory::instance().create_input(m_file, m_input_queue)) {
+                if (!m_input) {
+                    throw std::runtime_error("file type not supported");
+                }
                 int fd = open_input_file_or_url(m_file.filename());
                 m_input_thread = std::thread(InputThread {m_input_queue, m_file.encoding()->compress(), fd});
             }

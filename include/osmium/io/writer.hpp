@@ -88,6 +88,10 @@ namespace osmium {
             Writer(const osmium::io::File& file, const osmium::io::Header& header = osmium::io::Header()) :
                 m_file(file),
                 m_output(osmium::io::OutputFactory::instance().create_output(m_file, m_output_queue)) {
+                if (!m_output) {
+                    throw std::runtime_error("file type not supported");
+                }
+
                 m_output->set_header(header);
 
                 int fd = osmium::io::detail::open_for_writing(m_file.filename());

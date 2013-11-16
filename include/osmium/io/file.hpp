@@ -58,118 +58,6 @@ namespace osmium {
          */
         class File {
 
-        public:
-
-            /**
-             * Low-level system call error.
-             * This should normally not happen unless your system is out of
-             * resources like number of processes or filehandles.
-             */
-            class SystemError : public std::runtime_error {
-
-                int m_errno;
-
-            public:
-
-                SystemError(const std::string& whatarg, int e) :
-                    std::runtime_error(whatarg),
-                    m_errno(e) {
-                }
-
-                /**
-                 * Get the system errno variable from the system call that caused
-                 * this exception.
-                 */
-                int system_errno() const {
-                    return m_errno;
-                }
-
-            };
-
-            /**
-             * Low-level I/O Error.
-             * This exception if thrown if there is an error in an I/O system call.
-             */
-            class IOError : public std::runtime_error {
-
-                std::string m_filename;
-                int m_errno;
-
-            public:
-
-                IOError(const std::string& whatarg,
-                        const std::string& filename,
-                        int e) :
-                    std::runtime_error(whatarg),
-                    m_filename(filename),
-                    m_errno(e) {
-                }
-
-                ~IOError() throw() {
-                }
-
-                /**
-                 * Get the filename that caused this exception.
-                 */
-                const std::string& filename() const {
-                    return m_filename;
-                }
-
-                /**
-                 * Get the system errno variable from the system call that caused
-                 * this exception.
-                 */
-                int system_errno() const {
-                    return m_errno;
-                }
-
-            };
-
-            class ArgumentError : public std::runtime_error {
-
-                std::string m_value;
-
-            public:
-
-                ArgumentError(const std::string& whatarg,
-                              const std::string& value="") :
-                    std::runtime_error(whatarg),
-                    m_value(value) {
-                }
-
-                ~ArgumentError() throw() {
-                }
-
-                const std::string& value() const {
-                    return m_value;
-                }
-
-            };
-
-            /**
-             * An exception of a subclass of this class is thrown when the type of
-             * a file is not what you expected.
-             */
-            struct FileTypeError {
-            };
-
-            /**
-             * This exception is thrown when you wanted to read a normal OSM file,
-             * but the file opened had a different type.
-             */
-            struct FileTypeOSMExpected : public FileTypeError {
-            };
-
-            /**
-             * This exception is thrown when you wanted to read an OSM file with
-             * historic information, but the file opened had a different type.
-             */
-            struct FileTypeHistoryExpected : public FileTypeError {
-            };
-
-            class FileEncodingNotSupported {
-            };
-
         private:
 
             /// Type of file.
@@ -266,7 +154,7 @@ namespace osmium {
                     m_type     = osmium::io::FileType::Change();
                     m_encoding = osmium::io::Encoding::XMLgz();
                 } else {
-                    throw ArgumentError("Unknown OSM file type or encoding", suffix);
+                    throw std::runtime_error(std::string("Unknown OSM file type or encoding: ") + suffix);
                 }
             }
 
@@ -343,7 +231,7 @@ namespace osmium {
                 } else if (type == "change" || type == "osc") {
                     m_type = osmium::io::FileType::Change();
                 } else {
-                    throw ArgumentError("Unknown OSM file type", type);
+                    throw std::runtime_error(std::string("Unknown OSM file type: ") + type);
                 }
                 return *this;
             }
@@ -377,7 +265,7 @@ namespace osmium {
                 } else if (encoding == "oplbz2") {
                     m_encoding = osmium::io::Encoding::OPLbz2();
                 } else {
-                    throw ArgumentError("Unknown OSM file encoding", encoding);
+                    throw std::runtime_error(std::string("Unknown OSM file encoding: ") + encoding);
                 }
                 return *this;
             }

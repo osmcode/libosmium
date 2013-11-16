@@ -81,8 +81,8 @@ int main(int argc, char* argv[]) {
     if (!input_format.empty()) {
         try {
             infile.set_type_and_encoding(input_format);
-        } catch (osmium::io::File::ArgumentError& e) {
-            std::cerr << "Unknown format for input: " << e.value() << std::endl;
+        } catch (std::runtime_error& e) {
+            std::cerr << e.what() << std::endl;
             exit(1);
         }
     }
@@ -91,8 +91,8 @@ int main(int argc, char* argv[]) {
     if (!output_format.empty()) {
         try {
             outfile.set_type_and_encoding(output_format);
-        } catch (osmium::io::File::ArgumentError& e) {
-            std::cerr << "Unknown format for output: " << e.value() << std::endl;
+        } catch (std::runtime_error& e) {
+            std::cerr << e.what() << std::endl;
             exit(1);
         }
     }

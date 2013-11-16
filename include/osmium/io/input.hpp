@@ -136,7 +136,7 @@ namespace osmium {
                     return std::unique_ptr<osmium::io::Input>((it->second)(file, input_queue));
                 }
 
-                throw osmium::io::File::FileEncodingNotSupported();
+                return nullptr;
             }
 
         }; // class InputFactory
