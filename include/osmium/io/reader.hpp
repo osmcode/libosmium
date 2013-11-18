@@ -175,9 +175,10 @@ namespace osmium {
 
         public:
 
-            Reader(osmium::io::File file) :
+            Reader(osmium::io::File file, osmium::osm_entity::flags read_types = osmium::osm_entity::flags::all) :
                 m_file(std::move(file)),
-                m_input(osmium::io::InputFactory::instance().create_input(m_file, m_input_queue)) {
+                m_input(osmium::io::InputFactory::instance().create_input(m_file, m_input_queue)),
+                m_read_types(read_types) {
                 if (!m_input) {
                     throw std::runtime_error("file type not supported");
                 }
@@ -187,8 +188,8 @@ namespace osmium {
                 m_input_thread = std::thread(std::move(task));
             }
 
-            Reader(const std::string& filename) :
-                Reader(osmium::io::File(filename)) {
+            Reader(const std::string& filename, osmium::osm_entity::flags read_types = osmium::osm_entity::flags::all) :
+                Reader(osmium::io::File(filename), read_types) {
             }
 
             Reader(const Reader&) = delete;
@@ -230,9 +231,8 @@ namespace osmium {
                 }
             }
 
-            osmium::io::Header open(osmium::osm_entity::flags read_types = osmium::osm_entity::flags::all) {
-                m_read_types = read_types;
-                return m_input->read(read_types);
+            osmium::io::Header open() {
+                return m_input->read(m_read_types);
             }
 
             osmium::memory::Buffer read() {

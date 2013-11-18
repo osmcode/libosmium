@@ -31,8 +31,8 @@ int main(int argc, char* argv[]) {
         if (types.find('c') != std::string::npos) read_types |= osmium::osm_entity::flags::changeset;
     }
 
-    osmium::io::Reader reader(argv[1]);
-    osmium::io::Header header = reader.open(read_types);
+    osmium::io::Reader reader(argv[1], read_types);
+    osmium::io::Header header = reader.open();
 
     std::cout << "HEADER:\n  generator=" << header.generator() << "\n";
     std::cout << "  bounds=" << header.bounds() << "\n";
