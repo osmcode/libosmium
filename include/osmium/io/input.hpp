@@ -63,7 +63,14 @@ namespace osmium {
             osmium::io::File m_file;
             osmium::osm_entity::flags m_read_which_entities;
             osmium::thread::Queue<std::string>& m_input_queue;
-            osmium::io::Header m_header;
+            osmium::io::Header m_header {};
+
+            Input(const osmium::io::File& file, osmium::osm_entity::flags read_which_entities, osmium::thread::Queue<std::string>& input_queue) :
+                m_file(file),
+                m_read_which_entities(read_which_entities),
+                m_input_queue(input_queue) {
+                m_header.has_multiple_object_versions(m_file.has_multiple_object_versions());
+            }
 
             Input(const Input&) = delete;
             Input(Input&&) = delete;
@@ -76,21 +83,15 @@ namespace osmium {
             virtual ~Input() {
             }
 
-            virtual osmium::io::Header read() = 0;
+            virtual void open() = 0;
 
-            virtual osmium::memory::Buffer next_buffer() = 0;
+            virtual osmium::memory::Buffer read() = 0;
+
+            virtual void close() {
+            }
 
             osmium::io::Header header() const {
                 return m_header;
-            }
-
-        protected:
-
-            Input(const osmium::io::File& file, osmium::osm_entity::flags read_which_entities, osmium::thread::Queue<std::string>& input_queue) :
-                m_file(file),
-                m_read_which_entities(read_which_entities),
-                m_input_queue(input_queue) {
-                m_header.has_multiple_object_versions(m_file.has_multiple_object_versions());
             }
 
         }; // class Input

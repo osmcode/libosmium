@@ -59,7 +59,7 @@ namespace osmium {
             const std::string& m_compression;
             const int m_fd;
 
-            // If this is set in the main thread, we have to wrap up and the
+            // If this is set in the main thread, we have to wrap up at the
             // next possible moment.
             std::atomic<bool>& m_done;
 
@@ -102,6 +102,12 @@ namespace osmium {
 
         }; // class InputThread
 
+        /**
+         * This is the user-facing interface for reading OSM files. Instantiate
+         * an object of this class with a file name or osmium::io::File object
+         * and then call read() on it in a loop until it returns an invalid
+         * Buffer.
+         */
         class Reader {
 
             osmium::io::File m_file;
@@ -176,6 +182,15 @@ namespace osmium {
 
         public:
 
+            /**
+             * Create new Reader object.
+             *
+             * @param file The file we want to open.
+             * @param read_which_entities Which OSM entities (nodes, ways, relations, and/or changesets)
+             *                            should be read from the input file. It can speed the read up
+             *                            significantly if objects that are not needed anyway are not
+             *                            parsed.
+             */
             Reader(osmium::io::File file, osmium::osm_entity::flags read_which_entities = osmium::osm_entity::flags::all) :
                 m_file(std::move(file)),
                 m_read_which_entities(read_which_entities),
@@ -187,7 +202,7 @@ namespace osmium {
                 std::packaged_task<void()> task(InputThread {m_input_queue, m_file.encoding()->compress(), fd, m_input_done});
                 m_input_future = task.get_future();
                 m_input_thread = std::thread(std::move(task));
-                m_input->read();
+                m_input->open();
             }
 
             Reader(const std::string& filename, osmium::osm_entity::flags read_types = osmium::osm_entity::flags::all) :
@@ -201,12 +216,19 @@ namespace osmium {
                 close();
             }
 
+            /**
+             * Close down the Reader. A call to this is optional, because the
+             * destructor of Reader will also call this. But if you don't call
+             * this function first, the destructor might throw an exception
+             * which is bot good.
+             *
+             * @throws Some form of std::runtime_error when there is a problem.
+             */
             void close() {
                 // Signal to input child process that it should wrap up.
                 m_input_done = true;
 
-                // XXX
-//                m_input->close();
+                m_input->close();
 
                 if (m_childpid) {
                     int status;
@@ -233,10 +255,20 @@ namespace osmium {
                 }
             }
 
+            /**
+             * Get the header data from the file.
+             */
             osmium::io::Header header() const {
                 return m_input->header();
             }
 
+            /**
+             * Reads the next buffer from the input. An invalid buffer signals
+             * end-of-file. Do not call read() after the end-of-file.
+             *
+             * @returns Buffer.
+             * @throws Some form of std::runtime_error if there is an error.
+             */
             osmium::memory::Buffer read() {
                 // If an exception happened in the input thread, re-throw
                 // it in this (the main) thread.
@@ -248,7 +280,7 @@ namespace osmium {
                     // always get an empty buffer here.
                     return osmium::memory::Buffer();
                 }
-                return m_input->next_buffer();
+                return m_input->read();
             }
 
         }; // class Reader

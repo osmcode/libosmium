@@ -548,16 +548,16 @@ namespace osmium {
                 }
             }
 
-            osmium::io::Header read() override {
+            void open() override {
                 XMLParser parser(m_input_queue, m_queue, m_header_promise, m_read_which_entities, m_done);
 
                 m_reader = std::thread(std::move(parser));
 
                 // wait for header
-                return m_header_promise.get_future().get();
+                m_header_promise.get_future().get();
             }
 
-            osmium::memory::Buffer next_buffer() override {
+            osmium::memory::Buffer read() override {
                 osmium::memory::Buffer buffer;
 
                 if (!m_done || !m_queue.empty()) {

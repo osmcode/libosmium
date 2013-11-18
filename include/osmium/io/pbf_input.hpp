@@ -627,7 +627,7 @@ namespace osmium {
             /**
              * Read PBF file.
              */
-            osmium::io::Header read() override {
+            void open() override {
 
                 // handle OSMHeader
                 size_t size = read_blob_header("OSMHeader");
@@ -640,8 +640,6 @@ namespace osmium {
                 if (m_read_which_entities != osmium::osm_entity::flags::nothing) {
                     m_reader = std::thread(&PBFInput::parse_osm_data, this, m_read_which_entities);
                 }
-
-                return m_header;
             }
 
             /**
@@ -649,7 +647,7 @@ namespace osmium {
              * Blocks if data is not available yet.
              * Returns an empty buffer at end of input.
              */
-            osmium::memory::Buffer next_buffer() override {
+            osmium::memory::Buffer read() override {
                 std::future<osmium::memory::Buffer> buffer_future;
 
                 if (!m_done || !m_queue.empty()) {
