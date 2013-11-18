@@ -227,7 +227,6 @@ int main(int argc, char* argv[]) {
     }
 
     osmium::io::Reader reader(input_filename);
-    osmium::io::Header header = reader.open();
 
     index_pos_type index_pos;
     index_neg_type index_neg;

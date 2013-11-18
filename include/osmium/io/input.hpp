@@ -80,6 +80,10 @@ namespace osmium {
 
             virtual osmium::memory::Buffer next_buffer() = 0;
 
+            osmium::io::Header header() const {
+                return m_header;
+            }
+
         protected:
 
             Input(const osmium::io::File& file, osmium::osm_entity::flags read_which_entities, osmium::thread::Queue<std::string>& input_queue) :
@@ -87,10 +91,6 @@ namespace osmium {
                 m_read_which_entities(read_which_entities),
                 m_input_queue(input_queue) {
                 m_header.has_multiple_object_versions(m_file.has_multiple_object_versions());
-            }
-
-            osmium::io::Header& header() {
-                return m_header;
             }
 
         }; // class Input

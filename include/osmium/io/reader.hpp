@@ -187,6 +187,7 @@ namespace osmium {
                 std::packaged_task<void()> task(InputThread {m_input_queue, m_file.encoding()->compress(), fd, m_input_done});
                 m_input_future = task.get_future();
                 m_input_thread = std::thread(std::move(task));
+                m_input->read();
             }
 
             Reader(const std::string& filename, osmium::osm_entity::flags read_types = osmium::osm_entity::flags::all) :
@@ -232,8 +233,8 @@ namespace osmium {
                 }
             }
 
-            osmium::io::Header open() {
-                return m_input->read();
+            osmium::io::Header header() const {
+                return m_input->header();
             }
 
             osmium::memory::Buffer read() {

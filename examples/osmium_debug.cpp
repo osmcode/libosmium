@@ -32,7 +32,7 @@ int main(int argc, char* argv[]) {
     }
 
     osmium::io::Reader reader(argv[1], read_types);
-    osmium::io::Header header = reader.open();
+    osmium::io::Header header = reader.header();
 
     std::cout << "HEADER:\n  generator=" << header.generator() << "\n";
     std::cout << "  bounds=" << header.bounds() << "\n";

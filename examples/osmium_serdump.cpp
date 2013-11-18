@@ -109,7 +109,6 @@ int main(int argc, char* argv[]) {
     osmium::handler::ObjectRelations object_relations_handler(map_node2way, map_node2relation, map_way2relation, map_relation2relation);
 
     osmium::io::Reader reader(argv[1]);
-    osmium::io::Header header = reader.open();
 
     while (osmium::memory::Buffer buffer = reader.read()) {
         disk_store_handler(buffer); // XXX

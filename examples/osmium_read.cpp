@@ -20,7 +20,6 @@ int main(int argc, char* argv[]) {
 
     osmium::io::File infile(argv[1]);
     osmium::io::Reader reader(infile);
-    osmium::io::Header header = reader.open();
 
     while (osmium::memory::Buffer buffer = reader.read()) {
         // do nothing

@@ -633,7 +633,7 @@ namespace osmium {
                 size_t size = read_blob_header("OSMHeader");
 
                 {
-                    HeaderBlobParser header_blob_parser(size, m_input_queue_reader, header());
+                    HeaderBlobParser header_blob_parser(size, m_input_queue_reader, m_header);
                     header_blob_parser.doit();
                 }
 
@@ -641,7 +641,7 @@ namespace osmium {
                     m_reader = std::thread(&PBFInput::parse_osm_data, this, m_read_which_entities);
                 }
 
-                return header();
+                return m_header;
             }
 
             /**
