@@ -105,12 +105,13 @@ namespace osmium {
         class Reader {
 
             osmium::io::File m_file;
+            osmium::osm_entity::flags m_read_which_entities;
+
             std::unique_ptr<osmium::io::Input> m_input;
             osmium::thread::Queue<std::string> m_input_queue {};
             std::thread m_input_thread;
             std::future<void> m_input_future;
             std::atomic<bool> m_input_done {false};
-            osmium::osm_entity::flags m_read_types {osmium::osm_entity::flags::all};
             int m_childpid {0};
 
             /**
@@ -175,10 +176,10 @@ namespace osmium {
 
         public:
 
-            Reader(osmium::io::File file, osmium::osm_entity::flags read_types = osmium::osm_entity::flags::all) :
+            Reader(osmium::io::File file, osmium::osm_entity::flags read_which_entities = osmium::osm_entity::flags::all) :
                 m_file(std::move(file)),
-                m_input(osmium::io::InputFactory::instance().create_input(m_file, m_input_queue)),
-                m_read_types(read_types) {
+                m_read_which_entities(read_which_entities),
+                m_input(osmium::io::InputFactory::instance().create_input(m_file, m_read_which_entities, m_input_queue)) {
                 if (!m_input) {
                     throw std::runtime_error("file type not supported");
                 }
@@ -232,7 +233,7 @@ namespace osmium {
             }
 
             osmium::io::Header open() {
-                return m_input->read(m_read_types);
+                return m_input->read();
             }
 
             osmium::memory::Buffer read() {
@@ -241,7 +242,7 @@ namespace osmium {
                 if (m_input_future.valid() && m_input_future.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
                     m_input_future.get();
                 }
-                if (m_read_types == osmium::osm_entity::flags::nothing) {
+                if (m_read_which_entities == osmium::osm_entity::flags::nothing) {
                     // If the caller didn't want anything but the header, it will
                     // always get an empty buffer here.
                     return osmium::memory::Buffer();

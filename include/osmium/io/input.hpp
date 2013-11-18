@@ -61,6 +61,7 @@ namespace osmium {
         protected:
 
             osmium::io::File m_file;
+            osmium::osm_entity::flags m_read_which_entities;
             osmium::thread::Queue<std::string>& m_input_queue;
             osmium::io::Header m_header;
 
@@ -75,14 +76,15 @@ namespace osmium {
             virtual ~Input() {
             }
 
-            virtual osmium::io::Header read(osmium::osm_entity::flags read_types) = 0;
+            virtual osmium::io::Header read() = 0;
 
             virtual osmium::memory::Buffer next_buffer() = 0;
 
         protected:
 
-            Input(const osmium::io::File& file, osmium::thread::Queue<std::string>& input_queue) :
+            Input(const osmium::io::File& file, osmium::osm_entity::flags read_which_entities, osmium::thread::Queue<std::string>& input_queue) :
                 m_file(file),
+                m_read_which_entities(read_which_entities),
                 m_input_queue(input_queue) {
                 m_header.has_multiple_object_versions(m_file.has_multiple_object_versions());
             }
@@ -97,7 +99,7 @@ namespace osmium {
 
         public:
 
-            typedef std::function<osmium::io::Input*(const osmium::io::File&, osmium::thread::Queue<std::string>&)> create_input_type;
+            typedef std::function<osmium::io::Input*(const osmium::io::File&, osmium::osm_entity::flags read_which_entities, osmium::thread::Queue<std::string>&)> create_input_type;
 
         private:
 
@@ -129,11 +131,11 @@ namespace osmium {
                 return m_callbacks.erase(encoding) == 1;
             }
 
-            std::unique_ptr<osmium::io::Input> create_input(const osmium::io::File& file, osmium::thread::Queue<std::string>& input_queue) {
+            std::unique_ptr<osmium::io::Input> create_input(const osmium::io::File& file, osmium::osm_entity::flags read_which_entities, osmium::thread::Queue<std::string>& input_queue) {
                 encoding2create_type::iterator it = m_callbacks.find(file.encoding());
 
                 if (it != m_callbacks.end()) {
-                    return std::unique_ptr<osmium::io::Input>((it->second)(file, input_queue));
+                    return std::unique_ptr<osmium::io::Input>((it->second)(file, read_which_entities, input_queue));
                 }
 
                 return nullptr;

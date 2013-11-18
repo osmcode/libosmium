@@ -534,8 +534,8 @@ namespace osmium {
              *
              * @param file osmium::io::File instance.
              */
-            XMLInput(const osmium::io::File& file, osmium::thread::Queue<std::string>& input_queue) :
-                osmium::io::Input(file, input_queue),
+            XMLInput(const osmium::io::File& file, osmium::osm_entity::flags read_which_entities, osmium::thread::Queue<std::string>& input_queue) :
+                osmium::io::Input(file, read_which_entities, input_queue),
                 m_queue(),
                 m_done(false),
                 m_reader() {
@@ -548,8 +548,8 @@ namespace osmium {
                 }
             }
 
-            osmium::io::Header read(osmium::osm_entity::flags read_types) override {
-                XMLParser parser(m_input_queue, m_queue, m_header_promise, read_types, m_done);
+            osmium::io::Header read() override {
+                XMLParser parser(m_input_queue, m_queue, m_header_promise, m_read_which_entities, m_done);
 
                 m_reader = std::thread(std::move(parser));
 
@@ -575,8 +575,8 @@ namespace osmium {
                 osmium::io::Encoding::XML(),
                 osmium::io::Encoding::XMLgz(),
                 osmium::io::Encoding::XMLbz2()
-            }, [](const osmium::io::File& file, osmium::thread::Queue<std::string>& input_queue) {
-                return new osmium::io::XMLInput(file, input_queue);
+            }, [](const osmium::io::File& file, osmium::osm_entity::flags read_which_entities, osmium::thread::Queue<std::string>& input_queue) {
+                return new osmium::io::XMLInput(file, read_which_entities, input_queue);
             });
 
         } // anonymous namespace

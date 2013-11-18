@@ -606,8 +606,8 @@ namespace osmium {
              *
              * @param file osmium::io::File instance.
              */
-            PBFInput(const osmium::io::File& file, osmium::thread::Queue<std::string>& input_queue) :
-                osmium::io::Input(file, input_queue),
+            PBFInput(const osmium::io::File& file, osmium::osm_entity::flags read_which_entities, osmium::thread::Queue<std::string>& input_queue) :
+                osmium::io::Input(file, read_which_entities, input_queue),
                 m_use_thread_pool(true),
                 m_queue(),
                 m_max_work_queue_size(10), // XXX tune these settings
@@ -627,7 +627,7 @@ namespace osmium {
             /**
              * Read PBF file.
              */
-            osmium::io::Header read(osmium::osm_entity::flags read_types) override {
+            osmium::io::Header read() override {
 
                 // handle OSMHeader
                 size_t size = read_blob_header("OSMHeader");
@@ -637,8 +637,8 @@ namespace osmium {
                     header_blob_parser.doit();
                 }
 
-                if (read_types != osmium::osm_entity::flags::nothing) {
-                    m_reader = std::thread(&PBFInput::parse_osm_data, this, read_types);
+                if (m_read_which_entities != osmium::osm_entity::flags::nothing) {
+                    m_reader = std::thread(&PBFInput::parse_osm_data, this, m_read_which_entities);
                 }
 
                 return header();
@@ -666,8 +666,8 @@ namespace osmium {
 
             const bool registered_pbf_input = osmium::io::InputFactory::instance().register_input_format({
                 osmium::io::Encoding::PBF()
-            }, [](const osmium::io::File& file, osmium::thread::Queue<std::string>& input_queue) {
-                return new osmium::io::PBFInput(file, input_queue);
+            }, [](const osmium::io::File& file, osmium::osm_entity::flags read_which_entities, osmium::thread::Queue<std::string>& input_queue) {
+                return new osmium::io::PBFInput(file, read_which_entities, input_queue);
             });
 
         } // anonymous namespace
