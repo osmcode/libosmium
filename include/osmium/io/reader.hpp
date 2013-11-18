@@ -34,6 +34,7 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <functional>
+#include <future>
 #include <memory>
 #include <string>
 #include <system_error>
@@ -58,32 +59,45 @@ namespace osmium {
             const std::string& m_compression;
             const int m_fd;
 
+            // If this is set in the main thread, we have to wrap up and the
+            // next possible moment.
+            std::atomic<bool>& m_done;
+
         public:
 
-            InputThread(osmium::thread::Queue<std::string>& queue, const std::string& compression, int fd) :
+            InputThread(osmium::thread::Queue<std::string>& queue, const std::string& compression, int fd, std::atomic<bool>& done) :
                 m_queue(queue),
                 m_compression(compression),
-                m_fd(fd) {
+                m_fd(fd),
+                m_done(done) {
             }
 
             void operator()() {
                 osmium::thread::set_thread_name("_osmium_input");
 
-                std::unique_ptr<osmium::io::Decompressor> decompressor = osmium::io::CompressionFactory::instance().create_decompressor(m_compression, m_fd);
+                try {
+                    std::unique_ptr<osmium::io::Decompressor> decompressor = osmium::io::CompressionFactory::instance().create_decompressor(m_compression, m_fd);
 
-                bool done = false;
-                while (!done) {
-                    std::string data {decompressor->read()};
-                    if (data.empty()) {
-                        done = true;
+                    while (!m_done) {
+                        std::string data {decompressor->read()};
+                        if (data.empty()) {
+                            m_done = true;
+                        }
+                        m_queue.push(std::move(data));
+                        while (m_queue.size() > 10) {
+                            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+                        }
                     }
-                    m_queue.push(std::move(data));
-                    while (m_queue.size() > 10) {
-                        std::this_thread::sleep_for(std::chrono::milliseconds(10));
-                    }
+
+                    decompressor->close();
+                } catch (...) {
+                    // If there is an exception in this thread, we make sure
+                    // to push an empty string onto the queue to signal the
+                    // end-of-data to the reading thread so that it will not
+                    // hang. Then we re-throw the exception.
+                    m_queue.push(std::string());
+                    throw;
                 }
-
-                decompressor->close();
             }
 
         }; // class InputThread
@@ -94,6 +108,8 @@ namespace osmium {
             std::unique_ptr<osmium::io::Input> m_input;
             osmium::thread::Queue<std::string> m_input_queue {};
             std::thread m_input_thread;
+            std::future<void> m_input_future;
+            std::atomic<bool> m_input_done {false};
             osmium::osm_entity::flags m_read_types {osmium::osm_entity::flags::all};
             int m_childpid {0};
 
@@ -166,7 +182,9 @@ namespace osmium {
                     throw std::runtime_error("file type not supported");
                 }
                 int fd = open_input_file_or_url(m_file.filename());
-                m_input_thread = std::thread(InputThread {m_input_queue, m_file.encoding()->compress(), fd});
+                std::packaged_task<void()> task(InputThread {m_input_queue, m_file.encoding()->compress(), fd, m_input_done});
+                m_input_future = task.get_future();
+                m_input_thread = std::thread(std::move(task));
             }
 
             Reader(const std::string& filename) :
@@ -178,14 +196,15 @@ namespace osmium {
 
             ~Reader() {
                 close();
-                if (m_input_thread.joinable()) {
-                    m_input_thread.join();
-                }
             }
 
             void close() {
+                // Signal to input child process that it should wrap up.
+                m_input_done = true;
+
                 // XXX
 //                m_input->close();
+
                 if (m_childpid) {
                     int status;
                     pid_t pid = ::waitpid(m_childpid, &status, 0);
@@ -197,6 +216,18 @@ namespace osmium {
 #pragma GCC diagnostic pop
                     m_childpid = 0;
                 }
+
+                // If an exception happened in the input thread, re-throw
+                // it in this (the main) thread. This will block if the
+                // input thread isn't finished.
+                if (m_input_future.valid()) {
+                    m_input_future.get();
+                }
+
+                // Make sure input thread is done.
+                if (m_input_thread.joinable()) {
+                    m_input_thread.join();
+                }
             }
 
             osmium::io::Header open(osmium::osm_entity::flags read_types = osmium::osm_entity::flags::all) {
@@ -205,6 +236,11 @@ namespace osmium {
             }
 
             osmium::memory::Buffer read() {
+                // If an exception happened in the input thread, re-throw
+                // it in this (the main) thread.
+                if (m_input_future.valid() && m_input_future.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+                    m_input_future.get();
+                }
                 if (m_read_types == osmium::osm_entity::flags::nothing) {
                     // If the caller didn't want anything but the header, it will
                     // always get an empty buffer here.

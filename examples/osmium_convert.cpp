@@ -105,17 +105,22 @@ int main(int argc, char* argv[]) {
         std::cerr << "Warning! Source and destination are not of the same type." << std::endl;
     }
 
+    try {
+        osmium::io::Reader reader(infile);
+        osmium::io::Header header = reader.open();
 
-    osmium::io::Reader reader(infile);
-    osmium::io::Header header = reader.open();
+        header.generator("osmium_convert");
 
-    header.generator("osmium_convert");
-
-    osmium::io::Writer writer(outfile, header);
-    while (osmium::memory::Buffer buffer = reader.read()) {
-        writer(std::move(buffer));
+        osmium::io::Writer writer(outfile, header);
+        while (osmium::memory::Buffer buffer = reader.read()) {
+            writer(std::move(buffer));
+        }
+        writer.close();
+        reader.close();
+    } catch (std::exception& e) {
+        std::cerr << e.what() << "\n";
+        exit(1);
     }
-    writer.close();
 
     google::protobuf::ShutdownProtobufLibrary();
 }
