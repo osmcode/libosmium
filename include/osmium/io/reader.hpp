@@ -198,9 +198,6 @@ namespace osmium {
                 m_read_which_entities(read_which_entities),
                 m_input(osmium::io::InputFactory::instance().create_input(m_file, m_read_which_entities, m_input_queue)),
                 m_input_task(InputThread {m_input_queue, m_file.encoding()->compress(), open_input_file_or_url(m_file.filename()), m_input_done}) {
-                if (!m_input) {
-                    throw std::runtime_error("file type not supported");
-                }
                 m_input->open();
             }
 

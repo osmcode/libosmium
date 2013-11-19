@@ -110,10 +110,6 @@ namespace osmium {
                 m_file(file),
                 m_output(osmium::io::OutputFactory::instance().create_output(m_file, m_output_queue)),
                 m_output_task(OutputThread {m_output_queue, m_file.encoding()->compress(), osmium::io::detail::open_for_writing(m_file.filename())}) {
-                if (!m_output) {
-                    throw std::runtime_error("file type not supported");
-                }
-
                 m_output->write_header(header);
             }
 

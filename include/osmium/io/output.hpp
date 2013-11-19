@@ -136,7 +136,7 @@ namespace osmium {
                     return std::unique_ptr<osmium::io::Output>((it->second)(file, output_queue));
                 }
 
-                return nullptr;
+                throw std::runtime_error(std::string("Unknown encoding for output: ") + file.encoding()->suffix());
             }
 
         }; // class OutputFactory

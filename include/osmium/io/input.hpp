@@ -139,7 +139,7 @@ namespace osmium {
                     return std::unique_ptr<osmium::io::Input>((it->second)(file, read_which_entities, input_queue));
                 }
 
-                return nullptr;
+                throw std::runtime_error(std::string("Unknown encoding for input: ") + file.encoding()->suffix());
             }
 
         }; // class InputFactory
