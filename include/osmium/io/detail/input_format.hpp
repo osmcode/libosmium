@@ -1,5 +1,5 @@
-#ifndef OSMIUM_IO_INPUT_HPP
-#define OSMIUM_IO_INPUT_HPP
+#ifndef OSMIUM_IO_DETAIL_INPUT_FORMAT_HPP
+#define OSMIUM_IO_DETAIL_INPUT_FORMAT_HPP
 
 /*
 
@@ -159,4 +159,4 @@ namespace osmium {
 
 } // namespace osmium
 
-#endif // OSMIUM_IO_INPUT_HPP
+#endif // OSMIUM_IO_DETAIL_INPUT_FORMAT_HPP

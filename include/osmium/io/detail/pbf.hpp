@@ -1,5 +1,5 @@
-#ifndef OSMIUM_IO_PBF_HPP
-#define OSMIUM_IO_PBF_HPP
+#ifndef OSMIUM_IO_DETAIL_PBF_HPP
+#define OSMIUM_IO_DETAIL_PBF_HPP
 
 /*
 
@@ -79,4 +79,4 @@ namespace osmium {
 
 } // namespace osmium
 
-#endif // OSMIUM_IO_PBF_HPP
+#endif // OSMIUM_IO_DETAIL_PBF_HPP

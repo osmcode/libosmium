@@ -45,7 +45,7 @@ DEALINGS IN THE SOFTWARE.
 #include <unistd.h>
 
 #include <osmium/io/compression.hpp>
-#include <osmium/io/input.hpp>
+#include <osmium/io/detail/input_format.hpp>
 #include <osmium/thread/checked_task.hpp>
 #include <osmium/thread/debug.hpp>
 #include <osmium/thread/queue.hpp>

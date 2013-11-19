@@ -37,7 +37,7 @@ DEALINGS IN THE SOFTWARE.
 #include <string>
 
 #include <osmium/io/compression.hpp>
-#include <osmium/io/output.hpp>
+#include <osmium/io/detail/output_format.hpp>
 #include <osmium/thread/checked_task.hpp>
 #include <osmium/thread/debug.hpp>
 
