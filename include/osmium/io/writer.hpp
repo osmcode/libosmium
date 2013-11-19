@@ -92,7 +92,7 @@ namespace osmium {
                     throw std::runtime_error("file type not supported");
                 }
 
-                m_output->set_header(header);
+                m_output->write_header(header);
 
                 int fd = osmium::io::detail::open_for_writing(m_file.filename());
 
@@ -110,7 +110,7 @@ namespace osmium {
             }
 
             void operator()(osmium::memory::Buffer&& buffer) {
-                m_output->handle_buffer(std::move(buffer));
+                m_output->write_buffer(std::move(buffer));
             }
 
             void close() {

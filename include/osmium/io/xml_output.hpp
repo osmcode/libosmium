@@ -349,10 +349,10 @@ namespace osmium {
             XMLOutput(const XMLOutput&) = delete;
             XMLOutput& operator=(const XMLOutput&) = delete;
 
-            ~XMLOutput() {
+            ~XMLOutput() override final {
             }
 
-            void handle_buffer(osmium::memory::Buffer&& buffer) override {
+            void write_buffer(osmium::memory::Buffer&& buffer) override final {
                 XMLOutputBlock output_block(std::move(buffer), this->m_file.has_multiple_object_versions(), this->m_file.type() == osmium::io::FileType::Change());
                 m_output_queue.push(osmium::thread::Pool::instance().submit(std::move(output_block)));
                 while (m_output_queue.size() > 10) {
@@ -360,7 +360,7 @@ namespace osmium {
                 }
             }
 
-            void set_header(const osmium::io::Header& header) override {
+            void write_header(const osmium::io::Header& header) override final {
                 std::string out = "<?xml version='1.0' encoding='UTF-8'?>\n";
 
                 if (this->m_file.type() == osmium::io::FileType::Change()) {
@@ -386,7 +386,7 @@ namespace osmium {
                 promise.set_value(std::move(out));
             }
 
-            void close() override {
+            void close() override final {
                 {
                     std::string out;
                     if (this->m_file.type() == osmium::io::FileType::Change()) {
@@ -403,8 +403,6 @@ namespace osmium {
                 std::promise<std::string> promise;
                 m_output_queue.push(promise.get_future());
                 promise.set_value(std::string());
-
-//                this->m_file.close(); XXX who does close?
             }
 
         }; // class XMLOutput

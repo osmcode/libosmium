@@ -62,12 +62,6 @@ namespace osmium {
             osmium::io::File m_file;
             data_queue_type& m_output_queue;
 
-            Output(const Output&) = delete;
-            Output(Output&&) = delete;
-
-            Output& operator=(const Output&) = delete;
-            Output& operator=(Output&&) = delete;
-
         public:
 
             Output(const osmium::io::File& file, data_queue_type& output_queue) :
@@ -75,13 +69,19 @@ namespace osmium {
                 m_output_queue(output_queue) {
             }
 
+            Output(const Output&) = delete;
+            Output(Output&&) = delete;
+
+            Output& operator=(const Output&) = delete;
+            Output& operator=(Output&&) = delete;
+
             virtual ~Output() {
             }
 
-            virtual void set_header(const osmium::io::Header&) {
+            virtual void write_header(const osmium::io::Header&) {
             }
 
-            virtual void handle_buffer(osmium::memory::Buffer&&) = 0;
+            virtual void write_buffer(osmium::memory::Buffer&&) = 0;
 
             virtual void close() = 0;
 

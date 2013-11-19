@@ -717,7 +717,7 @@ namespace osmium {
                 GOOGLE_PROTOBUF_VERIFY_VERSION;
             }
 
-            void handle_buffer(osmium::memory::Buffer&& buffer) override {
+            void write_buffer(osmium::memory::Buffer&& buffer) override final {
                 osmium::handler::apply(buffer.cbegin(), buffer.cend(), *this);
             }
 
@@ -807,11 +807,7 @@ namespace osmium {
              * This initializes the header-block, sets the required-features and
              * the writing-program and adds the obligatory StringTable-Index 0.
              */
-            void set_header(const osmium::io::Header& header) override {
-                if (debug && has_debug_level(1)) {
-                    std::cerr << "pbf write set_header" << std::endl;
-                }
-
+            void write_header(const osmium::io::Header& header) override final {
                 // add the schema version as required feature to the HeaderBlock
                 pbf_header_block.add_required_features("OsmSchema-V0.6");
 
@@ -912,7 +908,7 @@ namespace osmium {
              * Finalize the writing process, flush any open primitive blocks to the file and
              * close the file.
              */
-            void close() override {
+            void close() override final {
                 if (debug && has_debug_level(1)) {
                     std::cerr << "finishing" << std::endl;
                 }
@@ -925,7 +921,6 @@ namespace osmium {
                 std::promise<std::string> promise;
                 m_output_queue.push(promise.get_future());
                 promise.set_value(std::string());
-               // this->m_file.close(); XXX where to we close now?
             }
 
         }; // class PBFOutput
