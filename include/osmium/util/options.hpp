@@ -33,6 +33,7 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <initializer_list>
 #include <map>
 #include <string>
 
@@ -57,8 +58,13 @@ namespace osmium {
 
             typedef option_map::iterator iterator;
             typedef option_map::const_iterator const_iterator;
+            typedef option_map::value_type value_type;
 
             Options() = default;
+
+            Options(std::initializer_list<value_type> values) :
+                m_options(values) {
+            }
 
             Options(const Options&) = default;
             Options& operator=(const Options&) = default;

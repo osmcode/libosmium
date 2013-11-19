@@ -33,6 +33,7 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <initializer_list>
 #include <string>
 
 #include <osmium/osm/bounds.hpp>
@@ -65,6 +66,10 @@ namespace osmium {
         public:
 
             Header() = default;
+
+            Header(std::initializer_list<osmium::util::Options::value_type> values) :
+                Options(values) {
+            }
 
             Header(const Header&) = default;
             Header& operator=(const Header&) = default;
