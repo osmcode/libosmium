@@ -36,8 +36,9 @@ DEALINGS IN THE SOFTWARE.
 #include <memory>
 #include <string>
 
-#include <osmium/io/output.hpp>
 #include <osmium/io/compression.hpp>
+#include <osmium/io/output.hpp>
+#include <osmium/thread/checked_task.hpp>
 #include <osmium/thread/debug.hpp>
 
 namespace osmium {
@@ -88,8 +89,8 @@ namespace osmium {
 
             std::unique_ptr<osmium::io::Output> m_output;
             data_queue_type m_output_queue {};
-            std::thread m_output_thread {};
-            std::future<void> m_output_future {};
+
+            osmium::thread::CheckedTask<OutputThread> m_output_task;
 
         public:
 
@@ -107,18 +108,13 @@ namespace osmium {
              */
             Writer(const osmium::io::File& file, const osmium::io::Header& header = osmium::io::Header()) :
                 m_file(file),
-                m_output(osmium::io::OutputFactory::instance().create_output(m_file, m_output_queue)) {
+                m_output(osmium::io::OutputFactory::instance().create_output(m_file, m_output_queue)),
+                m_output_task(OutputThread {m_output_queue, m_file.encoding()->compress(), osmium::io::detail::open_for_writing(m_file.filename())}) {
                 if (!m_output) {
                     throw std::runtime_error("file type not supported");
                 }
 
                 m_output->write_header(header);
-
-                int fd = osmium::io::detail::open_for_writing(m_file.filename());
-
-                std::packaged_task<void()> task(OutputThread {m_output_queue, m_file.encoding()->compress(), fd});
-                m_output_future = task.get_future();
-                m_output_thread = std::thread(std::move(task));
             }
 
             Writer(const Writer&) = delete;
@@ -134,11 +130,7 @@ namespace osmium {
              * @throws Some form of std::runtime_error when there is a problem.
              */
             void operator()(osmium::memory::Buffer&& buffer) {
-                // If an exception happened in the output thread, re-throw
-                // it in this (the main) thread.
-                if (m_output_future.valid() && m_output_future.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
-                    m_output_future.get();
-                }
+                m_output_task.check_for_exception();
                 m_output->write_buffer(std::move(buffer));
             }
 
@@ -152,18 +144,7 @@ namespace osmium {
              */
             void close() {
                 m_output->close();
-
-                // If an exception happened in the output thread, re-throw
-                // it in this (the main) thread. This will block if the
-                // output thread isn't finished.
-                if (m_output_future.valid()) {
-                    m_output_future.get();
-                }
-
-                // Make sure output thread is done.
-                if (m_output_thread.joinable()) {
-                    m_output_thread.join();
-                }
+                m_output_task.close();
             }
 
         }; // class Writer

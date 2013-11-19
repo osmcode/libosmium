@@ -44,10 +44,11 @@ DEALINGS IN THE SOFTWARE.
 #include <sys/wait.h>
 #include <unistd.h>
 
-#include <osmium/io/input.hpp>
 #include <osmium/io/compression.hpp>
-#include <osmium/thread/queue.hpp>
+#include <osmium/io/input.hpp>
+#include <osmium/thread/checked_task.hpp>
 #include <osmium/thread/debug.hpp>
+#include <osmium/thread/queue.hpp>
 
 namespace osmium {
 
@@ -115,8 +116,9 @@ namespace osmium {
 
             std::unique_ptr<osmium::io::Input> m_input;
             osmium::thread::Queue<std::string> m_input_queue {};
-            std::thread m_input_thread;
-            std::future<void> m_input_future;
+
+            osmium::thread::CheckedTask<InputThread> m_input_task;
+
             std::atomic<bool> m_input_done {false};
             int m_childpid {0};
 
@@ -194,14 +196,11 @@ namespace osmium {
             Reader(osmium::io::File file, osmium::osm_entity::flags read_which_entities = osmium::osm_entity::flags::all) :
                 m_file(std::move(file)),
                 m_read_which_entities(read_which_entities),
-                m_input(osmium::io::InputFactory::instance().create_input(m_file, m_read_which_entities, m_input_queue)) {
+                m_input(osmium::io::InputFactory::instance().create_input(m_file, m_read_which_entities, m_input_queue)),
+                m_input_task(InputThread {m_input_queue, m_file.encoding()->compress(), open_input_file_or_url(m_file.filename()), m_input_done}) {
                 if (!m_input) {
                     throw std::runtime_error("file type not supported");
                 }
-                int fd = open_input_file_or_url(m_file.filename());
-                std::packaged_task<void()> task(InputThread {m_input_queue, m_file.encoding()->compress(), fd, m_input_done});
-                m_input_future = task.get_future();
-                m_input_thread = std::thread(std::move(task));
                 m_input->open();
             }
 
@@ -242,17 +241,7 @@ namespace osmium {
                     m_childpid = 0;
                 }
 
-                // If an exception happened in the input thread, re-throw
-                // it in this (the main) thread. This will block if the
-                // input thread isn't finished.
-                if (m_input_future.valid()) {
-                    m_input_future.get();
-                }
-
-                // Make sure input thread is done.
-                if (m_input_thread.joinable()) {
-                    m_input_thread.join();
-                }
+                m_input_task.close();
             }
 
             /**
@@ -272,9 +261,8 @@ namespace osmium {
             osmium::memory::Buffer read() {
                 // If an exception happened in the input thread, re-throw
                 // it in this (the main) thread.
-                if (m_input_future.valid() && m_input_future.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
-                    m_input_future.get();
-                }
+                m_input_task.check_for_exception();
+
                 if (m_read_which_entities == osmium::osm_entity::flags::nothing) {
                     // If the caller didn't want anything but the header, it will
                     // always get an empty buffer here.
