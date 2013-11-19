@@ -554,7 +554,7 @@ namespace osmium {
                 m_reader = std::thread(std::move(parser));
 
                 // wait for header
-                m_header_promise.get_future().get();
+                m_header = m_header_promise.get_future().get();
             }
 
             osmium::memory::Buffer read() override {
