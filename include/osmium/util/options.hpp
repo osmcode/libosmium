@@ -40,14 +40,33 @@ namespace osmium {
 
     namespace util {
 
+        /**
+         * Stores key=value type options. This class can be used stand-alone or
+         * as a base class. Options are stored and retrieved by key using the
+         * different set() and get() methods.
+         *
+         * You can iterate over all set options. Dereferencing an iterator
+         * yields a std::pair of the key and value strings.
+         */
         class Options {
 
-            std::map<std::string, std::string> m_options;
+            typedef std::map<std::string, std::string> option_map;
+            option_map m_options;
 
         public:
 
-            Options() {
-            }
+            typedef option_map::iterator iterator;
+            typedef option_map::const_iterator const_iterator;
+
+            Options() = default;
+
+            Options(const Options&) = default;
+            Options& operator=(const Options&) = default;
+
+            Options(Options&&) = default;
+            Options& operator=(Options&&) = default;
+
+            ~Options() = default;
 
             void set(const std::string& key, const std::string& value) {
                 m_options[key] = value;
@@ -61,7 +80,11 @@ namespace osmium {
                 m_options[key] = value ? "true" : "false";
             }
 
-            std::string get(const std::string& key, const std::string& default_value="") const {
+            /**
+             * Get value of "key" option. If not set the default_value (or
+             * empty string) is returned.
+             */
+            std::string get(const std::string& key, const std::string& default_value="") const noexcept {
                 auto it = m_options.find(key);
                 if (it == m_options.end()) {
                     return default_value;
@@ -69,9 +92,36 @@ namespace osmium {
                 return it->second;
             }
 
-            bool is_true(const std::string& key) const {
+            /**
+             * Is this option set to a true value ("true" or "yes")?
+             */
+            bool is_true(const std::string& key) const noexcept {
                 std::string value = get(key);
-                return (value == "true");
+                return (value == "true" || value == "yes");
+            }
+
+            iterator begin() noexcept {
+                return m_options.begin();
+            }
+
+            iterator end() noexcept {
+                return m_options.end();
+            }
+
+            const_iterator begin() const noexcept {
+                return m_options.cbegin();
+            }
+
+            const_iterator end() const noexcept {
+                return m_options.cend();
+            }
+
+            const_iterator cbegin() const noexcept {
+                return m_options.cbegin();
+            }
+
+            const_iterator cend() const noexcept {
+                return m_options.cend();
             }
 
         }; // class Options
