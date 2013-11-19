@@ -114,7 +114,7 @@ namespace osmium {
             osmium::io::File m_file;
             osmium::osm_entity::flags m_read_which_entities;
 
-            std::unique_ptr<osmium::io::Input> m_input;
+            std::unique_ptr<osmium::io::detail::InputFormat> m_input;
             osmium::thread::Queue<std::string> m_input_queue {};
 
             osmium::thread::CheckedTask<InputThread> m_input_task;
@@ -196,7 +196,7 @@ namespace osmium {
             Reader(osmium::io::File file, osmium::osm_entity::flags read_which_entities = osmium::osm_entity::flags::all) :
                 m_file(std::move(file)),
                 m_read_which_entities(read_which_entities),
-                m_input(osmium::io::InputFactory::instance().create_input(m_file, m_read_which_entities, m_input_queue)),
+                m_input(osmium::io::detail::InputFormatFactory::instance().create_input(m_file, m_read_which_entities, m_input_queue)),
                 m_input_task(InputThread {m_input_queue, m_file.encoding()->compress(), open_input_file_or_url(m_file.filename()), m_input_done}) {
                 m_input->open();
             }

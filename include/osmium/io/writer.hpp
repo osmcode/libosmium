@@ -47,6 +47,8 @@ namespace osmium {
 
         class OutputThread {
 
+            typedef osmium::io::detail::data_queue_type data_queue_type;
+
             data_queue_type& m_input_queue;
             const std::string& m_compression;
             const int m_fd;
@@ -87,8 +89,8 @@ namespace osmium {
 
             osmium::io::File m_file;
 
-            std::unique_ptr<osmium::io::Output> m_output;
-            data_queue_type m_output_queue {};
+            std::unique_ptr<osmium::io::detail::OutputFormat> m_output;
+            osmium::io::detail::data_queue_type m_output_queue {};
 
             osmium::thread::CheckedTask<OutputThread> m_output_task;
 
@@ -108,7 +110,7 @@ namespace osmium {
              */
             Writer(const osmium::io::File& file, const osmium::io::Header& header = osmium::io::Header()) :
                 m_file(file),
-                m_output(osmium::io::OutputFactory::instance().create_output(m_file, m_output_queue)),
+                m_output(osmium::io::detail::OutputFormatFactory::instance().create_output(m_file, m_output_queue)),
                 m_output_task(OutputThread {m_output_queue, m_file.encoding()->compress(), osmium::io::detail::open_for_writing(m_file.filename())}) {
                 m_output->write_header(header);
             }

@@ -53,97 +53,101 @@ namespace osmium {
 
     namespace io {
 
-        typedef osmium::thread::Queue<std::future<std::string>> data_queue_type;
+        namespace detail {
 
-        /**
-         * Virtual base class for all classes writing OSM files in different
-         * encodings.
-         *
-         * Do not use this class or derived classes directly. Use the
-         * osmium::io::Writer class instead.
-         */
-        class Output {
+            typedef osmium::thread::Queue<std::future<std::string>> data_queue_type;
 
-        protected:
+            /**
+             * Virtual base class for all classes writing OSM files in different
+             * encodings.
+             *
+             * Do not use this class or derived classes directly. Use the
+             * osmium::io::Writer class instead.
+             */
+            class OutputFormat {
 
-            osmium::io::File m_file;
-            data_queue_type& m_output_queue;
+            protected:
 
-        public:
+                osmium::io::File m_file;
+                data_queue_type& m_output_queue;
 
-            Output(const osmium::io::File& file, data_queue_type& output_queue) :
-                m_file(file),
-                m_output_queue(output_queue) {
-            }
+            public:
 
-            Output(const Output&) = delete;
-            Output(Output&&) = delete;
+                OutputFormat(const osmium::io::File& file, data_queue_type& output_queue) :
+                    m_file(file),
+                    m_output_queue(output_queue) {
+                }
 
-            Output& operator=(const Output&) = delete;
-            Output& operator=(Output&&) = delete;
+                OutputFormat(const OutputFormat&) = delete;
+                OutputFormat(OutputFormat&&) = delete;
 
-            virtual ~Output() {
-            }
+                OutputFormat& operator=(const OutputFormat&) = delete;
+                OutputFormat& operator=(OutputFormat&&) = delete;
 
-            virtual void write_header(const osmium::io::Header&) {
-            }
+                virtual ~OutputFormat() {
+                }
 
-            virtual void write_buffer(osmium::memory::Buffer&&) = 0;
+                virtual void write_header(const osmium::io::Header&) {
+                }
 
-            virtual void close() = 0;
+                virtual void write_buffer(osmium::memory::Buffer&&) = 0;
 
-        }; // class Output
+                virtual void close() = 0;
 
-        /**
-         * This factory class is used to create objects that write OSM data
-         * into a specified output format.
-         *
-         * Do not use this class directly. Instead use the osmium::io::Writer
-         * class.
-         */
-        class OutputFactory {
+            }; // class OutputFormat
 
-        public:
+            /**
+             * This factory class is used to create objects that write OSM data
+             * into a specified output format.
+             *
+             * Do not use this class directly. Instead use the osmium::io::Writer
+             * class.
+             */
+            class OutputFormatFactory {
 
-            typedef std::function<osmium::io::Output*(const osmium::io::File&, data_queue_type&)> create_output_type;
+            public:
 
-        private:
+                typedef std::function<osmium::io::detail::OutputFormat*(const osmium::io::File&, data_queue_type&)> create_output_type;
 
-            typedef std::map<osmium::io::Encoding*, create_output_type> encoding2create_type;
+            private:
 
-            encoding2create_type m_callbacks;
+                typedef std::map<osmium::io::Encoding*, create_output_type> encoding2create_type;
 
-            OutputFactory() :
-                m_callbacks() {
-            }
+                encoding2create_type m_callbacks;
 
-        public:
+                OutputFormatFactory() :
+                    m_callbacks() {
+                }
 
-            static OutputFactory& instance() {
-                static OutputFactory factory;
-                return factory;
-            }
+            public:
 
-            bool register_output_format(std::vector<osmium::io::Encoding*> encodings, create_output_type create_function) {
-                for (auto encoding : encodings) {
-                    if (! m_callbacks.insert(encoding2create_type::value_type(encoding, create_function)).second) {
-                        return false;
+                static OutputFormatFactory& instance() {
+                    static OutputFormatFactory factory;
+                    return factory;
+                }
+
+                bool register_output_format(std::vector<osmium::io::Encoding*> encodings, create_output_type create_function) {
+                    for (auto encoding : encodings) {
+                        if (! m_callbacks.insert(encoding2create_type::value_type(encoding, create_function)).second) {
+                            return false;
+                        }
                     }
-                }
-                return true;
-            }
-
-            std::unique_ptr<osmium::io::Output> create_output(const osmium::io::File& file, data_queue_type& output_queue) {
-                encoding2create_type::iterator it = m_callbacks.find(file.encoding());
-
-                if (it != m_callbacks.end()) {
-                    return std::unique_ptr<osmium::io::Output>((it->second)(file, output_queue));
+                    return true;
                 }
 
-                throw std::runtime_error(std::string("Unknown encoding for output: ") + file.encoding()->suffix());
-            }
+                std::unique_ptr<osmium::io::detail::OutputFormat> create_output(const osmium::io::File& file, data_queue_type& output_queue) {
+                    encoding2create_type::iterator it = m_callbacks.find(file.encoding());
 
-        }; // class OutputFactory
+                    if (it != m_callbacks.end()) {
+                        return std::unique_ptr<osmium::io::detail::OutputFormat>((it->second)(file, output_queue));
+                    }
+
+                    throw std::runtime_error(std::string("Unknown encoding for output: ") + file.encoding()->suffix());
+                }
+
+            }; // class OutputFormatFactory
+
+        } // namespace detail
 
     } // namespace io
 

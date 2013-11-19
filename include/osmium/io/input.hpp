@@ -53,103 +53,107 @@ namespace osmium {
 
     namespace io {
 
-        /**
-         * Virtual base class for all classes reading OSM files in different
-         * encodings.
-         *
-         * Do not use this class or derived classes directly. Use the
-         * osmium::io::Reader class instead.
-         */
-        class Input {
+        namespace detail {
 
-        protected:
+            /**
+             * Virtual base class for all classes reading OSM files in different
+             * encodings.
+             *
+             * Do not use this class or derived classes directly. Use the
+             * osmium::io::Reader class instead.
+             */
+            class InputFormat {
 
-            osmium::io::File m_file;
-            osmium::osm_entity::flags m_read_which_entities;
-            osmium::thread::Queue<std::string>& m_input_queue;
-            osmium::io::Header m_header {};
+            protected:
 
-            Input(const osmium::io::File& file, osmium::osm_entity::flags read_which_entities, osmium::thread::Queue<std::string>& input_queue) :
-                m_file(file),
-                m_read_which_entities(read_which_entities),
-                m_input_queue(input_queue) {
-                m_header.has_multiple_object_versions(m_file.has_multiple_object_versions());
-            }
+                osmium::io::File m_file;
+                osmium::osm_entity::flags m_read_which_entities;
+                osmium::thread::Queue<std::string>& m_input_queue;
+                osmium::io::Header m_header {};
 
-            Input(const Input&) = delete;
-            Input(Input&&) = delete;
+                InputFormat(const osmium::io::File& file, osmium::osm_entity::flags read_which_entities, osmium::thread::Queue<std::string>& input_queue) :
+                    m_file(file),
+                    m_read_which_entities(read_which_entities),
+                    m_input_queue(input_queue) {
+                    m_header.has_multiple_object_versions(m_file.has_multiple_object_versions());
+                }
 
-            Input& operator=(const Input&) = delete;
-            Input& operator=(Input&&) = delete;
+                InputFormat(const InputFormat&) = delete;
+                InputFormat(InputFormat&&) = delete;
 
-        public:
+                InputFormat& operator=(const InputFormat&) = delete;
+                InputFormat& operator=(InputFormat&&) = delete;
 
-            virtual ~Input() {
-            }
+            public:
 
-            virtual void open() = 0;
+                virtual ~InputFormat() {
+                }
 
-            virtual osmium::memory::Buffer read() = 0;
+                virtual void open() = 0;
 
-            virtual void close() {
-            }
+                virtual osmium::memory::Buffer read() = 0;
 
-            osmium::io::Header header() const {
-                return m_header;
-            }
+                virtual void close() {
+                }
 
-        }; // class Input
+                osmium::io::Header header() const {
+                    return m_header;
+                }
 
-        /**
-         * This factory class is used to create objects that read OSM data
-         * written in a specified format.
-         *
-         * Do not use this class directly. Instead use the osmium::io::Reader
-         * class.
-         */
-        class InputFactory {
+            }; // class InputFormat
 
-        public:
+            /**
+             * This factory class is used to create objects that read OSM data
+             * written in a specified format.
+             *
+             * Do not use this class directly. Instead use the osmium::io::Reader
+             * class.
+             */
+            class InputFormatFactory {
 
-            typedef std::function<osmium::io::Input*(const osmium::io::File&, osmium::osm_entity::flags read_which_entities, osmium::thread::Queue<std::string>&)> create_input_type;
+            public:
 
-        private:
+                typedef std::function<osmium::io::detail::InputFormat*(const osmium::io::File&, osmium::osm_entity::flags read_which_entities, osmium::thread::Queue<std::string>&)> create_input_type;
 
-            typedef std::map<osmium::io::Encoding*, create_input_type> encoding2create_type;
+            private:
 
-            encoding2create_type m_callbacks;
+                typedef std::map<osmium::io::Encoding*, create_input_type> encoding2create_type;
 
-            InputFactory() :
-                m_callbacks() {
-            }
+                encoding2create_type m_callbacks;
 
-        public:
+                InputFormatFactory() :
+                    m_callbacks() {
+                }
 
-            static InputFactory& instance() {
-                static InputFactory factory;
-                return factory;
-            }
+            public:
 
-            bool register_input_format(std::vector<osmium::io::Encoding*> encodings, create_input_type create_function) {
-                for (auto encoding : encodings) {
-                    if (! m_callbacks.insert(encoding2create_type::value_type(encoding, create_function)).second) {
-                        return false;
+                static InputFormatFactory& instance() {
+                    static InputFormatFactory factory;
+                    return factory;
+                }
+
+                bool register_input_format(std::vector<osmium::io::Encoding*> encodings, create_input_type create_function) {
+                    for (auto encoding : encodings) {
+                        if (! m_callbacks.insert(encoding2create_type::value_type(encoding, create_function)).second) {
+                            return false;
+                        }
                     }
-                }
-                return true;
-            }
-
-            std::unique_ptr<osmium::io::Input> create_input(const osmium::io::File& file, osmium::osm_entity::flags read_which_entities, osmium::thread::Queue<std::string>& input_queue) {
-                encoding2create_type::iterator it = m_callbacks.find(file.encoding());
-
-                if (it != m_callbacks.end()) {
-                    return std::unique_ptr<osmium::io::Input>((it->second)(file, read_which_entities, input_queue));
+                    return true;
                 }
 
-                throw std::runtime_error(std::string("Unknown encoding for input: ") + file.encoding()->suffix());
-            }
+                std::unique_ptr<osmium::io::detail::InputFormat> create_input(const osmium::io::File& file, osmium::osm_entity::flags read_which_entities, osmium::thread::Queue<std::string>& input_queue) {
+                    encoding2create_type::iterator it = m_callbacks.find(file.encoding());
 
-        }; // class InputFactory
+                    if (it != m_callbacks.end()) {
+                        return std::unique_ptr<osmium::io::detail::InputFormat>((it->second)(file, read_which_entities, input_queue));
+                    }
+
+                    throw std::runtime_error(std::string("Unknown encoding for input: ") + file.encoding()->suffix());
+                }
+
+            }; // class InputFormatFactory
+
+        } // namespace detail
 
     } // namespace io
 
