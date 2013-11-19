@@ -279,7 +279,7 @@ namespace osmium {
                                             throw std::runtime_error("can only read version 0.6 files");
                                         }
                                     } else if (!strcmp(attrs[count], "generator")) {
-                                        m_header.generator(attrs[count+1]);
+                                        m_header.set("generator", attrs[count+1]);
                                     }
                                 }
                             }

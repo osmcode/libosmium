@@ -56,9 +56,6 @@ namespace osmium {
             */
             bool m_has_multiple_object_versions = false;
 
-            /// Program that generated this file.
-            std::string m_generator;
-
             /**
              * Are nodes in the PBF files encoded in "Dense" format.
              * This is only valid for PBF files.
@@ -96,15 +93,6 @@ namespace osmium {
 
             Header& has_multiple_object_versions(bool h) {
                 m_has_multiple_object_versions = h;
-                return *this;
-            }
-
-            const std::string& generator() const {
-                return m_generator;
-            }
-
-            Header& generator(const std::string& generator) {
-                m_generator = generator;
                 return *this;
             }
 

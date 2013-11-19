@@ -53,6 +53,10 @@ namespace osmium {
                 m_options[key] = value;
             }
 
+            void set(const std::string& key, const char* value) {
+                m_options[key] = value;
+            }
+
             void set(const std::string& key, bool value) {
                 m_options[key] = value ? "true" : "false";
             }

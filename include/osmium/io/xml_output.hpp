@@ -368,7 +368,7 @@ namespace osmium {
 
                 if (this->m_file.type() == osmium::io::FileType::Change()) {
                     out += "<osmChange version=\"0.6\" generator=\"";
-                    xml_string(out, header.generator().c_str());
+                    xml_string(out, header.get("generator").c_str());
                     out += "\">\n";
                 } else {
                     out += "<osm version=\"0.6\"";
@@ -380,7 +380,7 @@ namespace osmium {
                         out += "\"";
                     }
                     out += " generator=\"";
-                    xml_string(out, header.generator().c_str());
+                    xml_string(out, header.get("generator").c_str());
                     out += "\">\n";
                 }
 

@@ -108,7 +108,7 @@ int main(int argc, char* argv[]) {
     try {
         osmium::io::Reader reader(infile);
         osmium::io::Header header = reader.header();
-        header.generator("osmium_convert");
+        header.set("generator", "osmium_convert");
 
         osmium::io::Writer writer(outfile, header);
         while (osmium::memory::Buffer buffer = reader.read()) {

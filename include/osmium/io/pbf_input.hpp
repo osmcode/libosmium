@@ -475,7 +475,7 @@ namespace osmium {
                 }
 
                 if (pbf_header_block.has_writingprogram()) {
-                    m_header.generator(pbf_header_block.writingprogram());
+                    m_header.set("generator", pbf_header_block.writingprogram());
                 }
 
                 if (pbf_header_block.has_bbox()) {
