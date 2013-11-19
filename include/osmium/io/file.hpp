@@ -38,6 +38,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/io/encoding.hpp>
 #include <osmium/io/file_type.hpp>
+#include <osmium/util/options.hpp>
 
 namespace osmium {
 
@@ -48,7 +49,7 @@ namespace osmium {
          *
          * If the filename is empty or "-", this means stdin or stdout is used.
          */
-        class File {
+        class File : public osmium::util::Options {
 
         private:
 
@@ -72,6 +73,7 @@ namespace osmium {
              *                 An empty filename or "-" means stdin or stdout.
              */
             File(const std::string& filename = "") :
+                Options(),
                 m_type(osmium::io::FileType::OSM()),
                 m_encoding(osmium::io::Encoding::PBF()),
                 m_filename(filename) {

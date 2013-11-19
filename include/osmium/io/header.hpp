@@ -36,6 +36,7 @@ DEALINGS IN THE SOFTWARE.
 #include <string>
 
 #include <osmium/osm/bounds.hpp>
+#include <osmium/util/options.hpp>
 
 namespace osmium {
 
@@ -44,7 +45,7 @@ namespace osmium {
         /**
         * Meta information from the header of an OSM file.
         */
-        class Header {
+        class Header : public osmium::util::Options {
 
             /// Bounding box
             osmium::Bounds m_bounds;

@@ -340,10 +340,13 @@ namespace osmium {
 
         class XMLOutput : public osmium::io::Output, public osmium::handler::Handler {
 
+            bool m_write_visible_flag;
+
         public:
 
             XMLOutput(const osmium::io::File& file, data_queue_type& output_queue) :
-                Output(file, output_queue) {
+                Output(file, output_queue),
+                m_write_visible_flag(file.has_multiple_object_versions() || m_file.is_true("force_visible_flag")) {
             }
 
             XMLOutput(const XMLOutput&) = delete;
@@ -353,7 +356,7 @@ namespace osmium {
             }
 
             void write_buffer(osmium::memory::Buffer&& buffer) override final {
-                XMLOutputBlock output_block(std::move(buffer), this->m_file.has_multiple_object_versions(), this->m_file.type() == osmium::io::FileType::Change());
+                XMLOutputBlock output_block(std::move(buffer), m_write_visible_flag, this->m_file.type() == osmium::io::FileType::Change());
                 m_output_queue.push(osmium::thread::Pool::instance().submit(std::move(output_block)));
                 while (m_output_queue.size() > 10) {
                     std::this_thread::sleep_for(std::chrono::milliseconds(100)); // XXX
@@ -368,7 +371,15 @@ namespace osmium {
                     xml_string(out, header.generator().c_str());
                     out += "\">\n";
                 } else {
-                    out += "<osm version=\"0.6\" generator=\"";
+                    out += "<osm version=\"0.6\"";
+
+                    std::string xml_josm_upload = header.get("xml_josm_upload");
+                    if (xml_josm_upload == "true" || xml_josm_upload == "false") {
+                        out += " upload=\"";
+                        out += xml_josm_upload;
+                        out += "\"";
+                    }
+                    out += " generator=\"";
                     xml_string(out, header.generator().c_str());
                     out += "\">\n";
                 }
