@@ -55,6 +55,13 @@ namespace osmium {
 
         typedef osmium::thread::Queue<std::future<std::string>> data_queue_type;
 
+        /**
+         * Virtual base class for all classes writing OSM files in different
+         * encodings.
+         *
+         * Do not use this class or derived classes directly. Use the
+         * osmium::io::Writer class instead.
+         */
         class Output {
 
         protected:
@@ -88,9 +95,11 @@ namespace osmium {
         }; // class Output
 
         /**
-         * This factory class is used to register file output formats and open
-         * output files in these formats. You should not use this class directly.
-         * Instead use the osmium::output::open() function. XXX
+         * This factory class is used to create objects that write OSM data
+         * into a specified output format.
+         *
+         * Do not use this class directly. Instead use the osmium::io::Writer
+         * class.
          */
         class OutputFactory {
 
@@ -122,11 +131,6 @@ namespace osmium {
                     }
                 }
                 return true;
-            }
-
-
-            bool unregister_output_format(osmium::io::Encoding* encoding) {
-                return m_callbacks.erase(encoding) == 1;
             }
 
             std::unique_ptr<osmium::io::Output> create_output(const osmium::io::File& file, data_queue_type& output_queue) {

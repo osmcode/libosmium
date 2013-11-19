@@ -54,7 +54,11 @@ namespace osmium {
     namespace io {
 
         /**
-         * Virtual base class for all input classes.
+         * Virtual base class for all classes reading OSM files in different
+         * encodings.
+         *
+         * Do not use this class or derived classes directly. Use the
+         * osmium::io::Reader class instead.
          */
         class Input {
 
@@ -96,6 +100,13 @@ namespace osmium {
 
         }; // class Input
 
+        /**
+         * This factory class is used to create objects that read OSM data
+         * written in a specified format.
+         *
+         * Do not use this class directly. Instead use the osmium::io::Reader
+         * class.
+         */
         class InputFactory {
 
         public:
@@ -126,10 +137,6 @@ namespace osmium {
                     }
                 }
                 return true;
-            }
-
-            bool unregister_input_format(osmium::io::Encoding* encoding) {
-                return m_callbacks.erase(encoding) == 1;
             }
 
             std::unique_ptr<osmium::io::Input> create_input(const osmium::io::File& file, osmium::osm_entity::flags read_which_entities, osmium::thread::Queue<std::string>& input_queue) {
