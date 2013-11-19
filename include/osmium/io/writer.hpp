@@ -76,15 +76,35 @@ namespace osmium {
 
         }; // class OutputThread
 
+        /**
+         * This is the user-facing interface for writing OSM files. Instantiate
+         * an object of this class with a file name or osmium::io::File object
+         * and optionally the data for the header and then call operator() on it
+         * to write Buffers. Call close() to finish up.
+         */
         class Writer {
 
             osmium::io::File m_file;
+
             std::unique_ptr<osmium::io::Output> m_output;
             data_queue_type m_output_queue {};
-            std::thread m_output_thread;
+            std::thread m_output_thread {};
+            std::future<void> m_output_future {};
 
         public:
 
+            /**
+             * The constructor of the Writer object opens a file and writes the
+             * header to it.
+             *
+             * @param file File (contains name and format info) to open.
+             * @param header Optional header data. If this is not given sensible
+             *               defaults will be used. See the default constructor
+             *               of osmium::io::Header for details.
+             *
+             * @throws std::runtime_error If the file could not be opened.
+             * @throws std::system_error If the file could not be opened.
+             */
             Writer(const osmium::io::File& file, const osmium::io::Header& header = osmium::io::Header()) :
                 m_file(file),
                 m_output(osmium::io::OutputFactory::instance().create_output(m_file, m_output_queue)) {
@@ -96,7 +116,9 @@ namespace osmium {
 
                 int fd = osmium::io::detail::open_for_writing(m_file.filename());
 
-                m_output_thread = std::thread(OutputThread {m_output_queue, m_file.encoding()->compress(), fd});
+                std::packaged_task<void()> task(OutputThread {m_output_queue, m_file.encoding()->compress(), fd});
+                m_output_future = task.get_future();
+                m_output_thread = std::thread(std::move(task));
             }
 
             Writer(const Writer&) = delete;
@@ -104,17 +126,44 @@ namespace osmium {
 
             ~Writer() {
                 close();
-                if (m_output_thread.joinable()) {
-                    m_output_thread.join();
-                }
             }
 
+            /**
+             * Write contents of a buffer to the output file.
+             *
+             * @throws Some form of std::runtime_error when there is a problem.
+             */
             void operator()(osmium::memory::Buffer&& buffer) {
+                // If an exception happened in the output thread, re-throw
+                // it in this (the main) thread.
+                if (m_output_future.valid() && m_output_future.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+                    m_output_future.get();
+                }
                 m_output->write_buffer(std::move(buffer));
             }
 
+            /**
+             * Flush writes to output file and close it. If you do not
+             * call this, the destructor of Writer will also do the same
+             * thing. But because this call might thrown an exception,
+             * it is better to call close() explicitly.
+             *
+             * @throws Some form of std::runtime_error when there is a problem.
+             */
             void close() {
                 m_output->close();
+
+                // If an exception happened in the output thread, re-throw
+                // it in this (the main) thread. This will block if the
+                // output thread isn't finished.
+                if (m_output_future.valid()) {
+                    m_output_future.get();
+                }
+
+                // Make sure output thread is done.
+                if (m_output_thread.joinable()) {
+                    m_output_thread.join();
+                }
             }
 
         }; // class Writer
