@@ -358,7 +358,7 @@ namespace osmium {
                 }
 
                 void write_buffer(osmium::memory::Buffer&& buffer) override final {
-                    XMLOutputBlock output_block(std::move(buffer), m_write_visible_flag, this->m_file.type() == osmium::io::FileType::Change());
+                    XMLOutputBlock output_block(std::move(buffer), m_write_visible_flag, m_file.is_true("xml_change_format"));
                     m_output_queue.push(osmium::thread::Pool::instance().submit(std::move(output_block)));
                     while (m_output_queue.size() > 10) {
                         std::this_thread::sleep_for(std::chrono::milliseconds(100)); // XXX
@@ -368,7 +368,7 @@ namespace osmium {
                 void write_header(const osmium::io::Header& header) override final {
                     std::string out = "<?xml version='1.0' encoding='UTF-8'?>\n";
 
-                    if (this->m_file.type() == osmium::io::FileType::Change()) {
+                    if (m_file.is_true("xml_change_format")) {
                         out += "<osmChange version=\"0.6\" generator=\"";
                         xml_string(out, header.get("generator").c_str());
                         out += "\">\n";
@@ -402,7 +402,7 @@ namespace osmium {
                 void close() override final {
                     {
                         std::string out;
-                        if (this->m_file.type() == osmium::io::FileType::Change()) {
+                        if (m_file.is_true("xml_change_format")) {
                             out += "</osmChange>\n";
                         } else {
                             out += "</osm>\n";
@@ -422,12 +422,9 @@ namespace osmium {
 
             namespace {
 
-                const bool registered_xml_output = osmium::io::detail::OutputFormatFactory::instance().register_output_format({
-                    osmium::io::Encoding::XML(),
-                    osmium::io::Encoding::XMLgz(),
-                    osmium::io::Encoding::XMLbz2()
-                }, [](const osmium::io::File& file, data_queue_type& output_queue) {
-                    return new osmium::io::detail::XMLOutputFormat(file, output_queue);
+                const bool registered_xml_output = osmium::io::detail::OutputFormatFactory::instance().register_output_format(osmium::io::file_format::xml,
+                    [](const osmium::io::File& file, data_queue_type& output_queue) {
+                        return new osmium::io::detail::XMLOutputFormat(file, output_queue);
                 });
 
             } // anonymous namespace

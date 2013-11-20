@@ -573,12 +573,9 @@ namespace osmium {
 
             namespace {
 
-                const bool registered_xml_input = osmium::io::detail::InputFormatFactory::instance().register_input_format({
-                    osmium::io::Encoding::XML(),
-                    osmium::io::Encoding::XMLgz(),
-                    osmium::io::Encoding::XMLbz2()
-                }, [](const osmium::io::File& file, osmium::osm_entity::flags read_which_entities, osmium::thread::Queue<std::string>& input_queue) {
-                    return new osmium::io::detail::XMLInputFormat(file, read_which_entities, input_queue);
+                const bool registered_xml_input = osmium::io::detail::InputFormatFactory::instance().register_input_format(osmium::io::file_format::xml,
+                    [](const osmium::io::File& file, osmium::osm_entity::flags read_which_entities, osmium::thread::Queue<std::string>& input_queue) {
+                        return new osmium::io::detail::XMLInputFormat(file, read_which_entities, input_queue);
                 });
 
             } // anonymous namespace

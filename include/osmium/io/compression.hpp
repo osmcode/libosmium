@@ -41,6 +41,7 @@ DEALINGS IN THE SOFTWARE.
 #include <utility>
 
 #include <osmium/io/detail/read_write.hpp>
+#include <osmium/io/file_compression.hpp>
 
 namespace osmium {
 
@@ -97,7 +98,7 @@ namespace osmium {
 
         private:
 
-            typedef std::map<std::string, std::pair<create_compressor_type, create_decompressor_type>> compression_map_type;
+            typedef std::map<osmium::io::file_compression, std::pair<create_compressor_type, create_decompressor_type>> compression_map_type;
 
             compression_map_type m_callbacks {};
 
@@ -110,6 +111,13 @@ namespace osmium {
             CompressionFactory(CompressionFactory&&) = delete;
             CompressionFactory& operator=(CompressionFactory&&) = delete;
 
+            void error(osmium::io::file_compression compression) {
+                std::string error_message {"Support for compression type '"};
+                error_message += as_string(compression);
+                error_message += "' not compiled into this binary.";
+                throw std::runtime_error(error_message);
+            }
+
         public:
 
             static CompressionFactory& instance() {
@@ -117,37 +125,31 @@ namespace osmium {
                 return factory;
             }
 
-            bool register_compression(const std::string& name, create_compressor_type create_compressor, create_decompressor_type create_decompressor) {
-                if (! m_callbacks.insert(compression_map_type::value_type(name, std::make_pair(create_compressor, create_decompressor))).second) {
+            bool register_compression(osmium::io::file_compression compression, create_compressor_type create_compressor, create_decompressor_type create_decompressor) {
+                if (! m_callbacks.insert(compression_map_type::value_type(compression, std::make_pair(create_compressor, create_decompressor))).second) {
                     return false;
                 }
                 return true;
             }
 
-            std::unique_ptr<osmium::io::Compressor> create_compressor(const std::string& name, int fd) {
-                auto it = m_callbacks.find(name);
+            std::unique_ptr<osmium::io::Compressor> create_compressor(osmium::io::file_compression compression, int fd) {
+                auto it = m_callbacks.find(compression);
 
                 if (it != m_callbacks.end()) {
                     return std::unique_ptr<osmium::io::Compressor>((it->second.first)(fd));
                 }
 
-                std::string error_message {"compression type '"};
-                error_message += name;
-                error_message += "' not supported";
-                throw std::runtime_error(error_message);
+                error(compression);
             }
 
-            std::unique_ptr<osmium::io::Decompressor> create_decompressor(const std::string& name, int fd) {
-                auto it = m_callbacks.find(name);
+            std::unique_ptr<osmium::io::Decompressor> create_decompressor(osmium::io::file_compression compression, int fd) {
+                auto it = m_callbacks.find(compression);
 
                 if (it != m_callbacks.end()) {
                     return std::unique_ptr<osmium::io::Decompressor>((it->second.second)(fd));
                 }
 
-                std::string error_message {"decompression type '"};
-                error_message += name;
-                error_message += "' not supported";
-                throw std::runtime_error(error_message);
+                error(compression);
             }
 
         }; // class CompressionFactory
@@ -217,7 +219,7 @@ namespace osmium {
         namespace {
 
             const bool registered_no_compression = osmium::io::CompressionFactory::instance().register_compression({
-                ""
+                osmium::io::file_compression::none
             }, [](int fd) {
                 return new osmium::io::NoCompressor(fd);
             }, [](int fd) {

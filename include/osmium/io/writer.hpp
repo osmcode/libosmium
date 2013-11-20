@@ -50,12 +50,12 @@ namespace osmium {
             typedef osmium::io::detail::data_queue_type data_queue_type;
 
             data_queue_type& m_input_queue;
-            const std::string& m_compression;
+            osmium::io::file_compression m_compression;
             const int m_fd;
 
         public:
 
-            OutputThread(data_queue_type& input_queue, const std::string& compression, int fd) :
+            OutputThread(data_queue_type& input_queue, osmium::io::file_compression compression, int fd) :
                 m_input_queue(input_queue),
                 m_compression(compression),
                 m_fd(fd) {
@@ -111,7 +111,7 @@ namespace osmium {
             Writer(const osmium::io::File& file, const osmium::io::Header& header = osmium::io::Header()) :
                 m_file(file),
                 m_output(osmium::io::detail::OutputFormatFactory::instance().create_output(m_file, m_output_queue)),
-                m_output_task(OutputThread {m_output_queue, m_file.encoding()->compress(), osmium::io::detail::open_for_writing(m_file.filename())}) {
+                m_output_task(OutputThread {m_output_queue, m_file.compression(), osmium::io::detail::open_for_writing(m_file.filename())}) {
                 m_output->write_header(header);
             }
 

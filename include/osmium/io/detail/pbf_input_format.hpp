@@ -664,10 +664,9 @@ namespace osmium {
 
             namespace {
 
-                const bool registered_pbf_input = osmium::io::detail::InputFormatFactory::instance().register_input_format({
-                    osmium::io::Encoding::PBF()
-                }, [](const osmium::io::File& file, osmium::osm_entity::flags read_which_entities, osmium::thread::Queue<std::string>& input_queue) {
-                    return new osmium::io::detail::PBFInputFormat(file, read_which_entities, input_queue);
+                const bool registered_pbf_input = osmium::io::detail::InputFormatFactory::instance().register_input_format(osmium::io::file_format::pbf,
+                    [](const osmium::io::File& file, osmium::osm_entity::flags read_which_entities, osmium::thread::Queue<std::string>& input_queue) {
+                        return new osmium::io::detail::PBFInputFormat(file, read_which_entities, input_queue);
                 });
 
             } // anonymous namespace

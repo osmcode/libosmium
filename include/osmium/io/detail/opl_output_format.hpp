@@ -256,12 +256,9 @@ namespace osmium {
 
             namespace {
 
-                const bool registered_opl_output = osmium::io::detail::OutputFormatFactory::instance().register_output_format({
-                    osmium::io::Encoding::OPL(),
-                    osmium::io::Encoding::OPLgz(),
-                    osmium::io::Encoding::OPLbz2()
-                }, [](const osmium::io::File& file, data_queue_type& output_queue) {
-                    return new osmium::io::detail::OPLOutputFormat(file, output_queue);
+                const bool registered_opl_output = osmium::io::detail::OutputFormatFactory::instance().register_output_format(osmium::io::file_format::opl,
+                    [](const osmium::io::File& file, data_queue_type& output_queue) {
+                        return new osmium::io::detail::OPLOutputFormat(file, output_queue);
                 });
 
             } // anonymous namespace

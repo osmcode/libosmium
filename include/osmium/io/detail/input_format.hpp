@@ -40,7 +40,6 @@ DEALINGS IN THE SOFTWARE.
 #include <memory>
 #include <string>
 #include <utility>
-#include <vector>
 
 #include <osmium/io/file.hpp>
 #include <osmium/io/header.hpp>
@@ -57,7 +56,7 @@ namespace osmium {
 
             /**
              * Virtual base class for all classes reading OSM files in different
-             * encodings.
+             * formats.
              *
              * Do not use this class or derived classes directly. Use the
              * osmium::io::Reader class instead.
@@ -117,9 +116,9 @@ namespace osmium {
 
             private:
 
-                typedef std::map<osmium::io::Encoding*, create_input_type> encoding2create_type;
+                typedef std::map<osmium::io::file_format, create_input_type> map_type;
 
-                encoding2create_type m_callbacks;
+                map_type m_callbacks;
 
                 InputFormatFactory() :
                     m_callbacks() {
@@ -132,23 +131,20 @@ namespace osmium {
                     return factory;
                 }
 
-                bool register_input_format(std::vector<osmium::io::Encoding*> encodings, create_input_type create_function) {
-                    for (auto encoding : encodings) {
-                        if (! m_callbacks.insert(encoding2create_type::value_type(encoding, create_function)).second) {
-                            return false;
-                        }
+                bool register_input_format(osmium::io::file_format format, create_input_type create_function) {
+                    if (! m_callbacks.insert(map_type::value_type(format, create_function)).second) {
+                        return false;
                     }
                     return true;
                 }
 
                 std::unique_ptr<osmium::io::detail::InputFormat> create_input(const osmium::io::File& file, osmium::osm_entity::flags read_which_entities, osmium::thread::Queue<std::string>& input_queue) {
-                    encoding2create_type::iterator it = m_callbacks.find(file.encoding());
-
+                    auto it = m_callbacks.find(file.format());
                     if (it != m_callbacks.end()) {
                         return std::unique_ptr<osmium::io::detail::InputFormat>((it->second)(file, read_which_entities, input_queue));
                     }
 
-                    throw std::runtime_error(std::string("Unknown encoding for input: ") + file.encoding()->suffix());
+                    throw std::runtime_error(std::string("Unknown format for input: ") + as_string(file.format()));
                 }
 
             }; // class InputFormatFactory

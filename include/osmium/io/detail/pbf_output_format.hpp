@@ -820,7 +820,7 @@ namespace osmium {
 
                     // when the resulting file will carry history information, add
                     // HistoricalInformation as required feature
-                    if (this->m_file.type() == osmium::io::FileType::History()) {
+                    if (this->m_file.has_multiple_object_versions()) {
                         pbf_header_block.add_required_features("HistoricalInformation");
                     }
 
@@ -929,10 +929,9 @@ namespace osmium {
 
             namespace {
 
-                const bool registered_pbf_output = osmium::io::detail::OutputFormatFactory::instance().register_output_format({
-                    osmium::io::Encoding::PBF()
-                }, [](const osmium::io::File& file, data_queue_type& output_queue) {
-                    return new osmium::io::detail::PBFOutputFormat(file, output_queue);
+                const bool registered_pbf_output = osmium::io::detail::OutputFormatFactory::instance().register_output_format(osmium::io::file_format::pbf,
+                    [](const osmium::io::File& file, data_queue_type& output_queue) {
+                        return new osmium::io::detail::PBFOutputFormat(file, output_queue);
                 });
 
             } // anonymous namespace

@@ -57,7 +57,7 @@ namespace osmium {
         class InputThread {
 
             osmium::thread::Queue<std::string>& m_queue;
-            const std::string& m_compression;
+            osmium::io::file_compression m_compression;
             const int m_fd;
 
             // If this is set in the main thread, we have to wrap up at the
@@ -66,7 +66,7 @@ namespace osmium {
 
         public:
 
-            InputThread(osmium::thread::Queue<std::string>& queue, const std::string& compression, int fd, std::atomic<bool>& done) :
+            InputThread(osmium::thread::Queue<std::string>& queue, osmium::io::file_compression compression, int fd, std::atomic<bool>& done) :
                 m_queue(queue),
                 m_compression(compression),
                 m_fd(fd),
@@ -193,11 +193,11 @@ namespace osmium {
              *                            significantly if objects that are not needed anyway are not
              *                            parsed.
              */
-            Reader(osmium::io::File file, osmium::osm_entity::flags read_which_entities = osmium::osm_entity::flags::all) :
-                m_file(std::move(file)),
+            Reader(const osmium::io::File& file, osmium::osm_entity::flags read_which_entities = osmium::osm_entity::flags::all) :
+                m_file(file),
                 m_read_which_entities(read_which_entities),
                 m_input(osmium::io::detail::InputFormatFactory::instance().create_input(m_file, m_read_which_entities, m_input_queue)),
-                m_input_task(InputThread {m_input_queue, m_file.encoding()->compress(), open_input_file_or_url(m_file.filename()), m_input_done}) {
+                m_input_task(InputThread {m_input_queue, m_file.compression(), open_input_file_or_url(m_file.filename()), m_input_done}) {
                 m_input->open();
             }
 

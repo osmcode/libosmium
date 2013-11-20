@@ -33,15 +33,22 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <iostream>
 #include <stdexcept>
 #include <string>
 
-#include <osmium/io/encoding.hpp>
-#include <osmium/io/file_type.hpp>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp>
+
+#include <osmium/io/file_format.hpp>
+#include <osmium/io/file_compression.hpp>
 #include <osmium/util/options.hpp>
 
 namespace osmium {
 
+    /**
+     * @brief Namespace for everything related to input and output of OSM data.
+     */
     namespace io {
 
         /**
@@ -53,14 +60,13 @@ namespace osmium {
 
         private:
 
-            /// Type of file.
-            osmium::io::FileType* m_type;
-
-            /// Encoding of file.
-            osmium::io::Encoding* m_encoding;
-
-            /// File name.
             std::string m_filename;
+
+            file_format m_file_format {file_format::unknown};
+
+            file_compression m_file_compression {file_compression::none};
+
+            bool m_has_multiple_object_versions {false};
 
         public:
 
@@ -72,10 +78,8 @@ namespace osmium {
              *                 of the file will be taken from the suffix.
              *                 An empty filename or "-" means stdin or stdout.
              */
-            File(const std::string& filename = "") :
+            File(const std::string& filename = "", const std::string& format="") :
                 Options(),
-                m_type(osmium::io::FileType::OSM()),
-                m_encoding(osmium::io::Encoding::PBF()),
                 m_filename(filename) {
 
                 // stdin/stdout
@@ -89,19 +93,13 @@ namespace osmium {
                 std::string protocol = m_filename.substr(0, m_filename.find_first_of(':'));
                 if (protocol == "http" || protocol == "https") {
                     default_settings_for_url();
-                    return;
                 }
 
-                // isolate filename suffix
-                size_t n = filename.find_last_of('/');
-                if (n == std::string::npos) {
-                    n = 0;
-                } else {
-                    ++n;
-                }
-                std::string suffix(filename.substr(filename.find_first_of('.', n)+1));
+                detect_format_from_suffix(m_filename);
 
-                set_type_and_encoding(suffix);
+                if (format != "") {
+                    parse_format(format);
+                }
             }
 
             File(const File& other) = default;
@@ -112,51 +110,83 @@ namespace osmium {
 
             ~File() = default;
 
-            void set_type_and_encoding(const std::string& suffix) {
-                if (suffix == "pbf" || suffix == "osm.pbf") {
-                    m_type     = osmium::io::FileType::OSM();
-                    m_encoding = osmium::io::Encoding::PBF();
-                } else if (suffix == "osm") {
-                    m_type     = osmium::io::FileType::OSM();
-                    m_encoding = osmium::io::Encoding::XML();
-                } else if (suffix == "osm.bz2") {
-                    m_type     = osmium::io::FileType::OSM();
-                    m_encoding = osmium::io::Encoding::XMLbz2();
-                } else if (suffix == "osm.gz") {
-                    m_type     = osmium::io::FileType::OSM();
-                    m_encoding = osmium::io::Encoding::XMLgz();
-                } else if (suffix == "osm.opl") {
-                    m_type     = osmium::io::FileType::OSM();
-                    m_encoding = osmium::io::Encoding::OPL();
-                } else if (suffix == "osm.opl.bz2") {
-                    m_type     = osmium::io::FileType::OSM();
-                    m_encoding = osmium::io::Encoding::OPLbz2();
-                } else if (suffix == "osm.opl.gz") {
-                    m_type     = osmium::io::FileType::OSM();
-                    m_encoding = osmium::io::Encoding::OPLgz();
-                } else if (suffix == "osh.pbf") {
-                    m_type     = osmium::io::FileType::History();
-                    m_encoding = osmium::io::Encoding::PBF();
-                } else if (suffix == "osh") {
-                    m_type     = osmium::io::FileType::History();
-                    m_encoding = osmium::io::Encoding::XML();
-                } else if (suffix == "osh.bz2") {
-                    m_type     = osmium::io::FileType::History();
-                    m_encoding = osmium::io::Encoding::XMLbz2();
-                } else if (suffix == "osh.gz") {
-                    m_type     = osmium::io::FileType::History();
-                    m_encoding = osmium::io::Encoding::XMLgz();
-                } else if (suffix == "osc") {
-                    m_type     = osmium::io::FileType::Change();
-                    m_encoding = osmium::io::Encoding::XML();
-                } else if (suffix == "osc.bz2") {
-                    m_type     = osmium::io::FileType::Change();
-                    m_encoding = osmium::io::Encoding::XMLbz2();
-                } else if (suffix == "osc.gz") {
-                    m_type     = osmium::io::FileType::Change();
-                    m_encoding = osmium::io::Encoding::XMLgz();
-                } else {
-                    throw std::runtime_error(std::string("Unknown OSM file type or encoding: ") + suffix);
+            void parse_format(const std::string& format) {
+                std::vector<std::string> options;
+                boost::split(options, format, boost::is_any_of(","));
+
+                // if the first item in the format list doesn't contain
+                // an equals sign, it is a format
+                if (!options.empty() && options[0].find_first_of('=') == std::string::npos) {
+                    detect_format_from_suffix(options[0]);
+                    if (m_file_format == file_format::unknown) {
+                        throw std::runtime_error(std::string("Unknown file format: ") + options[0]);
+                    }
+                    options.erase(options.begin());
+                }
+
+                for (auto& option : options) {
+                    size_t pos = option.find_first_of('=');
+                    if (pos == std::string::npos) {
+                        set(option, true);
+                    } else {
+                        std::string value = option.substr(pos+1);
+                        option.erase(pos);
+                        set(option, value);
+                    }
+                }
+
+                if (get("history") == "true") {
+                    m_has_multiple_object_versions = true;
+                } else if (get("history") == "false") {
+                    m_has_multiple_object_versions = false;
+                }
+            }
+
+            void detect_format_from_suffix(const std::string& name) {
+                std::vector<std::string> suffixes;
+                boost::split(suffixes, name, boost::is_any_of("."));
+
+                if (suffixes.empty()) return;
+
+                // if the last suffix is one of a known set of compressions,
+                // set that compression
+                if (suffixes.back() == "gz") {
+                    m_file_compression = file_compression::gzip;
+                    suffixes.pop_back();
+                } else if (suffixes.back() == "bz2") {
+                    m_file_compression = file_compression::bzip2;
+                    suffixes.pop_back();
+                }
+
+                if (suffixes.empty()) return;
+
+                // if the last suffix is one of a known set of formats,
+                // set that format
+                if (suffixes.back() == "pbf") {
+                    m_file_format = file_format::pbf;
+                    suffixes.pop_back();
+                } else if (suffixes.back() == "xml") {
+                    m_file_format = file_format::xml;
+                    suffixes.pop_back();
+                } else if (suffixes.back() == "opl") {
+                    m_file_format = file_format::opl;
+                    suffixes.pop_back();
+                }
+
+                if (suffixes.empty()) return;
+
+                if (suffixes.back() == "osm") {
+                    if (m_file_format == file_format::unknown) m_file_format = file_format::xml;
+                    suffixes.pop_back();
+                } else if (suffixes.back() == "osh") {
+                    if (m_file_format == file_format::unknown) m_file_format = file_format::xml;
+                    m_has_multiple_object_versions = true;
+                    suffixes.pop_back();
+                } else if (suffixes.back() == "osc") {
+                    if (m_file_format == file_format::unknown) m_file_format = file_format::xml;
+                    m_has_multiple_object_versions = true;
+                    set("xml_change_format", true);
+                    suffixes.pop_back();
                 }
             }
 
@@ -166,8 +196,8 @@ namespace osmium {
              * override this in a subclass.
              */
             void default_settings_for_stdinout() {
-                m_type     = osmium::io::FileType::OSM();
-                m_encoding = osmium::io::Encoding::PBF();
+                m_file_format      = file_format::unknown;
+                m_file_compression = file_compression::none;
             }
 
             /**
@@ -176,8 +206,8 @@ namespace osmium {
              * override this in a subclass.
              */
             void default_settings_for_file() {
-                m_type     = osmium::io::FileType::OSM();
-                m_encoding = osmium::io::Encoding::PBF();
+                m_file_format      = file_format::unknown;
+                m_file_compression = file_compression::none;
             }
 
             /**
@@ -186,63 +216,34 @@ namespace osmium {
              * subclass.
              */
             void default_settings_for_url() {
-                m_type     = osmium::io::FileType::OSM();
-                m_encoding = osmium::io::Encoding::XML();
+                m_file_format      = file_format::xml;
+                m_file_compression = file_compression::none;
             }
 
-            osmium::io::FileType* type() const {
-                return m_type;
+            file_format format() const {
+                return m_file_format;
             }
 
-            File& type(osmium::io::FileType* type) {
-                m_type = type;
+            File& format(file_format format) {
+                m_file_format = format;
                 return *this;
             }
 
-            File& type(const std::string& type) {
-                if (type == "osm") {
-                    m_type = osmium::io::FileType::OSM();
-                } else if (type == "history" || type == "osh") {
-                    m_type = osmium::io::FileType::History();
-                } else if (type == "change" || type == "osc") {
-                    m_type = osmium::io::FileType::Change();
-                } else {
-                    throw std::runtime_error(std::string("Unknown OSM file type: ") + type);
-                }
+            file_compression compression() const {
+                return m_file_compression;
+            }
+
+            File& compression(file_compression compression) {
+                m_file_compression = compression;
                 return *this;
             }
 
             bool has_multiple_object_versions() const {
-                return m_type->has_multiple_object_versions();
+                return m_has_multiple_object_versions;
             }
 
-            osmium::io::Encoding* encoding() const {
-                return m_encoding;
-            }
-
-            File& encoding(osmium::io::Encoding* encoding) {
-                m_encoding = encoding;
-                return *this;
-            }
-
-            File& encoding(const std::string& encoding) {
-                if (encoding == "pbf") {
-                    m_encoding = osmium::io::Encoding::PBF();
-                } else if (encoding == "xml") {
-                    m_encoding = osmium::io::Encoding::XML();
-                } else if (encoding == "xmlgz" || encoding == "gz") {
-                    m_encoding = osmium::io::Encoding::XMLgz();
-                } else if (encoding == "xmlbz2" || encoding == "bz2") {
-                    m_encoding = osmium::io::Encoding::XMLbz2();
-                } else if (encoding == "opl") {
-                    m_encoding = osmium::io::Encoding::OPL();
-                } else if (encoding == "oplgz") {
-                    m_encoding = osmium::io::Encoding::OPLgz();
-                } else if (encoding == "oplbz2") {
-                    m_encoding = osmium::io::Encoding::OPLbz2();
-                } else {
-                    throw std::runtime_error(std::string("Unknown OSM file encoding: ") + encoding);
-                }
+            File& has_multiple_object_versions(bool value) {
+                m_has_multiple_object_versions = value;
                 return *this;
             }
 
@@ -257,16 +258,6 @@ namespace osmium {
 
             const std::string& filename() const {
                 return m_filename;
-            }
-
-            std::string filename_without_suffix() const {
-                return m_filename.substr(m_filename.find_first_of('.')+1);
-            }
-
-            std::string filename_with_default_suffix() const {
-                std::string filename = filename_without_suffix();
-                filename += m_type->suffix() + m_encoding->suffix();
-                return filename;
             }
 
         }; // class File

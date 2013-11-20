@@ -38,7 +38,6 @@ DEALINGS IN THE SOFTWARE.
 #include <map>
 #include <memory>
 #include <string>
-#include <vector>
 
 #include <osmium/thread/debug.hpp>
 #include <osmium/thread/queue.hpp>
@@ -59,7 +58,7 @@ namespace osmium {
 
             /**
              * Virtual base class for all classes writing OSM files in different
-             * encodings.
+             * formats.
              *
              * Do not use this class or derived classes directly. Use the
              * osmium::io::Writer class instead.
@@ -111,9 +110,9 @@ namespace osmium {
 
             private:
 
-                typedef std::map<osmium::io::Encoding*, create_output_type> encoding2create_type;
+                typedef std::map<osmium::io::file_format, create_output_type> map_type;
 
-                encoding2create_type m_callbacks;
+                map_type m_callbacks;
 
                 OutputFormatFactory() :
                     m_callbacks() {
@@ -126,23 +125,20 @@ namespace osmium {
                     return factory;
                 }
 
-                bool register_output_format(std::vector<osmium::io::Encoding*> encodings, create_output_type create_function) {
-                    for (auto encoding : encodings) {
-                        if (! m_callbacks.insert(encoding2create_type::value_type(encoding, create_function)).second) {
-                            return false;
-                        }
+                bool register_output_format(osmium::io::file_format format, create_output_type create_function) {
+                    if (! m_callbacks.insert(map_type::value_type(format, create_function)).second) {
+                        return false;
                     }
                     return true;
                 }
 
                 std::unique_ptr<osmium::io::detail::OutputFormat> create_output(const osmium::io::File& file, data_queue_type& output_queue) {
-                    encoding2create_type::iterator it = m_callbacks.find(file.encoding());
-
+                    auto it = m_callbacks.find(file.format());
                     if (it != m_callbacks.end()) {
                         return std::unique_ptr<osmium::io::detail::OutputFormat>((it->second)(file, output_queue));
                     }
 
-                    throw std::runtime_error(std::string("Unknown encoding for output: ") + file.encoding()->suffix());
+                    throw std::runtime_error(std::string("Unknown format for output: ") + as_string(file.format()));
                 }
 
             }; // class OutputFormatFactory

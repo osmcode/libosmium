@@ -77,33 +77,18 @@ int main(int argc, char* argv[]) {
         input =  argv[optind];
     }
 
-    osmium::io::File infile(input);
-    if (!input_format.empty()) {
-        try {
-            infile.set_type_and_encoding(input_format);
-        } catch (std::runtime_error& e) {
-            std::cerr << e.what() << std::endl;
-            exit(1);
-        }
-    }
+    osmium::io::File infile(input, input_format);
 
-    osmium::io::File outfile(output);
-    if (!output_format.empty()) {
-        try {
-            outfile.set_type_and_encoding(output_format);
-        } catch (std::runtime_error& e) {
-            std::cerr << e.what() << std::endl;
-            exit(1);
-        }
-    }
+    osmium::io::File outfile(output, output_format);
 
+/* XXX
     if (infile.type() == osmium::io::FileType::OSM() && outfile.type() == osmium::io::FileType::History()) {
         std::cerr << "Warning! You are converting from an OSM file without history information to one with history information.\nThis will almost certainly not do what you want!" << std::endl;
     } else if (infile.type() == osmium::io::FileType::History() && outfile.type() == osmium::io::FileType::OSM()) {
         std::cerr << "Warning! You are converting from an OSM file with history information to one without history information.\nThis will almost certainly not do what you want!" << std::endl;
     } else if (infile.type() != outfile.type()) {
         std::cerr << "Warning! Source and destination are not of the same type." << std::endl;
-    }
+    }*/
 
     try {
         osmium::io::Reader reader(infile);
