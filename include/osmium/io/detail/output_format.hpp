@@ -133,12 +133,14 @@ namespace osmium {
                 }
 
                 std::unique_ptr<osmium::io::detail::OutputFormat> create_output(const osmium::io::File& file, data_queue_type& output_queue) {
+                    file.check();
+
                     auto it = m_callbacks.find(file.format());
                     if (it != m_callbacks.end()) {
                         return std::unique_ptr<osmium::io::detail::OutputFormat>((it->second)(file, output_queue));
                     }
 
-                    throw std::runtime_error(std::string("Unknown format for output: ") + as_string(file.format()));
+                    throw std::runtime_error(std::string("Support for output format '") + as_string(file.format()) + "' not compiled into this binary.");
                 }
 
             }; // class OutputFormatFactory

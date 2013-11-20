@@ -16,16 +16,19 @@
 void print_help() {
     std::cout << "osmium_convert [OPTIONS] [INFILE [OUTFILE]]\n\n" \
               << "If INFILE or OUTFILE is not given stdin/stdout is assumed.\n" \
-              << "File format is given as suffix in format .TYPE[.ENCODING].\n" \
-              << "Use -f and -t options to force format.\n" \
+              << "File format is autodetected from file name suffix.\n" \
+              << "Use -f and -t options to force file format.\n" \
               << "\nFile types:\n" \
-              << "  osm     normal OSM file\n" \
-              << "  osh     OSM file with history information\n" \
-              << "\nFile encodings:\n" \
-              << "  (none)  XML encoding\n" \
-              << "  gz      XML encoding compressed with gzip\n" \
-              << "  bz2     XML encoding compressed with bzip2\n" \
-              << "  pbf     binary PBF encoding\n" \
+              << "  osm        normal OSM file\n" \
+              << "  osc        OSM change file\n" \
+              << "  osh        OSM file with history information\n" \
+              << "\nFile format:\n" \
+              << "  (default)  XML encoding\n" \
+              << "  pbf        binary PBF encoding\n" \
+              << "  opl        OPL encoding\n" \
+              << "\nFile compression\n" \
+              << "  gz         compressed with gzip\n" \
+              << "  bz2        compressed with bzip2\n" \
               << "\nOptions:\n" \
               << "  -h, --help                This help message\n" \
               << "  -f, --from-format=FORMAT  Input format\n" \

@@ -18,7 +18,9 @@ BOOST_AUTO_TEST_CASE(default_file_format) {
         BOOST_CHECK_EQUAL(osmium::io::file_compression::none, file.compression());
         BOOST_CHECK_EQUAL(false, file.has_multiple_object_versions());
     }
+}
 
+BOOST_AUTO_TEST_CASE(stdin_stdout) {
     {
         osmium::io::File file {""};
         BOOST_CHECK_EQUAL(osmium::io::file_format::unknown, file.format());
@@ -30,6 +32,14 @@ BOOST_AUTO_TEST_CASE(default_file_format) {
         osmium::io::File file {"-"};
         BOOST_CHECK_EQUAL(osmium::io::file_format::unknown, file.format());
         BOOST_CHECK_EQUAL(osmium::io::file_compression::none, file.compression());
+        BOOST_CHECK_EQUAL(false, file.has_multiple_object_versions());
+    }
+
+    {
+        osmium::io::File file {"-", "osm.bz2"};
+        BOOST_CHECK_EQUAL("", file.filename());
+        BOOST_CHECK_EQUAL(osmium::io::file_format::xml, file.format());
+        BOOST_CHECK_EQUAL(osmium::io::file_compression::bzip2, file.compression());
         BOOST_CHECK_EQUAL(false, file.has_multiple_object_versions());
     }
 }

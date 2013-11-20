@@ -139,12 +139,14 @@ namespace osmium {
                 }
 
                 std::unique_ptr<osmium::io::detail::InputFormat> create_input(const osmium::io::File& file, osmium::osm_entity::flags read_which_entities, osmium::thread::Queue<std::string>& input_queue) {
+                    file.check();
+
                     auto it = m_callbacks.find(file.format());
                     if (it != m_callbacks.end()) {
                         return std::unique_ptr<osmium::io::detail::InputFormat>((it->second)(file, read_which_entities, input_queue));
                     }
 
-                    throw std::runtime_error(std::string("Unknown format for input: ") + as_string(file.format()));
+                    throw std::runtime_error(std::string("Support for input format '") + as_string(file.format()) + "' not compiled into this binary.");
                 }
 
             }; // class InputFormatFactory

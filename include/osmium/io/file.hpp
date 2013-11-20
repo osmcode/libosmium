@@ -62,6 +62,8 @@ namespace osmium {
 
             std::string m_filename;
 
+            std::string m_format_string;
+
             file_format m_file_format {file_format::unknown};
 
             file_compression m_file_compression {file_compression::none};
@@ -80,13 +82,13 @@ namespace osmium {
              */
             File(const std::string& filename = "", const std::string& format="") :
                 Options(),
-                m_filename(filename) {
+                m_filename(filename),
+                m_format_string(format) {
 
                 // stdin/stdout
                 if (filename == "" || filename == "-") {
                     m_filename = "";
                     default_settings_for_stdinout();
-                    return;
                 }
 
                 // filename is actually a URL
@@ -118,9 +120,6 @@ namespace osmium {
                 // an equals sign, it is a format
                 if (!options.empty() && options[0].find_first_of('=') == std::string::npos) {
                     detect_format_from_suffix(options[0]);
-                    if (m_file_format == file_format::unknown) {
-                        throw std::runtime_error(std::string("Unknown file format: ") + options[0]);
-                    }
                     options.erase(options.begin());
                 }
 
@@ -187,6 +186,25 @@ namespace osmium {
                     m_has_multiple_object_versions = true;
                     set("xml_change_format", true);
                     suffixes.pop_back();
+                }
+            }
+
+            /**
+             * Check file format etc. for consistency and throw exception if there
+             * is a problem.
+             *
+             * @throws std::runtime_error
+             */
+            void check() const {
+                if (m_file_format == file_format::unknown) {
+                    std::string msg = "Could not detect file format from filename '";
+                    msg += m_filename;
+                    if (!m_format_string.empty())  {
+                        msg += "' and format string '";
+                        msg += m_format_string;
+                    }
+                    msg += "'.";
+                    throw std::runtime_error(msg);
                 }
             }
 

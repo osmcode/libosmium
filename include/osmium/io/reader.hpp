@@ -57,8 +57,7 @@ namespace osmium {
         class InputThread {
 
             osmium::thread::Queue<std::string>& m_queue;
-            osmium::io::file_compression m_compression;
-            const int m_fd;
+            osmium::io::Decompressor* m_decompressor;
 
             // If this is set in the main thread, we have to wrap up at the
             // next possible moment.
@@ -66,10 +65,9 @@ namespace osmium {
 
         public:
 
-            InputThread(osmium::thread::Queue<std::string>& queue, osmium::io::file_compression compression, int fd, std::atomic<bool>& done) :
+            InputThread(osmium::thread::Queue<std::string>& queue, osmium::io::Decompressor* decompressor, std::atomic<bool>& done) :
                 m_queue(queue),
-                m_compression(compression),
-                m_fd(fd),
+                m_decompressor(decompressor),
                 m_done(done) {
             }
 
@@ -77,10 +75,8 @@ namespace osmium {
                 osmium::thread::set_thread_name("_osmium_input");
 
                 try {
-                    std::unique_ptr<osmium::io::Decompressor> decompressor = osmium::io::CompressionFactory::instance().create_decompressor(m_compression, m_fd);
-
                     while (!m_done) {
-                        std::string data {decompressor->read()};
+                        std::string data {m_decompressor->read()};
                         if (data.empty()) {
                             m_done = true;
                         }
@@ -90,7 +86,7 @@ namespace osmium {
                         }
                     }
 
-                    decompressor->close();
+                    m_decompressor->close();
                 } catch (...) {
                     // If there is an exception in this thread, we make sure
                     // to push an empty string onto the queue to signal the
@@ -116,6 +112,8 @@ namespace osmium {
 
             std::unique_ptr<osmium::io::detail::InputFormat> m_input;
             osmium::thread::Queue<std::string> m_input_queue {};
+
+            std::unique_ptr<osmium::io::Decompressor> m_decompressor;
 
             osmium::thread::CheckedTask<InputThread> m_input_task;
 
@@ -197,7 +195,8 @@ namespace osmium {
                 m_file(file),
                 m_read_which_entities(read_which_entities),
                 m_input(osmium::io::detail::InputFormatFactory::instance().create_input(m_file, m_read_which_entities, m_input_queue)),
-                m_input_task(InputThread {m_input_queue, m_file.compression(), open_input_file_or_url(m_file.filename()), m_input_done}) {
+                m_decompressor(osmium::io::CompressionFactory::instance().create_decompressor(file.compression(), open_input_file_or_url(m_file.filename()))),
+                m_input_task(InputThread {m_input_queue, m_decompressor.get(), m_input_done}) {
                 m_input->open();
             }
 
