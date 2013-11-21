@@ -84,14 +84,9 @@ int main(int argc, char* argv[]) {
 
     osmium::io::File outfile(output, output_format);
 
-/* XXX
-    if (infile.type() == osmium::io::FileType::OSM() && outfile.type() == osmium::io::FileType::History()) {
-        std::cerr << "Warning! You are converting from an OSM file without history information to one with history information.\nThis will almost certainly not do what you want!" << std::endl;
-    } else if (infile.type() == osmium::io::FileType::History() && outfile.type() == osmium::io::FileType::OSM()) {
-        std::cerr << "Warning! You are converting from an OSM file with history information to one without history information.\nThis will almost certainly not do what you want!" << std::endl;
-    } else if (infile.type() != outfile.type()) {
-        std::cerr << "Warning! Source and destination are not of the same type." << std::endl;
-    }*/
+    if (infile.has_multiple_object_versions() && !outfile.has_multiple_object_versions()) {
+        std::cerr << "Warning! You are converting from an OSM file with (potentially) several versions of the same object to one that is not marked as such.\n";
+    }
 
     try {
         osmium::io::Reader reader(infile);
