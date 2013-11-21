@@ -197,13 +197,20 @@ namespace osmium {
              */
             void check() const {
                 if (m_file_format == file_format::unknown) {
-                    std::string msg = "Could not detect file format from filename '";
-                    msg += m_filename;
+                    std::string msg = "Could not detect file format";
                     if (!m_format_string.empty())  {
-                        msg += "' and format string '";
+                        msg += " from format string '";
                         msg += m_format_string;
+                        msg += "'";
                     }
-                    msg += "'.";
+                    if (m_filename.empty()) {
+                        msg += " for stdin/stdout";
+                    } else {
+                        msg += " for filename '";
+                        msg += m_filename;
+                        msg += "'";
+                    }
+                    msg += ".";
                     throw std::runtime_error(msg);
                 }
             }
