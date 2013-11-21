@@ -54,20 +54,27 @@ namespace osmium {
              * not, it is created. If the file name is empty or "-", no file
              * is open and the stdout file descriptor (1) is returned.
              *
+             * @param filename Name of file to be opened.
+             * @param allow_overwrite If the file exists, should it be overwritten?
              * @return File descriptor of open file.
              * @throws system_error if the file can't be opened.
              */
-            inline int open_for_writing(const std::string& filename) {
+            inline int open_for_writing(const std::string& filename, bool allow_overwrite=false) {
                 if (filename == "" || filename == "-") {
                     return 1; // stdout
                 } else {
-                    int flags = O_WRONLY | O_TRUNC | O_CREAT;
+                    int flags = O_WRONLY | O_CREAT;
+                    if (allow_overwrite) {
+                        flags |= O_TRUNC;
+                    } else {
+                        flags |= O_EXCL;
+                    }
 #ifdef WIN32
                     flags |= O_BINARY;
 #endif
                     int fd = ::open(filename.c_str(), flags, 0666);
                     if (fd < 0) {
-                        throw std::system_error(errno, std::system_category(), "Open failed");
+                        throw std::system_error(errno, std::system_category(), std::string("Open failed for '") + filename + "'");
                     }
                     return fd;
                 }
@@ -90,7 +97,7 @@ namespace osmium {
 #endif
                     int fd = ::open(filename.c_str(), flags);
                     if (fd < 0) {
-                        throw std::system_error(errno, std::system_category(), "Open failed");
+                        throw std::system_error(errno, std::system_category(), std::string("Open failed for '") + filename + "'");
                     }
                     return fd;
                 }
