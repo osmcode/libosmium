@@ -66,7 +66,7 @@ namespace osmium {
         }
 
         /**
-         * Parse ISO date/time string and return UTC unix time.
+         * Construct timestamp from ISO date/time string.
          * Throws std::invalid_argument, if the timestamp can not be parsed.
          */
         explicit Timestamp(const char* timestamp) {
