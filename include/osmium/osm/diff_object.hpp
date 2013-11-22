@@ -39,12 +39,13 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
-    template <class T>
     class DiffObject {
 
-        T* m_prev;
-        T* m_curr;
-        T* m_next;
+    protected:
+
+        osmium::Object* m_prev;
+        osmium::Object* m_curr;
+        osmium::Object* m_next;
 
     public:
 
@@ -54,7 +55,7 @@ namespace osmium {
             m_next(nullptr) {
         }
 
-        DiffObject(T& prev, T& curr, T& next) :
+        DiffObject(osmium::Object& prev, osmium::Object& curr, osmium::Object& next) :
             m_prev(&prev),
             m_curr(&curr),
             m_next(&next) {
@@ -66,15 +67,15 @@ namespace osmium {
         DiffObject(DiffObject&& other) = default;
         DiffObject& operator=(DiffObject&& other) = default;
 
-        const T& prev() const {
+        const osmium::Object& prev() const {
             return *m_prev;
         }
 
-        const T& curr() const {
+        const osmium::Object& curr() const {
             return *m_curr;
         }
 
-        const T& next() const {
+        const osmium::Object& next() const {
             return *m_next;
         }
 
@@ -84,6 +85,10 @@ namespace osmium {
 
         bool last() const {
             return m_curr == m_next;
+        }
+
+        osmium::item_type type() const {
+            return m_curr->type();
         }
 
         osmium::object_id_type id() const {
@@ -108,9 +113,38 @@ namespace osmium {
 
     }; // class DiffObject
 
-    typedef DiffObject<osmium::Node>     DiffNode;
-    typedef DiffObject<osmium::Way>      DiffWay;
-    typedef DiffObject<osmium::Relation> DiffRelation;
+    template <class T>
+    class DiffObjectDerived : public DiffObject {
+
+    public:
+
+        DiffObjectDerived(T& prev, T& curr, T& next) :
+            DiffObject(prev, curr, next) {
+        }
+
+        DiffObjectDerived(const DiffObjectDerived& other) = default;
+        DiffObjectDerived& operator=(const DiffObjectDerived& other) = default;
+
+        DiffObjectDerived(DiffObjectDerived&& other) = default;
+        DiffObjectDerived& operator=(DiffObjectDerived&& other) = default;
+
+        const T& prev() const {
+            return *static_cast<const T*>(m_prev);
+        }
+
+        const T& curr() const {
+            return *static_cast<const T*>(m_curr);
+        }
+
+        const T& next() const {
+            return *static_cast<const T*>(m_next);
+        }
+
+    }; // class DiffObjectDerived
+
+    typedef DiffObjectDerived<osmium::Node>     DiffNode;
+    typedef DiffObjectDerived<osmium::Way>      DiffWay;
+    typedef DiffObjectDerived<osmium::Relation> DiffRelation;
 
 } // namespace osmium
 

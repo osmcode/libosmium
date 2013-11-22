@@ -37,6 +37,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/memory/iterator.hpp>
 #include <osmium/osm/diff_object.hpp>
+#include <osmium/diff_iterator.hpp>
 
 namespace osmium {
 
@@ -135,24 +136,16 @@ namespace osmium {
             }
 
             template <class TIterator, class THandler>
-            inline void apply_item_recurse(TIterator prev, TIterator it, TIterator next, THandler& handler) {
-                if (prev->type() != it->type() || prev->id() != it->id()) {
-                    prev = it;
-                }
-
-                if (next->type() != it->type() || next->id() != it->id()) {
-                    next = it;
-                }
-
+            inline void apply_item_recurse(TIterator it, THandler& handler) {
                 switch (it->type()) {
                     case osmium::item_type::node:
-                        handler.node(DiffNode{ static_cast<osmium::Node&>(*prev), static_cast<osmium::Node&>(*it), static_cast<osmium::Node&>(*next) });
+                        handler.node(static_cast<const DiffNode&>(*it));
                         break;
                     case osmium::item_type::way:
-                        handler.way(DiffWay{ static_cast<osmium::Way&>(*prev), static_cast<osmium::Way&>(*it), static_cast<osmium::Way&>(*next) });
+                        handler.way(static_cast<const DiffWay&>(*it));
                         break;
                     case osmium::item_type::relation:
-                        handler.relation(DiffRelation{ static_cast<osmium::Relation&>(*prev), static_cast<osmium::Relation&>(*it), static_cast<osmium::Relation&>(*next) });
+                        handler.relation(static_cast<const DiffRelation&>(*it));
                         break;
                     default:
                         throw std::runtime_error("unknown type");
@@ -160,37 +153,31 @@ namespace osmium {
             }
 
             template <class TIterator, class THandler, class ...TRest>
-            inline void apply_item_recurse(TIterator prev, TIterator it, TIterator next, THandler& handler, TRest&... more) {
-                apply_item_recurse(prev, it, next, handler);
-                apply_item_recurse(prev, it, next, more...);
+            inline void apply_item_recurse(TIterator it, THandler& handler, TRest&... more) {
+                apply_item_recurse(it, handler);
+                apply_item_recurse(it, more...);
             }
 
         } // namespace detail
 
         template <class TIterator, class ...THandlers>
         inline void apply(TIterator it, TIterator end, THandlers&... handlers) {
+            typedef osmium::DiffIterator<TIterator> diff_iterator;
+
+            diff_iterator dit(it, end);
+            diff_iterator dend(end, end);
+
             osmium::item_type last_type = osmium::item_type::undefined;
-            TIterator prev = it;
-            TIterator next = it;
-            while (it != end) {
 
-                if (last_type != it->type()) {
-                    osmium::diff_handler::detail::apply_before_and_after_recurse(last_type, it->type(), handlers...);
-                    last_type = it->type();
+            for (; dit != dend; ++dit) {
+                if (last_type != dit->type()) {
+                    osmium::diff_handler::detail::apply_before_and_after_recurse(last_type, dit->type(), handlers...);
+                    last_type = dit->type();
                 }
-
-                ++next;
-                if (next == end) {
-                    osmium::diff_handler::detail::apply_item_recurse(prev, it, it, handlers...);
-                    osmium::diff_handler::detail::apply_before_and_after_recurse(last_type, osmium::item_type::undefined, handlers...);
-                    return;
-                }
-
-                osmium::diff_handler::detail::apply_item_recurse(prev, it, next, handlers...);
-
-                prev = it;
-                it = next;
+                osmium::diff_handler::detail::apply_item_recurse(dit, handlers...);
             }
+
+            osmium::diff_handler::detail::apply_before_and_after_recurse(last_type, osmium::item_type::undefined, handlers...);
         }
 
         template <class TSource, class ...THandlers>
