@@ -42,56 +42,68 @@ namespace osmium {
     template <class T>
     class DiffObject {
 
-        const T& m_prev;
-        const T& m_curr;
-        const T& m_next;
+        T* m_prev;
+        T* m_curr;
+        T* m_next;
 
     public:
 
-        DiffObject(const T& prev, const T& curr, const T& next) :
-            m_prev(prev),
-            m_curr(curr),
-            m_next(next) {
+        DiffObject() :
+            m_prev(nullptr),
+            m_curr(nullptr),
+            m_next(nullptr) {
         }
+
+        DiffObject(T& prev, T& curr, T& next) :
+            m_prev(&prev),
+            m_curr(&curr),
+            m_next(&next) {
+        }
+
+        DiffObject(const DiffObject& other) = default;
+        DiffObject& operator=(const DiffObject& other) = default;
+
+        DiffObject(DiffObject&& other) = default;
+        DiffObject& operator=(DiffObject&& other) = default;
 
         const T& prev() const {
-            return m_prev;
+            return *m_prev;
         }
 
-        const T& current() const {
-            return m_curr;
+        const T& curr() const {
+            return *m_curr;
         }
 
         const T& next() const {
-            return m_next;
+            return *m_next;
         }
 
         bool first() const {
-            return &m_prev == &m_curr;
+            return m_prev == m_curr;
         }
 
         bool last() const {
-            return &m_curr == &m_next;
+            return m_curr == m_next;
         }
 
         osmium::object_id_type id() const {
-            return m_curr.id();
+            return m_curr->id();
         }
 
         osmium::object_version_type version() const {
-            return m_curr.version();
+            return m_curr->version();
         }
 
         osmium::changeset_id_type changeset() const {
-            return m_curr.changeset();
+            return m_curr->changeset();
         }
 
         const osmium::Timestamp start_time() const {
-            return m_curr.timestamp();
+            return m_curr->timestamp();
         }
 
         const osmium::Timestamp end_time() const {
-            return last() ? osmium::Timestamp() : m_next.timestamp();
+            return last() ? osmium::Timestamp() : m_next->timestamp();
         }
 
     }; // class DiffObject

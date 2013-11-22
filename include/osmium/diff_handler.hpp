@@ -146,13 +146,13 @@ namespace osmium {
 
                 switch (it->type()) {
                     case osmium::item_type::node:
-                        handler.node(DiffNode{ static_cast<const osmium::Node&>(*prev), static_cast<const osmium::Node&>(*it), static_cast<const osmium::Node&>(*next) });
+                        handler.node(DiffNode{ static_cast<osmium::Node&>(*prev), static_cast<osmium::Node&>(*it), static_cast<osmium::Node&>(*next) });
                         break;
                     case osmium::item_type::way:
-                        handler.way(DiffWay{ static_cast<const osmium::Way&>(*prev), static_cast<const osmium::Way&>(*it), static_cast<const osmium::Way&>(*next) });
+                        handler.way(DiffWay{ static_cast<osmium::Way&>(*prev), static_cast<osmium::Way&>(*it), static_cast<osmium::Way&>(*next) });
                         break;
                     case osmium::item_type::relation:
-                        handler.relation(DiffRelation{ static_cast<const osmium::Relation&>(*prev), static_cast<const osmium::Relation&>(*it), static_cast<const osmium::Relation&>(*next) });
+                        handler.relation(DiffRelation{ static_cast<osmium::Relation&>(*prev), static_cast<osmium::Relation&>(*it), static_cast<osmium::Relation&>(*next) });
                         break;
                     default:
                         throw std::runtime_error("unknown type");
