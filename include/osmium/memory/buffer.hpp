@@ -306,13 +306,15 @@ namespace osmium {
                 if (m_written + size > m_capacity) {
                     if (m_full) {
                         m_full(*this);
-                    } else if (!m_memory.empty()) {
+#if 0
+                    } else if (!m_memory.empty()) { // XXX
                         // double buffer size until there is enough space
                         size_t new_capacity = m_capacity * 2;
                         while (m_written + size > new_capacity) {
                             new_capacity *= 2;
                         }
                         grow(new_capacity);
+#endif
                     } else {
                         throw BufferIsFull();
                     }
