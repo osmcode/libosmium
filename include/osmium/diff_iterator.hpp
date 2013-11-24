@@ -84,7 +84,7 @@ namespace osmium {
         DiffIterator& operator=(DiffIterator&& other) = default;
 
         DiffIterator& operator++() {
-            m_prev = m_curr;
+            m_prev = std::move(m_curr);
             m_curr = m_next;
 
             if (m_next != m_end) {
