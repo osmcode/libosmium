@@ -38,6 +38,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/memory/buffer.hpp>
 #include <osmium/memory/item.hpp>
+#include <osmium/osm/diff_object.hpp>
 
 namespace osmium {
 
@@ -46,35 +47,45 @@ namespace osmium {
         template <class TDest>
         class OutputIterator : public std::iterator<std::output_iterator_tag, osmium::memory::Item> {
 
+            struct buffer_wrapper {
+                osmium::memory::Buffer buffer;
+
+                buffer_wrapper(size_t buffer_size) :
+                    buffer(buffer_size) {
+                }
+            };
+
             static const int default_buffer_size = 10 * 1024 * 1024;
 
             TDest& m_destination;
 
-            size_t m_buffer_size;
-
-            std::shared_ptr<osmium::memory::Buffer> m_buffer;
+            std::shared_ptr<buffer_wrapper> m_buffer_wrapper;
 
         public:
 
             OutputIterator(TDest& destination, const size_t buffer_size = default_buffer_size) :
                 m_destination(destination),
-                m_buffer_size(buffer_size),
-                m_buffer(std::make_shared<osmium::memory::Buffer>(buffer_size)) {
+                m_buffer_wrapper(std::make_shared<buffer_wrapper>(buffer_size)) {
             }
 
             void flush() {
-                m_destination(std::move(*m_buffer));
-                m_buffer = std::make_shared<osmium::memory::Buffer>(m_buffer_size);
+                osmium::memory::Buffer buffer(m_buffer_wrapper->buffer.capacity());
+                std::swap(m_buffer_wrapper->buffer, buffer);
+                m_destination(std::move(buffer));
             }
 
             OutputIterator& operator=(const osmium::memory::Item& item) {
                 try {
-                    m_buffer->push_back(item);
+                    m_buffer_wrapper->buffer.push_back(item);
                 } catch (osmium::memory::BufferIsFull&) {
                     flush();
-                    m_buffer->push_back(item);
+                    m_buffer_wrapper->buffer.push_back(item);
                 }
                 return *this;
+            }
+
+            OutputIterator& operator=(const osmium::DiffObject& diff) {
+                return this->operator=(diff.curr());
             }
 
             OutputIterator& operator*() {

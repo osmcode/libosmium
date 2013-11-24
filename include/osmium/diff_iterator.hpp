@@ -43,7 +43,7 @@ DEALINGS IN THE SOFTWARE.
 namespace osmium {
 
     template <class TBasicIterator>
-    class DiffIterator : public std::iterator<std::forward_iterator_tag, const osmium::DiffObject> {
+    class DiffIterator : public std::iterator<std::input_iterator_tag, const osmium::DiffObject> {
 
         TBasicIterator m_prev;
         TBasicIterator m_curr;
@@ -77,6 +77,12 @@ namespace osmium {
             m_next(begin == end ? begin : ++begin),
             m_end(end) {
         }
+
+        DiffIterator(const DiffIterator& other) = default;
+        DiffIterator& operator=(const DiffIterator& other) = default;
+
+        DiffIterator(DiffIterator&& other) = default;
+        DiffIterator& operator=(DiffIterator&& other) = default;
 
         DiffIterator& operator++() {
             m_prev = m_curr;
