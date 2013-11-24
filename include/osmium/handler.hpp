@@ -217,9 +217,9 @@ namespace osmium {
             for (; it != end; ++it) {
                 if (last_type != it->type()) {
                     osmium::handler::detail::apply_before_and_after_recurse(last_type, it->type(), handlers...);
+                    last_type = it->type();
                 }
                 osmium::handler::detail::apply_item_recurse(*it, handlers...);
-                last_type = it->type();
             }
             osmium::handler::detail::apply_before_and_after_recurse(last_type, osmium::item_type::undefined, handlers...);
         }
