@@ -346,8 +346,7 @@ namespace osmium {
              * Add an item to the buffer. This function is provided so that
              * you can use std::back_inserter.
              */
-            template <class T>
-            void push_back(const T& item) {
+            void push_back(const osmium::memory::Item& item) {
                 add_item(item);
                 commit();
             }
