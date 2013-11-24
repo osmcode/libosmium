@@ -1,5 +1,5 @@
-#ifndef OSMIUM_MEMORY_ITERATOR_HPP
-#define OSMIUM_MEMORY_ITERATOR_HPP
+#ifndef OSMIUM_IO_INPUT_ITERATOR_HPP
+#define OSMIUM_IO_INPUT_ITERATOR_HPP
 
 /*
 
@@ -41,7 +41,7 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
-    namespace memory {
+    namespace io {
 
         /**
          * This iterator class allows you to iterate over all items from a
@@ -49,7 +49,7 @@ namespace osmium {
          * source accessible as a normal STL input iterator.
          */
         template <class TSource, class TItem = osmium::memory::Item>
-        class Iterator {
+        class InputIterator {
 
             static_assert(std::is_base_of<osmium::memory::Item, TItem>::value, "TItem must derive from osmium::buffer::Item");
 
@@ -78,17 +78,17 @@ namespace osmium {
             typedef TItem*                  pointer;
             typedef TItem&                  reference;
 
-            Iterator(TSource& source) :
+            InputIterator(TSource& source) :
                 m_source(&source) {
                 update_buffer();
             }
 
             // end iterator
-            Iterator() :
+            InputIterator() :
                 m_source(nullptr) {
             }
 
-            Iterator& operator++() {
+            InputIterator& operator++() {
                 assert(m_source);
                 assert(m_buffer);
                 assert(m_iter != nullptr);
@@ -99,19 +99,19 @@ namespace osmium {
                 return *this;
             }
 
-            Iterator operator++(int) {
-                Iterator tmp(*this);
+            InputIterator operator++(int) {
+                InputIterator tmp(*this);
                 operator++();
                 return tmp;
             }
 
-            bool operator==(const Iterator& rhs) const {
+            bool operator==(const InputIterator& rhs) const {
                 return m_source == rhs.m_source &&
                        m_buffer == rhs.m_buffer &&
                        m_iter == rhs.m_iter;
             }
 
-            bool operator!=(const Iterator& rhs) const {
+            bool operator!=(const InputIterator& rhs) const {
                 return !(*this == rhs);
             }
 
@@ -125,10 +125,10 @@ namespace osmium {
                 return &static_cast<reference>(*m_iter);
             }
 
-        }; // class Iterator
+        }; // class InputIterator
 
-    } // namespace memory
+    } // namespace io
 
 } // namespace osmium
 
-#endif // OSMIUM_MEMORY_ITERATOR_HPP
+#endif // OSMIUM_IO_INPUT_ITERATOR_HPP

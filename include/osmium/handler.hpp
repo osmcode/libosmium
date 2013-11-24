@@ -37,7 +37,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/osm.hpp>
 #include <osmium/memory/item.hpp>
-#include <osmium/memory/iterator.hpp>
+#include <osmium/io/input_iterator.hpp>
 
 namespace osmium {
 
@@ -226,8 +226,8 @@ namespace osmium {
 
         template <class TSource, class ...THandlers>
         inline void apply(TSource& source, THandlers&... handlers) {
-            apply(osmium::memory::Iterator<TSource>{source},
-                  osmium::memory::Iterator<TSource>{},
+            apply(osmium::io::InputIterator<TSource>{source},
+                  osmium::io::InputIterator<TSource>{},
                   handlers...);
         }
 

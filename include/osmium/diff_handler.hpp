@@ -35,7 +35,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <stdexcept>
 
-#include <osmium/memory/iterator.hpp>
+#include <osmium/io/input_iterator.hpp>
 #include <osmium/osm/diff_object.hpp>
 #include <osmium/diff_iterator.hpp>
 
@@ -182,8 +182,8 @@ namespace osmium {
 
         template <class TSource, class ...THandlers>
         inline void apply(TSource& source, THandlers&... handlers) {
-            apply(osmium::memory::Iterator<TSource, osmium::Object>{source},
-                  osmium::memory::Iterator<TSource, osmium::Object>{},
+            apply(osmium::io::InputIterator<TSource, osmium::Object>{source},
+                  osmium::io::InputIterator<TSource, osmium::Object>{},
                   handlers...);
         }
 
