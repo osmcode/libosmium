@@ -43,7 +43,8 @@ namespace osmium {
             unknown = 0,
             xml     = 1,
             pbf     = 2,
-            opl     = 3
+            opl     = 3,
+            json    = 4
         };
 
         inline const char* as_string(file_format format) {
@@ -56,6 +57,8 @@ namespace osmium {
                     return "PBF";
                 case file_format::opl:
                     return "OPL";
+                case file_format::json:
+                    return "JSON";
             }
             return "";
         }
