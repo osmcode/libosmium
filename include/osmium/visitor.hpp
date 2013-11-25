@@ -139,8 +139,7 @@ namespace osmium {
 
             template <class TVisitor, class TItem>
             inline void apply_item_recurse(TItem& item, TVisitor& visitor) {
-                typename std::is_base_of<osmium::handler::Handler, TVisitor>::type tag;
-                switch_on_type(visitor, item, tag);
+                switch_on_type(visitor, item, std::is_base_of<osmium::handler::Handler, TVisitor>());
             }
 
             template <class TVisitor, class TItem, class ...TRest>
@@ -198,8 +197,7 @@ namespace osmium {
 
             template <class TVisitor>
             inline void apply_before_and_after_recurse(osmium::item_type last, osmium::item_type current, TVisitor& visitor) {
-                typename std::is_base_of<osmium::handler::Handler, TVisitor>::type tag;
-                switch_on_type_before_after(last, current, visitor, tag);
+                switch_on_type_before_after(last, current, visitor, std::is_base_of<osmium::handler::Handler, TVisitor>());
             }
 
             template <class TVisitor, class ...TRest>
