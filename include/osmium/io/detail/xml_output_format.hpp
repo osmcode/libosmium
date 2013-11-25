@@ -312,11 +312,11 @@ namespace osmium {
                         m_out += " open=\"true\"";
                     }
 
-                    if (changeset.bounds()) {
-                        oprintf(m_out, " min_lon=\"%.7f\"", changeset.bounds().bottom_left().lon());
-                        oprintf(m_out, " min_lat=\"%.7f\"", changeset.bounds().bottom_left().lat());
-                        oprintf(m_out, " max_lon=\"%.7f\"", changeset.bounds().top_right().lon());
-                        oprintf(m_out, " max_lat=\"%.7f\"", changeset.bounds().top_right().lat());
+                    if (changeset.bbox()) {
+                        oprintf(m_out, " min_lon=\"%.7f\"", changeset.bbox().bottom_left().lon());
+                        oprintf(m_out, " min_lat=\"%.7f\"", changeset.bbox().bottom_left().lat());
+                        oprintf(m_out, " max_lon=\"%.7f\"", changeset.bbox().top_right().lon());
+                        oprintf(m_out, " max_lat=\"%.7f\"", changeset.bbox().top_right().lat());
                     }
 
                     if (!changeset.user_is_anonymous()) {
@@ -386,12 +386,12 @@ namespace osmium {
                         out += "\">\n";
                     }
 
-                    if (header.bounds()) {
+                    for (auto& bbox : header.bboxes()) {
                         out += "  <bounds";
-                        oprintf(out, " minlon=\"%.7f\"", header.bounds().bottom_left().lon());
-                        oprintf(out, " minlat=\"%.7f\"", header.bounds().bottom_left().lat());
-                        oprintf(out, " maxlon=\"%.7f\"", header.bounds().top_right().lon());
-                        oprintf(out, " maxlat=\"%.7f\"/>\n", header.bounds().top_right().lat());
+                        oprintf(out, " minlon=\"%.7f\"", bbox.bottom_left().lon());
+                        oprintf(out, " minlat=\"%.7f\"", bbox.bottom_left().lat());
+                        oprintf(out, " maxlon=\"%.7f\"", bbox.top_right().lon());
+                        oprintf(out, " maxlat=\"%.7f\"/>\n", bbox.top_right().lat());
                     }
 
                     std::promise<std::string> promise;

@@ -229,8 +229,8 @@ namespace osmium {
                         }
                     }
 
-                    new_changeset.bounds().extend(min);
-                    new_changeset.bounds().extend(max);
+                    new_changeset.bbox().extend(min);
+                    new_changeset.bbox().extend(max);
 
                     if (!user_set) {
                         builder->add_user("");
@@ -347,7 +347,9 @@ namespace osmium {
                                             max.lat(atof(attrs[count+1]));
                                         }
                                     }
-                                    m_header.bounds().extend(min).extend(max);
+                                    osmium::BBox bbox;
+                                    bbox.extend(min).extend(max);
+                                    m_header.add_bbox(bbox);
                                 } else if (!strcmp(element, "delete")) {
                                     m_in_delete_section = true;
                                 }

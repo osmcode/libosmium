@@ -35,7 +35,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <boost/operators.hpp>
 
-#include <osmium/osm/bounds.hpp>
+#include <osmium/osm/bbox.hpp>
 #include <osmium/osm/entity.hpp>
 #include <osmium/osm/tag.hpp>
 #include <osmium/osm/timestamp.hpp>
@@ -53,7 +53,7 @@ namespace osmium {
 
         osmium::Timestamp m_created_at {};
         osmium::Timestamp m_closed_at {};
-        osmium::Bounds    m_bounds {};
+        osmium::BBox      m_bbox {};
         changeset_id_type m_id {0};
         num_changes_type  m_num_changes {0};
         user_id_type      m_uid {0};
@@ -223,12 +223,12 @@ namespace osmium {
             return this->num_changes(osmium::string_to_num_changes(num_changes));
         }
 
-        osmium::Bounds& bounds() noexcept {
-            return m_bounds;
+        osmium::BBox& bbox() noexcept {
+            return m_bbox;
         }
 
-        const osmium::Bounds& bounds() const noexcept {
-            return m_bounds;
+        const osmium::BBox& bbox() const noexcept {
+            return m_bbox;
         }
 
         /// Get user name.

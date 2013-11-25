@@ -35,7 +35,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <iostream>
 
-#include <osmium/osm/bounds.hpp>
+#include <osmium/osm/bbox.hpp>
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/tag.hpp>
 #include <osmium/osm/types.hpp>
@@ -63,16 +63,16 @@ namespace osmium {
         return out;
     }
 
-    inline std::ostream& operator<<(std::ostream& out, const Bounds& bounds) {
-        if (bounds) {
+    inline std::ostream& operator<<(std::ostream& out, const osmium::BBox& bbox) {
+        if (bbox) {
             out << '('
-                << bounds.bottom_left().lon()
+                << bbox.bottom_left().lon()
                 << ','
-                << bounds.bottom_left().lat()
+                << bbox.bottom_left().lat()
                 << ','
-                << bounds.top_right().lon()
+                << bbox.top_right().lon()
                 << ','
-                << bounds.top_right().lat()
+                << bbox.top_right().lat()
                 << ')';
         } else {
             out << "(undefined)";

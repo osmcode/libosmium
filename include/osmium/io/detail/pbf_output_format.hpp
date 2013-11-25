@@ -827,12 +827,13 @@ namespace osmium {
                     // set the writing program
                     pbf_header_block.set_writingprogram(header.get("generator"));
 
-                    if (header.bounds()) {
-                        OSMPBF::HeaderBBox* bbox = pbf_header_block.mutable_bbox();
-                        bbox->set_left(header.bounds().bottom_left().lon() * OSMPBF::lonlat_resolution);
-                        bbox->set_bottom(header.bounds().bottom_left().lat() * OSMPBF::lonlat_resolution);
-                        bbox->set_right(header.bounds().top_right().lon() * OSMPBF::lonlat_resolution);
-                        bbox->set_top(header.bounds().top_right().lat() * OSMPBF::lonlat_resolution);
+                    if (!header.bboxes().empty()) {
+                        OSMPBF::HeaderBBox* pbf_bbox = pbf_header_block.mutable_bbox();
+                        osmium::BBox bbox = header.joined_bboxes();
+                        pbf_bbox->set_left(bbox.bottom_left().lon() * OSMPBF::lonlat_resolution);
+                        pbf_bbox->set_bottom(bbox.bottom_left().lat() * OSMPBF::lonlat_resolution);
+                        pbf_bbox->set_right(bbox.top_right().lon() * OSMPBF::lonlat_resolution);
+                        pbf_bbox->set_top(bbox.top_right().lat() * OSMPBF::lonlat_resolution);
                     }
 
                     store_header_block();

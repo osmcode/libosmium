@@ -481,10 +481,12 @@ namespace osmium {
                     }
 
                     if (pbf_header_block.has_bbox()) {
-                        const OSMPBF::HeaderBBox& bbox = pbf_header_block.bbox();
+                        const OSMPBF::HeaderBBox& pbf_bbox = pbf_header_block.bbox();
                         const int64_t resolution_convert = OSMPBF::lonlat_resolution / osmium::Location::coordinate_precision;
-                        m_header.bounds().extend(osmium::Location(bbox.left()  / resolution_convert, bbox.bottom() / resolution_convert));
-                        m_header.bounds().extend(osmium::Location(bbox.right() / resolution_convert, bbox.top()    / resolution_convert));
+                        osmium::BBox bbox;
+                        bbox.extend(osmium::Location(pbf_bbox.left()  / resolution_convert, pbf_bbox.bottom() / resolution_convert));
+                        bbox.extend(osmium::Location(pbf_bbox.right() / resolution_convert, pbf_bbox.top()    / resolution_convert));
+                        m_header.add_bbox(bbox);
                     }
                 }
 

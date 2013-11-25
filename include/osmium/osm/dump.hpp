@@ -214,8 +214,8 @@ namespace osmium {
                       << changeset.closed_at().to_iso()
                       << "\n";
                 m_out << m_prefix
-                      << "  bounds="
-                      << changeset.bounds()
+                      << "  bbox="
+                      << changeset.bbox()
                       << "\n";
 
                 Dump dump(m_out, m_with_size, m_prefix + "  ");

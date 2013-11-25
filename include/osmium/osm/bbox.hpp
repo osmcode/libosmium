@@ -1,5 +1,5 @@
-#ifndef OSMIUM_OSM_BOUNDS_HPP
-#define OSMIUM_OSM_BOUNDS_HPP
+#ifndef OSMIUM_OSM_BBOX_HPP
+#define OSMIUM_OSM_BBOX_HPP
 
 /*
 
@@ -39,7 +39,8 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
-    class Bounds {
+    /// Bounding box.
+    class BBox {
 
         osmium::Location m_bottom_left;
         osmium::Location m_top_right;
@@ -47,25 +48,25 @@ namespace osmium {
     public:
 
         /**
-         * Create undefined Bounds. Use the extend() function
+         * Create undefined BBox. Use the extend() function
          * to add actual bounds.
          */
-        constexpr Bounds() :
+        constexpr BBox() :
             m_bottom_left(),
             m_top_right() {
         }
 
-        Bounds(const Bounds&) = default;
-        Bounds(Bounds&&) = default;
-        Bounds& operator=(const Bounds&) = default;
-        Bounds& operator=(Bounds&&) = default;
-        ~Bounds() = default;
+        BBox(const BBox&) = default;
+        BBox(BBox&&) = default;
+        BBox& operator=(const BBox&) = default;
+        BBox& operator=(BBox&&) = default;
+        ~BBox() = default;
 
         /**
          * Extend the bounding box by the given location. If the
          * location is undefined, the bounding box is unchanged.
          */
-        Bounds& extend(const Location& location) noexcept {
+        BBox& extend(const Location& location) noexcept {
             if (location) {
                 if (m_bottom_left) {
                     if (location.x() < m_bottom_left.x()) {
@@ -89,14 +90,14 @@ namespace osmium {
         }
 
         /**
-         * Bounds are defined, ie. contains defined coordinates.
+         * BBox are defined, ie. contains defined coordinates.
          */
         explicit constexpr operator bool() const noexcept {
             return static_cast<bool>(m_bottom_left);
         }
 
         /**
-         * Bounds are valid, ie. defined and inside usual bounds
+         * BBox are valid, ie. defined and inside usual bounds
          * (-180<=lon<=180, -90<=lat<=90).
          */
         constexpr bool valid() const noexcept {
@@ -117,15 +118,15 @@ namespace osmium {
             return m_top_right;
         }
 
-    }; // class Bounds
+    }; // class BBox
 
     /**
-     * Bounds are equal if both locations are equal.
+     * BBoxes are equal if both locations are equal.
      */
-    inline constexpr bool operator==(const Bounds& lhs, const Bounds& rhs) noexcept {
+    inline constexpr bool operator==(const BBox& lhs, const BBox& rhs) noexcept {
         return lhs.bottom_left() == rhs.bottom_left() && lhs.top_right() == rhs.top_right();
     }
 
 } // namespace osmium
 
-#endif // OSMIUM_OSM_BOUNDS_HPP
+#endif // OSMIUM_OSM_BBOX_HPP

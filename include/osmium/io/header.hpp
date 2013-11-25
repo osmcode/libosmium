@@ -35,8 +35,9 @@ DEALINGS IN THE SOFTWARE.
 
 #include <initializer_list>
 #include <string>
+#include <vector>
 
-#include <osmium/osm/bounds.hpp>
+#include <osmium/osm/bbox.hpp>
 #include <osmium/util/options.hpp>
 
 namespace osmium {
@@ -48,8 +49,8 @@ namespace osmium {
         */
         class Header : public osmium::util::Options {
 
-            /// Bounding box
-            osmium::Bounds m_bounds;
+            /// Bounding boxes
+            std::vector<osmium::BBox> m_bboxes;
 
             /**
             * Are there possibly multiple versions of the same object in this stream of objects?
@@ -79,16 +80,34 @@ namespace osmium {
 
             ~Header() = default;
 
-            osmium::Bounds& bounds() {
-                return m_bounds;
+            std::vector<osmium::BBox>& bboxes() {
+                return m_bboxes;
             }
 
-            const osmium::Bounds& bounds() const {
-                return m_bounds;
+            const std::vector<osmium::BBox>& bboxes() const {
+                return m_bboxes;
             }
 
-            Header& bounds(const osmium::Bounds& bounds) {
-                m_bounds = bounds;
+            Header& bboxes(const std::vector<osmium::BBox>& bboxes) {
+                m_bboxes = bboxes;
+                return *this;
+            }
+
+            osmium::BBox bbox() const {
+                return m_bboxes.empty() ? osmium::BBox() : m_bboxes.front();
+            }
+
+            osmium::BBox joined_bboxes() const {
+                osmium::BBox bbox;
+                for (auto& b : m_bboxes) {
+                    bbox.extend(b.bottom_left());
+                    bbox.extend(b.top_right());
+                }
+                return bbox;
+            }
+
+            Header& add_bbox(const osmium::BBox& bbox) {
+                m_bboxes.push_back(bbox);
                 return *this;
             }
 

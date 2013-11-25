@@ -35,7 +35,10 @@ int main(int argc, char* argv[]) {
     osmium::io::Header header = reader.header();
 
     std::cout << "HEADER:\n  generator=" << header.get("generator") << "\n";
-    std::cout << "  bounds=" << header.bounds() << "\n";
+
+    for (auto& bbox : header.bboxes()) {
+        std::cout << "  bbox=" << bbox << "\n";
+    }
 
     osmium::osm::Dump dump(std::cout);
     while (osmium::memory::Buffer buffer = reader.read()) {
