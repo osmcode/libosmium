@@ -38,31 +38,15 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/osm.hpp>
 #include <osmium/memory/buffer.hpp>
-#include <osmium/handler.hpp>
-#include <osmium/osm/visitor.hpp>
 #include <osmium/io/input_iterator.hpp>
 
 namespace osmium {
 
     namespace handler {
-
         class Handler;
-
     }
 
     namespace visitor {
-
-        class Visitor {
-
-        public:
-
-            void operator()(const osmium::memory::Item&) const {
-            }
-
-            void operator()(osmium::memory::Item&) const {
-            }
-
-        }; // Visitor
 
         namespace detail {
 

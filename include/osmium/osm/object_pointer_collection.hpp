@@ -38,7 +38,6 @@ DEALINGS IN THE SOFTWARE.
 #include <boost/iterator/indirect_iterator.hpp>
 
 #include <osmium/osm/object_comparisons.hpp>
-#include <osmium/visitor.hpp>
 
 namespace osmium {
 
@@ -60,7 +59,7 @@ namespace osmium {
          *   osmium::apply(buffer, objects);
          *
          */
-        class ObjectPointerCollection : public osmium::visitor::Visitor {
+        class ObjectPointerCollection {
 
             std::vector<osmium::Object*> m_objects;
 
@@ -70,12 +69,11 @@ namespace osmium {
             typedef boost::indirect_iterator<std::vector<osmium::Object*>::const_iterator, const osmium::Object> const_iterator;
 
             ObjectPointerCollection() :
-                osmium::visitor::Visitor(),
                 m_objects() {
             }
 
-            // bring in empty default implementations for unknown types from visitor base class
-            using osmium::visitor::Visitor::operator();
+            void operator()(osmium::memory::Item&) const {
+            }
 
             void operator()(osmium::Object& object) {
                 m_objects.push_back(&object);
