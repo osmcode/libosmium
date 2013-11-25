@@ -86,6 +86,7 @@ namespace osmium {
             size_t m_capacity;
             size_t m_written;
             size_t m_committed;
+            bool m_auto_grow {false};
             std::function<void(Buffer&)> m_full {};
 
         public:
@@ -153,12 +154,13 @@ namespace osmium {
              * required size. The dynamic memory will be automatically
              * freed when the Buffer is destroyed.
              */
-            Buffer(size_t capacity) :
+            Buffer(size_t capacity, bool auto_grow = true) :
                 m_memory(capacity),
                 m_data(m_memory.data()),
                 m_capacity(capacity),
                 m_written(0),
-                m_committed(0) {
+                m_committed(0),
+                m_auto_grow(auto_grow) {
                 if (capacity % align_bytes != 0) {
                     throw std::invalid_argument("buffer capacity needs to be multiple of alignment");
                 }
@@ -306,15 +308,13 @@ namespace osmium {
                 if (m_written + size > m_capacity) {
                     if (m_full) {
                         m_full(*this);
-#if 0
-                    } else if (!m_memory.empty()) { // XXX
+                    } else if (!m_memory.empty() && m_auto_grow) {
                         // double buffer size until there is enough space
                         size_t new_capacity = m_capacity * 2;
                         while (m_written + size > new_capacity) {
                             new_capacity *= 2;
                         }
                         grow(new_capacity);
-#endif
                     } else {
                         throw BufferIsFull();
                     }

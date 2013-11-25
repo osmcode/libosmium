@@ -51,7 +51,7 @@ namespace osmium {
                 osmium::memory::Buffer buffer;
 
                 buffer_wrapper(size_t buffer_size) :
-                    buffer(buffer_size) {
+                    buffer(buffer_size, false) {
                 }
             };
 
@@ -69,7 +69,7 @@ namespace osmium {
             }
 
             void flush() {
-                osmium::memory::Buffer buffer(m_buffer_wrapper->buffer.capacity());
+                osmium::memory::Buffer buffer(m_buffer_wrapper->buffer.capacity(), false);
                 std::swap(m_buffer_wrapper->buffer, buffer);
                 m_destination(std::move(buffer));
             }
