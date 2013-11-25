@@ -231,6 +231,7 @@ int main(int argc, char* argv[]) {
     index_pos_type index_pos;
     index_neg_type index_neg;
     location_handler_type location_handler(index_pos, index_neg);
+    location_handler.ignore_errors();
 
     MyOGRHandler ogr_handler(output_format, output_filename);
 

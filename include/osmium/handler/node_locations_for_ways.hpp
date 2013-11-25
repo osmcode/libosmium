@@ -61,6 +61,8 @@ namespace osmium {
             /// Object that handles the actual storage of the node locations (with negative IDs).
             TStorageNegIDs& m_storage_neg;
 
+            bool m_ignore_errors {false};
+
             // It is okay to have this static dummy instance, even when using several threads,
             // because it is read-only.
             static dummy_type& get_dummy() {
@@ -80,6 +82,10 @@ namespace osmium {
             NodeLocationsForWays& operator=(const NodeLocationsForWays&) = delete;
 
             ~NodeLocationsForWays() noexcept = default;
+
+            void ignore_errors() {
+                m_ignore_errors = true;
+            }
 
             /**
              * Store the location of the node in the storage.
@@ -110,8 +116,19 @@ namespace osmium {
              * them to the way object.
              */
             void way(osmium::Way& way) const {
+                bool error = false;
                 for (auto& wn : way.nodes()) {
-                    wn.location(get_node_location(wn.ref()));
+                    try {
+                        wn.location(get_node_location(wn.ref()));
+                        if (!wn.location()) {
+                            error = true;
+                        }
+                    } catch (std::out_of_range&) {
+                        error = true;
+                    }
+                }
+                if (error && !m_ignore_errors) {
+                    throw std::out_of_range("Missing location");
                 }
             }
 
