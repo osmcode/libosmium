@@ -265,7 +265,7 @@ namespace osmium {
                  * blobs in raw format. Disabling the compression can improve the
                  * writing speed a little but the output will be 2x to 3x bigger.
                  */
-                bool m_use_compression;
+                bool m_use_compression {true};
 
                 /**
                  * While the .osm.pbf-format is able to carry all meta information, it is
@@ -472,7 +472,7 @@ namespace osmium {
 
                     std::promise<std::string> promise;
                     m_output_queue.push(promise.get_future());
-                    promise.set_value(serialize_blob("OSMHeader", pbf_header_block, use_compression()));
+                    promise.set_value(serialize_blob("OSMHeader", pbf_header_block, m_use_compression));
 
                     pbf_header_block.Clear();
                 }
@@ -499,7 +499,7 @@ namespace osmium {
 
                     std::promise<std::string> promise;
                     m_output_queue.push(promise.get_future());
-                    promise.set_value(serialize_blob("OSMData", pbf_primitive_block, use_compression()));
+                    promise.set_value(serialize_blob("OSMData", pbf_primitive_block, m_use_compression));
                     while (m_output_queue.size() > 10) {
                         std::this_thread::sleep_for(std::chrono::milliseconds(100)); // XXX
                     }
@@ -700,7 +700,6 @@ namespace osmium {
                     pbf_relations(nullptr),
                     m_location_granularity(pbf_primitive_block.granularity()),
                     m_date_granularity(pbf_primitive_block.date_granularity()),
-                    m_use_compression(true),
                     m_should_add_metadata(true),
                     m_add_visible(file.has_multiple_object_versions()),
                     primitive_block_contents(0),
@@ -718,26 +717,13 @@ namespace osmium {
                     if (file.get("pbf_dense_nodes") == "false") {
                         m_use_dense_nodes = false;
                     }
+                    if (file.get("pbf_compression") == "none" || file.get("pbf_compression") == "false") {
+                        m_use_compression = false;
+                    }
                 }
 
                 void write_buffer(osmium::memory::Buffer&& buffer) override final {
                     osmium::apply(buffer.cbegin(), buffer.cend(), *this);
-                }
-
-
-                /**
-                 * getter to check whether zlib-compression is used
-                 */
-                bool use_compression() const {
-                    return m_use_compression;
-                }
-
-                /**
-                 * setter to set whether zlib-compression is used
-                 */
-                PBFOutputFormat& use_compression(bool flag) {
-                    m_use_compression = flag;
-                    return *this;
                 }
 
 
