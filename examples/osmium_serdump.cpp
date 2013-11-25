@@ -112,7 +112,7 @@ int main(int argc, char* argv[]) {
 
     while (osmium::memory::Buffer buffer = reader.read()) {
         disk_store_handler(buffer); // XXX
-        osmium::handler::apply(buffer, object_relations_handler);
+        osmium::apply(buffer, object_relations_handler);
     }
 
     {

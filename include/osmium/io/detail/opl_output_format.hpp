@@ -145,7 +145,7 @@ namespace osmium {
                 OPLOutputBlock& operator=(OPLOutputBlock&& other) = default;
 
                 std::string operator()() {
-                    osmium::handler::apply(m_input_buffer.cbegin(), m_input_buffer.cend(), *this);
+                    osmium::apply(m_input_buffer.cbegin(), m_input_buffer.cend(), *this);
 
                     std::string out;
                     std::swap(out, m_out);

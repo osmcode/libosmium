@@ -190,7 +190,7 @@ namespace osmium {
                 XMLOutputBlock& operator=(XMLOutputBlock&& other) = default;
 
                 std::string operator()() {
-                    osmium::handler::apply(m_input_buffer.cbegin(), m_input_buffer.cend(), *this);
+                    osmium::apply(m_input_buffer.cbegin(), m_input_buffer.cend(), *this);
 
                     if (m_write_change_ops) {
                         open_close_op_tag('\0');

@@ -91,7 +91,7 @@ namespace osmium {
             void operator()(const osmium::memory::Buffer& buffer) {
                 osmium::io::detail::reliable_write(m_data_fd, buffer.data(), buffer.committed());
 
-                osmium::handler::apply(buffer.begin(), buffer.end(), *this);
+                osmium::apply(buffer.begin(), buffer.end(), *this);
             }
 
         }; // class DiskStore

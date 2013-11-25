@@ -234,7 +234,7 @@ int main(int argc, char* argv[]) {
 
     MyOGRHandler ogr_handler(output_format, output_filename);
 
-    osmium::handler::apply(reader, location_handler, ogr_handler);
+    osmium::apply(reader, location_handler, ogr_handler);
 
     google::protobuf::ShutdownProtobufLibrary();
 

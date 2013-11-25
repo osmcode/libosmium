@@ -720,7 +720,7 @@ namespace osmium {
                 }
 
                 void write_buffer(osmium::memory::Buffer&& buffer) override final {
-                    osmium::handler::apply(buffer.cbegin(), buffer.cend(), *this);
+                    osmium::apply(buffer.cbegin(), buffer.cend(), *this);
                 }
 
                 /**

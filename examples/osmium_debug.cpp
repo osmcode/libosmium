@@ -39,7 +39,7 @@ int main(int argc, char* argv[]) {
 
     osmium::osm::Dump dump(std::cout);
     while (osmium::memory::Buffer buffer = reader.read()) {
-        osmium::osm::apply_visitor(dump, buffer);
+        osmium::apply(buffer, dump);
     }
 
     google::protobuf::ShutdownProtobufLibrary();

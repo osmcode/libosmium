@@ -40,7 +40,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/osm/types.hpp>
 #include <osmium/osm/ostream.hpp>
-#include <osmium/osm/visitor.hpp>
+#include <osmium/visitor.hpp>
 
 namespace osmium {
 
@@ -97,7 +97,7 @@ namespace osmium {
                       << "\n";
 
                 Dump dump(m_out, m_with_size, m_prefix + "  ");
-                osmium::osm::apply_visitor(dump, object.cbegin(), object.cend());
+                osmium::apply(object.cbegin(), object.cend(), dump);
             }
 
             void print_location(const osmium::Node& node) {
@@ -170,7 +170,7 @@ namespace osmium {
                           << "|\n";
                     if (member.full_member()) {
                         Dump dump(m_out, m_with_size, m_prefix + "  | ");
-                        osmium::osm::apply_visitor(dump, member.get_object());
+                        osmium::apply_item(member.get_object(), dump);
                     }
                 }
             }
@@ -219,7 +219,7 @@ namespace osmium {
                       << "\n";
 
                 Dump dump(m_out, m_with_size, m_prefix + "  ");
-                osmium::osm::apply_visitor(dump, changeset.cbegin(), changeset.cend());
+                osmium::apply(changeset.cbegin(), changeset.cend(), dump);
             }
 
         }; // class Dump
