@@ -463,7 +463,7 @@ namespace osmium {
 
                         if (feature == "OsmSchema-V0.6") continue;
                         if (feature == "DenseNodes") {
-                            m_header.pbf_has_dense_nodes(true);
+                            m_header.set("pbf_dense_nodes", true);
                             continue;
                         }
                         if (feature == "HistoricalInformation") {

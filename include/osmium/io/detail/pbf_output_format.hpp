@@ -250,13 +250,13 @@ namespace osmium {
                  * should nodes be serialized into the dense format?
                  *
                  * nodes can be encoded one of two ways, as a Node
-                 * (m_use_dense_format = false) and a special dense format.
+                 * (m_use_dense_nodes = false) and a special dense format.
                  * In the dense format, all information is stored 'column wise',
                  * as an array of ID's, array of latitudes, and array of
                  * longitudes. Each column is delta-encoded. This reduces
                  * header overheads and allows delta-coding to work very effectively.
                  */
-                bool m_use_dense_format;
+                bool m_use_dense_nodes {true};
 
                 /**
                  * should the PBF blobs contain zlib compressed data?
@@ -700,7 +700,6 @@ namespace osmium {
                     pbf_relations(nullptr),
                     m_location_granularity(pbf_primitive_block.granularity()),
                     m_date_granularity(pbf_primitive_block.date_granularity()),
-                    m_use_dense_format(true),
                     m_use_compression(true),
                     m_should_add_metadata(true),
                     m_add_visible(file.has_multiple_object_versions()),
@@ -715,27 +714,14 @@ namespace osmium {
                     m_delta_uid(),
                     m_delta_user_sid(),
                     debug(true) {
-
                     GOOGLE_PROTOBUF_VERIFY_VERSION;
+                    if (file.get("pbf_dense_nodes") == "false") {
+                        m_use_dense_nodes = false;
+                    }
                 }
 
                 void write_buffer(osmium::memory::Buffer&& buffer) override final {
                     osmium::apply(buffer.cbegin(), buffer.cend(), *this);
-                }
-
-                /**
-                 * getter to check whether the densenodes-feature is used
-                 */
-                bool use_dense_format() const {
-                    return m_use_dense_format;
-                }
-
-                /**
-                 * setter to set whether the densenodes-feature is used
-                 */
-                PBFOutputFormat& use_dense_format(bool flag) {
-                    m_use_dense_format = flag;
-                    return *this;
                 }
 
 
@@ -814,7 +800,7 @@ namespace osmium {
                     pbf_header_block.add_required_features("OsmSchema-V0.6");
 
                     // when the densenodes-feature is used, add DenseNodes as required feature
-                    if (use_dense_format()) {
+                    if (m_use_dense_nodes) {
                         pbf_header_block.add_required_features("DenseNodes");
                     }
 
@@ -860,7 +846,7 @@ namespace osmium {
                         pbf_nodes = pbf_primitive_block.add_primitivegroup();
                     }
 
-                    if (use_dense_format()) {
+                    if (m_use_dense_nodes) {
                         write_dense_node(node);
                     } else {
                         write_node(node);

@@ -58,12 +58,6 @@ namespace osmium {
             */
             bool m_has_multiple_object_versions = false;
 
-            /**
-             * Are nodes in the PBF files encoded in "Dense" format.
-             * This is only valid for PBF files.
-             */
-            bool m_pbf_has_dense_nodes = false;
-
         public:
 
             Header() = default;
@@ -117,15 +111,6 @@ namespace osmium {
 
             Header& has_multiple_object_versions(bool h) {
                 m_has_multiple_object_versions = h;
-                return *this;
-            }
-
-            bool pbf_has_dense_nodes() const {
-                return m_pbf_has_dense_nodes;
-            }
-
-            Header& pbf_has_dense_nodes(bool h) {
-                m_pbf_has_dense_nodes = h;
                 return *this;
             }
 
