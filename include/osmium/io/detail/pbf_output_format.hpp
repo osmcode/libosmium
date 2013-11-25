@@ -271,7 +271,7 @@ namespace osmium {
                  * While the .osm.pbf-format is able to carry all meta information, it is
                  * also able to omit this information to reduce size.
                  */
-                bool m_should_add_metadata;
+                bool m_should_add_metadata {true};
 
                 /**
                  * Should the visible flag be added on objects?
@@ -445,7 +445,7 @@ namespace osmium {
                         out->add_vals(string_table.record_string(tag.value()));
                     }
 
-                    if (should_add_metadata()) {
+                    if (m_should_add_metadata) {
                         // add an info-section to the pbf object and set the meta-info on it
                         OSMPBF::Info* out_info = out->mutable_info();
                         if (m_add_visible) {
@@ -603,7 +603,7 @@ namespace osmium {
                     }
                     dense->add_keys_vals(0);
 
-                    if (should_add_metadata()) {
+                    if (m_should_add_metadata) {
                         // add a DenseInfo-Section to the PrimitiveGroup
                         OSMPBF::DenseInfo* denseinfo = dense->mutable_denseinfo();
 
@@ -700,7 +700,6 @@ namespace osmium {
                     pbf_relations(nullptr),
                     m_location_granularity(pbf_primitive_block.granularity()),
                     m_date_granularity(pbf_primitive_block.date_granularity()),
-                    m_should_add_metadata(true),
                     m_add_visible(file.has_multiple_object_versions()),
                     primitive_block_contents(0),
                     primitive_block_size(0),
@@ -719,6 +718,9 @@ namespace osmium {
                     }
                     if (file.get("pbf_compression") == "none" || file.get("pbf_compression") == "false") {
                         m_use_compression = false;
+                    }
+                    if (file.get("pbf_add_metadata") == "false") {
+                        m_should_add_metadata = false;
                     }
                 }
 
@@ -755,22 +757,6 @@ namespace osmium {
                  */
                 PBFOutputFormat& date_granularity(int g) {
                     m_date_granularity = g;
-                    return *this;
-                }
-
-
-                /**
-                 * Getter to check whether metadata should be added.
-                 */
-                bool should_add_metadata() const {
-                    return m_should_add_metadata;
-                }
-
-                /**
-                 * Setter to set whether to add metadata.
-                 */
-                PBFOutputFormat& should_add_metadata(bool flag) {
-                    m_should_add_metadata = flag;
                     return *this;
                 }
 
