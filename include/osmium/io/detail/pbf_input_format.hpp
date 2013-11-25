@@ -488,6 +488,18 @@ namespace osmium {
                         bbox.extend(osmium::Location(pbf_bbox.right() / resolution_convert, pbf_bbox.top()    / resolution_convert));
                         m_header.add_bbox(bbox);
                     }
+
+                    if (pbf_header_block.has_osmosis_replication_timestamp()) {
+                        m_header.set("osmosis_replication_timestamp", osmium::Timestamp(pbf_header_block.osmosis_replication_timestamp()).to_iso());
+                    }
+
+                    if (pbf_header_block.has_osmosis_replication_sequence_number()) {
+                        m_header.set("osmosis_replication_sequence_number", std::to_string(pbf_header_block.osmosis_replication_sequence_number()));
+                    }
+
+                    if (pbf_header_block.has_osmosis_replication_base_url()) {
+                        m_header.set("osmosis_replication_base_url", pbf_header_block.osmosis_replication_base_url());
+                    }
                 }
 
             public:

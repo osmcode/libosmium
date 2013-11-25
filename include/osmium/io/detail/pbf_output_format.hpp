@@ -97,6 +97,7 @@ More complete outlines of real .osm.pbf files can be created using the osmpbf-ou
 
 #include <algorithm>
 #include <cmath>
+#include <cstdlib>
 #include <memory>
 
 #include <osmium/io/detail/output_format.hpp>
@@ -792,6 +793,22 @@ namespace osmium {
                         pbf_bbox->set_bottom(bbox.bottom_left().lat() * OSMPBF::lonlat_resolution);
                         pbf_bbox->set_right(bbox.top_right().lon() * OSMPBF::lonlat_resolution);
                         pbf_bbox->set_top(bbox.top_right().lat() * OSMPBF::lonlat_resolution);
+                    }
+
+                    std::string osmosis_replication_timestamp = header.get("osmosis_replication_timestamp");
+                    if (!osmosis_replication_timestamp.empty()) {
+                        osmium::Timestamp ts(osmosis_replication_timestamp.c_str());
+                        pbf_header_block.set_osmosis_replication_timestamp(ts);
+                    }
+
+                    std::string osmosis_replication_sequence_number = header.get("osmosis_replication_sequence_number");
+                    if (!osmosis_replication_sequence_number.empty()) {
+                        pbf_header_block.set_osmosis_replication_sequence_number(atoll(osmosis_replication_sequence_number.c_str()));
+                    }
+
+                    std::string osmosis_replication_base_url = header.get("osmosis_replication_base_url");
+                    if (!osmosis_replication_base_url.empty()) {
+                        pbf_header_block.set_osmosis_replication_base_url(osmosis_replication_base_url);
                     }
 
                     store_header_block();
