@@ -149,7 +149,7 @@ namespace osmium {
             }
 
             template <class TVisitor>
-            inline void switch_on_type_before_after(osmium::item_type last, osmium::item_type current, TVisitor& visitor, std::false_type) {
+            inline void switch_on_type_before_after(osmium::item_type /*last*/, osmium::item_type /*current*/, TVisitor& /*visitor*/, std::false_type) {
                 // intentionally left blank
             }
 

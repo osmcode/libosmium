@@ -114,7 +114,7 @@ namespace osmium {
             CompressionFactory(CompressionFactory&&) = delete;
             CompressionFactory& operator=(CompressionFactory&&) = delete;
 
-            void error(osmium::io::file_compression compression) {
+            void error(osmium::io::file_compression compression) __attribute__ ((noreturn)) {
                 std::string error_message {"Support for compression '"};
                 error_message += as_string(compression);
                 error_message += "' not compiled into this binary.";
