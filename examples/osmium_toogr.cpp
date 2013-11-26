@@ -24,6 +24,7 @@
 #include <osmium/index/map/mmap_vector_anon.hpp>
 
 #include <osmium/handler/node_locations_for_ways.hpp>
+#include <osmium/visitor.hpp>
 
 #include <osmium/geom/ogr.hpp>
 #include <osmium/io/any_input.hpp>

@@ -33,7 +33,7 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <osmium/io/writer.hpp>
-#include <osmium/io/detail/pbf_output_format.hpp>
+#include <osmium/io/writer.hpp> // IWYU pragma: export
+#include <osmium/io/detail/pbf_output_format.hpp> // IWYU pragma: export
 
 #endif // OSMIUM_IO_PBF_OUTPUT_HPP

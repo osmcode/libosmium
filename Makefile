@@ -83,6 +83,12 @@ check-includes: $(INCLUDE_FILES)
 test:
 	(cd test && ./run_tests.sh)
 
+iwyu:
+	for FILE in $(INCLUDE_FILES); do \
+	    echo "\n=== $${FILE} ========================================================="; \
+	    iwyu --std=c++11 $${FILE}; \
+	done;
+
 indent:
 	astyle --style=java --indent-namespaces --indent-switches --pad-header --lineend=linux --suffix=none --recursive include/\*.hpp examples/\*.cpp test/\*.cpp
 #	astyle --style=java --indent-namespaces --indent-switches --pad-header --unpad-paren --align-pointer=type --lineend=linux --suffix=none --recursive include/\*.hpp examples/\*.cpp test/\*.cpp

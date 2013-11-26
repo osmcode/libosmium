@@ -35,6 +35,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <boost/operators.hpp>
 
+#include <osmium/osm/location.hpp>
 #include <osmium/osm/segment.hpp>
 
 namespace osmium {

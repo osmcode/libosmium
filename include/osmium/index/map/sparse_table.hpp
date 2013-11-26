@@ -33,7 +33,9 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <cstddef>
 #include <stdexcept>
+#include <utility>
 #include <vector>
 
 #include <google/sparsetable>

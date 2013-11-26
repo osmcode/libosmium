@@ -33,7 +33,7 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <exception>
+#include <stdexcept>
 #include <string>
 
 #include <osmium/osm/location.hpp>

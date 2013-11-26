@@ -33,6 +33,7 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <algorithm>
 #include <memory>
 
 namespace osmium {

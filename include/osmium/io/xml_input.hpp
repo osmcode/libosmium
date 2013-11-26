@@ -33,7 +33,7 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <osmium/io/reader.hpp>
-#include <osmium/io/detail/xml_input_format.hpp>
+#include <osmium/io/reader.hpp> // IWYU pragma: export
+#include <osmium/io/detail/xml_input_format.hpp> // IWYU pragma: export
 
 #endif // OSMIUM_IO_XML_INPUT_HPP

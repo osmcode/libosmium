@@ -37,16 +37,14 @@ DEALINGS IN THE SOFTWARE.
 #include <future>
 #include <map>
 #include <memory>
+#include <stdexcept>
 #include <string>
 
-#include <osmium/thread/debug.hpp>
-#include <osmium/thread/queue.hpp>
 #include <osmium/io/file.hpp>
+#include <osmium/io/file_format.hpp>
 #include <osmium/io/header.hpp>
-#include <osmium/io/detail/read_write.hpp>
 #include <osmium/memory/buffer.hpp>
-#include <osmium/osm.hpp>
-#include <osmium/handler.hpp>
+#include <osmium/thread/queue.hpp>
 
 namespace osmium {
 

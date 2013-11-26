@@ -34,13 +34,10 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <algorithm>
-#include <stdexcept>
+#include <cstddef>
 #include <utility>
-#include <vector>
 
 #include <osmium/index/multimap.hpp>
-#include <osmium/detail/mmap_vector_anon.hpp>
-#include <osmium/detail/mmap_vector_file.hpp>
 #include <osmium/io/detail/read_write.hpp>
 
 namespace osmium {

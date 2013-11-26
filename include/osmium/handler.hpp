@@ -33,10 +33,12 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <osmium/osm.hpp>
-#include <osmium/visitor.hpp>
-
 namespace osmium {
+
+    class Node;
+    class Way;
+    class Relation;
+    class Changeset;
 
     namespace handler {
 

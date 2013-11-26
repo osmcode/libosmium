@@ -35,7 +35,6 @@ DEALINGS IN THE SOFTWARE.
 
 #include <cassert>
 #include <iterator>
-#include <stdexcept>
 
 #include <osmium/osm/diff_object.hpp>
 

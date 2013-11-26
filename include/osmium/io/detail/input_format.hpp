@@ -33,18 +33,16 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <cassert>
 #include <functional>
-#include <iterator>
 #include <map>
 #include <memory>
+#include <stdexcept>
 #include <string>
 #include <utility>
 
 #include <osmium/io/file.hpp>
 #include <osmium/io/header.hpp>
 #include <osmium/memory/buffer.hpp>
-#include <osmium/osm/object.hpp>
 #include <osmium/osm/entity_flags.hpp>
 #include <osmium/thread/queue.hpp>
 

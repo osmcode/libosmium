@@ -36,13 +36,15 @@ DEALINGS IN THE SOFTWARE.
 #include <stdexcept>
 #include <type_traits>
 
-#include <osmium/osm.hpp>
-#include <osmium/memory/buffer.hpp>
-#include <osmium/io/input_iterator.hpp>
-#include <osmium/osm/diff_object.hpp>
 #include <osmium/diff_iterator.hpp>
+#include <osmium/io/input_iterator.hpp>
+#include <osmium/memory/buffer.hpp>
+#include <osmium/osm/diff_object.hpp>
+#include <osmium/osm/item_type.hpp>
 
 namespace osmium {
+
+    class Object;
 
     namespace diff_handler {
         class DiffHandler;

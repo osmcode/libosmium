@@ -33,12 +33,13 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <cstdlib>
+#include <cerrno>
+#include <cstddef>
+#include <stdexcept>
 #include <system_error>
 
 #include <sys/mman.h>
 #include <sys/stat.h>
-#include <sys/types.h>
 #include <unistd.h>
 
 // for bsd systems

@@ -33,8 +33,10 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <chrono>
 #include <future>
 #include <thread>
+#include <utility>
 
 namespace osmium {
 

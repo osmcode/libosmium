@@ -34,6 +34,7 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <algorithm>
+#include <cstddef>
 #include <stdexcept>
 #include <utility>
 

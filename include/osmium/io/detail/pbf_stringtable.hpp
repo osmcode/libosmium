@@ -34,7 +34,7 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <algorithm>
-#include <iostream>
+#include <iterator>
 #include <map>
 #include <stdint.h>
 #include <string>

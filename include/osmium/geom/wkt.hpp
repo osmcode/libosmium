@@ -37,6 +37,7 @@ DEALINGS IN THE SOFTWARE.
 #include <iterator>
 #include <string>
 
+#include <osmium/osm/location.hpp>
 #include <osmium/geom/factory.hpp>
 
 namespace osmium {

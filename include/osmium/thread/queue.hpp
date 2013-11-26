@@ -33,7 +33,9 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <chrono>
 #include <condition_variable>
+#include <cstddef>
 #include <mutex>
 #include <queue>
 #include <utility>

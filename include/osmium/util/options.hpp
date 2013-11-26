@@ -36,6 +36,7 @@ DEALINGS IN THE SOFTWARE.
 #include <initializer_list>
 #include <map>
 #include <string>
+#include <utility>
 
 namespace osmium {
 

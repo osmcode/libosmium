@@ -36,22 +36,24 @@ DEALINGS IN THE SOFTWARE.
 
 #include <algorithm>
 #include <atomic>
+#include <cassert>
 #include <chrono>
+#include <cstddef>
+#include <cstdint>
+#include <future>
+#include <memory>
 #include <sstream>
 #include <stdexcept>
 #include <string>
 #include <thread>
-#include <utility>
-#include <vector>
 
 #include <osmium/io/detail/input_format.hpp>
-#include <osmium/io/detail/read_write.hpp>
-#include <osmium/io/detail/zlib.hpp>
 #include <osmium/io/detail/pbf.hpp>
+#include <osmium/io/detail/zlib.hpp>
 #include <osmium/osm/builder.hpp>
-#include <osmium/thread/pool.hpp>
 #include <osmium/thread/debug.hpp>
-#include <osmium/thread/sorted_queue.hpp>
+#include <osmium/thread/pool.hpp>
+#include <osmium/thread/queue.hpp>
 
 namespace osmium {
 

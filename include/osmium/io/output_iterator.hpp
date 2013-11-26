@@ -33,14 +33,18 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <cstddef>
 #include <iterator>
 #include <memory>
 
 #include <osmium/memory/buffer.hpp>
-#include <osmium/memory/item.hpp>
 #include <osmium/osm/diff_object.hpp>
 
 namespace osmium {
+
+    namespace memory {
+        class Item;
+    } // namespace memory
 
     namespace io {
 

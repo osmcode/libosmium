@@ -34,7 +34,6 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <initializer_list>
-#include <string>
 #include <vector>
 
 #include <osmium/osm/bbox.hpp>

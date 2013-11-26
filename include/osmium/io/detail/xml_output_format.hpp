@@ -36,8 +36,19 @@ DEALINGS IN THE SOFTWARE.
 #define __STDC_FORMAT_MACROS
 #include <inttypes.h>
 
+#include <chrono>
+#include <cstddef>
+#include <cstdio>
+#include <future>
+#include <iterator>
+#include <memory>
+#include <string>
+#include <thread>
+
+#include <osmium/handler.hpp>
 #include <osmium/io/detail/output_format.hpp>
 #include <osmium/thread/pool.hpp>
+#include <osmium/visitor.hpp>
 
 namespace osmium {
 

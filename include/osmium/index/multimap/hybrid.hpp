@@ -33,8 +33,10 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <cstddef>
 #include <utility>
 
+#include <osmium/index/multimap.hpp>
 #include <osmium/index/multimap/stl_vector.hpp>
 #include <osmium/index/multimap/stl_multimap.hpp>
 

@@ -34,9 +34,10 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <atomic>
+#include <cstddef>
 #include <future>
 #include <thread>
-#include <utility>
+#include <type_traits>
 #include <vector>
 
 #include <osmium/thread/queue.hpp>

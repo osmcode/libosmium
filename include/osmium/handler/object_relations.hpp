@@ -34,8 +34,11 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <osmium/handler.hpp>
-#include <osmium/io/detail/read_write.hpp>
 #include <osmium/index/multimap.hpp>
+#include <osmium/osm/item_type.hpp>
+#include <osmium/osm/relation.hpp>
+#include <osmium/osm/types.hpp>
+#include <osmium/osm/way.hpp>
 
 namespace osmium {
 

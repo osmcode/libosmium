@@ -33,8 +33,6 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <ostream>
-
 #include <osmium/osm/location.hpp>
 
 namespace osmium {

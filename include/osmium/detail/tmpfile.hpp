@@ -33,7 +33,8 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <cstdlib>
+#include <cerrno>
+#include <cstdio>
 #include <system_error>
 
 namespace osmium {

@@ -33,12 +33,12 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <osmium/io/compression.hpp>
-#include <osmium/io/gzip_compression.hpp>
-#include <osmium/io/bzip2_compression.hpp>
+#include <osmium/io/compression.hpp> // IWYU pragma: export
+#include <osmium/io/gzip_compression.hpp> // IWYU pragma: export
+#include <osmium/io/bzip2_compression.hpp> // IWYU pragma: export
 
-#include <osmium/io/opl_output.hpp>
-#include <osmium/io/pbf_output.hpp>
-#include <osmium/io/xml_output.hpp>
+#include <osmium/io/opl_output.hpp> // IWYU pragma: export
+#include <osmium/io/pbf_output.hpp> // IWYU pragma: export
+#include <osmium/io/xml_output.hpp> // IWYU pragma: export
 
 #endif // OSMIUM_IO_ANY_OUTPUT_HPP

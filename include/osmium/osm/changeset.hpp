@@ -33,10 +33,16 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <cstdint>
+#include <cstring>
+
 #include <boost/operators.hpp>
 
+#include <osmium/memory/collection.hpp>
+#include <osmium/memory/item.hpp>
 #include <osmium/osm/bbox.hpp>
 #include <osmium/osm/entity.hpp>
+#include <osmium/osm/item_type.hpp>
 #include <osmium/osm/tag.hpp>
 #include <osmium/osm/timestamp.hpp>
 #include <osmium/osm/types.hpp>

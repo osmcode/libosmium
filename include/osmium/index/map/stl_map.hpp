@@ -33,6 +33,9 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <algorithm>
+#include <cstddef>
+#include <iterator>
 #include <map>
 #include <vector>
 

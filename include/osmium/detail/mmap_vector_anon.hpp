@@ -35,6 +35,9 @@ DEALINGS IN THE SOFTWARE.
 
 #ifdef __linux__
 
+#include <cstddef>
+
+#include <osmium/detail/typed_mmap.hpp>
 #include <osmium/detail/mmap_vector_base.hpp>
 
 namespace osmium {

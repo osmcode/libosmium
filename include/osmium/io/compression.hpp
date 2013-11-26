@@ -33,11 +33,14 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <cerrno>
 #include <functional>
 #include <map>
 #include <memory>
+#include <stdexcept>
 #include <string>
 #include <system_error>
+#include <unistd.h>
 #include <utility>
 
 #include <osmium/io/detail/read_write.hpp>

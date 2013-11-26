@@ -33,10 +33,7 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <stdexcept>
-
 #include <osmium/osm/diff_object.hpp>
-#include <osmium/diff_visitor.hpp>
 
 namespace osmium {
 

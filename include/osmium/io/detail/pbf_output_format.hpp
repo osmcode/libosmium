@@ -96,14 +96,20 @@ More complete outlines of real .osm.pbf files can be created using the osmpbf-ou
 */
 
 #include <algorithm>
+#include <chrono>
 #include <cmath>
+#include <cstdint>
 #include <cstdlib>
 #include <memory>
+#include <string>
+#include <time.h>
 
+#include <osmium/handler.hpp>
 #include <osmium/io/detail/output_format.hpp>
 #include <osmium/io/detail/pbf.hpp>
 #include <osmium/io/detail/pbf_stringtable.hpp>
 #include <osmium/io/detail/zlib.hpp>
+#include <osmium/visitor.hpp>
 
 namespace osmium {
 

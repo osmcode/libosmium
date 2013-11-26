@@ -33,6 +33,7 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <cstdint>
 #include <ctime>
 #include <stdexcept>
 #include <string>

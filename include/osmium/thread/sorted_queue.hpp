@@ -34,6 +34,7 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <condition_variable>
+#include <cstddef>
 #include <deque>
 #include <mutex>
 

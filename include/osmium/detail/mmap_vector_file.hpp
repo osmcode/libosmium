@@ -33,6 +33,9 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <cstddef>
+
+#include <osmium/detail/typed_mmap.hpp>
 #include <osmium/detail/mmap_vector_base.hpp>
 #include <osmium/detail/tmpfile.hpp>
 

@@ -33,9 +33,12 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <cstddef>
+#include <cstdint>
 #include <cstring>
 #include <string>
 
+#include <osmium/osm/location.hpp>
 #include <osmium/geom/factory.hpp>
 
 namespace osmium {
@@ -130,7 +133,7 @@ namespace osmium {
                 }
             }
 
-            point_type make_point(const Location location) {
+            point_type make_point(const osmium::Location location) {
                 std::string data;
                 header(data, wkbPoint);
                 str_push(data, location.lon());
@@ -150,7 +153,7 @@ namespace osmium {
                 str_push(m_data, static_cast<uint32_t>(0));
             }
 
-            void linestring_add_location(const Location location) {
+            void linestring_add_location(const osmium::Location location) {
                 str_push(m_data, location.lon());
                 str_push(m_data, location.lat());
                 ++m_points;

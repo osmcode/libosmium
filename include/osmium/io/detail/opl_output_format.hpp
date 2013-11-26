@@ -36,15 +36,22 @@ DEALINGS IN THE SOFTWARE.
 #define __STDC_FORMAT_MACROS
 #include <inttypes.h>
 
+#include <chrono>
+#include <cstddef>
+#include <cstdint>
 #include <cstdio>
+#include <future>
+#include <memory>
+#include <string>
+#include <thread>
 
 // UTF8-CPP header-only library
 #include <utf8/unchecked.h>
 
 #include <osmium/io/detail/output_format.hpp>
-#include <osmium/io/detail/read_write.hpp>
 #include <osmium/handler.hpp>
 #include <osmium/thread/pool.hpp>
+#include <osmium/visitor.hpp>
 
 namespace osmium {
 
