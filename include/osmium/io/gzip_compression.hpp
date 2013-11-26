@@ -35,9 +35,13 @@ DEALINGS IN THE SOFTWARE.
 
 #define OSMIUM_LINK_WITH_LIBS_ZLIB -lz
 
+#include <stdexcept>
+#include <string>
+
 #include <zlib.h>
 
 #include <osmium/io/compression.hpp>
+#include <osmium/io/file_compression.hpp>
 
 namespace osmium {
 

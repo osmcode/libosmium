@@ -33,13 +33,16 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#define OSMIUM_LINK_WITH_LIBS_ZLIB -lbz2
+#define OSMIUM_LINK_WITH_LIBS_BZ2LIB -lbz2
 
 #include <cstdio>
+#include <stdexcept>
+#include <string>
 
 #include <bzlib.h>
 
 #include <osmium/io/compression.hpp>
+#include <osmium/io/file_compression.hpp>
 
 namespace osmium {
 

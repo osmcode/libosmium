@@ -1,5 +1,5 @@
-#ifndef OSMIUM_IO_ANY_OUTPUT_HPP
-#define OSMIUM_IO_ANY_OUTPUT_HPP
+#ifndef OSMIUM_IO_ANY_COMPRESSION_HPP
+#define OSMIUM_IO_ANY_COMPRESSION_HPP
 
 /*
 
@@ -33,10 +33,7 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <osmium/io/any_compression.hpp> // IWYU pragma: export
+#include <osmium/io/bzip2_compression.hpp> // IWYU pragma: export
+#include <osmium/io/gzip_compression.hpp> // IWYU pragma: export
 
-#include <osmium/io/opl_output.hpp> // IWYU pragma: export
-#include <osmium/io/pbf_output.hpp> // IWYU pragma: export
-#include <osmium/io/xml_output.hpp> // IWYU pragma: export
-
-#endif // OSMIUM_IO_ANY_OUTPUT_HPP
+#endif // OSMIUM_IO_ANY_COMPRESSION_HPP

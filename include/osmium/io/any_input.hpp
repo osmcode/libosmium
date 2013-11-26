@@ -33,9 +33,7 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <osmium/io/compression.hpp> // IWYU pragma: export
-#include <osmium/io/gzip_compression.hpp> // IWYU pragma: export
-#include <osmium/io/bzip2_compression.hpp> // IWYU pragma: export
+#include <osmium/io/any_compression.hpp> // IWYU pragma: export
 
 #include <osmium/io/pbf_input.hpp> // IWYU pragma: export
 #include <osmium/io/xml_input.hpp> // IWYU pragma: export
