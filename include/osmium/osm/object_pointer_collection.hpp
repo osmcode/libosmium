@@ -33,11 +33,16 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <algorithm>
 #include <vector>
 
 #include <boost/iterator/indirect_iterator.hpp>
 
-#include <osmium/osm/object_comparisons.hpp>
+#include <osmium/memory/item.hpp>
+#include <osmium/osm/object.hpp>
+
+// IWYU pragma: no_forward_declare osmium::Object
+// IWYU pragma: no_forward_declare osmium::memory::Item
 
 namespace osmium {
 

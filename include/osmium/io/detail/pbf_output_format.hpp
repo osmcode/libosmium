@@ -109,6 +109,11 @@ More complete outlines of real .osm.pbf files can be created using the osmpbf-ou
 #include <osmium/io/detail/pbf.hpp>
 #include <osmium/io/detail/pbf_stringtable.hpp>
 #include <osmium/io/detail/zlib.hpp>
+#include <osmium/osm/item_type.hpp>
+#include <osmium/osm/node.hpp>
+#include <osmium/osm/object.hpp>
+#include <osmium/osm/relation.hpp>
+#include <osmium/osm/way.hpp>
 #include <osmium/visitor.hpp>
 
 namespace osmium {

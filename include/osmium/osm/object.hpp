@@ -33,22 +33,24 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <cstddef>
 #include <cstdint>
 #include <cstdlib>
+#include <cstring>
+#include <stdexcept>
 
 #include <boost/operators.hpp>
 
+#include <osmium/memory/collection.hpp>
+#include <osmium/memory/item.hpp>
 #include <osmium/osm/entity.hpp>
+#include <osmium/osm/item_type.hpp>
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/tag.hpp>
 #include <osmium/osm/timestamp.hpp>
 #include <osmium/osm/types.hpp>
 
 namespace osmium {
-
-    namespace memory {
-        template <class T> class ObjectBuilder;
-    }
 
     /**
      * OSM Object (Node, Way, or Relation).

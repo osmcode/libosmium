@@ -35,6 +35,12 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/memory/builder.hpp>
 #include <osmium/osm.hpp>
+#include <osmium/osm/entity.hpp>
+#include <osmium/osm/item_type.hpp>
+#include <osmium/osm/location.hpp>
+#include <osmium/osm/object.hpp>
+#include <osmium/osm/tag.hpp>
+#include <osmium/osm/types.hpp>
 
 namespace osmium {
 
@@ -94,7 +100,7 @@ namespace osmium {
                 add_size(sizeof(osmium::WayNode));
             }
 
-            void add_way_node(const object_id_type ref, const Location location=Location()) {
+            void add_way_node(const object_id_type ref, const osmium::Location location=Location()) {
                 add_way_node(WayNode(ref, location));
             }
 

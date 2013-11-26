@@ -41,12 +41,16 @@ DEALINGS IN THE SOFTWARE.
 #include <utility>
 
 #include <osmium/io/file.hpp>
+#include <osmium/io/file_format.hpp>
 #include <osmium/io/header.hpp>
 #include <osmium/memory/buffer.hpp>
 #include <osmium/osm/entity_flags.hpp>
-#include <osmium/thread/queue.hpp>
 
 namespace osmium {
+
+    namespace thread {
+        template <typename T> class Queue;
+    } // namespace thread
 
     namespace io {
 

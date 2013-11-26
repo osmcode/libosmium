@@ -85,8 +85,12 @@ test:
 
 iwyu:
 	for FILE in $(INCLUDE_FILES); do \
-	    echo "\n=== $${FILE} ========================================================="; \
-	    iwyu --std=c++11 $${FILE}; \
+	    flags=`./get_options.sh --cflags $${FILE}`; \
+	    eval eflags=$${flags}; \
+	    cmdline="iwyu $(CXXFLAGS) $(WARNINGFLAGS) -I include $${eflags} $${FILE}"; \
+	    echo "\n======== $${FILE} ========================================================="; \
+	    echo "$${cmdline}"; \
+	    $${cmdline}; \
 	done;
 
 indent:

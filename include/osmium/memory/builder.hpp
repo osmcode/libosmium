@@ -34,10 +34,13 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <cassert>
+#include <cstddef>
+#include <cstdint>
 #include <cstring>
 #include <new>
 
 #include <osmium/memory/buffer.hpp>
+#include <osmium/memory/item.hpp>
 
 namespace osmium {
 

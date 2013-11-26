@@ -35,6 +35,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <iterator>
 #include <ostream>
+#include <type_traits>
 
 #include <osmium/memory/item.hpp>
 

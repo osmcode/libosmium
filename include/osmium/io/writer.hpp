@@ -33,8 +33,10 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <future>
 #include <memory>
 #include <string>
+#include <utility>
 
 #include <osmium/io/compression.hpp>
 #include <osmium/io/detail/output_format.hpp>

@@ -34,10 +34,21 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <cassert>
+#include <cstddef>
+#include <cstdlib>
 
+#include <osmium/memory/collection.hpp>
+#include <osmium/memory/item.hpp>
+#include <osmium/osm/item_type.hpp>
+#include <osmium/osm/location.hpp>
 #include <osmium/osm/object.hpp>
+#include <osmium/osm/types.hpp>
 
 namespace osmium {
+
+    namespace memory {
+        template <class T> class ObjectBuilder;
+    }
 
     class WayNode : public osmium::memory::detail::ItemHelper {
 

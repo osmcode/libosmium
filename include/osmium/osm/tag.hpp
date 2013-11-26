@@ -34,9 +34,12 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <algorithm>
+#include <cstddef>
 #include <cstring>
+#include <iterator>
 
 #include <osmium/memory/collection.hpp>
+#include <osmium/memory/item.hpp>
 #include <osmium/osm/item_type.hpp>
 
 namespace osmium {

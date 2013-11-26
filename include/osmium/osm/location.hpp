@@ -36,6 +36,7 @@ DEALINGS IN THE SOFTWARE.
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
+#include <cstdio>
 #include <limits>
 
 #include <boost/operators.hpp>

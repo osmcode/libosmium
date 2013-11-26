@@ -33,11 +33,16 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <osmium/osm/node.hpp>
-#include <osmium/osm/way.hpp>
-#include <osmium/osm/relation.hpp>
+#include <osmium/osm/item_type.hpp>
+#include <osmium/osm/object.hpp>
+#include <osmium/osm/timestamp.hpp>
+#include <osmium/osm/types.hpp>
 
 namespace osmium {
+
+    class Node;
+    class Way;
+    class Relation;
 
     class DiffObject {
 

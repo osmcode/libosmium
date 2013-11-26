@@ -36,11 +36,14 @@ DEALINGS IN THE SOFTWARE.
 #define OSMIUM_COMPILE_WITH_CFLAGS_OGR `gdal-config --cflags`
 #define OSMIUM_LINK_WITH_LIBS_OGR `gdal-config --libs`
 
+#include <cassert>
 #include <memory>
+#include <utility>
 
 #include <ogr_geometry.h>
 
 #include <osmium/geom/factory.hpp>
+#include <osmium/osm/location.hpp>
 
 namespace osmium {
 

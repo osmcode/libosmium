@@ -33,17 +33,27 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <cstddef>
+#include <cstdint>
+#include <cstdlib>
 #include <iterator>
 
+#include <osmium/memory/collection.hpp>
+#include <osmium/memory/item.hpp>
+#include <osmium/osm/entity.hpp>
+#include <osmium/osm/item_type.hpp>
 #include <osmium/osm/object.hpp>
+#include <osmium/osm/types.hpp>
 
 namespace osmium {
 
+    namespace memory {
+        template <class T> class ObjectBuilder;
+    }
+
     namespace osm {
-
         class RelationMemberListBuilder;
-
-    } // namespace osm
+    }
 
     class RelationMember : public osmium::memory::detail::ItemHelper {
 

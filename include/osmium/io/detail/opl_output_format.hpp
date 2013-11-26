@@ -41,15 +41,26 @@ DEALINGS IN THE SOFTWARE.
 #include <cstdint>
 #include <cstdio>
 #include <future>
+#include <iterator>
 #include <memory>
 #include <string>
 #include <thread>
+#include <utility>
 
 // UTF8-CPP header-only library
 #include <utf8/unchecked.h>
 
-#include <osmium/io/detail/output_format.hpp>
 #include <osmium/handler.hpp>
+#include <osmium/io/detail/output_format.hpp>
+#include <osmium/io/file_format.hpp>
+#include <osmium/memory/buffer.hpp>
+#include <osmium/osm/bbox.hpp>
+#include <osmium/osm/changeset.hpp>
+#include <osmium/osm/item_type.hpp>
+#include <osmium/osm/node.hpp>
+#include <osmium/osm/relation.hpp>
+#include <osmium/osm/tag.hpp>
+#include <osmium/osm/way.hpp>
 #include <osmium/thread/pool.hpp>
 #include <osmium/visitor.hpp>
 

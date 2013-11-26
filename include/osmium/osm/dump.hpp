@@ -33,13 +33,21 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <algorithm>
 #include <iomanip>
 #include <iostream>
 #include <string>
 
-#include <osmium/osm/types.hpp>
+#include <osmium/memory/collection.hpp>
+#include <osmium/memory/item.hpp>
+#include <osmium/osm/changeset.hpp>
+#include <osmium/osm/location.hpp>
+#include <osmium/osm/node.hpp>
+#include <osmium/osm/object.hpp>
 #include <osmium/osm/ostream.hpp>
+#include <osmium/osm/relation.hpp>
+#include <osmium/osm/tag.hpp>
+#include <osmium/osm/timestamp.hpp>
+#include <osmium/osm/way.hpp>
 #include <osmium/visitor.hpp>
 
 namespace osmium {

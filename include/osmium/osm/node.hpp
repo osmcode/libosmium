@@ -33,9 +33,15 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <osmium/osm/item_type.hpp>
+#include <osmium/osm/location.hpp>
 #include <osmium/osm/object.hpp>
 
 namespace osmium {
+
+    namespace memory {
+        template <class T> class ObjectBuilder;
+    }
 
     class Node : public Object {
 
