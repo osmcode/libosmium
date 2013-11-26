@@ -156,15 +156,15 @@ namespace osmium {
 
                         if (node.visible()) {
                             node.location(osmium::Location(
-                                        (pbf_node.lon() * m_granularity + m_lon_offset) / (OSMPBF::lonlat_resolution / osmium::Location::coordinate_precision),
-                                        (pbf_node.lat() * m_granularity + m_lat_offset) / (OSMPBF::lonlat_resolution / osmium::Location::coordinate_precision)));
+                                              (pbf_node.lon() * m_granularity + m_lon_offset) / (OSMPBF::lonlat_resolution / osmium::Location::coordinate_precision),
+                                              (pbf_node.lat() * m_granularity + m_lat_offset) / (OSMPBF::lonlat_resolution / osmium::Location::coordinate_precision)));
                         }
 
                         if (pbf_node.keys_size() > 0) {
                             osmium::osm::TagListBuilder tl_builder(m_buffer, &builder);
                             for (int tag=0; tag < pbf_node.keys_size(); ++tag) {
                                 tl_builder.add_tag(m_stringtable->s(pbf_node.keys(tag)).data(),
-                                                m_stringtable->s(pbf_node.vals(tag)).data());
+                                                   m_stringtable->s(pbf_node.vals(tag)).data());
                             }
                         }
 
@@ -208,7 +208,7 @@ namespace osmium {
                             osmium::osm::TagListBuilder tl_builder(m_buffer, &builder);
                             for (int tag=0; tag < pbf_way.keys_size(); ++tag) {
                                 tl_builder.add_tag(m_stringtable->s(pbf_way.keys(tag)).data(),
-                                                m_stringtable->s(pbf_way.vals(tag)).data());
+                                                   m_stringtable->s(pbf_way.vals(tag)).data());
                             }
                         }
 
@@ -252,7 +252,7 @@ namespace osmium {
                             osmium::osm::TagListBuilder tl_builder(m_buffer, &builder);
                             for (int tag=0; tag < pbf_relation.keys_size(); ++tag) {
                                 tl_builder.add_tag(m_stringtable->s(pbf_relation.keys(tag)).data(),
-                                                m_stringtable->s(pbf_relation.vals(tag)).data());
+                                                   m_stringtable->s(pbf_relation.vals(tag)).data());
                             }
                         }
 
@@ -279,7 +279,7 @@ namespace osmium {
                         }
 
                         tl_builder.add_tag(m_stringtable->s(tag_key_pos).data(),
-                                        m_stringtable->s(dense.keys_vals(n)).data());
+                                           m_stringtable->s(dense.keys_vals(n)).data());
 
                         ++n;
                     }
@@ -334,8 +334,8 @@ namespace osmium {
 
                         if (node.visible()) {
                             node.location(osmium::Location(
-                                        (last_dense_longitude * m_granularity + m_lon_offset) / (OSMPBF::lonlat_resolution / osmium::Location::coordinate_precision),
-                                        (last_dense_latitude  * m_granularity + m_lat_offset) / (OSMPBF::lonlat_resolution / osmium::Location::coordinate_precision)));
+                                              (last_dense_longitude * m_granularity + m_lon_offset) / (OSMPBF::lonlat_resolution / osmium::Location::coordinate_precision),
+                                              (last_dense_latitude  * m_granularity + m_lat_offset) / (OSMPBF::lonlat_resolution / osmium::Location::coordinate_precision)));
                         }
 
                         last_dense_tag = add_tags(dense, last_dense_tag, &builder);

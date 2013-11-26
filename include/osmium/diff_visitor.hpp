@@ -175,8 +175,8 @@ namespace osmium {
 
     template <class TSource, class ...TVisitors>
     inline void apply_diff(TSource& source, TVisitors&... visitors) {
-        apply_diff(osmium::io::InputIterator<TSource, osmium::Object>{source},
-                   osmium::io::InputIterator<TSource, osmium::Object>{},
+        apply_diff(osmium::io::InputIterator<TSource, osmium::Object> {source},
+                   osmium::io::InputIterator<TSource, osmium::Object> {},
                    visitors...);
     }
 

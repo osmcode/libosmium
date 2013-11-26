@@ -58,9 +58,9 @@ namespace osmium {
                 std::string output(output_size, '\0');
 
                 if (::compress(reinterpret_cast<unsigned char*>(const_cast<char *>(output.data())),
-                    &output_size,
-                    reinterpret_cast<const unsigned char*>(input.data()),
-                    input.size()) != Z_OK) {
+                               &output_size,
+                               reinterpret_cast<const unsigned char*>(input.data()),
+                               input.size()) != Z_OK) {
                     throw std::runtime_error("failed to compress data");
                 }
 
@@ -80,9 +80,9 @@ namespace osmium {
                 std::string output(raw_size, '\0');
 
                 if (::uncompress(reinterpret_cast<unsigned char*>(const_cast<char *>(output.data())),
-                    &raw_size,
-                    reinterpret_cast<const unsigned char*>(input.data()),
-                    input.size()) != Z_OK) {
+                                 &raw_size,
+                                 reinterpret_cast<const unsigned char*>(input.data()),
+                                 input.size()) != Z_OK) {
                     throw std::runtime_error("failed to uncompress data");
                 }
 

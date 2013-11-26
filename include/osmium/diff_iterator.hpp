@@ -112,7 +112,7 @@ namespace osmium {
             set_diff();
             return m_diff;
         }
-        
+
         pointer operator->() const {
             set_diff();
             return &m_diff;

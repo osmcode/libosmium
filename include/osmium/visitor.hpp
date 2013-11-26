@@ -235,8 +235,8 @@ namespace osmium {
 
     template <class TSource, class ...TVisitors>
     inline void apply(TSource& source, TVisitors&... visitors) {
-        apply(osmium::io::InputIterator<TSource>{source},
-              osmium::io::InputIterator<TSource>{},
+        apply(osmium::io::InputIterator<TSource> {source},
+              osmium::io::InputIterator<TSource> {},
               visitors...);
     }
 

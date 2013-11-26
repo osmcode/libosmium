@@ -544,7 +544,7 @@ namespace osmium {
                     } else if (primitive_block_size > (static_cast<uint32_t>(OSMPBF::max_uncompressed_blob_size) * buffer_fill_percent / 100)) {
                         if (debug && has_debug_level(1)) {
                             std::cerr << "storing primitive_block with only " << primitive_block_contents << " items, because its ByteSize (" << primitive_block_size << ") reached " <<
-                                    (static_cast<float>(primitive_block_size) / static_cast<float>(OSMPBF::max_uncompressed_blob_size) * 100.0) << "% of the maximum blob-size" << std::endl;
+                                      (static_cast<float>(primitive_block_size) / static_cast<float>(OSMPBF::max_uncompressed_blob_size) * 100.0) << "% of the maximum blob-size" << std::endl;
                         }
 
                         store_primitive_block();
