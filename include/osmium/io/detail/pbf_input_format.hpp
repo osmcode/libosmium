@@ -153,6 +153,7 @@ namespace osmium {
 
                         const OSMPBF::Node& pbf_node = group.nodes(i);
                         node.id(pbf_node.id());
+                        node.visible(true);
 
                         if (pbf_node.has_info()) {
                             node.version(pbf_node.info().version())
@@ -161,16 +162,16 @@ namespace osmium {
                             .uid_from_signed(pbf_node.info().uid());
                             if (pbf_node.info().has_visible()) {
                                 node.visible(pbf_node.info().visible());
-                            } else {
-                                node.visible(true);
                             }
                             builder.add_user(m_stringtable->s(pbf_node.info().user_sid()).data());
                         } else {
                             builder.add_user("");
                         }
 
-                        if (node.visible()) {
-                            node.location(osmium::Location(
+                        // calling builder.add_user possibly invalidates 'node' reference!
+
+                        if (builder.object().visible()) {
+                            builder.object().location(osmium::Location(
                                               (pbf_node.lon() * m_granularity + m_lon_offset) / (OSMPBF::lonlat_resolution / osmium::Location::coordinate_precision),
                                               (pbf_node.lat() * m_granularity + m_lat_offset) / (OSMPBF::lonlat_resolution / osmium::Location::coordinate_precision)));
                         }
