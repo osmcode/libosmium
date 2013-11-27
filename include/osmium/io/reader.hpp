@@ -55,7 +55,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/memory/buffer.hpp>
 #include <osmium/osm/entity_flags.hpp>
 #include <osmium/thread/checked_task.hpp>
-#include <osmium/thread/debug.hpp>
+#include <osmium/thread/name.hpp>
 #include <osmium/thread/queue.hpp>
 
 namespace osmium {

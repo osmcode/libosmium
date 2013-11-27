@@ -1,5 +1,5 @@
-#ifndef OSMIUM_THREAD_DEBUG_HPP
-#define OSMIUM_THREAD_DEBUG_HPP
+#ifndef OSMIUM_THREAD_NAME_HPP
+#define OSMIUM_THREAD_NAME_HPP
 
 /*
 
@@ -58,4 +58,4 @@ namespace osmium {
 
 } // namespace osmium
 
-#endif //  OSMIUM_THREAD_DEBUG_HPP
+#endif //  OSMIUM_THREAD_NAME_HPP

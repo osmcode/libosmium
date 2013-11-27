@@ -62,7 +62,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/object.hpp>
 #include <osmium/osm/timestamp.hpp>
-#include <osmium/thread/debug.hpp>
+#include <osmium/thread/name.hpp>
 #include <osmium/thread/pool.hpp>
 #include <osmium/thread/queue.hpp>
 

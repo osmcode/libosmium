@@ -43,7 +43,7 @@ DEALINGS IN THE SOFTWARE.
 #include <vector>
 
 #include <osmium/thread/queue.hpp>
-#include <osmium/thread/debug.hpp>
+#include <osmium/thread/name.hpp>
 #include <osmium/thread/function_wrapper.hpp>
 
 namespace osmium {
