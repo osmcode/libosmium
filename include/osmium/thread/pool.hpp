@@ -33,8 +33,10 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <algorithm>
 #include <atomic>
 #include <cstddef>
+#include <cstdlib>
 #include <future>
 #include <thread>
 #include <type_traits>
@@ -94,12 +96,37 @@ namespace osmium {
                 }
             }
 
+            /**
+             * Create thread pool with the given number of threads. If
+             * num_threads is 0, the number of threads is read from
+             * the environment variable OSMIUM_POOL_THREADS. The default
+             * value in that case is -2.
+             *
+             * If the number of threads is a negative number, it will be
+             * set to the actual number of cores on the system plus the
+             * given number, ie it will leave a number of cores unused.
+             *
+             * In all cases the minimum number of threads in the pool is 1.
+             */
             Pool(int num_threads) :
                 m_done(false),
                 m_work_queue(),
                 m_threads(),
                 m_joiner(m_threads),
                 m_num_threads(num_threads) {
+
+                if (m_num_threads == 0) {
+                    const char* env_threads = getenv("OSMIUM_POOL_THREADS");
+                    if (env_threads) {
+                        m_num_threads = atoi(env_threads);
+                    } else {
+                        m_num_threads = -2;
+                    }
+                }
+
+                if (m_num_threads <= 0) {
+                    m_num_threads = std::max(1, static_cast<int>(std::thread::hardware_concurrency()) + m_num_threads);
+                }
 
                 try {
                     for (int i=0; i < m_num_threads; ++i) {
@@ -113,7 +140,7 @@ namespace osmium {
 
         public:
 
-            static const int default_num_threads = 2; //std::thread::hardware_concurrency();
+            static const int default_num_threads = 0;
 
             static Pool& instance() {
                 static Pool pool(default_num_threads);
