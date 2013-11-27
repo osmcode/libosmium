@@ -40,6 +40,9 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/io/compression.hpp>
 #include <osmium/io/detail/output_format.hpp>
+#include <osmium/io/detail/read_write.hpp>
+#include <osmium/io/file.hpp>
+#include <osmium/io/header.hpp>
 #include <osmium/thread/checked_task.hpp>
 #include <osmium/thread/debug.hpp>
 

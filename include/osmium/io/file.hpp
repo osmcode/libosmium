@@ -34,9 +34,9 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <cstddef>
-#include <iostream>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>

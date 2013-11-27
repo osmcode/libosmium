@@ -40,17 +40,28 @@ DEALINGS IN THE SOFTWARE.
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
+#include <cstring>
 #include <future>
 #include <memory>
+#include <ratio>
 #include <sstream>
 #include <stdexcept>
 #include <string>
 #include <thread>
 
 #include <osmium/io/detail/input_format.hpp>
-#include <osmium/io/detail/pbf.hpp>
+#include <osmium/io/detail/pbf.hpp> // IWYU pragma: export
 #include <osmium/io/detail/zlib.hpp>
+#include <osmium/io/file_format.hpp>
+#include <osmium/io/header.hpp>
+#include <osmium/memory/buffer.hpp>
+#include <osmium/osm.hpp>
+#include <osmium/osm/bbox.hpp>
 #include <osmium/osm/builder.hpp>
+#include <osmium/osm/entity_flags.hpp>
+#include <osmium/osm/location.hpp>
+#include <osmium/osm/object.hpp>
+#include <osmium/osm/timestamp.hpp>
 #include <osmium/thread/debug.hpp>
 #include <osmium/thread/pool.hpp>
 #include <osmium/thread/queue.hpp>
@@ -58,6 +69,8 @@ DEALINGS IN THE SOFTWARE.
 namespace osmium {
 
     namespace io {
+
+        class File;
 
         namespace detail {
 

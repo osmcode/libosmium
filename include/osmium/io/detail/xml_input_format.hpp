@@ -35,29 +35,46 @@ DEALINGS IN THE SOFTWARE.
 
 #define OSMIUM_LINK_WITH_LIBS_EXPAT -lexpat
 
+
 #include <atomic>
 #include <cassert>
 #include <chrono>
-#include <cstdio>
+#include <cstddef>
 #include <cstdlib>
 #include <cstring>
+#include <exception>
 #include <future>
 #include <iostream>
 #include <memory>
+#include <ratio>
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <thread>
 #include <utility>
 
 #include <expat.h>
 
 #include <osmium/io/detail/input_format.hpp>
+#include <osmium/io/file_format.hpp>
+#include <osmium/io/header.hpp>
+#include <osmium/memory/buffer.hpp>
+#include <osmium/memory/builder.hpp>
+#include <osmium/osm.hpp>
+#include <osmium/osm/bbox.hpp>
 #include <osmium/osm/builder.hpp>
+#include <osmium/osm/entity_flags.hpp>
+#include <osmium/osm/item_type.hpp>
+#include <osmium/osm/location.hpp>
+#include <osmium/osm/object.hpp>
+#include <osmium/osm/types.hpp>
 #include <osmium/thread/queue.hpp>
 
 namespace osmium {
 
     namespace io {
+
+        class File;
 
         namespace detail {
 

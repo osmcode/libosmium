@@ -39,14 +39,18 @@ DEALINGS IN THE SOFTWARE.
 #include <memory>
 #include <stdexcept>
 #include <string>
+#include <utility>
 
 #include <osmium/io/file.hpp>
 #include <osmium/io/file_format.hpp>
 #include <osmium/io/header.hpp>
-#include <osmium/memory/buffer.hpp>
 #include <osmium/thread/queue.hpp>
 
 namespace osmium {
+
+    namespace memory {
+        class Buffer;
+    }
 
     namespace io {
 

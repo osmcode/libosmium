@@ -87,7 +87,7 @@ iwyu:
 	for FILE in $(INCLUDE_FILES); do \
 	    flags=`./get_options.sh --cflags $${FILE}`; \
 	    eval eflags=$${flags}; \
-	    cmdline="iwyu $(CXXFLAGS) $(WARNINGFLAGS) -I include $${eflags} $${FILE}"; \
+	    cmdline="iwyu -Xiwyu --mapping_file=osmium.imp $(CXXFLAGS) $(WARNINGFLAGS) -I include $${eflags} $${FILE}"; \
 	    echo "\n======== $${FILE} ========================================================="; \
 	    echo "$${cmdline}"; \
 	    $${cmdline}; \

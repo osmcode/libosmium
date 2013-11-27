@@ -33,19 +33,27 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <functional>
-#include <future>
+#include <atomic>
+#include <cerrno>
+#include <chrono>
+#include <cstdlib>
+#include <fcntl.h>
 #include <memory>
+#include <ratio>
 #include <string>
+#include <sys/wait.h>
 #include <system_error>
 #include <thread>
-#include <utility>
-#include <sys/types.h>
-#include <sys/wait.h>
 #include <unistd.h>
+#include <utility>
 
 #include <osmium/io/compression.hpp>
 #include <osmium/io/detail/input_format.hpp>
+#include <osmium/io/detail/read_write.hpp>
+#include <osmium/io/file.hpp>
+#include <osmium/io/header.hpp>
+#include <osmium/memory/buffer.hpp>
+#include <osmium/osm/entity_flags.hpp>
 #include <osmium/thread/checked_task.hpp>
 #include <osmium/thread/debug.hpp>
 #include <osmium/thread/queue.hpp>

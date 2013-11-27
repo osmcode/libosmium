@@ -43,6 +43,7 @@ DEALINGS IN THE SOFTWARE.
 #include <future>
 #include <iterator>
 #include <memory>
+#include <ratio>
 #include <string>
 #include <thread>
 #include <utility>
@@ -54,12 +55,16 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/io/detail/output_format.hpp>
 #include <osmium/io/file_format.hpp>
 #include <osmium/memory/buffer.hpp>
+#include <osmium/memory/collection.hpp>
 #include <osmium/osm/bbox.hpp>
 #include <osmium/osm/changeset.hpp>
 #include <osmium/osm/item_type.hpp>
+#include <osmium/osm/location.hpp>
 #include <osmium/osm/node.hpp>
+#include <osmium/osm/object.hpp>
 #include <osmium/osm/relation.hpp>
 #include <osmium/osm/tag.hpp>
+#include <osmium/osm/timestamp.hpp>
 #include <osmium/osm/way.hpp>
 #include <osmium/thread/pool.hpp>
 #include <osmium/visitor.hpp>
@@ -67,6 +72,8 @@ DEALINGS IN THE SOFTWARE.
 namespace osmium {
 
     namespace io {
+
+        class File;
 
         namespace detail {
 

@@ -100,19 +100,33 @@ More complete outlines of real .osm.pbf files can be created using the osmpbf-ou
 #include <cmath>
 #include <cstdint>
 #include <cstdlib>
+#include <future>
+#include <iostream>
 #include <memory>
+#include <ratio>
 #include <string>
+#include <thread>
 #include <time.h>
+#include <utility>
 
 #include <osmium/handler.hpp>
 #include <osmium/io/detail/output_format.hpp>
-#include <osmium/io/detail/pbf.hpp>
+#include <osmium/io/detail/pbf.hpp> // IWYU pragma: export
 #include <osmium/io/detail/pbf_stringtable.hpp>
 #include <osmium/io/detail/zlib.hpp>
+#include <osmium/io/file.hpp>
+#include <osmium/io/file_format.hpp>
+#include <osmium/io/header.hpp>
+#include <osmium/memory/buffer.hpp>
+#include <osmium/memory/collection.hpp>
+#include <osmium/osm/bbox.hpp>
 #include <osmium/osm/item_type.hpp>
+#include <osmium/osm/location.hpp>
 #include <osmium/osm/node.hpp>
 #include <osmium/osm/object.hpp>
 #include <osmium/osm/relation.hpp>
+#include <osmium/osm/tag.hpp>
+#include <osmium/osm/timestamp.hpp>
 #include <osmium/osm/way.hpp>
 #include <osmium/visitor.hpp>
 
