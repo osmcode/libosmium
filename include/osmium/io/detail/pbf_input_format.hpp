@@ -680,9 +680,8 @@ namespace osmium {
                  * Returns an empty buffer at end of input.
                  */
                 osmium::memory::Buffer read() override {
-                    std::future<osmium::memory::Buffer> buffer_future;
-
                     if (!m_done || !m_queue.empty()) {
+                        std::future<osmium::memory::Buffer> buffer_future;
                         m_queue.wait_and_pop(buffer_future);
                         return std::move(buffer_future.get());
                     }
