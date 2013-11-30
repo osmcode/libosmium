@@ -8,7 +8,7 @@
  * This is the API documentation that was automatically created from the
  * source code.
  *
- * For more information about Osmium see http://osmcode.org/osmium .
+ * For more information about the Osmium Library see http://osmcode.org/libosmium .
  *
  * The source code is available at https://github.com/osmcode/libosmium .
  *
@@ -20,7 +20,6 @@
  * Everything in namespaces called "detail" is for internal Osmium use only,
  * do not depend on it in your code. Do not include any include files in
  * directories named "detail" directly.
- *
  *
  */
 

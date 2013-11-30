@@ -1,25 +1,21 @@
 
-NOTES FOR DEVELOPERS
-====================
+# Notes for Developers
 
 (Read this if you want to contribute to Osmium.)
 
 
-Versioning
-==========
+## Versioning
 
 Osmium is currently considered in beta and doesn't use versioning yet. Proper
 versions will be introduced as soon as it is somewhat stable.
 
 
-Namespace
-=========
+## Namespace
 
 All Osmium code MUST be in the "osmium" namespace or one of its sub-namespaces.
 
 
-Include-Only
-============
+## Include-Only
 
 Osmium is a include-only library. You can't compile the library itself. There
 is no libosmium.so.
@@ -30,8 +26,7 @@ is no place to put this data.
 All free functions must be declared "inline".
 
 
-Coding Conventions
-==================
+## Coding Conventions
 
 These coding conventions have been changing over time and some code is still
 different.
@@ -75,8 +70,7 @@ in the toplevel directory to fix indentation and styling. It calls "astyle"
 with the right parameters. This program is in the "astyle" Debian package.
 
 
-C++11
-=====
+## C++11
 
 Osmium uses C++11 and you can use its features such as auto, lambdas,
 threading, etc. There are a few features we do not use, because even modern
@@ -96,8 +90,7 @@ C++11 features you should not use:
   Studio)
 
 
-Checking your code
-==================
+## Checking your code
 
 The Osmium makefiles use pretty draconian warning options for the compiler.
 This is good. Code MUST never produce any warnings, even with those settings.
@@ -112,17 +105,20 @@ Use "make check-includes" to compile all include files on their own to
 check whether dependencies are all okay. All include files MUST include
 all other include files they depend on.
 
+Use "make iwyu" to check for proper includes and forward declarations. This
+uses the clang-based include-what-you-use program. Note that it does produce
+some false reports. The osmium.imp file can be used to define mappings for
+iwyu. See the IWYU tool at <http://code.google.com/p/include-what-you-use/>.
 
-Testing
-=======
+
+## Testing
 
 There are a unit tests using the Boost Unit Test Framework in the 'test'
 directory. Go there and type "./run_tests.sh" to compile and run the tests.
 Many more tests are needed.
 
 
-Documenting the code
-====================
+## Documenting the code
 
 All namespaces, classes, functions, attributes, etc. should be documented.
 

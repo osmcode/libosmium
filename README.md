@@ -1,16 +1,14 @@
-Osmium
-======
+# Osmium Library
 
 A fast and flexible C++ library for working with OpenStreetMap data.
 
 NOTE: This is an alpha version of the next-generation Osmium. For production
 use, see the Osmium version at https://github.com/joto/osmium .
 
-There are a few applications that use Osmium in the examples directory.
+There are a few applications that use the Osmium library in the examples directory.
 
 
-PREREQUISITES
--------------
+## Prerequisites
 
 Because Osmium uses many C++11 features you need a modern compiler and standard
 C++ library. Osmium needs at least GCC 4.7.3 or clang (LLVM) 3.2. (Some parts may
@@ -88,21 +86,19 @@ You need to either install the packages for your distribution or install those
 libraries from source. Most libraries should be available in all distributions.
 
 
-FILES
------
+## Files
 
-Doxyfile - Needed for building the Osmium C++ docs, call "make doc" to build.
+* Doxyfile: Needed for building the Osmium C++ docs, call "make doc" to build.
 
-include  - C/C++ include files. All of Osmium is in those header files which
-           are needed for building Osmium applications.
+* include: C/C++ include files. All of Osmium is in those header files which
+  are needed for building Osmium applications.
 
-examples - Osmium example applications.
+* examples: Osmium example applications.
 
-test     - Tests (see below).
+* test: Tests (see below).
 
 
-BUILDING
---------
+## Building
 
 Osmium is a header-only library, so there is nothing to build for the
 library itself.
@@ -120,8 +116,7 @@ If not you have to build the compiler yourself. See the instructions
 on http://clang.llvm.org/ .
 
 
-TESTING
--------
+## Testing
 
 There are a few tests using the Boost Unit Test Framework in the "test"
 directory. Many more tests are needed, any help appreciated.
@@ -139,17 +134,17 @@ for instance:
     ./run_test.sh t/basic/test_node.cpp
 
 
-LICENSE
--------
+## License
 
-Osmium is available under the Boost Software License. See LICENSE.txt.
+The Osmium Library is available under the Boost Software License. See
+LICENSE.txt.
 
 
-AUTHORS
--------
+## Authors
 
-Osmium was mainly written and is maintained by Jochen Topf (jochen@topf.org).
+The Osmium Library was mainly written and is maintained by Jochen Topf
+(jochen@topf.org).
 
 Other authors:
-* Peter Körner (github@mazdermind.de) (XML and PBF writer, ...)
+* Peter Körner (github@mazdermind.de) (PBF writer, ...)
 

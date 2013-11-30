@@ -1,7 +1,23 @@
 
 body {
+    font-family: "Droid Sans",Helvetica,Arial,sans-serif;
+    background-color: #fffdea;
+    color: #202060;
 }
 
-.tabs, .tabs2, .tabs3, .tablist li {
+.tabs, .tabs2, .tabs3, .navpath ul, .tablist li {
+    background-image: none;
+}
+
+.tabs, .tabs2, .tabs3 {
+    border-top: 1px solid #202060;
+}
+
+div.contents {
+    background-color: #ffffff;
+    margin: 0px;
+    padding-top: 10px;
+    padding-left: 12px;
+    padding-right: 8px;
 }
 
