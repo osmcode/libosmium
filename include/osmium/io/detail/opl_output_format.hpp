@@ -33,10 +33,8 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#define __STDC_FORMAT_MACROS
-#include <inttypes.h>
-
 #include <chrono>
+#include <cinttypes>
 #include <cstddef>
 #include <cstdint>
 #include <cstdio>
