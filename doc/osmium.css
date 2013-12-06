@@ -1,7 +1,7 @@
 
 body {
     font-family: "Droid Sans",Helvetica,Arial,sans-serif;
-    background-color: #fffdea;
+    background-color: #ffffff;
     color: #202060;
 }
 
@@ -14,7 +14,6 @@ body {
 }
 
 div.contents {
-    background-color: #ffffff;
     margin: 0px;
     padding-top: 10px;
     padding-left: 12px;
