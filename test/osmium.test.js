@@ -47,7 +47,7 @@ describe('osmium', function() {
         var nodes = 0, ways = 0;
         handler.on('node', function(node) {
             if (nodes == 0) {
-                assert.equal(node.id(), 50031066);
+                assert.equal(node.id, 50031066);
                 assert.equal(node.lon, -120.1891610);
             }
             if (nodes == 1) {

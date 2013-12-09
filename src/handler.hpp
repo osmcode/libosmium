@@ -51,9 +51,7 @@ namespace node_osmium {
                         Node* node = new Node(it);
                         Handle<Value> ext = External::New(node);
                         Local<Object> obj = Node::constructor->GetFunction()->NewInstance(1, &ext);
-
-                        Node* n = node::ObjectWrap::Unwrap<Node>(obj);
-                        Local<Value> argv[argc] = { Local<Value>::New(n->handle_) };
+                        Local<Value> argv[argc] = { obj };
 
                         TryCatch trycatch;
                         Handle<Value> v = node_cb->Call(Context::GetCurrent()->Global(), argc, argv);
