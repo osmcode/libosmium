@@ -1,6 +1,6 @@
 {
     "name": "osmium",
-    "description": "Node bindings to Osmium",
+    "description": "Node.js bindings to Osmium",
     "url": "https://github.com/osmcode/node-osmium",
     "homepage": "http://osmcode.org/node-osmium",
     "author": "Dane Springmeyer <springmeyer>",
@@ -11,7 +11,7 @@
     "main": "./lib/osmium.js",
     "bugs": {
         "email": "dane@mapbox.com",
-        "url": "https://github.com/springmeyer/node-osmium/issues"
+        "url": "https://github.com/osmcode/node-osmium/issues"
     },
     "keywords": [
         "osmium",
