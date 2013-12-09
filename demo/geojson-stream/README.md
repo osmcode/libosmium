@@ -1,9 +1,6 @@
-
-
 # Install
 
     npm install
-
 
 # Usage
 
