@@ -28,9 +28,18 @@ namespace node_osmium {
         static Handle<Value> New(Arguments const& args);
 
         File(const std::string& filename = "", const std::string& format = "");
-        void _ref() { Ref(); }
-        void _unref() { Unref(); }
-        file_ptr get() { return this_; }
+
+        void _ref() {
+            Ref();
+        }
+
+        void _unref() {
+            Unref();
+        }
+
+        file_ptr get() {
+            return this_;
+        }
 
     private:
 
@@ -56,8 +65,7 @@ namespace node_osmium {
         this_(std::make_shared<osmium::io::File>(filename, format)) {
     }
 
-    Handle<Value> File::New(Arguments const& args)
-    {
+    Handle<Value> File::New(Arguments const& args) {
         HandleScope scope;
         if (!args.IsConstructCall()) {
             return ThrowException(Exception::Error(String::New("Cannot call constructor as function, you need to use 'new' keyword")));

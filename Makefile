@@ -19,6 +19,9 @@ berlin-latest.osm.pbf:
 test: berlin-latest.osm.pbf
 	@PATH="./node_modules/mocha/bin:${PATH}" && NODE_PATH="./lib:$(NODE_PATH)" mocha -R spec --timeout 10000
 
+indent:
+	astyle --style=java --indent-namespaces --indent-switches --pad-header --lineend=linux --suffix=none src/\*pp
+
 check: test
 
-.PHONY: test
+.PHONY: test indent
