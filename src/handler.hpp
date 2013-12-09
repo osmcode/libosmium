@@ -47,7 +47,11 @@ namespace node_osmium {
                 case osmium::item_type::node:
                     if (!node_cb.IsEmpty() && (!node_callback_for_tagged_only || !it->tags().empty())) {
                         const int argc = 1;
-                        Handle<Object> obj = Node::New(it);
+
+                        Node* node = new Node(it);
+                        Handle<Value> ext = External::New(node);
+                        Local<Object> obj = Node::constructor->GetFunction()->NewInstance(1, &ext);
+
                         Node* n = node::ObjectWrap::Unwrap<Node>(obj);
                         Local<Value> argv[argc] = { Local<Value>::New(n->handle_) };
 
