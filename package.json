@@ -1,0 +1,36 @@
+{
+    "name": "osmium",
+    "description": "Node bindings to Osmium",
+    "url": "https://github.com/osmcode/node-osmium",
+    "homepage": "http://osmcode.org/node-osmium",
+    "author": "Dane Springmeyer <springmeyer>",
+    "contributors": [
+        "Jochen Topf <joto>"
+    ],
+    "version": "0.1.0",
+    "main": "./lib/osmium.js",
+    "bugs": {
+        "email": "dane@mapbox.com",
+        "url": "https://github.com/springmeyer/node-osmium/issues"
+    },
+    "keywords": [
+        "osmium",
+        "osm",
+        "pbf",
+        "changeset"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/osmcode/node-osmium.git"
+    },
+    "licenses": [ { "type": "Boost" } ],
+    "devDependencies": {
+        "mocha": "*"
+    },
+    "engines": {
+        "node": ">= 0.6.13 < 0.11.0"
+    },
+    "scripts": {
+        "test": "mocha -R spec"
+    }
+}

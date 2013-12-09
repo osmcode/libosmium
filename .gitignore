@@ -1,0 +1,4 @@
+node_modules
+lib/osmium.node
+.DS_Store
+build
