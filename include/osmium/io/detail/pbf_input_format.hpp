@@ -56,7 +56,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/io/header.hpp>
 #include <osmium/memory/buffer.hpp>
 #include <osmium/osm.hpp>
-#include <osmium/osm/bbox.hpp>
+#include <osmium/osm/box.hpp>
 #include <osmium/osm/builder.hpp>
 #include <osmium/osm/entity_flags.hpp>
 #include <osmium/osm/location.hpp>
@@ -499,10 +499,10 @@ namespace osmium {
                     if (pbf_header_block.has_bbox()) {
                         const OSMPBF::HeaderBBox& pbf_bbox = pbf_header_block.bbox();
                         const int64_t resolution_convert = OSMPBF::lonlat_resolution / osmium::Location::coordinate_precision;
-                        osmium::BBox bbox;
-                        bbox.extend(osmium::Location(pbf_bbox.left()  / resolution_convert, pbf_bbox.bottom() / resolution_convert));
-                        bbox.extend(osmium::Location(pbf_bbox.right() / resolution_convert, pbf_bbox.top()    / resolution_convert));
-                        m_header.add_bbox(bbox);
+                        osmium::Box box;
+                        box.extend(osmium::Location(pbf_bbox.left()  / resolution_convert, pbf_bbox.bottom() / resolution_convert));
+                        box.extend(osmium::Location(pbf_bbox.right() / resolution_convert, pbf_bbox.top()    / resolution_convert));
+                        m_header.add_box(box);
                     }
 
                     if (pbf_header_block.has_osmosis_replication_timestamp()) {

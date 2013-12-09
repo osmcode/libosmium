@@ -61,7 +61,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/memory/buffer.hpp>
 #include <osmium/memory/builder.hpp>
 #include <osmium/osm.hpp>
-#include <osmium/osm/bbox.hpp>
+#include <osmium/osm/box.hpp>
 #include <osmium/osm/builder.hpp>
 #include <osmium/osm/entity_flags.hpp>
 #include <osmium/osm/item_type.hpp>
@@ -246,8 +246,8 @@ namespace osmium {
                         }
                     }
 
-                    new_changeset.bbox().extend(min);
-                    new_changeset.bbox().extend(max);
+                    new_changeset.bounds().extend(min);
+                    new_changeset.bounds().extend(max);
 
                     if (!user_set) {
                         builder->add_user("");
@@ -364,9 +364,9 @@ namespace osmium {
                                             max.lat(atof(attrs[count+1]));
                                         }
                                     }
-                                    osmium::BBox bbox;
-                                    bbox.extend(min).extend(max);
-                                    m_header.add_bbox(bbox);
+                                    osmium::Box box;
+                                    box.extend(min).extend(max);
+                                    m_header.add_box(box);
                                 } else if (!strcmp(element, "delete")) {
                                     m_in_delete_section = true;
                                 }

@@ -36,7 +36,7 @@ DEALINGS IN THE SOFTWARE.
 #include <initializer_list>
 #include <vector>
 
-#include <osmium/osm/bbox.hpp>
+#include <osmium/osm/box.hpp>
 #include <osmium/util/options.hpp>
 
 namespace osmium {
@@ -49,7 +49,7 @@ namespace osmium {
         class Header : public osmium::util::Options {
 
             /// Bounding boxes
-            std::vector<osmium::BBox> m_bboxes;
+            std::vector<osmium::Box> m_boxes;
 
             /**
             * Are there possibly multiple versions of the same object in this stream of objects?
@@ -73,34 +73,34 @@ namespace osmium {
 
             ~Header() = default;
 
-            std::vector<osmium::BBox>& bboxes() {
-                return m_bboxes;
+            std::vector<osmium::Box>& boxes() {
+                return m_boxes;
             }
 
-            const std::vector<osmium::BBox>& bboxes() const {
-                return m_bboxes;
+            const std::vector<osmium::Box>& boxes() const {
+                return m_boxes;
             }
 
-            Header& bboxes(const std::vector<osmium::BBox>& bboxes) {
-                m_bboxes = bboxes;
+            Header& boxes(const std::vector<osmium::Box>& boxes) {
+                m_boxes = boxes;
                 return *this;
             }
 
-            osmium::BBox bbox() const {
-                return m_bboxes.empty() ? osmium::BBox() : m_bboxes.front();
+            osmium::Box box() const {
+                return m_boxes.empty() ? osmium::Box() : m_boxes.front();
             }
 
-            osmium::BBox joined_bboxes() const {
-                osmium::BBox bbox;
-                for (auto& b : m_bboxes) {
-                    bbox.extend(b.bottom_left());
-                    bbox.extend(b.top_right());
+            osmium::Box joined_boxes() const {
+                osmium::Box box;
+                for (auto& b : m_boxes) {
+                    box.extend(b.bottom_left());
+                    box.extend(b.top_right());
                 }
-                return bbox;
+                return box;
             }
 
-            Header& add_bbox(const osmium::BBox& bbox) {
-                m_bboxes.push_back(bbox);
+            Header& add_box(const osmium::Box& box) {
+                m_boxes.push_back(box);
                 return *this;
             }
 

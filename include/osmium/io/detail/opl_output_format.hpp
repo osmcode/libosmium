@@ -54,7 +54,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/io/file_format.hpp>
 #include <osmium/memory/buffer.hpp>
 #include <osmium/memory/collection.hpp>
-#include <osmium/osm/bbox.hpp>
+#include <osmium/osm/box.hpp>
 #include <osmium/osm/changeset.hpp>
 #include <osmium/osm/item_type.hpp>
 #include <osmium/osm/location.hpp>
@@ -229,8 +229,8 @@ namespace osmium {
                     snprintf(m_tmp_buffer, tmp_buffer_size, " i%d u", changeset.uid());
                     m_out += m_tmp_buffer;
                     append_encoded_string(changeset.user());
-                    write_location(changeset.bbox().bottom_left(), 'x', 'y');
-                    write_location(changeset.bbox().top_right(), 'X', 'Y');
+                    write_location(changeset.bounds().bottom_left(), 'x', 'y');
+                    write_location(changeset.bounds().top_right(), 'X', 'Y');
                     m_out += " T";
                     bool first = true;
                     for (auto& tag : changeset.tags()) {

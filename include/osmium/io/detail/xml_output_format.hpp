@@ -52,7 +52,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/io/header.hpp>
 #include <osmium/memory/buffer.hpp>
 #include <osmium/memory/collection.hpp>
-#include <osmium/osm/bbox.hpp>
+#include <osmium/osm/box.hpp>
 #include <osmium/osm/changeset.hpp>
 #include <osmium/osm/item_type.hpp>
 #include <osmium/osm/location.hpp>
@@ -339,11 +339,11 @@ namespace osmium {
                         m_out += " open=\"true\"";
                     }
 
-                    if (changeset.bbox()) {
-                        oprintf(m_out, " min_lon=\"%.7f\"", changeset.bbox().bottom_left().lon());
-                        oprintf(m_out, " min_lat=\"%.7f\"", changeset.bbox().bottom_left().lat());
-                        oprintf(m_out, " max_lon=\"%.7f\"", changeset.bbox().top_right().lon());
-                        oprintf(m_out, " max_lat=\"%.7f\"", changeset.bbox().top_right().lat());
+                    if (changeset.bounds()) {
+                        oprintf(m_out, " min_lon=\"%.7f\"", changeset.bounds().bottom_left().lon());
+                        oprintf(m_out, " min_lat=\"%.7f\"", changeset.bounds().bottom_left().lat());
+                        oprintf(m_out, " max_lon=\"%.7f\"", changeset.bounds().top_right().lon());
+                        oprintf(m_out, " max_lat=\"%.7f\"", changeset.bounds().top_right().lat());
                     }
 
                     if (!changeset.user_is_anonymous()) {
@@ -413,12 +413,12 @@ namespace osmium {
                         out += "\">\n";
                     }
 
-                    for (auto& bbox : header.bboxes()) {
+                    for (auto& box : header.boxes()) {
                         out += "  <bounds";
-                        oprintf(out, " minlon=\"%.7f\"", bbox.bottom_left().lon());
-                        oprintf(out, " minlat=\"%.7f\"", bbox.bottom_left().lat());
-                        oprintf(out, " maxlon=\"%.7f\"", bbox.top_right().lon());
-                        oprintf(out, " maxlat=\"%.7f\"/>\n", bbox.top_right().lat());
+                        oprintf(out, " minlon=\"%.7f\"", box.bottom_left().lon());
+                        oprintf(out, " minlat=\"%.7f\"", box.bottom_left().lat());
+                        oprintf(out, " maxlon=\"%.7f\"", box.top_right().lon());
+                        oprintf(out, " maxlat=\"%.7f\"/>\n", box.top_right().lat());
                     }
 
                     std::promise<std::string> promise;

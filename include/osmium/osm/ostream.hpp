@@ -36,7 +36,7 @@ DEALINGS IN THE SOFTWARE.
 #include <cstdint>
 #include <iostream>
 
-#include <osmium/osm/bbox.hpp>
+#include <osmium/osm/box.hpp>
 #include <osmium/osm/item_type.hpp>
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/tag.hpp>
@@ -64,16 +64,16 @@ namespace osmium {
         return out;
     }
 
-    inline std::ostream& operator<<(std::ostream& out, const osmium::BBox& bbox) {
-        if (bbox) {
+    inline std::ostream& operator<<(std::ostream& out, const osmium::Box& box) {
+        if (box) {
             out << '('
-                << bbox.bottom_left().lon()
+                << box.bottom_left().lon()
                 << ','
-                << bbox.bottom_left().lat()
+                << box.bottom_left().lat()
                 << ','
-                << bbox.top_right().lon()
+                << box.top_right().lon()
                 << ','
-                << bbox.top_right().lat()
+                << box.top_right().lat()
                 << ')';
         } else {
             out << "(undefined)";

@@ -40,7 +40,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/memory/collection.hpp>
 #include <osmium/memory/item.hpp>
-#include <osmium/osm/bbox.hpp>
+#include <osmium/osm/box.hpp>
 #include <osmium/osm/entity.hpp>
 #include <osmium/osm/item_type.hpp>
 #include <osmium/osm/tag.hpp>
@@ -59,7 +59,7 @@ namespace osmium {
 
         osmium::Timestamp m_created_at {};
         osmium::Timestamp m_closed_at {};
-        osmium::BBox      m_bbox {};
+        osmium::Box       m_bounds {};
         changeset_id_type m_id {0};
         num_changes_type  m_num_changes {0};
         user_id_type      m_uid {0};
@@ -229,12 +229,12 @@ namespace osmium {
             return this->num_changes(osmium::string_to_num_changes(num_changes));
         }
 
-        osmium::BBox& bbox() noexcept {
-            return m_bbox;
+        osmium::Box& bounds() noexcept {
+            return m_bounds;
         }
 
-        const osmium::BBox& bbox() const noexcept {
-            return m_bbox;
+        const osmium::Box& bounds() const noexcept {
+            return m_bounds;
         }
 
         /// Get user name.

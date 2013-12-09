@@ -36,7 +36,7 @@ int main(int argc, char* argv[]) {
 
     std::cout << "HEADER:\n  generator=" << header.get("generator") << "\n";
 
-    for (auto& bbox : header.bboxes()) {
+    for (auto& bbox : header.boxes()) {
         std::cout << "  bbox=" << bbox << "\n";
     }
 

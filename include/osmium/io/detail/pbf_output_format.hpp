@@ -119,7 +119,7 @@ More complete outlines of real .osm.pbf files can be created using the osmpbf-ou
 #include <osmium/io/header.hpp>
 #include <osmium/memory/buffer.hpp>
 #include <osmium/memory/collection.hpp>
-#include <osmium/osm/bbox.hpp>
+#include <osmium/osm/box.hpp>
 #include <osmium/osm/item_type.hpp>
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/node.hpp>
@@ -811,13 +811,13 @@ namespace osmium {
                     // set the writing program
                     pbf_header_block.set_writingprogram(header.get("generator"));
 
-                    if (!header.bboxes().empty()) {
+                    if (!header.boxes().empty()) {
                         OSMPBF::HeaderBBox* pbf_bbox = pbf_header_block.mutable_bbox();
-                        osmium::BBox bbox = header.joined_bboxes();
-                        pbf_bbox->set_left(bbox.bottom_left().lon() * OSMPBF::lonlat_resolution);
-                        pbf_bbox->set_bottom(bbox.bottom_left().lat() * OSMPBF::lonlat_resolution);
-                        pbf_bbox->set_right(bbox.top_right().lon() * OSMPBF::lonlat_resolution);
-                        pbf_bbox->set_top(bbox.top_right().lat() * OSMPBF::lonlat_resolution);
+                        osmium::Box box = header.joined_boxes();
+                        pbf_bbox->set_left(box.bottom_left().lon() * OSMPBF::lonlat_resolution);
+                        pbf_bbox->set_bottom(box.bottom_left().lat() * OSMPBF::lonlat_resolution);
+                        pbf_bbox->set_right(box.top_right().lon() * OSMPBF::lonlat_resolution);
+                        pbf_bbox->set_top(box.top_right().lat() * OSMPBF::lonlat_resolution);
                     }
 
                     std::string osmosis_replication_timestamp = header.get("osmosis_replication_timestamp");
