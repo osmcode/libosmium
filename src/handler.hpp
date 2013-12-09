@@ -1,11 +1,10 @@
 // c++11
-#include <memory>
-#include <iostream>
+#include <string>
 
 // v8
 #include <v8.h>
 
-// node
+// node.js
 #include <node.h>
 #include <node_version.h>
 #include <node_object_wrap.h>
@@ -27,9 +26,9 @@ namespace node_osmium {
 
         static Persistent<FunctionTemplate> constructor;
         static void Initialize(Handle<Object> target);
-        static Handle<Value> New(Arguments const& args);
-        static Handle<Value> on(Arguments const& args);
-        static Handle<Value> options(Arguments const& args);
+        static Handle<Value> New(const Arguments& args);
+        static Handle<Value> on(const Arguments& args);
+        static Handle<Value> options(const Arguments& args);
         JSHandler();
 
         void _ref() {
@@ -227,7 +226,7 @@ namespace node_osmium {
         constructor->SetClassName(String::NewSymbol("Handler"));
         NODE_SET_PROTOTYPE_METHOD(constructor, "on", on);
         NODE_SET_PROTOTYPE_METHOD(constructor, "options", options);
-        target->Set(String::NewSymbol("Handler"),constructor->GetFunction());
+        target->Set(String::NewSymbol("Handler"), constructor->GetFunction());
     }
 
     JSHandler::JSHandler() :

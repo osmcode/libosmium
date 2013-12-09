@@ -1,18 +1,17 @@
-
 // c++11
+#include <exception>
 #include <memory>
-#include <sstream>
 
 // v8
 #include <v8.h>
 
-// node
+// node.js
 #include <node.h>
 #include <node_version.h>
 #include <node_object_wrap.h>
 
 // osmium
-#include <osmium/io/any_input.hpp> // bring in XML and PBF support
+#include <osmium/io/any_input.hpp>
 #include <osmium/io/reader.hpp>
 #include <osmium/visitor.hpp>
 #include <osmium/handler/node_locations_for_ways.hpp>
@@ -36,10 +35,10 @@ namespace node_osmium {
 
         static Persistent<FunctionTemplate> constructor;
         static void Initialize(Handle<Object> target);
-        static Handle<Value> New(Arguments const& args);
-        static Handle<Value> header(Arguments const& args);
-        static Handle<Value> apply(Arguments const& args);
-        static Handle<Value> close(Arguments const& args);
+        static Handle<Value> New(const Arguments& args);
+        static Handle<Value> header(const Arguments& args);
+        static Handle<Value> apply(const Arguments& args);
+        static Handle<Value> close(const Arguments& args);
         Reader(osmium::io::File& infile, osmium::osm_entity::flags entities);
 
         void _ref() {
@@ -129,7 +128,7 @@ namespace node_osmium {
             } else {
                 return ThrowException(Exception::TypeError(String::New("please provide a File object or string for the first argument when creating a Reader")));
             }
-        } catch (std::exception const& ex) {
+        } catch (const std::exception& ex) {
             return ThrowException(Exception::TypeError(String::New(ex.what())));
         }
         return Undefined();
@@ -139,15 +138,15 @@ namespace node_osmium {
         HandleScope scope;
         Local<Object> obj = Object::New();
         Reader* reader = node::ObjectWrap::Unwrap<Reader>(args.This());
-        osmium::io::Header const& header = reader->header_;
+        const osmium::io::Header& header = reader->header_;
         obj->Set(String::NewSymbol("generator"), String::New(header.get("generator").c_str()));
-        osmium::Box const& bounds = header.box();
+        const osmium::Box& bounds = header.box();
         Local<Array> arr = Array::New(4);
-        arr->Set(0,Number::New(bounds.bottom_left().lon()));
-        arr->Set(1,Number::New(bounds.bottom_left().lat()));
-        arr->Set(2,Number::New(bounds.top_right().lon()));
-        arr->Set(3,Number::New(bounds.top_right().lat()));
-        obj->Set(String::NewSymbol("bounds"),arr);
+        arr->Set(0, Number::New(bounds.bottom_left().lon()));
+        arr->Set(1, Number::New(bounds.bottom_left().lat()));
+        arr->Set(2, Number::New(bounds.top_right().lon()));
+        arr->Set(3, Number::New(bounds.top_right().lat()));
+        obj->Set(String::NewSymbol("bounds"), arr);
         return scope.Close(obj);
     }
 

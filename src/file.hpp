@@ -1,11 +1,12 @@
-
+// c++11
+#include <exception>
 #include <memory>
 #include <string>
 
 // v8
 #include <v8.h>
 
-// node
+// node.js
 #include <node.h>
 #include <node_version.h>
 #include <node_object_wrap.h>
@@ -25,7 +26,7 @@ namespace node_osmium {
 
         static Persistent<FunctionTemplate> constructor;
         static void Initialize(Handle<Object> target);
-        static Handle<Value> New(Arguments const& args);
+        static Handle<Value> New(const Arguments& args);
 
         File(const std::string& filename = "", const std::string& format = "");
 
@@ -65,7 +66,7 @@ namespace node_osmium {
         this_(std::make_shared<osmium::io::File>(filename, format)) {
     }
 
-    Handle<Value> File::New(Arguments const& args) {
+    Handle<Value> File::New(const Arguments& args) {
         HandleScope scope;
         if (!args.IsConstructCall()) {
             return ThrowException(Exception::Error(String::New("Cannot call constructor as function, you need to use 'new' keyword")));
@@ -92,7 +93,7 @@ namespace node_osmium {
             File* q = new File(filename, format);
             q->Wrap(args.This());
             return args.This();
-        } catch (std::exception const& ex) {
+        } catch (const std::exception& ex) {
             return ThrowException(Exception::TypeError(String::New(ex.what())));
         }
         return Undefined();

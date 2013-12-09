@@ -1,7 +1,7 @@
 // v8
 #include <v8.h>
 
-// node
+// node.js
 #include <node.h>
 
 // node-osmium

@@ -1,7 +1,10 @@
+// c++11
+#include <sstream>
+
 // v8
 #include <v8.h>
 
-// node
+// node.js
 #include <node.h>
 #include <node_version.h>
 #include <node_object_wrap.h>
@@ -21,8 +24,8 @@ namespace node_osmium {
 
         static Persistent<FunctionTemplate> constructor;
         static void Initialize(Handle<Object> target);
-        static Handle<Value> New(Arguments const& args);
-        static Handle<Value> dump(Arguments const& args);
+        static Handle<Value> New(const Arguments& args);
+        static Handle<Value> dump(const Arguments& args);
         Buffer(reader_ptr reader);
         void _ref() {
             Ref();
