@@ -12,7 +12,7 @@
 
 // osmium
 #include <osmium/io/any_input.hpp>
-#include <osmium/io/reader.hpp>
+#include <osmium/io/input_iterator.hpp>
 #include <osmium/visitor.hpp>
 #include <osmium/handler/node_locations_for_ways.hpp>
 #include <osmium/index/map/dummy.hpp>
@@ -184,9 +184,16 @@ namespace node_osmium {
             index_pos_type index_pos;
             index_neg_type index_neg;
             location_handler_type location_handler(index_pos, index_neg);
-            osmium::apply(*r_ptr, location_handler, *handler);
+//            osmium::apply(*r_ptr, location_handler, *handler);
         } else {
-            osmium::apply(*r_ptr, *handler);
+            osmium::io::InputIterator<osmium::io::Reader, osmium::Object> it(*r_ptr);
+            osmium::io::InputIterator<osmium::io::Reader, osmium::Object> end;
+
+            for (; it != end; ++it) {
+                handler->doit(it);
+            }
+
+//            osmium::apply(*r_ptr, *handler);
         }
 
         return Undefined();

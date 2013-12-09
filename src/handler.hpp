@@ -13,6 +13,8 @@
 // osmium
 #include <osmium/handler.hpp>
 #include <osmium/osm.hpp>
+#include <osmium/io/input_iterator.hpp>
+#include <osmium/io/reader.hpp>
 #include <osmium/geom/wkb.hpp>
 #include <osmium/geom/wkt.hpp>
 
@@ -20,7 +22,7 @@ namespace node_osmium {
 
     using namespace v8;
 
-    class JSHandler : public node::ObjectWrap, public osmium::handler::Handler {
+    class JSHandler : public node::ObjectWrap {
 
     public:
 
@@ -39,6 +41,32 @@ namespace node_osmium {
             Unref();
         }
 
+        void doit(const osmium::io::InputIterator<osmium::io::Reader, osmium::Object>& it) {
+            HandleScope scope;
+            switch (it->type()) {
+                case osmium::item_type::node:
+                    if (!node_cb.IsEmpty() && (!node_callback_for_tagged_only || !it->tags().empty())) {
+                        const int argc = 1;
+                        Handle<Object> obj = Node::New(it);
+                        Node* n = node::ObjectWrap::Unwrap<Node>(obj);
+                        Local<Value> argv[argc] = { Local<Value>::New(n->handle_) };
+
+                        TryCatch trycatch;
+                        Handle<Value> v = node_cb->Call(Context::GetCurrent()->Global(), argc, argv);
+                        if (v.IsEmpty()) {
+                            Handle<Value> exception = trycatch.Exception();
+                            String::AsciiValue exception_str(exception);
+                            printf("Exception: %s\n", *exception_str);
+                            exit(1);
+                        }
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+
+#if 0 
         void node(const osmium::Node& node) {
             HandleScope scope;
             if (!node_cb.IsEmpty() && (!node_callback_for_tagged_only || !node.tags().empty())) {
@@ -196,6 +224,7 @@ namespace node_osmium {
                 }
             }
         }
+#endif
 
         void done() {
             if (!done_cb.IsEmpty()) {

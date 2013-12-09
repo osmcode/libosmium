@@ -5,6 +5,7 @@
 #include <node.h>
 
 // node-osmium
+#include "node.hpp"
 #include "handler.hpp"
 #include "file.hpp"
 #include "reader.hpp"
