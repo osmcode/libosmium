@@ -13,6 +13,7 @@ rebuild:
 	@make
 
 berlin-latest.osm.pbf:
+	cd test/data
 	wget http://download.geofabrik.de/europe/germany/berlin-latest.osm.pbf
 
 test: berlin-latest.osm.pbf

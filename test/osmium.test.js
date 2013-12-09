@@ -4,7 +4,7 @@ var assert = require('assert');
 describe('osmium', function() {
 
     it('should be able to create an osmium.Reader', function(done) {
-        var file = new osmium.File("berlin-latest.osm.pbf");
+        var file = new osmium.File(__dirname+"/data/berlin-latest.osm.pbf");
         var reader = new osmium.Reader(file, {});
         var header = reader.header();
         assert.equal(header.generator, 'Osmium (http://wiki.openstreetmap.org/wiki/Osmium)');
@@ -27,12 +27,12 @@ describe('osmium', function() {
         handler.on('done',function() {
             assert.equal(nodes >= 1993505, true);
         });
-        var file = new osmium.File("berlin-latest.osm.pbf");
+        var file = new osmium.File(__dirname+"/data/berlin-latest.osm.pbf");
         var reader = new osmium.Reader(file);
         reader.apply(handler);
 
         // since reader.apply is sync, we can re-use handlers
-        var file2 = new osmium.File("winthrop.osm");
+        var file2 = new osmium.File(__dirname+"/data/winthrop.osm");
         var reader2 = new osmium.Reader(file2);
         nodes = 0;
         handler.on('done',function() {
@@ -66,7 +66,7 @@ describe('osmium', function() {
             assert.equal(nodes,1525);
             done();
         });
-        var reader = new osmium.Reader("winthrop.osm", { 'node': true, 'way': true });
+        var reader = new osmium.Reader(__dirname+"/data/winthrop.osm", { 'node': true, 'way': true });
         reader.apply(handler);
     });
 
