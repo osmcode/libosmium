@@ -184,7 +184,6 @@ namespace node_osmium {
             index_pos_type index_pos;
             index_neg_type index_neg;
             location_handler_type location_handler(index_pos, index_neg);
-//            osmium::apply(*r_ptr, location_handler, *handler);
         } else {
             osmium::io::InputIterator<osmium::io::Reader, osmium::Object> it(*r_ptr);
             osmium::io::InputIterator<osmium::io::Reader, osmium::Object> end;
@@ -194,8 +193,6 @@ namespace node_osmium {
             }
 
             handler->done();
-
-//            osmium::apply(*r_ptr, *handler);
         }
 
         return Undefined();
