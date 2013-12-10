@@ -15,8 +15,13 @@ var argv = require('minimist')(process.argv, {
     string: 'output',
 });
 
-if (!argv.output || typeof(argv.output) != 'string') throw new Error('--output argument required (path to a new file or the keyword "stdout")');
-if (!argv.input || typeof(argv.input) != 'string') throw new Error('--input argument required (path to an osm file)');
+function stop(msg) {
+    console.error(msg);
+    process.exit(-1);
+}
+
+if (!argv.output || typeof(argv.output) != 'string') stop('--output argument required (path to a new file or the keyword "stdout")');
+if (!argv.input || typeof(argv.input) != 'string') stop('--input argument required (path to an osm file)');
 
 var reader = new osmium.Reader(argv.input);
 
