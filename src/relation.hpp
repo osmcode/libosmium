@@ -11,13 +11,13 @@
 #include <osmium/io/input_iterator.hpp>
 #include <osmium/io/reader.hpp>
 
+#include "osm_object.hpp"
+
 using namespace v8;
 
 namespace node_osmium {
 
-    typedef osmium::io::InputIterator<osmium::io::Reader, osmium::Object> input_iterator;
-
-    class Relation : public node::ObjectWrap {
+    class Relation : public OSMObject {
 
     public:
 
@@ -40,8 +40,6 @@ namespace node_osmium {
 
     private:
 
-        input_iterator m_it;
-
         ~Relation();
 
     };
@@ -53,12 +51,12 @@ namespace node_osmium {
         constructor = Persistent<FunctionTemplate>::New(FunctionTemplate::New(Relation::New));
         constructor->InstanceTemplate()->SetInternalFieldCount(1);
         constructor->SetClassName(String::NewSymbol("Relation"));
+        NODE_SET_PROTOTYPE_METHOD(constructor, "tags", tags);
         target->Set(String::NewSymbol("Relation"), constructor->GetFunction());
     }
 
     Relation::Relation(const input_iterator& it) :
-        ObjectWrap(),
-        m_it(it) {
+        OSMObject(it) {
     }
 
     Relation::~Relation() {

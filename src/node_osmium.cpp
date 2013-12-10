@@ -4,6 +4,10 @@
 // node.js
 #include <node.h>
 
+// osmium
+#include <osmium/geom/wkb.hpp>
+#include <osmium/geom/wkt.hpp>
+
 // node-osmium
 #include "node.hpp"
 #include "way.hpp"
@@ -27,6 +31,9 @@ namespace node_osmium {
             node_osmium::Reader::Initialize(target);
         }
     }
+
+    osmium::geom::WKBFactory wkb_factory;
+    osmium::geom::WKTFactory wkt_factory;
 
 } // namespace node_osmium
 

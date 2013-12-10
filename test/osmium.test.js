@@ -54,6 +54,11 @@ describe('osmium', function() {
                 assert.equal(node.id, 50031085);
                 assert.equal(node.lon, -120.1929190);
             }
+            if (node.id == 1564464078) {
+                assert.equal(node.changeset, 10220832);
+                assert.equal(node.tags().amenity, 'pub');
+                assert.equal(node.tags('name'), 'Old Schoolhouse Brewery');
+            }
             ++nodes;
         });
         handler.on('way', function(way) {

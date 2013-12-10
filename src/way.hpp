@@ -11,19 +11,21 @@
 #include <osmium/io/input_iterator.hpp>
 #include <osmium/io/reader.hpp>
 
+#include "osm_object.hpp"
+
 using namespace v8;
 
 namespace node_osmium {
 
-    typedef osmium::io::InputIterator<osmium::io::Reader, osmium::Object> input_iterator;
-
-    class Way : public node::ObjectWrap {
+    class Way : public OSMObject {
 
     public:
 
         static Persistent<FunctionTemplate> constructor;
         static void Initialize(Handle<Object> target);
         static Handle<Value> New(const Arguments& args);
+        static Handle<Value> wkb(const Arguments& args);
+        static Handle<Value> wkt(const Arguments& args);
         Way(const input_iterator&);
 
         void _ref() {
@@ -40,8 +42,6 @@ namespace node_osmium {
 
     private:
 
-        input_iterator m_it;
-
         ~Way();
 
     };
@@ -53,12 +53,14 @@ namespace node_osmium {
         constructor = Persistent<FunctionTemplate>::New(FunctionTemplate::New(Way::New));
         constructor->InstanceTemplate()->SetInternalFieldCount(1);
         constructor->SetClassName(String::NewSymbol("Way"));
+        NODE_SET_PROTOTYPE_METHOD(constructor, "tags", tags);
+        NODE_SET_PROTOTYPE_METHOD(constructor, "wkb", wkb);
+        NODE_SET_PROTOTYPE_METHOD(constructor, "wkt", wkt);
         target->Set(String::NewSymbol("Way"), constructor->GetFunction());
     }
 
     Way::Way(const input_iterator& it) :
-        ObjectWrap(),
-        m_it(it) {
+        OSMObject(it) {
     }
 
     Way::~Way() {
@@ -84,6 +86,34 @@ namespace node_osmium {
             return ThrowException(Exception::TypeError(String::New("osmium.Way cannot be created in Javascript")));
         }
         return Undefined();
+    }
+
+    Handle<Value> Way::wkb(const Arguments& args) {
+        HandleScope scope;
+        osmium::Way& way = static_cast<osmium::Way&>(*(node::ObjectWrap::Unwrap<Way>(args.This())->m_it));
+
+        try {
+            std::string wkb { wkb_factory.create_linestring(way) };
+#if NODE_VERSION_AT_LEAST(0, 10, 0)
+            return scope.Close(node::Buffer::New(wkb.data(), wkb.size())->handle_);
+#else
+            return scope.Close(node::Buffer::New(const_cast<char*>(wkb.data()), wkb.size())->handle_);
+#endif
+        } catch (osmium::geom::geometry_error&) {
+            return scope.Close(Undefined());
+        }
+    }
+
+    Handle<Value> Way::wkt(const Arguments& args) {
+        HandleScope scope;
+        osmium::Way& way = static_cast<osmium::Way&>(*(node::ObjectWrap::Unwrap<Way>(args.This())->m_it));
+
+        try {
+            std::string wkt { wkt_factory.create_linestring(way) };
+            return scope.Close(String::New(wkt.c_str()));
+        } catch (osmium::geom::geometry_error&) {
+            return scope.Close(Undefined());
+        }
     }
 
 } // namespace node_osmium

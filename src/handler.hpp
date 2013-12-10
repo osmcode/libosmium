@@ -282,8 +282,7 @@ namespace node_osmium {
     private:
 
         ~JSHandler();
-        osmium::geom::WKBFactory wkb_factory;
-        osmium::geom::WKTFactory wkt_factory;
+
     };
 
     Persistent<FunctionTemplate> JSHandler::constructor;
