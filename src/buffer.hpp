@@ -46,9 +46,9 @@ namespace node_osmium {
         HandleScope scope;
         constructor = Persistent<FunctionTemplate>::New(FunctionTemplate::New(Buffer::New));
         constructor->InstanceTemplate()->SetInternalFieldCount(1);
-        constructor->SetClassName(String::NewSymbol("Buffer"));
+        constructor->SetClassName(String::New("Buffer"));
         NODE_SET_PROTOTYPE_METHOD(constructor, "dump", dump);
-        target->Set(String::NewSymbol("Buffer"), constructor->GetFunction());
+        target->Set(String::New("Buffer"), constructor->GetFunction());
     }
 
     Buffer::Buffer(reader_ptr reader) :

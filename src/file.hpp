@@ -57,8 +57,8 @@ namespace node_osmium {
         HandleScope scope;
         constructor = Persistent<FunctionTemplate>::New(FunctionTemplate::New(File::New));
         constructor->InstanceTemplate()->SetInternalFieldCount(1);
-        constructor->SetClassName(String::NewSymbol("File"));
-        target->Set(String::NewSymbol("File"), constructor->GetFunction());
+        constructor->SetClassName(String::New("File"));
+        target->Set(String::New("File"), constructor->GetFunction());
     }
 
     File::File(const std::string& filename, const std::string& format) :

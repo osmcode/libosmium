@@ -53,12 +53,12 @@ namespace node_osmium {
         HandleScope scope;
         constructor = Persistent<FunctionTemplate>::New(FunctionTemplate::New(Way::New));
         constructor->InstanceTemplate()->SetInternalFieldCount(1);
-        constructor->SetClassName(String::NewSymbol("Way"));
+        constructor->SetClassName(String::New("Way"));
         NODE_SET_PROTOTYPE_METHOD(constructor, "tags", tags);
         NODE_SET_PROTOTYPE_METHOD(constructor, "wkb", wkb);
         NODE_SET_PROTOTYPE_METHOD(constructor, "wkt", wkt);
         NODE_SET_PROTOTYPE_METHOD(constructor, "nodes", nodes);
-        target->Set(String::NewSymbol("Way"), constructor->GetFunction());
+        target->Set(String::New("Way"), constructor->GetFunction());
     }
 
     Way::Way(const input_iterator& it) :
@@ -76,14 +76,14 @@ namespace node_osmium {
             Way* way = static_cast<Way*>(ptr);
             way->Wrap(args.This());
             osmium::Way& obj = static_cast<osmium::Way&>(*(way->m_it));
-            args.This()->Set(String::NewSymbol("id"), Number::New(obj.id()));
-            args.This()->Set(String::NewSymbol("version"), Number::New(obj.version()));
-            args.This()->Set(String::NewSymbol("changeset"), Number::New(obj.changeset()));
-            args.This()->Set(String::NewSymbol("visible"), Boolean::New(obj.visible()));
-            args.This()->Set(String::NewSymbol("timestamp"), Number::New(obj.timestamp()));
-            args.This()->Set(String::NewSymbol("timestamp_iso"), String::New(obj.timestamp().to_iso().c_str(), obj.timestamp().to_iso().size()));
-            args.This()->Set(String::NewSymbol("uid"), Number::New(obj.uid()));
-            args.This()->Set(String::NewSymbol("user"), String::New(obj.user()));
+            args.This()->Set(String::New("id"), Number::New(obj.id()));
+            args.This()->Set(String::New("version"), Number::New(obj.version()));
+            args.This()->Set(String::New("changeset"), Number::New(obj.changeset()));
+            args.This()->Set(String::New("visible"), Boolean::New(obj.visible()));
+            args.This()->Set(String::New("timestamp"), Number::New(obj.timestamp()));
+            args.This()->Set(String::New("timestamp_iso"), String::New(obj.timestamp().to_iso().c_str(), obj.timestamp().to_iso().size()));
+            args.This()->Set(String::New("uid"), Number::New(obj.uid()));
+            args.This()->Set(String::New("user"), String::New(obj.user()));
             return args.This();
         } else {
             return ThrowException(Exception::TypeError(String::New("osmium.Way cannot be created in Javascript")));

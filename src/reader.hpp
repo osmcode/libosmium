@@ -66,11 +66,11 @@ namespace node_osmium {
         HandleScope scope;
         constructor = Persistent<FunctionTemplate>::New(FunctionTemplate::New(Reader::New));
         constructor->InstanceTemplate()->SetInternalFieldCount(1);
-        constructor->SetClassName(String::NewSymbol("Reader"));
+        constructor->SetClassName(String::New("Reader"));
         NODE_SET_PROTOTYPE_METHOD(constructor, "header", header);
         NODE_SET_PROTOTYPE_METHOD(constructor, "apply", apply);
         NODE_SET_PROTOTYPE_METHOD(constructor, "close", close);
-        target->Set(String::NewSymbol("Reader"), constructor->GetFunction());
+        target->Set(String::New("Reader"), constructor->GetFunction());
     }
 
     Reader::Reader(osmium::io::File& file, osmium::osm_entity::flags entities) :
@@ -98,17 +98,17 @@ namespace node_osmium {
                 read_which_entities = osmium::osm_entity::flags::nothing;
                 Local<Object> options = args[1]->ToObject();
 
-                Local<Value> want_nodes = options->Get(String::NewSymbol("node"));
+                Local<Value> want_nodes = options->Get(String::New("node"));
                 if (want_nodes->IsBoolean() && want_nodes->BooleanValue()) {
                     read_which_entities |= osmium::osm_entity::flags::node;
                 }
 
-                Local<Value> want_ways = options->Get(String::NewSymbol("way"));
+                Local<Value> want_ways = options->Get(String::New("way"));
                 if (want_ways->IsBoolean() && want_ways->BooleanValue()) {
                     read_which_entities |= osmium::osm_entity::flags::way;
                 }
 
-                Local<Value> want_relations = options->Get(String::NewSymbol("relation"));
+                Local<Value> want_relations = options->Get(String::New("relation"));
                 if (want_relations->IsBoolean() && want_relations->BooleanValue()) {
                     read_which_entities |= osmium::osm_entity::flags::relation;
                 }
@@ -139,14 +139,14 @@ namespace node_osmium {
         Local<Object> obj = Object::New();
         Reader* reader = node::ObjectWrap::Unwrap<Reader>(args.This());
         const osmium::io::Header& header = reader->header_;
-        obj->Set(String::NewSymbol("generator"), String::New(header.get("generator").c_str()));
+        obj->Set(String::New("generator"), String::New(header.get("generator").c_str()));
         const osmium::Box& bounds = header.box();
         Local<Array> arr = Array::New(4);
         arr->Set(0, Number::New(bounds.bottom_left().lon()));
         arr->Set(1, Number::New(bounds.bottom_left().lat()));
         arr->Set(2, Number::New(bounds.top_right().lon()));
         arr->Set(3, Number::New(bounds.top_right().lat()));
-        obj->Set(String::NewSymbol("bounds"), arr);
+        obj->Set(String::New("bounds"), arr);
         return scope.Close(obj);
     }
 
@@ -170,7 +170,7 @@ namespace node_osmium {
             if (!args[1]->IsObject()) {
                 return ThrowException(Exception::TypeError(String::New("second argument must be 'option' object")));
             }
-            Local<Value> wlh = args[1]->ToObject()->Get(String::NewSymbol("with_location_handler"));
+            Local<Value> wlh = args[1]->ToObject()->Get(String::New("with_location_handler"));
             if (wlh->BooleanValue()) {
                 with_location_handler = true;
             }
