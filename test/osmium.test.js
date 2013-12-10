@@ -36,7 +36,7 @@ describe('osmium', function() {
         var reader2 = new osmium.Reader(file2);
         nodes = 0;
         handler.on('done',function() {
-            assert.equal(nodes,1525);
+            assert.equal(nodes, 1525);
             done();
         });
         reader2.apply(handler);

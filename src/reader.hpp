@@ -193,6 +193,8 @@ namespace node_osmium {
                 handler->doit(it);
             }
 
+            handler->done();
+
 //            osmium::apply(*r_ptr, *handler);
         }
 

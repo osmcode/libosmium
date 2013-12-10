@@ -73,7 +73,16 @@ namespace node_osmium {
             void* ptr = ext->Value();
             Node* node = static_cast<Node*>(ptr);
             node->Wrap(args.This());
-            args.This()->Set(String::NewSymbol("id"), Number::New(node->m_it->id()));
+            osmium::Node& obj = static_cast<osmium::Node&>(*(node->m_it));
+            args.This()->Set(String::NewSymbol("id"), Number::New(obj.id()));
+            args.This()->Set(String::NewSymbol("version"), Number::New(obj.version()));
+            args.This()->Set(String::NewSymbol("changeset"), Number::New(obj.changeset()));
+            args.This()->Set(String::NewSymbol("visible"), Boolean::New(obj.visible()));
+            args.This()->Set(String::NewSymbol("timestamp"), String::New(obj.timestamp().to_iso().c_str(), obj.timestamp().to_iso().size()));
+            args.This()->Set(String::NewSymbol("uid"), Number::New(obj.uid()));
+            args.This()->Set(String::NewSymbol("user"), String::New(obj.user()));
+            args.This()->Set(String::NewSymbol("lon"), Number::New(obj.lon()));
+            args.This()->Set(String::NewSymbol("lat"), Number::New(obj.lat()));
             return args.This();
         } else {
             return ThrowException(Exception::TypeError(String::New("osmium.Node cannot be created in Javascript")));
