@@ -44,7 +44,7 @@ describe('osmium', function() {
 
     it('should be able to get node data from handler parameter', function(done) {
         var handler = new osmium.Handler();
-        var nodes = 0, ways = 0;
+        var nodes = 0, ways = 0, relations = 0;
         handler.on('node', function(node) {
             if (nodes == 0) {
                 assert.equal(node.id, 50031066);
@@ -68,6 +68,14 @@ describe('osmium', function() {
                 assert.deepEqual(way.nodes(), [50253600, 50253602, 50137292, 50137371, 50253605, 50253608]);
             }
             ++ways;
+        });
+        handler.on('relation', function(relation) {
+            if (relations == 0) {
+                assert.equal(relation.id, 237891);
+                assert.deepEqual(relation.members()[0], ['w', 40512249, 'outer']);
+                assert.deepEqual(relation.members(3), ['w', 40512257, 'inner']);
+            }
+            ++relations;
         });
         handler.on('done', function() {
             assert.equal(nodes, 1525);

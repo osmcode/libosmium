@@ -1,3 +1,6 @@
+// c++11
+#include <iterator>
+
 // v8
 #include <v8.h>
 
@@ -24,6 +27,7 @@ namespace node_osmium {
         static Persistent<FunctionTemplate> constructor;
         static void Initialize(Handle<Object> target);
         static Handle<Value> New(const Arguments& args);
+        static Handle<Value> members(const Arguments& args);
         Relation(const input_iterator&);
 
         void _ref() {
@@ -52,6 +56,7 @@ namespace node_osmium {
         constructor->InstanceTemplate()->SetInternalFieldCount(1);
         constructor->SetClassName(String::NewSymbol("Relation"));
         NODE_SET_PROTOTYPE_METHOD(constructor, "tags", tags);
+        NODE_SET_PROTOTYPE_METHOD(constructor, "members", members);
         target->Set(String::NewSymbol("Relation"), constructor->GetFunction());
     }
 
@@ -82,6 +87,45 @@ namespace node_osmium {
         } else {
             return ThrowException(Exception::TypeError(String::New("osmium.Relation cannot be created in Javascript")));
         }
+        return Undefined();
+    }
+
+    Handle<Value> Relation::members(const Arguments& args) {
+        HandleScope scope;
+        osmium::Relation& relation = static_cast<osmium::Relation&>(*(node::ObjectWrap::Unwrap<Relation>(args.This())->m_it));
+
+        if (args.Length() == 0) {
+            Local<Array> members = Array::New();
+            int i = 0;
+            char typec[2] = " ";
+            for (auto& member : relation.members()) {
+                Local<Object> jsmember = Object::New();
+                typec[0] = osmium::item_type_to_char(member.type());
+                jsmember->Set(String::NewSymbol("type"), String::New(typec));
+                jsmember->Set(String::NewSymbol("ref"), Number::New(member.ref()));
+                jsmember->Set(String::NewSymbol("role"), String::New(member.role()));
+                members->Set(i, jsmember);
+                ++i;
+            }
+            return scope.Close(members);
+        } else if (args.Length() == 1) {
+            if (args[0]->IsNumber()) {
+                int n = static_cast<int>(args[0]->ToNumber()->Value());
+                if (n > 0 && n < static_cast<int>(relation.members().size())) {
+                    auto it = relation.members().begin();
+                    std::advance(it, n);
+                    osmium::RelationMember& member = *it;
+                    Local<Object> jsmember = Object::New();
+                    char typec[2] = " ";
+                    typec[0] = osmium::item_type_to_char(member.type());
+                    jsmember->Set(String::NewSymbol("type"), String::New(typec));
+                    jsmember->Set(String::NewSymbol("ref"), Number::New(member.ref()));
+                    jsmember->Set(String::NewSymbol("role"), String::New(member.role()));
+                    return scope.Close(jsmember);
+                }
+            }
+        }
+
         return Undefined();
     }
 
