@@ -178,7 +178,7 @@ namespace node_osmium {
     Handle<Value> JSHandler::options(const Arguments& args) {
         if (args.Length() == 1) {
             if (args[0]->IsObject()) {
-                Local<Value> tagged_nodes_only = args[0]->ToObject()->Get(String::NewSymbol("tagged_nodes_only"));
+                Local<Value> tagged_nodes_only = args[0]->ToObject()->Get(String::New("tagged_nodes_only"));
                 if (tagged_nodes_only->IsBoolean()) {
                     JSHandler* handler = node::ObjectWrap::Unwrap<JSHandler>(args.This());
                     handler->node_callback_for_tagged_only = tagged_nodes_only->BooleanValue();
@@ -193,28 +193,28 @@ namespace node_osmium {
         if (args.Length() != 2 || !args[0]->IsString() || !args[1]->IsFunction()) {
             return ThrowException(Exception::TypeError(String::New("please provide an event name and callback function")));
         }
-        Local<String> callback_name = args[0]->ToString();
+        std::string callback_name = *String::Utf8Value(args[0]->ToString());
         Local<Function> callback = Local<Function>::Cast(args[1]);
         if (callback->IsNull() || callback->IsUndefined()) {
             return ThrowException(Exception::TypeError(String::New("please provide a valid callback function for second arg")));
         }
         JSHandler * handler = node::ObjectWrap::Unwrap<JSHandler>(args.This());
-        if (callback_name == String::NewSymbol("node")) {
+        if (callback_name == "node") {
             if (!handler->node_cb.IsEmpty()) {
                 handler->node_cb.Dispose();
             }
             handler->node_cb = Persistent<Function>::New(callback);
-        } else if (callback_name == String::NewSymbol("way")) {
+        } else if (callback_name == "way") {
             if (!handler->way_cb.IsEmpty()) {
                 handler->way_cb.Dispose();
             }
             handler->way_cb = Persistent<Function>::New(callback);
-        } else if (callback_name == String::NewSymbol("relation")) {
+        } else if (callback_name == "relation") {
             if (!handler->relation_cb.IsEmpty()) {
                 handler->relation_cb.Dispose();
             }
             handler->relation_cb = Persistent<Function>::New(callback);
-        } else if (callback_name == String::NewSymbol("done")) {
+        } else if (callback_name == "done") {
             if (!handler->done_cb.IsEmpty()) {
                 handler->done_cb.Dispose();
             }
