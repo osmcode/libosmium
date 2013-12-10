@@ -63,6 +63,44 @@ namespace node_osmium {
                         }
                     }
                     break;
+                case osmium::item_type::way:
+                    if (!way_cb.IsEmpty()) {
+                        const int argc = 1;
+
+                        Way* way = new Way(it);
+                        Handle<Value> ext = External::New(way);
+                        Local<Object> obj = Way::constructor->GetFunction()->NewInstance(1, &ext);
+                        Local<Value> argv[argc] = { obj };
+
+                        TryCatch trycatch;
+                        Handle<Value> v = way_cb->Call(Context::GetCurrent()->Global(), argc, argv);
+                        if (v.IsEmpty()) {
+                            Handle<Value> exception = trycatch.Exception();
+                            String::AsciiValue exception_str(exception);
+                            printf("Exception: %s\n", *exception_str);
+                            exit(1);
+                        }
+                    }
+                    break;
+                case osmium::item_type::relation:
+                    if (!relation_cb.IsEmpty()) {
+                        const int argc = 1;
+
+                        Relation* relation = new Relation(it);
+                        Handle<Value> ext = External::New(relation);
+                        Local<Object> obj = Relation::constructor->GetFunction()->NewInstance(1, &ext);
+                        Local<Value> argv[argc] = { obj };
+
+                        TryCatch trycatch;
+                        Handle<Value> v = relation_cb->Call(Context::GetCurrent()->Global(), argc, argv);
+                        if (v.IsEmpty()) {
+                            Handle<Value> exception = trycatch.Exception();
+                            String::AsciiValue exception_str(exception);
+                            printf("Exception: %s\n", *exception_str);
+                            exit(1);
+                        }
+                    }
+                    break;
                 default:
                     break;
             }

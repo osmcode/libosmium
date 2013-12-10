@@ -6,6 +6,8 @@
 
 // node-osmium
 #include "node.hpp"
+#include "way.hpp"
+#include "relation.hpp"
 #include "handler.hpp"
 #include "file.hpp"
 #include "reader.hpp"
@@ -17,6 +19,8 @@ namespace node_osmium {
         static void start(v8::Handle<v8::Object> target) {
             v8::HandleScope scope;
             node_osmium::Node::Initialize(target);
+            node_osmium::Way::Initialize(target);
+            node_osmium::Relation::Initialize(target);
             node_osmium::JSHandler::Initialize(target);
             node_osmium::Buffer::Initialize(target);
             node_osmium::File::Initialize(target);
