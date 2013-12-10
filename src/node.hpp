@@ -24,7 +24,6 @@ namespace node_osmium {
         static Persistent<FunctionTemplate> constructor;
         static void Initialize(Handle<Object> target);
         static Handle<Value> New(const Arguments& args);
-        static Handle<Value> id(const Arguments& args);
         Node(const input_iterator&);
 
         void _ref() {
@@ -54,7 +53,6 @@ namespace node_osmium {
         constructor = Persistent<FunctionTemplate>::New(FunctionTemplate::New(Node::New));
         constructor->InstanceTemplate()->SetInternalFieldCount(1);
         constructor->SetClassName(String::NewSymbol("Node"));
-        NODE_SET_PROTOTYPE_METHOD(constructor, "id", id);
         target->Set(String::NewSymbol("Node"), constructor->GetFunction());
     }
 
@@ -88,12 +86,6 @@ namespace node_osmium {
             return ThrowException(Exception::TypeError(String::New("osmium.Node cannot be created in Javascript")));
         }
         return Undefined();
-    }
-
-    Handle<Value> Node::id(const Arguments& args) {
-        HandleScope scope;
-        Node* node = node::ObjectWrap::Unwrap<Node>(args.This());
-        return scope.Close(Number::New(node->object().id()));
     }
 
 } // namespace node_osmium
