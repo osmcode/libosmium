@@ -26,6 +26,7 @@ namespace node_osmium {
         static Handle<Value> New(const Arguments& args);
         static Handle<Value> wkb(const Arguments& args);
         static Handle<Value> wkt(const Arguments& args);
+        static Handle<Value> nodes(const Arguments& args);
         Way(const input_iterator&);
 
         void _ref() {
@@ -56,6 +57,7 @@ namespace node_osmium {
         NODE_SET_PROTOTYPE_METHOD(constructor, "tags", tags);
         NODE_SET_PROTOTYPE_METHOD(constructor, "wkb", wkb);
         NODE_SET_PROTOTYPE_METHOD(constructor, "wkt", wkt);
+        NODE_SET_PROTOTYPE_METHOD(constructor, "nodes", nodes);
         target->Set(String::NewSymbol("Way"), constructor->GetFunction());
     }
 
@@ -114,6 +116,29 @@ namespace node_osmium {
         } catch (osmium::geom::geometry_error&) {
             return scope.Close(Undefined());
         }
+    }
+
+    Handle<Value> Way::nodes(const Arguments& args) {
+        HandleScope scope;
+        osmium::Way& way = static_cast<osmium::Way&>(*(node::ObjectWrap::Unwrap<Way>(args.This())->m_it));
+
+        if (args.Length() == 0) {
+            Local<Array> nodes = Array::New(way.nodes().size());
+            int i = 0;
+            for (auto& wn : way.nodes()) {
+                nodes->Set(i, Number::New(wn.ref()));
+                ++i;
+            }
+            return scope.Close(nodes);
+        } else if (args.Length() == 1) {
+            if (args[0]->IsNumber()) {
+                int n = static_cast<int>(args[0]->ToNumber()->Value());
+                if (n > 0 && n < static_cast<int>(way.nodes().size())) {
+                    return scope.Close(Number::New(way.nodes()[n].ref()));
+                }
+            }
+        }
+        return Undefined();
     }
 
 } // namespace node_osmium
