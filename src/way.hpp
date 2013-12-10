@@ -80,7 +80,8 @@ namespace node_osmium {
             args.This()->Set(String::NewSymbol("version"), Number::New(obj.version()));
             args.This()->Set(String::NewSymbol("changeset"), Number::New(obj.changeset()));
             args.This()->Set(String::NewSymbol("visible"), Boolean::New(obj.visible()));
-            args.This()->Set(String::NewSymbol("timestamp"), String::New(obj.timestamp().to_iso().c_str(), obj.timestamp().to_iso().size()));
+            args.This()->Set(String::NewSymbol("timestamp"), Number::New(obj.timestamp()));
+            args.This()->Set(String::NewSymbol("timestamp_iso"), String::New(obj.timestamp().to_iso().c_str(), obj.timestamp().to_iso().size()));
             args.This()->Set(String::NewSymbol("uid"), Number::New(obj.uid()));
             args.This()->Set(String::NewSymbol("user"), String::New(obj.user()));
             return args.This();
