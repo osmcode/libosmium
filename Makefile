@@ -1,15 +1,17 @@
 all: osmium.node
 
-osmium.node:
+./build:
+	`npm explore npm -g -- pwd`/bin/node-gyp-bin/node-gyp configure
+
+osmium.node: binding.gyp Makefile ./build
 	`npm explore npm -g -- pwd`/bin/node-gyp-bin/node-gyp --verbose build
 
 clean:
-	@rm -rf ./build
+	rm -rf ./build
 	rm -f lib/osmium.node
 
 rebuild:
 	@make clean
-	@./configure
 	@make
 
 test/data/berlin-latest.osm.pbf:
