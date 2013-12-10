@@ -56,11 +56,11 @@ namespace node_osmium {
         HandleScope scope;
         constructor = Persistent<FunctionTemplate>::New(FunctionTemplate::New(Node::New));
         constructor->InstanceTemplate()->SetInternalFieldCount(1);
-        constructor->SetClassName(String::New("Node"));
+        constructor->SetClassName(String::NewSymbol("Node"));
         NODE_SET_PROTOTYPE_METHOD(constructor, "tags", tags);
         NODE_SET_PROTOTYPE_METHOD(constructor, "wkb", wkb);
         NODE_SET_PROTOTYPE_METHOD(constructor, "wkt", wkt);
-        target->Set(String::New("Node"), constructor->GetFunction());
+        target->Set(String::NewSymbol("Node"), constructor->GetFunction());
     }
 
     Node::Node(const input_iterator& it) :
@@ -78,16 +78,16 @@ namespace node_osmium {
             Node* node = static_cast<Node*>(ptr);
             node->Wrap(args.This());
             osmium::Node& obj = static_cast<osmium::Node&>(*(node->m_it));
-            args.This()->Set(String::New("id"), Number::New(obj.id()));
-            args.This()->Set(String::New("version"), Number::New(obj.version()));
-            args.This()->Set(String::New("changeset"), Number::New(obj.changeset()));
-            args.This()->Set(String::New("visible"), Boolean::New(obj.visible()));
-            args.This()->Set(String::New("timestamp"), Number::New(obj.timestamp()));
-            args.This()->Set(String::New("timestamp_iso"), String::New(obj.timestamp().to_iso().c_str(), obj.timestamp().to_iso().size()));
-            args.This()->Set(String::New("uid"), Number::New(obj.uid()));
-            args.This()->Set(String::New("user"), String::New(obj.user()));
-            args.This()->Set(String::New("lon"), Number::New(obj.lon()));
-            args.This()->Set(String::New("lat"), Number::New(obj.lat()));
+            args.This()->Set(String::NewSymbol("id"), Number::New(obj.id()));
+            args.This()->Set(String::NewSymbol("version"), Number::New(obj.version()));
+            args.This()->Set(String::NewSymbol("changeset"), Number::New(obj.changeset()));
+            args.This()->Set(String::NewSymbol("visible"), Boolean::New(obj.visible()));
+            args.This()->Set(String::NewSymbol("timestamp"), Number::New(obj.timestamp()));
+            args.This()->Set(String::NewSymbol("timestamp_iso"), String::New(obj.timestamp().to_iso().c_str(), obj.timestamp().to_iso().size()));
+            args.This()->Set(String::NewSymbol("uid"), Number::New(obj.uid()));
+            args.This()->Set(String::NewSymbol("user"), String::New(obj.user()));
+            args.This()->Set(String::NewSymbol("lon"), Number::New(obj.lon()));
+            args.This()->Set(String::NewSymbol("lat"), Number::New(obj.lat()));
 
             return args.This();
         } else {

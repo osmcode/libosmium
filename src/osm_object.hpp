@@ -40,7 +40,7 @@ namespace node_osmium {
         if (args.Length() == 0) {
             Local<Object> tags = Object::New();
             for (auto& tag : object.tags()) {
-                tags->Set(String::New(tag.key()), String::New(tag.value()));
+                tags->Set(String::NewSymbol(tag.key()), String::New(tag.value()));
             }
             return scope.Close(tags);
         } else if (args.Length() == 1) {
