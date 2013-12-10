@@ -184,12 +184,22 @@ namespace node_osmium {
             index_pos_type index_pos;
             index_neg_type index_neg;
             location_handler_type location_handler(index_pos, index_neg);
+
+            osmium::io::InputIterator<osmium::io::Reader, osmium::Object> it(*r_ptr);
+            osmium::io::InputIterator<osmium::io::Reader, osmium::Object> end;
+
+            for (; it != end; ++it) {
+                osmium::apply_item(*it, location_handler);
+                handler->dispatch_object(it);
+            }
+
+            handler->done();
         } else {
             osmium::io::InputIterator<osmium::io::Reader, osmium::Object> it(*r_ptr);
             osmium::io::InputIterator<osmium::io::Reader, osmium::Object> end;
 
             for (; it != end; ++it) {
-                handler->doit(it);
+                handler->dispatch_object(it);
             }
 
             handler->done();

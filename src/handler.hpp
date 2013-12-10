@@ -41,7 +41,7 @@ namespace node_osmium {
             Unref();
         }
 
-        void doit(const osmium::io::InputIterator<osmium::io::Reader, osmium::Object>& it) {
+        void dispatch_object(const osmium::io::InputIterator<osmium::io::Reader, osmium::Object>& it) {
             HandleScope scope;
             switch (it->type()) {
                 case osmium::item_type::node:
