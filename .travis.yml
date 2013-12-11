@@ -2,9 +2,14 @@ language: node_js
 
 node_js:
  - "0.10"
- - "0.8"
 
 before_install:
+ # first test install of binary
+ - npm install --verbose
+ - make test
+
+install:
+ # next test source compile, so get dependencies
  - sudo apt-add-repository --yes ppa:mapnik/boost
  - sudo apt-add-repository --yes ppa:ubuntu-toolchain-r/test
  - sudo apt-get -y update -qq
@@ -14,12 +19,9 @@ before_install:
  - make && sudo make install
  - cd ../../
 
-install:
- - npm install mocha
-
 before_script:
  - git clone https://github.com/osmcode/libosmium.git ../libosmium
- - CXX=g++-4.7 npm install --verbose
+ - CXX=g++-4.7 npm install
 
 script:
  - make test
