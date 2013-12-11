@@ -1,13 +1,67 @@
 # node-osmium
 
-Node.js bindings to [libosmium](https://github.com/osmcode/libosmium).
+Fast and flexible Javascript library for working with OpenStreetMap data.
+
+Provides a bindings to the [libosmium](https://github.com/osmcode/libosmium) C++ library.
 
 [![Build Status](https://secure.travis-ci.org/osmcode/node-osmium.png)](http://travis-ci.org/osmcode/node-osmium)
 
 # Depends
 
- - Compiler that supports `-std=c++11` (>= clang++ 3.2 || >= g++ 4.8)
  - Node.js v0.10.x
+
+# Installing
+
+By default, binaries are provided and no external depedencies and no compile is needed.
+
+Just do:
+
+    npm install osmium
+
+We currently provide binaries for 64 bit OS X and 64 bit Linux. Running `npm install` on other
+platforms will fall back to a source compile (see `Developing` below for build details).
+
+# Usage
+
+## Get the bounds of an `.osm` file
+
+```js
+var osmium = require('osmium');
+var file = new osmium.File("test/data/winthrop.osm");
+var reader = new osmium.Reader(file);
+console.log(reader.header())
+{ generator: 'CGImap 0.2.0',
+  bounds: [ -120.2024, 48.4636, -120.1569, 48.4869 ] }
+```
+
+## Parse a `.pbf` file and create a node handler callback to count total nodes
+
+```js
+var osmium = require('osmium');
+var file = new osmium.File("test/data/winthrop.osm");
+var reader = new osmium.Reader(file);
+var handler = new osmium.Handler();
+var nodes = 0;
+handler.on('node',function(node) {
+    ++nodes;
+});
+reader.apply(handler);
+console.log(nodes);
+1525
+```
+
+# Developing
+
+If you wish to develop on `node-osmium` you can check out the code and then build like:
+
+    git clone https://github.com/osmcode/node-osmium.git
+    cd node-osmium
+    make
+    make test
+
+## Source build dependencies
+
+ - Compiler that supports `-std=c++11` (>= clang++ 3.2 || >= g++ 4.8)
  - Boost >= 1.49 with development headers
  - OSM-Binary
  - Protocol buffers
@@ -42,43 +96,3 @@ Set depedencies up on OS X like:
     ./scripts/build_osm-pbf.sh
     # NOTE: in the same terminal then run the build commands
     # Or from a different terminal re-run `source MacOSX.sh`
-
-# Building
-
-To build the bindings:
-
-    git clone https://github.com/osmcode/libosmium.git
-    git clone https://github.com/osmcode/node-osmium.git
-    cd node-osmium
-    npm install
-
-# Testing
-
-Run the tests like:
-
-    npm install mocha
-    make test
-
-# Troubleshooting
-
-If you hit a test error like the below it means you need to run `make test` instead of just `npm test` so that the test data is downloaded:
-
-    1) osmium should be able to create an osmium.Reader:
-         TypeError: Open failed
-
-If you hit an error like the below it means you need a more recent compiler that implements the C++11 language standard
-
-    cc1plus: error: unrecognized command line option ‘-std=c++11’
-
-This error indicates you need the boost development headers installed:
-
-    ../../include/osmium/osm/location.hpp:40:31: fatal error: boost/operators.hpp: No such file or directory
-
-An error like this indicates that your compiler is too old and does not support all needed c++11 features
-
-    ../../include/osmium/io/header.hpp:55:51: sorry, unimplemented: non-static data member initializers
-    ../../include/osmium/io/header.hpp:55:51: error: ISO C++ forbids in-class initialization of non-const static member ‘m_has_multiple_object_versions’
-
-And error like this indicates that you need to do `export CXXFLAGS=-fPIC` and then recompile `libosmpbf`:
-
-    /usr/bin/ld: /usr/lib/gcc/x86_64-linux-gnu/4.7/../../../../lib/libosmpbf.a(fileformat.pb.o): relocation R_X86_64_32 against `.rodata.str1.1' can not be used when making a shared object; recompile with -fPIC
