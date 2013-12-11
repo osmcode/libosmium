@@ -15,7 +15,6 @@
 #include "handler.hpp"
 #include "file_wrap.hpp"
 #include "reader_wrap.hpp"
-#include "buffer.hpp"
 
 namespace node_osmium {
 
@@ -26,7 +25,6 @@ namespace node_osmium {
             node_osmium::OSMWayWrap::Initialize(target);
             node_osmium::OSMRelationWrap::Initialize(target);
             node_osmium::JSHandler::Initialize(target);
-//            node_osmium::Buffer::Initialize(target);
             node_osmium::FileWrap::Initialize(target);
             node_osmium::ReaderWrap::Initialize(target);
         }
