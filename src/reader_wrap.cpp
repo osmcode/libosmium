@@ -1,4 +1,8 @@
 
+// c++
+#include <exception>
+
+// node-osmium
 #include "reader_wrap.hpp"
 #include "file_wrap.hpp"
 #include "handler.hpp"
@@ -17,14 +21,6 @@ namespace node_osmium {
         NODE_SET_PROTOTYPE_METHOD(constructor, "close", close);
         target->Set(String::NewSymbol("Reader"), constructor->GetFunction());
     }
-
-    ReaderWrap::ReaderWrap(osmium::io::File& file, osmium::osm_entity::flags entities) :
-        ObjectWrap(),
-        this_(std::make_shared<osmium::io::Reader>(file, entities)),
-        header_(this_->header()) {
-    }
-
-    ReaderWrap::~ReaderWrap() { }
 
     Handle<Value> ReaderWrap::New(const Arguments& args) {
         HandleScope scope;
@@ -83,7 +79,7 @@ namespace node_osmium {
         HandleScope scope;
         Local<Object> obj = Object::New();
         ReaderWrap* reader = node::ObjectWrap::Unwrap<ReaderWrap>(args.This());
-        const osmium::io::Header& header = reader->header_;
+        const osmium::io::Header& header = reader->m_header;
         obj->Set(String::New("generator"), String::New(header.get("generator").c_str()));
         const osmium::Box& bounds = header.box();
         Local<Array> arr = Array::New(4);

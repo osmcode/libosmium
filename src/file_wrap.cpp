@@ -1,4 +1,7 @@
 
+// c++
+#include <exception>
+
 #include "file_wrap.hpp"
 
 namespace node_osmium {
@@ -11,11 +14,6 @@ namespace node_osmium {
         constructor->InstanceTemplate()->SetInternalFieldCount(1);
         constructor->SetClassName(String::NewSymbol("File"));
         target->Set(String::NewSymbol("File"), constructor->GetFunction());
-    }
-
-    FileWrap::FileWrap(const std::string& filename, const std::string& format) :
-        ObjectWrap(),
-        this_(std::make_shared<osmium::io::File>(filename, format)) {
     }
 
     Handle<Value> FileWrap::New(const Arguments& args) {

@@ -1,8 +1,7 @@
 #ifndef READER_WRAP_HPP
 #define READER_WRAP_HPP
 
-// c++11
-#include <exception>
+// c++
 #include <memory>
 
 // v8
@@ -42,7 +41,12 @@ namespace node_osmium {
         static Handle<Value> header(const Arguments& args);
         static Handle<Value> apply(const Arguments& args);
         static Handle<Value> close(const Arguments& args);
-        ReaderWrap(osmium::io::File& infile, osmium::osm_entity::flags entities);
+
+        ReaderWrap(osmium::io::File& file, osmium::osm_entity::flags entities) :
+            ObjectWrap(),
+            m_this(std::make_shared<osmium::io::Reader>(file, entities)),
+            m_header(m_this->header()) {
+        }
 
         void _ref() {
             Ref();
@@ -53,14 +57,16 @@ namespace node_osmium {
         }
 
         reader_ptr get() {
-            return this_;
+            return m_this;
         }
 
     private:
 
-        ~ReaderWrap();
-        reader_ptr this_;
-        osmium::io::Header header_;
+        ~ReaderWrap() {
+        }
+
+        reader_ptr m_this;
+        osmium::io::Header m_header;
     };
 
 } // namespace node_osmium

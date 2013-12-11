@@ -1,4 +1,7 @@
 
+// c++
+#include <string>
+
 #include "handler.hpp"
 #include "osm_node_wrap.hpp"
 #include "osm_way_wrap.hpp"

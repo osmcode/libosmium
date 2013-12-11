@@ -1,5 +1,3 @@
-// c++11
-#include <string>
 
 // v8
 #include <v8.h>
@@ -12,11 +10,9 @@
 
 // osmium
 #include <osmium/handler.hpp>
-#include <osmium/osm.hpp>
+#include <osmium/osm/object.hpp>
 #include <osmium/io/input_iterator.hpp>
 #include <osmium/io/reader.hpp>
-#include <osmium/geom/wkb.hpp>
-#include <osmium/geom/wkt.hpp>
 
 namespace node_osmium {
 
@@ -51,6 +47,7 @@ namespace node_osmium {
         }
 
         bool node_callback_for_tagged_only;
+
         Persistent<Function> node_cb;
         Persistent<Function> way_cb;
         Persistent<Function> relation_cb;

@@ -1,8 +1,7 @@
 #ifndef FILE_WRAP_HPP
 #define FILE_WRAP_HPP
 
-// c++11
-#include <exception>
+// c++
 #include <memory>
 #include <string>
 
@@ -31,7 +30,10 @@ namespace node_osmium {
         static void Initialize(Handle<Object> target);
         static Handle<Value> New(const Arguments& args);
 
-        FileWrap(const std::string& filename = "", const std::string& format = "");
+        FileWrap(const std::string& filename, const std::string& format) :
+            ObjectWrap(),
+            m_this(std::make_shared<osmium::io::File>(filename, format)) {
+        }
 
         void _ref() {
             Ref();
@@ -42,7 +44,7 @@ namespace node_osmium {
         }
 
         file_ptr get() {
-            return this_;
+            return m_this;
         }
 
     private:
@@ -50,7 +52,7 @@ namespace node_osmium {
         ~FileWrap() {
         }
 
-        file_ptr this_;
+        file_ptr m_this;
 
     };
 
