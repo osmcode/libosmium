@@ -1,0 +1,55 @@
+#ifndef NODE_WRAP_HPP
+#define NODE_WRAP_HPP
+
+// v8
+#include <v8.h>
+
+// node
+#include <node.h>
+#include <node_version.h>
+#include <node_object_wrap.h>
+#include <node_buffer.h>
+
+// osmium
+#include <osmium/osm/node.hpp>
+#include <osmium/io/input_iterator.hpp>
+#include <osmium/io/reader.hpp>
+
+#include "osm_object_wrap.hpp"
+
+using namespace v8;
+
+namespace node_osmium {
+
+    class OSMNodeWrap : public OSMObjectWrap {
+
+    public:
+
+        static Persistent<FunctionTemplate> constructor;
+        static void Initialize(Handle<Object> target);
+        static Handle<Value> New(const Arguments& args);
+        static Handle<Value> wkb(const Arguments& args);
+        static Handle<Value> wkt(const Arguments& args);
+        OSMNodeWrap(const input_iterator&);
+
+        void _ref() {
+            Ref();
+        }
+
+        void _unref() {
+            Unref();
+        }
+
+        osmium::Node& object() {
+            return static_cast<osmium::Node&>(*m_it);
+        }
+
+    private:
+
+        ~OSMNodeWrap();
+
+    };
+
+} // namespace node_osmium
+
+#endif // NODE_WRAP_HPP

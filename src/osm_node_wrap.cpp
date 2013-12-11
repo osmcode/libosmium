@@ -1,60 +1,19 @@
-// v8
-#include <v8.h>
 
-// node
-#include <node.h>
-#include <node_version.h>
-#include <node_object_wrap.h>
-#include <node_buffer.h>
+#include <osmium/geom/wkb.hpp>
+#include <osmium/geom/wkt.hpp>
 
-// osmium
-#include <osmium/osm/node.hpp>
-#include <osmium/io/input_iterator.hpp>
-#include <osmium/io/reader.hpp>
-
-#include "osm_object.hpp"
-
-using namespace v8;
+#include "osm_node_wrap.hpp"
 
 namespace node_osmium {
 
     extern osmium::geom::WKBFactory wkb_factory;
     extern osmium::geom::WKTFactory wkt_factory;
 
-    class Node : public OSMObject {
+    Persistent<FunctionTemplate> OSMNodeWrap::constructor;
 
-    public:
-
-        static Persistent<FunctionTemplate> constructor;
-        static void Initialize(Handle<Object> target);
-        static Handle<Value> New(const Arguments& args);
-        static Handle<Value> wkb(const Arguments& args);
-        static Handle<Value> wkt(const Arguments& args);
-        Node(const input_iterator&);
-
-        void _ref() {
-            Ref();
-        }
-
-        void _unref() {
-            Unref();
-        }
-
-        osmium::Node& object() {
-            return static_cast<osmium::Node&>(*m_it);
-        }
-
-    private:
-
-        ~Node();
-
-    };
-
-    Persistent<FunctionTemplate> Node::constructor;
-
-    void Node::Initialize(Handle<Object> target) {
+    void OSMNodeWrap::Initialize(Handle<Object> target) {
         HandleScope scope;
-        constructor = Persistent<FunctionTemplate>::New(FunctionTemplate::New(Node::New));
+        constructor = Persistent<FunctionTemplate>::New(FunctionTemplate::New(OSMNodeWrap::New));
         constructor->InstanceTemplate()->SetInternalFieldCount(1);
         constructor->SetClassName(String::NewSymbol("Node"));
         NODE_SET_PROTOTYPE_METHOD(constructor, "tags", tags);
@@ -63,19 +22,19 @@ namespace node_osmium {
         target->Set(String::NewSymbol("Node"), constructor->GetFunction());
     }
 
-    Node::Node(const input_iterator& it) :
-        OSMObject(it) {
+    OSMNodeWrap::OSMNodeWrap(const input_iterator& it) :
+        OSMObjectWrap(it) {
     }
 
-    Node::~Node() {
+    OSMNodeWrap::~OSMNodeWrap() {
     }
 
-    Handle<Value> Node::New(const Arguments& args) {
+    Handle<Value> OSMNodeWrap::New(const Arguments& args) {
         HandleScope scope;
         if (args[0]->IsExternal()) {
             Local<External> ext = Local<External>::Cast(args[0]);
             void* ptr = ext->Value();
-            Node* node = static_cast<Node*>(ptr);
+            OSMNodeWrap* node = static_cast<OSMNodeWrap*>(ptr);
             node->Wrap(args.This());
             osmium::Node& obj = static_cast<osmium::Node&>(*(node->m_it));
             args.This()->Set(String::New("id"), Number::New(obj.id()));
@@ -96,9 +55,9 @@ namespace node_osmium {
         return Undefined();
     }
 
-    Handle<Value> Node::wkb(const Arguments& args) {
+    Handle<Value> OSMNodeWrap::wkb(const Arguments& args) {
         HandleScope scope;
-        osmium::Node& node = static_cast<osmium::Node&>(*(node::ObjectWrap::Unwrap<Node>(args.This())->m_it));
+        osmium::Node& node = static_cast<osmium::Node&>(*(node::ObjectWrap::Unwrap<OSMNodeWrap>(args.This())->m_it));
 
         std::string wkb { wkb_factory.create_point(node) };
 #if NODE_VERSION_AT_LEAST(0, 10, 0)
@@ -108,13 +67,12 @@ namespace node_osmium {
 #endif
     }
 
-    Handle<Value> Node::wkt(const Arguments& args) {
+    Handle<Value> OSMNodeWrap::wkt(const Arguments& args) {
         HandleScope scope;
-        osmium::Node& node = static_cast<osmium::Node&>(*(node::ObjectWrap::Unwrap<Node>(args.This())->m_it));
+        osmium::Node& node = static_cast<osmium::Node&>(*(node::ObjectWrap::Unwrap<OSMNodeWrap>(args.This())->m_it));
 
         std::string wkt { wkt_factory.create_point(node) };
 
         return scope.Close(String::New(wkt.c_str()));
     }
-
 } // namespace node_osmium

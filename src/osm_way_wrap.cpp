@@ -1,57 +1,19 @@
-// v8
-#include <v8.h>
 
-// node
-#include <node.h>
-#include <node_version.h>
-#include <node_object_wrap.h>
+#include <osmium/geom/wkb.hpp>
+#include <osmium/geom/wkt.hpp>
 
-// osmium
-#include <osmium/osm/way.hpp>
-#include <osmium/io/input_iterator.hpp>
-#include <osmium/io/reader.hpp>
-
-#include "osm_object.hpp"
-
-using namespace v8;
+#include "osm_way_wrap.hpp"
 
 namespace node_osmium {
 
-    class Way : public OSMObject {
+    extern osmium::geom::WKBFactory wkb_factory;
+    extern osmium::geom::WKTFactory wkt_factory;
 
-    public:
+    Persistent<FunctionTemplate> OSMWayWrap::constructor;
 
-        static Persistent<FunctionTemplate> constructor;
-        static void Initialize(Handle<Object> target);
-        static Handle<Value> New(const Arguments& args);
-        static Handle<Value> wkb(const Arguments& args);
-        static Handle<Value> wkt(const Arguments& args);
-        static Handle<Value> nodes(const Arguments& args);
-        Way(const input_iterator&);
-
-        void _ref() {
-            Ref();
-        }
-
-        void _unref() {
-            Unref();
-        }
-
-        osmium::Way& object() {
-            return static_cast<osmium::Way&>(*m_it);
-        }
-
-    private:
-
-        ~Way();
-
-    };
-
-    Persistent<FunctionTemplate> Way::constructor;
-
-    void Way::Initialize(Handle<Object> target) {
+    void OSMWayWrap::Initialize(Handle<Object> target) {
         HandleScope scope;
-        constructor = Persistent<FunctionTemplate>::New(FunctionTemplate::New(Way::New));
+        constructor = Persistent<FunctionTemplate>::New(FunctionTemplate::New(OSMWayWrap::New));
         constructor->InstanceTemplate()->SetInternalFieldCount(1);
         constructor->SetClassName(String::NewSymbol("Way"));
         NODE_SET_PROTOTYPE_METHOD(constructor, "tags", tags);
@@ -61,19 +23,19 @@ namespace node_osmium {
         target->Set(String::NewSymbol("Way"), constructor->GetFunction());
     }
 
-    Way::Way(const input_iterator& it) :
-        OSMObject(it) {
+    OSMWayWrap::OSMWayWrap(const input_iterator& it) :
+        OSMObjectWrap(it) {
     }
 
-    Way::~Way() {
+    OSMWayWrap::~OSMWayWrap() {
     }
 
-    Handle<Value> Way::New(const Arguments& args) {
+    Handle<Value> OSMWayWrap::New(const Arguments& args) {
         HandleScope scope;
         if (args[0]->IsExternal()) {
             Local<External> ext = Local<External>::Cast(args[0]);
             void* ptr = ext->Value();
-            Way* way = static_cast<Way*>(ptr);
+            OSMWayWrap* way = static_cast<OSMWayWrap*>(ptr);
             way->Wrap(args.This());
             osmium::Way& obj = static_cast<osmium::Way&>(*(way->m_it));
             args.This()->Set(String::New("id"), Number::New(obj.id()));
@@ -91,9 +53,9 @@ namespace node_osmium {
         return Undefined();
     }
 
-    Handle<Value> Way::wkb(const Arguments& args) {
+    Handle<Value> OSMWayWrap::wkb(const Arguments& args) {
         HandleScope scope;
-        osmium::Way& way = static_cast<osmium::Way&>(*(node::ObjectWrap::Unwrap<Way>(args.This())->m_it));
+        osmium::Way& way = static_cast<osmium::Way&>(*(node::ObjectWrap::Unwrap<OSMWayWrap>(args.This())->m_it));
 
         try {
             std::string wkb { wkb_factory.create_linestring(way) };
@@ -107,9 +69,9 @@ namespace node_osmium {
         }
     }
 
-    Handle<Value> Way::wkt(const Arguments& args) {
+    Handle<Value> OSMWayWrap::wkt(const Arguments& args) {
         HandleScope scope;
-        osmium::Way& way = static_cast<osmium::Way&>(*(node::ObjectWrap::Unwrap<Way>(args.This())->m_it));
+        osmium::Way& way = static_cast<osmium::Way&>(*(node::ObjectWrap::Unwrap<OSMWayWrap>(args.This())->m_it));
 
         try {
             std::string wkt { wkt_factory.create_linestring(way) };
@@ -119,9 +81,9 @@ namespace node_osmium {
         }
     }
 
-    Handle<Value> Way::nodes(const Arguments& args) {
+    Handle<Value> OSMWayWrap::nodes(const Arguments& args) {
         HandleScope scope;
-        osmium::Way& way = static_cast<osmium::Way&>(*(node::ObjectWrap::Unwrap<Way>(args.This())->m_it));
+        osmium::Way& way = static_cast<osmium::Way&>(*(node::ObjectWrap::Unwrap<OSMWayWrap>(args.This())->m_it));
 
         if (args.Length() == 0) {
             Local<Array> nodes = Array::New(way.nodes().size());
@@ -143,3 +105,4 @@ namespace node_osmium {
     }
 
 } // namespace node_osmium
+

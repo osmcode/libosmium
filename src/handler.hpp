@@ -48,9 +48,8 @@ namespace node_osmium {
                     if (!node_cb.IsEmpty() && (!node_callback_for_tagged_only || !it->tags().empty())) {
                         const int argc = 1;
 
-                        Node* node = new Node(it);
-                        Handle<Value> ext = External::New(node);
-                        Local<Object> obj = Node::constructor->GetFunction()->NewInstance(1, &ext);
+                        Handle<Value> ext = External::New(new OSMNodeWrap(it));
+                        Local<Object> obj = OSMNodeWrap::constructor->GetFunction()->NewInstance(1, &ext);
                         Local<Value> argv[argc] = { obj };
 
                         TryCatch trycatch;
@@ -67,9 +66,8 @@ namespace node_osmium {
                     if (!way_cb.IsEmpty()) {
                         const int argc = 1;
 
-                        Way* way = new Way(it);
-                        Handle<Value> ext = External::New(way);
-                        Local<Object> obj = Way::constructor->GetFunction()->NewInstance(1, &ext);
+                        Handle<Value> ext = External::New(new OSMWayWrap(it));
+                        Local<Object> obj = OSMWayWrap::constructor->GetFunction()->NewInstance(1, &ext);
                         Local<Value> argv[argc] = { obj };
 
                         TryCatch trycatch;
@@ -86,9 +84,8 @@ namespace node_osmium {
                     if (!relation_cb.IsEmpty()) {
                         const int argc = 1;
 
-                        Relation* relation = new Relation(it);
-                        Handle<Value> ext = External::New(relation);
-                        Local<Object> obj = Relation::constructor->GetFunction()->NewInstance(1, &ext);
+                        Handle<Value> ext = External::New(new OSMRelationWrap(it));
+                        Local<Object> obj = OSMRelationWrap::constructor->GetFunction()->NewInstance(1, &ext);
                         Local<Value> argv[argc] = { obj };
 
                         TryCatch trycatch;

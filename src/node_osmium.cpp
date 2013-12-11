@@ -9,9 +9,9 @@
 #include <osmium/geom/wkt.hpp>
 
 // node-osmium
-#include "node.hpp"
-#include "way.hpp"
-#include "relation.hpp"
+#include "osm_node_wrap.hpp"
+#include "osm_way_wrap.hpp"
+#include "osm_relation_wrap.hpp"
 #include "handler.hpp"
 #include "file.hpp"
 #include "reader.hpp"
@@ -22,9 +22,9 @@ namespace node_osmium {
     extern "C" {
         static void start(v8::Handle<v8::Object> target) {
             v8::HandleScope scope;
-            node_osmium::Node::Initialize(target);
-            node_osmium::Way::Initialize(target);
-            node_osmium::Relation::Initialize(target);
+            node_osmium::OSMNodeWrap::Initialize(target);
+            node_osmium::OSMWayWrap::Initialize(target);
+            node_osmium::OSMRelationWrap::Initialize(target);
             node_osmium::JSHandler::Initialize(target);
             node_osmium::Buffer::Initialize(target);
             node_osmium::File::Initialize(target);
