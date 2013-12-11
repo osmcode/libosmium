@@ -23,16 +23,22 @@ namespace node_osmium {
 
     class OSMObjectWrap : public node::ObjectWrap {
 
-    protected:
-
         input_iterator m_it;
 
     public:
 
         static Handle<Value> tags(const Arguments& args);
 
+        static osmium::Object& wrapped(Local<Object> object) {
+            return *(node::ObjectWrap::Unwrap<OSMObjectWrap>(object)->get());
+        }
+
         OSMObjectWrap(const input_iterator& it) :
             m_it(it) {
+        }
+
+        input_iterator& get() {
+            return m_it;
         }
 
     }; // class OSMObjectWrap

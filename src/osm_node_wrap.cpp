@@ -36,7 +36,7 @@ namespace node_osmium {
             void* ptr = ext->Value();
             OSMNodeWrap* node = static_cast<OSMNodeWrap*>(ptr);
             node->Wrap(args.This());
-            osmium::Node& obj = static_cast<osmium::Node&>(*(node->m_it));
+            osmium::Node& obj = static_cast<osmium::Node&>(*(node->get()));
             args.This()->Set(String::New("id"), Number::New(obj.id()));
             args.This()->Set(String::New("version"), Number::New(obj.version()));
             args.This()->Set(String::New("changeset"), Number::New(obj.changeset()));
@@ -52,14 +52,13 @@ namespace node_osmium {
         } else {
             return ThrowException(Exception::TypeError(String::New("osmium.Node cannot be created in Javascript")));
         }
-        return Undefined();
+        return scope.Close(Undefined());
     }
 
     Handle<Value> OSMNodeWrap::wkb(const Arguments& args) {
         HandleScope scope;
-        osmium::Node& node = static_cast<osmium::Node&>(*(node::ObjectWrap::Unwrap<OSMNodeWrap>(args.This())->m_it));
 
-        std::string wkb { wkb_factory.create_point(node) };
+        std::string wkb { wkb_factory.create_point(wrapped(args.This())) };
 #if NODE_VERSION_AT_LEAST(0, 10, 0)
         return scope.Close(node::Buffer::New(wkb.data(), wkb.size())->handle_);
 #else
@@ -69,9 +68,8 @@ namespace node_osmium {
 
     Handle<Value> OSMNodeWrap::wkt(const Arguments& args) {
         HandleScope scope;
-        osmium::Node& node = static_cast<osmium::Node&>(*(node::ObjectWrap::Unwrap<OSMNodeWrap>(args.This())->m_it));
 
-        std::string wkt { wkt_factory.create_point(node) };
+        std::string wkt { wkt_factory.create_point(wrapped(args.This())) };
 
         return scope.Close(String::New(wkt.c_str()));
     }

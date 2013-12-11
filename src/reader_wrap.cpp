@@ -1,11 +1,20 @@
 
 // c++
 #include <exception>
+#include <string>
+
+// node.js
+#include <node.h>
+#include <node_object_wrap.h>
+
+// osmium
+#include <osmium/visitor.hpp>
 
 // node-osmium
 #include "reader_wrap.hpp"
 #include "file_wrap.hpp"
 #include "handler.hpp"
+#include "osm_object_wrap.hpp"
 
 namespace node_osmium {
 
@@ -79,7 +88,7 @@ namespace node_osmium {
         HandleScope scope;
         Local<Object> obj = Object::New();
         ReaderWrap* reader = node::ObjectWrap::Unwrap<ReaderWrap>(args.This());
-        const osmium::io::Header& header = reader->m_header;
+        const osmium::io::Header& header = reader->m_this->header();
         obj->Set(String::New("generator"), String::New(header.get("generator").c_str()));
         const osmium::Box& bounds = header.box();
         Local<Array> arr = Array::New(4);
@@ -118,16 +127,15 @@ namespace node_osmium {
         }
 
         JSHandler* handler = node::ObjectWrap::Unwrap<JSHandler>(obj);
-        ReaderWrap* reader = node::ObjectWrap::Unwrap<ReaderWrap>(args.This());
-        reader_ptr r_ptr = reader->get();
+        osmium::io::Reader& reader = wrapped(args.This());
 
         if (with_location_handler) {
             index_pos_type index_pos;
             index_neg_type index_neg;
             location_handler_type location_handler(index_pos, index_neg);
 
-            osmium::io::InputIterator<osmium::io::Reader, osmium::Object> it(*r_ptr);
-            osmium::io::InputIterator<osmium::io::Reader, osmium::Object> end;
+            input_iterator it(reader);
+            input_iterator end;
 
             for (; it != end; ++it) {
                 osmium::apply_item(*it, location_handler);
@@ -136,8 +144,8 @@ namespace node_osmium {
 
             handler->done();
         } else {
-            osmium::io::InputIterator<osmium::io::Reader, osmium::Object> it(*r_ptr);
-            osmium::io::InputIterator<osmium::io::Reader, osmium::Object> end;
+            input_iterator it(reader);
+            input_iterator end;
 
             for (; it != end; ++it) {
                 handler->dispatch_object(it);
@@ -150,10 +158,7 @@ namespace node_osmium {
     }
 
     Handle<Value> ReaderWrap::close(const Arguments& args) {
-        HandleScope scope;
-        ReaderWrap* reader = node::ObjectWrap::Unwrap<ReaderWrap>(args.This());
-        reader_ptr r_ptr = reader->get();
-        r_ptr->close();
+        wrapped(args.This()).close();
         return Undefined();
     }
 

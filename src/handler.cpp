@@ -2,6 +2,17 @@
 // c++
 #include <string>
 
+// v8
+#include <v8.h>
+
+// node
+#include <node.h>
+#include <node_object_wrap.h>
+
+// osmium
+#include <osmium/osm/object.hpp>
+
+// node-osmium
 #include "handler.hpp"
 #include "osm_node_wrap.hpp"
 #include "osm_way_wrap.hpp"
@@ -107,7 +118,7 @@ namespace node_osmium {
         return scope.Close(Undefined());
     }
 
-    void JSHandler::dispatch_object(const osmium::io::InputIterator<osmium::io::Reader, osmium::Object>& it) {
+    void JSHandler::dispatch_object(const input_iterator& it) {
         HandleScope scope;
         switch (it->type()) {
             case osmium::item_type::node:

@@ -3,16 +3,10 @@
 #include <v8.h>
 
 // node.js
-#include <node.h>
-#include <node_version.h>
 #include <node_object_wrap.h>
-#include <node_buffer.h>
 
-// osmium
-#include <osmium/handler.hpp>
-#include <osmium/osm/object.hpp>
-#include <osmium/io/input_iterator.hpp>
-#include <osmium/io/reader.hpp>
+// node-osmium
+#include "osm_object_wrap.hpp"
 
 namespace node_osmium {
 
@@ -37,7 +31,7 @@ namespace node_osmium {
             Unref();
         }
 
-        void dispatch_object(const osmium::io::InputIterator<osmium::io::Reader, osmium::Object>& it);
+        void dispatch_object(const input_iterator& it);
 
         void done() {
             if (!done_cb.IsEmpty()) {

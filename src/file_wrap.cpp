@@ -2,6 +2,9 @@
 // c++
 #include <exception>
 
+// v8
+#include <v8.h>
+
 #include "file_wrap.hpp"
 
 namespace node_osmium {

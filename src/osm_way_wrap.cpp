@@ -37,7 +37,7 @@ namespace node_osmium {
             void* ptr = ext->Value();
             OSMWayWrap* way = static_cast<OSMWayWrap*>(ptr);
             way->Wrap(args.This());
-            osmium::Way& obj = static_cast<osmium::Way&>(*(way->m_it));
+            osmium::Way& obj = static_cast<osmium::Way&>(*(way->get()));
             args.This()->Set(String::New("id"), Number::New(obj.id()));
             args.This()->Set(String::New("version"), Number::New(obj.version()));
             args.This()->Set(String::New("changeset"), Number::New(obj.changeset()));
@@ -55,10 +55,9 @@ namespace node_osmium {
 
     Handle<Value> OSMWayWrap::wkb(const Arguments& args) {
         HandleScope scope;
-        osmium::Way& way = static_cast<osmium::Way&>(*(node::ObjectWrap::Unwrap<OSMWayWrap>(args.This())->m_it));
 
         try {
-            std::string wkb { wkb_factory.create_linestring(way) };
+            std::string wkb { wkb_factory.create_linestring(wrapped(args.This())) };
 #if NODE_VERSION_AT_LEAST(0, 10, 0)
             return scope.Close(node::Buffer::New(wkb.data(), wkb.size())->handle_);
 #else
@@ -71,10 +70,9 @@ namespace node_osmium {
 
     Handle<Value> OSMWayWrap::wkt(const Arguments& args) {
         HandleScope scope;
-        osmium::Way& way = static_cast<osmium::Way&>(*(node::ObjectWrap::Unwrap<OSMWayWrap>(args.This())->m_it));
 
         try {
-            std::string wkt { wkt_factory.create_linestring(way) };
+            std::string wkt { wkt_factory.create_linestring(wrapped(args.This())) };
             return scope.Close(String::New(wkt.c_str()));
         } catch (osmium::geom::geometry_error&) {
             return scope.Close(Undefined());
@@ -83,7 +81,7 @@ namespace node_osmium {
 
     Handle<Value> OSMWayWrap::nodes(const Arguments& args) {
         HandleScope scope;
-        osmium::Way& way = static_cast<osmium::Way&>(*(node::ObjectWrap::Unwrap<OSMWayWrap>(args.This())->m_it));
+        osmium::Way& way = static_cast<osmium::Way&>(*(node::ObjectWrap::Unwrap<OSMWayWrap>(args.This())->get()));
 
         if (args.Length() == 0) {
             Local<Array> nodes = Array::New(way.nodes().size());

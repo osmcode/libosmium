@@ -29,7 +29,7 @@ namespace node_osmium {
             void* ptr = ext->Value();
             OSMRelationWrap* relation = static_cast<OSMRelationWrap*>(ptr);
             relation->Wrap(args.This());
-            osmium::Relation& obj = static_cast<osmium::Relation&>(*(relation->m_it));
+            osmium::Relation& obj = static_cast<osmium::Relation&>(*(relation->get()));
             args.This()->Set(String::New("id"), Number::New(obj.id()));
             args.This()->Set(String::New("version"), Number::New(obj.version()));
             args.This()->Set(String::New("changeset"), Number::New(obj.changeset()));
@@ -47,7 +47,7 @@ namespace node_osmium {
 
     Handle<Value> OSMRelationWrap::members(const Arguments& args) {
         HandleScope scope;
-        osmium::Relation& relation = static_cast<osmium::Relation&>(*(node::ObjectWrap::Unwrap<OSMRelationWrap>(args.This())->m_it));
+        osmium::Relation& relation = wrapped(args.This());
 
         if (args.Length() == 0) {
             Local<Array> members = Array::New();

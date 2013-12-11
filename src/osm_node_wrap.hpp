@@ -30,6 +30,11 @@ namespace node_osmium {
         static Handle<Value> New(const Arguments& args);
         static Handle<Value> wkb(const Arguments& args);
         static Handle<Value> wkt(const Arguments& args);
+
+        static osmium::Node& wrapped(Local<Object> object) {
+            return static_cast<osmium::Node&>(OSMObjectWrap::wrapped(object));
+        }
+
         OSMNodeWrap(const input_iterator&);
 
         void _ref() {
@@ -41,7 +46,7 @@ namespace node_osmium {
         }
 
         osmium::Node& object() {
-            return static_cast<osmium::Node&>(*m_it);
+            return static_cast<osmium::Node&>(*get());
         }
 
     private:

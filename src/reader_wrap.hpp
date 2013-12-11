@@ -8,14 +8,14 @@
 #include <v8.h>
 
 // node.js
-#include <node.h>
-#include <node_version.h>
 #include <node_object_wrap.h>
 
 // osmium
 #include <osmium/io/any_input.hpp>
-#include <osmium/io/input_iterator.hpp>
-#include <osmium/visitor.hpp>
+#include <osmium/io/reader.hpp>
+#include <osmium/osm/entity_flags.hpp>
+#include <osmium/osm/location.hpp>
+#include <osmium/osm/types.hpp>
 #include <osmium/handler/node_locations_for_ways.hpp>
 #include <osmium/index/map/dummy.hpp>
 #include <osmium/index/map/stl_map.hpp>
@@ -42,10 +42,13 @@ namespace node_osmium {
         static Handle<Value> apply(const Arguments& args);
         static Handle<Value> close(const Arguments& args);
 
-        ReaderWrap(osmium::io::File& file, osmium::osm_entity::flags entities) :
+        static osmium::io::Reader& wrapped(Local<Object> object) {
+            return *(node::ObjectWrap::Unwrap<ReaderWrap>(object)->get());
+        }
+
+        ReaderWrap(const osmium::io::File& file, osmium::osm_entity::flags entities) :
             ObjectWrap(),
-            m_this(std::make_shared<osmium::io::Reader>(file, entities)),
-            m_header(m_this->header()) {
+            m_this(std::make_shared<osmium::io::Reader>(file, entities)) {
         }
 
         void _ref() {
@@ -66,7 +69,6 @@ namespace node_osmium {
         }
 
         reader_ptr m_this;
-        osmium::io::Header m_header;
     };
 
 } // namespace node_osmium
