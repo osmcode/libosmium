@@ -1,72 +1,24 @@
-// c++11
-#include <exception>
-#include <memory>
-#include <string>
 
-// v8
-#include <v8.h>
-
-// node.js
-#include <node.h>
-#include <node_version.h>
-#include <node_object_wrap.h>
-
-// osmium
-#include <osmium/io/file.hpp>
-
-using namespace v8;
+#include "file_wrap.hpp"
 
 namespace node_osmium {
 
-    typedef std::shared_ptr<osmium::io::File> file_ptr;
+    Persistent<FunctionTemplate> FileWrap::constructor;
 
-    class File : public node::ObjectWrap {
-
-    public:
-
-        static Persistent<FunctionTemplate> constructor;
-        static void Initialize(Handle<Object> target);
-        static Handle<Value> New(const Arguments& args);
-
-        File(const std::string& filename = "", const std::string& format = "");
-
-        void _ref() {
-            Ref();
-        }
-
-        void _unref() {
-            Unref();
-        }
-
-        file_ptr get() {
-            return this_;
-        }
-
-    private:
-
-        ~File() {
-        }
-
-        file_ptr this_;
-
-    };
-
-    Persistent<FunctionTemplate> File::constructor;
-
-    void File::Initialize(Handle<Object> target) {
+    void FileWrap::Initialize(Handle<Object> target) {
         HandleScope scope;
-        constructor = Persistent<FunctionTemplate>::New(FunctionTemplate::New(File::New));
+        constructor = Persistent<FunctionTemplate>::New(FunctionTemplate::New(FileWrap::New));
         constructor->InstanceTemplate()->SetInternalFieldCount(1);
         constructor->SetClassName(String::NewSymbol("File"));
         target->Set(String::NewSymbol("File"), constructor->GetFunction());
     }
 
-    File::File(const std::string& filename, const std::string& format) :
+    FileWrap::FileWrap(const std::string& filename, const std::string& format) :
         ObjectWrap(),
         this_(std::make_shared<osmium::io::File>(filename, format)) {
     }
 
-    Handle<Value> File::New(const Arguments& args) {
+    Handle<Value> FileWrap::New(const Arguments& args) {
         HandleScope scope;
         if (!args.IsConstructCall()) {
             return ThrowException(Exception::Error(String::New("Cannot call constructor as function, you need to use 'new' keyword")));
@@ -90,7 +42,7 @@ namespace node_osmium {
                 }
                 format = *String::Utf8Value(args[1]);
             }
-            File* q = new File(filename, format);
+            FileWrap* q = new FileWrap(filename, format);
             q->Wrap(args.This());
             return args.This();
         } catch (const std::exception& ex) {

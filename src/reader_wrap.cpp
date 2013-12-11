@@ -1,70 +1,15 @@
-// c++11
-#include <exception>
-#include <memory>
 
-// v8
-#include <v8.h>
-
-// node.js
-#include <node.h>
-#include <node_version.h>
-#include <node_object_wrap.h>
-
-// osmium
-#include <osmium/io/any_input.hpp>
-#include <osmium/io/input_iterator.hpp>
-#include <osmium/visitor.hpp>
-#include <osmium/handler/node_locations_for_ways.hpp>
-#include <osmium/index/map/dummy.hpp>
-#include <osmium/index/map/stl_map.hpp>
-#include <osmium/index/map/sparse_table.hpp>
-
-typedef osmium::index::map::Dummy<osmium::unsigned_object_id_type, osmium::Location> index_neg_type;
-typedef osmium::index::map::SparseTable<osmium::unsigned_object_id_type, osmium::Location> index_pos_type;
-typedef osmium::handler::NodeLocationsForWays<index_pos_type, index_neg_type> location_handler_type;
-
-using namespace v8;
+#include "reader_wrap.hpp"
+#include "file_wrap.hpp"
+#include "handler.hpp"
 
 namespace node_osmium {
 
-    typedef std::shared_ptr<osmium::io::Reader> reader_ptr;
+    Persistent<FunctionTemplate> ReaderWrap::constructor;
 
-    class Reader : public node::ObjectWrap {
-
-    public:
-
-        static Persistent<FunctionTemplate> constructor;
-        static void Initialize(Handle<Object> target);
-        static Handle<Value> New(const Arguments& args);
-        static Handle<Value> header(const Arguments& args);
-        static Handle<Value> apply(const Arguments& args);
-        static Handle<Value> close(const Arguments& args);
-        Reader(osmium::io::File& infile, osmium::osm_entity::flags entities);
-
-        void _ref() {
-            Ref();
-        }
-
-        void _unref() {
-            Unref();
-        }
-
-        reader_ptr get() {
-            return this_;
-        }
-
-    private:
-
-        ~Reader();
-        reader_ptr this_;
-        osmium::io::Header header_;
-    };
-
-    Persistent<FunctionTemplate> Reader::constructor;
-
-    void Reader::Initialize(Handle<Object> target) {
+    void ReaderWrap::Initialize(Handle<Object> target) {
         HandleScope scope;
-        constructor = Persistent<FunctionTemplate>::New(FunctionTemplate::New(Reader::New));
+        constructor = Persistent<FunctionTemplate>::New(FunctionTemplate::New(ReaderWrap::New));
         constructor->InstanceTemplate()->SetInternalFieldCount(1);
         constructor->SetClassName(String::NewSymbol("Reader"));
         NODE_SET_PROTOTYPE_METHOD(constructor, "header", header);
@@ -73,15 +18,15 @@ namespace node_osmium {
         target->Set(String::NewSymbol("Reader"), constructor->GetFunction());
     }
 
-    Reader::Reader(osmium::io::File& file, osmium::osm_entity::flags entities) :
+    ReaderWrap::ReaderWrap(osmium::io::File& file, osmium::osm_entity::flags entities) :
         ObjectWrap(),
         this_(std::make_shared<osmium::io::Reader>(file, entities)),
         header_(this_->header()) {
     }
 
-    Reader::~Reader() { }
+    ReaderWrap::~ReaderWrap() { }
 
-    Handle<Value> Reader::New(const Arguments& args) {
+    Handle<Value> ReaderWrap::New(const Arguments& args) {
         HandleScope scope;
         if (!args.IsConstructCall()) {
             return ThrowException(Exception::Error(String::New("Cannot call constructor as function, you need to use 'new' keyword")));
@@ -116,13 +61,13 @@ namespace node_osmium {
             }
             if (args[0]->IsString()) {
                 osmium::io::File file(*String::Utf8Value(args[0]));
-                Reader* q = new Reader(file, read_which_entities);
+                ReaderWrap* q = new ReaderWrap(file, read_which_entities);
                 q->Wrap(args.This());
                 return args.This();
-            } else if (args[0]->IsObject() && File::constructor->HasInstance(args[0]->ToObject())) {
+            } else if (args[0]->IsObject() && FileWrap::constructor->HasInstance(args[0]->ToObject())) {
                 Local<Object> file_obj = args[0]->ToObject();
-                File* file_wrap = node::ObjectWrap::Unwrap<File>(file_obj);
-                Reader* q = new Reader(*(file_wrap->get()), read_which_entities);
+                FileWrap* file_wrap = node::ObjectWrap::Unwrap<FileWrap>(file_obj);
+                ReaderWrap* q = new ReaderWrap(*(file_wrap->get()), read_which_entities);
                 q->Wrap(args.This());
                 return args.This();
             } else {
@@ -134,10 +79,10 @@ namespace node_osmium {
         return Undefined();
     }
 
-    Handle<Value> Reader::header(const Arguments& args) {
+    Handle<Value> ReaderWrap::header(const Arguments& args) {
         HandleScope scope;
         Local<Object> obj = Object::New();
-        Reader* reader = node::ObjectWrap::Unwrap<Reader>(args.This());
+        ReaderWrap* reader = node::ObjectWrap::Unwrap<ReaderWrap>(args.This());
         const osmium::io::Header& header = reader->header_;
         obj->Set(String::New("generator"), String::New(header.get("generator").c_str()));
         const osmium::Box& bounds = header.box();
@@ -150,7 +95,7 @@ namespace node_osmium {
         return scope.Close(obj);
     }
 
-    Handle<Value> Reader::apply(const Arguments& args) {
+    Handle<Value> ReaderWrap::apply(const Arguments& args) {
         HandleScope scope;
 
         if (args.Length() != 1 && args.Length() != 2) {
@@ -177,7 +122,7 @@ namespace node_osmium {
         }
 
         JSHandler* handler = node::ObjectWrap::Unwrap<JSHandler>(obj);
-        Reader* reader = node::ObjectWrap::Unwrap<Reader>(args.This());
+        ReaderWrap* reader = node::ObjectWrap::Unwrap<ReaderWrap>(args.This());
         reader_ptr r_ptr = reader->get();
 
         if (with_location_handler) {
@@ -208,9 +153,9 @@ namespace node_osmium {
         return Undefined();
     }
 
-    Handle<Value> Reader::close(const Arguments& args) {
+    Handle<Value> ReaderWrap::close(const Arguments& args) {
         HandleScope scope;
-        Reader* reader = node::ObjectWrap::Unwrap<Reader>(args.This());
+        ReaderWrap* reader = node::ObjectWrap::Unwrap<ReaderWrap>(args.This());
         reader_ptr r_ptr = reader->get();
         r_ptr->close();
         return Undefined();

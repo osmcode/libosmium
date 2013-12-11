@@ -9,6 +9,9 @@
       "target_name": "<(module_name)",
       "sources": [
         "src/node_osmium.cpp",
+        "src/handler.cpp",
+        "src/file_wrap.cpp",
+        "src/reader_wrap.cpp",
         "src/osm_object_wrap.cpp",
         "src/osm_node_wrap.cpp",
         "src/osm_way_wrap.cpp",
