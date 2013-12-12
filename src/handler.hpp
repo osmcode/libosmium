@@ -25,25 +25,37 @@ namespace node_osmium {
 
         void dispatch_object(const input_iterator& it);
 
-        void done() {
-            if (!done_cb.IsEmpty()) {
-                Local<Value> argv[0] = { };
-                TryCatch trycatch;
-                Handle<Value> v = done_cb->Call(Context::GetCurrent()->Global(), 0, argv);
-                if (v.IsEmpty()) {
-                    Handle<Value> exception = trycatch.Exception();
-                    String::AsciiValue exception_str(exception);
-                    printf("Exception: %s\n", *exception_str);
-                    exit(1);
-                }
-            }
-        }
+        void init();
+        void before_nodes();
+        void after_nodes();
+        void before_ways();
+        void after_ways();
+        void before_relations();
+        void after_relations();
+        void before_changesets();
+        void after_changesets();
+        void done();
 
         bool node_callback_for_tagged_only;
 
+        Persistent<Function> init_cb;
+
+        Persistent<Function> before_nodes_cb;
         Persistent<Function> node_cb;
+        Persistent<Function> after_nodes_cb;
+
+        Persistent<Function> before_ways_cb;
         Persistent<Function> way_cb;
+        Persistent<Function> after_ways_cb;
+
+        Persistent<Function> before_relations_cb;
         Persistent<Function> relation_cb;
+        Persistent<Function> after_relations_cb;
+
+        Persistent<Function> before_changesets_cb;
+        Persistent<Function> changeset_cb;
+        Persistent<Function> after_changesets_cb;
+
         Persistent<Function> done_cb;
 
     private:

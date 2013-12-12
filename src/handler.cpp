@@ -109,6 +109,41 @@ namespace node_osmium {
                 handler->relation_cb.Dispose();
             }
             handler->relation_cb = Persistent<Function>::New(callback);
+        } else if (callback_name == "init") {
+            if (!handler->init_cb.IsEmpty()) {
+                handler->init_cb.Dispose();
+            }
+            handler->init_cb = Persistent<Function>::New(callback);
+        } else if (callback_name == "before_nodes") {
+            if (!handler->before_nodes_cb.IsEmpty()) {
+                handler->before_nodes_cb.Dispose();
+            }
+            handler->before_nodes_cb = Persistent<Function>::New(callback);
+        } else if (callback_name == "after_nodes") {
+            if (!handler->after_nodes_cb.IsEmpty()) {
+                handler->after_nodes_cb.Dispose();
+            }
+            handler->after_nodes_cb = Persistent<Function>::New(callback);
+        } else if (callback_name == "before_ways") {
+            if (!handler->before_ways_cb.IsEmpty()) {
+                handler->before_ways_cb.Dispose();
+            }
+            handler->before_ways_cb = Persistent<Function>::New(callback);
+        } else if (callback_name == "after_ways") {
+            if (!handler->after_ways_cb.IsEmpty()) {
+                handler->after_ways_cb.Dispose();
+            }
+            handler->after_ways_cb = Persistent<Function>::New(callback);
+        } else if (callback_name == "before_relations") {
+            if (!handler->before_relations_cb.IsEmpty()) {
+                handler->before_relations_cb.Dispose();
+            }
+            handler->before_relations_cb = Persistent<Function>::New(callback);
+        } else if (callback_name == "after_relations") {
+            if (!handler->after_relations_cb.IsEmpty()) {
+                handler->after_relations_cb.Dispose();
+            }
+            handler->after_relations_cb = Persistent<Function>::New(callback);
         } else if (callback_name == "done") {
             if (!handler->done_cb.IsEmpty()) {
                 handler->done_cb.Dispose();
@@ -177,6 +212,146 @@ namespace node_osmium {
                 break;
             default:
                 break;
+        }
+    }
+
+    void JSHandler::init() {
+        if (!init_cb.IsEmpty()) {
+            Local<Value> argv[0] = { };
+            TryCatch trycatch;
+            Handle<Value> v = init_cb->Call(Context::GetCurrent()->Global(), 0, argv);
+            if (v.IsEmpty()) {
+                Handle<Value> exception = trycatch.Exception();
+                String::AsciiValue exception_str(exception);
+                printf("Exception: %s\n", *exception_str);
+                exit(1);
+            }
+        }
+    }
+
+    void JSHandler::before_nodes() {
+        if (!before_nodes_cb.IsEmpty()) {
+            Local<Value> argv[0] = { };
+            TryCatch trycatch;
+            Handle<Value> v = before_nodes_cb->Call(Context::GetCurrent()->Global(), 0, argv);
+            if (v.IsEmpty()) {
+                Handle<Value> exception = trycatch.Exception();
+                String::AsciiValue exception_str(exception);
+                printf("Exception: %s\n", *exception_str);
+                exit(1);
+            }
+        }
+    }
+
+    void JSHandler::after_nodes() {
+        if (!after_nodes_cb.IsEmpty()) {
+            Local<Value> argv[0] = { };
+            TryCatch trycatch;
+            Handle<Value> v = after_nodes_cb->Call(Context::GetCurrent()->Global(), 0, argv);
+            if (v.IsEmpty()) {
+                Handle<Value> exception = trycatch.Exception();
+                String::AsciiValue exception_str(exception);
+                printf("Exception: %s\n", *exception_str);
+                exit(1);
+            }
+        }
+    }
+
+    void JSHandler::before_ways() {
+        if (!before_ways_cb.IsEmpty()) {
+            Local<Value> argv[0] = { };
+            TryCatch trycatch;
+            Handle<Value> v = before_ways_cb->Call(Context::GetCurrent()->Global(), 0, argv);
+            if (v.IsEmpty()) {
+                Handle<Value> exception = trycatch.Exception();
+                String::AsciiValue exception_str(exception);
+                printf("Exception: %s\n", *exception_str);
+                exit(1);
+            }
+        }
+    }
+
+    void JSHandler::after_ways() {
+        if (!after_ways_cb.IsEmpty()) {
+            Local<Value> argv[0] = { };
+            TryCatch trycatch;
+            Handle<Value> v = after_ways_cb->Call(Context::GetCurrent()->Global(), 0, argv);
+            if (v.IsEmpty()) {
+                Handle<Value> exception = trycatch.Exception();
+                String::AsciiValue exception_str(exception);
+                printf("Exception: %s\n", *exception_str);
+                exit(1);
+            }
+        }
+    }
+
+    void JSHandler::before_relations() {
+        if (!before_relations_cb.IsEmpty()) {
+            Local<Value> argv[0] = { };
+            TryCatch trycatch;
+            Handle<Value> v = before_relations_cb->Call(Context::GetCurrent()->Global(), 0, argv);
+            if (v.IsEmpty()) {
+                Handle<Value> exception = trycatch.Exception();
+                String::AsciiValue exception_str(exception);
+                printf("Exception: %s\n", *exception_str);
+                exit(1);
+            }
+        }
+    }
+
+    void JSHandler::after_relations() {
+        if (!after_relations_cb.IsEmpty()) {
+            Local<Value> argv[0] = { };
+            TryCatch trycatch;
+            Handle<Value> v = after_relations_cb->Call(Context::GetCurrent()->Global(), 0, argv);
+            if (v.IsEmpty()) {
+                Handle<Value> exception = trycatch.Exception();
+                String::AsciiValue exception_str(exception);
+                printf("Exception: %s\n", *exception_str);
+                exit(1);
+            }
+        }
+    }
+
+    void JSHandler::before_changesets() {
+        if (!before_changesets_cb.IsEmpty()) {
+            Local<Value> argv[0] = { };
+            TryCatch trycatch;
+            Handle<Value> v = before_changesets_cb->Call(Context::GetCurrent()->Global(), 0, argv);
+            if (v.IsEmpty()) {
+                Handle<Value> exception = trycatch.Exception();
+                String::AsciiValue exception_str(exception);
+                printf("Exception: %s\n", *exception_str);
+                exit(1);
+            }
+        }
+    }
+
+    void JSHandler::after_changesets() {
+        if (!after_changesets_cb.IsEmpty()) {
+            Local<Value> argv[0] = { };
+            TryCatch trycatch;
+            Handle<Value> v = after_changesets_cb->Call(Context::GetCurrent()->Global(), 0, argv);
+            if (v.IsEmpty()) {
+                Handle<Value> exception = trycatch.Exception();
+                String::AsciiValue exception_str(exception);
+                printf("Exception: %s\n", *exception_str);
+                exit(1);
+            }
+        }
+    }
+
+    void JSHandler::done() {
+        if (!done_cb.IsEmpty()) {
+            Local<Value> argv[0] = { };
+            TryCatch trycatch;
+            Handle<Value> v = done_cb->Call(Context::GetCurrent()->Global(), 0, argv);
+            if (v.IsEmpty()) {
+                Handle<Value> exception = trycatch.Exception();
+                String::AsciiValue exception_str(exception);
+                printf("Exception: %s\n", *exception_str);
+                exit(1);
+            }
         }
     }
 

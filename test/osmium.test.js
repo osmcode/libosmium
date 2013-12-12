@@ -93,4 +93,36 @@ describe('osmium', function() {
         reader.apply(location_handler, handler);
     });
 
+    it('should be able to call before and after callbacks', function(done) {
+        var handler = new osmium.Handler();
+        var nodes = 0;
+        var before_nodes = 0, after_nodes = 0;
+
+        handler.on('init', function() {
+            assert.equal(nodes, 0);
+        });
+        handler.on('before_nodes', function() {
+            assert.equal(nodes, 0);
+            before_nodes++;
+        });
+        handler.on('node',function(node) {
+            ++nodes;
+        });
+        handler.on('after_nodes', function() {
+            assert.equal(nodes >= 1500, true);
+            after_nodes++;
+        });
+        handler.on('done',function() {
+            assert.equal(nodes >= 1500, true);
+            done();
+        });
+
+        var file = new osmium.File(__dirname+"/data/winthrop.osm");
+        var reader = new osmium.Reader(file);
+        reader.apply(handler);
+
+        assert.equal(before_nodes, 1);
+        assert.equal(after_nodes, 1);
+    });
+
 });

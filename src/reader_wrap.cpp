@@ -123,14 +123,59 @@ namespace node_osmium {
 
     }; // visitor_type
 
-    struct visitor_done_type : public boost::static_visitor<> {
+    struct visitor_before_after_type : public boost::static_visitor<> {
 
-        template <class T>
-        void operator()(T& handler) const {
-            handler.done();
+        osmium::item_type m_last;
+        osmium::item_type m_current;
+
+        visitor_before_after_type(osmium::item_type last, osmium::item_type current) :
+            m_last(last),
+            m_current(current) {
         }
 
-    }; // visitor_done_type
+        template <class TVisitor>
+        void operator()(TVisitor& visitor) const {
+            switch (m_last) {
+                case osmium::item_type::undefined:
+                    visitor.init();
+                    break;
+                case osmium::item_type::node:
+                    visitor.after_nodes();
+                    break;
+                case osmium::item_type::way:
+                    visitor.after_ways();
+                    break;
+                case osmium::item_type::relation:
+                    visitor.after_relations();
+                    break;
+                case osmium::item_type::changeset:
+                    visitor.after_changesets();
+                    break;
+                default:
+                    break;
+            }
+            switch (m_current) {
+                case osmium::item_type::undefined:
+                    visitor.done();
+                    break;
+                case osmium::item_type::node:
+                    visitor.before_nodes();
+                    break;
+                case osmium::item_type::way:
+                    visitor.before_ways();
+                    break;
+                case osmium::item_type::relation:
+                    visitor.before_relations();
+                    break;
+                case osmium::item_type::changeset:
+                    visitor.before_changesets();
+                    break;
+                default:
+                    break;
+            }
+        }
+
+    }; // visitor_before_after
 
     Handle<Value> ReaderWrap::apply(const Arguments& args) {
         HandleScope scope;
@@ -157,16 +202,27 @@ namespace node_osmium {
         input_iterator it(reader);
         input_iterator end;
 
+        osmium::item_type last_type = osmium::item_type::undefined;
+
         for (; it != end; ++it) {
+            visitor_before_after_type visitor_before_after(last_type, it->type());
             visitor_type visitor(it);
+
             for (some_handler_type& handler : handlers) {
+                if (last_type != it->type()) {
+                    boost::apply_visitor(visitor_before_after, handler);
+                }
                 boost::apply_visitor(visitor, handler);
+            }
+
+            if (last_type != it->type()) {
+                last_type = it->type();
             }
         }
 
-        visitor_done_type visitor_done;
+        visitor_before_after_type visitor_before_after(last_type, osmium::item_type::undefined);
         for (auto handler : handlers) {
-            boost::apply_visitor(visitor_done, handler);
+            boost::apply_visitor(visitor_before_after, handler);
         }
 
         return Undefined();
