@@ -30,7 +30,6 @@ namespace node_osmium {
         static Handle<Value> wkb(const Arguments& args);
         static Handle<Value> wkt(const Arguments& args);
         static Handle<Value> nodes(const Arguments& args);
-        static Handle<Value> get_prop(Local<String> property,const AccessorInfo& info);
 
         static osmium::Way& wrapped(Local<Object> object) {
             return static_cast<osmium::Way&>(OSMObjectWrap::wrapped(object));
