@@ -12,6 +12,15 @@ namespace node_osmium {
         constructor->SetClassName(String::NewSymbol("Relation"));
         NODE_SET_PROTOTYPE_METHOD(constructor, "tags", tags);
         NODE_SET_PROTOTYPE_METHOD(constructor, "members", members);
+        enum PropertyAttribute attributes =
+            static_cast<PropertyAttribute>(v8::ReadOnly | v8::DontDelete);
+        SET_ACCESSOR(constructor, "id", get_id, attributes);
+        SET_ACCESSOR(constructor, "version", get_version, attributes);
+        SET_ACCESSOR(constructor, "changeset", get_changeset, attributes);
+        SET_ACCESSOR(constructor, "visible", get_visible, attributes);
+        SET_ACCESSOR(constructor, "timestamp", get_timestamp, attributes);
+        SET_ACCESSOR(constructor, "uid", get_uid, attributes);
+        SET_ACCESSOR(constructor, "user", get_user, attributes);
         target->Set(String::NewSymbol("Relation"), constructor->GetFunction());
     }
 
@@ -29,15 +38,6 @@ namespace node_osmium {
             void* ptr = ext->Value();
             OSMRelationWrap* relation = static_cast<OSMRelationWrap*>(ptr);
             relation->Wrap(args.This());
-            osmium::Relation& obj = static_cast<osmium::Relation&>(*(relation->get()));
-            args.This()->Set(String::New("id"), Number::New(obj.id()));
-            args.This()->Set(String::New("version"), Number::New(obj.version()));
-            args.This()->Set(String::New("changeset"), Number::New(obj.changeset()));
-            args.This()->Set(String::New("visible"), Boolean::New(obj.visible()));
-            args.This()->Set(String::New("timestamp"), Number::New(obj.timestamp()));
-            args.This()->Set(String::New("timestamp_iso"), String::New(obj.timestamp().to_iso().c_str(), obj.timestamp().to_iso().size()));
-            args.This()->Set(String::New("uid"), Number::New(obj.uid()));
-            args.This()->Set(String::New("user"), String::New(obj.user()));
             return args.This();
         } else {
             return ThrowException(Exception::TypeError(String::New("osmium.Relation cannot be created in Javascript")));

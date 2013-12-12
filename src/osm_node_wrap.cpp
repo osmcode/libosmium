@@ -19,6 +19,17 @@ namespace node_osmium {
         NODE_SET_PROTOTYPE_METHOD(constructor, "tags", tags);
         NODE_SET_PROTOTYPE_METHOD(constructor, "wkb", wkb);
         NODE_SET_PROTOTYPE_METHOD(constructor, "wkt", wkt);
+        enum PropertyAttribute attributes =
+            static_cast<PropertyAttribute>(v8::ReadOnly | v8::DontDelete);
+        SET_ACCESSOR(constructor, "id", get_id, attributes);
+        SET_ACCESSOR(constructor, "version", get_version, attributes);
+        SET_ACCESSOR(constructor, "changeset", get_changeset, attributes);
+        SET_ACCESSOR(constructor, "visible", get_visible, attributes);
+        SET_ACCESSOR(constructor, "timestamp", get_timestamp, attributes);
+        SET_ACCESSOR(constructor, "uid", get_uid, attributes);
+        SET_ACCESSOR(constructor, "user", get_user, attributes);
+        SET_ACCESSOR(constructor, "lon", get_lon, attributes);
+        SET_ACCESSOR(constructor, "lat", get_lat, attributes);
         target->Set(String::NewSymbol("Node"), constructor->GetFunction());
     }
 
@@ -36,23 +47,23 @@ namespace node_osmium {
             void* ptr = ext->Value();
             OSMNodeWrap* node = static_cast<OSMNodeWrap*>(ptr);
             node->Wrap(args.This());
-            osmium::Node& obj = static_cast<osmium::Node&>(*(node->get()));
-            args.This()->Set(String::New("id"), Number::New(obj.id()));
-            args.This()->Set(String::New("version"), Number::New(obj.version()));
-            args.This()->Set(String::New("changeset"), Number::New(obj.changeset()));
-            args.This()->Set(String::New("visible"), Boolean::New(obj.visible()));
-            args.This()->Set(String::New("timestamp"), Number::New(obj.timestamp()));
-            args.This()->Set(String::New("timestamp_iso"), String::New(obj.timestamp().to_iso().c_str(), obj.timestamp().to_iso().size()));
-            args.This()->Set(String::New("uid"), Number::New(obj.uid()));
-            args.This()->Set(String::New("user"), String::New(obj.user()));
-            args.This()->Set(String::New("lon"), Number::New(obj.lon()));
-            args.This()->Set(String::New("lat"), Number::New(obj.lat()));
-
             return args.This();
         } else {
             return ThrowException(Exception::TypeError(String::New("osmium.Node cannot be created in Javascript")));
         }
         return scope.Close(Undefined());
+    }
+
+    Handle<Value> OSMNodeWrap::get_lon(Local<String> property,const AccessorInfo& info)
+    {
+        HandleScope scope;
+        return scope.Close(Number::New(wrapped(info.This()).lon()));
+    }
+
+    Handle<Value> OSMNodeWrap::get_lat(Local<String> property,const AccessorInfo& info)
+    {
+        HandleScope scope;
+        return scope.Close(Number::New(wrapped(info.This()).lat()));
     }
 
     Handle<Value> OSMNodeWrap::wkb(const Arguments& args) {

@@ -31,6 +31,7 @@ namespace node_osmium {
         static void Initialize(Handle<Object> target);
         static Handle<Value> New(const Arguments& args);
         static Handle<Value> members(const Arguments& args);
+        static Handle<Value> get_prop(Local<String> property,const AccessorInfo& info);
 
         static osmium::Relation& wrapped(Local<Object> object) {
             return static_cast<osmium::Relation&>(OSMObjectWrap::wrapped(object));

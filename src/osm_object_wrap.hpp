@@ -17,6 +17,10 @@
 
 using namespace v8;
 
+#define SET_ACCESSOR(t, name, getter,attributes)                                         \
+    t->InstanceTemplate()->SetAccessor(String::NewSymbol(name),getter,NULL,Handle<Value>(),v8::DEFAULT,attributes); \
+
+
 namespace node_osmium {
 
     typedef osmium::io::InputIterator<osmium::io::Reader, osmium::Object> input_iterator;
@@ -28,6 +32,13 @@ namespace node_osmium {
     public:
 
         static Handle<Value> tags(const Arguments& args);
+        static Handle<Value> get_id(Local<String> property,const AccessorInfo& info);
+        static Handle<Value> get_version(Local<String> property,const AccessorInfo& info);
+        static Handle<Value> get_changeset(Local<String> property,const AccessorInfo& info);
+        static Handle<Value> get_visible(Local<String> property,const AccessorInfo& info);
+        static Handle<Value> get_timestamp(Local<String> property,const AccessorInfo& info);
+        static Handle<Value> get_uid(Local<String> property,const AccessorInfo& info);
+        static Handle<Value> get_user(Local<String> property,const AccessorInfo& info);
 
         static osmium::Object& wrapped(Local<Object> object) {
             return *(node::ObjectWrap::Unwrap<OSMObjectWrap>(object)->get());

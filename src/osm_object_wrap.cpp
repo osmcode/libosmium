@@ -25,4 +25,46 @@ namespace node_osmium {
         return Undefined();
     }
 
+    Handle<Value> OSMObjectWrap::get_id(Local<String> property,const AccessorInfo& info)
+    {
+        HandleScope scope;
+        return scope.Close(Number::New(wrapped(info.This()).id()));
+    }
+
+    Handle<Value> OSMObjectWrap::get_version(Local<String> property,const AccessorInfo& info)
+    {
+        HandleScope scope;
+        return scope.Close(Number::New(wrapped(info.This()).version()));
+    }
+
+    Handle<Value> OSMObjectWrap::get_changeset(Local<String> property,const AccessorInfo& info)
+    {
+        HandleScope scope;
+        return scope.Close(Number::New(wrapped(info.This()).changeset()));
+    }
+
+    Handle<Value> OSMObjectWrap::get_visible(Local<String> property,const AccessorInfo& info)
+    {
+        HandleScope scope;
+        return scope.Close(Boolean::New(wrapped(info.This()).visible()));
+    }
+
+    Handle<Value> OSMObjectWrap::get_timestamp(Local<String> property,const AccessorInfo& info)
+    {
+        HandleScope scope;
+        return scope.Close(Number::New(wrapped(info.This()).timestamp()));
+    }
+
+    Handle<Value> OSMObjectWrap::get_uid(Local<String> property,const AccessorInfo& info)
+    {
+        HandleScope scope;
+        return scope.Close(Number::New(wrapped(info.This()).uid()));
+    }
+
+    Handle<Value> OSMObjectWrap::get_user(Local<String> property,const AccessorInfo& info)
+    {
+        HandleScope scope;
+        return scope.Close(String::New(wrapped(info.This()).user()));
+    }
+
 } // namespace node_osmium
