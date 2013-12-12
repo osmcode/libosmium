@@ -10,6 +10,7 @@
       "sources": [
         "src/node_osmium.cpp",
         "src/handler.cpp",
+        "src/location_handler_wrap.cpp",
         "src/file_wrap.cpp",
         "src/reader_wrap.cpp",
         "src/osm_object_wrap.cpp",

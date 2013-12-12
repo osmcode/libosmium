@@ -2,6 +2,10 @@
 // c++
 #include <exception>
 #include <string>
+#include <vector>
+
+// boost
+#include <boost/variant.hpp>
 
 // node.js
 #include <node.h>
@@ -14,6 +18,7 @@
 #include "reader_wrap.hpp"
 #include "file_wrap.hpp"
 #include "handler.hpp"
+#include "location_handler_wrap.hpp"
 #include "osm_object_wrap.hpp"
 
 namespace node_osmium {
@@ -100,58 +105,68 @@ namespace node_osmium {
         return scope.Close(obj);
     }
 
+    struct visitor_type : public boost::static_visitor<> {
+
+        input_iterator& m_it;
+
+        visitor_type(input_iterator& it) :
+            m_it(it) {
+        }
+
+        void operator()(JSHandler& handler) const {
+            handler.dispatch_object(m_it);
+        }
+
+        void operator()(location_handler_type& handler) const {
+            osmium::apply_item(*m_it, handler);
+        }
+
+    }; // visitor_type
+
+    struct visitor_done_type : public boost::static_visitor<> {
+
+        template <class T>
+        void operator()(T& handler) const {
+            handler.done();
+        }
+
+    }; // visitor_done_type
+
     Handle<Value> ReaderWrap::apply(const Arguments& args) {
         HandleScope scope;
 
-        if (args.Length() != 1 && args.Length() != 2) {
-            return ThrowException(Exception::TypeError(String::New("please provide a single handler object")));
-        }
-        if (!args[0]->IsObject()) {
-            return ThrowException(Exception::TypeError(String::New("please provide a single handler object")));
-        }
-        Local<Object> obj = args[0]->ToObject();
-        if (obj->IsNull() || obj->IsUndefined() || !JSHandler::constructor->HasInstance(obj)) {
-            return ThrowException(Exception::TypeError(String::New("please provide a valid handler object")));
-        }
+        typedef boost::variant<location_handler_type&, JSHandler&> some_handler_type;
+        std::vector<some_handler_type> handlers;
 
-        bool with_location_handler = false;
-
-        if (args.Length() == 2) {
-            if (!args[1]->IsObject()) {
-                return ThrowException(Exception::TypeError(String::New("second argument must be 'option' object")));
-            }
-            Local<Value> wlh = args[1]->ToObject()->Get(String::New("with_location_handler"));
-            if (wlh->BooleanValue()) {
-                with_location_handler = true;
+        for (int i=0; i != args.Length(); ++i) {
+            if (args[i]->IsObject()) {
+                Local<Object> obj = args[i]->ToObject();
+                if (JSHandler::constructor->HasInstance(obj)) {
+                    handlers.push_back(*node::ObjectWrap::Unwrap<JSHandler>(obj));
+                } else if (LocationHandlerWrap::constructor->HasInstance(obj)) {
+                    location_handler_type* lh = node::ObjectWrap::Unwrap<LocationHandlerWrap>(obj)->get().get();
+                    handlers.push_back(*lh);
+                }
+            } else {
+                return ThrowException(Exception::TypeError(String::New("please provide a handler object")));
             }
         }
 
-        JSHandler* handler = node::ObjectWrap::Unwrap<JSHandler>(obj);
         osmium::io::Reader& reader = wrapped(args.This());
 
-        if (with_location_handler) {
-            index_pos_type index_pos;
-            index_neg_type index_neg;
-            location_handler_type location_handler(index_pos, index_neg);
+        input_iterator it(reader);
+        input_iterator end;
 
-            input_iterator it(reader);
-            input_iterator end;
-
-            for (; it != end; ++it) {
-                osmium::apply_item(*it, location_handler);
-                handler->dispatch_object(it);
+        for (; it != end; ++it) {
+            visitor_type visitor(it);
+            for (some_handler_type& handler : handlers) {
+                boost::apply_visitor(visitor, handler);
             }
+        }
 
-            handler->done();
-        } else {
-            input_iterator it(reader);
-            input_iterator end;
-
-            for (; it != end; ++it) {
-                handler->dispatch_object(it);
-            }
-
-            handler->done();
+        visitor_done_type visitor_done;
+        for (auto handler : handlers) {
+            boost::apply_visitor(visitor_done, handler);
         }
 
         return Undefined();

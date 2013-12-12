@@ -36,7 +36,14 @@ namespace node_osmium {
         void done() {
             if (!done_cb.IsEmpty()) {
                 Local<Value> argv[0] = { };
-                done_cb->Call(Context::GetCurrent()->Global(), 0, argv);
+                TryCatch trycatch;
+                Handle<Value> v = done_cb->Call(Context::GetCurrent()->Global(), 0, argv);
+                if (v.IsEmpty()) {
+                    Handle<Value> exception = trycatch.Exception();
+                    String::AsciiValue exception_str(exception);
+                    printf("Exception: %s\n", *exception_str);
+                    exit(1);
+                }
             }
         }
 

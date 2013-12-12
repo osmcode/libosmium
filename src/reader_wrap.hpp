@@ -16,14 +16,6 @@
 #include <osmium/osm/entity_flags.hpp>
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/types.hpp>
-#include <osmium/handler/node_locations_for_ways.hpp>
-#include <osmium/index/map/dummy.hpp>
-#include <osmium/index/map/stl_map.hpp>
-#include <osmium/index/map/sparse_table.hpp>
-
-typedef osmium::index::map::Dummy<osmium::unsigned_object_id_type, osmium::Location> index_neg_type;
-typedef osmium::index::map::SparseTable<osmium::unsigned_object_id_type, osmium::Location> index_pos_type;
-typedef osmium::handler::NodeLocationsForWays<index_pos_type, index_neg_type> location_handler_type;
 
 using namespace v8;
 
