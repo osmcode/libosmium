@@ -54,14 +54,12 @@ namespace node_osmium {
         return scope.Close(Undefined());
     }
 
-    Handle<Value> OSMNodeWrap::get_lon(Local<String> property,const AccessorInfo& info)
-    {
+    Handle<Value> OSMNodeWrap::get_lon(Local<String> property,const AccessorInfo& info) {
         HandleScope scope;
         return scope.Close(Number::New(wrapped(info.This()).lon()));
     }
 
-    Handle<Value> OSMNodeWrap::get_lat(Local<String> property,const AccessorInfo& info)
-    {
+    Handle<Value> OSMNodeWrap::get_lat(Local<String> property,const AccessorInfo& info) {
         HandleScope scope;
         return scope.Close(Number::New(wrapped(info.This()).lat()));
     }

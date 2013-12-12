@@ -19,7 +19,7 @@ using namespace v8;
 
 #define SET_ACCESSOR(t, name, getter,attributes)                                         \
     t->InstanceTemplate()->SetAccessor(String::NewSymbol(name),getter,NULL,Handle<Value>(),v8::DEFAULT,attributes); \
-
+ 
 
 namespace node_osmium {
 
