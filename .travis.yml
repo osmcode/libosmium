@@ -24,7 +24,7 @@ install:
 
 before_script:
  - git clone https://github.com/osmcode/libosmium.git ../libosmium
- - CXX=g++-4.7 npm install
+ - CXX=g++-4.7 npm install --build-from-source
 
 script:
  - make test
