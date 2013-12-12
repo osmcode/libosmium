@@ -46,8 +46,7 @@ DEALINGS IN THE SOFTWARE.
 #include <thread>
 #include <utility>
 
-// UTF8-CPP header-only library
-#include <utf8/unchecked.h>
+#include <boost/regex/pending/unicode_iterator.hpp>
 
 #include <osmium/handler.hpp>
 #include <osmium/io/detail/output_format.hpp>
@@ -89,8 +88,9 @@ namespace osmium {
                 char m_tmp_buffer[tmp_buffer_size+1];
 
                 void append_encoded_string(const std::string& data) {
-                    utf8::unchecked::iterator<std::string::const_iterator> it {data.cbegin()};
-                    utf8::unchecked::iterator<std::string::const_iterator> end {data.cend()};
+                    boost::u8_to_u32_iterator<std::string::const_iterator> it(data.cbegin(), data.cbegin(), data.cend());
+                    boost::u8_to_u32_iterator<std::string::const_iterator> end(data.cend(), data.cend(), data.cend());
+                    boost::utf8_output_iterator<std::back_insert_iterator<std::string>> oit(std::back_inserter(m_out));
 
                     for (; it != end; ++it) {
                         uint32_t c = *it;
@@ -108,7 +108,7 @@ namespace osmium {
                             (0x0041 <= c && c <= 0x007e) ||
                             (0x00a1 <= c && c <= 0x00ac) ||
                             (0x00ae <= c && c <= 0x05ff)) {
-                            utf8::unchecked::append(c, std::back_inserter(m_out));
+                            *oit = c;
                         } else {
                             m_out += '%';
                             snprintf(m_tmp_buffer, tmp_buffer_size, "%04x", c);
