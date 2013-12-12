@@ -125,4 +125,26 @@ describe('osmium', function() {
         assert.equal(after_nodes, 1);
     });
 
+    it('should be able to call two handlers one after the other', function(done) {
+        var handler1 = new osmium.Handler();
+        var handler2 = new osmium.Handler();
+
+        var count=0;
+        handler1.on('init', function() {
+            assert.equal(count, 0);
+            count++;
+        });
+        handler2.on('init', function() {
+            assert.equal(count, 1);
+            count++;
+        });
+
+        var file = new osmium.File(__dirname+"/data/winthrop.osm");
+        var reader = new osmium.Reader(file);
+        reader.apply(handler1, handler2);
+
+        assert.equal(count, 2);
+        done();
+    });
+
 });
