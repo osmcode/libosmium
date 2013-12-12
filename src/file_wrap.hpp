@@ -33,14 +33,6 @@ namespace node_osmium {
             m_this(std::make_shared<osmium::io::File>(filename, format)) {
         }
 
-        void _ref() {
-            Ref();
-        }
-
-        void _unref() {
-            Unref();
-        }
-
         file_ptr get() {
             return m_this;
         }

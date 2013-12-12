@@ -23,14 +23,6 @@ namespace node_osmium {
         static Handle<Value> options(const Arguments& args);
         JSHandler();
 
-        void _ref() {
-            Ref();
-        }
-
-        void _unref() {
-            Unref();
-        }
-
         void dispatch_object(const input_iterator& it);
 
         void done() {
