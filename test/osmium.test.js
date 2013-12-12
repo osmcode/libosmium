@@ -4,10 +4,12 @@ var assert = require('assert');
 describe('osmium', function() {
 
     it('should be able to create an osmium.Reader', function(done) {
-        var file = new osmium.File(__dirname+"/data/berlin-latest.osm.pbf");
+        var file = new osmium.File(__dirname+"/data/winthrop.osm");
         var reader = new osmium.Reader(file, {});
         var header = reader.header();
-        assert.equal(header.generator, 'Osmium (http://wiki.openstreetmap.org/wiki/Osmium)');
+        assert.equal(header.generator, 'CGImap 0.2.0');
+        done();
+        /*
         var bounds = header.bounds;
         var expected = [ 13.08283, 52.33446, 13.76136, 52.6783 ];
         assert.ok(Math.abs(bounds[0] - expected[0]) < .000000001);
@@ -16,30 +18,22 @@ describe('osmium', function() {
         assert.ok(Math.abs(bounds[3] - expected[3]) < .000000001);
         reader.close();
         done();
+        */
     });
 
-    it('should be able to apply a handler to a reader', function(done) {
+   it('should be able to read ISO time from node', function(done) {
         var handler = new osmium.Handler();
-        var nodes = 0;
+        var count = 0;
         handler.on('node',function(node) {
-            ++nodes;
+            if (count == 0) {
+                assert.equal(node.date().toISOString(),'2009-11-17T00:10:56.000Z');
+                done();
+            }
+            count++;
         });
-        handler.on('done',function() {
-            assert.equal(nodes >= 1993505, true);
-        });
-        var file = new osmium.File(__dirname+"/data/berlin-latest.osm.pbf");
-        var reader = new osmium.Reader(file);
+        var file = new osmium.File(__dirname+"/data/winthrop.osm");
+        var reader = new osmium.Reader(file, {node:true});
         reader.apply(handler);
-
-        // since reader.apply is sync, we can re-use handlers
-        var file2 = new osmium.File(__dirname+"/data/winthrop.osm");
-        var reader2 = new osmium.Reader(file2);
-        nodes = 0;
-        handler.on('done',function() {
-            assert.equal(nodes, 1525);
-            done();
-        });
-        reader2.apply(handler);
     });
 
     it('should be able to get node data from handler parameter', function(done) {

@@ -14,11 +14,7 @@ rebuild:
 	@make clean
 	@make
 
-test/data/berlin-latest.osm.pbf:
-	cd test/data; \
-	wget http://download.geofabrik.de/europe/germany/berlin-latest.osm.pbf
-
-test: test/data/berlin-latest.osm.pbf
+test:
 	@PATH="./node_modules/mocha/bin:${PATH}" && NODE_PATH="./lib:$(NODE_PATH)" mocha -R spec --timeout 10000
 
 indent:
