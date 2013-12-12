@@ -9,8 +9,8 @@ before_install:
  - sudo apt-get -y update
  - sudo apt-get -y install gcc-4.7 g++-4.7
  # first test install of binary
- - npm install --verbose
- - make test
+# - npm install --verbose
+# - make test
 
 install:
  # next test source compile, so get dependencies
