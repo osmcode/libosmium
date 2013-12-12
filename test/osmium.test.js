@@ -8,17 +8,14 @@ describe('osmium', function() {
         var reader = new osmium.Reader(file, {});
         var header = reader.header();
         assert.equal(header.generator, 'CGImap 0.2.0');
-        done();
-        /*
         var bounds = header.bounds;
-        var expected = [ 13.08283, 52.33446, 13.76136, 52.6783 ];
+        var expected = [ -120.2024, 48.4636, -120.1569, 48.4869 ];
         assert.ok(Math.abs(bounds[0] - expected[0]) < .000000001);
         assert.ok(Math.abs(bounds[1] - expected[1]) < .000000001);
         assert.ok(Math.abs(bounds[2] - expected[2]) < .000000001);
         assert.ok(Math.abs(bounds[3] - expected[3]) < .000000001);
         reader.close();
         done();
-        */
     });
 
    it('should be able to read ISO time from node', function(done) {
