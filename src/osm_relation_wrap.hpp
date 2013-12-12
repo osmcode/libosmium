@@ -38,14 +38,6 @@ namespace node_osmium {
 
         OSMRelationWrap(const input_iterator&);
 
-        void _ref() {
-            Ref();
-        }
-
-        void _unref() {
-            Unref();
-        }
-
         osmium::Relation& object() {
             return static_cast<osmium::Relation&>(*get());
         }

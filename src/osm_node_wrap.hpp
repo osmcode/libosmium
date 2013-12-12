@@ -37,14 +37,6 @@ namespace node_osmium {
 
         OSMNodeWrap(const input_iterator&);
 
-        void _ref() {
-            Ref();
-        }
-
-        void _unref() {
-            Unref();
-        }
-
         osmium::Node& object() {
             return static_cast<osmium::Node&>(*get());
         }

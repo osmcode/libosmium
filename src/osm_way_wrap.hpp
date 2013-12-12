@@ -37,14 +37,6 @@ namespace node_osmium {
 
         OSMWayWrap(const input_iterator&);
 
-        void _ref() {
-            Ref();
-        }
-
-        void _unref() {
-            Unref();
-        }
-
         osmium::Way& object() {
             return static_cast<osmium::Way&>(*get());
         }

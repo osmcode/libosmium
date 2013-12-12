@@ -43,14 +43,6 @@ namespace node_osmium {
             m_this(std::make_shared<osmium::io::Reader>(file, entities)) {
         }
 
-        void _ref() {
-            Ref();
-        }
-
-        void _unref() {
-            Unref();
-        }
-
         reader_ptr get() {
             return m_this;
         }
