@@ -46,7 +46,13 @@ DEALINGS IN THE SOFTWARE.
 #include <thread>
 #include <utility>
 
-#include <boost/regex/pending/unicode_iterator.hpp>
+#include <boost/version.hpp>
+
+#if BOOST_VERSION >= 104800
+# include <boost/regex/pending/unicode_iterator.hpp>
+#else
+# include <boost_unicode_iterator.hpp>
+#endif
 
 #include <osmium/handler.hpp>
 #include <osmium/io/detail/output_format.hpp>
