@@ -81,7 +81,7 @@ namespace osmium {
              *                 of the file will be taken from the suffix.
              *                 An empty filename or "-" means stdin or stdout.
              */
-            File(const std::string& filename = "", const std::string& format="") :
+            File(const std::string& filename, const std::string& format = "") :
                 Options(),
                 m_filename(filename),
                 m_format_string(format) {
@@ -103,6 +103,10 @@ namespace osmium {
                 if (format != "") {
                     parse_format(format);
                 }
+            }
+
+            File(const char* filename = "") :
+                File(filename, "") {
             }
 
             File(const File& other) = default;
