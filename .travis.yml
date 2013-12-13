@@ -14,6 +14,11 @@ install:
  - if [ "${CXX}" = 'g++' ]; then sudo apt-get install -y gcc-4.8 g++-4.8; fi;
  # upgrade libosmium dependencies
  - sudo apt-get install -y make libboost-dev libboost-program-options-dev zlib1g-dev libbz2-dev libexpat1-dev libsparsehash-dev libprotobuf-dev protobuf-compiler libosmpbf-dev libboost-test-dev libgdal1-dev libgeos++-dev
+ - git clone https://github.com/scrosby/OSM-binary.git
+ - cd OSM-binary/src
+ - make
+ - sudo make install
+ - cd ../..
 
 #env:
 
