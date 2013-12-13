@@ -3,14 +3,10 @@
 #endif
 #include <boost/test/unit_test.hpp>
 
-#include <boost/regex.hpp>
-
 #include <osmium/geom/wkt.hpp>
 #include <osmium/osm/ostream.hpp>
 
 #include "../basic/helper.hpp"
-
-#define OSMIUM_LINK_WITH_LIBS_BOOST_REGEX "-lboost_regex"
 
 BOOST_AUTO_TEST_SUITE(WKT_Geometry)
 
