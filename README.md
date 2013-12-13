@@ -7,6 +7,7 @@ use, see the Osmium version at https://github.com/joto/osmium .
 
 There are a few applications that use the Osmium library in the examples directory.
 
+[![Build Status](https://secure.travis-ci.org/osmcode/libosmium.png)](http://travis-ci.org/osmcode/libosmium)
 
 ## Prerequisites
 
