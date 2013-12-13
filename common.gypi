@@ -13,6 +13,7 @@
           'Release': {
               'xcode_settings': {
                 'GCC_OPTIMIZATION_LEVEL': 's',
+                'OTHER_CPLUSPLUSFLAGS':['-gline-tables-only','-fno-omit-frame-pointer'],
               },
               'ldflags': [
                     '-Wl,-s'
