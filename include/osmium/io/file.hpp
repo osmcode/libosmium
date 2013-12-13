@@ -105,10 +105,6 @@ namespace osmium {
                 }
             }
 
-            File(const char* filename = "") :
-                File(filename, "") {
-            }
-
             File(const File& other) = default;
             File& operator=(const File& other) = default;
 

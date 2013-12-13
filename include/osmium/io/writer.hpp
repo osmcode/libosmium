@@ -111,12 +111,20 @@ namespace osmium {
              * @throws std::runtime_error If the file could not be opened.
              * @throws std::system_error If the file could not be opened.
              */
-            Writer(const osmium::io::File& file, const osmium::io::Header& header = osmium::io::Header(), bool allow_overwrite=false) :
+            explicit Writer(const osmium::io::File& file, const osmium::io::Header& header = osmium::io::Header(), bool allow_overwrite=false) :
                 m_file(file),
                 m_output(osmium::io::detail::OutputFormatFactory::instance().create_output(m_file, m_output_queue)),
                 m_compressor(osmium::io::CompressionFactory::instance().create_compressor(file.compression(), osmium::io::detail::open_for_writing(m_file.filename(), allow_overwrite))),
                 m_output_task(OutputThread {m_output_queue, m_compressor.get()}) {
                 m_output->write_header(header);
+            }
+
+            explicit Writer(const std::string& filename, const osmium::io::Header& header = osmium::io::Header(), bool allow_overwrite=false) :
+                Writer(osmium::io::File(filename), header, allow_overwrite) {
+            }
+
+            explicit Writer(const char* filename, const osmium::io::Header& header = osmium::io::Header(), bool allow_overwrite=false) :
+                Writer(osmium::io::File(filename), header, allow_overwrite) {
             }
 
             Writer(const Writer&) = delete;

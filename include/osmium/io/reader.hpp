@@ -199,7 +199,7 @@ namespace osmium {
              *                            significantly if objects that are not needed anyway are not
              *                            parsed.
              */
-            Reader(const osmium::io::File& file, osmium::osm_entity::flags read_which_entities = osmium::osm_entity::flags::all) :
+            explicit Reader(const osmium::io::File& file, osmium::osm_entity::flags read_which_entities = osmium::osm_entity::flags::all) :
                 m_file(file),
                 m_read_which_entities(read_which_entities),
                 m_input(osmium::io::detail::InputFormatFactory::instance().create_input(m_file, m_read_which_entities, m_input_queue)),
@@ -208,7 +208,11 @@ namespace osmium {
                 m_input->open();
             }
 
-            Reader(const std::string& filename, osmium::osm_entity::flags read_types = osmium::osm_entity::flags::all) :
+            explicit Reader(const std::string& filename, osmium::osm_entity::flags read_types = osmium::osm_entity::flags::all) :
+                Reader(osmium::io::File(filename), read_types) {
+            }
+
+            explicit Reader(const char* filename, osmium::osm_entity::flags read_types = osmium::osm_entity::flags::all) :
                 Reader(osmium::io::File(filename), read_types) {
             }
 
