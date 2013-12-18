@@ -1,6 +1,6 @@
 all: osmium.node
 
-./build:
+./build: binding.gyp
 	`npm explore npm -g -- pwd`/bin/node-gyp-bin/node-gyp configure
 
 osmium.node: binding.gyp Makefile ./build
