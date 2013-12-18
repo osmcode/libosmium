@@ -1,10 +1,13 @@
 all: osmium.node
 
-./build: binding.gyp
-	`npm explore npm -g -- pwd`/bin/node-gyp-bin/node-gyp configure
+./node_modules/.bin/node-gyp:
+	npm install node-gyp
 
-osmium.node: binding.gyp Makefile ./build
-	`npm explore npm -g -- pwd`/bin/node-gyp-bin/node-gyp --verbose build
+./build: binding.gyp ./node_modules/.bin/node-gyp
+	./node_modules/.bin/node-gyp configure
+
+osmium.node: Makefile ./build
+	./node_modules/.bin/node-gyp build
 
 clean:
 	rm -rf ./build
