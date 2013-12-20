@@ -24,6 +24,7 @@ sed -e "s/__PROJECTNAME__/$1/g" >Makefile <<'__EOF__'
 CXXFLAGS += -O3
 #CXXFLAGS += -g
 CXXFLAGS += -std=c++11 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64
+CXXFLAGS += -I../include
 
 OS:=$(shell uname -s)
 ifeq ($(OS),Darwin)
@@ -35,6 +36,10 @@ CXXFLAGS_WARNINGS := -Wall -Wextra -pedantic -Wredundant-decls -Wdisabled-optimi
 
 LIB_EXPAT := -lexpat
 LIB_PBF   := -pthread -lz -lprotobuf-lite -losmpbf
+LIB_GZIP  := -lz
+LIB_BZIP2 := -lbz2
+
+LIB_IO    := $(LIB_EXPAT) $(LIB_PBF) $(LIB_GZIP) $(LIB_BZIP2)
 
 PROGRAMS := __PROJECTNAME__
 
@@ -43,7 +48,7 @@ PROGRAMS := __PROJECTNAME__
 all: $(PROGRAMS)
 
 __PROJECTNAME__: main.cpp
-	$(CXX) $(CXXFLAGS) $(CXXFLAGS_WARNINGS) -o $@ $< $(LDFLAGS) $(LIB_EXPAT) $(LIB_PBF)
+	$(CXX) $(CXXFLAGS) $(CXXFLAGS_WARNINGS) -o $@ $< $(LDFLAGS) $(LIB_IO)
 
 clean:
 	rm -f *.o core $(PROGRAMS)
@@ -54,13 +59,14 @@ cat >main.cpp <<'__EOF__'
 
 #include <osmium/io/any_input.hpp>
 #include <osmium/handler.hpp>
+#include <osmium/visitor.hpp>
 
-class MyHandler : public osmium::handler::Handler<MyHandler> {
+class MyHandler : public osmium::handler::Handler {
 
 public:
 
     MyHandler() :
-        osmium::handler::Handler<MyHandler>() {
+        osmium::handler::Handler() {
     }
 
     void node(const osmium::Node& node) {
@@ -83,8 +89,7 @@ int main(int argc, char* argv[]) {
 
     MyHandler handler;
     osmium::io::Reader reader(argv[1]);
-    osmium::io::Header header = reader.open();
-    reader.apply(handler);
+    osmium::apply(reader, handler);
 }
 
 __EOF__
