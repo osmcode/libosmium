@@ -30,7 +30,7 @@
         "template": "{module_name}-v{major}.{minor}.{patch}-{node_abi}-{platform}-{arch}.tar.gz"
     },
     "dependencies": {
-        "node-pre-gyp": "~0.1.4"
+        "node-pre-gyp": "~0.2.1"
     },
     "bundledDependencies":["node-pre-gyp"],
     "devDependencies": {
@@ -41,7 +41,7 @@
         "node": ">= 0.6.13 < 0.11.0"
     },
     "scripts": {
-        "install": "node-pre-gyp rebuild",
+        "install": "node-pre-gyp install --fallback-to-build",
         "test": "mocha -R spec"
     }
 }
