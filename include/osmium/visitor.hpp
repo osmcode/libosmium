@@ -5,7 +5,7 @@
 
 This file is part of Osmium (http://osmcode.org/osmium).
 
-Copyright 2013 Jochen Topf <jochen@topf.org> and others (see README).
+Copyright 2013,2014 Jochen Topf <jochen@topf.org> and others (see README).
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -46,6 +46,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/relation.hpp>
 #include <osmium/osm/tag.hpp>
 #include <osmium/osm/way.hpp>
+#include <osmium/osm/area.hpp>
 
 // IWYU pragma: no_forward_declare osmium::Changeset
 // IWYU pragma: no_forward_declare osmium::TagList
@@ -76,6 +77,9 @@ namespace osmium {
                     case osmium::item_type::relation:
                         visitor(static_cast<MaybeConst<TItem, osmium::Relation>&>(item));
                         break;
+                    case osmium::item_type::area:
+                        visitor(static_cast<MaybeConst<TItem, osmium::Area>&>(item));
+                        break;
                     case osmium::item_type::changeset:
                         visitor(static_cast<MaybeConst<TItem, osmium::Changeset>&>(item));
                         break;
@@ -88,6 +92,12 @@ namespace osmium {
                     case osmium::item_type::relation_member_list:
                     case osmium::item_type::relation_member_list_with_full_members:
                         visitor(static_cast<MaybeConst<TItem, osmium::RelationMemberList>&>(item));
+                        break;
+                    case osmium::item_type::outer_ring:
+                        visitor(static_cast<MaybeConst<TItem, osmium::OuterRing>&>(item));
+                        break;
+                    case osmium::item_type::inner_ring:
+                        visitor(static_cast<MaybeConst<TItem, osmium::InnerRing>&>(item));
                         break;
                     default:
                         throw std::runtime_error("unknown type");
@@ -105,6 +115,9 @@ namespace osmium {
                         break;
                     case osmium::item_type::relation:
                         visitor.relation(static_cast<MaybeConst<TItem, osmium::Relation>&>(item));
+                        break;
+                    case osmium::item_type::area:
+                        visitor.area(static_cast<MaybeConst<TItem, osmium::Area>&>(item));
                         break;
                     case osmium::item_type::changeset:
                         visitor.changeset(static_cast<MaybeConst<TItem, osmium::Changeset>&>(item));
@@ -126,6 +139,9 @@ namespace osmium {
                     case osmium::item_type::relation:
                         visitor.relation(static_cast<osmium::Relation&>(item));
                         break;
+                    case osmium::item_type::area:
+                        visitor.area(static_cast<osmium::Area&>(item));
+                        break;
                     default:
                         throw std::runtime_error("unknown type");
                 }
@@ -142,6 +158,9 @@ namespace osmium {
                         break;
                     case osmium::item_type::relation:
                         visitor.relation(static_cast<const osmium::Relation&>(item));
+                        break;
+                    case osmium::item_type::area:
+                        visitor.area(static_cast<const osmium::Area&>(item));
                         break;
                     default:
                         throw std::runtime_error("unknown type");

@@ -5,7 +5,7 @@
 
 This file is part of Osmium (http://osmcode.org/osmium).
 
-Copyright 2013 Jochen Topf <jochen@topf.org> and others (see README).
+Copyright 2013,2014 Jochen Topf <jochen@topf.org> and others (see README).
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -48,7 +48,9 @@ namespace osmium {
         tag_list                               = 0x11,
         way_node_list                          = 0x12,
         relation_member_list                   = 0x13,
-        relation_member_list_with_full_members = 0x23
+        relation_member_list_with_full_members = 0x23,
+        outer_ring                             = 0x40,
+        inner_ring                             = 0x41,
 
     }; // enum class item_type
 
@@ -60,6 +62,8 @@ namespace osmium {
                 return item_type::way;
             case 'r':
                 return item_type::relation;
+            case 'a':
+                return item_type::area;
             case 'c':
                 return item_type::changeset;
             default:
@@ -75,6 +79,8 @@ namespace osmium {
                 return 'w';
             case item_type::relation:
                 return 'r';
+            case item_type::area:
+                return 'a';
             case item_type::changeset:
                 return 'c';
             default:
@@ -90,6 +96,8 @@ namespace osmium {
                 return "way";
             case item_type::relation:
                 return "relation";
+            case item_type::area:
+                return "area";
             case item_type::changeset:
                 return "changeset";
             default:

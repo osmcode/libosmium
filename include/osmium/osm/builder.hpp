@@ -5,7 +5,7 @@
 
 This file is part of Osmium (http://osmcode.org/osmium).
 
-Copyright 2013 Jochen Topf <jochen@topf.org> and others (see README).
+Copyright 2013,2014 Jochen Topf <jochen@topf.org> and others (see README).
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -62,6 +62,7 @@ namespace osmium {
         typedef OSMObjectBuilder<osmium::Node> NodeBuilder;
         typedef OSMObjectBuilder<osmium::Way> WayBuilder;
         typedef OSMObjectBuilder<osmium::Relation> RelationBuilder;
+        typedef OSMObjectBuilder<osmium::Area> AreaBuilder;
 
         typedef osmium::memory::ObjectBuilder<osmium::Changeset> ChangesetBuilder;
 
@@ -95,16 +96,54 @@ namespace osmium {
                 add_padding();
             }
 
-            void add_way_node(const WayNode& way_node) {
-                new (reserve_space_for<osmium::WayNode>()) osmium::WayNode(way_node);
-                add_size(sizeof(osmium::WayNode));
+            void add_way_node(const NodeRef& way_node) {
+                new (reserve_space_for<osmium::NodeRef>()) osmium::NodeRef(way_node);
+                add_size(sizeof(osmium::NodeRef));
             }
 
             void add_way_node(const object_id_type ref, const osmium::Location location=Location()) {
-                add_way_node(WayNode(ref, location));
+                add_way_node(NodeRef(ref, location));
             }
 
         }; // class WayNodeListBuilder
+
+        class OuterRingBuilder : public osmium::memory::ObjectBuilder<OuterRing> {
+
+        public:
+
+            OuterRingBuilder(osmium::memory::Buffer& buffer, Builder* parent=nullptr) :
+                osmium::memory::ObjectBuilder<OuterRing>(buffer, parent) {
+            }
+
+            ~OuterRingBuilder() {
+                add_padding();
+            }
+
+            void add_node_ref(const NodeRef& node_ref) {
+                new (reserve_space_for<osmium::NodeRef>()) osmium::NodeRef(node_ref);
+                add_size(sizeof(osmium::NodeRef));
+            }
+
+        }; // class OuterRingBuilder
+
+        class InnerRingBuilder : public osmium::memory::ObjectBuilder<InnerRing> {
+
+        public:
+
+            InnerRingBuilder(osmium::memory::Buffer& buffer, Builder* parent=nullptr) :
+                osmium::memory::ObjectBuilder<InnerRing>(buffer, parent) {
+            }
+
+            ~InnerRingBuilder() {
+                add_padding();
+            }
+
+            void add_node_ref(const NodeRef& node_ref) {
+                new (reserve_space_for<osmium::NodeRef>()) osmium::NodeRef(node_ref);
+                add_size(sizeof(osmium::NodeRef));
+            }
+
+        }; // class InnerRingBuilder
 
         class RelationMemberListBuilder : public osmium::memory::ObjectBuilder<RelationMemberList> {
 

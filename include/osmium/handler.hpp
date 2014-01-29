@@ -5,7 +5,7 @@
 
 This file is part of Osmium (http://osmcode.org/osmium).
 
-Copyright 2013 Jochen Topf <jochen@topf.org> and others (see README).
+Copyright 2013,2014 Jochen Topf <jochen@topf.org> and others (see README).
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -38,6 +38,7 @@ namespace osmium {
     class Node;
     class Way;
     class Relation;
+    class Area;
     class Changeset;
 
     namespace handler {
@@ -53,6 +54,9 @@ namespace osmium {
             }
 
             void relation(const osmium::Relation&) const {
+            }
+
+            void area(const osmium::Area&) const {
             }
 
             void changeset(const osmium::Changeset&) const {

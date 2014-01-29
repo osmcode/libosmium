@@ -5,7 +5,7 @@
 
 This file is part of Osmium (http://osmcode.org/osmium).
 
-Copyright 2013 Jochen Topf <jochen@topf.org> and others (see README).
+Copyright 2013,2014 Jochen Topf <jochen@topf.org> and others (see README).
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -43,6 +43,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/object.hpp>
 #include <osmium/osm/types.hpp>
+#include <osmium/osm/noderef.hpp>
 
 namespace osmium {
 
@@ -50,96 +51,32 @@ namespace osmium {
         template <class T> class ObjectBuilder;
     }
 
-    class WayNode : public osmium::memory::detail::ItemHelper {
-
-        object_id_type m_ref;
-        Location m_location;
-
-        template <class TMember>
-        friend class osmium::memory::CollectionIterator;
-
-        unsigned char* next() {
-            return data() + sizeof(WayNode);
-        }
-
-        const unsigned char* next() const {
-            return data() + sizeof(WayNode);
-        }
-
-    public:
-
-        static constexpr osmium::item_type collection_type = osmium::item_type::way_node_list;
-
-        WayNode(const object_id_type ref=0, const Location& location=Location()) :
-            m_ref(ref),
-            m_location(location) {
-        }
-
-        object_id_type ref() const {
-            return m_ref;
-        }
-
-        unsigned_object_id_type positive_ref() const {
-            return std::abs(m_ref);
-        }
-
-        Location location() const {
-            return m_location;
-        }
-
-        void location(const Location& location) {
-            m_location = location;
-        }
-
-    }; // class WayNode
-
-    inline bool operator<(const WayNode& lhs, const WayNode& rhs) {
-        return lhs.ref() < rhs.ref();
-    }
-
-    inline bool operator>(const WayNode& lhs, const WayNode& rhs) {
-        return lhs.ref() > rhs.ref();
-    }
-
-    inline bool operator<=(const WayNode& lhs, const WayNode& rhs) {
-        return lhs.ref() <= rhs.ref();
-    }
-
-    inline bool operator>=(const WayNode& lhs, const WayNode& rhs) {
-        return lhs.ref() >= rhs.ref();
-    }
-
-    inline bool operator==(const WayNode& lhs, const WayNode& rhs) {
-        return lhs.ref() == rhs.ref();
-    }
-
-    inline bool operator!=(const WayNode& lhs, const WayNode& rhs) {
-        return !(lhs == rhs);
-    }
-
-
-    class WayNodeList : public osmium::memory::Collection<WayNode> {
+    class WayNodeList : public osmium::memory::Collection<NodeRef, osmium::item_type::way_node_list> {
 
     public:
 
         static constexpr osmium::item_type itemtype = osmium::item_type::way_node_list;
 
         WayNodeList():
-            osmium::memory::Collection<WayNode>() {
+            osmium::memory::Collection<NodeRef, osmium::item_type::way_node_list>() {
         }
 
         size_t size() const noexcept {
-            assert((byte_size() - sizeof(WayNodeList)) % sizeof(WayNode) == 0);
-            return (byte_size() - sizeof(WayNodeList)) / sizeof(WayNode);
+            assert((byte_size() - sizeof(WayNodeList)) % sizeof(NodeRef) == 0);
+            return (byte_size() - sizeof(WayNodeList)) / sizeof(NodeRef);
         }
 
-        const WayNode& operator[](size_t n) const {
-            const WayNode* wn = &*begin();
-            return wn[n];
+        const NodeRef& operator[](size_t n) const {
+            const NodeRef* node_ref = &*begin();
+            return node_ref[n];
         }
 
         bool is_closed() const {
             return operator[](0).ref() == operator[](size()-1).ref();
+        }
+
+        void switch_type_to_outer_ring() {
+            type(osmium::item_type::outer_ring);
         }
 
     }; // class WayNodeList
@@ -155,8 +92,6 @@ namespace osmium {
 
     public:
 
-        static constexpr osmium::item_type itemtype = osmium::item_type::way;
-
         WayNodeList& nodes() {
             return subitem_of_type<WayNodeList>();
         }
@@ -166,19 +101,38 @@ namespace osmium {
         }
 
         /**
-         * Update all nodes in a way with the ID of the given WayNode with the
-         * location of the given WayNode.
+         * Update all nodes in a way with the ID of the given NodeRef with the
+         * location of the given NodeRef.
          */
-        void update_node_location(const WayNode& new_wn) {
-            for (auto& wn : nodes()) {
-                if (wn.ref() == new_wn.ref()) {
-                    wn.location(new_wn.location());
+        void update_node_location(const NodeRef& new_node_ref) {
+            for (auto& node_ref : nodes()) {
+                if (node_ref.ref() == new_node_ref.ref()) {
+                    node_ref.location(new_node_ref.location());
                 }
             }
         }
 
+        /**
+         * Do the nodes in this way form a closed ring?
+         */
         bool is_closed() const {
             return nodes().is_closed();
+        }
+
+        /**
+         * Switch the type of this object to Area. This should only be done when
+         * the nodes form a closed ring. This will also change the Id of the way
+         * to make sure Area Ids are unique.
+         */
+        void switch_type_to_area() {
+            assert(is_closed());
+            type(osmium::item_type::area);
+            nodes().switch_type_to_outer_ring();
+            osmium::object_id_type new_id = positive_id() * 2;
+            if (id() < 0) {
+                new_id = - new_id;
+            }
+            id(new_id);
         }
 
     }; // class Way

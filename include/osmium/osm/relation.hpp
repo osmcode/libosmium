@@ -5,7 +5,7 @@
 
 This file is part of Osmium (http://osmcode.org/osmium).
 
-Copyright 2013 Jochen Topf <jochen@topf.org> and others (see README).
+Copyright 2013,2014 Jochen Topf <jochen@topf.org> and others (see README).
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -141,14 +141,12 @@ namespace osmium {
 
     }; // class RelationMember
 
-    class RelationMemberList : public osmium::memory::Collection<RelationMember> {
+    class RelationMemberList : public osmium::memory::Collection<RelationMember, osmium::item_type::relation_member_list> {
 
     public:
 
-        static constexpr osmium::item_type itemtype = osmium::item_type::relation_member_list;
-
         RelationMemberList() :
-            osmium::memory::Collection<RelationMember>() {
+            osmium::memory::Collection<RelationMember, osmium::item_type::relation_member_list>() {
         }
 
         size_t size() const noexcept {

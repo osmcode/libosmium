@@ -5,7 +5,7 @@
 
 This file is part of Osmium (http://osmcode.org/osmium).
 
-Copyright 2013 Jochen Topf <jochen@topf.org> and others (see README).
+Copyright 2013,2014 Jochen Topf <jochen@topf.org> and others (see README).
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -99,7 +99,7 @@ namespace osmium {
 
         }; // class CollectionIterator
 
-        template <class TMember>
+        template <class TMember, osmium::item_type TCollectionItemType>
         class Collection : public Item {
 
         public:
@@ -108,16 +108,18 @@ namespace osmium {
             typedef CollectionIterator<const TMember> const_iterator;
             typedef TMember value_type;
 
+            static constexpr osmium::item_type itemtype = TCollectionItemType;
+
             Collection() :
-                Item(sizeof(Collection<TMember>), TMember::collection_type) {
+                Item(sizeof(Collection<TMember, TCollectionItemType>), TCollectionItemType) {
             }
 
             bool empty() const {
-                return sizeof(Collection<TMember>) == byte_size();
+                return sizeof(Collection<TMember, TCollectionItemType>) == byte_size();
             }
 
             iterator begin() {
-                return iterator(data() + sizeof(Collection<TMember>));
+                return iterator(data() + sizeof(Collection<TMember, TCollectionItemType>));
             }
 
             iterator end() {
@@ -125,7 +127,7 @@ namespace osmium {
             }
 
             const_iterator cbegin() const {
-                return const_iterator(data() + sizeof(Collection<TMember>));
+                return const_iterator(data() + sizeof(Collection<TMember, TCollectionItemType>));
             }
 
             const_iterator cend() const {

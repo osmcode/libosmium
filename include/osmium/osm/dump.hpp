@@ -5,7 +5,7 @@
 
 This file is part of Osmium (http://osmcode.org/osmium).
 
-Copyright 2013 Jochen Topf <jochen@topf.org> and others (see README).
+Copyright 2013,2014 Jochen Topf <jochen@topf.org> and others (see README).
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -140,7 +140,7 @@ namespace osmium {
 
             void operator()(const osmium::TagList& tags) {
                 print_title("TAGS", tags);
-                for (auto& tag : tags) {
+                for (const auto& tag : tags) {
                     m_out << m_prefix
                           << "  k=|"
                           << tag.key()
@@ -153,13 +153,13 @@ namespace osmium {
 
             void operator()(const osmium::WayNodeList& wnl) {
                 print_title("NODES", wnl);
-                for (auto& wn : wnl) {
+                for (const auto& node_ref : wnl) {
                     m_out << m_prefix
                           << "  ref="
-                          << wn.ref();
-                    if (wn.location()) {
+                          << node_ref.ref();
+                    if (node_ref.location()) {
                         m_out << " pos="
-                              << wn.location();
+                              << node_ref.location();
                     }
                     m_out << "\n";
                 }
@@ -167,7 +167,7 @@ namespace osmium {
 
             void operator()(const osmium::RelationMemberList& rml) {
                 print_title("MEMBERS", rml);
-                for (auto& member : rml) {
+                for (const auto& member : rml) {
                     m_out << m_prefix
                           << "  type="
                           << member.type()
@@ -180,6 +180,34 @@ namespace osmium {
                         Dump dump(m_out, m_with_size, m_prefix + "  | ");
                         osmium::apply_item(member.get_object(), dump);
                     }
+                }
+            }
+
+            void operator()(const osmium::OuterRing& ring) {
+                print_title("OUTER RING", ring);
+                for (const auto& node_ref : ring) {
+                    m_out << m_prefix
+                          << "  ref="
+                          << node_ref.ref();
+                    if (node_ref.location()) {
+                        m_out << " pos="
+                              << node_ref.location();
+                    }
+                    m_out << "\n";
+                }
+            }
+
+            void operator()(const osmium::InnerRing& ring) {
+                print_title("INNER RING", ring);
+                for (const auto& node_ref : ring) {
+                    m_out << m_prefix
+                          << "  ref="
+                          << node_ref.ref();
+                    if (node_ref.location()) {
+                        m_out << " pos="
+                              << node_ref.location();
+                    }
+                    m_out << "\n";
                 }
             }
 
@@ -197,6 +225,11 @@ namespace osmium {
             void operator()(const osmium::Relation& relation) {
                 print_title("RELATION", relation);
                 print_meta(relation);
+            }
+
+            void operator()(const osmium::Area& area) {
+                print_title("AREA", area);
+                print_meta(area);
             }
 
             void operator()(const osmium::Changeset& changeset) {
