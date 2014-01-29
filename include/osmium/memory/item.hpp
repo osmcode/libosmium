@@ -5,7 +5,7 @@
 
 This file is part of Osmium (http://osmcode.org/osmium).
 
-Copyright 2013 Jochen Topf <jochen@topf.org> and others (see README).
+Copyright 2013,2014 Jochen Topf <jochen@topf.org> and others (see README).
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -114,11 +114,6 @@ namespace osmium {
                 return *this;
             }
 
-            Item& type(const item_type item_type) {
-                m_type = item_type;
-                return *this;
-            }
-
         protected:
 
             Item(item_size_type size=0, item_type type=item_type()) :
@@ -131,6 +126,11 @@ namespace osmium {
 
             Item& operator=(const Item&) = delete;
             Item& operator=(Item&&) = delete;
+
+            Item& type(const item_type item_type) {
+                m_type = item_type;
+                return *this;
+            }
 
         public:
 
