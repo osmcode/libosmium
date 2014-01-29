@@ -5,7 +5,7 @@
 
 This file is part of Osmium (http://osmcode.org/osmium).
 
-Copyright 2013 Jochen Topf <jochen@topf.org> and others (see README).
+Copyright 2013,2014 Jochen Topf <jochen@topf.org> and others (see README).
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -81,7 +81,7 @@ namespace osmium {
              *                 of the file will be taken from the suffix.
              *                 An empty filename or "-" means stdin or stdout.
              */
-            File(const std::string& filename, const std::string& format = "") :
+            File(const std::string& filename = "", const std::string& format = "") :
                 Options(),
                 m_filename(filename),
                 m_format_string(format) {
