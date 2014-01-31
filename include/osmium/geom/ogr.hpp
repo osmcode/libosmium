@@ -5,7 +5,7 @@
 
 This file is part of Osmium (http://osmcode.org/osmium).
 
-Copyright 2013 Jochen Topf <jochen@topf.org> and others (see README).
+Copyright 2013,2014 Jochen Topf <jochen@topf.org> and others (see README).
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -50,9 +50,11 @@ namespace osmium {
     namespace geom {
 
         struct ogr_factory_traits {
-            typedef std::unique_ptr<OGRPoint>      point_type;
-            typedef std::unique_ptr<OGRLineString> linestring_type;
-            typedef std::unique_ptr<OGRPolygon>    polygon_type;
+            typedef std::unique_ptr<OGRPoint>        point_type;
+            typedef std::unique_ptr<OGRLineString>   linestring_type;
+            typedef std::unique_ptr<OGRPolygon>      polygon_type;
+            typedef std::unique_ptr<OGRMultiPolygon> multipolygon_type;
+            typedef std::unique_ptr<OGRLinearRing>   ring_type;
         };
 
         class OGRFactory : public GeometryFactory<OGRFactory, ogr_factory_traits> {
@@ -67,11 +69,15 @@ namespace osmium {
 
         private:
 
-            linestring_type m_linestring;
+            /* Point */
 
             point_type make_point(const osmium::Location location) {
                 return std::move(std::unique_ptr<OGRPoint>(new OGRPoint(location.lon(), location.lat())));
             }
+
+            /* LineString */
+
+            linestring_type m_linestring;
 
             void linestring_start() {
                 m_linestring = std::unique_ptr<OGRLineString>(new OGRLineString());
@@ -84,6 +90,51 @@ namespace osmium {
 
             linestring_type linestring_finish() {
                 return std::move(m_linestring);
+            }
+
+            /* MultiPolygon */
+
+            multipolygon_type m_multipolygon;
+            polygon_type      m_polygon;
+            ring_type         m_ring;
+
+            void multipolygon_start() {
+                m_multipolygon = std::unique_ptr<OGRMultiPolygon>(new OGRMultiPolygon());
+            }
+
+            void multipolygon_add_outer_ring() {
+                if (m_ring) {
+                    m_polygon->addRingDirectly(m_ring.release());
+                }
+                if (m_polygon) {
+                    m_multipolygon->addGeometryDirectly(m_polygon.release());
+                }
+                m_polygon = std::unique_ptr<OGRPolygon>(new OGRPolygon());
+                m_ring = std::unique_ptr<OGRLinearRing>(new OGRLinearRing());
+            }
+
+            void multipolygon_add_inner_ring() {
+                assert(!!m_polygon);
+                if (m_ring) {
+                    m_polygon->addRingDirectly(m_ring.release());
+                }
+                m_ring = std::unique_ptr<OGRLinearRing>(new OGRLinearRing());
+            }
+
+            void multipolygon_add_location(const osmium::Location location) {
+                assert(!!m_polygon);
+                assert(!!m_ring);
+                m_ring->addPoint(location.lon(), location.lat());
+            }
+
+            multipolygon_type multipolygon_finish() {
+                if (m_ring) {
+                    m_polygon->addRingDirectly(m_ring.release());
+                }
+                if (m_polygon) {
+                    m_multipolygon->addGeometryDirectly(m_polygon.release());
+                }
+                return std::move(m_multipolygon);
             }
 
         }; // class OGRFactory

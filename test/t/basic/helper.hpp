@@ -61,4 +61,29 @@ inline osmium::Relation& buffer_add_relation(
     return builder.object();
 }
 
+inline osmium::Area& buffer_add_area(osmium::memory::Buffer& buffer, const char* user,
+        const std::vector<std::pair<const char*, const char*>>& tags,
+        const std::vector<std::pair<bool,
+            const std::vector<std::pair<osmium::object_id_type, osmium::Location>>>>& rings) {
+    osmium::osm::AreaBuilder builder(buffer);
+    builder.add_user(user);
+    add_tags(buffer, builder, tags);
+
+    for (auto& ring : rings) {
+        if (ring.first) {
+            osmium::osm::OuterRingBuilder ring_builder(buffer, &builder);
+            for (auto& p : ring.second) {
+                ring_builder.add_node_ref(p.first, p.second);
+            }
+        } else {
+            osmium::osm::InnerRingBuilder ring_builder(buffer, &builder);
+            for (auto& p : ring.second) {
+                ring_builder.add_node_ref(p.first, p.second);
+            }
+        }
+    }
+    buffer.commit();
+    return builder.object();
+}
+
 #endif // TEST_HELPER_HPP

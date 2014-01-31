@@ -5,7 +5,7 @@
 
 This file is part of Osmium (http://osmcode.org/osmium).
 
-Copyright 2013 Jochen Topf <jochen@topf.org> and others (see README).
+Copyright 2013,2014 Jochen Topf <jochen@topf.org> and others (see README).
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -49,6 +49,8 @@ namespace osmium {
             typedef std::string point_type;
             typedef std::string linestring_type;
             typedef std::string polygon_type;
+            typedef std::string multipolygon_type;
+            typedef std::string ring_type;
         };
 
         class WKBFactory : public GeometryFactory<WKBFactory, wkb_factory_traits> {
@@ -133,6 +135,8 @@ namespace osmium {
                 }
             }
 
+            /* Point */
+
             point_type make_point(const osmium::Location location) {
                 std::string data;
                 header(data, wkbPoint);
@@ -145,6 +149,8 @@ namespace osmium {
                     return data;
                 }
             }
+
+            /* LineString */
 
             void linestring_start() {
                 m_data.clear();
@@ -175,6 +181,8 @@ namespace osmium {
                     }
                 }
             }
+
+            /* MultiPolygon */
 
         }; // class WKBFactory
 

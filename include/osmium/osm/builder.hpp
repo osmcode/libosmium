@@ -124,6 +124,10 @@ namespace osmium {
                 add_size(sizeof(osmium::NodeRef));
             }
 
+            void add_node_ref(const object_id_type ref, const osmium::Location location=Location()) {
+                add_node_ref(NodeRef(ref, location));
+            }
+
         }; // class OuterRingBuilder
 
         class InnerRingBuilder : public osmium::memory::ObjectBuilder<InnerRing> {
@@ -141,6 +145,10 @@ namespace osmium {
             void add_node_ref(const NodeRef& node_ref) {
                 new (reserve_space_for<osmium::NodeRef>()) osmium::NodeRef(node_ref);
                 add_size(sizeof(osmium::NodeRef));
+            }
+
+            void add_node_ref(const object_id_type ref, const osmium::Location location=Location()) {
+                add_node_ref(NodeRef(ref, location));
             }
 
         }; // class InnerRingBuilder

@@ -5,7 +5,7 @@
 
 This file is part of Osmium (http://osmcode.org/osmium).
 
-Copyright 2013 Jochen Topf <jochen@topf.org> and others (see README).
+Copyright 2013,2014 Jochen Topf <jochen@topf.org> and others (see README).
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -36,6 +36,7 @@ DEALINGS IN THE SOFTWARE.
 #include <cassert>
 #include <iterator>
 #include <string>
+#include <utility>
 
 #include <osmium/osm/location.hpp>
 #include <osmium/geom/factory.hpp>
@@ -48,6 +49,8 @@ namespace osmium {
             typedef std::string point_type;
             typedef std::string linestring_type;
             typedef std::string polygon_type;
+            typedef std::string multipolygon_type;
+            typedef std::string ring_type;
         };
 
         class WKTFactory : public GeometryFactory<WKTFactory, wkt_factory_traits> {
@@ -65,12 +68,16 @@ namespace osmium {
             std::string m_str {};
             int m_points {0};
 
+            /* Point */
+
             point_type make_point(const Location location) {
                 std::string str {"POINT("};
                 location.as_string(std::back_inserter(str), ' ');
                 str += ')';
                 return str;
             }
+
+            /* LineString */
 
             void linestring_start() {
                 m_str = "LINESTRING(";
@@ -94,6 +101,45 @@ namespace osmium {
                     str[str.size()-1] = ')';
                     return str;
                 }
+            }
+
+            /* MultiPolygon */
+
+            bool m_in_polygon = false;
+            bool m_first = true;
+
+            void multipolygon_start() {
+                m_str = "MULTIPOLYGON(";
+                m_in_polygon = false;
+            }
+
+            void multipolygon_add_outer_ring() {
+                if (m_in_polygon) {
+                    m_str += ")),";
+                }
+                m_str += "((";
+                m_in_polygon = true;
+                m_first = true;
+            }
+
+            void multipolygon_add_inner_ring() {
+                m_str += "),(";
+                m_first = true;
+            }
+
+            void multipolygon_add_location(const osmium::Location location) {
+                if (!m_first) {
+                    m_str += ",";
+                }
+                location.as_string(std::back_inserter(m_str), ' ');
+                m_first = false;
+            }
+
+            multipolygon_type multipolygon_finish() {
+                m_in_polygon = false;
+                m_first = true;
+                m_str += ")))";
+                return std::move(m_str);
             }
 
         }; // class WKTFactory

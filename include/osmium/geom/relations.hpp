@@ -34,6 +34,7 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <osmium/osm/box.hpp>
+#include <osmium/osm/location.hpp>
 
 namespace osmium {
 
