@@ -1,8 +1,10 @@
 osmium_convert
 osmium_debug
 osmium_index
+osmium_mpdump
 osmium_read
 osmium_serdump
 osmium_toogr
+osmium_toogr2
 ogr_out
 core

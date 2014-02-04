@@ -45,11 +45,12 @@ PROGRAMS := \
     osmium_convert \
     osmium_debug \
     osmium_index \
+    osmium_mpdump \
     osmium_read \
     osmium_serdump \
-    osmium_toogr
+    osmium_toogr \
+    osmium_toogr2
 #    osmium_find_bbox \
-#    osmium_mpdump \
 #    osmium_range_from_history \
 #    osmium_relation_members \
 #    osmium_sizeof \
@@ -57,7 +58,6 @@ PROGRAMS := \
 #    osmium_serget \
 #    osmium_store_and_debug \
 #    osmium_time \
-#    osmium_toogr2 \
 #    osmium_to_postgis
 
 .PHONY: all clean
@@ -80,7 +80,7 @@ osmium_find_bbox: osmium_find_bbox.cpp
 	$(CXX) $(CXXFLAGS) $(CXXFLAGS_WARNINGS) -o $@ $< $(LDFLAGS) $(LIB_IO)
 
 osmium_mpdump: osmium_mpdump.cpp
-	$(CXX) $(CXXFLAGS) $(CXXFLAGS_WARNINGS) $(CXXFLAGS_GEOS) -o $@ $< $(LDFLAGS) $(LIB_IO) $(LIB_GEOS)
+	$(CXX) $(CXXFLAGS) $(CXXFLAGS_WARNINGS) -o $@ $< $(LDFLAGS) $(LIB_IO)
 
 osmium_range_from_history: osmium_range_from_history.cpp
 	$(CXX) $(CXXFLAGS) $(CXXFLAGS_WARNINGS) -o $@ $< $(LDFLAGS) $(LIB_IO)
@@ -110,7 +110,7 @@ osmium_toogr: osmium_toogr.cpp
 	$(CXX) $(CXXFLAGS) $(CXXFLAGS_WARNINGS) $(CXXFLAGS_OGR) -o $@ $< $(LDFLAGS) $(LIB_IO) $(LIB_OGR)
 
 osmium_toogr2: osmium_toogr2.cpp
-	$(CXX) $(CXXFLAGS) $(CXXFLAGS_WARNINGS) $(CXXFLAGS_OGR) $(CXXFLAGS_GEOS) -o $@ $< $(LDFLAGS) $(LIB_IO) $(LIB_OGR) $(LIB_GEOS)
+	$(CXX) $(CXXFLAGS) $(CXXFLAGS_WARNINGS) $(CXXFLAGS_OGR) -o $@ $< $(LDFLAGS) $(LIB_IO) $(LIB_OGR)
 
 osmium_to_postgis: osmium_to_postgis.cpp
 	$(CXX) $(CXXFLAGS) $(CXXFLAGS_WARNINGS) $(CXXFLAGS_OGR) -o $@ $< $(LDFLAGS) $(LIB_IO) $(LIB_OGR)
