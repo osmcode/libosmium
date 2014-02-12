@@ -39,6 +39,8 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/box.hpp>
 #include <osmium/osm/item_type.hpp>
 #include <osmium/osm/location.hpp>
+#include <osmium/osm/segment.hpp>
+#include <osmium/osm/undirected_segment.hpp>
 #include <osmium/osm/tag.hpp>
 
 namespace osmium {
@@ -78,6 +80,16 @@ namespace osmium {
         } else {
             out << "(undefined)";
         }
+        return out;
+    }
+
+    inline std::ostream& operator<<(std::ostream& out, const osmium::Segment& segment) {
+        out << segment.first() << "->" << segment.second();
+        return out;
+    }
+
+    inline std::ostream& operator<<(std::ostream& out, const osmium::UndirectedSegment& segment) {
+        out << segment.first() << "--" << segment.second();
         return out;
     }
 
