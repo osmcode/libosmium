@@ -201,23 +201,11 @@ namespace osmium {
                     }
                 }
 
-                void after_nodes() {
-                    if (N) {
-                        after(osmium::item_type::node);
-                    }
-                }
-
                 void way(const osmium::Way& way) const {
                     if (W) {
                         if (! find_and_add_object(way)) {
                             m_collector.way_not_in_any_relation(way);
                         }
-                    }
-                }
-
-                void after_ways() {
-                    if (W) {
-                        after(osmium::item_type::way);
                     }
                 }
 
@@ -228,11 +216,34 @@ namespace osmium {
                         }
                     }
                 }
+/*
+                void after_nodes() {
+                    if (N) {
+                        after(osmium::item_type::node);
+                    }
+                }
+
+                void after_ways() {
+                    if (W) {
+                        after(osmium::item_type::way);
+                    }
+                }
 
                 void after_relations() {
                     if (R) {
                         after(osmium::item_type::relation);
                     }
+                }
+*/
+                void done() {
+                    // clear all memory used by m_member_meta of this type
+                    m_collector.member_meta(osmium::item_type::node).clear();
+                    m_collector.member_meta(osmium::item_type::node).shrink_to_fit();
+                    m_collector.member_meta(osmium::item_type::way).clear();
+                    m_collector.member_meta(osmium::item_type::way).shrink_to_fit();
+                    m_collector.member_meta(osmium::item_type::relation).clear();
+                    m_collector.member_meta(osmium::item_type::relation).shrink_to_fit();
+                    m_collector.done();
                 }
 
             }; // class HandlerPass2
