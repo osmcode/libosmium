@@ -330,6 +330,10 @@ namespace osmium {
                             if (dense.denseinfo().visible_size() > 0) {
                                 visible = dense.denseinfo().visible(i);
                             }
+                            assert(last_dense_changeset >= 0);
+                            assert(last_dense_timestamp >= 0);
+                            assert(last_dense_uid >= 0);
+                            assert(last_dense_user_sid >= 0);
                         }
 
                         osmium::osm::NodeBuilder builder(m_buffer);
