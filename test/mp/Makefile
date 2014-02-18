@@ -43,6 +43,7 @@ mp_test: mp_test.cpp
 	$(CXX) $(CXXFLAGS) $(CXXFLAGS_WARNINGS) $(CXXFLAGS_OGR) -o $@ $< $(LDFLAGS) $(LIB_IO) $(LIB_OGR)
 
 test: mp_test
+	rm -f mp_test.db wkt.out
 	./mp_test ../../../osm-testdata/data/all.osm
 
 clean:
