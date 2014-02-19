@@ -1,2 +1,5 @@
 testdata-overview
 testdata-overview.db
+runtests
+tests-include.hpp
+tests-run.hpp

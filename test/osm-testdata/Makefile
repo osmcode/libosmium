@@ -10,8 +10,7 @@
 #  
 #------------------------------------------------------------------------------
 
-CXXFLAGS += -O3
-#CXXFLAGS += -g
+CXXFLAGS += -O3 -g
 CXXFLAGS += -std=c++11 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64
 CXXFLAGS += -I../../include
 
@@ -33,11 +32,11 @@ LIB_IO     := $(LIB_EXPAT) $(LIB_PBF) $(LIB_GZIP) $(LIB_BZIP2)
 
 LIB_OGR    := $(shell gdal-config --libs)
 
-PROGRAMS := testdata-overview
+PROGRAMS := testdata-overview runtests
 
 .PHONY: all clean
 
-all: $(PROGRAMS)
+all: testdata-overview test
 
 testdata-overview: testdata-overview.cpp
 	$(CXX) $(CXXFLAGS) $(CXXFLAGS_WARNINGS) $(CXXFLAGS_OGR) -o $@ $< $(LDFLAGS) $(LIB_IO) $(LIB_OGR)
@@ -46,6 +45,18 @@ overview: testdata-overview
 	rm -f testdata-overview.db
 	./testdata-overview ../../../osm-testdata/data/all.osm
 
+tests-include.hpp: testcases/*.hpp
+	(for file in testcases/*.hpp; do echo "#include \"$${file}\""; done) >tests-include.hpp
+
+tests-run.hpp: testcases/*.hpp
+	(for id in $(patsubst testcases/test-%.hpp,%,$(wildcard testcases/*.hpp)); do echo "std::cerr << \"Running test $${id}...\\\n\"; testcase_$${id}::RunTest t$${id}; t$${id}(directory);"; done) >tests-run.hpp
+
+runtests: runtests.cpp testcases/*.hpp tests-include.hpp tests-run.hpp
+	$(CXX) $(CXXFLAGS) $(CXXFLAGS_WARNINGS) $(CXXFLAGS_OGR) -o $@ $< $(LDFLAGS) $(LIB_IO) $(LIB_OGR)
+
+test: runtests
+	./runtests ../../../osm-testdata/data
+
 clean:
-	rm -f *.o core $(PROGRAMS) testdata-overview.db
+	rm -f *.o core $(PROGRAMS) testdata-overview.db tests-include.hpp tests-run.hpp
 
