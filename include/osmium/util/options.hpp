@@ -87,6 +87,17 @@ namespace osmium {
                 m_options[key] = value ? "true" : "false";
             }
 
+            void set(std::string data) {
+                size_t pos = data.find_first_of('=');
+                if (pos == std::string::npos) {
+                    m_options[data] = "true";
+                } else {
+                    std::string value = data.substr(pos+1);
+                    data.erase(pos);
+                    set(data, value);
+                }
+            }
+
             /**
              * Get value of "key" option. If not set the default_value (or
              * empty string) is returned.
@@ -105,6 +116,10 @@ namespace osmium {
             bool is_true(const std::string& key) const noexcept {
                 std::string value = get(key);
                 return (value == "true" || value == "yes");
+            }
+
+            size_t size() const noexcept {
+                return m_options.size();
             }
 
             iterator begin() noexcept {
