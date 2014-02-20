@@ -32,18 +32,24 @@ BOOST_AUTO_TEST_CASE(instantiation_with_double_parameters) {
 
     osmium::Location loc3 = loc1;
     BOOST_CHECK_EQUAL(4.5, loc3.lat());
+}
 
-    osmium::Location loc4 { 2.2, 3.3 };
-    BOOST_CHECK_EQUAL(2.2, loc4.lon());
-    BOOST_CHECK_EQUAL(3.3, loc4.lat());
+BOOST_AUTO_TEST_CASE(instantiation_with_double_parameters_constructor_with_universal_initializer) {
+    osmium::Location loc { 2.2, 3.3 };
+    BOOST_CHECK_EQUAL(2.2, loc.lon());
+    BOOST_CHECK_EQUAL(3.3, loc.lat());
+}
 
-    osmium::Location loc5({ 4.4, 5.5 });
-    BOOST_CHECK_EQUAL(4.4, loc5.lon());
-    BOOST_CHECK_EQUAL(5.5, loc5.lat());
+BOOST_AUTO_TEST_CASE(instantiation_with_double_parameters_constructor_with_initializer_list) {
+    osmium::Location loc({ 4.4, 5.5 });
+    BOOST_CHECK_EQUAL(4.4, loc.lon());
+    BOOST_CHECK_EQUAL(5.5, loc.lat());
+}
 
-    osmium::Location loc6 = { 5.5, 6.6 };
-    BOOST_CHECK_EQUAL(5.5, loc6.lon());
-    BOOST_CHECK_EQUAL(6.6, loc6.lat());
+BOOST_AUTO_TEST_CASE(instantiation_with_double_parameters_operator_equal) {
+    osmium::Location loc = { 5.5, 6.6 };
+    BOOST_CHECK_EQUAL(5.5, loc.lon());
+    BOOST_CHECK_EQUAL(6.6, loc.lat());
 }
 
 BOOST_AUTO_TEST_CASE(equality) {
@@ -78,55 +84,60 @@ BOOST_AUTO_TEST_CASE(validity) {
 }
 
 
-BOOST_AUTO_TEST_CASE(output_to_iterator) {
+BOOST_AUTO_TEST_CASE(output_to_iterator_comma_separator) {
     char buffer[100];
-    {
-        osmium::Location loc(-3.2, 47.3);
-        *loc.as_string(buffer, ',') = 0;
-        BOOST_CHECK(!strcmp(buffer, "-3.2,47.3"));
-    }
-    {
-        osmium::Location loc(0.0, 7.0);
-        *loc.as_string(buffer, ' ') = 0;
-        BOOST_CHECK(!strcmp(buffer, "0 7"));
-    }
-    {
-        osmium::Location loc(-179.9999999, -90.0);
-        *loc.as_string(buffer, ' ') = 0;
-        BOOST_CHECK(!strcmp(buffer, "-179.9999999 -90"));
-    }
-    {
-        osmium::Location loc;
-        *loc.as_string(buffer, ',') = 0;
-        BOOST_CHECK(!strcmp(buffer, "undefined,undefined"));
-    }
+    osmium::Location loc(-3.2, 47.3);
+    *loc.as_string(buffer, ',') = 0;
+    BOOST_CHECK(!strcmp(buffer, "-3.2,47.3"));
 }
 
-BOOST_AUTO_TEST_CASE(output_to_string) {
+BOOST_AUTO_TEST_CASE(output_to_iterator_space_separator) {
+    char buffer[100];
+    osmium::Location loc(0.0, 7.0);
+    *loc.as_string(buffer, ' ') = 0;
+    BOOST_CHECK(!strcmp(buffer, "0 7"));
+}
+
+BOOST_AUTO_TEST_CASE(output_to_iterator_check_precision) {
+    char buffer[100];
+    osmium::Location loc(-179.9999999, -90.0);
+    *loc.as_string(buffer, ' ') = 0;
+    BOOST_CHECK(!strcmp(buffer, "-179.9999999 -90"));
+}
+
+BOOST_AUTO_TEST_CASE(output_to_iterator_undefined_location) {
+    char buffer[100];
+    osmium::Location loc;
+    *loc.as_string(buffer, ',') = 0;
+    BOOST_CHECK(!strcmp(buffer, "undefined,undefined"));
+}
+
+BOOST_AUTO_TEST_CASE(output_to_string_comman_separator) {
     std::string s;
-    {
-        osmium::Location loc(-3.2, 47.3);
-        loc.as_string(std::back_inserter(s), ',');
-        BOOST_CHECK_EQUAL(s, "-3.2,47.3");
-    }
-    s.clear();
-    {
-        osmium::Location loc(0.0, 7.0);
-        loc.as_string(std::back_inserter(s), ' ');
-        BOOST_CHECK_EQUAL(s, "0 7");
-    }
-    s.clear();
-    {
-        osmium::Location loc(-179.9999999, -90.0);
-        loc.as_string(std::back_inserter(s), ' ');
-        BOOST_CHECK_EQUAL(s, "-179.9999999 -90");
-    }
-    s.clear();
-    {
-        osmium::Location loc;
-        loc.as_string(std::back_inserter(s), ',');
-        BOOST_CHECK_EQUAL(s, std::string("undefined,undefined"));
-    }
+    osmium::Location loc(-3.2, 47.3);
+    loc.as_string(std::back_inserter(s), ',');
+    BOOST_CHECK_EQUAL(s, "-3.2,47.3");
+}
+
+BOOST_AUTO_TEST_CASE(output_to_string_space_separator) {
+    std::string s;
+    osmium::Location loc(0.0, 7.0);
+    loc.as_string(std::back_inserter(s), ' ');
+    BOOST_CHECK_EQUAL(s, "0 7");
+}
+
+BOOST_AUTO_TEST_CASE(output_to_string_check_precision) {
+    std::string s;
+    osmium::Location loc(-179.9999999, -90.0);
+    loc.as_string(std::back_inserter(s), ' ');
+    BOOST_CHECK_EQUAL(s, "-179.9999999 -90");
+}
+
+BOOST_AUTO_TEST_CASE(output_to_string_undefined_location) {
+    std::string s;
+    osmium::Location loc;
+    loc.as_string(std::back_inserter(s), ',');
+    BOOST_CHECK_EQUAL(s, std::string("undefined,undefined"));
 }
 
 BOOST_AUTO_TEST_CASE(output_defined) {
