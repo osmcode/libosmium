@@ -30,11 +30,11 @@ namespace testcase_100 {
         bool operator()(const std::string& dirname) {
             osmium::io::Reader reader(dirname + "/1-basic-geom/100/data.osm");
 
-            CountObjectsHandler count_handler(1, 0, 0);
+            CheckBasicsHandler check_basics_handler(100, 1, 0, 0);
             CheckWKTHandler check_wkt_handler(dirname + "/1-basic-geom/100/out.wkt");
             TestHandler test_handler;
 
-            osmium::apply(reader, count_handler, check_wkt_handler, test_handler);
+            osmium::apply(reader, check_basics_handler, check_wkt_handler, test_handler);
 
             return true;
         }

@@ -16,7 +16,7 @@ typedef osmium::index::map::Dummy<osmium::unsigned_object_id_type, osmium::Locat
 typedef osmium::index::map::SparseMapMem<osmium::unsigned_object_id_type, osmium::Location> index_pos_type;
 typedef osmium::handler::NodeLocationsForWays<index_pos_type, index_neg_type> location_handler_type;
 
-#include "count_objects_handler.hpp"
+#include "check_basics_handler.hpp"
 #include "check_wkt_handler.hpp"
 
 /* ================================================== */
