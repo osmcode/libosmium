@@ -35,6 +35,8 @@ LIB_OGR    := $(shell gdal-config --libs)
 
 PROGRAMS := mp_test
 
+TESTDATA_DIR := ../../../osm-testdata/grid/data
+
 .PHONY: all clean
 
 all: $(PROGRAMS)
@@ -44,7 +46,7 @@ mp_test: mp_test.cpp
 
 test: mp_test
 	rm -f mp_test.db wkt.out
-	./mp_test ../../../osm-testdata/data/all.osm
+	./mp_test $(TESTDATA_DIR)/all.osm
 
 clean:
 	rm -f *.o core $(PROGRAMS) mp_test.db wkt.out

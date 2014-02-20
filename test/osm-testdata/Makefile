@@ -32,6 +32,8 @@ LIB_IO     := $(LIB_EXPAT) $(LIB_PBF) $(LIB_GZIP) $(LIB_BZIP2)
 
 LIB_OGR    := $(shell gdal-config --libs)
 
+TESTDATA_DIR := ../../../osm-testdata/grid/data
+
 PROGRAMS := testdata-overview runtests
 
 .PHONY: all clean
@@ -43,7 +45,7 @@ testdata-overview: testdata-overview.cpp
 
 overview: testdata-overview
 	rm -f testdata-overview.db
-	./testdata-overview ../../../osm-testdata/data/all.osm
+	./testdata-overview $(TESTDATA_DIR)/all.osm
 
 tests-include.hpp: testcases/*.hpp
 	(for file in testcases/*.hpp; do echo "#include \"$${file}\""; done) >tests-include.hpp
@@ -55,7 +57,7 @@ runtests: runtests.cpp testcases/*.hpp tests-include.hpp tests-run.hpp
 	$(CXX) $(CXXFLAGS) $(CXXFLAGS_WARNINGS) $(CXXFLAGS_OGR) -o $@ $< $(LDFLAGS) $(LIB_IO) $(LIB_OGR)
 
 test: runtests
-	./runtests ../../../osm-testdata/data
+	./runtests $(TESTDATA_DIR)
 
 clean:
 	rm -f *.o core $(PROGRAMS) testdata-overview.db tests-include.hpp tests-run.hpp
