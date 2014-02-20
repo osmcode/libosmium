@@ -53,7 +53,7 @@ tests-include.hpp: testcases/*.hpp
 tests-run.hpp: testcases/*.hpp
 	(for id in $(patsubst testcases/test-%.hpp,%,$(wildcard testcases/*.hpp)); do echo "std::cerr << \"Running test $${id}...\\\n\"; testcase_$${id}::RunTest t$${id}; t$${id}(directory);"; done) >tests-run.hpp
 
-runtests: runtests.cpp testcases/*.hpp tests-include.hpp tests-run.hpp
+runtests: runtests.cpp testcases/*.hpp check_wkt_handler.hpp count_objects_handler.hpp tests-include.hpp tests-run.hpp
 	$(CXX) $(CXXFLAGS) $(CXXFLAGS_WARNINGS) $(CXXFLAGS_OGR) -o $@ $< $(LDFLAGS) $(LIB_IO) $(LIB_OGR)
 
 test: runtests

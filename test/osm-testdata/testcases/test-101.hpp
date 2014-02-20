@@ -33,6 +33,7 @@ namespace testcase_101 {
             osmium::io::Reader reader(dirname + "/1-basic-geom/101/data.osm");
 
             CountObjectsHandler count_handler(4, 0, 0);
+            CheckWKTHandler check_wkt_handler(dirname + "/1-basic-geom/101/out.wkt");
             TestHandler test_handler;
 
             osmium::apply(reader, count_handler, test_handler);

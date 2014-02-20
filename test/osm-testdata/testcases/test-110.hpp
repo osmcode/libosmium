@@ -29,10 +29,6 @@ namespace testcase_110 {
 
                 const char *test_id = way.tags().get_value_by_key("test:id");
                 assert(test_id && !strcmp(test_id, "110"));
-
-                osmium::geom::WKTFactory factory;
-                std::string wkt = factory.create_linestring(way);
-                assert(wkt == "LINESTRING(1.02 1.12,1.07 1.13)");
             } else {
                 throw std::runtime_error("Unknown ID");
             }
@@ -51,9 +47,10 @@ namespace testcase_110 {
             location_handler.ignore_errors();
 
             CountObjectsHandler count_handler(2, 1, 0);
+            CheckWKTHandler check_wkt_handler(dirname + "/1-basic-geom/110/out.wkt");
             TestHandler test_handler;
 
-            osmium::apply(reader, location_handler, count_handler, test_handler);
+            osmium::apply(reader, location_handler, count_handler, check_wkt_handler, test_handler);
 
             return true;
         }

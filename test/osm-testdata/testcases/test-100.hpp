@@ -18,10 +18,6 @@ namespace testcase_100 {
                 assert(node.changeset() == 1);
                 assert(node.location().lon() == 1.02);
                 assert(node.location().lat() == 1.02);
-                
-                osmium::geom::WKTFactory factory;
-                std::string wkt = factory.create_point(node.location());
-                assert(wkt == "POINT(1.02 1.02)");
             } else {
                 throw std::runtime_error("Unknown ID");
             }
@@ -35,9 +31,10 @@ namespace testcase_100 {
             osmium::io::Reader reader(dirname + "/1-basic-geom/100/data.osm");
 
             CountObjectsHandler count_handler(1, 0, 0);
+            CheckWKTHandler check_wkt_handler(dirname + "/1-basic-geom/100/out.wkt");
             TestHandler test_handler;
 
-            osmium::apply(reader, count_handler, test_handler);
+            osmium::apply(reader, count_handler, check_wkt_handler, test_handler);
 
             return true;
         }
