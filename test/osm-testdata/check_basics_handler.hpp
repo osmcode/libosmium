@@ -58,7 +58,7 @@ public:
     }
 
     void node(const osmium::Node& node) {
-        id_check(node.id(), 0, 699);
+        id_check(node.id(), 0, 799);
         --m_num_nodes;
     }
 
