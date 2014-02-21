@@ -42,7 +42,7 @@ class TestHandler : public osmium::handler::Handler {
 public:
 
     TestHandler(const std::string& driver_name, const std::string& filename) :
-        m_out("multipolygon.wkt") {
+        m_out("multipolygon-is.wkt") {
 
         OGRRegisterAll();
 

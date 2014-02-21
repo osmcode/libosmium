@@ -58,11 +58,12 @@ testdata-multipolygon: testdata-multipolygon.cpp
 	$(CXX) $(CXXFLAGS) $(CXXFLAGS_WARNINGS) $(CXXFLAGS_OGR) -o $@ $< $(LDFLAGS) $(LIB_IO) $(LIB_OGR)
 
 multipolygon: testdata-multipolygon
-	rm -f multipolygon.db multipolygon.wkt
+	rm -f multipolygon.db multipolygon-is.wkt
 	./testdata-multipolygon $(TESTDATA_DIR)/all.osm
+	diff -u multipolygon-should.wkt multipolygon-is.wkt
 
 clean-multipolygon:
-	rm -f testdata-multipolygon multipolygon.db multipolygon.wkt
+	rm -f testdata-multipolygon multipolygon.db multipolygon-is.wkt
 
 # --------------
 
