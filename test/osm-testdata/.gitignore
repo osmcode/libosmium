@@ -3,3 +3,7 @@ testdata-overview.db
 runtests
 tests-include.hpp
 tests-run.hpp
+mp_test
+mp_test.db
+mp_test.qgs~
+wkt.out

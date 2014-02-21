@@ -34,7 +34,7 @@ LIB_OGR    := $(shell gdal-config --libs)
 
 TESTDATA_DIR := ../../../osm-testdata/grid/data
 
-PROGRAMS := testdata-overview runtests
+PROGRAMS := testdata-overview runtests mp_test
 
 .PHONY: all clean
 
@@ -56,9 +56,16 @@ tests-run.hpp: testcases/*.hpp
 runtests: runtests.cpp testcases/*.hpp check_basics_handler.hpp check_wkt_handler.hpp tests-include.hpp tests-run.hpp
 	$(CXX) $(CXXFLAGS) $(CXXFLAGS_WARNINGS) $(CXXFLAGS_OGR) -o $@ $< $(LDFLAGS) $(LIB_IO) $(LIB_OGR)
 
+mp_test: mp_test.cpp
+	$(CXX) $(CXXFLAGS) $(CXXFLAGS_WARNINGS) $(CXXFLAGS_OGR) -o $@ $< $(LDFLAGS) $(LIB_IO) $(LIB_OGR)
+
 test: runtests
 	./runtests $(TESTDATA_DIR)
 
+runmptest: mp_test
+	rm -f mp_test.db wkt.out
+	./mp_test $(TESTDATA_DIR)/all.osm
+
 clean:
-	rm -f *.o core $(PROGRAMS) testdata-overview.db tests-include.hpp tests-run.hpp
+	rm -f *.o core $(PROGRAMS) testdata-overview.db tests-include.hpp tests-run.hpp mp_test.db wkt.out
 
