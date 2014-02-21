@@ -1,9 +1,9 @@
 testdata-overview
 testdata-overview.db
-runtests
+testdata-multipolygon
+multipolygon.db
+multipolygon.wkt
+multipolygon.qgs~
+testdata-testcases
 tests-include.hpp
 tests-run.hpp
-mp_test
-mp_test.db
-mp_test.qgs~
-wkt.out

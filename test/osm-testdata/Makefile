@@ -32,13 +32,15 @@ LIB_IO     := $(LIB_EXPAT) $(LIB_PBF) $(LIB_GZIP) $(LIB_BZIP2)
 
 LIB_OGR    := $(shell gdal-config --libs)
 
+# place where the test data directory has been cloned
+# https://github.com/osmcode/osm-testdata
 TESTDATA_DIR := ../../../osm-testdata/grid/data
 
-PROGRAMS := testdata-overview runtests mp_test
+.PHONY: all clean overview clean-overview multipolygon clean-multipolygon testcases clean-testcases
 
-.PHONY: all clean
+all: overview multipolygon testcases
 
-all: testdata-overview test
+# --------------
 
 testdata-overview: testdata-overview.cpp
 	$(CXX) $(CXXFLAGS) $(CXXFLAGS_WARNINGS) $(CXXFLAGS_OGR) -o $@ $< $(LDFLAGS) $(LIB_IO) $(LIB_OGR)
@@ -47,25 +49,40 @@ overview: testdata-overview
 	rm -f testdata-overview.db
 	./testdata-overview $(TESTDATA_DIR)/all.osm
 
+clean-overview:
+	rm -f testdata-overview testdata-overview.db
+
+# --------------
+
+testdata-multipolygon: testdata-multipolygon.cpp
+	$(CXX) $(CXXFLAGS) $(CXXFLAGS_WARNINGS) $(CXXFLAGS_OGR) -o $@ $< $(LDFLAGS) $(LIB_IO) $(LIB_OGR)
+
+multipolygon: testdata-multipolygon
+	rm -f multipolygon.db multipolygon.wkt
+	./testdata-multipolygon $(TESTDATA_DIR)/all.osm
+
+clean-multipolygon:
+	rm -f testdata-multipolygon multipolygon.db multipolygon.wkt
+
+# --------------
+
 tests-include.hpp: testcases/*.hpp
 	(for file in testcases/*.hpp; do echo "#include \"$${file}\""; done) >tests-include.hpp
 
 tests-run.hpp: testcases/*.hpp
 	(for id in $(patsubst testcases/test-%.hpp,%,$(wildcard testcases/*.hpp)); do echo "std::cerr << \"Running test $${id}...\\\n\"; testcase_$${id}::RunTest t$${id}; t$${id}(directory);"; done) >tests-run.hpp
 
-runtests: runtests.cpp testcases/*.hpp check_basics_handler.hpp check_wkt_handler.hpp tests-include.hpp tests-run.hpp
+testdata-testcases: testdata-testcases.cpp testcases/*.hpp check_basics_handler.hpp check_wkt_handler.hpp tests-include.hpp tests-run.hpp
 	$(CXX) $(CXXFLAGS) $(CXXFLAGS_WARNINGS) $(CXXFLAGS_OGR) -o $@ $< $(LDFLAGS) $(LIB_IO) $(LIB_OGR)
 
-mp_test: mp_test.cpp
-	$(CXX) $(CXXFLAGS) $(CXXFLAGS_WARNINGS) $(CXXFLAGS_OGR) -o $@ $< $(LDFLAGS) $(LIB_IO) $(LIB_OGR)
+testcases: testdata-testcases
+	./testdata-testcases $(TESTDATA_DIR)
 
-test: runtests
-	./runtests $(TESTDATA_DIR)
+clean-testcases:
+	rm -f testdata-testcases tests-include.hpp tests-run.hpp
 
-runmptest: mp_test
-	rm -f mp_test.db wkt.out
-	./mp_test $(TESTDATA_DIR)/all.osm
+# --------------
 
-clean:
-	rm -f *.o core $(PROGRAMS) testdata-overview.db tests-include.hpp tests-run.hpp mp_test.db wkt.out
+clean: clean-overview clean-multipolygon clean-testcases
+	rm -f *.o core
 

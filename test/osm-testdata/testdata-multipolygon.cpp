@@ -42,7 +42,7 @@ class TestHandler : public osmium::handler::Handler {
 public:
 
     TestHandler(const std::string& driver_name, const std::string& filename) :
-        m_out("wkt.out") {
+        m_out("multipolygon.wkt") {
 
         OGRRegisterAll();
 
@@ -207,7 +207,7 @@ public:
 void print_help() {
     std::cout << "mp_test [OPTIONS] [INFILE [OUTFILE]]\n\n" \
               << "If INFILE is not given stdin is assumed.\n" \
-              << "If OUTFILE is not given 'mp_test.db' is used.\n" \
+              << "If OUTFILE is not given 'multipolygon.db' is used.\n" \
               << "\nOptions:\n" \
               << "  -h, --help           This help message\n" \
               << "  -f, --format=FORMAT  Output OGR format (Default: 'SQLite')\n";
@@ -241,7 +241,7 @@ int main(int argc, char* argv[]) {
     }
 
     std::string input_filename;
-    std::string output_filename("mp_test.db");
+    std::string output_filename("multipolygon.db");
     int remaining_args = argc - optind;
     if (remaining_args > 2) {
         std::cerr << "Usage: " << argv[0] << " [OPTIONS] [INFILE [OUTFILE]]" << std::endl;
