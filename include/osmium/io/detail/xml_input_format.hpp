@@ -277,11 +277,13 @@ namespace osmium {
                 }
 
                 void header_is_done() {
-                    m_header_promise.set_value(m_header);
-                    if (m_read_types == osmium::osm_entity::flags::nothing) {
-                        throw ParserIsDone();
+                    if (!m_promise_fulfilled) {
+                        m_header_promise.set_value(m_header);
+                        if (m_read_types == osmium::osm_entity::flags::nothing) {
+                            throw ParserIsDone();
+                        }
+                        m_promise_fulfilled = true;
                     }
-                    m_promise_fulfilled = true;
                 }
 
                 void start_element(const XML_Char* element, const XML_Char** attrs) {
@@ -294,6 +296,7 @@ namespace osmium {
                                     }
                                     for (int count = 0; attrs[count]; count += 2) {
                                         if (!strcmp(attrs[count], "version")) {
+                                            m_header.set("version", attrs[count+1]);
                                             if (strcmp(attrs[count+1], "0.6")) {
                                                 throw std::runtime_error("can only read version 0.6 files");
                                             }
@@ -301,15 +304,16 @@ namespace osmium {
                                             m_header.set("generator", attrs[count+1]);
                                         }
                                     }
+                                    if (m_header.get("version") == "") {
+                                        throw std::runtime_error("version attribute on osm element missing");
+                                    }
                                 }
                                 m_context = context::top;
                                 break;
                             case context::top:
                                 assert(!m_tl_builder);
                                 if (!strcmp(element, "node")) {
-                                    if (!m_promise_fulfilled) {
-                                        header_is_done();
-                                    }
+                                    header_is_done();
                                     if (m_read_types & osmium::osm_entity::flags::node) {
                                         m_node_builder = std::unique_ptr<osmium::osm::NodeBuilder>(new osmium::osm::NodeBuilder(m_buffer));
                                         m_node_builder->add_user(init_object(m_node_builder->object(), attrs));
@@ -318,9 +322,7 @@ namespace osmium {
                                         m_context = context::ignored_node;
                                     }
                                 } else if (!strcmp(element, "way")) {
-                                    if (!m_promise_fulfilled) {
-                                        header_is_done();
-                                    }
+                                    header_is_done();
                                     if (m_read_types & osmium::osm_entity::flags::way) {
                                         m_way_builder = std::unique_ptr<osmium::osm::WayBuilder>(new osmium::osm::WayBuilder(m_buffer));
                                         m_way_builder->add_user(init_object(m_way_builder->object(), attrs));
@@ -329,9 +331,7 @@ namespace osmium {
                                         m_context = context::ignored_way;
                                     }
                                 } else if (!strcmp(element, "relation")) {
-                                    if (!m_promise_fulfilled) {
-                                        header_is_done();
-                                    }
+                                    header_is_done();
                                     if (m_read_types & osmium::osm_entity::flags::relation) {
                                         m_relation_builder = std::unique_ptr<osmium::osm::RelationBuilder>(new osmium::osm::RelationBuilder(m_buffer));
                                         m_relation_builder->add_user(init_object(m_relation_builder->object(), attrs));
@@ -340,9 +340,7 @@ namespace osmium {
                                         m_context = context::ignored_relation;
                                     }
                                 } else if (!strcmp(element, "changeset")) {
-                                    if (!m_promise_fulfilled) {
-                                        header_is_done();
-                                    }
+                                    header_is_done();
                                     if (m_read_types & osmium::osm_entity::flags::changeset) {
                                         m_changeset_builder = std::unique_ptr<osmium::osm::ChangesetBuilder>(new osmium::osm::ChangesetBuilder(m_buffer));
                                         init_changeset(m_changeset_builder.get(), attrs);
@@ -452,8 +450,11 @@ namespace osmium {
                                 break;
                             case context::top:
                                 if (!strcmp(element, "osm") || !strcmp(element, "osmChange")) {
+                                    header_is_done();
                                     m_context = context::root;
-                                    m_queue.push(std::move(m_buffer));
+                                    if (m_buffer.committed() > 0) {
+                                        m_queue.push(std::move(m_buffer));
+                                    }
                                     m_queue.push(osmium::memory::Buffer()); // empty buffer to signify eof
                                 } else if (!strcmp(element, "delete")) {
                                     m_in_delete_section = false;
