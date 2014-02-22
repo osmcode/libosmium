@@ -1,6 +1,7 @@
 testdata-overview
 testdata-overview.db
 testdata-multipolygon
+testdata-xml
 multipolygon.db
 multipolygon-is.wkt
 multipolygon.qgs~

@@ -34,11 +34,11 @@ LIB_OGR    := $(shell gdal-config --libs)
 
 # place where the test data directory has been cloned
 # https://github.com/osmcode/osm-testdata
-TESTDATA_DIR := ../../../osm-testdata/grid/data
+TESTDATA_DIR := ../../../osm-testdata
 
-.PHONY: all clean overview clean-overview multipolygon clean-multipolygon testcases clean-testcases
+.PHONY: all clean overview clean-overview multipolygon clean-multipolygon testcases clean-testcases xml clean-xml
 
-all: overview multipolygon testcases
+all: overview multipolygon testcases xml
 
 # --------------
 
@@ -47,7 +47,7 @@ testdata-overview: testdata-overview.cpp
 
 overview: testdata-overview
 	rm -f testdata-overview.db
-	./testdata-overview $(TESTDATA_DIR)/all.osm
+	./testdata-overview $(TESTDATA_DIR)/grid/data/all.osm
 
 clean-overview:
 	rm -f testdata-overview testdata-overview.db
@@ -59,7 +59,7 @@ testdata-multipolygon: testdata-multipolygon.cpp
 
 multipolygon: testdata-multipolygon
 	rm -f multipolygon.db multipolygon-is.wkt
-	./testdata-multipolygon $(TESTDATA_DIR)/all.osm
+	./testdata-multipolygon $(TESTDATA_DIR)/grid/data/all.osm
 	diff -u multipolygon-should.wkt multipolygon-is.wkt
 
 clean-multipolygon:
@@ -77,10 +77,21 @@ testdata-testcases: testdata-testcases.cpp testcases/*.hpp check_basics_handler.
 	$(CXX) $(CXXFLAGS) $(CXXFLAGS_WARNINGS) $(CXXFLAGS_OGR) -o $@ $< $(LDFLAGS) $(LIB_IO) $(LIB_OGR)
 
 testcases: testdata-testcases
-	./testdata-testcases $(TESTDATA_DIR)
+	./testdata-testcases $(TESTDATA_DIR)/grid/data
 
 clean-testcases:
 	rm -f testdata-testcases tests-include.hpp tests-run.hpp
+
+# --------------
+
+testdata-xml: testdata-xml.cpp
+	$(CXX) $(CXXFLAGS) $(CXXFLAGS_WARNINGS) $(CXXFLAGS_OGR) -o $@ $< $(LDFLAGS) $(LIB_IO) -DBOOST_TEST_DYN_LINK -lboost_unit_test_framework
+
+xml: testdata-xml
+	TESTDIR=$(TESTDATA_DIR)/xml/data ./testdata-xml
+
+clean-xml:
+	rm -f testdata-xml
 
 # --------------
 
