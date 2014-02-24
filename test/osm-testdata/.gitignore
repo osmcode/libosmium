@@ -3,7 +3,7 @@ testdata-overview.db
 testdata-multipolygon
 testdata-xml
 multipolygon.db
-multipolygon-is.wkt
+multipolygon.wkt
 multipolygon.qgs~
 testdata-testcases
 tests-include.hpp

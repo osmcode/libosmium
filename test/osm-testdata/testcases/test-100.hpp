@@ -31,7 +31,7 @@ namespace testcase_100 {
             osmium::io::Reader reader(dirname + "/1-basic-geom/100/data.osm");
 
             CheckBasicsHandler check_basics_handler(100, 1, 0, 0);
-            CheckWKTHandler check_wkt_handler(dirname + "/1-basic-geom/100/out.wkt");
+            CheckWKTHandler check_wkt_handler(dirname, "1-basic-geom", 100);
             TestHandler test_handler;
 
             osmium::apply(reader, check_basics_handler, check_wkt_handler, test_handler);

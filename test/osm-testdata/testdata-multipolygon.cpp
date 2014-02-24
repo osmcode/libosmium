@@ -42,7 +42,7 @@ class TestHandler : public osmium::handler::Handler {
 public:
 
     TestHandler(const std::string& driver_name, const std::string& filename) :
-        m_out("multipolygon-is.wkt") {
+        m_out("multipolygon.wkt") {
 
         OGRRegisterAll();
 
@@ -120,11 +120,11 @@ public:
             exit(1);
         }
 
-        OGRFieldDefn layer_polygon_field_type("type", OFTString);
-        layer_polygon_field_type.SetWidth(30);
+        OGRFieldDefn layer_polygon_field_from_type("from_type", OFTString);
+        layer_polygon_field_from_type.SetWidth(1);
 
-        if (m_layer_polygon->CreateField(&layer_polygon_field_type) != OGRERR_NONE) {
-            std::cerr << "Creating type field failed.\n";
+        if (m_layer_polygon->CreateField(&layer_polygon_field_from_type) != OGRERR_NONE) {
+            std::cerr << "Creating from_type field failed.\n";
             exit(1);
         }
     }
@@ -171,23 +171,23 @@ public:
     void area(const osmium::Area& area) {
         try {
             std::string wkt = m_wkt_factory.create_multipolygon(area);
-            m_out << "test=" << (area.orig_id() / 1000) << " area=" << area.id() << " WKT " << wkt << "\n";
+            m_out << "test=" << (area.orig_id() / 1000) << " area=" << area.id() << " from_id=" << area.orig_id() << " WKT " << wkt << "\n";
         } catch (osmium::geom::geometry_error&) {
-            m_out << "test=" << (area.orig_id() / 1000) << " area=" << area.id() << " ILLEGAL GEOMETRY\n";
+            m_out << "test=" << (area.orig_id() / 1000) << " area=" << area.id() << " from_id=" << area.orig_id() << " ILLEGAL GEOMETRY\n";
         }
         try {
             std::unique_ptr<OGRMultiPolygon> ogr_polygon = m_ogr_factory.create_multipolygon(area);
             OGRFeature* feature = OGRFeature::CreateFeature(m_layer_polygon->GetLayerDefn());
             feature->SetGeometry(ogr_polygon.get());
-            feature->SetField("id", static_cast<int>(area.id()));
+            feature->SetField("id", static_cast<int>(area.orig_id()));
 
-            std::string type = "";
+            std::string from_type;
             if (area.from_way()) {
-                type += "w";
+                from_type = "w";
             } else {
-                type += "r";
+                from_type = "r";
             }
-            feature->SetField("type", type.c_str());
+            feature->SetField("from_type", from_type.c_str());
 
             if (m_layer_polygon->CreateFeature(feature) != OGRERR_NONE) {
                 std::cerr << "Failed to create feature.\n";
