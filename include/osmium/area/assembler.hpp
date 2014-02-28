@@ -47,143 +47,12 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/ostream.hpp>
 #include <osmium/osm/relation.hpp>
 
+#include <osmium/area/segment.hpp>
+#include <osmium/area/problem.hpp>
+
 namespace osmium {
 
     namespace area {
-
-        /**
-         * Helper class for Assembler class.
-         */
-        class NodeRefSegment : boost::less_than_comparable<NodeRefSegment> {
-
-            osmium::NodeRef m_first;
-            osmium::NodeRef m_second;
-
-            bool m_cw;
-
-            void swap_locations() {
-                using std::swap;
-                swap(m_first, m_second);
-            }
-
-        public:
-
-            NodeRefSegment(const osmium::NodeRef& nr1, const osmium::NodeRef& nr2) :
-                m_first(nr1),
-                m_second(nr2) {
-                if (nr2.location() < nr1.location()) {
-                    swap_locations();
-                }
-            }
-
-            NodeRefSegment(const NodeRefSegment&) = default;
-            NodeRefSegment(NodeRefSegment&&) = default;
-
-            NodeRefSegment& operator=(const NodeRefSegment&) = default;
-            NodeRefSegment& operator=(NodeRefSegment&&) = default;
-
-            ~NodeRefSegment() = default;
-
-            /// Return first NodeRef of Segment.
-            const osmium::NodeRef& first() const {
-                return m_first;
-            }
-
-            /// Return second NodeRef of Segment.
-            const osmium::NodeRef& second() const {
-                return m_second;
-            }
-
-            bool cw() const {
-                return m_cw;
-            }
-
-            NodeRefSegment make_cw() {
-                m_cw = true;
-                NodeRefSegment seg(*this);
-                if (seg.first().location().y() > seg.second().location().y()) {
-                    seg.swap_locations();
-                }
-                return seg;
-            }
-
-            NodeRefSegment make_ccw() {
-                m_cw = false;
-                NodeRefSegment seg(*this);
-                if (seg.first().location().y() < seg.second().location().y()) {
-                    seg.swap_locations();
-                }
-                return seg;
-            }
-
-        }; // class NodeRefSegment
-
-        /// NodeRefSegments are equal if both their locations are equal
-        inline constexpr bool operator==(const NodeRefSegment& lhs, const NodeRefSegment& rhs) {
-            return lhs.first().location() == rhs.first().location() && lhs.second().location() == rhs.second().location();
-        }
-
-        /**
-         * NodeRefSegments are "smaller" if they are to the left and down of another
-         * segment. The first() location is checked first() and only if they have the
-         * same first() location the second() location is taken into account.
-         */
-        inline bool operator<(const NodeRefSegment& lhs, const NodeRefSegment& rhs) {
-            return (lhs.first().location() == rhs.first().location() && lhs.second().location() < rhs.second().location()) || lhs.first().location() < rhs.first().location();
-        }
-
-        inline std::ostream& operator<<(std::ostream& out, const NodeRefSegment& segment) {
-            out << segment.first() << "--" << segment.second();
-            return out;
-        }
-
-        inline bool outside_x_range(const NodeRefSegment& s1, const NodeRefSegment& s2) {
-            if (s1.first().location().x() > s2.second().location().x()) {
-                return true;
-            }
-            return false;
-        }
-
-        inline bool y_range_overlap(const NodeRefSegment& s1, const NodeRefSegment& s2) {
-            int tmin = s1.first().location().y() < s1.second().location().y() ? s1.first().location().y( ) : s1.second().location().y();
-            int tmax = s1.first().location().y() < s1.second().location().y() ? s1.second().location().y() : s1.first().location().y();
-            int omin = s2.first().location().y() < s2.second().location().y() ? s2.first().location().y()  : s2.second().location().y();
-            int omax = s2.first().location().y() < s2.second().location().y() ? s2.second().location().y() : s2.first().location().y();
-            if (tmin > omax || omin > tmax) {
-                return false;
-            }
-            return true;
-        }
-
-        inline osmium::Location intersection(const NodeRefSegment& s1, const NodeRefSegment&s2) {
-            if (s1.first()  == s2.first()  ||
-                s1.first()  == s2.second() ||
-                s1.second() == s2.first()  ||
-                s1.second() == s2.second()) {
-                return osmium::Location();
-            }
-
-            double denom = ((s2.second().lat() - s2.first().lat())*(s1.second().lon() - s1.first().lon())) -
-                           ((s2.second().lon() - s2.first().lon())*(s1.second().lat() - s1.first().lat()));
-
-            if (denom != 0) {
-                double nume_a = ((s2.second().lon() - s2.first().lon())*(s1.first().lat() - s2.first().lat())) -
-                                ((s2.second().lat() - s2.first().lat())*(s1.first().lon() - s2.first().lon()));
-
-                double nume_b = ((s1.second().lon() - s1.first().lon())*(s1.first().lat() - s2.first().lat())) -
-                                ((s1.second().lat() - s1.first().lat())*(s1.first().lon() - s2.first().lon()));
-
-                if ((denom > 0 && nume_a >= 0 && nume_a <= denom && nume_b >= 0 && nume_b <= denom) ||
-                    (denom < 0 && nume_a <= 0 && nume_a >= denom && nume_b <= 0 && nume_b >= denom)) {
-                    double ua = nume_a / denom;
-                    double ix = s1.first().lon() + ua*(s1.second().lon() - s1.first().lon());
-                    double iy = s1.first().lat() + ua*(s1.second().lat() - s1.first().lat());
-                    return osmium::Location(ix, iy);
-                }
-            }
-
-            return osmium::Location();
-        }
 
         /**
          * Assembles area objects from multipolygon relations and their
@@ -336,11 +205,6 @@ namespace osmium {
                 }
             }
 
-        public:
-
-            Assembler() {
-            }
-
             bool is_below(const osmium::Location& loc, const NodeRefSegment& seg) const {
                 double ax = seg.first().location().x();
                 double bx = seg.second().location().x();
@@ -361,20 +225,23 @@ namespace osmium {
                 return nullptr;
             }
 
-            bool find_intersections(std::vector<NodeRefSegment>& segments) const {
-                bool okay = true;
+            /**
+             * Find intersection between segments.
+             *
+             * @returns true if there are intersections.
+             */
+            bool find_intersections(std::vector<NodeRefSegment>& segments) {
                 if (segments.begin() == segments.end()) {
                     return false;
                 }
+
+                bool found_intersections = false;
                 for (auto it1 = segments.begin(); it1 != segments.end()-1; ++it1) {
                     const NodeRefSegment& s1 = *it1;
                     for (auto it2 = it1+1; it2 != segments.end(); ++it2) {
                         const NodeRefSegment& s2 = *it2;
                         if (s1 == s2) {
                             std::cerr << "overlap on segment " << s1 << "\n";
-/*                            OGRLineString* line = create_ogr_linestring(s1);
-                            output.add_error_line(line, "overlap");
-                            overlaps++;*/
                         } else {
                             if (outside_x_range(s2, s1)) {
                                 break;
@@ -382,15 +249,27 @@ namespace osmium {
                             if (y_range_overlap(s1, s2)) {
                                 osmium::Location i = intersection(s1, s2);
                                 if (i) {
-                                    okay = false;
-                                   // intersections.push_back(i);
+                                    found_intersections = true;
+                                    // intersections.push_back(i);
                                     std::cerr << "intersection " << i << "\n";
+                                    m_problems.emplace_back(Problem(osmium::area::Problem::problem_type::intersection, osmium::NodeRef(0, i), s1, s2));
                                 }
                             }
                         }
                     }
                 }
-                return okay;
+                return found_intersections;
+            }
+
+            std::vector<Problem> m_problems;
+
+        public:
+
+            Assembler() {
+            }
+
+            const std::vector<Problem>& problems() const {
+                return m_problems;
             }
 
             void operator()(const osmium::Relation& relation, std::vector<size_t>& members, const osmium::memory::Buffer& in_buffer, osmium::memory::Buffer& out_buffer) {
@@ -438,7 +317,7 @@ namespace osmium {
 
                 // Now we look for segments crossing each other. If there are
                 // any, the multipolygon is invalid.
-                if (!find_intersections(segments)) {
+                if (find_intersections(segments)) {
                     std::cerr << "INTERSECTION!\n";
                 }
 
@@ -554,6 +433,8 @@ namespace osmium {
 
                 for (auto& ring : rings) {
                     if (!ring.closed()) {
+                        m_problems.emplace_back(Problem(osmium::area::Problem::problem_type::ring_not_closed, ring.first()));
+                        m_problems.emplace_back(Problem(osmium::area::Problem::problem_type::ring_not_closed, ring.last()));
                         std::cerr << "    not all rings are closed\n";
                         out_buffer.commit();
                         return;

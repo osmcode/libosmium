@@ -33,6 +33,7 @@ class TestHandler : public osmium::handler::Handler {
     OGRLayer* m_layer_point;
     OGRLayer* m_layer_linestring;
     OGRLayer* m_layer_polygon;
+    OGRLayer* m_layer_perror;
 
     osmium::geom::OGRFactory m_ogr_factory {};
     osmium::geom::WKTFactory m_wkt_factory {};
@@ -62,6 +63,9 @@ public:
 
         OGRSpatialReference sparef;
         sparef.SetWellKnownGeogCS("WGS84");
+
+        /**************/
+
         m_layer_point = m_data_source->CreateLayer("points", &sparef, wkbPoint, nullptr);
         if (!m_layer_point) {
             std::cerr << "Layer creation failed.\n";
@@ -76,13 +80,15 @@ public:
             exit(1);
         }
 
-        OGRFieldDefn layer_point_field_operator("type", OFTString);
-        layer_point_field_operator.SetWidth(30);
+        OGRFieldDefn layer_point_field_type("type", OFTString);
+        layer_point_field_type.SetWidth(30);
 
-        if (m_layer_point->CreateField(&layer_point_field_operator) != OGRERR_NONE) {
-            std::cerr << "Creating operator field failed.\n";
+        if (m_layer_point->CreateField(&layer_point_field_type) != OGRERR_NONE) {
+            std::cerr << "Creating type field failed.\n";
             exit(1);
         }
+
+        /**************/
 
         m_layer_linestring = m_data_source->CreateLayer("lines", &sparef, wkbLineString, nullptr);
         if (!m_layer_linestring) {
@@ -106,6 +112,8 @@ public:
             exit(1);
         }
 
+        /**************/
+
         m_layer_polygon = m_data_source->CreateLayer("multipolygons", &sparef, wkbMultiPolygon, nullptr);
         if (!m_layer_polygon) {
             std::cerr << "Layer creation failed.\n";
@@ -127,6 +135,31 @@ public:
             std::cerr << "Creating from_type field failed.\n";
             exit(1);
         }
+
+        /**************/
+
+        m_layer_perror = m_data_source->CreateLayer("perrors", &sparef, wkbPoint, nullptr);
+        if (!m_layer_perror) {
+            std::cerr << "Layer creation failed.\n";
+            exit(1);
+        }
+
+        OGRFieldDefn layer_perror_field_id("id", OFTReal);
+        layer_perror_field_id.SetWidth(10);
+
+        if (m_layer_perror->CreateField(&layer_perror_field_id) != OGRERR_NONE) {
+            std::cerr << "Creating id field failed.\n";
+            exit(1);
+        }
+
+        OGRFieldDefn layer_perror_field_type("type", OFTString);
+        layer_perror_field_type.SetWidth(30);
+
+        if (m_layer_perror->CreateField(&layer_perror_field_type) != OGRERR_NONE) {
+            std::cerr << "Creating type field failed.\n";
+            exit(1);
+        }
+
     }
 
     ~TestHandler() {
@@ -198,6 +231,23 @@ public:
             OGRFeature::DestroyFeature(feature);
         } catch (osmium::geom::geometry_error&) {
             std::cerr << "Ignoring illegal geometry for area " << area.id() << ".\n";
+        }
+    }
+
+    void write_problems(const std::vector<osmium::area::Problem>& problems) {
+        for (auto& problem : problems) {
+            OGRFeature* feature = OGRFeature::CreateFeature(m_layer_perror->GetLayerDefn());
+            std::unique_ptr<OGRPoint> ogr_point = m_ogr_factory.create_point(problem.m_node_ref.location());
+            feature->SetGeometry(ogr_point.get());
+            feature->SetField("id", static_cast<double>(problem.m_node_ref.ref()));
+            feature->SetField("type", problem.problem().c_str());
+
+            if (m_layer_perror->CreateFeature(feature) != OGRERR_NONE) {
+                std::cerr << "Failed to create feature.\n";
+                exit(1);
+            }
+
+            OGRFeature::DestroyFeature(feature);
         }
     }
 
@@ -279,6 +329,8 @@ int main(int argc, char* argv[]) {
     std::cerr << "Pass 2 done\n";
 
     osmium::apply(collector, ogr_handler);
+
+    ogr_handler.write_problems(assembler.problems());
 
     google::protobuf::ShutdownProtobufLibrary();
 }
