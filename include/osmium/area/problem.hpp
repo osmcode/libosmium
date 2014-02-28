@@ -34,6 +34,7 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <osmium/osm/noderef.hpp>
+#include <osmium/osm/ostream.hpp>
 #include <osmium/area/segment.hpp>
 
 namespace osmium {

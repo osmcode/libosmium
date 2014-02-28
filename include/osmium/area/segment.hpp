@@ -33,6 +33,11 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <boost/operators.hpp>
+
+#include <osmium/osm/noderef.hpp>
+#include <osmium/osm/ostream.hpp>
+
 namespace osmium {
 
     namespace area {

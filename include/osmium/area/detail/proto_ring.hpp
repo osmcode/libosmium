@@ -33,7 +33,11 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <cassert>
+#include <vector>
+
 #include <osmium/osm/noderef.hpp>
+#include <osmium/osm/ostream.hpp>
 #include <osmium/area/segment.hpp>
 
 namespace osmium {

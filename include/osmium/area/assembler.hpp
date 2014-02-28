@@ -38,8 +38,6 @@ DEALINGS IN THE SOFTWARE.
 #include <iterator>
 #include <vector>
 
-#include <boost/operators.hpp>
-
 #include <osmium/memory/buffer.hpp>
 #include <osmium/osm/area.hpp>
 #include <osmium/osm/builder.hpp>
