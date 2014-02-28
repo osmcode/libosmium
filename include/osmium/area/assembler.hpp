@@ -49,10 +49,13 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/area/segment.hpp>
 #include <osmium/area/problem.hpp>
+#include <osmium/area/detail/proto_ring.hpp>
 
 namespace osmium {
 
     namespace area {
+
+        using osmium::area::detail::ProtoRing;
 
         /**
          * Assembles area objects from multipolygon relations and their
@@ -60,150 +63,6 @@ namespace osmium {
          * members have been collected.
          */
         class Assembler {
-
-            /**
-             * A ring in the process of being built by the Assembler object.
-             */
-            class ProtoRing {
-
-                // nodes in this ring
-                std::vector<osmium::NodeRef> m_nodes;
-
-                std::vector<ProtoRing*> m_inner;
-
-            public:
-
-                ProtoRing() :
-                    m_nodes() {
-                }
-
-                const std::vector<osmium::NodeRef>& nodes() const {
-                    return m_nodes;
-                }
-
-                void add_location_end(const osmium::NodeRef& nr) {
-                    m_nodes.push_back(nr);
-                }
-
-                void add_location_start(const osmium::NodeRef& nr) {
-                    m_nodes.insert(m_nodes.begin(), nr);
-                }
-
-                const osmium::NodeRef& first() const {
-                    return m_nodes.front();
-                }
-
-                osmium::NodeRef& first() {
-                    return m_nodes.front();
-                }
-
-                const osmium::NodeRef& last() const {
-                    return m_nodes.back();
-                }
-
-                osmium::NodeRef& last() {
-                    return m_nodes.back();
-                }
-
-                const osmium::Location top() const {
-                    return first().location().y() > last().location().y() ? first().location() : last().location();
-                }
-
-                const osmium::Location bottom() const {
-                    return first().location().y() < last().location().y() ? first().location() : last().location();
-                }
-
-                bool closed() const {
-                    return m_nodes.front().location() == m_nodes.back().location();
-                }
-
-                bool is_outer() const {
-                    int64_t sum = 0;
-
-                    for (size_t i = 0; i < m_nodes.size(); ++i) {
-                        size_t j = (i + 1) % m_nodes.size();
-                        sum += static_cast<int64_t>(m_nodes[i].location().x()) * static_cast<int64_t>(m_nodes[j].location().y());
-                        sum -= static_cast<int64_t>(m_nodes[j].location().x()) * static_cast<int64_t>(m_nodes[i].location().y());
-                    }
-
-                    return sum <= 0;
-                }
-
-                void swap_nodes(ProtoRing& other) {
-                    std::swap(m_nodes, other.m_nodes);
-                }
-
-                void add_inner_ring(ProtoRing* ring) {
-                    m_inner.push_back(ring);
-                }
-
-                const std::vector<ProtoRing*> inner_rings() const {
-                    return m_inner;
-                }
-
-                /**
-                 * Merge other ring to end of this ring.
-                 */
-                void merge_ring(const ProtoRing& other) {
-                    std::cout << "        MERGE rings " << *this << " to " << other << "\n";
-
-                    if (last() == other.first()) {
-                        for (auto ni = other.nodes().begin() + 1; ni != other.nodes().end(); ++ni) {
-                            add_location_end(*ni);
-                        }
-                    } else {
-                        exit(3); // XXX
-                        assert(last() == other.last());
-                        for (auto ni = other.nodes().rbegin() + 1; ni != other.nodes().rend(); ++ni) {
-                            add_location_end(*ni);
-                        }
-                    }
-                }
-
-            }; // class ProtoRing
-
-            inline friend std::ostream& operator<<(std::ostream& out, const ProtoRing& ring) {
-                out << "[";
-                bool first = true;
-                for (auto& nr : ring.nodes()) {
-                    if (!first) {
-                        out << ',';
-                    }
-                    out << nr.ref();
-                    first = false;
-                }
-                out << "]";
-                return out;
-            }
-
-            void combine_rings_end(ProtoRing& ring, std::vector<ProtoRing>& rings) {
-                osmium::Location location = ring.last().location();
-
-                for (auto it = rings.begin(); it != rings.end(); ++it) {
-                    if (&*it != &ring) {
-                        if ((location == it->first().location())) { // || (location == it->last().location())) {
-                            ring.merge_ring(*it);
-                            rings.erase(it);
-                            return;
-                        }
-                    }
-                }
-            }
-
-            void combine_rings_start(ProtoRing& ring, std::vector<ProtoRing>& rings) {
-                osmium::Location location = ring.first().location();
-
-                for (auto it = rings.begin(); it != rings.end(); ++it) {
-                    if (&*it != &ring) {
-                        if ((location == it->first().location())) { // || (location == it->last().location())) {
-                            ring.swap_nodes(*it);
-                            ring.merge_ring(*it);
-                            rings.erase(it);
-                            return;
-                        }
-                    }
-                }
-            }
 
             bool is_below(const osmium::Location& loc, const NodeRefSegment& seg) const {
                 double ax = seg.first().location().x();
