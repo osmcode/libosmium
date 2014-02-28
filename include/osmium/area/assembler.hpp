@@ -59,6 +59,8 @@ namespace osmium {
             osmium::NodeRef m_first;
             osmium::NodeRef m_second;
 
+            bool m_cw;
+
             void swap_locations() {
                 using std::swap;
                 swap(m_first, m_second);
@@ -92,9 +94,23 @@ namespace osmium {
                 return m_second;
             }
 
+            bool cw() const {
+                return m_cw;
+            }
+
             NodeRefSegment make_cw() {
+                m_cw = true;
                 NodeRefSegment seg(*this);
                 if (seg.first().location().y() > seg.second().location().y()) {
+                    seg.swap_locations();
+                }
+                return seg;
+            }
+
+            NodeRefSegment make_ccw() {
+                m_cw = false;
+                NodeRefSegment seg(*this);
+                if (seg.first().location().y() < seg.second().location().y()) {
                     seg.swap_locations();
                 }
                 return seg;
@@ -344,7 +360,6 @@ namespace osmium {
 
                 // Now iterator over all segments and add them to rings
                 // until there are no segments left.
-                auto startwin = segments.begin();
                 for (auto it = segments.begin(); it != segments.end(); ++it) {
                     auto& segment = *it;
 
@@ -389,21 +404,27 @@ namespace osmium {
                         std::cerr << "    new ring for segment " << segment << "\n";
                         ProtoRing ri;
 
-/*                        while (startwin->second().location() < it->first().location()) {
-                            std::cerr << "      startwin=" << *startwin << "\n";
-                            ++startwin;
-                        }*/
-
                         bool cw = true;
-                        for (auto oit = startwin; oit != it; ++oit) {
-                            std::cerr << "      win=" << *oit << "\n";
-                            if (oit->second().location().x() < it->first().location().x()) {
-                                continue;
+
+                        if (it != segments.begin()) {
+                            osmium::Location loc = segment.first().location();
+                            std::cerr << "      compare against id=" << segment.first().ref() << " lat()=" << loc.lat() << "\n";
+                            for (auto oit = it-1; oit != segments.begin()-1; --oit) {
+                                std::cerr << "      seg=" << *oit << "\n";
+                                auto mm = std::minmax(oit->first().location().y(), oit->second().location().y());
+                                if (mm.first <= loc.y() && mm.second >= loc.y()) {
+                                    std::cerr << "        in range\n";
+                                    if (oit->first().location().x() <= loc.x() &&
+                                        oit->second().location().x() <= loc.x()) {
+                                        cw = !oit->cw();
+                                        break;
+                                    }
+                                    if (is_below(loc, *oit)) { // XXX
+                                        cw = !oit->cw();
+                                        break;
+                                    }
+                                }
                             }
-                            if (is_below(it->first().location(), *oit)) {
-                                break;
-                            }
-                            cw = !cw;
                         }
 
                         if (cw) {
@@ -413,9 +434,9 @@ namespace osmium {
                             ri.add_location_end(s.second());
                         } else {
                             std::cerr << "      is ccw\n";
-                            NodeRefSegment s = segment.make_cw();
-                            ri.add_location_end(s.second());
+                            NodeRefSegment s = segment.make_ccw();
                             ri.add_location_end(s.first());
+                            ri.add_location_end(s.second());
                         }
 
                         rings.push_back(ri);
