@@ -38,16 +38,88 @@ DEALINGS IN THE SOFTWARE.
 #include <iterator>
 #include <vector>
 
+#include <boost/operators.hpp>
+
 #include <osmium/memory/buffer.hpp>
 #include <osmium/osm/area.hpp>
 #include <osmium/osm/builder.hpp>
-#include <osmium/osm/relation.hpp>
-#include <osmium/osm/undirected_segment.hpp>
+#include <osmium/osm/location.hpp>
 #include <osmium/osm/ostream.hpp>
+#include <osmium/osm/relation.hpp>
 
 namespace osmium {
 
     namespace area {
+
+        /**
+         * Helper class for Assembler class.
+         */
+        class NodeRefSegment : boost::less_than_comparable<NodeRefSegment> {
+
+            osmium::NodeRef m_first;
+            osmium::NodeRef m_second;
+
+            void swap_locations() {
+                using std::swap;
+                swap(m_first, m_second);
+            }
+
+        public:
+
+            NodeRefSegment(const osmium::NodeRef& nr1, const osmium::NodeRef& nr2) :
+                m_first(nr1),
+                m_second(nr2) {
+                if (nr2.location() < nr1.location()) {
+                    swap_locations();
+                }
+            }
+
+            NodeRefSegment(const NodeRefSegment&) = default;
+            NodeRefSegment(NodeRefSegment&&) = default;
+
+            NodeRefSegment& operator=(const NodeRefSegment&) = default;
+            NodeRefSegment& operator=(NodeRefSegment&&) = default;
+
+            ~NodeRefSegment() = default;
+
+            /// Return first NodeRef of Segment.
+            const osmium::NodeRef& first() const {
+                return m_first;
+            }
+
+            /// Return second NodeRef of Segment.
+            const osmium::NodeRef& second() const {
+                return m_second;
+            }
+
+            NodeRefSegment make_cw() {
+                NodeRefSegment seg(*this);
+                if (seg.first().location().y() > seg.second().location().y()) {
+                    seg.swap_locations();
+                }
+                return seg;
+            }
+
+        }; // class NodeRefSegment
+
+        /// NodeRefSegments are equal if both their locations are equal
+        inline constexpr bool operator==(const NodeRefSegment& lhs, const NodeRefSegment& rhs) {
+            return lhs.first().location() == rhs.first().location() && lhs.second().location() == rhs.second().location();
+        }
+
+        /**
+         * NodeRefSegments are "smaller" if they are to the left and down of another
+         * segment. The first() location is checked first() and only if they have the
+         * same first() location the second() location is taken into account.
+         */
+        inline bool operator<(const NodeRefSegment& lhs, const NodeRefSegment& rhs) {
+            return (lhs.first().location() == rhs.first().location() && lhs.second().location() < rhs.second().location()) || lhs.first().location() < rhs.first().location();
+        }
+
+        inline std::ostream& operator<<(std::ostream& out, const NodeRefSegment& segment) {
+            out << segment.first() << "--" << segment.second();
+            return out;
+        }
 
         /**
          * Assembles area objects from multipolygon relations and their
@@ -61,26 +133,27 @@ namespace osmium {
              */
             class ProtoRing {
 
+                // nodes in this ring
                 std::vector<osmium::NodeRef> m_nodes;
-                bool m_outer;
+
+                std::vector<ProtoRing*> m_inner;
 
             public:
 
                 ProtoRing() :
-                    m_nodes(),
-                    m_outer(true) {
+                    m_nodes() {
                 }
 
                 const std::vector<osmium::NodeRef>& nodes() const {
                     return m_nodes;
                 }
 
-                void add_location_end(const osmium::Location& location) {
-                    m_nodes.push_back(osmium::NodeRef(0, location));
+                void add_location_end(const osmium::NodeRef& nr) {
+                    m_nodes.push_back(nr);
                 }
 
-                void add_location_start(const osmium::Location& location) {
-                    m_nodes.insert(m_nodes.begin(), osmium::NodeRef(0, location));
+                void add_location_start(const osmium::NodeRef& nr) {
+                    m_nodes.insert(m_nodes.begin(), nr);
                 }
 
                 const osmium::NodeRef& first() const {
@@ -111,58 +184,63 @@ namespace osmium {
                     return m_nodes.front().location() == m_nodes.back().location();
                 }
 
-                bool outer() const {
-                    return m_outer;
-                }
+                bool is_outer() const {
+                    int64_t sum = 0;
 
-                void outer(bool value) {
-                    m_outer = value;
+                    for (size_t i = 0; i < m_nodes.size(); ++i) {
+                        size_t j = (i + 1) % m_nodes.size();
+                        sum += static_cast<int64_t>(m_nodes[i].location().x()) * static_cast<int64_t>(m_nodes[j].location().y());
+                        sum -= static_cast<int64_t>(m_nodes[j].location().x()) * static_cast<int64_t>(m_nodes[i].location().y());
+                    }
+
+                    return sum <= 0;
                 }
 
                 void swap_nodes(ProtoRing& other) {
                     std::swap(m_nodes, other.m_nodes);
                 }
 
+                void add_inner_ring(ProtoRing* ring) {
+                    m_inner.push_back(ring);
+                }
+
+                const std::vector<ProtoRing*> inner_rings() const {
+                    return m_inner;
+                }
+
                 /**
                  * Merge other ring to end of this ring.
                  */
                 void merge_ring(const ProtoRing& other) {
-                    if (outer() != other.outer()) {
-                        std::cerr << "Merging inner ring with outer!\n";
-                    }
+                    std::cout << "        MERGE rings " << *this << " to " << other << "\n";
 
                     if (last() == other.first()) {
                         for (auto ni = other.nodes().begin() + 1; ni != other.nodes().end(); ++ni) {
-                            add_location_end(ni->location());
+                            add_location_end(*ni);
                         }
                     } else {
+                        exit(3); // XXX
                         assert(last() == other.last());
                         for (auto ni = other.nodes().rbegin() + 1; ni != other.nodes().rend(); ++ni) {
-                            add_location_end(ni->location());
+                            add_location_end(*ni);
                         }
                     }
                 }
 
             }; // class ProtoRing
 
-            bool find_outer(const std::vector<ProtoRing>& rings, const osmium::Location& location) {
-                std::vector<ProtoRing> candidates;
-
-                for (const auto& ring : rings) {
-                    if (ring.bottom().y() <= location.y() && ring.top().y() >= location.y()) {
-                        candidates.push_back(ring);
+            inline friend std::ostream& operator<<(std::ostream& out, const ProtoRing& ring) {
+                out << "[";
+                bool first = true;
+                for (auto& nr : ring.nodes()) {
+                    if (!first) {
+                        out << ',';
                     }
+                    out << nr.ref();
+                    first = false;
                 }
-
-                if (candidates.empty()) {
-                    return true;
-                }
-
-                std::sort(candidates.begin(), candidates.end(), [](const ProtoRing& a, const ProtoRing& b) {
-                    return (a.top().y() - a.bottom().y()) < (b.top().y() - b.bottom().y());
-                });
-
-                return !candidates.front().outer();
+                out << "]";
+                return out;
             }
 
             void combine_rings_end(ProtoRing& ring, std::vector<ProtoRing>& rings) {
@@ -170,7 +248,7 @@ namespace osmium {
 
                 for (auto it = rings.begin(); it != rings.end(); ++it) {
                     if (&*it != &ring) {
-                        if ((location == it->first().location()) || (location == it->last().location())) {
+                        if ((location == it->first().location())) { // || (location == it->last().location())) {
                             ring.merge_ring(*it);
                             rings.erase(it);
                             return;
@@ -184,7 +262,7 @@ namespace osmium {
 
                 for (auto it = rings.begin(); it != rings.end(); ++it) {
                     if (&*it != &ring) {
-                        if ((location == it->first().location()) || (location == it->last().location())) {
+                        if ((location == it->first().location())) { // || (location == it->last().location())) {
                             ring.swap_nodes(*it);
                             ring.merge_ring(*it);
                             rings.erase(it);
@@ -199,24 +277,51 @@ namespace osmium {
             Assembler() {
             }
 
-            void operator()(const osmium::Relation& relation, std::vector<size_t>& members, osmium::memory::Buffer& in_buffer, osmium::memory::Buffer& out_buffer) {
-                std::cerr << "build rel " << relation.id() << " members.size=" << members.size() << "\n";
+            bool is_below(const osmium::Location& loc, const NodeRefSegment& seg) const {
+                double ax = seg.first().location().x();
+                double bx = seg.second().location().x();
+                double cx = loc.x();
+                double ay = seg.first().location().y();
+                double by = seg.second().location().y();
+                double cy = loc.y();
+                return ((bx - ax)*(cy - ay) - (by - ay)*(cx - ax)) <= 0;
+            }
 
-                std::vector<osmium::UndirectedSegment> segments;
+            ProtoRing* find_outer(std::vector<ProtoRing>& rings, const ProtoRing& ring) {
+                // dummy
+                for (auto& ring : rings) {
+                    if (ring.is_outer()) {
+                        return &ring;
+                    }
+                }
+                return nullptr;
+            }
+
+            void operator()(const osmium::Relation& relation, std::vector<size_t>& members, const osmium::memory::Buffer& in_buffer, osmium::memory::Buffer& out_buffer) {
+
+                // First we extract all segments from all ways that make up this
+                // multipolygon relation. The segments all have their smaller
+                // coordinate at the beginning of the segment. Smaller, in this
+                // case, means smaller x coordinate, and if they are the same
+                // smaller y coordinate.
+                std::vector<NodeRefSegment> segments;
 
                 for (size_t offset : members) {
                     const osmium::Way& way = in_buffer.get<const osmium::Way>(offset);
                     osmium::NodeRef last_nr;
                     for (osmium::NodeRef nr : way.nodes()) {
                         if (last_nr.location() && last_nr != nr) {
-                            segments.push_back(osmium::UndirectedSegment(last_nr.location(), nr.location()));
+                            segments.push_back(NodeRefSegment(last_nr, nr));
                         }
                         last_nr = nr;
                     }
                 }
 
-                std::cerr << "segments: " << segments.size() << "\n";
+                std::cerr << "\nBuild relation id()=" << relation.id() << " members.size()=" << members.size() << " segments.size()=" << segments.size() << "\n";
 
+                // Now all of these segments are sorted. Again, smaller, in
+                // this case, means smaller x coordinate, and if they are the
+                // same smaller y coordinate.
                 std::sort(segments.begin(), segments.end());
 
                 // remove empty segments
@@ -224,45 +329,51 @@ namespace osmium {
                     return segment.first() == segment.second();
                 }));*/
 
-                // remove duplicates
+                // Find duplicate segments (ie same start and end point) and
+                // removes them.
                 while (true) {
-                    std::vector<osmium::UndirectedSegment>::iterator found = std::adjacent_find(segments.begin(), segments.end());
+                    std::vector<NodeRefSegment>::iterator found = std::adjacent_find(segments.begin(), segments.end());
                     if (found == segments.end()) {
                         break;
                     }
-                    std::cerr << "erase: " << *found << "\n";
+                    std::cerr << "erase duplicate: " << *found << "\n";
                     segments.erase(found, found+2);
                 }
 
                 std::vector<ProtoRing> rings;
 
-                for (const osmium::UndirectedSegment& segment : segments) {
-//                    osmium::Location loc = segment.first();
+                // Now iterator over all segments and add them to rings
+                // until there are no segments left.
+                auto startwin = segments.begin();
+                for (auto it = segments.begin(); it != segments.end(); ++it) {
+                    auto& segment = *it;
 
                     std::cerr << "  check segment " << segment << "\n";
 
                     int n=0;
                     for (auto& ring : rings) {
-                        std::cerr << "  check against ring " << n << " [" << ring.first().location() << "..." << ring.last().location() << "]\n";
+                        std::cerr << "    check against ring " << n << " " << ring << "\n";
                         if (!ring.closed()) {
-                            std::cerr << "      ring " << ring.first().location() << "..." << ring.last().location() << "\n";
-                            if (ring.last().location() == segment.first() ) {
+                            if (ring.last() == segment.first() ) {
+                                std::cerr << "      match\n";
                                 ring.add_location_end(segment.second());
-
                                 combine_rings_end(ring, rings);
                                 goto next_segment;
                             }
-                            if (ring.last().location() == segment.second() ) {
+                            if (ring.last() == segment.second() ) {
+                                std::cerr << "      match\n";
                                 ring.add_location_end(segment.first());
                                 combine_rings_end(ring, rings);
                                 goto next_segment;
                             }
-                            if (ring.first().location() == segment.first() ) {
+                            if (ring.first() == segment.first() ) {
+                                std::cerr << "      match\n";
                                 ring.add_location_start(segment.second());
                                 combine_rings_start(ring, rings);
                                 goto next_segment;
                             }
-                            if (ring.first().location() == segment.second() ) {
+                            if (ring.first() == segment.second() ) {
+                                std::cerr << "      match\n";
                                 ring.add_location_start(segment.first());
                                 combine_rings_start(ring, rings);
                                 goto next_segment;
@@ -277,11 +388,35 @@ namespace osmium {
                     {
                         std::cerr << "    new ring for segment " << segment << "\n";
                         ProtoRing ri;
-                        ri.add_location_end(segment.first());
-                        ri.add_location_end(segment.second());
 
-                        bool outer = find_outer(rings, segment.first());
-                        ri.outer(outer);
+/*                        while (startwin->second().location() < it->first().location()) {
+                            std::cerr << "      startwin=" << *startwin << "\n";
+                            ++startwin;
+                        }*/
+
+                        bool cw = true;
+                        for (auto oit = startwin; oit != it; ++oit) {
+                            std::cerr << "      win=" << *oit << "\n";
+                            if (oit->second().location().x() < it->first().location().x()) {
+                                continue;
+                            }
+                            if (is_below(it->first().location(), *oit)) {
+                                break;
+                            }
+                            cw = !cw;
+                        }
+
+                        if (cw) {
+                            std::cerr << "      is cw\n";
+                            NodeRefSegment s = segment.make_cw();
+                            ri.add_location_end(s.first());
+                            ri.add_location_end(s.second());
+                        } else {
+                            std::cerr << "      is ccw\n";
+                            NodeRefSegment s = segment.make_cw();
+                            ri.add_location_end(s.second());
+                            ri.add_location_end(s.first());
+                        }
 
                         rings.push_back(ri);
                     }
@@ -311,20 +446,42 @@ namespace osmium {
                 }
 
                 for (auto& ring : rings) {
-                    if (ring.outer()) {
-                        osmium::osm::OuterRingBuilder ring_builder(out_buffer, &builder);
-                        for (auto& node_ref : ring.nodes()) {
-                            ring_builder.add_node_ref(node_ref);
-                        }
-                    } else {
-                        osmium::osm::InnerRingBuilder ring_builder(out_buffer, &builder);
-                        for (auto& node_ref : ring.nodes()) {
-                            ring_builder.add_node_ref(node_ref);
+                    if (!ring.closed()) {
+                        std::cerr << "    not all rings are closed\n";
+                        out_buffer.commit();
+                        return;
+                    }
+                }
+
+                for (auto& ring : rings) {
+                    if (!ring.is_outer()) {
+                        ProtoRing* outer = find_outer(rings, ring);
+                        if (outer) {
+                            outer->add_inner_ring(&ring);
+                        } else {
+                            std::cerr << "    something bad happened\n";
+                            out_buffer.commit();
+                            return;
                         }
                     }
                 }
 
-                out_buffer.commit();
+                for (auto& ring : rings) {
+                    if (ring.is_outer()) {
+                        std::cerr << "    ring " << ring << " is outer\n";
+                        osmium::osm::OuterRingBuilder ring_builder(out_buffer, &builder);
+                        for (auto& node_ref : ring.nodes()) {
+                            ring_builder.add_node_ref(node_ref);
+                        }
+                        for (ProtoRing* inner : ring.inner_rings()) {
+                            osmium::osm::InnerRingBuilder ring_builder(out_buffer, &builder);
+                            for (auto& node_ref : inner->nodes()) {
+                                ring_builder.add_node_ref(node_ref);
+                            }
+                        }
+                        out_buffer.commit();
+                    }
+                }
             }
 
         }; // class Assembler

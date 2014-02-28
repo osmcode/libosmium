@@ -36,7 +36,9 @@ LIB_OGR    := $(shell gdal-config --libs)
 # https://github.com/osmcode/osm-testdata
 TESTDATA_DIR := ../../../osm-testdata
 
-.PHONY: all clean overview clean-overview multipolygon clean-multipolygon testcases clean-testcases xml clean-xml
+COMPARE_WKT = $(TESTDATA_DIR)/bin/compare-wkt.sh
+
+.PHONY: all clean overview clean-overview multipolygon clean-multipolygon compare-multipolygons testcases clean-testcases xml clean-xml
 
 all: overview multipolygon testcases xml
 
@@ -57,12 +59,23 @@ clean-overview:
 testdata-multipolygon: testdata-multipolygon.cpp
 	$(CXX) $(CXXFLAGS) $(CXXFLAGS_WARNINGS) $(CXXFLAGS_OGR) -o $@ $< $(LDFLAGS) $(LIB_IO) $(LIB_OGR)
 
-multipolygon: testdata-multipolygon
+multipolygon.db: testdata-multipolygon
 	rm -f multipolygon.db multipolygon.wkt
 	./testdata-multipolygon $(TESTDATA_DIR)/grid/data/all.osm
 
+multipolygon: multipolygon.db
+
 clean-multipolygon:
 	rm -f testdata-multipolygon multipolygon.db multipolygon.wkt
+
+compare-multipolygons: multipolygon.wkt $(TESTDATA_DIR)/grid/data-multipolygons.wkt
+	cat $(TESTDATA_DIR)/grid/data-multipolygons.wkt | while read id stype tag wkt1; do \
+	    wkt2=`grep from_id=$$id multipolygon.wkt | cut -d' ' -f4-`; \
+        if [ "$$id" = "$$lastid" ]; then show_id="......"; else show_id="$$id"; fi; \
+        printf "%s [%-8s]... " $$show_id $$tag; \
+	    $(COMPARE_WKT) "$$wkt1" "$$wkt2" || true; \
+        lastid=$$id; \
+	done
 
 # --------------
 
@@ -94,11 +107,6 @@ clean-xml:
 
 # --------------
 
-compare-multipolygons: multipolygon.db $(TESTDATA_DIR)/grid/grid.db compare.sql
-	spatialite -batch -bail multipolygon.db <compare.sql
-
-# --------------
-
-clean: clean-overview clean-multipolygon clean-testcases
+clean: clean-overview clean-multipolygon clean-testcases clean-xml
 	rm -f *.o core
 

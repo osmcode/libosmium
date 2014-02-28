@@ -178,17 +178,25 @@ namespace osmium {
             /* MultiPolygon */
 
             multipolygon_type create_multipolygon(const osmium::Area& area) {
+                int num_rings = 0;
                 static_cast<G*>(this)->multipolygon_start();
 
                 for (auto it = area.cbegin(); it != area.cend(); ++it) {
                     const osmium::OuterRing& ring = static_cast<const osmium::OuterRing&>(*it);
                     if (it->type() == osmium::item_type::outer_ring) {
+                        ++num_rings;
                         static_cast<G*>(this)->multipolygon_add_outer_ring();
                         add_points(ring);
                     } else if (it->type() == osmium::item_type::inner_ring) {
+                        ++num_rings;
                         static_cast<G*>(this)->multipolygon_add_inner_ring();
                         add_points(ring);
                     }
+                }
+
+                // if there are no rings, this area is invalid
+                if (num_rings == 0) {
+                    throw geometry_error("invalid area");
                 }
 
                 return static_cast<G*>(this)->multipolygon_finish();

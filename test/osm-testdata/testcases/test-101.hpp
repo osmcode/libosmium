@@ -30,10 +30,10 @@ namespace testcase_101 {
     struct RunTest {
 
         bool operator()(const std::string& dirname) {
-            osmium::io::Reader reader(dirname + "/1-basic-geom/101/data.osm");
+            osmium::io::Reader reader(dirname + "/1/101/data.osm");
 
             CheckBasicsHandler check_basics_handler(101, 4, 0, 0);
-            CheckWKTHandler check_wkt_handler(dirname, "1-basic-geom", 101);
+            CheckWKTHandler check_wkt_handler(dirname, 101);
             TestHandler test_handler;
 
             osmium::apply(reader, check_basics_handler, test_handler);

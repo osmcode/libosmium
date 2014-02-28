@@ -169,11 +169,12 @@ public:
     }
 
     void area(const osmium::Area& area) {
+        m_out << "test=" << (area.orig_id() / 1000) << " area=" << area.id() << " from_id=" << area.orig_id() << " ";
         try {
             std::string wkt = m_wkt_factory.create_multipolygon(area);
-            m_out << "test=" << (area.orig_id() / 1000) << " area=" << area.id() << " from_id=" << area.orig_id() << " WKT " << wkt << "\n";
+            m_out << wkt << "\n";
         } catch (osmium::geom::geometry_error&) {
-            m_out << "test=" << (area.orig_id() / 1000) << " area=" << area.id() << " from_id=" << area.orig_id() << " ILLEGAL GEOMETRY\n";
+            m_out << "INVALID\n";
         }
         try {
             std::unique_ptr<OGRMultiPolygon> ogr_polygon = m_ogr_factory.create_multipolygon(area);
@@ -205,7 +206,7 @@ public:
 /* ================================================== */
 
 void print_help() {
-    std::cout << "mp_test [OPTIONS] [INFILE [OUTFILE]]\n\n" \
+    std::cout << "testdata-multipolygon [OPTIONS] [INFILE [OUTFILE]]\n\n" \
               << "If INFILE is not given stdin is assumed.\n" \
               << "If OUTFILE is not given 'multipolygon.db' is used.\n" \
               << "\nOptions:\n" \

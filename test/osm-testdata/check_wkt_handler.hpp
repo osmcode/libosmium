@@ -15,7 +15,6 @@ class CheckWKTHandler : public osmium::handler::Handler {
 
     std::map<osmium::object_id_type, std::string> m_geometries {};
     osmium::geom::WKTFactory m_factory {};
-    int m_test_id;
 
     void read_wkt_file(const std::string& filename) {
         std::ifstream in(filename, std::ifstream::in);
@@ -46,11 +45,10 @@ class CheckWKTHandler : public osmium::handler::Handler {
 
 public:
 
-    CheckWKTHandler(const std::string& dirname, const std::string& test_category, int test_id) :
-        osmium::handler::Handler(),
-        m_test_id(test_id) {
+    CheckWKTHandler(const std::string& dirname, int test_id) :
+        osmium::handler::Handler() {
 
-        std::string filename = dirname + "/" + test_category + "/" + std::to_string(test_id) + "/";
+        std::string filename = dirname + "/" + std::to_string(test_id / 100) + "/" + std::to_string(test_id) + "/";
         read_wkt_file(filename + "nodes.wkt");
         read_wkt_file(filename + "ways.wkt");
     }

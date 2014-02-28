@@ -39,7 +39,7 @@ namespace testcase_110 {
     struct RunTest {
 
         bool operator()(const std::string& dirname) {
-            osmium::io::Reader reader(dirname + "/1-basic-geom/110/data.osm");
+            osmium::io::Reader reader(dirname + "/1/110/data.osm");
 
             index_pos_type index_pos;
             index_neg_type index_neg;
@@ -47,7 +47,7 @@ namespace testcase_110 {
             location_handler.ignore_errors();
 
             CheckBasicsHandler check_basics_handler(110, 2, 1, 0);
-            CheckWKTHandler check_wkt_handler(dirname, "1-basic-geom", 110);
+            CheckWKTHandler check_wkt_handler(dirname, 110);
             TestHandler test_handler;
 
             osmium::apply(reader, location_handler, check_basics_handler, check_wkt_handler, test_handler);

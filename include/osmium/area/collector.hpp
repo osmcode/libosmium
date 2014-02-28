@@ -126,7 +126,6 @@ namespace osmium {
             void complete_relation(osmium::relations::RelationMeta& relation_meta) {
                 relation_meta.remove_empty_members();
                 const osmium::Relation& relation = this->get_relation(relation_meta);
-                std::cerr << "Area from Relation " << relation.id() << "\n";
                 m_assembler(relation, relation_meta.member_offsets(), this->buffer(), m_output_buffer);
             }
 
