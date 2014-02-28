@@ -137,6 +137,54 @@ namespace osmium {
             return out;
         }
 
+        inline bool outside_x_range(const NodeRefSegment& s1, const NodeRefSegment& s2) {
+            if (s1.first().location().x() > s2.second().location().x()) {
+                return true;
+            }
+            return false;
+        }
+
+        inline bool y_range_overlap(const NodeRefSegment& s1, const NodeRefSegment& s2) {
+            int tmin = s1.first().location().y() < s1.second().location().y() ? s1.first().location().y( ) : s1.second().location().y();
+            int tmax = s1.first().location().y() < s1.second().location().y() ? s1.second().location().y() : s1.first().location().y();
+            int omin = s2.first().location().y() < s2.second().location().y() ? s2.first().location().y()  : s2.second().location().y();
+            int omax = s2.first().location().y() < s2.second().location().y() ? s2.second().location().y() : s2.first().location().y();
+            if (tmin > omax || omin > tmax) {
+                return false;
+            }
+            return true;
+        }
+
+        inline osmium::Location intersection(const NodeRefSegment& s1, const NodeRefSegment&s2) {
+            if (s1.first()  == s2.first()  ||
+                s1.first()  == s2.second() ||
+                s1.second() == s2.first()  ||
+                s1.second() == s2.second()) {
+                return osmium::Location();
+            }
+
+            double denom = ((s2.second().lat() - s2.first().lat())*(s1.second().lon() - s1.first().lon())) -
+                           ((s2.second().lon() - s2.first().lon())*(s1.second().lat() - s1.first().lat()));
+
+            if (denom != 0) {
+                double nume_a = ((s2.second().lon() - s2.first().lon())*(s1.first().lat() - s2.first().lat())) -
+                                ((s2.second().lat() - s2.first().lat())*(s1.first().lon() - s2.first().lon()));
+
+                double nume_b = ((s1.second().lon() - s1.first().lon())*(s1.first().lat() - s2.first().lat())) -
+                                ((s1.second().lat() - s1.first().lat())*(s1.first().lon() - s2.first().lon()));
+
+                if ((denom > 0 && nume_a >= 0 && nume_a <= denom && nume_b >= 0 && nume_b <= denom) ||
+                    (denom < 0 && nume_a <= 0 && nume_a >= denom && nume_b <= 0 && nume_b >= denom)) {
+                    double ua = nume_a / denom;
+                    double ix = s1.first().lon() + ua*(s1.second().lon() - s1.first().lon());
+                    double iy = s1.first().lat() + ua*(s1.second().lat() - s1.first().lat());
+                    return osmium::Location(ix, iy);
+                }
+            }
+
+            return osmium::Location();
+        }
+
         /**
          * Assembles area objects from multipolygon relations and their
          * members. This is called by the Collector object after all
@@ -313,6 +361,38 @@ namespace osmium {
                 return nullptr;
             }
 
+            bool find_intersections(std::vector<NodeRefSegment>& segments) const {
+                bool okay = true;
+                if (segments.begin() == segments.end()) {
+                    return false;
+                }
+                for (auto it1 = segments.begin(); it1 != segments.end()-1; ++it1) {
+                    const NodeRefSegment& s1 = *it1;
+                    for (auto it2 = it1+1; it2 != segments.end(); ++it2) {
+                        const NodeRefSegment& s2 = *it2;
+                        if (s1 == s2) {
+                            std::cerr << "overlap on segment " << s1 << "\n";
+/*                            OGRLineString* line = create_ogr_linestring(s1);
+                            output.add_error_line(line, "overlap");
+                            overlaps++;*/
+                        } else {
+                            if (outside_x_range(s2, s1)) {
+                                break;
+                            }
+                            if (y_range_overlap(s1, s2)) {
+                                osmium::Location i = intersection(s1, s2);
+                                if (i) {
+                                    okay = false;
+                                   // intersections.push_back(i);
+                                    std::cerr << "intersection " << i << "\n";
+                                }
+                            }
+                        }
+                    }
+                }
+                return okay;
+            }
+
             void operator()(const osmium::Relation& relation, std::vector<size_t>& members, const osmium::memory::Buffer& in_buffer, osmium::memory::Buffer& out_buffer) {
 
                 // First we extract all segments from all ways that make up this
@@ -354,6 +434,12 @@ namespace osmium {
                     }
                     std::cerr << "erase duplicate: " << *found << "\n";
                     segments.erase(found, found+2);
+                }
+
+                // Now we look for segments crossing each other. If there are
+                // any, the multipolygon is invalid.
+                if (!find_intersections(segments)) {
+                    std::cerr << "INTERSECTION!\n";
                 }
 
                 std::vector<ProtoRing> rings;
