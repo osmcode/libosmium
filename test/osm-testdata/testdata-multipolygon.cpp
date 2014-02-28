@@ -34,6 +34,7 @@ class TestHandler : public osmium::handler::Handler {
     OGRLayer* m_layer_linestring;
     OGRLayer* m_layer_polygon;
     OGRLayer* m_layer_perror;
+    OGRLayer* m_layer_lerror;
 
     osmium::geom::OGRFactory m_ogr_factory {};
     osmium::geom::WKTFactory m_wkt_factory {};
@@ -160,6 +161,30 @@ public:
             exit(1);
         }
 
+        /**************/
+
+        m_layer_lerror = m_data_source->CreateLayer("lerrors", &sparef, wkbLineString, nullptr);
+        if (!m_layer_lerror) {
+            std::cerr << "Layer creation failed.\n";
+            exit(1);
+        }
+
+        OGRFieldDefn layer_lerror_field_id("id", OFTReal);
+        layer_lerror_field_id.SetWidth(10);
+
+        if (m_layer_lerror->CreateField(&layer_lerror_field_id) != OGRERR_NONE) {
+            std::cerr << "Creating id field failed.\n";
+            exit(1);
+        }
+
+        OGRFieldDefn layer_lerror_field_type("type", OFTString);
+        layer_lerror_field_type.SetWidth(30);
+
+        if (m_layer_lerror->CreateField(&layer_lerror_field_type) != OGRERR_NONE) {
+            std::cerr << "Creating type field failed.\n";
+            exit(1);
+        }
+
     }
 
     ~TestHandler() {
@@ -234,20 +259,47 @@ public:
         }
     }
 
+    void write_problem_line(const std::string& problem_type, const osmium::area::NodeRefSegment& segment) {
+        std::unique_ptr<OGRPoint> ogr_point1 = m_ogr_factory.create_point(segment.first().location());
+        std::unique_ptr<OGRPoint> ogr_point2 = m_ogr_factory.create_point(segment.second().location());
+        std::unique_ptr<OGRLineString> ogr_linestring = std::unique_ptr<OGRLineString>(new OGRLineString());
+        ogr_linestring->addPoint(ogr_point1.get());
+        ogr_linestring->addPoint(ogr_point2.get());
+        OGRFeature* feature = OGRFeature::CreateFeature(m_layer_lerror->GetLayerDefn());
+        feature->SetGeometry(ogr_linestring.get());
+        //    feature->SetField("id", static_cast<double>(way.id()));
+        feature->SetField("type", problem_type.c_str());
+
+        if (m_layer_lerror->CreateFeature(feature) != OGRERR_NONE) {
+            std::cerr << "Failed to create feature.\n";
+            exit(1);
+        }
+
+        OGRFeature::DestroyFeature(feature);
+    }
+
     void write_problems(const std::vector<osmium::area::Problem>& problems) {
         for (auto& problem : problems) {
-            OGRFeature* feature = OGRFeature::CreateFeature(m_layer_perror->GetLayerDefn());
-            std::unique_ptr<OGRPoint> ogr_point = m_ogr_factory.create_point(problem.m_node_ref.location());
-            feature->SetGeometry(ogr_point.get());
-            feature->SetField("id", static_cast<double>(problem.m_node_ref.ref()));
-            feature->SetField("type", problem.problem().c_str());
+            if (problem.m_node_ref.location()) {
+                OGRFeature* feature = OGRFeature::CreateFeature(m_layer_perror->GetLayerDefn());
+                std::unique_ptr<OGRPoint> ogr_point = m_ogr_factory.create_point(problem.m_node_ref.location());
+                feature->SetGeometry(ogr_point.get());
+                feature->SetField("id", static_cast<double>(problem.m_node_ref.ref()));
+                feature->SetField("type", problem.problem().c_str());
 
-            if (m_layer_perror->CreateFeature(feature) != OGRERR_NONE) {
-                std::cerr << "Failed to create feature.\n";
-                exit(1);
+                if (m_layer_perror->CreateFeature(feature) != OGRERR_NONE) {
+                    std::cerr << "Failed to create feature.\n";
+                    exit(1);
+                }
+
+                OGRFeature::DestroyFeature(feature);
             }
-
-            OGRFeature::DestroyFeature(feature);
+            if (problem.m_segment1.first().location()) {
+                write_problem_line(problem.problem(), problem.m_segment1);
+            }
+            if (problem.m_segment2.first().location()) {
+                write_problem_line(problem.problem(), problem.m_segment2);
+            }
         }
     }
 
