@@ -332,7 +332,7 @@ namespace osmium {
                             }
                             assert(last_dense_changeset >= 0);
                             assert(last_dense_timestamp >= 0);
-                            assert(last_dense_uid >= 0);
+                            assert(last_dense_uid >= -1);
                             assert(last_dense_user_sid >= 0);
                         }
 
