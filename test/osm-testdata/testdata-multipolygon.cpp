@@ -360,6 +360,8 @@ int main(int argc, char* argv[]) {
 
     typedef osmium::area::Assembler area_assembler_type;
     area_assembler_type assembler;
+    assembler.enable_debug_output();
+    assembler.remember_problems();
     osmium::area::Collector<area_assembler_type> collector(assembler);
 
     std::cerr << "Pass 1...\n";

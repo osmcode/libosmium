@@ -142,12 +142,14 @@ namespace osmium {
                 /**
                  * Merge other ring to end of this ring.
                  */
-                void merge_ring(const ProtoRing& other) {
-                    std::cout << "        MERGE rings "; // << *this << " to " << other << "\n";
-                    print(std::cout);
-                    std::cout << " to ";
-                    other.print(std::cout);
-                    std::cout << "\n";
+                void merge_ring(const ProtoRing& other, bool debug) {
+                    if (debug) {
+                        std::cerr << "        MERGE rings ";
+                        print(std::cerr);
+                        std::cerr << " to ";
+                        other.print(std::cerr);
+                        std::cerr << "\n";
+                    }
 
                     if (last() == other.first()) {
                         for (auto ni = other.nodes().begin() + 1; ni != other.nodes().end(); ++ni) {
@@ -169,13 +171,16 @@ namespace osmium {
                 return out;
             }
 
-            inline void combine_rings_end(ProtoRing& ring, std::vector<ProtoRing>& rings) {
+            inline void combine_rings_end(ProtoRing& ring, std::vector<ProtoRing>& rings, bool debug) {
                 osmium::Location location = ring.last().location();
 
+                if (debug) {
+                    std::cerr << "      combine_rings_end\n";
+                }
                 for (auto it = rings.begin(); it != rings.end(); ++it) {
                     if (&*it != &ring) {
                         if ((location == it->first().location())) { // || (location == it->last().location())) {
-                            ring.merge_ring(*it);
+                            ring.merge_ring(*it, debug);
                             rings.erase(it);
                             return;
                         }
@@ -183,14 +188,17 @@ namespace osmium {
                 }
             }
 
-            inline void combine_rings_start(ProtoRing& ring, std::vector<ProtoRing>& rings) {
+            inline void combine_rings_start(ProtoRing& ring, std::vector<ProtoRing>& rings, bool debug) {
                 osmium::Location location = ring.first().location();
 
+                if (debug) {
+                    std::cerr << "      combine_rings_start\n";
+                }
                 for (auto it = rings.begin(); it != rings.end(); ++it) {
                     if (&*it != &ring) {
-                        if ((location == it->first().location())) { // || (location == it->last().location())) {
+                        if ((location == it->last().location())) { // || (location == it->last().location())) {
                             ring.swap_nodes(*it);
-                            ring.merge_ring(*it);
+                            ring.merge_ring(*it, debug);
                             rings.erase(it);
                             return;
                         }

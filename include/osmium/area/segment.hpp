@@ -151,7 +151,7 @@ namespace osmium {
             return true;
         }
 
-        inline osmium::Location intersection(const NodeRefSegment& s1, const NodeRefSegment&s2) {
+        inline osmium::Location calculate_intersection(const NodeRefSegment& s1, const NodeRefSegment& s2) {
             if (s1.first()  == s2.first()  ||
                 s1.first()  == s2.second() ||
                 s1.second() == s2.first()  ||
