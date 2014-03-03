@@ -227,7 +227,7 @@ public:
 
                 OGRFeature::DestroyFeature(feature);
             } catch (osmium::geom::geometry_error&) {
-                std::cerr << "Ignoring illegal geometry for area " << area.id() << ".\n";
+                std::cerr << "Ignoring illegal geometry for area " << area.id() << " created from " << (area.from_way() ? "way" : "relation") << " with id=" << area.orig_id() << ".\n";
             }
         }
     }
