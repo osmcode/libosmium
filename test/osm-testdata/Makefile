@@ -69,12 +69,19 @@ clean-multipolygon:
 	rm -f testdata-multipolygon multipolygon.db multipolygon.wkt
 
 compare-multipolygons: multipolygon.wkt $(TESTDATA_DIR)/grid/data-multipolygons.wkt
-	cat $(TESTDATA_DIR)/grid/data-multipolygons.wkt | while read id stype tag wkt1; do \
-	    wkt2=`grep from_id=$$id multipolygon.wkt | cut -d' ' -f4-`; \
-        if [ "$$id" = "$$lastid" ]; then show_id="......"; else show_id="$$id"; fi; \
-        printf "%s [%-8s]... " $$show_id $$tag; \
-	    $(COMPARE_WKT) "$$wkt1" "$$wkt2" || true; \
-        lastid=$$id; \
+	cut -d' ' -f1 $(TESTDATA_DIR)/grid/data-multipolygons.wkt | uniq | while read id; do \
+	    echo -n "$$id... "; \
+	    out=$$(egrep "^$$id " $(TESTDATA_DIR)/grid/data-multipolygons.wkt | while read id stype variant wkt1; do \
+	        wkt2=`grep from_id=$$id multipolygon.wkt | cut -d' ' -f4-`; \
+	        result=`$(COMPARE_WKT) "$$wkt1" "$$wkt2"`; \
+	        echo -n " [$$variant => $$result]"; \
+	    done;); \
+	    if echo $$out | egrep ' OK ' >/dev/null; then \
+	        echo -n "\033[1;32mOK\033[0m  "; \
+	    else \
+	        echo -n "\033[1;31mERR\033[0m "; \
+	    fi; \
+	    echo $$out; \
 	done
 
 # --------------
