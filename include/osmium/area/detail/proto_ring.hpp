@@ -54,6 +54,8 @@ namespace osmium {
                 // nodes in this ring
                 std::vector<osmium::NodeRef> m_nodes {};
 
+                NodeRefSegment* m_first_segment { nullptr };
+
                 // if this is an outer ring, these point to it's inner rings (if any)
                 std::vector<ProtoRing*> m_inner {};
 
@@ -164,22 +166,12 @@ namespace osmium {
                     }
                 }
 
-                NodeRefSegment find_first_segment() const {
+                void first_segment(NodeRefSegment& first_segment) {
+                    m_first_segment = &first_segment;
+                }
 
-                    auto it = std::min_element(m_nodes.begin(), m_nodes.end(), [](const NodeRef& nr1, const NodeRef& nr2) {
-                        return nr1.location() < nr2.location();
-                    });
-                    auto prev = (it == m_nodes.begin()) ? m_nodes.end()-2 : (it-1);
-                    auto next = it+1;
-                    if (next == m_nodes.end()) {
-                        next = m_nodes.begin()+1;
-                    }
-
-                    NodeRefSegment segment(*it, std::min(*prev, *next, [](const NodeRef& nr1, const NodeRef& nr2) {
-                        return nr1.location() < nr2.location();
-                    }));
-
-                    return segment;
+                NodeRefSegment& first_segment() const {
+                    return *m_first_segment;
                 }
 
             }; // class ProtoRing

@@ -85,25 +85,19 @@ namespace osmium {
 
             ProtoRing* find_outer(const std::vector<NodeRefSegment>& segments, std::list<ProtoRing>& rings, const ProtoRing& ring) {
 
-                NodeRefSegment first_segment = ring.find_first_segment();
-
+                NodeRefSegment& first_segment = ring.first_segment();
                 if (m_debug) {
                     std::cerr << "      First segment is: " << first_segment << "\n";
                 }
 
-                auto it = std::find(segments.begin(), segments.end(), first_segment);
-                assert(it != segments.end());
-
-                NodeRefSegment* left = it->left_segment();
+                NodeRefSegment* left = first_segment.left_segment();
                 assert(left);
                 std::cerr << "      Left segment is: " << *left << "\n";
                 while (left && !left->ring()->is_outer()) {
                     std::cerr << "        ring is " << *(left->ring()) << "\n";
-                    NodeRefSegment s1 = left->ring()->find_first_segment();
-                    auto it1 = std::find(segments.begin(), segments.end(), s1);
-                    assert(it1 != segments.end());
-                    std::cerr << "          first segment is " << *it1 << "\n";
-                    left = it1->left_segment();
+                    NodeRefSegment& s1 = left->ring()->first_segment();
+                    std::cerr << "          first segment is " << s1 << "\n";
+                    left = s1.left_segment();
                     assert(left);
                     std::cerr << "      Left segment is: " << *left << "\n";
                 }
@@ -367,6 +361,7 @@ namespace osmium {
                             segment.cw(true);
                             ri.add_location_end(segment.first_cw());
                             ri.add_location_end(segment.second_cw());
+                            ri.first_segment(segment);
                         } else {
                             if (m_debug) {
                                 std::cerr << "      is ccw\n";
@@ -374,6 +369,7 @@ namespace osmium {
                             segment.cw(false);
                             ri.add_location_end(segment.first_cw());
                             ri.add_location_end(segment.second_cw());
+                            ri.first_segment(segment);
                         }
 
                         rings.push_back(ri);
