@@ -33,6 +33,8 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <algorithm>
+
 #include <boost/operators.hpp>
 
 #include <osmium/osm/noderef.hpp>
@@ -43,18 +45,23 @@ namespace osmium {
     namespace area {
 
         /**
-         * Helper class for Assembler class.
+         * This helper class for the Assembler class models a segment
+         * (connection between two nodes).
          */
         class NodeRefSegment : boost::less_than_comparable<NodeRefSegment> {
 
             osmium::NodeRef m_first;
             osmium::NodeRef m_second;
 
-            bool m_cw;
+            bool m_cw {true};
 
             void swap_locations() {
                 using std::swap;
                 swap(m_first, m_second);
+            }
+
+            bool swap_ends() const {
+                return m_cw ? m_first.location().y() > m_second.location().y() : m_first.location().y() < m_second.location().y();
             }
 
         public:
@@ -80,42 +87,43 @@ namespace osmium {
 
             ~NodeRefSegment() = default;
 
-            /// Return first NodeRef of Segment.
+            /// Return first NodeRef of Segment according to sorting order (bottom left to top right).
             const osmium::NodeRef& first() const {
                 return m_first;
             }
 
-            /// Return second NodeRef of Segment.
+            /// Return second NodeRef of Segment according to sorting order (bottom left to top right).
             const osmium::NodeRef& second() const {
                 return m_second;
             }
 
+            /// Return first NodeRef of Segment taking into account whether this Segment is set as clockwise or counter-clockwise.
+            const osmium::NodeRef& first_cw() const {
+                return swap_ends() ? m_second : m_first;
+            }
+
+            /// Return second NodeRef of Segment taking into account whether this Segment is set as clockwise or counter-clockwise.
+            const osmium::NodeRef& second_cw() const {
+                return swap_ends() ? m_first : m_second;
+            }
+
+            /// Is this segment oriented clockwise?
             bool cw() const {
                 return m_cw;
             }
 
-            NodeRefSegment make_cw() {
-                m_cw = true;
-                NodeRefSegment seg(*this);
-                if (seg.first().location().y() > seg.second().location().y()) {
-                    seg.swap_locations();
-                }
-                return seg;
-            }
-
-            NodeRefSegment make_ccw() {
-                m_cw = false;
-                NodeRefSegment seg(*this);
-                if (seg.first().location().y() < seg.second().location().y()) {
-                    seg.swap_locations();
-                }
-                return seg;
+            /**
+             * Set orientation of this segment
+             * (true: clockwise, false: counter-clockwise)
+             */
+            void cw(bool cw) {
+                m_cw = cw;
             }
 
         }; // class NodeRefSegment
 
         /// NodeRefSegments are equal if both their locations are equal
-        inline constexpr bool operator==(const NodeRefSegment& lhs, const NodeRefSegment& rhs) {
+        inline bool operator==(const NodeRefSegment& lhs, const NodeRefSegment& rhs) {
             return lhs.first().location() == rhs.first().location() && lhs.second().location() == rhs.second().location();
         }
 
@@ -141,11 +149,9 @@ namespace osmium {
         }
 
         inline bool y_range_overlap(const NodeRefSegment& s1, const NodeRefSegment& s2) {
-            int tmin = s1.first().location().y() < s1.second().location().y() ? s1.first().location().y( ) : s1.second().location().y();
-            int tmax = s1.first().location().y() < s1.second().location().y() ? s1.second().location().y() : s1.first().location().y();
-            int omin = s2.first().location().y() < s2.second().location().y() ? s2.first().location().y()  : s2.second().location().y();
-            int omax = s2.first().location().y() < s2.second().location().y() ? s2.second().location().y() : s2.first().location().y();
-            if (tmin > omax || omin > tmax) {
+            auto m1 = std::minmax(s1.first().location().y(), s1.second().location().y());
+            auto m2 = std::minmax(s2.first().location().y(), s2.second().location().y());
+            if (m1.first > m2.second || m2.first > m1.second) {
                 return false;
             }
             return true;

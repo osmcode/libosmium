@@ -52,14 +52,14 @@ namespace osmium {
             class ProtoRing {
 
                 // nodes in this ring
-                std::vector<osmium::NodeRef> m_nodes;
+                std::vector<osmium::NodeRef> m_nodes {};
 
-                std::vector<ProtoRing*> m_inner;
+                // if this is an outer ring, these point to it's inner rings (if any)
+                std::vector<ProtoRing*> m_inner {};
 
             public:
 
-                ProtoRing() :
-                    m_nodes() {
+                ProtoRing() {
                 }
 
                 const std::vector<osmium::NodeRef>& nodes() const {

@@ -297,7 +297,7 @@ namespace osmium {
                                 if (m_debug) {
                                     std::cerr << "      seg=" << *oit << "\n";
                                 }
-                                auto mm = std::minmax(oit->first().location().y(), oit->second().location().y());
+                                std::pair<int32_t, int32_t> mm = std::minmax(oit->first().location().y(), oit->second().location().y());
                                 if (mm.first <= loc.y() && mm.second >= loc.y()) {
                                     if (m_debug) {
                                         std::cerr << "        in range\n";
@@ -319,16 +319,16 @@ namespace osmium {
                             if (m_debug) {
                                 std::cerr << "      is cw\n";
                             }
-                            NodeRefSegment s = segment.make_cw();
-                            ri.add_location_end(s.first());
-                            ri.add_location_end(s.second());
+                            segment.cw(true);
+                            ri.add_location_end(segment.first_cw());
+                            ri.add_location_end(segment.second_cw());
                         } else {
                             if (m_debug) {
                                 std::cerr << "      is ccw\n";
                             }
-                            NodeRefSegment s = segment.make_ccw();
-                            ri.add_location_end(s.first());
-                            ri.add_location_end(s.second());
+                            segment.cw(false);
+                            ri.add_location_end(segment.first_cw());
+                            ri.add_location_end(segment.second_cw());
                         }
 
                         rings.push_back(ri);
