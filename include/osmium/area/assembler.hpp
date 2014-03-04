@@ -134,13 +134,29 @@ namespace osmium {
                 }
             }
 
+            bool check_for_open_rings(const std::list<ProtoRing>& rings) {
+                bool open_rings = false;
+
+                for (auto& ring : rings) {
+                    if (!ring.closed()) {
+                        open_rings = true;
+                        if (m_remember_problems) {
+                            m_problems.emplace_back(Problem(osmium::area::Problem::problem_type::ring_not_closed, ring.first()));
+                            m_problems.emplace_back(Problem(osmium::area::Problem::problem_type::ring_not_closed, ring.last()));
+                        }
+                    }
+                }
+
+                return open_rings;
+            }
+
         public:
 
             Assembler() {
             }
 
             /**
-             * Enable or disable debug output to stdout. This is for Osmium
+             * Enable or disable debug output to stderr. This is for Osmium
              * developers only.
              */
             void enable_debug_output(bool debug=true) {
@@ -148,7 +164,7 @@ namespace osmium {
             }
 
             /**
-             * Enable or disable collection of problems in the in put data.
+             * Enable or disable collection of problems in the input data.
              * If this is enabled the assembler will keep a list of all
              * problems found (such as self-intersections and unclosed rings).
              * This creates some overhead so it is disabled by default.
@@ -194,7 +210,7 @@ namespace osmium {
                     std::cerr << "\nBuild relation id()=" << relation.id() << " members.size()=" << members.size() << " segments.size()=" << segments.size() << "\n";
                 }
 
-                // Now all of these segments are sorted. Again, smaller, in
+                // Now all of these segments will be sorted. Again, smaller, in
                 // this case, means smaller x coordinate, and if they are the
                 // same smaller y coordinate.
                 std::sort(segments.begin(), segments.end());
@@ -205,7 +221,9 @@ namespace osmium {
                 }));*/
 
                 // Find duplicate segments (ie same start and end point) and
-                // removes them.
+                // remove them. This will always remove pairs of the same
+                // segment. So if there are three, for instance, two will be
+                // removed and one will be left.
                 while (true) {
                     std::vector<NodeRefSegment>::iterator found = std::adjacent_find(segments.begin(), segments.end());
                     if (found == segments.end()) {
@@ -217,14 +235,45 @@ namespace osmium {
                     segments.erase(found, found+2);
                 }
 
+                // Now create the Area object and add the attributes and tags
+                // from the relation.
+                osmium::osm::AreaBuilder builder(out_buffer);
+                osmium::Area& area = builder.object();
+                area.id(relation.id() * 2 + 1);
+                area.version(relation.version());
+                area.changeset(relation.changeset());
+                area.timestamp(relation.timestamp());
+                area.visible(relation.visible());
+                area.uid(relation.uid());
+
+                builder.add_user(relation.user());
+
+                {
+                    osmium::osm::TagListBuilder tl_builder(out_buffer, &builder);
+                    for (const osmium::Tag& tag : relation.tags()) {
+                        tl_builder.add_tag(tag.key(), tag.value());
+                    }
+                }
+
+                // From now on we have an area object without any rings in it.
+                // Areas without rings are "defined" to be invalid. We can commit
+                // this area at any time and the caller of the assembler will see
+                // the invalid area. Or we can later add the rings and make a valid
+                // area out of it.
+
                 // Now we look for segments crossing each other. If there are
                 // any, the multipolygon is invalid.
-                find_intersections(segments);
+                // In the future this could be improved by trying to fix those
+                // cases.
+                if (find_intersections(segments)) {
+                    out_buffer.commit();
+                    return;
+                }
 
-                std::list<ProtoRing> rings;
 
                 // Now iterator over all segments and add them to rings
                 // until there are no segments left.
+                std::list<ProtoRing> rings;
                 for (auto it = segments.begin(); it != segments.end(); ++it) {
                     auto& segment = *it;
 
@@ -337,41 +386,20 @@ namespace osmium {
 
                 }
 
-                // create Area object
-                osmium::osm::AreaBuilder builder(out_buffer);
-                osmium::Area& area = builder.object();
-                area.id(relation.id() * 2 + 1);
-                area.version(relation.version());
-                area.changeset(relation.changeset());
-                area.timestamp(relation.timestamp());
-                area.visible(relation.visible());
-                area.uid(relation.uid());
-
-                builder.add_user(relation.user());
-
-                {
-                    osmium::osm::TagListBuilder tl_builder(out_buffer, &builder);
-                    for (const osmium::Tag& tag : relation.tags()) {
-                        tl_builder.add_tag(tag.key(), tag.value());
+                if (check_for_open_rings(rings)) {
+                    if (m_debug) {
+                        std::cerr << "    not all rings are closed\n";
                     }
+                    out_buffer.commit();
+                    return;
                 }
 
+                // Find inner rings to each outer ring.
+                std::vector<ProtoRing*> outer_rings;
                 for (auto& ring : rings) {
-                    if (!ring.closed()) {
-                        if (m_remember_problems) {
-                            m_problems.emplace_back(Problem(osmium::area::Problem::problem_type::ring_not_closed, ring.first()));
-                            m_problems.emplace_back(Problem(osmium::area::Problem::problem_type::ring_not_closed, ring.last()));
-                        }
-                        if (m_debug) {
-                            std::cerr << "    not all rings are closed\n";
-                        }
-                        out_buffer.commit();
-                        return;
-                    }
-                }
-
-                for (auto& ring : rings) {
-                    if (!ring.is_outer()) {
+                    if (ring.is_outer()) {
+                        outer_rings.push_back(&ring);
+                    } else {
                         ProtoRing* outer = ring.find_outer(m_debug);
                         if (outer) {
                             outer->add_inner_ring(&ring);
@@ -385,23 +413,23 @@ namespace osmium {
                     }
                 }
 
-                for (auto& ring : rings) {
-                    if (ring.is_outer()) {
-                        if (m_debug) {
-                            std::cerr << "    ring " << ring << " is outer\n";
-                        }
-                        osmium::osm::OuterRingBuilder ring_builder(out_buffer, &builder);
-                        for (auto& node_ref : ring.nodes()) {
+                // Append each outer ring together with its inner rings to the
+                // area in the buffer.
+                for (const ProtoRing* ring : outer_rings) {
+                    if (m_debug) {
+                        std::cerr << "    ring " << *ring << " is outer\n";
+                    }
+                    osmium::osm::OuterRingBuilder ring_builder(out_buffer, &builder);
+                    for (auto& node_ref : ring->nodes()) {
+                        ring_builder.add_node_ref(node_ref);
+                    }
+                    for (ProtoRing* inner : ring->inner_rings()) {
+                        osmium::osm::InnerRingBuilder ring_builder(out_buffer, &builder);
+                        for (auto& node_ref : inner->nodes()) {
                             ring_builder.add_node_ref(node_ref);
                         }
-                        for (ProtoRing* inner : ring.inner_rings()) {
-                            osmium::osm::InnerRingBuilder ring_builder(out_buffer, &builder);
-                            for (auto& node_ref : inner->nodes()) {
-                                ring_builder.add_node_ref(node_ref);
-                            }
-                        }
-                        out_buffer.commit();
                     }
+                    out_buffer.commit();
                 }
             }
 
