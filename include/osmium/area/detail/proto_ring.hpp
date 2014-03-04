@@ -174,6 +174,29 @@ namespace osmium {
                     return *m_first_segment;
                 }
 
+                ProtoRing* find_outer(bool debug) {
+                    ProtoRing* ring = this;
+
+                    while (!ring->is_outer()) {
+                        NodeRefSegment& segment = ring->first_segment();
+                        if (debug) {
+                            std::cerr << "      First segment is: " << segment << "\n";
+                        }
+                        NodeRefSegment* left = segment.left_segment();
+                        if (debug) {
+                            std::cerr << "      Left segment is: " << *left << "\n";
+                        }
+                        ring = left->ring();
+                        if (debug) {
+                            std::cerr << "      Ring is ";
+                            ring->print(std::cerr);
+                            std::cerr << "\n";
+                        }
+                    }
+
+                    return ring;
+                }
+
             }; // class ProtoRing
 
             inline std::ostream& operator<<(std::ostream& out, const ProtoRing& ring) {

@@ -83,36 +83,6 @@ namespace osmium {
                 return ((bx - ax)*(cy - ay) - (by - ay)*(cx - ax)) <= 0;
             }
 
-            ProtoRing* find_outer(const std::vector<NodeRefSegment>& segments, std::list<ProtoRing>& rings, const ProtoRing& ring) {
-
-                NodeRefSegment& first_segment = ring.first_segment();
-                if (m_debug) {
-                    std::cerr << "      First segment is: " << first_segment << "\n";
-                }
-
-                NodeRefSegment* left = first_segment.left_segment();
-                assert(left);
-                std::cerr << "      Left segment is: " << *left << "\n";
-                while (left && !left->ring()->is_outer()) {
-                    std::cerr << "        ring is " << *(left->ring()) << "\n";
-                    NodeRefSegment& s1 = left->ring()->first_segment();
-                    std::cerr << "          first segment is " << s1 << "\n";
-                    left = s1.left_segment();
-                    assert(left);
-                    std::cerr << "      Left segment is: " << *left << "\n";
-                }
-                assert(left);
-
-                ProtoRing* outer_ring = left->ring();
-
-                assert(outer_ring);
-                if (m_debug) {
-                    std::cerr << "      Outer ring is: " << *outer_ring << "\n";
-                }
-
-                return outer_ring;
-            }
-
             /**
              * Find intersection between segments.
              *
@@ -416,7 +386,7 @@ namespace osmium {
 
                 for (auto& ring : rings) {
                     if (!ring.is_outer()) {
-                        ProtoRing* outer = find_outer(segments, rings, ring);
+                        ProtoRing* outer = ring.find_outer(m_debug);
                         if (outer) {
                             outer->add_inner_ring(&ring);
                         } else {
