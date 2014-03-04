@@ -164,6 +164,24 @@ namespace osmium {
                     }
                 }
 
+                NodeRefSegment find_first_segment() const {
+
+                    auto it = std::min_element(m_nodes.begin(), m_nodes.end(), [](const NodeRef& nr1, const NodeRef& nr2) {
+                        return nr1.location() < nr2.location();
+                    });
+                    auto prev = (it == m_nodes.begin()) ? m_nodes.end()-2 : (it-1);
+                    auto next = it+1;
+                    if (next == m_nodes.end()) {
+                        next = m_nodes.begin()+1;
+                    }
+
+                    NodeRefSegment segment(*it, std::min(*prev, *next, [](const NodeRef& nr1, const NodeRef& nr2) {
+                        return nr1.location() < nr2.location();
+                    }));
+
+                    return segment;
+                }
+
             }; // class ProtoRing
 
             inline std::ostream& operator<<(std::ostream& out, const ProtoRing& ring) {
@@ -171,7 +189,8 @@ namespace osmium {
                 return out;
             }
 
-            inline void combine_rings_end(ProtoRing& ring, std::vector<ProtoRing>& rings, bool debug) {
+            inline ProtoRing* combine_rings_end(ProtoRing& ring, std::list<ProtoRing>& rings, bool debug) {
+                ProtoRing* ring_ptr = nullptr;
                 osmium::Location location = ring.last().location();
 
                 if (debug) {
@@ -181,14 +200,17 @@ namespace osmium {
                     if (&*it != &ring) {
                         if ((location == it->first().location())) { // || (location == it->last().location())) {
                             ring.merge_ring(*it, debug);
+                            ring_ptr = &*it;
                             rings.erase(it);
-                            return;
+                            return ring_ptr;
                         }
                     }
                 }
+                return ring_ptr;
             }
 
-            inline void combine_rings_start(ProtoRing& ring, std::vector<ProtoRing>& rings, bool debug) {
+            inline ProtoRing* combine_rings_start(ProtoRing& ring, std::list<ProtoRing>& rings, bool debug) {
+                ProtoRing* ring_ptr = nullptr;
                 osmium::Location location = ring.first().location();
 
                 if (debug) {
@@ -199,11 +221,13 @@ namespace osmium {
                         if ((location == it->last().location())) { // || (location == it->last().location())) {
                             ring.swap_nodes(*it);
                             ring.merge_ring(*it, debug);
+                            ring_ptr = &*it;
                             rings.erase(it);
-                            return;
+                            return ring_ptr;
                         }
                     }
                 }
+                return ring_ptr;
             }
 
         } // namespace detail

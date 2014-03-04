@@ -36,6 +36,8 @@ DEALINGS IN THE SOFTWARE.
 #include <algorithm>
 #include <iostream>
 #include <iterator>
+#include <list>
+#include <map>
 #include <vector>
 
 #include <osmium/memory/buffer.hpp>
@@ -81,14 +83,40 @@ namespace osmium {
                 return ((bx - ax)*(cy - ay) - (by - ay)*(cx - ax)) <= 0;
             }
 
-            ProtoRing* find_outer(std::vector<ProtoRing>& rings, const ProtoRing& ring) {
-                // dummy
-                for (auto& ring : rings) {
-                    if (ring.is_outer()) {
-                        return &ring;
-                    }
+            ProtoRing* find_outer(const std::vector<NodeRefSegment>& segments, std::list<ProtoRing>& rings, const ProtoRing& ring) {
+
+                NodeRefSegment first_segment = ring.find_first_segment();
+
+                if (m_debug) {
+                    std::cerr << "      First segment is: " << first_segment << "\n";
                 }
-                return nullptr;
+
+                auto it = std::find(segments.begin(), segments.end(), first_segment);
+                assert(it != segments.end());
+
+                NodeRefSegment* left = it->left_segment();
+                assert(left);
+                std::cerr << "      Left segment is: " << *left << "\n";
+                while (left && !left->ring()->is_outer()) {
+                    std::cerr << "        ring is " << *(left->ring()) << "\n";
+                    NodeRefSegment s1 = left->ring()->find_first_segment();
+                    auto it1 = std::find(segments.begin(), segments.end(), s1);
+                    assert(it1 != segments.end());
+                    std::cerr << "          first segment is " << *it1 << "\n";
+                    left = it1->left_segment();
+                    assert(left);
+                    std::cerr << "      Left segment is: " << *left << "\n";
+                }
+                assert(left);
+
+                ProtoRing* outer_ring = left->ring();
+
+                assert(outer_ring);
+                if (m_debug) {
+                    std::cerr << "      Outer ring is: " << *outer_ring << "\n";
+                }
+
+                return outer_ring;
             }
 
             /**
@@ -134,6 +162,14 @@ namespace osmium {
                 return found_intersections;
             }
 
+            void update_ring_link_in_segments(const ProtoRing* old_ring, ProtoRing* new_ring, std::vector<NodeRefSegment>& segments) {
+                for (NodeRefSegment& segment : segments) {
+                    if (segment.ring() == old_ring) {
+                        segment.ring(new_ring);
+                    }
+                }
+            }
+
         public:
 
             Assembler() {
@@ -172,7 +208,6 @@ namespace osmium {
             }
 
             void operator()(const osmium::Relation& relation, std::vector<size_t>& members, const osmium::memory::Buffer& in_buffer, osmium::memory::Buffer& out_buffer) {
-
                 // First we extract all segments from all ways that make up this
                 // multipolygon relation. The segments all have their smaller
                 // coordinate at the beginning of the segment. Smaller, in this
@@ -222,7 +257,7 @@ namespace osmium {
                 // any, the multipolygon is invalid.
                 find_intersections(segments);
 
-                std::vector<ProtoRing> rings;
+                std::list<ProtoRing> rings;
 
                 // Now iterator over all segments and add them to rings
                 // until there are no segments left.
@@ -243,32 +278,40 @@ namespace osmium {
                                 if (m_debug) {
                                     std::cerr << "      match\n";
                                 }
+                                segment.ring(&ring);
                                 ring.add_location_end(segment.second());
-                                combine_rings_end(ring, rings, m_debug);
+                                ProtoRing* pr = combine_rings_end(ring, rings, m_debug);
+                                update_ring_link_in_segments(pr, &ring, segments);
                                 goto next_segment;
                             }
                             if (ring.last() == segment.second() ) {
                                 if (m_debug) {
                                     std::cerr << "      match\n";
                                 }
+                                segment.ring(&ring);
                                 ring.add_location_end(segment.first());
-                                combine_rings_end(ring, rings, m_debug);
+                                ProtoRing* pr = combine_rings_end(ring, rings, m_debug);
+                                update_ring_link_in_segments(pr, &ring, segments);
                                 goto next_segment;
                             }
                             if (ring.first() == segment.first() ) {
                                 if (m_debug) {
                                     std::cerr << "      match\n";
                                 }
+                                segment.ring(&ring);
                                 ring.add_location_start(segment.second());
-                                combine_rings_start(ring, rings, m_debug);
+                                ProtoRing* pr = combine_rings_start(ring, rings, m_debug);
+                                update_ring_link_in_segments(pr, &ring, segments);
                                 goto next_segment;
                             }
                             if (ring.first() == segment.second() ) {
                                 if (m_debug) {
                                     std::cerr << "      match\n";
                                 }
+                                segment.ring(&ring);
                                 ring.add_location_start(segment.first());
-                                combine_rings_start(ring, rings, m_debug);
+                                ProtoRing* pr = combine_rings_start(ring, rings, m_debug);
+                                update_ring_link_in_segments(pr, &ring, segments);
                                 goto next_segment;
                             }
                         } else {
@@ -305,10 +348,12 @@ namespace osmium {
                                     if (oit->first().location().x() <= loc.x() &&
                                         oit->second().location().x() <= loc.x()) {
                                         cw = !oit->cw();
+                                        segment.left_segment(&*oit);
                                         break;
                                     }
                                     if (is_below(loc, *oit)) { // XXX
                                         cw = !oit->cw();
+                                        segment.left_segment(&*oit);
                                         break;
                                     }
                                 }
@@ -332,6 +377,7 @@ namespace osmium {
                         }
 
                         rings.push_back(ri);
+                        segment.ring(&rings.back());
                     }
 
                     next_segment:
@@ -374,7 +420,7 @@ namespace osmium {
 
                 for (auto& ring : rings) {
                     if (!ring.is_outer()) {
-                        ProtoRing* outer = find_outer(rings, ring);
+                        ProtoRing* outer = find_outer(segments, rings, ring);
                         if (outer) {
                             outer->add_inner_ring(&ring);
                         } else {

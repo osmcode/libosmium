@@ -44,6 +44,10 @@ namespace osmium {
 
     namespace area {
 
+        namespace detail {
+            class ProtoRing;
+        }
+
         /**
          * This helper class for the Assembler class models a segment
          * (connection between two nodes).
@@ -52,6 +56,11 @@ namespace osmium {
 
             osmium::NodeRef m_first;
             osmium::NodeRef m_second;
+
+            /// This is the ring this segment is in (if already known).
+            osmium::area::detail::ProtoRing* m_ring { nullptr };
+
+            NodeRefSegment* m_left_segment { nullptr };
 
             bool m_cw {true};
 
@@ -105,6 +114,22 @@ namespace osmium {
             /// Return second NodeRef of Segment taking into account whether this Segment is set as clockwise or counter-clockwise.
             const osmium::NodeRef& second_cw() const {
                 return swap_ends() ? m_first : m_second;
+            }
+
+            NodeRefSegment* left_segment() const {
+                return m_left_segment;
+            }
+
+            void left_segment(NodeRefSegment* segment) {
+                m_left_segment = segment;
+            }
+
+            osmium::area::detail::ProtoRing* ring() const {
+                return m_ring;
+            }
+
+            void ring(osmium::area::detail::ProtoRing* ring) {
+                m_ring = ring;
             }
 
             /// Is this segment oriented clockwise?
