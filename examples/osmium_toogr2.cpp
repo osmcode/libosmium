@@ -242,20 +242,23 @@ void print_help() {
               << "If OUTFILE is not given 'ogr_out' is used.\n" \
               << "\nOptions:\n" \
               << "  -h, --help           This help message\n" \
+              << "  -d, --debug          Enable debug output\n" \
               << "  -f, --format=FORMAT  Output OGR format (Default: 'SQLite')\n";
 }
 
 int main(int argc, char* argv[]) {
     static struct option long_options[] = {
         {"help",   no_argument, 0, 'h'},
+        {"debug",  no_argument, 0, 'd'},
         {"format", required_argument, 0, 'f'},
         {0, 0, 0, 0}
     };
 
     std::string output_format("SQLite");
+    bool debug = false;
 
     while (true) {
-        int c = getopt_long(argc, argv, "hf:", long_options, 0);
+        int c = getopt_long(argc, argv, "hdf:", long_options, 0);
         if (c == -1) {
             break;
         }
@@ -264,6 +267,9 @@ int main(int argc, char* argv[]) {
             case 'h':
                 print_help();
                 exit(0);
+            case 'd':
+                debug = true;
+                break;
             case 'f':
                 output_format = optarg;
                 break;
@@ -289,6 +295,7 @@ int main(int argc, char* argv[]) {
 
     typedef osmium::area::Assembler area_assembler_type;
     area_assembler_type assembler;
+    assembler.enable_debug_output(debug);
     osmium::area::Collector<area_assembler_type> collector(assembler);
 
     std::cerr << "Pass 1...\n";
