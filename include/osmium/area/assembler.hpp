@@ -291,7 +291,6 @@ namespace osmium {
                         if (m_debug) {
                             std::cerr << "    new ring for segment " << segment << "\n";
                         }
-                        ProtoRing ri;
 
                         bool cw = true;
 
@@ -324,25 +323,12 @@ namespace osmium {
                             }
                         }
 
-                        if (cw) {
-                            if (m_debug) {
-                                std::cerr << "      is cw\n";
-                            }
-                            segment.cw(true);
-                            ri.add_location_end(segment.first_cw());
-                            ri.add_location_end(segment.second_cw());
-                            ri.first_segment(segment);
-                        } else {
-                            if (m_debug) {
-                                std::cerr << "      is ccw\n";
-                            }
-                            segment.cw(false);
-                            ri.add_location_end(segment.first_cw());
-                            ri.add_location_end(segment.second_cw());
-                            ri.first_segment(segment);
+                        if (m_debug) {
+                            std::cerr << "      is " << (cw ? "cw" : "ccw") << "\n";
                         }
 
-                        rings.push_back(ri);
+                        segment.cw(cw);
+                        rings.emplace_back(ProtoRing(segment));
                         segment.ring(&rings.back());
                     }
 
