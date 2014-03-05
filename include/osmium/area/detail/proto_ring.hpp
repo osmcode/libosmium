@@ -178,10 +178,12 @@ namespace osmium {
                             std::cerr << "      First segment is: " << segment << "\n";
                         }
                         NodeRefSegment* left = segment.left_segment();
+                        assert(left);
                         if (debug) {
                             std::cerr << "      Left segment is: " << *left << "\n";
                         }
                         ring = left->ring();
+                        assert(ring);
                         if (debug) {
                             std::cerr << "      Ring is ";
                             ring->print(std::cerr);

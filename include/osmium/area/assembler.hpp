@@ -386,9 +386,20 @@ namespace osmium {
 
                 }
 
+                if (m_debug) {
+                    std::cerr << "  Rings:\n";
+                    for (auto& ring : rings) {
+                        std::cerr << "    " << ring;
+                        if (ring.closed()) {
+                            std::cerr << " (closed)";
+                        }
+                        std::cerr << "\n";
+                    }
+                }
+
                 if (check_for_open_rings(rings)) {
                     if (m_debug) {
-                        std::cerr << "    not all rings are closed\n";
+                        std::cerr << "  not all rings are closed\n";
                     }
                     out_buffer.commit();
                     return;

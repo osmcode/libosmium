@@ -70,7 +70,7 @@ namespace osmium {
             }
 
             bool swap_ends() const {
-                return m_cw ? m_first.location().y() > m_second.location().y() : m_first.location().y() < m_second.location().y();
+                return m_cw == (m_first.location().y() >= m_second.location().y());
             }
 
         public:
