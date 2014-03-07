@@ -112,8 +112,8 @@ namespace osmium {
 
                     for (size_t i = 0; i < m_nodes.size(); ++i) {
                         size_t j = (i + 1) % m_nodes.size();
-                        sum += static_cast<int64_t>(m_nodes[i].location().x()) * static_cast<int64_t>(m_nodes[j].location().y());
-                        sum -= static_cast<int64_t>(m_nodes[j].location().x()) * static_cast<int64_t>(m_nodes[i].location().y());
+                        sum += static_cast<int64_t>(m_nodes[i].location().x()) * static_cast<int64_t>(m_nodes[j].location().y()) -
+                               static_cast<int64_t>(m_nodes[j].location().x()) * static_cast<int64_t>(m_nodes[i].location().y());
                     }
 
                     return sum <= 0;

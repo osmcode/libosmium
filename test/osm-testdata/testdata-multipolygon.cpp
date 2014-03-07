@@ -18,7 +18,7 @@
 #include <osmium/handler/node_locations_for_ways.hpp>
 #include <osmium/index/map/dummy.hpp>
 #include <osmium/index/map/stl_vector.hpp>
-#include <osmium/io/any_input.hpp>
+#include <osmium/io/xml_input.hpp>
 #include <osmium/visitor.hpp>
 
 typedef osmium::index::map::Dummy<osmium::unsigned_object_id_type, osmium::Location> index_neg_type;
@@ -385,7 +385,5 @@ int main(int argc, char* argv[]) {
     osmium::apply(collector, ogr_handler);
 
     ogr_handler.write_problems(assembler.problems());
-
-    google::protobuf::ShutdownProtobufLibrary();
 }
 

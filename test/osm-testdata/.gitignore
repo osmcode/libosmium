@@ -8,3 +8,4 @@ multipolygon.qgs~
 testdata-testcases
 tests-include.hpp
 tests-run.hpp
+compare-geometries.out

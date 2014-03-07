@@ -111,8 +111,8 @@ on http://clang.llvm.org/ .
 
 ## Testing
 
-There are a few tests using the Boost Unit Test Framework in the "test"
-directory. Many more tests are needed, any help appreciated.
+there are a few unit tests using the boost unit test framework in the "test"
+directory. many more tests are needed, any help appreciated.
 
 Run "make test" from the main directory or go to the "test" directory and type
 
@@ -125,6 +125,10 @@ to compile and run the tests. You can run a single test by calling
 for instance:
 
     ./run_test.sh t/basic/test_node.cpp
+
+In addition there are some test based on the OSM Test Data Repository at
+http://osmcode.org/osm-testdata/ . Go into the test/osm-testdata directory
+and type 'make' to run them all.
 
 
 ## License

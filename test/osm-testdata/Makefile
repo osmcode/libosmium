@@ -36,9 +36,7 @@ LIB_OGR    := $(shell gdal-config --libs)
 # https://github.com/osmcode/osm-testdata
 TESTDATA_DIR := ../../../osm-testdata
 
-COMPARE_WKT = $(TESTDATA_DIR)/bin/compare-wkt.sh
-
-.PHONY: all clean overview clean-overview multipolygon clean-multipolygon compare-multipolygons testcases clean-testcases xml clean-xml
+.PHONY: all clean overview clean-overview multipolygon clean-multipolygon testcases clean-testcases xml clean-xml
 
 all: overview multipolygon testcases xml
 
@@ -57,32 +55,19 @@ clean-overview:
 # --------------
 
 testdata-multipolygon: testdata-multipolygon.cpp
-	$(CXX) $(CXXFLAGS) $(CXXFLAGS_WARNINGS) $(CXXFLAGS_OGR) -o $@ $< $(LDFLAGS) $(LIB_IO) $(LIB_OGR)
+	$(CXX) $(CXXFLAGS) $(CXXFLAGS_WARNINGS) $(CXXFLAGS_OGR) -o $@ $< $(LDFLAGS) $(LIB_EXPAT) $(LIB_OGR)
 
 multipolygon.db: testdata-multipolygon
 	rm -f multipolygon.db multipolygon.wkt
 	./testdata-multipolygon $(TESTDATA_DIR)/grid/data/all.osm
 
-multipolygon: multipolygon.db
+compare-geometries.out: multipolygon.wkt $(TESTDATA_DIR)/grid/data-multipolygons.wkt
+	$(TESTDATA_DIR)/bin/compare-geometries.sh $(TESTDATA_DIR)/grid/data-multipolygons.wkt multipolygon.wkt
+
+multipolygon: multipolygon.db compare-geometries.out
 
 clean-multipolygon:
 	rm -f testdata-multipolygon multipolygon.db multipolygon.wkt
-
-compare-multipolygons: multipolygon.wkt $(TESTDATA_DIR)/grid/data-multipolygons.wkt
-	cut -d' ' -f1 $(TESTDATA_DIR)/grid/data-multipolygons.wkt | uniq | while read id; do \
-	    echo -n "$$id... "; \
-	    out=$$(egrep "^$$id " $(TESTDATA_DIR)/grid/data-multipolygons.wkt | while read id stype variant wkt1; do \
-	        wkt2=`grep from_id=$$id multipolygon.wkt | cut -d' ' -f4-`; \
-	        result=`$(COMPARE_WKT) "$$wkt1" "$$wkt2"`; \
-	        echo -n " [$$variant => $$result]"; \
-	    done;); \
-	    if echo $$out | egrep ' OK ' >/dev/null; then \
-	        echo -n "\033[1;32mOK\033[0m  "; \
-	    else \
-	        echo -n "\033[1;31mERR\033[0m "; \
-	    fi; \
-	    echo $$out; \
-	done
 
 # --------------
 

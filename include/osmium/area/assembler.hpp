@@ -405,12 +405,22 @@ namespace osmium {
                     return;
                 }
 
+                if (m_debug) {
+                    std::cerr << "  Find inner/outer...\n";
+                }
+
                 // Find inner rings to each outer ring.
                 std::vector<ProtoRing*> outer_rings;
                 for (auto& ring : rings) {
                     if (ring.is_outer()) {
+                        if (m_debug) {
+                            std::cerr << "    Outer: " << ring << "\n";
+                        }
                         outer_rings.push_back(&ring);
                     } else {
+                        if (m_debug) {
+                            std::cerr << "    Inner: " << ring << "\n";
+                        }
                         ProtoRing* outer = ring.find_outer(m_debug);
                         if (outer) {
                             outer->add_inner_ring(&ring);
