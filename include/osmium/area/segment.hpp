@@ -152,13 +152,28 @@ namespace osmium {
             return lhs.first().location() == rhs.first().location() && lhs.second().location() == rhs.second().location();
         }
 
+        inline bool below(const NodeRefSegment& lhs, const NodeRefSegment& rhs) {
+            osmium::Location l = lhs.first().location();
+            osmium::Location a = lhs.second().location();
+            osmium::Location b = rhs.second().location();
+
+            if (l.x() == a.x()) {
+                return true;
+            }
+            if (l.x() == b.x()) {
+                return false;
+            }
+
+            return (a.lat() - l.lat()) / (a.lon() - l.lon()) < (b.lat() - l.lat()) / (b.lon() - l.lon());
+        }
+
         /**
          * NodeRefSegments are "smaller" if they are to the left and down of another
          * segment. The first() location is checked first() and only if they have the
          * same first() location the second() location is taken into account.
          */
         inline bool operator<(const NodeRefSegment& lhs, const NodeRefSegment& rhs) {
-            return (lhs.first().location() == rhs.first().location() && lhs.second().location() < rhs.second().location()) || lhs.first().location() < rhs.first().location();
+            return (lhs.first().location() == rhs.first().location() && below(lhs, rhs)) || lhs.first().location() < rhs.first().location();
         }
 
         inline std::ostream& operator<<(std::ostream& out, const NodeRefSegment& segment) {
