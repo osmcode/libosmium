@@ -34,6 +34,7 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <cassert>
+#include <list>
 #include <vector>
 
 #include <osmium/osm/noderef.hpp>
