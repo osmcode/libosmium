@@ -146,28 +146,31 @@ namespace osmium {
 
             private:
 
+                template <class TBuilder, class TPBFObject>
+                void parse_attributes(TBuilder& builder, const TPBFObject& pbf_object) {
+                    auto& object = builder.object();
+
+                    object.id(pbf_object.id());
+
+                    if (pbf_object.has_info()) {
+                        object.version(pbf_object.info().version())
+                            .changeset(pbf_object.info().changeset())
+                            .timestamp(pbf_object.info().timestamp() * m_date_factor)
+                            .uid_from_signed(pbf_object.info().uid());
+                        if (pbf_object.info().has_visible()) {
+                            object.visible(pbf_object.info().visible());
+                        }
+                        builder.add_user(m_stringtable->s(pbf_object.info().user_sid()).data());
+                    } else {
+                        builder.add_user("");
+                    }
+                }
+
                 void parse_node_group(const OSMPBF::PrimitiveGroup& group) {
                     for (int i=0; i < group.nodes_size(); ++i) {
                         osmium::osm::NodeBuilder builder(m_buffer);
-                        osmium::Node& node = builder.object();
-
                         const OSMPBF::Node& pbf_node = group.nodes(i);
-                        node.id(pbf_node.id());
-
-                        if (pbf_node.has_info()) {
-                            node.version(pbf_node.info().version())
-                            .changeset(pbf_node.info().changeset())
-                            .timestamp(pbf_node.info().timestamp() * m_date_factor)
-                            .uid_from_signed(pbf_node.info().uid());
-                            if (pbf_node.info().has_visible()) {
-                                node.visible(pbf_node.info().visible());
-                            }
-                            builder.add_user(m_stringtable->s(pbf_node.info().user_sid()).data());
-                        } else {
-                            builder.add_user("");
-                        }
-
-                        // calling builder.add_user possibly invalidates 'node' reference!
+                        parse_attributes(builder, pbf_node);
 
                         if (builder.object().visible()) {
                             builder.object().location(osmium::Location(
@@ -190,23 +193,8 @@ namespace osmium {
                 void parse_way_group(const OSMPBF::PrimitiveGroup& group) {
                     for (int i=0; i < group.ways_size(); ++i) {
                         osmium::osm::WayBuilder builder(m_buffer);
-                        osmium::Way& way = builder.object();
-
                         const OSMPBF::Way& pbf_way = group.ways(i);
-                        way.id(pbf_way.id());
-
-                        if (pbf_way.has_info()) {
-                            way.version(pbf_way.info().version())
-                            .changeset(pbf_way.info().changeset())
-                            .timestamp(pbf_way.info().timestamp() * m_date_factor)
-                            .uid_from_signed(pbf_way.info().uid());
-                            if (pbf_way.info().has_visible()) {
-                                way.visible(pbf_way.info().visible());
-                            }
-                            builder.add_user(m_stringtable->s(pbf_way.info().user_sid()).data());
-                        } else {
-                            builder.add_user("");
-                        }
+                        parse_attributes(builder, pbf_way);
 
                         if (pbf_way.refs_size() > 0) {
                             osmium::osm::WayNodeListBuilder wnl_builder(m_buffer, &builder);
@@ -232,23 +220,8 @@ namespace osmium {
                 void parse_relation_group(const OSMPBF::PrimitiveGroup& group) {
                     for (int i=0; i < group.relations_size(); ++i) {
                         osmium::osm::RelationBuilder builder(m_buffer);
-                        osmium::Relation& relation = builder.object();
-
                         const OSMPBF::Relation& pbf_relation = group.relations(i);
-                        relation.id(pbf_relation.id());
-
-                        if (pbf_relation.has_info()) {
-                            relation.version(pbf_relation.info().version())
-                            .changeset(pbf_relation.info().changeset())
-                            .timestamp(pbf_relation.info().timestamp() * m_date_factor)
-                            .uid_from_signed(pbf_relation.info().uid());
-                            if (pbf_relation.info().has_visible()) {
-                                relation.visible(pbf_relation.info().visible());
-                            }
-                            builder.add_user(m_stringtable->s(pbf_relation.info().user_sid()).data());
-                        } else {
-                            builder.add_user("");
-                        }
+                        parse_attributes(builder, pbf_relation);
 
                         if (pbf_relation.types_size() > 0) {
                             osmium::osm::RelationMemberListBuilder rml_builder(m_buffer, &builder);
