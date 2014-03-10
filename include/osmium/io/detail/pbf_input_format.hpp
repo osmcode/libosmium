@@ -153,7 +153,6 @@ namespace osmium {
 
                         const OSMPBF::Node& pbf_node = group.nodes(i);
                         node.id(pbf_node.id());
-                        node.visible(true);
 
                         if (pbf_node.has_info()) {
                             node.version(pbf_node.info().version())
@@ -203,8 +202,6 @@ namespace osmium {
                             .uid_from_signed(pbf_way.info().uid());
                             if (pbf_way.info().has_visible()) {
                                 way.visible(pbf_way.info().visible());
-                            } else {
-                                way.visible(true);
                             }
                             builder.add_user(m_stringtable->s(pbf_way.info().user_sid()).data());
                         } else {
@@ -247,8 +244,6 @@ namespace osmium {
                             .uid_from_signed(pbf_relation.info().uid());
                             if (pbf_relation.info().has_visible()) {
                                 relation.visible(pbf_relation.info().visible());
-                            } else {
-                                relation.visible(true);
                             }
                             builder.add_user(m_stringtable->s(pbf_relation.info().user_sid()).data());
                         } else {
@@ -352,8 +347,8 @@ namespace osmium {
                             builder.add_user("");
                         }
 
-                        if (node.visible()) {
-                            node.location(osmium::Location(
+                        if (visible) {
+                            builder.object().location(osmium::Location(
                                               (last_dense_longitude * m_granularity + m_lon_offset) / (OSMPBF::lonlat_resolution / osmium::Location::coordinate_precision),
                                               (last_dense_latitude  * m_granularity + m_lat_offset) / (OSMPBF::lonlat_resolution / osmium::Location::coordinate_precision)));
                         }
