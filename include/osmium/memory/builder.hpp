@@ -140,7 +140,12 @@ namespace osmium {
                 return length;
             }
 
-        }; // Builder
+            /// Return the buffer this builder is using.
+            osmium::memory::Buffer& buffer() {
+                return m_buffer;
+            }
+
+        }; // class Builder
 
         template <class T>
         class ObjectBuilder : public Builder {

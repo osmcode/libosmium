@@ -94,6 +94,45 @@ namespace osmium {
             std::list<ProtoRing> m_rings;
 
             /**
+             * Extract all segments from all ways that make up this
+             * multipolygon relation. The segments all have their smaller
+             * coordinate at the beginning of the segment. Smaller, in this
+             * case, means smaller x coordinate, and if they are the same
+             * smaller y coordinate.
+             */
+            void extract_segments_from_ways(const std::vector<size_t>& members, const osmium::memory::Buffer& in_buffer) {
+                for (size_t offset : members) {
+                    const osmium::Way& way = in_buffer.get<const osmium::Way>(offset);
+                    osmium::NodeRef last_nr;
+                    for (osmium::NodeRef nr : way.nodes()) {
+                        if (last_nr.location() && last_nr != nr) {
+                            m_segments.push_back(NodeRefSegment(last_nr, nr));
+                        }
+                        last_nr = nr;
+                    }
+                }
+            }
+
+            /**
+             * Find duplicate segments (ie same start and end point) and
+             * remove them. This will always remove pairs of the same
+             * segment. So if there are three, for instance, two will be
+             * removed and one will be left.
+             */
+            void find_and_erase_duplicate_segments() {
+                while (true) {
+                    std::vector<NodeRefSegment>::iterator found = std::adjacent_find(m_segments.begin(), m_segments.end());
+                    if (found == m_segments.end()) {
+                        break;
+                    }
+                    if (m_debug) {
+                        std::cerr << "  erase duplicate segment: " << *found << "\n";
+                    }
+                    m_segments.erase(found, found+2);
+                }
+            }
+
+            /**
              * Find intersection between segments.
              *
              * @returns true if there are intersections.
@@ -136,6 +175,32 @@ namespace osmium {
                 return found_intersections;
             }
 
+            /**
+             * Initialize area attributes and tags from the attributes and tags
+             * of the relation.
+             */
+            void initialize_area_from_relation(osmium::osm::AreaBuilder& builder, const osmium::Relation& relation) const {
+                osmium::Area& area = builder.object();
+                area.id(relation.id() * 2 + 1);
+                area.version(relation.version());
+                area.changeset(relation.changeset());
+                area.timestamp(relation.timestamp());
+                area.visible(relation.visible());
+                area.uid(relation.uid());
+
+                builder.add_user(relation.user());
+
+                osmium::osm::TagListBuilder tl_builder(builder.buffer(), &builder);
+                for (const osmium::Tag& tag : relation.tags()) {
+                    tl_builder.add_tag(tag.key(), tag.value());
+                }
+            }
+
+            /**
+             * Segments have a pointer to the ring they are in. If two rings
+             * are merged, all segments need to be updated that point to the
+             * ring that is merged into the other. This function does that.
+             */
             void update_ring_link_in_segments(const ProtoRing* old_ring, ProtoRing* new_ring) {
                 for (NodeRefSegment& segment : m_segments) {
                     if (segment.ring() == old_ring) {
@@ -144,6 +209,13 @@ namespace osmium {
                 }
             }
 
+            /**
+             * Go through all the rings and find rings that are not closed.
+             * Problem objects are created for the end points of the open
+             * rings and placed into the m_problems collection.
+             *
+             * @returns true if any rings were not closed, false otherwise
+             */
             bool check_for_open_rings() {
                 bool open_rings = false;
 
@@ -160,10 +232,27 @@ namespace osmium {
                 return open_rings;
             }
 
+            void combine_rings(NodeRefSegment& segment, const NodeRef& node_ref, ProtoRing& ring, bool at_end) {
+                if (m_debug) {
+                    std::cerr << "      match\n";
+                }
+                segment.ring(&ring);
+                ProtoRing* pr = nullptr;
+                if (at_end) {
+                    ring.add_location_end(node_ref);
+                    pr = combine_rings_end(ring, m_rings, m_debug);
+                } else {
+                    ring.add_location_start(node_ref);
+                    pr = combine_rings_start(ring, m_rings, m_debug);
+                }
+                update_ring_link_in_segments(pr, &ring);
+            }
+
         public:
 
-            Assembler() {
-            }
+            Assembler() = default;
+
+            ~Assembler() = default;
 
             /**
              * Enable or disable debug output to stderr. This is for Osmium
@@ -197,42 +286,17 @@ namespace osmium {
                 return m_problems;
             }
 
-            void combine_rings(NodeRefSegment& segment, const NodeRef& node_ref, ProtoRing& ring, bool at_end) {
-                if (m_debug) {
-                    std::cerr << "      match\n";
-                }
-                segment.ring(&ring);
-                ProtoRing* pr = nullptr;
-                if (at_end) {
-                    ring.add_location_end(node_ref);
-                    pr = combine_rings_end(ring, m_rings, m_debug);
-                } else {
-                    ring.add_location_start(node_ref);
-                    pr = combine_rings_start(ring, m_rings, m_debug);
-                }
-                update_ring_link_in_segments(pr, &ring);
-            }
-
-            void operator()(const osmium::Relation& relation, std::vector<size_t>& members, const osmium::memory::Buffer& in_buffer, osmium::memory::Buffer& out_buffer) {
+            /**
+             * Assemble an area from the given relation and its members.
+             * All members are to be found in the in_buffer at the offsets
+             * given by the members parameter.
+             * The resulting area is put into the out_buffer.
+             */
+            void operator()(const osmium::Relation& relation, const std::vector<size_t>& members, const osmium::memory::Buffer& in_buffer, osmium::memory::Buffer& out_buffer) {
                 m_segments.clear();
                 m_rings.clear();
 
-                // First we extract all segments from all ways that make up this
-                // multipolygon relation. The segments all have their smaller
-                // coordinate at the beginning of the segment. Smaller, in this
-                // case, means smaller x coordinate, and if they are the same
-                // smaller y coordinate.
-
-                for (size_t offset : members) {
-                    const osmium::Way& way = in_buffer.get<const osmium::Way>(offset);
-                    osmium::NodeRef last_nr;
-                    for (osmium::NodeRef nr : way.nodes()) {
-                        if (last_nr.location() && last_nr != nr) {
-                            m_segments.push_back(NodeRefSegment(last_nr, nr));
-                        }
-                        last_nr = nr;
-                    }
-                }
+                extract_segments_from_ways(members, in_buffer);
 
                 if (m_debug) {
                     std::cerr << "\nBuild relation id()=" << relation.id() << " members.size()=" << members.size() << " segments.size()=" << m_segments.size() << "\n";
@@ -248,40 +312,12 @@ namespace osmium {
                     return segment.first() == segment.second();
                 }));*/
 
-                // Find duplicate segments (ie same start and end point) and
-                // remove them. This will always remove pairs of the same
-                // segment. So if there are three, for instance, two will be
-                // removed and one will be left.
-                while (true) {
-                    std::vector<NodeRefSegment>::iterator found = std::adjacent_find(m_segments.begin(), m_segments.end());
-                    if (found == m_segments.end()) {
-                        break;
-                    }
-                    if (m_debug) {
-                        std::cerr << "  erase duplicate segment: " << *found << "\n";
-                    }
-                    m_segments.erase(found, found+2);
-                }
+                find_and_erase_duplicate_segments();
 
                 // Now create the Area object and add the attributes and tags
                 // from the relation.
                 osmium::osm::AreaBuilder builder(out_buffer);
-                osmium::Area& area = builder.object();
-                area.id(relation.id() * 2 + 1);
-                area.version(relation.version());
-                area.changeset(relation.changeset());
-                area.timestamp(relation.timestamp());
-                area.visible(relation.visible());
-                area.uid(relation.uid());
-
-                builder.add_user(relation.user());
-
-                {
-                    osmium::osm::TagListBuilder tl_builder(out_buffer, &builder);
-                    for (const osmium::Tag& tag : relation.tags()) {
-                        tl_builder.add_tag(tag.key(), tag.value());
-                    }
-                }
+                initialize_area_from_relation(builder, relation);
 
                 // From now on we have an area object without any rings in it.
                 // Areas without rings are "defined" to be invalid. We can commit
@@ -297,7 +333,6 @@ namespace osmium {
                     out_buffer.commit();
                     return;
                 }
-
 
                 // Now iterator over all segments and add them to rings
                 // until there are no segments left.
