@@ -57,6 +57,20 @@ namespace osmium {
 
         using osmium::area::detail::ProtoRing;
 
+        namespace detail {
+
+            inline bool is_below(const osmium::Location& loc, const NodeRefSegment& seg) {
+                double ax = seg.first().location().x();
+                double bx = seg.second().location().x();
+                double cx = loc.x();
+                double ay = seg.first().location().y();
+                double by = seg.second().location().y();
+                double cy = loc.y();
+                return ((bx - ax)*(cy - ay) - (by - ay)*(cx - ax)) <= 0;
+            }
+
+        }
+
         /**
          * Assembles area objects from multipolygon relations and their
          * members. This is called by the Collector object after all
@@ -78,16 +92,6 @@ namespace osmium {
 
             // The rings we are building from the way segments
             std::list<ProtoRing> m_rings;
-
-            bool is_below(const osmium::Location& loc, const NodeRefSegment& seg) const {
-                double ax = seg.first().location().x();
-                double bx = seg.second().location().x();
-                double cx = loc.x();
-                double ay = seg.first().location().y();
-                double by = seg.second().location().y();
-                double cy = loc.y();
-                return ((bx - ax)*(cy - ay) - (by - ay)*(cx - ax)) <= 0;
-            }
 
             /**
              * Find intersection between segments.
@@ -362,7 +366,7 @@ namespace osmium {
                                         segment.left_segment(&*oit);
                                         break;
                                     }
-                                    if (is_below(loc, *oit)) { // XXX
+                                    if (detail::is_below(loc, *oit)) { // XXX
                                         cw = !oit->cw();
                                         segment.left_segment(&*oit);
                                         break;
