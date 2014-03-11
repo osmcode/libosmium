@@ -187,6 +187,22 @@ namespace osmium {
                 return m_problems;
             }
 
+            void combine_rings(NodeRefSegment& segment, const NodeRef& node_ref, ProtoRing& ring, std::list<ProtoRing>& rings, std::vector<NodeRefSegment>& segments, bool at_end) {
+                if (m_debug) {
+                    std::cerr << "      match\n";
+                }
+                segment.ring(&ring);
+                ProtoRing* pr = nullptr;
+                if (at_end) {
+                    ring.add_location_end(node_ref);
+                    pr = combine_rings_end(ring, rings, m_debug);
+                } else {
+                    ring.add_location_start(node_ref);
+                    pr = combine_rings_start(ring, rings, m_debug);
+                }
+                update_ring_link_in_segments(pr, &ring, segments);
+            }
+
             void operator()(const osmium::Relation& relation, std::vector<size_t>& members, const osmium::memory::Buffer& in_buffer, osmium::memory::Buffer& out_buffer) {
                 // First we extract all segments from all ways that make up this
                 // multipolygon relation. The segments all have their smaller
@@ -288,43 +304,19 @@ namespace osmium {
                         }
                         if (!ring.closed()) {
                             if (ring.last() == segment.first() ) {
-                                if (m_debug) {
-                                    std::cerr << "      match\n";
-                                }
-                                segment.ring(&ring);
-                                ring.add_location_end(segment.second());
-                                ProtoRing* pr = combine_rings_end(ring, rings, m_debug);
-                                update_ring_link_in_segments(pr, &ring, segments);
+                                combine_rings(segment, segment.second(), ring, rings, segments, true);
                                 goto next_segment;
                             }
                             if (ring.last() == segment.second() ) {
-                                if (m_debug) {
-                                    std::cerr << "      match\n";
-                                }
-                                segment.ring(&ring);
-                                ring.add_location_end(segment.first());
-                                ProtoRing* pr = combine_rings_end(ring, rings, m_debug);
-                                update_ring_link_in_segments(pr, &ring, segments);
+                                combine_rings(segment, segment.first(), ring, rings, segments, true);
                                 goto next_segment;
                             }
                             if (ring.first() == segment.first() ) {
-                                if (m_debug) {
-                                    std::cerr << "      match\n";
-                                }
-                                segment.ring(&ring);
-                                ring.add_location_start(segment.second());
-                                ProtoRing* pr = combine_rings_start(ring, rings, m_debug);
-                                update_ring_link_in_segments(pr, &ring, segments);
+                                combine_rings(segment, segment.second(), ring, rings, segments, false);
                                 goto next_segment;
                             }
                             if (ring.first() == segment.second() ) {
-                                if (m_debug) {
-                                    std::cerr << "      match\n";
-                                }
-                                segment.ring(&ring);
-                                ring.add_location_start(segment.first());
-                                ProtoRing* pr = combine_rings_start(ring, rings, m_debug);
-                                update_ring_link_in_segments(pr, &ring, segments);
+                                combine_rings(segment, segment.first(), ring, rings, segments, false);
                                 goto next_segment;
                             }
                         } else {
