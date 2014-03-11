@@ -232,7 +232,14 @@ namespace osmium {
                 return open_rings;
             }
 
-            ProtoRing* combine_rings_end(ProtoRing& ring) {
+            /**
+             * Check whether there are any rings that can be combined with the
+             * given ring to one larger ring by appending the other ring to
+             * the end of this ring.
+             * If the rings can be combined they are and the function returns
+             * a pointer to the old ring that is not used any more.
+             */
+            ProtoRing* possibly_combine_rings_end(ProtoRing& ring) {
                 osmium::Location location = ring.last().location();
 
                 if (m_debug) {
@@ -251,7 +258,14 @@ namespace osmium {
                 return nullptr;
             }
 
-            ProtoRing* combine_rings_start(ProtoRing& ring) {
+            /**
+             * Check whether there are any rings that can be combined with the
+             * given ring to one larger ring by prepending the other ring to
+             * the start of this ring.
+             * If the rings can be combined they are and the function returns
+             * a pointer to the old ring that is not used any more.
+             */
+            ProtoRing* possibly_combine_rings_start(ProtoRing& ring) {
                 osmium::Location location = ring.first().location();
 
                 if (m_debug) {
@@ -276,15 +290,19 @@ namespace osmium {
                     std::cerr << "      match\n";
                 }
                 segment.ring(&ring);
+
                 ProtoRing* pr = nullptr;
                 if (at_end) {
                     ring.add_location_end(node_ref);
-                    pr = combine_rings_end(ring);
+                    pr = possibly_combine_rings_end(ring);
                 } else {
                     ring.add_location_start(node_ref);
-                    pr = combine_rings_start(ring);
+                    pr = possibly_combine_rings_start(ring);
                 }
-                update_ring_link_in_segments(pr, &ring);
+
+                if (pr) {
+                    update_ring_link_in_segments(pr, &ring);
+                }
             }
 
             /**
