@@ -73,6 +73,12 @@ namespace osmium {
             // Enables debug output to stderr
             bool m_debug { false };
 
+            // The way segments
+            std::vector<NodeRefSegment> m_segments;
+
+            // The rings we are building from the way segments
+            std::list<ProtoRing> m_rings;
+
             bool is_below(const osmium::Location& loc, const NodeRefSegment& seg) const {
                 double ax = seg.first().location().x();
                 double bx = seg.second().location().x();
@@ -88,16 +94,16 @@ namespace osmium {
              *
              * @returns true if there are intersections.
              */
-            bool find_intersections(std::vector<NodeRefSegment>& segments) {
-                if (segments.begin() == segments.end()) {
+            bool find_intersections() {
+                if (m_segments.begin() == m_segments.end()) {
                     return false;
                 }
 
                 bool found_intersections = false;
 
-                for (auto it1 = segments.begin(); it1 != segments.end()-1; ++it1) {
+                for (auto it1 = m_segments.begin(); it1 != m_segments.end()-1; ++it1) {
                     const NodeRefSegment& s1 = *it1;
-                    for (auto it2 = it1+1; it2 != segments.end(); ++it2) {
+                    for (auto it2 = it1+1; it2 != m_segments.end(); ++it2) {
                         const NodeRefSegment& s2 = *it2;
                         if (s1 == s2) {
                             if (m_debug) {
@@ -126,18 +132,18 @@ namespace osmium {
                 return found_intersections;
             }
 
-            void update_ring_link_in_segments(const ProtoRing* old_ring, ProtoRing* new_ring, std::vector<NodeRefSegment>& segments) {
-                for (NodeRefSegment& segment : segments) {
+            void update_ring_link_in_segments(const ProtoRing* old_ring, ProtoRing* new_ring) {
+                for (NodeRefSegment& segment : m_segments) {
                     if (segment.ring() == old_ring) {
                         segment.ring(new_ring);
                     }
                 }
             }
 
-            bool check_for_open_rings(const std::list<ProtoRing>& rings) {
+            bool check_for_open_rings() {
                 bool open_rings = false;
 
-                for (auto& ring : rings) {
+                for (auto& ring : m_rings) {
                     if (!ring.closed()) {
                         open_rings = true;
                         if (m_remember_problems) {
@@ -187,7 +193,7 @@ namespace osmium {
                 return m_problems;
             }
 
-            void combine_rings(NodeRefSegment& segment, const NodeRef& node_ref, ProtoRing& ring, std::list<ProtoRing>& rings, std::vector<NodeRefSegment>& segments, bool at_end) {
+            void combine_rings(NodeRefSegment& segment, const NodeRef& node_ref, ProtoRing& ring, bool at_end) {
                 if (m_debug) {
                     std::cerr << "      match\n";
                 }
@@ -195,44 +201,46 @@ namespace osmium {
                 ProtoRing* pr = nullptr;
                 if (at_end) {
                     ring.add_location_end(node_ref);
-                    pr = combine_rings_end(ring, rings, m_debug);
+                    pr = combine_rings_end(ring, m_rings, m_debug);
                 } else {
                     ring.add_location_start(node_ref);
-                    pr = combine_rings_start(ring, rings, m_debug);
+                    pr = combine_rings_start(ring, m_rings, m_debug);
                 }
-                update_ring_link_in_segments(pr, &ring, segments);
+                update_ring_link_in_segments(pr, &ring);
             }
 
             void operator()(const osmium::Relation& relation, std::vector<size_t>& members, const osmium::memory::Buffer& in_buffer, osmium::memory::Buffer& out_buffer) {
+                m_segments.clear();
+                m_rings.clear();
+
                 // First we extract all segments from all ways that make up this
                 // multipolygon relation. The segments all have their smaller
                 // coordinate at the beginning of the segment. Smaller, in this
                 // case, means smaller x coordinate, and if they are the same
                 // smaller y coordinate.
-                std::vector<NodeRefSegment> segments;
 
                 for (size_t offset : members) {
                     const osmium::Way& way = in_buffer.get<const osmium::Way>(offset);
                     osmium::NodeRef last_nr;
                     for (osmium::NodeRef nr : way.nodes()) {
                         if (last_nr.location() && last_nr != nr) {
-                            segments.push_back(NodeRefSegment(last_nr, nr));
+                            m_segments.push_back(NodeRefSegment(last_nr, nr));
                         }
                         last_nr = nr;
                     }
                 }
 
                 if (m_debug) {
-                    std::cerr << "\nBuild relation id()=" << relation.id() << " members.size()=" << members.size() << " segments.size()=" << segments.size() << "\n";
+                    std::cerr << "\nBuild relation id()=" << relation.id() << " members.size()=" << members.size() << " segments.size()=" << m_segments.size() << "\n";
                 }
 
                 // Now all of these segments will be sorted. Again, smaller, in
                 // this case, means smaller x coordinate, and if they are the
                 // same smaller y coordinate.
-                std::sort(segments.begin(), segments.end());
+                std::sort(m_segments.begin(), m_segments.end());
 
                 // remove empty segments
-/*                segments.erase(std::remove_if(segments.begin(), segments.end(), [](osmium::UndirectedSegment& segment) {
+/*                m_segments.erase(std::remove_if(m_segments.begin(), m_segments.end(), [](osmium::UndirectedSegment& segment) {
                     return segment.first() == segment.second();
                 }));*/
 
@@ -241,14 +249,14 @@ namespace osmium {
                 // segment. So if there are three, for instance, two will be
                 // removed and one will be left.
                 while (true) {
-                    std::vector<NodeRefSegment>::iterator found = std::adjacent_find(segments.begin(), segments.end());
-                    if (found == segments.end()) {
+                    std::vector<NodeRefSegment>::iterator found = std::adjacent_find(m_segments.begin(), m_segments.end());
+                    if (found == m_segments.end()) {
                         break;
                     }
                     if (m_debug) {
                         std::cerr << "  erase duplicate segment: " << *found << "\n";
                     }
-                    segments.erase(found, found+2);
+                    m_segments.erase(found, found+2);
                 }
 
                 // Now create the Area object and add the attributes and tags
@@ -281,7 +289,7 @@ namespace osmium {
                 // any, the multipolygon is invalid.
                 // In the future this could be improved by trying to fix those
                 // cases.
-                if (find_intersections(segments)) {
+                if (find_intersections()) {
                     out_buffer.commit();
                     return;
                 }
@@ -289,8 +297,7 @@ namespace osmium {
 
                 // Now iterator over all segments and add them to rings
                 // until there are no segments left.
-                std::list<ProtoRing> rings;
-                for (auto it = segments.begin(); it != segments.end(); ++it) {
+                for (auto it = m_segments.begin(); it != m_segments.end(); ++it) {
                     auto& segment = *it;
 
                     if (m_debug) {
@@ -298,25 +305,25 @@ namespace osmium {
                     }
 
                     int n=0;
-                    for (auto& ring : rings) {
+                    for (auto& ring : m_rings) {
                         if (m_debug) {
                             std::cerr << "    check against ring " << n << " " << ring << "\n";
                         }
                         if (!ring.closed()) {
                             if (ring.last() == segment.first() ) {
-                                combine_rings(segment, segment.second(), ring, rings, segments, true);
+                                combine_rings(segment, segment.second(), ring, true);
                                 goto next_segment;
                             }
                             if (ring.last() == segment.second() ) {
-                                combine_rings(segment, segment.first(), ring, rings, segments, true);
+                                combine_rings(segment, segment.first(), ring, true);
                                 goto next_segment;
                             }
                             if (ring.first() == segment.first() ) {
-                                combine_rings(segment, segment.second(), ring, rings, segments, false);
+                                combine_rings(segment, segment.second(), ring, false);
                                 goto next_segment;
                             }
                             if (ring.first() == segment.second() ) {
-                                combine_rings(segment, segment.first(), ring, rings, segments, false);
+                                combine_rings(segment, segment.first(), ring, false);
                                 goto next_segment;
                             }
                         } else {
@@ -335,12 +342,12 @@ namespace osmium {
 
                         bool cw = true;
 
-                        if (it != segments.begin()) {
+                        if (it != m_segments.begin()) {
                             osmium::Location loc = segment.first().location();
                             if (m_debug) {
                                 std::cerr << "      compare against id=" << segment.first().ref() << " lat()=" << loc.lat() << "\n";
                             }
-                            for (auto oit = it-1; oit != segments.begin()-1; --oit) {
+                            for (auto oit = it-1; oit != m_segments.begin()-1; --oit) {
                                 if (m_debug) {
                                     std::cerr << "      seg=" << *oit << "\n";
                                 }
@@ -369,8 +376,8 @@ namespace osmium {
                         }
 
                         segment.cw(cw);
-                        rings.emplace_back(ProtoRing(segment));
-                        segment.ring(&rings.back());
+                        m_rings.emplace_back(ProtoRing(segment));
+                        segment.ring(&m_rings.back());
                     }
 
                     next_segment:
@@ -380,7 +387,7 @@ namespace osmium {
 
                 if (m_debug) {
                     std::cerr << "  Rings:\n";
-                    for (auto& ring : rings) {
+                    for (auto& ring : m_rings) {
                         std::cerr << "    " << ring;
                         if (ring.closed()) {
                             std::cerr << " (closed)";
@@ -389,7 +396,7 @@ namespace osmium {
                     }
                 }
 
-                if (check_for_open_rings(rings)) {
+                if (check_for_open_rings()) {
                     if (m_debug) {
                         std::cerr << "  not all rings are closed\n";
                     }
@@ -403,7 +410,7 @@ namespace osmium {
 
                 // Find inner rings to each outer ring.
                 std::vector<ProtoRing*> outer_rings;
-                for (auto& ring : rings) {
+                for (auto& ring : m_rings) {
                     if (ring.is_outer()) {
                         if (m_debug) {
                             std::cerr << "    Outer: " << ring << "\n";
