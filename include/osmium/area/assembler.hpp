@@ -232,6 +232,45 @@ namespace osmium {
                 return open_rings;
             }
 
+            ProtoRing* combine_rings_end(ProtoRing& ring) {
+                osmium::Location location = ring.last().location();
+
+                if (m_debug) {
+                    std::cerr << "      combine_rings_end\n";
+                }
+                for (auto it = m_rings.begin(); it != m_rings.end(); ++it) {
+                    if (&*it != &ring) {
+                        if ((location == it->first().location())) {
+                            ring.merge_ring(*it, m_debug);
+                            ProtoRing* ring_ptr = &*it;
+                            m_rings.erase(it);
+                            return ring_ptr;
+                        }
+                    }
+                }
+                return nullptr;
+            }
+
+            ProtoRing* combine_rings_start(ProtoRing& ring) {
+                osmium::Location location = ring.first().location();
+
+                if (m_debug) {
+                    std::cerr << "      combine_rings_start\n";
+                }
+                for (auto it = m_rings.begin(); it != m_rings.end(); ++it) {
+                    if (&*it != &ring) {
+                        if ((location == it->last().location())) {
+                            ring.swap_nodes(*it);
+                            ring.merge_ring(*it, m_debug);
+                            ProtoRing* ring_ptr = &*it;
+                            m_rings.erase(it);
+                            return ring_ptr;
+                        }
+                    }
+                }
+                return nullptr;
+            }
+
             void combine_rings(NodeRefSegment& segment, const NodeRef& node_ref, ProtoRing& ring, bool at_end) {
                 if (m_debug) {
                     std::cerr << "      match\n";
@@ -240,10 +279,10 @@ namespace osmium {
                 ProtoRing* pr = nullptr;
                 if (at_end) {
                     ring.add_location_end(node_ref);
-                    pr = combine_rings_end(ring, m_rings, m_debug);
+                    pr = combine_rings_end(ring);
                 } else {
                     ring.add_location_start(node_ref);
-                    pr = combine_rings_start(ring, m_rings, m_debug);
+                    pr = combine_rings_start(ring);
                 }
                 update_ring_link_in_segments(pr, &ring);
             }

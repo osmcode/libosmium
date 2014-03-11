@@ -202,47 +202,6 @@ namespace osmium {
                 return out;
             }
 
-            inline ProtoRing* combine_rings_end(ProtoRing& ring, std::list<ProtoRing>& rings, bool debug) {
-                ProtoRing* ring_ptr = nullptr;
-                osmium::Location location = ring.last().location();
-
-                if (debug) {
-                    std::cerr << "      combine_rings_end\n";
-                }
-                for (auto it = rings.begin(); it != rings.end(); ++it) {
-                    if (&*it != &ring) {
-                        if ((location == it->first().location())) { // || (location == it->last().location())) {
-                            ring.merge_ring(*it, debug);
-                            ring_ptr = &*it;
-                            rings.erase(it);
-                            return ring_ptr;
-                        }
-                    }
-                }
-                return ring_ptr;
-            }
-
-            inline ProtoRing* combine_rings_start(ProtoRing& ring, std::list<ProtoRing>& rings, bool debug) {
-                ProtoRing* ring_ptr = nullptr;
-                osmium::Location location = ring.first().location();
-
-                if (debug) {
-                    std::cerr << "      combine_rings_start\n";
-                }
-                for (auto it = rings.begin(); it != rings.end(); ++it) {
-                    if (&*it != &ring) {
-                        if ((location == it->last().location())) { // || (location == it->last().location())) {
-                            ring.swap_nodes(*it);
-                            ring.merge_ring(*it, debug);
-                            ring_ptr = &*it;
-                            rings.erase(it);
-                            return ring_ptr;
-                        }
-                    }
-                }
-                return ring_ptr;
-            }
-
         } // namespace detail
 
     } // namespace area
