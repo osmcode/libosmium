@@ -248,6 +248,29 @@ namespace osmium {
                 update_ring_link_in_segments(pr, &ring);
             }
 
+            /**
+             * Append each outer ring together with its inner rings to the
+             * area in the buffer.
+             */
+            void add_rings_to_area(osmium::osm::AreaBuilder& builder, const std::vector<const ProtoRing*> outer_rings) const {
+                for (const ProtoRing* ring : outer_rings) {
+                    if (m_debug) {
+                        std::cerr << "    ring " << *ring << " is outer\n";
+                    }
+                    osmium::osm::OuterRingBuilder ring_builder(builder.buffer(), &builder);
+                    for (auto& node_ref : ring->nodes()) {
+                        ring_builder.add_node_ref(node_ref);
+                    }
+                    for (ProtoRing* inner : ring->inner_rings()) {
+                        osmium::osm::InnerRingBuilder ring_builder(builder.buffer(), &builder);
+                        for (auto& node_ref : inner->nodes()) {
+                            ring_builder.add_node_ref(node_ref);
+                        }
+                    }
+                    builder.buffer().commit();
+                }
+            }
+
         public:
 
             Assembler() = default;
@@ -320,17 +343,17 @@ namespace osmium {
                 initialize_area_from_relation(builder, relation);
 
                 // From now on we have an area object without any rings in it.
-                // Areas without rings are "defined" to be invalid. We can commit
-                // this area at any time and the caller of the assembler will see
-                // the invalid area. Or we can later add the rings and make a valid
-                // area out of it.
+                // Areas without rings are "defined" to be invalid. We commit
+                // this area and the caller of the assembler will see the
+                // invalid area. If all goes well, we later add the rings, commit
+                // again, and thus make a valid area out of it.
+                out_buffer.commit();
 
                 // Now we look for segments crossing each other. If there are
                 // any, the multipolygon is invalid.
                 // In the future this could be improved by trying to fix those
                 // cases.
                 if (find_intersections()) {
-                    out_buffer.commit();
                     return;
                 }
 
@@ -439,7 +462,6 @@ namespace osmium {
                     if (m_debug) {
                         std::cerr << "  not all rings are closed\n";
                     }
-                    out_buffer.commit();
                     return;
                 }
 
@@ -448,7 +470,7 @@ namespace osmium {
                 }
 
                 // Find inner rings to each outer ring.
-                std::vector<ProtoRing*> outer_rings;
+                std::vector<const ProtoRing*> outer_rings;
                 for (auto& ring : m_rings) {
                     if (ring.is_outer()) {
                         if (m_debug) {
@@ -466,30 +488,12 @@ namespace osmium {
                             if (m_debug) {
                                 std::cerr << "    something bad happened\n";
                             }
-                            out_buffer.commit();
                             return;
                         }
                     }
                 }
 
-                // Append each outer ring together with its inner rings to the
-                // area in the buffer.
-                for (const ProtoRing* ring : outer_rings) {
-                    if (m_debug) {
-                        std::cerr << "    ring " << *ring << " is outer\n";
-                    }
-                    osmium::osm::OuterRingBuilder ring_builder(out_buffer, &builder);
-                    for (auto& node_ref : ring->nodes()) {
-                        ring_builder.add_node_ref(node_ref);
-                    }
-                    for (ProtoRing* inner : ring->inner_rings()) {
-                        osmium::osm::InnerRingBuilder ring_builder(out_buffer, &builder);
-                        for (auto& node_ref : inner->nodes()) {
-                            ring_builder.add_node_ref(node_ref);
-                        }
-                    }
-                    out_buffer.commit();
-                }
+                add_rings_to_area(builder, outer_rings);
             }
 
         }; // class Assembler
