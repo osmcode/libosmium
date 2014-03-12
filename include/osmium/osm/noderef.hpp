@@ -116,6 +116,36 @@ namespace osmium {
         return !(lhs == rhs);
     }
 
+    /**
+     * Functor to compare NodeRefs by Location instead of id.
+     */
+    struct location_equal {
+
+        bool operator()(const NodeRef& lhs, const NodeRef& rhs) const {
+            return lhs.location() == rhs.location();
+        }
+
+        typedef NodeRef first_argument_type;
+        typedef NodeRef second_argument_type;
+        typedef bool result_type;
+
+    }; // struct location_equal
+
+    /**
+     * Functor to compare NodeRefs by Location instead of id.
+     */
+    struct location_less {
+
+        bool operator()(const NodeRef& lhs, const NodeRef& rhs) const {
+            return lhs.location() < rhs.location();
+        }
+
+        typedef NodeRef first_argument_type;
+        typedef NodeRef second_argument_type;
+        typedef bool result_type;
+
+    }; // struct location_less
+
 } // namespace osmium
 
 #endif // OSMIUM_OSM_NODEREF_HPP
