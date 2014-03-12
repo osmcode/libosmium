@@ -158,7 +158,10 @@ namespace osmium {
             osmium::Location b = rhs.second().location();
 
             if (l.x() == a.x()) {
-                return true;
+                if (l.x() != b.x()) {
+                    return true;
+                }
+                return a.y() < b.y();
             }
             if (l.x() == b.x()) {
                 return false;

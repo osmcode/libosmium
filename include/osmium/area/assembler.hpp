@@ -246,7 +246,7 @@ namespace osmium {
                     std::cerr << "      combine_rings_end\n";
                 }
                 for (auto it = m_rings.begin(); it != m_rings.end(); ++it) {
-                    if (&*it != &ring) {
+                    if (&*it != &ring && !it->closed()) {
                         if ((location == it->first().location())) {
                             ring.merge_ring(*it, m_debug);
                             ProtoRing* ring_ptr = &*it;
@@ -272,7 +272,7 @@ namespace osmium {
                     std::cerr << "      combine_rings_start\n";
                 }
                 for (auto it = m_rings.begin(); it != m_rings.end(); ++it) {
-                    if (&*it != &ring) {
+                    if (&*it != &ring && !it->closed()) {
                         if ((location == it->last().location())) {
                             ring.swap_nodes(*it);
                             ring.merge_ring(*it, m_debug);
@@ -285,6 +285,68 @@ namespace osmium {
                 return nullptr;
             }
 
+            bool has_closed_subring_end(ProtoRing& ring, const NodeRef& node_ref) {
+                if (m_debug) {
+                    std::cerr << "      has_closed_subring_end()\n";
+                }
+                osmium::Location loc = node_ref.location();
+                if (loc == ring.first().location()) {
+                    if (m_debug) {
+                        std::cerr << "        ring now closed\n";
+                        return true;
+                    }
+                } else {
+                    for (auto it = ring.nodes().begin(); it != ring.nodes().end() - 1; ++it) {
+                        if (it->location() == loc) {
+                            if (m_debug) {
+                                std::cerr << "        subring found at: " << *it << "\n";
+                            }
+                            ProtoRing new_ring(it, ring.nodes().end());
+                            ring.remove_nodes(it+1, ring.nodes().end());
+                            if (m_debug) {
+                                std::cerr << "        split into two rings:\n";
+                                std::cerr << "          " << new_ring << "\n";
+                                std::cerr << "          " << ring << "\n";
+                            }
+                            m_rings.push_back(new_ring);
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+
+            bool has_closed_subring_start(ProtoRing& ring, const NodeRef& node_ref) {
+                if (m_debug) {
+                    std::cerr << "      has_closed_subring_start()\n";
+                }
+                osmium::Location loc = node_ref.location();
+                if (loc == ring.last().location()) {
+                    if (m_debug) {
+                        std::cerr << "        ring now closed\n";
+                        return true;
+                    }
+                } else {
+                    for (auto it = ring.nodes().begin() + 1; it != ring.nodes().end(); ++it) {
+                        if (it->location() == loc) {
+                            if (m_debug) {
+                                std::cerr << "        subring found at: " << *it << "\n";
+                            }
+                            ProtoRing new_ring(ring.nodes().begin(), it+1);
+                            ring.remove_nodes(ring.nodes().begin(), it);
+                            if (m_debug) {
+                                std::cerr << "        split into two rings:\n";
+                                std::cerr << "          " << new_ring << "\n";
+                                std::cerr << "          " << ring << "\n";
+                            }
+                            m_rings.push_back(new_ring);
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+
             void combine_rings(NodeRefSegment& segment, const NodeRef& node_ref, ProtoRing& ring, bool at_end) {
                 if (m_debug) {
                     std::cerr << "      match\n";
@@ -294,9 +356,15 @@ namespace osmium {
                 ProtoRing* pr = nullptr;
                 if (at_end) {
                     ring.add_location_end(node_ref);
+                    if (has_closed_subring_end(ring, node_ref)) {
+//                        return;
+                    }
                     pr = possibly_combine_rings_end(ring);
                 } else {
                     ring.add_location_start(node_ref);
+                    if (has_closed_subring_start(ring, node_ref)) {
+//                        return;
+                    }
                     pr = possibly_combine_rings_start(ring);
                 }
 
@@ -475,17 +543,20 @@ namespace osmium {
                                     if (m_debug) {
                                         std::cerr << "        in range\n";
                                     }
-                                    if (oit->first().location().x() <= loc.x() &&
-                                        oit->second().location().x() <= loc.x()) {
+                                    if (oit->first().location().x() < loc.x() &&
+                                        oit->second().location().x() < loc.x()) {
+                                        std::cerr << "          if 1\n";
                                         cw = !oit->cw();
                                         segment.left_segment(&*oit);
                                         break;
                                     }
                                     if (detail::is_below(loc, *oit)) { // XXX
+                                        std::cerr << "          if 2\n";
                                         cw = !oit->cw();
                                         segment.left_segment(&*oit);
                                         break;
                                     }
+                                    std::cerr << "          else\n";
                                 }
                             }
                         }
@@ -538,7 +609,7 @@ namespace osmium {
                         if (m_debug) {
                             std::cerr << "    Inner: " << ring << "\n";
                         }
-                        ProtoRing* outer = ring.find_outer(m_debug);
+                        ProtoRing* outer = ring.find_outer(m_segments, m_debug);
                         if (outer) {
                             outer->add_inner_ring(&ring);
                         } else {

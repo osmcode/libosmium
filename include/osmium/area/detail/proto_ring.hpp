@@ -55,21 +55,68 @@ namespace osmium {
                 // nodes in this ring
                 std::vector<osmium::NodeRef> m_nodes {};
 
-                const NodeRefSegment& m_first_segment;
-
                 // if this is an outer ring, these point to it's inner rings (if any)
                 std::vector<ProtoRing*> m_inner {};
 
             public:
 
-                ProtoRing(const NodeRefSegment& segment) :
-                    m_first_segment(segment) {
+                ProtoRing(const NodeRefSegment& segment) {
                     add_location_end(segment.first_cw());
                     add_location_end(segment.second_cw());
                 }
 
+                ProtoRing(std::vector<osmium::NodeRef>::const_iterator nodes_begin, std::vector<osmium::NodeRef>::const_iterator nodes_end) {
+                    for (auto it = nodes_begin; it != nodes_end; ++it) {
+                        add_location_end(*it);
+                    }
+                }
+
+                bool location_is_below(const osmium::Location& loc, const NodeRefSegment& seg) const {
+                    double ax = seg.first().location().x();
+                    double bx = seg.second().location().x();
+                    double cx = loc.x();
+                    double ay = seg.first().location().y();
+                    double by = seg.second().location().y();
+                    double cy = loc.y();
+                    return ((bx - ax)*(cy - ay) - (by - ay)*(cx - ax)) <= 0;
+                }
+
+                const NodeRefSegment& first_segment(std::vector<NodeRefSegment>& segments, bool debug) const {
+                    auto min = std::min_element(m_nodes.begin(), m_nodes.end(), osmium::location_less());
+                    std::cerr << "      first_segment() min=" << *min << "\n";
+                    auto next = min+1;
+                    if (next == m_nodes.end()) {
+                        next = m_nodes.begin();
+                    }
+                    auto prev = (min == m_nodes.begin()) ? m_nodes.end()-1 : min-1;
+                    auto other = prev;
+                    if (prev->location().x() > min->location().x() && location_is_below(next->location(), NodeRefSegment(*min, *prev))) {
+                        other = next;
+                    }
+                    std::cerr << "                      other=" << *other << "\n";
+
+                    for (auto& segment : segments) {
+                        if (segment.first() == *other && segment.second() == *min) {
+                            return segment;
+                        }
+                        if (segment.second() == *other && segment.first() == *min) {
+                            return segment;
+                        }
+                    }
+
+                    throw std::runtime_error("should not be here");
+                }
+
+                std::vector<osmium::NodeRef>& nodes() {
+                    return m_nodes;
+                }
+
                 const std::vector<osmium::NodeRef>& nodes() const {
                     return m_nodes;
+                }
+
+                void remove_nodes(std::vector<osmium::NodeRef>::iterator nodes_begin, std::vector<osmium::NodeRef>::iterator nodes_end) {
+                    m_nodes.erase(nodes_begin, nodes_end);
                 }
 
                 void add_location_end(const osmium::NodeRef& nr) {
@@ -170,11 +217,11 @@ namespace osmium {
                     }
                 }
 
-                ProtoRing* find_outer(bool debug) {
+                ProtoRing* find_outer(std::vector<NodeRefSegment>& segments, bool debug) {
                     ProtoRing* ring = this;
 
                     while (!ring->is_outer()) {
-                        const NodeRefSegment& segment = ring->m_first_segment;
+                        const NodeRefSegment& segment = ring->first_segment(segments, debug);
                         if (debug) {
                             std::cerr << "      First segment is: " << segment << "\n";
                         }
