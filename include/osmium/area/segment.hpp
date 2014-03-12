@@ -197,11 +197,26 @@ namespace osmium {
             return true;
         }
 
+        /**
+         * Calculate the intersection between to NodeRefSegments. The result is returned
+         * as a Location. Note that because the Location uses integers with limited
+         * precision internally, the result might be slightly different than the
+         * numerically correct location.
+         *
+         * If the segments touch in one of their endpoints, it doesn't count as an
+         * intersection.
+         *
+         * If the segments intersect not in a single point but in multiple points, ie
+         * if they overlap, this is NOT detected.
+         *
+         * @returns Undefined osmium::Location if there is no intersection or a defined
+         *          Location if the segments intersect.
+         */
         inline osmium::Location calculate_intersection(const NodeRefSegment& s1, const NodeRefSegment& s2) {
-            if (s1.first()  == s2.first()  ||
-                s1.first()  == s2.second() ||
-                s1.second() == s2.first()  ||
-                s1.second() == s2.second()) {
+            if (s1.first().location()  == s2.first().location()  ||
+                s1.first().location()  == s2.second().location() ||
+                s1.second().location() == s2.first().location()  ||
+                s1.second().location() == s2.second().location()) {
                 return osmium::Location();
             }
 
