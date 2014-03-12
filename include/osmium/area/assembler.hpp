@@ -349,7 +349,7 @@ namespace osmium {
 
             void combine_rings(NodeRefSegment& segment, const NodeRef& node_ref, ProtoRing& ring, bool at_end) {
                 if (m_debug) {
-                    std::cerr << "      match\n";
+                    std::cerr << " => match at " << (at_end ? "end" : "start") << " of ring\n";
                 }
                 segment.ring(&ring);
 
@@ -450,11 +450,11 @@ namespace osmium {
                 int n=0;
                 for (auto& ring : m_rings) {
                     if (m_debug) {
-                        std::cerr << "    check against ring " << n << " " << ring << "\n";
+                        std::cerr << "    check against ring " << n << " " << ring;
                     }
                     if (ring.closed()) {
                         if (m_debug) {
-                            std::cerr << "      ring CLOSED\n";
+                            std::cerr << " => ring CLOSED\n";
                         }
                     } else {
                         if (ring.last() == segment.first() ) {
@@ -472,6 +472,9 @@ namespace osmium {
                         if (ring.first() == segment.second() ) {
                             combine_rings(segment, segment.first(), ring, false);
                             return true;
+                        }
+                        if (m_debug) {
+                            std::cerr << " => no match\n";
                         }
                     }
 
