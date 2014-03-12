@@ -396,6 +396,90 @@ namespace osmium {
                 }
             }
 
+            void create_new_ring_for_segment(std::vector<NodeRefSegment>::iterator it) {
+                auto& segment = *it;
+
+                if (m_debug) {
+                    std::cerr << "    new ring for segment " << segment << "\n";
+                }
+
+                bool cw = true;
+
+                if (it != m_segments.begin()) {
+                    osmium::Location loc = segment.first().location();
+                    if (m_debug) {
+                        std::cerr << "      compare against id=" << segment.first().ref() << " lat()=" << loc.lat() << "\n";
+                    }
+                    for (auto oit = it-1; oit != m_segments.begin()-1; --oit) {
+                        if (m_debug) {
+                            std::cerr << "      seg=" << *oit << "\n";
+                        }
+                        std::pair<int32_t, int32_t> mm = std::minmax(oit->first().location().y(), oit->second().location().y());
+                        if (mm.first <= loc.y() && mm.second >= loc.y()) {
+                            if (m_debug) {
+                                std::cerr << "        in range\n";
+                            }
+                            if (oit->first().location().x() < loc.x() &&
+                                oit->second().location().x() < loc.x()) {
+                                std::cerr << "          if 1\n";
+                                cw = !oit->cw();
+                                segment.left_segment(&*oit);
+                                break;
+                            }
+                            if (detail::is_below(loc, *oit)) { // XXX
+                                std::cerr << "          if 2\n";
+                                cw = !oit->cw();
+                                segment.left_segment(&*oit);
+                                break;
+                            }
+                            std::cerr << "          else\n";
+                        }
+                    }
+                }
+
+                if (m_debug) {
+                    std::cerr << "      is " << (cw ? "cw" : "ccw") << "\n";
+                }
+
+                segment.cw(cw);
+                m_rings.emplace_back(ProtoRing(segment));
+                segment.ring(&m_rings.back());
+            }
+
+            bool add_to_existing_ring(NodeRefSegment& segment) {
+                int n=0;
+                for (auto& ring : m_rings) {
+                    if (m_debug) {
+                        std::cerr << "    check against ring " << n << " " << ring << "\n";
+                    }
+                    if (ring.closed()) {
+                        if (m_debug) {
+                            std::cerr << "      ring CLOSED\n";
+                        }
+                    } else {
+                        if (ring.last() == segment.first() ) {
+                            combine_rings(segment, segment.second(), ring, true);
+                            return true;
+                        }
+                        if (ring.last() == segment.second() ) {
+                            combine_rings(segment, segment.first(), ring, true);
+                            return true;
+                        }
+                        if (ring.first() == segment.first() ) {
+                            combine_rings(segment, segment.second(), ring, false);
+                            return true;
+                        }
+                        if (ring.first() == segment.second() ) {
+                            combine_rings(segment, segment.first(), ring, false);
+                            return true;
+                        }
+                    }
+
+                    ++n;
+                }
+                return false;
+            }
+
         public:
 
             Assembler() = default;
@@ -482,97 +566,16 @@ namespace osmium {
                     return;
                 }
 
-                // Now iterator over all segments and add them to rings
-                // until there are no segments left.
+                // Now iterator over all segments and add them to rings. Each segment
+                // is tacked on to either end of an existing ring if possible, or a
+                // new ring is started with it.
                 for (auto it = m_segments.begin(); it != m_segments.end(); ++it) {
-                    auto& segment = *it;
-
                     if (m_debug) {
-                        std::cerr << "  check segment " << segment << "\n";
+                        std::cerr << "  checking segment " << *it << "\n";
                     }
-
-                    int n=0;
-                    for (auto& ring : m_rings) {
-                        if (m_debug) {
-                            std::cerr << "    check against ring " << n << " " << ring << "\n";
-                        }
-                        if (!ring.closed()) {
-                            if (ring.last() == segment.first() ) {
-                                combine_rings(segment, segment.second(), ring, true);
-                                goto next_segment;
-                            }
-                            if (ring.last() == segment.second() ) {
-                                combine_rings(segment, segment.first(), ring, true);
-                                goto next_segment;
-                            }
-                            if (ring.first() == segment.first() ) {
-                                combine_rings(segment, segment.second(), ring, false);
-                                goto next_segment;
-                            }
-                            if (ring.first() == segment.second() ) {
-                                combine_rings(segment, segment.first(), ring, false);
-                                goto next_segment;
-                            }
-                        } else {
-                            if (m_debug) {
-                                std::cerr << "      ring CLOSED\n";
-                            }
-                        }
-
-                        ++n;
+                    if (!add_to_existing_ring(*it)) {
+                        create_new_ring_for_segment(it);
                     }
-
-                    {
-                        if (m_debug) {
-                            std::cerr << "    new ring for segment " << segment << "\n";
-                        }
-
-                        bool cw = true;
-
-                        if (it != m_segments.begin()) {
-                            osmium::Location loc = segment.first().location();
-                            if (m_debug) {
-                                std::cerr << "      compare against id=" << segment.first().ref() << " lat()=" << loc.lat() << "\n";
-                            }
-                            for (auto oit = it-1; oit != m_segments.begin()-1; --oit) {
-                                if (m_debug) {
-                                    std::cerr << "      seg=" << *oit << "\n";
-                                }
-                                std::pair<int32_t, int32_t> mm = std::minmax(oit->first().location().y(), oit->second().location().y());
-                                if (mm.first <= loc.y() && mm.second >= loc.y()) {
-                                    if (m_debug) {
-                                        std::cerr << "        in range\n";
-                                    }
-                                    if (oit->first().location().x() < loc.x() &&
-                                        oit->second().location().x() < loc.x()) {
-                                        std::cerr << "          if 1\n";
-                                        cw = !oit->cw();
-                                        segment.left_segment(&*oit);
-                                        break;
-                                    }
-                                    if (detail::is_below(loc, *oit)) { // XXX
-                                        std::cerr << "          if 2\n";
-                                        cw = !oit->cw();
-                                        segment.left_segment(&*oit);
-                                        break;
-                                    }
-                                    std::cerr << "          else\n";
-                                }
-                            }
-                        }
-
-                        if (m_debug) {
-                            std::cerr << "      is " << (cw ? "cw" : "ccw") << "\n";
-                        }
-
-                        segment.cw(cw);
-                        m_rings.emplace_back(ProtoRing(segment));
-                        segment.ring(&m_rings.back());
-                    }
-
-                    next_segment:
-                        ;
-
                 }
 
                 if (m_debug) {
