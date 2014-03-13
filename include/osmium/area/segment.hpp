@@ -44,10 +44,6 @@ namespace osmium {
 
     namespace area {
 
-        namespace detail {
-            class ProtoRing;
-        }
-
         /**
          * This helper class for the Assembler class models a segment
          * (connection between two nodes).
@@ -57,20 +53,9 @@ namespace osmium {
             osmium::NodeRef m_first;
             osmium::NodeRef m_second;
 
-            /// This is the ring this segment is in (if already known).
-            osmium::area::detail::ProtoRing* m_ring { nullptr };
-
-            NodeRefSegment* m_left_segment { nullptr };
-
-            bool m_cw {true};
-
             void swap_locations() {
                 using std::swap;
                 swap(m_first, m_second);
-            }
-
-            bool swap_ends() const {
-                return m_cw == (m_first.location().y() >= m_second.location().y());
             }
 
         public:
@@ -106,43 +91,21 @@ namespace osmium {
                 return m_second;
             }
 
-            /// Return first NodeRef of Segment taking into account whether this Segment is set as clockwise or counter-clockwise.
-            const osmium::NodeRef& first_cw() const {
-                return swap_ends() ? m_second : m_first;
-            }
-
-            /// Return second NodeRef of Segment taking into account whether this Segment is set as clockwise or counter-clockwise.
-            const osmium::NodeRef& second_cw() const {
-                return swap_ends() ? m_first : m_second;
-            }
-
-            NodeRefSegment* left_segment() const {
-                return m_left_segment;
-            }
-
-            void left_segment(NodeRefSegment* segment) {
-                m_left_segment = segment;
-            }
-
-            osmium::area::detail::ProtoRing* ring() const {
-                return m_ring;
-            }
-
-            void ring(osmium::area::detail::ProtoRing* ring) {
-                m_ring = ring;
-            }
-
-            /// Is this segment oriented clockwise?
-            bool cw() const {
-                return m_cw;
-            }
-
-            /**
-             * Set orientation of this segment
-             * (true: clockwise, false: counter-clockwise)
-             */
-            void cw(bool cw) {
-                m_cw = cw;
+            bool to_left_of(const osmium::Location loc) const {
+                auto mm = std::minmax(first().location(), second().location(), [](const osmium::Location a, const osmium::Location b){
+                    return a.y() < b.y();
+                });
+                auto y = loc.y();
+                if (mm.first.y() >= y || y > mm.second.y() || first().location().x() > loc.x()) {
+                    return false;
+                }
+                double ax = mm.first.x();
+                double bx = mm.second.x();
+                double lx = loc.x();
+                double ay = mm.first.y();
+                double by = mm.second.y();
+                double ly = loc.y();
+                return ((bx - ax)*(ly - ay) - (by - ay)*(lx - ax)) <= 0;
             }
 
         }; // class NodeRefSegment
@@ -152,31 +115,13 @@ namespace osmium {
             return lhs.first().location() == rhs.first().location() && lhs.second().location() == rhs.second().location();
         }
 
-        inline bool below(const NodeRefSegment& lhs, const NodeRefSegment& rhs) {
-            osmium::Location l = lhs.first().location();
-            osmium::Location a = lhs.second().location();
-            osmium::Location b = rhs.second().location();
-
-            if (l.x() == a.x()) {
-                if (l.x() != b.x()) {
-                    return true;
-                }
-                return a.y() < b.y();
-            }
-            if (l.x() == b.x()) {
-                return false;
-            }
-
-            return (a.lat() - l.lat()) / (a.lon() - l.lon()) < (b.lat() - l.lat()) / (b.lon() - l.lon());
-        }
-
         /**
          * NodeRefSegments are "smaller" if they are to the left and down of another
          * segment. The first() location is checked first() and only if they have the
          * same first() location the second() location is taken into account.
          */
         inline bool operator<(const NodeRefSegment& lhs, const NodeRefSegment& rhs) {
-            return (lhs.first().location() == rhs.first().location() && below(lhs, rhs)) || lhs.first().location() < rhs.first().location();
+            return (lhs.first().location() == rhs.first().location() && lhs.second().location() < rhs.second().location()) || lhs.first().location() < rhs.first().location();
         }
 
         inline std::ostream& operator<<(std::ostream& out, const NodeRefSegment& segment) {

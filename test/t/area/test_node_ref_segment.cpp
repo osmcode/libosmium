@@ -35,25 +35,6 @@ BOOST_AUTO_TEST_CASE(instantiation) {
     BOOST_CHECK_EQUAL(s3.second().ref(), 4);
 }
 
-BOOST_AUTO_TEST_CASE(cw_ccw) {
-    osmium::NodeRef nr1(2, { 1.4, 3.1 });
-    osmium::NodeRef nr2(3, { 1.2, 3.6 });
-    osmium::area::NodeRefSegment s(nr1, nr2);
-
-    BOOST_CHECK_EQUAL(s.first().ref(), 3);
-    BOOST_CHECK_EQUAL(s.second().ref(), 2);
-
-    s.cw(true);
-    BOOST_CHECK_EQUAL(s.cw(), true);
-    BOOST_CHECK_EQUAL(s.first_cw().ref(), 2);
-    BOOST_CHECK_EQUAL(s.second_cw().ref(), 3);
-
-    s.cw(false);
-    BOOST_CHECK_EQUAL(s.cw(), false);
-    BOOST_CHECK_EQUAL(s.first_cw().ref(), 3);
-    BOOST_CHECK_EQUAL(s.second_cw().ref(), 2);
-}
-
 BOOST_AUTO_TEST_CASE(intersection) {
     osmium::area::NodeRefSegment s1({ 1, {0.0, 0.0}}, { 2, {2.0, 2.0}});
     osmium::area::NodeRefSegment s2({ 3, {0.0, 2.0}}, { 4, {2.0, 0.0}});
@@ -73,8 +54,33 @@ BOOST_AUTO_TEST_CASE(intersection) {
     BOOST_CHECK_EQUAL(calculate_intersection(s1, s7), osmium::Location());
 }
 
+BOOST_AUTO_TEST_CASE(to_left_of) {
+    osmium::Location loc { 2.0, 2.0 };
 
-#if 0
+    BOOST_CHECK_EQUAL(osmium::area::NodeRefSegment({0, {0.0, 0.0}}, {1, {0.0, 4.0}}).to_left_of(loc), true);
+    BOOST_CHECK_EQUAL(osmium::area::NodeRefSegment({0, {4.0, 0.0}}, {1, {4.0, 4.0}}).to_left_of(loc), false);
+    BOOST_CHECK_EQUAL(osmium::area::NodeRefSegment({0, {1.0, 0.0}}, {1, {1.0, 4.0}}).to_left_of(loc), true);
+
+    BOOST_CHECK_EQUAL(osmium::area::NodeRefSegment({0, {0.0, 0.0}}, {1, {1.0, 4.0}}).to_left_of(loc), true);
+    BOOST_CHECK_EQUAL(osmium::area::NodeRefSegment({0, {0.0, 0.0}}, {1, {2.0, 4.0}}).to_left_of(loc), true);
+    BOOST_CHECK_EQUAL(osmium::area::NodeRefSegment({0, {0.0, 0.0}}, {1, {3.0, 4.0}}).to_left_of(loc), true);
+    BOOST_CHECK_EQUAL(osmium::area::NodeRefSegment({0, {0.0, 0.0}}, {1, {4.0, 4.0}}).to_left_of(loc), true);
+    BOOST_CHECK_EQUAL(osmium::area::NodeRefSegment({0, {0.0, 0.0}}, {1, {4.0, 3.0}}).to_left_of(loc), false);
+
+    BOOST_CHECK_EQUAL(osmium::area::NodeRefSegment({0, {1.0, 3.0}}, {1, {2.0, 0.0}}).to_left_of(loc), true);
+    BOOST_CHECK_EQUAL(osmium::area::NodeRefSegment({0, {1.0, 3.0}}, {1, {3.0, 1.0}}).to_left_of(loc), true);
+    BOOST_CHECK_EQUAL(osmium::area::NodeRefSegment({0, {1.0, 3.0}}, {1, {3.0, 2.0}}).to_left_of(loc), false);
+
+    BOOST_CHECK_EQUAL(osmium::area::NodeRefSegment({0, {0.0, 2.0}}, {1, {2.0, 2.0}}).to_left_of(loc), false);
+
+    BOOST_CHECK_EQUAL(osmium::area::NodeRefSegment({0, {2.0, 0.0}}, {1, {2.0, 4.0}}).to_left_of(loc), true);
+//    BOOST_CHECK_EQUAL(osmium::area::NodeRefSegment({0, {2.0, 0.0}}, {1, {2.0, 2.0}}).to_left_of(loc), false);
+    BOOST_CHECK_EQUAL(osmium::area::NodeRefSegment({0, {2.0, 2.0}}, {1, {2.0, 4.0}}).to_left_of(loc), false);
+
+    BOOST_CHECK_EQUAL(osmium::area::NodeRefSegment({0, {0.0, 0.0}}, {1, {0.0, 1.0}}).to_left_of(loc), false);
+    BOOST_CHECK_EQUAL(osmium::area::NodeRefSegment({0, {1.0, 0.0}}, {1, {0.0, 1.0}}).to_left_of(loc), false);
+}
+
 BOOST_AUTO_TEST_CASE(ordering) {
     osmium::NodeRef node_ref1(1, { 1.0, 3.0 });
     osmium::NodeRef node_ref2(2, { 1.4, 2.9 });
@@ -92,7 +98,6 @@ BOOST_AUTO_TEST_CASE(ordering) {
     BOOST_CHECK(osmium::location_less()(node_ref3, node_ref4));
     BOOST_CHECK(!osmium::location_less()(node_ref1, node_ref1));
 }
-#endif
 
 BOOST_AUTO_TEST_SUITE_END()
 
