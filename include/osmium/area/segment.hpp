@@ -53,12 +53,12 @@ namespace osmium {
             osmium::NodeRef m_first;
             osmium::NodeRef m_second;
 
+        public:
+
             void swap_locations() {
                 using std::swap;
                 swap(m_first, m_second);
             }
-
-        public:
 
             NodeRefSegment() :
                 m_first(),

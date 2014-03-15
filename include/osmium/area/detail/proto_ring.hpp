@@ -53,8 +53,14 @@ namespace osmium {
              */
             class ProtoRing {
 
-                // nodes in this ring
-                std::vector<osmium::NodeRef> m_nodes {};
+            public:
+
+                typedef std::vector<osmium::area::NodeRefSegment> segments_type;
+
+            private:
+
+                // segments in this ring
+                segments_type m_segments;
 
                 bool m_outer {true};
 
@@ -63,15 +69,14 @@ namespace osmium {
 
             public:
 
-                ProtoRing(const NodeRefSegment& segment) {
-                    add_location_end(segment.first());
-                    add_location_end(segment.second());
+                ProtoRing(const NodeRefSegment& segment) :
+                    m_segments() {
+                    add_segment_end(segment);
                 }
 
-                ProtoRing(std::vector<osmium::NodeRef>::const_iterator nodes_begin, std::vector<osmium::NodeRef>::const_iterator nodes_end) {
-                    for (auto it = nodes_begin; it != nodes_end; ++it) {
-                        add_location_end(*it);
-                    }
+                ProtoRing(segments_type::const_iterator sbegin, segments_type::const_iterator send) :
+                    m_segments(std::distance(sbegin, send)) {
+                    std::copy(sbegin, send, m_segments.begin());
                 }
 
                 bool outer() const {
@@ -82,53 +87,52 @@ namespace osmium {
                     m_outer = false;
                 }
 
-                std::vector<osmium::NodeRef>& nodes() {
-                    return m_nodes;
+                segments_type& segments() {
+                    return m_segments;
                 }
 
-                const std::vector<osmium::NodeRef>& nodes() const {
-                    return m_nodes;
+                const segments_type& segments() const {
+                    return m_segments;
                 }
 
-                void remove_nodes(std::vector<osmium::NodeRef>::iterator nodes_begin, std::vector<osmium::NodeRef>::iterator nodes_end) {
-                    m_nodes.erase(nodes_begin, nodes_end);
+                void remove_segments(segments_type::iterator sbegin, segments_type::iterator send) {
+                    m_segments.erase(sbegin, send);
                 }
 
-                void add_location_end(const osmium::NodeRef& nr) {
-                    m_nodes.push_back(nr);
+                void add_segment_end(const NodeRefSegment& segment) {
+                    m_segments.push_back(segment);
                 }
 
-                void add_location_start(const osmium::NodeRef& nr) {
-                    m_nodes.insert(m_nodes.begin(), nr);
+                void add_segment_start(const NodeRefSegment& segment) {
+                    m_segments.insert(m_segments.begin(), segment);
                 }
 
-                const osmium::NodeRef& first() const {
-                    return m_nodes.front();
+                const NodeRefSegment& first_segment() const {
+                    return m_segments.front();
                 }
 
-                osmium::NodeRef& first() {
-                    return m_nodes.front();
+                NodeRefSegment& first_segment() {
+                    return m_segments.front();
                 }
 
-                const osmium::NodeRef& last() const {
-                    return m_nodes.back();
+                const NodeRefSegment& last_segment() const {
+                    return m_segments.back();
                 }
 
-                osmium::NodeRef& last() {
-                    return m_nodes.back();
+                NodeRefSegment& last_segment() {
+                    return m_segments.back();
                 }
 
                 bool closed() const {
-                    return m_nodes.front().location() == m_nodes.back().location();
+                    return m_segments.front().first().location() == m_segments.back().second().location();
                 }
 
                 int64_t sum() const {
                     int64_t sum = 0;
 
-                    for (size_t i = 0; i < m_nodes.size(); ++i) {
-                        size_t j = (i + 1) % m_nodes.size();
-                        sum += static_cast<int64_t>(m_nodes[i].location().x()) * static_cast<int64_t>(m_nodes[j].location().y()) -
-                               static_cast<int64_t>(m_nodes[j].location().x()) * static_cast<int64_t>(m_nodes[i].location().y());
+                    for (auto segment : m_segments) {
+                        sum += static_cast<int64_t>(segment.first().location().x()) * static_cast<int64_t>(segment.second().location().y()) -
+                               static_cast<int64_t>(segment.second().location().x()) * static_cast<int64_t>(segment.first().location().y());
                     }
 
                     return sum;
@@ -142,8 +146,8 @@ namespace osmium {
                     return std::abs(sum()) / 2;
                 }
 
-                void swap_nodes(ProtoRing& other) {
-                    std::swap(m_nodes, other.m_nodes);
+                void swap_segments(ProtoRing& other) {
+                    std::swap(m_segments, other.m_segments);
                 }
 
                 void add_inner_ring(ProtoRing* ring) {
@@ -157,18 +161,21 @@ namespace osmium {
                 void print(std::ostream& out) const {
                     out << "[";
                     bool first = true;
-                    for (auto& nr : nodes()) {
-                        if (!first) {
-                            out << ',';
+                    for (auto& segment : m_segments) {
+                        if (first) {
+                            out << segment.first().ref();
                         }
-                        out << nr.ref();
+                        out << ',' << segment.second().ref();
                         first = false;
                     }
                     out << "]";
                 }
 
-                void reverse_nodes() {
-                    std::reverse(m_nodes.begin(), m_nodes.end());
+                void reverse() {
+                    std::for_each(m_segments.begin(), m_segments.end(), [](NodeRefSegment& segment) {
+                        segment.swap_locations();
+                    });
+                    std::reverse(m_segments.begin(), m_segments.end());
                 }
 
                 /**
@@ -182,8 +189,13 @@ namespace osmium {
                         other.print(std::cerr);
                         std::cerr << "\n";
                     }
-                    for (auto ni = other.nodes().begin() + 1; ni != other.nodes().end(); ++ni) {
-                        add_location_end(*ni);
+                    size_t n = m_segments.size();
+                    m_segments.resize(n + other.m_segments.size());
+                    std::copy(other.m_segments.begin(), other.m_segments.end(), m_segments.begin() + n);
+                    if (debug) {
+                        std::cerr << "          result ring: ";
+                        print(std::cerr);
+                        std::cerr << "\n";
                     }
                 }
 
@@ -195,22 +207,35 @@ namespace osmium {
                         other.print(std::cerr);
                         std::cerr << "\n";
                     }
-                    for (auto ni = other.nodes().rbegin() + 1; ni != other.nodes().rend(); ++ni) {
-                        add_location_end(*ni);
+                    size_t n = m_segments.size();
+                    m_segments.resize(n + other.m_segments.size());
+                    std::transform(other.m_segments.rbegin(), other.m_segments.rend(), m_segments.begin() + n, [](NodeRefSegment segment) {
+                        segment.swap_locations();
+                        return segment;
+                    });
+                    if (debug) {
+                        std::cerr << "          result ring: ";
+                        print(std::cerr);
+                        std::cerr << "\n";
                     }
                 }
 
                 const NodeRef& min_node() const {
-                    return *std::min_element(nodes().begin(), nodes().end(), location_less());
+                    auto it = std::min_element(m_segments.begin(), m_segments.end());
+                    if (location_less()(it->first(), it->second())) {
+                        return it->first();
+                    } else {
+                        return it->second();
+                    }
                 }
 
                 bool is_in(ProtoRing* outer) {
-                    osmium::Location testpoint = nodes().front().location();
+                    osmium::Location testpoint = segments().front().first().location();
                     bool is_in = false;
 
-                    for (size_t i = 0, j = outer->nodes().size()-1; i < outer->nodes().size(); j = i++) {
-                        if (((outer->nodes()[i].location().y() > testpoint.y()) != (outer->nodes()[j].location().y() > testpoint.y())) &&
-                            (testpoint.x() < (outer->nodes()[j].location().x() - outer->nodes()[i].location().x()) * (testpoint.y() - outer->nodes()[i].location().y()) / (outer->nodes()[j].location().y() - outer->nodes()[i].location().y()) + outer->nodes()[i].location().x()) ) {
+                    for (size_t i = 0, j = outer->segments().size()-1; i < outer->segments().size(); j = i++) {
+                        if (((outer->segments()[i].first().location().y() > testpoint.y()) != (outer->segments()[j].first().location().y() > testpoint.y())) &&
+                            (testpoint.x() < (outer->segments()[j].first().location().x() - outer->segments()[i].first().location().x()) * (testpoint.y() - outer->segments()[i].first().location().y()) / (outer->segments()[j].first().location().y() - outer->segments()[i].first().location().y()) + outer->segments()[i].first().location().x()) ) {
                             is_in = !is_in;
                         }
                     }
