@@ -177,7 +177,9 @@ namespace osmium {
                 area.uid(relation.uid());
 
                 builder.add_user(relation.user());
+            }
 
+            void add_tags_to_area(osmium::osm::AreaBuilder& builder, const osmium::Relation& relation, std::vector<ProtoRing*>& outer_rings) const {
                 osmium::osm::TagListBuilder tl_builder(builder.buffer(), &builder);
                 for (const osmium::Tag& tag : relation.tags()) {
                     tl_builder.add_tag(tag.key(), tag.value());
@@ -688,6 +690,8 @@ namespace osmium {
                 }
 
                 check_inner_outer_roles(outer_rings, inner_rings);
+
+                add_tags_to_area(builder, relation, outer_rings);
 
                 add_rings_to_area(builder, outer_rings);
             }
