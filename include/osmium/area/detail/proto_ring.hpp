@@ -36,6 +36,7 @@ DEALINGS IN THE SOFTWARE.
 #include <algorithm>
 #include <cassert>
 #include <list>
+#include <set>
 #include <vector>
 
 #include <osmium/osm/noderef.hpp>
@@ -241,6 +242,12 @@ namespace osmium {
                     }
 
                     return is_in;
+                }
+
+                void get_ways(std::set<const osmium::Way*>& ways) {
+                    for (auto& segment : m_segments) {
+                        ways.insert(segment.way());
+                    }
                 }
 
             }; // class ProtoRing

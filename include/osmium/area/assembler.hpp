@@ -46,6 +46,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/ostream.hpp>
 #include <osmium/osm/relation.hpp>
+#include <osmium/tags/key_filter.hpp>
 
 #include <osmium/area/segment.hpp>
 #include <osmium/area/problem.hpp>
@@ -180,9 +181,47 @@ namespace osmium {
             }
 
             void add_tags_to_area(osmium::osm::AreaBuilder& builder, const osmium::Relation& relation, std::vector<ProtoRing*>& outer_rings) const {
-                osmium::osm::TagListBuilder tl_builder(builder.buffer(), &builder);
-                for (const osmium::Tag& tag : relation.tags()) {
-                    tl_builder.add_tag(tag.key(), tag.value());
+                osmium::tags::KeyFilter filter(true);
+                filter.add(false, "type").add(false, "created_by").add(false, "source").add(false, "note");
+
+                osmium::tags::KeyFilter::iterator fi_begin(filter, relation.tags().begin(), relation.tags().end());
+                osmium::tags::KeyFilter::iterator fi_end(filter, relation.tags().end(), relation.tags().end());
+
+                size_t count = std::distance(fi_begin, fi_end);
+
+                if (m_debug) {
+                    std::cerr << "  found " << count << " tags on relation (without ignored ones)\n";
+                }
+
+                if (count > 0) {
+                    if (m_debug) {
+                        std::cerr << "    use tags from relation\n";
+                    }
+                    osmium::osm::TagListBuilder tl_builder(builder.buffer(), &builder);
+                    for (const osmium::Tag& tag : relation.tags()) {
+                        tl_builder.add_tag(tag.key(), tag.value());
+                    }
+                } else {
+                    if (m_debug) {
+                        std::cerr << "    use tags from outer ways\n";
+                    }
+                    std::set<const osmium::Way*> ways;
+                    for (auto& ring : outer_rings) {
+                        ring->get_ways(ways);
+                    }
+                    if (ways.size() == 1) {
+                        if (m_debug) {
+                            std::cerr << "      only one outer ways\n";
+                        }
+                        osmium::osm::TagListBuilder tl_builder(builder.buffer(), &builder);
+                        for (const osmium::Tag& tag : (*ways.begin())->tags()) {
+                            tl_builder.add_tag(tag.key(), tag.value());
+                        }
+                    } else {
+                        if (m_debug) {
+                            std::cerr << "      multiple outer ways, get common tags\n";
+                        }
+                    }
                 }
             }
 
