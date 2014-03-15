@@ -53,6 +53,12 @@ namespace osmium {
             osmium::NodeRef m_first;
             osmium::NodeRef m_second;
 
+            /// Role of the member this segment was from.
+            const char* m_role;
+
+            /// Way this segment was from.
+            const osmium::Way* m_way;
+
         public:
 
             void swap_locations() {
@@ -62,12 +68,16 @@ namespace osmium {
 
             NodeRefSegment() :
                 m_first(),
-                m_second() {
+                m_second(),
+                m_role(nullptr),
+                m_way(nullptr) {
             }
 
-            NodeRefSegment(const osmium::NodeRef& nr1, const osmium::NodeRef& nr2) :
+            NodeRefSegment(const osmium::NodeRef& nr1, const osmium::NodeRef& nr2, const char* role, const osmium::Way* way) :
                 m_first(nr1),
-                m_second(nr2) {
+                m_second(nr2),
+                m_role(role),
+                m_way(way) {
                 if (nr2.location() < nr1.location()) {
                     swap_locations();
                 }
@@ -106,6 +116,18 @@ namespace osmium {
                 double by = mm.second.y();
                 double ly = loc.y();
                 return ((bx - ax)*(ly - ay) - (by - ay)*(lx - ax)) <= 0;
+            }
+
+            bool role_outer() const {
+                return !strcmp(m_role, "outer");
+            }
+
+            bool role_inner() const {
+                return !strcmp(m_role, "inner");
+            }
+
+            const osmium::Way* way() const {
+                return m_way;
             }
 
         }; // class NodeRefSegment

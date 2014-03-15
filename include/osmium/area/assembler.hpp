@@ -86,16 +86,18 @@ namespace osmium {
              * case, means smaller x coordinate, and if they are the same
              * smaller y coordinate.
              */
-            void extract_segments_from_ways(const std::vector<size_t>& members, const osmium::memory::Buffer& in_buffer) {
+            void extract_segments_from_ways(const osmium::Relation& relation, const std::vector<size_t>& members, const osmium::memory::Buffer& in_buffer) {
+                auto memit = relation.members().begin();
                 for (size_t offset : members) {
                     const osmium::Way& way = in_buffer.get<const osmium::Way>(offset);
                     osmium::NodeRef last_nr;
                     for (osmium::NodeRef nr : way.nodes()) {
                         if (last_nr.location() && last_nr != nr) {
-                            m_segments.push_back(NodeRefSegment(last_nr, nr));
+                            m_segments.push_back(NodeRefSegment(last_nr, nr, memit->role(), &way));
                         }
                         last_nr = nr;
                     }
+                    ++memit;
                 }
             }
 
@@ -502,6 +504,26 @@ namespace osmium {
                 }
             }
 
+            void check_inner_outer_roles(std::vector<ProtoRing*>& outer, std::vector<ProtoRing*>& inner) {
+                if (m_debug) {
+                    std::cerr << "    check_inner_outer_roles\n";
+                }
+                for (auto ringptr : outer) {
+                    for (auto segment : ringptr->segments()) {
+                        if (!segment.role_outer()) {
+                            std::cerr << "      segment " << segment << " from way " << segment.way()->id() << " should have role 'outer'\n";
+                        }
+                    }
+                }
+                for (auto ringptr : inner) {
+                    for (auto segment : ringptr->segments()) {
+                        if (!segment.role_inner()) {
+                            std::cerr << "      segment " << segment << " from way " << segment.way()->id() << " should have role 'inner'\n";
+                        }
+                    }
+                }
+            }
+
         public:
 
             Assembler() = default;
@@ -550,7 +572,7 @@ namespace osmium {
                 m_segments.clear();
                 m_rings.clear();
 
-                extract_segments_from_ways(members, in_buffer);
+                extract_segments_from_ways(relation, members, in_buffer);
 
                 if (m_debug) {
                     std::cerr << "\nBuild relation id()=" << relation.id() << " members.size()=" << members.size() << " segments.size()=" << m_segments.size() << "\n";
@@ -664,6 +686,8 @@ namespace osmium {
                         }
                     }
                 }
+
+                check_inner_outer_roles(outer_rings, inner_rings);
 
                 add_rings_to_area(builder, outer_rings);
             }
