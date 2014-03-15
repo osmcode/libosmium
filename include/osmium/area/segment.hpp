@@ -42,6 +42,8 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
+    class Way;
+
     namespace area {
 
         /**
