@@ -85,6 +85,14 @@ namespace osmium {
 
     }; // class Tag
 
+    inline bool operator==(const Tag& a, const Tag& b) {
+        return !std::strcmp(a.key(), b.key()) && !strcmp(a.value(), b.value());
+    }
+
+    inline bool operator<(const Tag& a, const Tag& b) {
+        return (!std::strcmp(a.key(), b.key()) && (std::strcmp(a.value(), b.value()) < 0)) || (std::strcmp(a.key(), b.key()) < 0);
+    }
+
     class TagList : public osmium::memory::Collection<Tag, osmium::item_type::tag_list> {
 
     public:
