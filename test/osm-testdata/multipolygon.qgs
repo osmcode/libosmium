@@ -1,14 +1,14 @@
 <!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
-<qgis projectname="" version="2.1.0-Master">
+<qgis projectname="" version="2.2.0-Valmiera">
     <title></title>
     <relations/>
     <mapcanvas>
         <units>degrees</units>
         <extent>
-            <xmin>0.82500024999999999</xmin>
-            <ymin>-0.35415386986094277</ymin>
-            <xmax>8.17498974999999994</xmax>
-            <ymax>3.45415386986094308</ymax>
+            <xmin>0.77500024999999972</xmin>
+            <ymin>-0.89819860988512734</ymin>
+            <xmax>10.22498975000000065</xmax>
+            <ymax>3.99819860988512765</ymax>
         </extent>
         <projections>0</projections>
         <destinationsrs>
@@ -25,7 +25,7 @@
         </destinationsrs>
         <layer_coordinate_transform_info/>
     </mapcanvas>
-    <legend updateDrawingOrder="true" activeLayer="lerrors20140228172357933">
+    <legend updateDrawingOrder="true">
         <legendlayer drawingOrder="-1" open="true" checked="Qt::Checked" name="Error Points" showFeatureCount="0">
             <filegroup open="true" hidden="false">
                 <legendlayerfile isInOverview="0" layerid="perrors20140228163658956" visible="1"/>
@@ -69,7 +69,13 @@
             <provider encoding="System">spatialite</provider>
             <previewExpression></previewExpression>
             <vectorjoins/>
-            <renderer-v2 symbollevels="0" type="singleSymbol">
+            <renderer-v2 attr="type" symbollevels="0" type="categorizedSymbol">
+                <categories>
+                    <category symbol="0" value="intersection" label="intersection"/>
+                    <category symbol="1" value="role_should_be_outer" label="role_should_be_outer"/>
+                    <category symbol="2" value="role_should_be_inner" label="role_should_be_inner"/>
+                    <category symbol="3" value="" label=""/>
+                </categories>
                 <symbols>
                     <symbol alpha="1" type="line" name="0">
                         <layer pass="0" class="SimpleLine" locked="0">
@@ -83,11 +89,79 @@
                             <prop k="offset_unit" v="MM"/>
                             <prop k="penstyle" v="solid"/>
                             <prop k="use_custom_dash" v="0"/>
-                            <prop k="width" v="1"/>
+                            <prop k="width" v="0.5"/>
+                            <prop k="width_unit" v="MM"/>
+                        </layer>
+                    </symbol>
+                    <symbol alpha="1" type="line" name="1">
+                        <layer pass="0" class="SimpleLine" locked="0">
+                            <prop k="capstyle" v="square"/>
+                            <prop k="color" v="255,122,33,255"/>
+                            <prop k="customdash" v="5;2"/>
+                            <prop k="customdash_unit" v="MM"/>
+                            <prop k="draw_inside_polygon" v="0"/>
+                            <prop k="joinstyle" v="bevel"/>
+                            <prop k="offset" v="0"/>
+                            <prop k="offset_unit" v="MM"/>
+                            <prop k="penstyle" v="solid"/>
+                            <prop k="use_custom_dash" v="0"/>
+                            <prop k="width" v="0.5"/>
+                            <prop k="width_unit" v="MM"/>
+                        </layer>
+                    </symbol>
+                    <symbol alpha="1" type="line" name="2">
+                        <layer pass="0" class="SimpleLine" locked="0">
+                            <prop k="capstyle" v="square"/>
+                            <prop k="color" v="255,122,33,255"/>
+                            <prop k="customdash" v="5;2"/>
+                            <prop k="customdash_unit" v="MM"/>
+                            <prop k="draw_inside_polygon" v="0"/>
+                            <prop k="joinstyle" v="bevel"/>
+                            <prop k="offset" v="0"/>
+                            <prop k="offset_unit" v="MM"/>
+                            <prop k="penstyle" v="dash"/>
+                            <prop k="use_custom_dash" v="0"/>
+                            <prop k="width" v="0.5"/>
+                            <prop k="width_unit" v="MM"/>
+                        </layer>
+                    </symbol>
+                    <symbol alpha="1" type="line" name="3">
+                        <layer pass="0" class="SimpleLine" locked="0">
+                            <prop k="capstyle" v="square"/>
+                            <prop k="color" v="255,0,0,255"/>
+                            <prop k="customdash" v="5;2"/>
+                            <prop k="customdash_unit" v="MM"/>
+                            <prop k="draw_inside_polygon" v="0"/>
+                            <prop k="joinstyle" v="bevel"/>
+                            <prop k="offset" v="0"/>
+                            <prop k="offset_unit" v="MM"/>
+                            <prop k="penstyle" v="solid"/>
+                            <prop k="use_custom_dash" v="0"/>
+                            <prop k="width" v="0.5"/>
                             <prop k="width_unit" v="MM"/>
                         </layer>
                     </symbol>
                 </symbols>
+                <source-symbol>
+                    <symbol alpha="1" type="line" name="0">
+                        <layer pass="0" class="SimpleLine" locked="0">
+                            <prop k="capstyle" v="square"/>
+                            <prop k="color" v="77,243,51,255"/>
+                            <prop k="customdash" v="5;2"/>
+                            <prop k="customdash_unit" v="MM"/>
+                            <prop k="draw_inside_polygon" v="0"/>
+                            <prop k="joinstyle" v="bevel"/>
+                            <prop k="offset" v="0"/>
+                            <prop k="offset_unit" v="MM"/>
+                            <prop k="penstyle" v="solid"/>
+                            <prop k="use_custom_dash" v="0"/>
+                            <prop k="width" v="0.26"/>
+                            <prop k="width_unit" v="MM"/>
+                        </layer>
+                    </symbol>
+                </source-symbol>
+                <colorramp type="randomcolors" name="[source]"/>
+                <invertedcolorramp value="0"/>
                 <rotation/>
                 <sizescale scalemethod="area"/>
             </renderer-v2>
@@ -239,10 +313,10 @@
                 <edittype labelontop="0" editable="1" type="0" name="id"/>
                 <edittype labelontop="0" editable="1" type="0" name="type"/>
             </edittypes>
-            <editform></editform>
+            <editform>.</editform>
             <editforminit></editforminit>
             <featformsuppress>0</featformsuppress>
-            <annotationform></annotationform>
+            <annotationform>.</annotationform>
             <editorlayout>generatedlayout</editorlayout>
             <excludeAttributesWMS/>
             <excludeAttributesWFS/>

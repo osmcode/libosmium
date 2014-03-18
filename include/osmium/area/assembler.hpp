@@ -546,6 +546,10 @@ namespace osmium {
             }
 
             void check_inner_outer_roles(std::vector<ProtoRing*>& outer, std::vector<ProtoRing*>& inner) {
+                if (!m_debug && !m_remember_problems) {
+                    return;
+                }
+
                 if (m_debug) {
                     std::cerr << "    check_inner_outer_roles\n";
                 }
@@ -553,6 +557,9 @@ namespace osmium {
                     for (auto segment : ringptr->segments()) {
                         if (!segment.role_outer()) {
                             std::cerr << "      segment " << segment << " from way " << segment.way()->id() << " should have role 'outer'\n";
+                            if (m_remember_problems) {
+                                m_problems.emplace_back(Problem(osmium::area::Problem::problem_type::role_should_be_outer, osmium::NodeRef(0), segment));
+                            }
                         }
                     }
                 }
@@ -560,6 +567,9 @@ namespace osmium {
                     for (auto segment : ringptr->segments()) {
                         if (!segment.role_inner()) {
                             std::cerr << "      segment " << segment << " from way " << segment.way()->id() << " should have role 'inner'\n";
+                            if (m_remember_problems) {
+                                m_problems.emplace_back(Problem(osmium::area::Problem::problem_type::role_should_be_inner, osmium::NodeRef(0), segment));
+                            }
                         }
                     }
                 }

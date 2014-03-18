@@ -46,8 +46,10 @@ namespace osmium {
         public:
 
             enum class problem_type : int {
-                intersection    = 0,
-                ring_not_closed = 1
+                intersection         = 0,
+                ring_not_closed      = 1,
+                role_should_be_outer = 2,
+                role_should_be_inner = 3
             }; // enum class problem_type
 
         public:
@@ -72,6 +74,12 @@ namespace osmium {
                         break;
                     case problem_type::ring_not_closed:
                         p = "ring_not_closed";
+                        break;
+                    case problem_type::role_should_be_outer:
+                        p = "role_should_be_outer";
+                        break;
+                    case problem_type::role_should_be_inner:
+                        p = "role_should_be_inner";
                         break;
                 }
                 return p;
