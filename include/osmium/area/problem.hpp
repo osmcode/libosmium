@@ -33,9 +33,10 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <osmium/osm/location.hpp>
 #include <osmium/osm/noderef.hpp>
-#include <osmium/osm/ostream.hpp>
-#include <osmium/area/segment.hpp>
+#include <osmium/osm/segment.hpp>
+#include <osmium/osm/types.hpp>
 
 namespace osmium {
 
@@ -52,21 +53,25 @@ namespace osmium {
                 role_should_be_inner = 3
             }; // enum class problem_type
 
-        public:
+        private:
 
-            problem_type m_problem;
-            NodeRef m_node_ref;
-            NodeRefSegment m_segment1;
-            NodeRefSegment m_segment2;
+            const problem_type m_problem;
+            const osmium::object_id_type m_object_id;
 
-            Problem(problem_type problem, const osmium::NodeRef& node_ref = osmium::NodeRef(), const NodeRefSegment& segment1 = NodeRefSegment(), const NodeRefSegment& segment2 = NodeRefSegment()) :
+        protected:
+
+            Problem(const problem_type problem, const osmium::object_id_type object_id) :
                 m_problem(problem),
-                m_node_ref(node_ref),
-                m_segment1(segment1),
-                m_segment2(segment2) {
+                m_object_id(object_id) {
             }
 
-            std::string problem() const {
+        public:
+
+            problem_type type() const {
+                return m_problem;
+            }
+
+            std::string type_string() const {
                 std::string p;
                 switch (m_problem) {
                     case problem_type::intersection:
@@ -85,7 +90,69 @@ namespace osmium {
                 return p;
             }
 
+            osmium::object_id_type object_id() const {
+                return m_object_id;
+            }
+
         }; // class Problem
+
+        class ProblemPoint : public Problem {
+
+            const osmium::object_id_type m_node_id;
+            const osmium::Location m_location;
+
+        public:
+
+            ProblemPoint(const problem_type problem, const osmium::object_id_type object_id, const osmium::object_id_type node_id, const osmium::Location location) :
+                Problem(problem, object_id),
+                m_node_id(node_id),
+                m_location(location) {
+            }
+
+            ProblemPoint(const problem_type problem, const osmium::object_id_type object_id, const osmium::NodeRef& node_ref) :
+                Problem(problem, object_id),
+                m_node_id(node_ref.ref()),
+                m_location(node_ref.location()) {
+            }
+
+            osmium::object_id_type node_id() const {
+                return m_node_id;
+            }
+
+            osmium::Location location() const {
+                return m_location;
+            }
+
+        }; // class ProblemPoint
+
+        class ProblemLine : public Problem {
+
+            const osmium::object_id_type m_way_id;
+            const osmium::Segment m_segment;
+
+        public:
+
+            ProblemLine(const problem_type problem, const osmium::object_id_type object_id, const osmium::object_id_type way_id, const osmium::Segment segment) :
+                Problem(problem, object_id),
+                m_way_id(way_id),
+                m_segment(segment) {
+            }
+
+            ProblemLine(const problem_type problem, const osmium::object_id_type object_id, const osmium::object_id_type way_id, const osmium::Location loc1, const osmium::Location loc2) :
+                Problem(problem, object_id),
+                m_way_id(way_id),
+                m_segment(loc1, loc2) {
+            }
+
+            osmium::object_id_type way_id() const {
+                return m_way_id;
+            }
+
+            const osmium::Segment& segment() const {
+                return m_segment;
+            }
+
+        }; // class ProblemLine
 
     } // namespace area
 

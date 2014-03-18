@@ -45,7 +45,7 @@
         <legendgroup embedded="1" drawingOrder="-1" open="true" checked="Qt::Checked" name="Test Framework" project="../../../osm-testdata/grid/tests.qgs"/>
     </legend>
     <projectlayers layercount="9">
-        <maplayer minimumScale="0" maximumScale="1e+08" simplifyDrawingHints="1" minLabelScale="0" maxLabelScale="1e+08" simplifyDrawingTol="1" geometry="Line" simplifyMaxScale="1" type="vector" hasScaleBasedVisibilityFlag="0" simplifyLocal="1" scaleBasedLabelVisibilityFlag="0">
+        <maplayer minimumScale="-4.65661e-10" maximumScale="1e+08" simplifyDrawingHints="1" minLabelScale="0" maxLabelScale="1e+08" simplifyDrawingTol="1" geometry="Line" simplifyMaxScale="1" type="vector" hasScaleBasedVisibilityFlag="0" simplifyLocal="1" scaleBasedLabelVisibilityFlag="0">
             <id>lerrors20140228172357933</id>
             <datasource>dbname='./multipolygon.db' table="lerrors" (GEOMETRY) sql=</datasource>
             <title></title>
@@ -67,9 +67,9 @@
                 </spatialrefsys>
             </srs>
             <provider encoding="System">spatialite</provider>
-            <previewExpression></previewExpression>
+            <previewExpression>COALESCE( "OGC_FID", '&lt;NULL>' )</previewExpression>
             <vectorjoins/>
-            <renderer-v2 attr="type" symbollevels="0" type="categorizedSymbol">
+            <renderer-v2 attr="problem_type" symbollevels="0" type="categorizedSymbol">
                 <categories>
                     <category symbol="0" value="intersection" label="intersection"/>
                     <category symbol="1" value="role_should_be_outer" label="role_should_be_outer"/>
@@ -160,8 +160,6 @@
                         </layer>
                     </symbol>
                 </source-symbol>
-                <colorramp type="randomcolors" name="[source]"/>
-                <invertedcolorramp value="0"/>
                 <rotation/>
                 <sizescale scalemethod="area"/>
             </renderer-v2>
@@ -311,7 +309,10 @@
             <edittypes>
                 <edittype labelontop="0" editable="1" type="0" name="OGC_FID"/>
                 <edittype labelontop="0" editable="1" type="0" name="id"/>
+                <edittype labelontop="0" editable="1" type="0" name="object_id"/>
+                <edittype labelontop="0" editable="1" type="0" name="problem_type"/>
                 <edittype labelontop="0" editable="1" type="0" name="type"/>
+                <edittype labelontop="0" editable="1" type="0" name="way_id"/>
             </edittypes>
             <editform>.</editform>
             <editforminit></editforminit>
@@ -521,7 +522,7 @@
             <excludeAttributesWFS/>
             <attributeactions/>
         </maplayer>
-        <maplayer minimumScale="0" maximumScale="1e+08" simplifyDrawingHints="0" minLabelScale="0" maxLabelScale="1e+08" simplifyDrawingTol="1" geometry="Point" simplifyMaxScale="1" type="vector" hasScaleBasedVisibilityFlag="0" simplifyLocal="1" scaleBasedLabelVisibilityFlag="0">
+        <maplayer minimumScale="-4.65661e-10" maximumScale="1e+08" simplifyDrawingHints="0" minLabelScale="0" maxLabelScale="1e+08" simplifyDrawingTol="1" geometry="Point" simplifyMaxScale="1" type="vector" hasScaleBasedVisibilityFlag="0" simplifyLocal="1" scaleBasedLabelVisibilityFlag="0">
             <id>perrors20140228163658956</id>
             <datasource>dbname='./multipolygon.db' table="perrors" (GEOMETRY) sql=</datasource>
             <title></title>
@@ -543,9 +544,9 @@
                 </spatialrefsys>
             </srs>
             <provider encoding="System">spatialite</provider>
-            <previewExpression></previewExpression>
+            <previewExpression>COALESCE( "OGC_FID", '&lt;NULL>' )</previewExpression>
             <vectorjoins/>
-            <renderer-v2 attr="type" symbollevels="0" type="categorizedSymbol">
+            <renderer-v2 attr="problem_type" symbollevels="0" type="categorizedSymbol">
                 <categories>
                     <category symbol="0" value="intersection" label="intersection"/>
                     <category symbol="1" value="ring_not_closed" label="ring_not_closed"/>
@@ -757,6 +758,9 @@
             <edittypes>
                 <edittype labelontop="0" editable="1" type="0" name="OGC_FID"/>
                 <edittype labelontop="0" editable="1" type="0" name="id"/>
+                <edittype labelontop="0" editable="1" type="0" name="node_id"/>
+                <edittype labelontop="0" editable="1" type="0" name="object_id"/>
+                <edittype labelontop="0" editable="1" type="0" name="problem_type"/>
                 <edittype labelontop="0" editable="1" type="0" name="type"/>
             </edittypes>
             <editform>.</editform>

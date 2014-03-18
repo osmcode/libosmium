@@ -65,8 +65,9 @@ namespace osmium {
          */
         class Assembler {
 
-            // List of problems found when assembling areas
-            std::vector<Problem> m_problems {};
+            // Problems found when assembling areas
+            std::vector<ProblemPoint> m_problem_points {};
+            std::vector<ProblemLine> m_problem_lines {};
 
             // Enables list of problems to be kept
             bool m_remember_problems { false };
@@ -79,6 +80,9 @@ namespace osmium {
 
             // The rings we are building from the way segments
             std::list<ProtoRing> m_rings;
+
+            // ID of the relation we are currently working on
+            osmium::object_id_type m_relation_id;
 
             /**
              * Extract all segments from all ways that make up this
@@ -153,7 +157,9 @@ namespace osmium {
                                         std::cerr << "  segments " << s1 << " and " << s2 << " intersecting at " << intersection << "\n";
                                     }
                                     if (m_remember_problems) {
-                                        m_problems.emplace_back(Problem(osmium::area::Problem::problem_type::intersection, osmium::NodeRef(0, intersection), s1, s2));
+                                        m_problem_points.emplace_back(ProblemPoint(osmium::area::Problem::problem_type::intersection, m_relation_id, 0, intersection));
+                                        m_problem_lines.emplace_back(ProblemLine(osmium::area::Problem::problem_type::intersection, m_relation_id, s1.way()->id(), s1.first().location(), s1.second().location()));
+                                        m_problem_lines.emplace_back(ProblemLine(osmium::area::Problem::problem_type::intersection, m_relation_id, s2.way()->id(), s2.first().location(), s2.second().location()));
                                     }
                                 }
                             }
@@ -239,8 +245,8 @@ namespace osmium {
                     if (!ring.closed()) {
                         open_rings = true;
                         if (m_remember_problems) {
-                            m_problems.emplace_back(Problem(osmium::area::Problem::problem_type::ring_not_closed, ring.first_segment().first()));
-                            m_problems.emplace_back(Problem(osmium::area::Problem::problem_type::ring_not_closed, ring.last_segment().second()));
+                            m_problem_points.emplace_back(ProblemPoint(osmium::area::Problem::problem_type::ring_not_closed, m_relation_id, ring.first_segment().first()));
+                            m_problem_points.emplace_back(ProblemPoint(osmium::area::Problem::problem_type::ring_not_closed, m_relation_id, ring.last_segment().second()));
                         }
                     }
                 }
@@ -558,7 +564,7 @@ namespace osmium {
                         if (!segment.role_outer()) {
                             std::cerr << "      segment " << segment << " from way " << segment.way()->id() << " should have role 'outer'\n";
                             if (m_remember_problems) {
-                                m_problems.emplace_back(Problem(osmium::area::Problem::problem_type::role_should_be_outer, osmium::NodeRef(0), segment));
+                                m_problem_lines.emplace_back(ProblemLine(osmium::area::Problem::problem_type::role_should_be_outer, m_relation_id, segment.way()->id(), segment.first().location(), segment.second().location()));
                             }
                         }
                     }
@@ -568,7 +574,7 @@ namespace osmium {
                         if (!segment.role_inner()) {
                             std::cerr << "      segment " << segment << " from way " << segment.way()->id() << " should have role 'inner'\n";
                             if (m_remember_problems) {
-                                m_problems.emplace_back(Problem(osmium::area::Problem::problem_type::role_should_be_inner, osmium::NodeRef(0), segment));
+                                m_problem_lines.emplace_back(ProblemLine(osmium::area::Problem::problem_type::role_should_be_inner, m_relation_id, segment.way()->id(), segment.first().location(), segment.second().location()));
                             }
                         }
                     }
@@ -603,14 +609,22 @@ namespace osmium {
              * Clear the list of problems that have been found.
              */
             void clear_problems() {
-                m_problems.clear();
+                m_problem_points.clear();
+                m_problem_lines.clear();
             }
 
             /**
-             * Get the list of problems found so far in the input data.
+             * Get the list of problem points found so far in the input data.
              */
-            const std::vector<Problem>& problems() const {
-                return m_problems;
+            const std::vector<ProblemPoint>& problem_points() const {
+                return m_problem_points;
+            }
+
+            /**
+             * Get the list of problem lines found so far in the input data.
+             */
+            const std::vector<ProblemLine>& problem_lines() const {
+                return m_problem_lines;
             }
 
             /**
@@ -622,6 +636,7 @@ namespace osmium {
             void operator()(const osmium::Relation& relation, const std::vector<size_t>& members, const osmium::memory::Buffer& in_buffer, osmium::memory::Buffer& out_buffer) {
                 m_segments.clear();
                 m_rings.clear();
+                m_relation_id = relation.id();
 
                 extract_segments_from_ways(relation, members, in_buffer);
 
