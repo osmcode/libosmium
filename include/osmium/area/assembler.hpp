@@ -126,6 +126,23 @@ namespace osmium {
             }
 
             /**
+             * Checks whether the given NodeRefs have the same location.
+             * Uses the actual location for the test, not the id. If both
+             * have the same location, but not the same id, a problem
+             * point will be added to the list of problem points (unless
+             * m_remember_problems is false).
+             */
+            bool has_same_location(const osmium::NodeRef& nr1, const osmium::NodeRef& nr2) {
+                if (nr1.location() != nr2.location()) {
+                    return false;
+                }
+                if (m_remember_problems && nr1.ref() != nr2.ref()) {
+                    m_problem_points.emplace_back(ProblemPoint(osmium::area::Problem::problem_type::duplicate_node, nr1.ref(), nr2.ref(), nr1.location()));
+                }
+                return true;
+            }
+
+            /**
              * Find intersection between segments.
              *
              * @returns true if there are intersections.
@@ -262,14 +279,14 @@ namespace osmium {
              * true.
              */
             bool possibly_combine_rings_end(ProtoRing& ring) {
-                osmium::Location location = ring.last_segment().second().location();
+                const osmium::NodeRef& nr = ring.last_segment().second();
 
                 if (m_debug) {
                     std::cerr << "      combine_rings_end\n";
                 }
                 for (auto it = m_rings.begin(); it != m_rings.end(); ++it) {
                     if (&*it != &ring && !it->closed()) {
-                        if ((location == it->first_segment().first().location())) {
+                        if (has_same_location(nr, it->first_segment().first())) {
                             if (m_debug) {
                                 std::cerr << "      ring.last=it->first\n";
                             }
@@ -277,7 +294,7 @@ namespace osmium {
                             m_rings.erase(it);
                             return true;
                         }
-                        if ((location == it->last_segment().second().location())) {
+                        if (has_same_location(nr, it->last_segment().second())) {
                             if (m_debug) {
                                 std::cerr << "      ring.last=it->last\n";
                             }
@@ -298,14 +315,14 @@ namespace osmium {
              * true.
              */
             bool possibly_combine_rings_start(ProtoRing& ring) {
-                osmium::Location location = ring.first_segment().first().location();
+                const osmium::NodeRef& nr = ring.first_segment().first();
 
                 if (m_debug) {
                     std::cerr << "      combine_rings_start\n";
                 }
                 for (auto it = m_rings.begin(); it != m_rings.end(); ++it) {
                     if (&*it != &ring && !it->closed()) {
-                        if ((location == it->last_segment().second().location())) {
+                        if (has_same_location(nr, it->last_segment().second())) {
                             if (m_debug) {
                                 std::cerr << "      ring.first=it->last\n";
                             }
@@ -314,7 +331,7 @@ namespace osmium {
                             m_rings.erase(it);
                             return true;
                         }
-                        if ((location == it->first_segment().first().location())) { // XXX
+                        if (has_same_location(nr, it->first_segment().first())) {
                             if (m_debug) {
                                 std::cerr << "      ring.first=it->first\n";
                             }
@@ -335,10 +352,10 @@ namespace osmium {
                 if (m_debug) {
                     std::cerr << "      has_closed_subring_end()\n";
                 }
-                osmium::Location loc = segment.second().location();
+                const osmium::NodeRef& nr = segment.second();
                 auto end = ring.segments().end();
                 for (auto it = ring.segments().begin() + 1; it != end - 1; ++it) {
-                    if (it->first().location() == loc) {
+                    if (has_same_location(nr, it->first())) {
                         if (m_debug) {
                             std::cerr << "        subring found at: " << *it << "\n";
                         }
@@ -363,9 +380,9 @@ namespace osmium {
                 if (m_debug) {
                     std::cerr << "      has_closed_subring_start()\n";
                 }
-                osmium::Location loc = segment.first().location();
+                const osmium::NodeRef& nr = segment.first();
                 for (auto it = ring.segments().begin() + 1; it != ring.segments().end() - 1; ++it) {
-                    if (it->second().location() == loc) {
+                    if (has_same_location(nr, it->second())) {
                         if (m_debug) {
                             std::cerr << "        subring found at: " << *it << "\n";
                         }
@@ -391,8 +408,8 @@ namespace osmium {
                 osmium::area::detail::ProtoRing::segments_type segments(ring.segments().size());
                 std::copy(ring.segments().begin(), ring.segments().end(), segments.begin());
                 std::sort(segments.begin(), segments.end());
-                auto it = std::adjacent_find(segments.begin(), segments.end(), [](const NodeRefSegment& s1, const NodeRefSegment& s2) {
-                    return s1.first().location() == s2.first().location();
+                auto it = std::adjacent_find(segments.begin(), segments.end(), [this](const NodeRefSegment& s1, const NodeRefSegment& s2) {
+                    return has_same_location(s1.first(), s2.first());
                 });
                 if (it == segments.end()) {
                     return false;
@@ -477,21 +494,21 @@ namespace osmium {
                             std::cerr << " => ring CLOSED\n";
                         }
                     } else {
-                        if (ring.last_segment().second() == segment.first() ) {
+                        if (has_same_location(ring.last_segment().second(), segment.first())) {
                             combine_rings(segment, ring, true);
                             return true;
                         }
-                        if (ring.last_segment().second() == segment.second() ) {
+                        if (has_same_location(ring.last_segment().second(), segment.second())) {
                             segment.swap_locations();
                             combine_rings(segment, ring, true);
                             return true;
                         }
-                        if (ring.first_segment().first() == segment.first() ) {
+                        if (has_same_location(ring.first_segment().first(), segment.first())) {
                             segment.swap_locations();
                             combine_rings(segment, ring, false);
                             return true;
                         }
-                        if (ring.first_segment().first() == segment.second() ) {
+                        if (has_same_location(ring.first_segment().first(), segment.second())) {
                             combine_rings(segment, ring, false);
                             return true;
                         }
@@ -534,18 +551,17 @@ namespace osmium {
 
             void check_inner_outer(ProtoRing& ring) {
                 const osmium::NodeRef& min_node = ring.min_node();
-                osmium::Location min_loc = min_node.location();
                 if (m_debug) {
                     std::cerr << "    check_inner_outer min_node=" << min_node << "\n";
                 }
                 for (auto it = m_segments.begin(); it != m_segments.end(); ++it) {
-                    if (it->first().location() == min_loc) {
+                    if (has_same_location(it->first(), min_node)) {
                         if (count_segments(m_segments.begin(), it, min_node) % 2) {
                             ring.set_inner();
                         }
                         return;
                     }
-                    if (it->second().location() == min_loc) {
+                    if (has_same_location(it->second(), min_node)) {
                         std::cerr << "SECOND loc: " << *it << "\n";
                     }
                 }
@@ -625,6 +641,16 @@ namespace osmium {
              */
             const std::vector<ProblemLine>& problem_lines() const {
                 return m_problem_lines;
+            }
+
+            void operator()(const osmium::Way& way, osmium::memory::Buffer& out_buffer) {
+                if (m_remember_problems) {
+                    if (!way.ends_have_same_id()) {
+                        m_problem_points.emplace_back(ProblemPoint(osmium::area::Problem::problem_type::duplicate_node, way.nodes().front().ref(), way.nodes().back().ref(), way.nodes().front().location()));
+                    }
+                }
+                out_buffer.add_item(way).switch_type_to_area();
+                out_buffer.commit();
             }
 
             /**

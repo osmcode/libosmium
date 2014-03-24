@@ -145,19 +145,19 @@ public:
             exit(1);
         }
 
-        OGRFieldDefn layer_perror_field_object_id("object_id", OFTReal);
-        layer_perror_field_object_id.SetWidth(10);
+        OGRFieldDefn layer_perror_field_id1("id1", OFTReal);
+        layer_perror_field_id1.SetWidth(10);
 
-        if (m_layer_perror->CreateField(&layer_perror_field_object_id) != OGRERR_NONE) {
-            std::cerr << "Creating object_id field failed.\n";
+        if (m_layer_perror->CreateField(&layer_perror_field_id1) != OGRERR_NONE) {
+            std::cerr << "Creating id1 field failed.\n";
             exit(1);
         }
 
-        OGRFieldDefn layer_perror_field_node_id("node_id", OFTReal);
-        layer_perror_field_node_id.SetWidth(10);
+        OGRFieldDefn layer_perror_field_id2("id2", OFTReal);
+        layer_perror_field_id2.SetWidth(10);
 
-        if (m_layer_perror->CreateField(&layer_perror_field_node_id) != OGRERR_NONE) {
-            std::cerr << "Creating node_id field failed.\n";
+        if (m_layer_perror->CreateField(&layer_perror_field_id2) != OGRERR_NONE) {
+            std::cerr << "Creating id2 field failed.\n";
             exit(1);
         }
 
@@ -177,19 +177,19 @@ public:
             exit(1);
         }
 
-        OGRFieldDefn layer_lerror_field_object_id("object_id", OFTReal);
-        layer_lerror_field_object_id.SetWidth(10);
+        OGRFieldDefn layer_lerror_field_id1("id1", OFTReal);
+        layer_lerror_field_id1.SetWidth(10);
 
-        if (m_layer_lerror->CreateField(&layer_lerror_field_object_id) != OGRERR_NONE) {
-            std::cerr << "Creating object_id field failed.\n";
+        if (m_layer_lerror->CreateField(&layer_lerror_field_id1) != OGRERR_NONE) {
+            std::cerr << "Creating id1 field failed.\n";
             exit(1);
         }
 
-        OGRFieldDefn layer_lerror_field_way_id("way_id", OFTReal);
-        layer_lerror_field_way_id.SetWidth(10);
+        OGRFieldDefn layer_lerror_field_id2("id2", OFTReal);
+        layer_lerror_field_id2.SetWidth(10);
 
-        if (m_layer_lerror->CreateField(&layer_lerror_field_way_id) != OGRERR_NONE) {
-            std::cerr << "Creating way_id field failed.\n";
+        if (m_layer_lerror->CreateField(&layer_lerror_field_id2) != OGRERR_NONE) {
+            std::cerr << "Creating id2 field failed.\n";
             exit(1);
         }
 
@@ -280,8 +280,8 @@ public:
             OGRFeature* feature = OGRFeature::CreateFeature(m_layer_perror->GetLayerDefn());
             std::unique_ptr<OGRPoint> ogr_point = m_ogr_factory.create_point(problem.location());
             feature->SetGeometry(ogr_point.get());
-            feature->SetField("object_id", static_cast<double>(problem.object_id()));
-            feature->SetField("node_id", static_cast<double>(problem.node_id()));
+            feature->SetField("id1", static_cast<double>(problem.id1()));
+            feature->SetField("id2", static_cast<double>(problem.id2()));
             feature->SetField("problem_type", problem.type_string().c_str());
 
             if (m_layer_perror->CreateFeature(feature) != OGRERR_NONE) {
@@ -302,8 +302,8 @@ public:
             ogr_linestring->addPoint(ogr_point2.get());
             OGRFeature* feature = OGRFeature::CreateFeature(m_layer_lerror->GetLayerDefn());
             feature->SetGeometry(ogr_linestring.get());
-            feature->SetField("object_id", static_cast<double>(problem.object_id()));
-            feature->SetField("way_id", static_cast<double>(problem.way_id()));
+            feature->SetField("id1", static_cast<double>(problem.id1()));
+            feature->SetField("id2", static_cast<double>(problem.id2()));
             feature->SetField("problem_type", problem.type_string().c_str());
 
             if (m_layer_lerror->CreateFeature(feature) != OGRERR_NONE) {

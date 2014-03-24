@@ -71,8 +71,24 @@ namespace osmium {
             return node_ref[n];
         }
 
+        const NodeRef& front() const {
+            return operator[](0);
+        }
+
+        const NodeRef& back() const {
+            return operator[](size()-1);
+        }
+
         bool is_closed() const {
-            return operator[](0).ref() == operator[](size()-1).ref();
+            return front().ref() == back().ref();
+        }
+
+        bool ends_have_same_id() const {
+            return front().ref() == back().ref();
+        }
+
+        bool ends_have_same_location() const {
+            return front().location() == back().location();
         }
 
         void switch_type_to_outer_ring() {
@@ -119,13 +135,21 @@ namespace osmium {
             return nodes().is_closed();
         }
 
+        bool ends_have_same_id() const {
+            return nodes().ends_have_same_id();
+        }
+
+        bool ends_have_same_location() const {
+            return nodes().ends_have_same_location();
+        }
+
         /**
          * Switch the type of this object to Area. This should only be done when
          * the nodes form a closed ring. This will also change the Id of the way
          * to make sure Area Ids are unique.
          */
         void switch_type_to_area() {
-            assert(is_closed());
+            assert(ends_have_same_location());
             type(osmium::item_type::area);
             nodes().switch_type_to_outer_ring();
             osmium::object_id_type new_id = positive_id() * 2;

@@ -59,8 +59,9 @@ namespace osmium {
             enum class problem_type : int {
                 intersection         = 0,
                 ring_not_closed      = 1,
-                role_should_be_outer = 2,
-                role_should_be_inner = 3
+                duplicate_node       = 2,
+                role_should_be_outer = 3,
+                role_should_be_inner = 4
             }; // enum class problem_type
 
         private:
@@ -68,17 +69,15 @@ namespace osmium {
             /// Problem type
             const problem_type m_problem;
 
-            /**
-             * ID of the object this problem was detected in. This is either
-             * a relation id or a way id.
-             */
-            const osmium::object_id_type m_object_id;
+            const osmium::object_id_type m_id1;
+            const osmium::object_id_type m_id2;
 
         protected:
 
-            Problem(const problem_type problem, const osmium::object_id_type object_id) :
+            Problem(const problem_type problem, const osmium::object_id_type id1, const osmium::object_id_type id2) :
                 m_problem(problem),
-                m_object_id(object_id) {
+                m_id1(id1),
+                m_id2(id2) {
             }
 
         public:
@@ -96,6 +95,9 @@ namespace osmium {
                     case problem_type::ring_not_closed:
                         p = "ring_not_closed";
                         break;
+                    case problem_type::duplicate_node:
+                        p = "duplicate_node";
+                        break;
                     case problem_type::role_should_be_outer:
                         p = "role_should_be_outer";
                         break;
@@ -106,33 +108,30 @@ namespace osmium {
                 return p;
             }
 
-            osmium::object_id_type object_id() const {
-                return m_object_id;
+            osmium::object_id_type id1() const {
+                return m_id1;
+            }
+
+            osmium::object_id_type id2() const {
+                return m_id2;
             }
 
         }; // class Problem
 
         class ProblemPoint : public Problem {
 
-            const osmium::object_id_type m_node_id;
             const osmium::Location m_location;
 
         public:
 
-            ProblemPoint(const problem_type problem, const osmium::object_id_type object_id, const osmium::object_id_type node_id, const osmium::Location location) :
-                Problem(problem, object_id),
-                m_node_id(node_id),
+            ProblemPoint(const problem_type problem, const osmium::object_id_type id1, const osmium::object_id_type id2, const osmium::Location location) :
+                Problem(problem, id1, id2),
                 m_location(location) {
             }
 
-            ProblemPoint(const problem_type problem, const osmium::object_id_type object_id, const osmium::NodeRef& node_ref) :
-                Problem(problem, object_id),
-                m_node_id(node_ref.ref()),
+            ProblemPoint(const problem_type problem, const osmium::object_id_type id1, const osmium::NodeRef& node_ref) :
+                Problem(problem, id1, node_ref.ref()),
                 m_location(node_ref.location()) {
-            }
-
-            osmium::object_id_type node_id() const {
-                return m_node_id;
             }
 
             osmium::Location location() const {
@@ -143,25 +142,18 @@ namespace osmium {
 
         class ProblemLine : public Problem {
 
-            const osmium::object_id_type m_way_id;
             const osmium::Segment m_segment;
 
         public:
 
-            ProblemLine(const problem_type problem, const osmium::object_id_type object_id, const osmium::object_id_type way_id, const osmium::Segment segment) :
-                Problem(problem, object_id),
-                m_way_id(way_id),
+            ProblemLine(const problem_type problem, const osmium::object_id_type id1, const osmium::object_id_type id2, const osmium::Segment segment) :
+                Problem(problem, id1, id2),
                 m_segment(segment) {
             }
 
-            ProblemLine(const problem_type problem, const osmium::object_id_type object_id, const osmium::object_id_type way_id, const osmium::Location loc1, const osmium::Location loc2) :
-                Problem(problem, object_id),
-                m_way_id(way_id),
+            ProblemLine(const problem_type problem, const osmium::object_id_type id1, const osmium::object_id_type id2, const osmium::Location loc1, const osmium::Location loc2) :
+                Problem(problem, id1, id2),
                 m_segment(loc1, loc2) {
-            }
-
-            osmium::object_id_type way_id() const {
-                return m_way_id;
             }
 
             const osmium::Segment& segment() const {

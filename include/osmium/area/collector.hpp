@@ -117,9 +117,8 @@ namespace osmium {
              * buffer and change its type to area.
              */
             void way_not_in_any_relation(const osmium::Way& way) {
-                if (way.is_closed() && way.nodes().size() > 3) { // way is closed and has enough nodes, build simple multipolygon
-                    m_output_buffer.add_item(way).switch_type_to_area();
-                    m_output_buffer.commit();
+                if (way.ends_have_same_location() && way.nodes().size() > 3) { // way is closed and has enough nodes, build simple multipolygon
+                    m_assembler(way, m_output_buffer);
                 }
             }
 
