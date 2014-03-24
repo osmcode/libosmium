@@ -42,10 +42,20 @@ namespace osmium {
 
     namespace area {
 
+        /**
+         * When assembling a multipolygon/area from a multipolygon relation
+         * or a closed way several problems can be detected. This includes
+         * intersections between lines, wrong role attributes on relation
+         * members etc. Data about these problems can be stored in the child
+         * classes of the Problem class, ProblemPoint and ProblemLine.
+         */
         class Problem {
 
         public:
 
+            /**
+             * The type of problem detected.
+             */
             enum class problem_type : int {
                 intersection         = 0,
                 ring_not_closed      = 1,
@@ -55,7 +65,13 @@ namespace osmium {
 
         private:
 
+            /// Problem type
             const problem_type m_problem;
+
+            /**
+             * ID of the object this problem was detected in. This is either
+             * a relation id or a way id.
+             */
             const osmium::object_id_type m_object_id;
 
         protected:
