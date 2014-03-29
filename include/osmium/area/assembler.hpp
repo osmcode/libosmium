@@ -234,9 +234,13 @@ namespace osmium {
                     if (m_debug) {
                         std::cerr << "    use tags from relation\n";
                     }
+
+                    // write out all tags except type=*
                     osmium::osm::TagListBuilder tl_builder(builder.buffer(), &builder);
                     for (const osmium::Tag& tag : relation.tags()) {
-                        tl_builder.add_tag(tag.key(), tag.value());
+                        if (strcmp(tag.key(), "type")) {
+                            tl_builder.add_tag(tag.key(), tag.value());
+                        }
                     }
                 } else {
                     if (m_debug) {
@@ -665,6 +669,10 @@ namespace osmium {
                 m_object_id = id;
             }
 
+            /**
+             * Assemble an area from the given way.
+             * The resulting area is put into the out_buffer.
+             */
             void operator()(const osmium::Way& way, osmium::memory::Buffer& out_buffer) {
                 init_assembler(way.id());
 
