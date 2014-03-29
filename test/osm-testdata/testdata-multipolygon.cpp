@@ -272,7 +272,7 @@ public:
         } else {
             m_out << ",\n";
         }
-        m_out << "{\n  \"test_id\": " << (area.orig_id() / 1000) << ",\n  \"area_id\": " << area.id() << ",\n  \"from_id\": " << area.orig_id() << ",\n  \"wkt\": \"";
+        m_out << "{\n  \"test_id\": " << (area.orig_id() / 1000) << ",\n  \"area_id\": " << area.id() << ",\n  \"from_id\": " << area.orig_id() << ",\n  \"from_type\": \"" << (area.from_way() ? "way" : "relation") << "\",\n  \"wkt\": \"";
         try {
             std::string wkt = m_wkt_factory.create_multipolygon(area);
             m_out << wkt << "\",\n  \"tags\": {";

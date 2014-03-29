@@ -730,6 +730,41 @@ namespace osmium {
                 add_rings_to_area(builder);
             }
 
+            const osmium::Way* has_different_tags(const ProtoRing* ring, const osmium::Area& area) {
+                const osmium::Way* way = nullptr;
+                for (auto& segment : ring->segments()) {
+                    if (!way) {
+                        way = segment.way();
+                    } else if (way != segment.way()) {
+                        if (m_debug) {
+                            std::cerr << "    inner ring is made up out of several ways\n";
+                        }
+                        return nullptr;
+                    }
+                }
+                assert(way);
+
+                osmium::tags::KeyFilter filter(true);
+                filter.add(false, "created_by").add(false, "source").add(false, "note");
+                filter.add(false, "test:id").add(false, "test:section");
+
+                osmium::tags::KeyFilter::iterator fi_begin(filter, way->tags().begin(), way->tags().end());
+                osmium::tags::KeyFilter::iterator fi_end(filter, way->tags().end(), way->tags().end());
+
+                size_t count = std::distance(fi_begin, fi_end);
+
+                if (count == 0) {
+                    if (m_debug) {
+                        std::cerr << "    inner ring has no interesting tags\n";
+                    }
+                    return nullptr;
+                }
+
+                // XXX check for same tags here
+
+                return way;
+            }
+
             /**
              * Assemble an area from the given relation and its members.
              * All members are to be found in the in_buffer at the offsets
@@ -764,6 +799,28 @@ namespace osmium {
                 add_tags_to_area(builder, relation);
 
                 add_rings_to_area(builder);
+
+                // if there are inner rings. check their tags and create
+                // extra areas if needed
+                for (const ProtoRing* ring : m_inner_rings) {
+                    if (m_debug) {
+                        std::cerr << "  check if inner ring should make extra area: " << *ring << "\n";
+                    }
+                    if (const osmium::Way* way = has_different_tags(ring, builder.object())) {
+                        if (m_debug) {
+                            std::cerr << "    inner ring has different tags\n";
+                        }
+                        osmium::osm::AreaBuilder inner_builder(out_buffer);
+                        initialize_area_from_object(inner_builder, *way, 0);
+                        osmium::osm::OuterRingBuilder ring_builder(out_buffer, &inner_builder);
+                        ring_builder.add_node_ref(ring->first_segment().first());
+                        for (auto& segment : ring->segments()) {
+                            ring_builder.add_node_ref(segment.second());
+                        }
+                        add_tags_to_area(inner_builder, *ring->segments().front().way());
+                        out_buffer.commit();
+                    }
+                }
             }
 
             bool stage2() {
