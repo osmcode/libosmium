@@ -220,6 +220,7 @@ namespace osmium {
             void add_tags_to_area(osmium::osm::AreaBuilder& builder, const osmium::Relation& relation) const {
                 osmium::tags::KeyFilter filter(true);
                 filter.add(false, "type").add(false, "created_by").add(false, "source").add(false, "note");
+                filter.add(false, "test:id").add(false, "test:section");
 
                 osmium::tags::KeyFilter::iterator fi_begin(filter, relation.tags().begin(), relation.tags().end());
                 osmium::tags::KeyFilter::iterator fi_end(filter, relation.tags().end(), relation.tags().end());

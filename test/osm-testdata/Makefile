@@ -58,16 +58,16 @@ testdata-multipolygon: testdata-multipolygon.cpp
 	$(CXX) $(CXXFLAGS) $(CXXFLAGS_WARNINGS) $(CXXFLAGS_OGR) -o $@ $< $(LDFLAGS) $(LIB_EXPAT) $(LIB_OGR)
 
 multipolygon.db: testdata-multipolygon
-	rm -f multipolygon.db multipolygon.wkt
+	rm -f multipolygon.db multipolygon-tests.json
 	./testdata-multipolygon $(TESTDATA_DIR)/grid/data/all.osm
 
-compare-geometries.out: multipolygon.wkt $(TESTDATA_DIR)/grid/data-multipolygons.wkt
-	$(TESTDATA_DIR)/bin/compare-geometries.sh $(TESTDATA_DIR)/grid/data-multipolygons.wkt multipolygon.wkt
+compare-areas.out: $(TESTDATA_DIR)/grid/data/tests.json multipolygon-tests.json
+	$(TESTDATA_DIR)/bin/compare-areas.rb $^
 
-multipolygon: multipolygon.db compare-geometries.out
+multipolygon: multipolygon.db compare-areas.out
 
 clean-multipolygon:
-	rm -f testdata-multipolygon multipolygon.db multipolygon.wkt
+	rm -f testdata-multipolygon multipolygon.db multipolygon-tests.json compare-areas.out
 
 # --------------
 

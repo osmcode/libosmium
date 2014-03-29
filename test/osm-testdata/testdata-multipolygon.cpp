@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <getopt.h>
+#include <map>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wold-style-cast"
@@ -27,6 +28,26 @@ typedef osmium::index::map::SparseMapMem<osmium::unsigned_object_id_type, osmium
 
 typedef osmium::handler::NodeLocationsForWays<index_pos_type, index_neg_type> location_handler_type;
 
+struct less_charptr {
+
+    bool operator()(const char* a, const char* b) const {
+        return std::strcmp(a, b) < 0;
+    }
+
+}; // less_charptr
+
+typedef std::map<const char*, const char*, less_charptr> tagmap_type;
+
+inline tagmap_type create_map(const osmium::TagList& taglist) {
+    tagmap_type map;
+
+    for (auto& tag : taglist) {
+        map[tag.key()] = tag.value();
+    }
+
+    return map;
+}
+
 class TestHandler : public osmium::handler::Handler {
 
     OGRDataSource* m_data_source;
@@ -41,10 +62,12 @@ class TestHandler : public osmium::handler::Handler {
 
     std::ofstream m_out;
 
+    bool m_first_out{true};
+
 public:
 
     TestHandler(const std::string& driver_name, const std::string& filename) :
-        m_out("multipolygon.wkt") {
+        m_out("multipolygon-tests.json") {
 
         OGRRegisterAll();
 
@@ -200,10 +223,10 @@ public:
             std::cerr << "Creating problem_type field failed.\n";
             exit(1);
         }
-
     }
 
     ~TestHandler() {
+        m_out << "\n]\n";
         OGRDataSource::DestroyDataSource(m_data_source);
         OGRCleanupAll();
     }
@@ -243,12 +266,30 @@ public:
     }
 
     void area(const osmium::Area& area) {
-        m_out << "test=" << (area.orig_id() / 1000) << " area=" << area.id() << " from_id=" << area.orig_id() << " ";
+        if (m_first_out) {
+            m_out << "[\n";
+            m_first_out = false;
+        } else {
+            m_out << ",\n";
+        }
+        m_out << "{\n  \"test_id\": " << (area.orig_id() / 1000) << ",\n  \"area_id\": " << area.id() << ",\n  \"from_id\": " << area.orig_id() << ",\n  \"wkt\": \"";
         try {
             std::string wkt = m_wkt_factory.create_multipolygon(area);
-            m_out << wkt << "\n";
+            m_out << wkt << "\",\n  \"tags\": {";
+
+            auto tagmap = create_map(area.tags());
+            bool first = true;
+            for (auto& tag : tagmap) {
+                if (first) {
+                    first = false;
+                } else {
+                    m_out << ", ";
+                }
+                m_out << '"' << tag.first << "\": \"" << tag.second << '"';
+            }
+            m_out << "}\n}";
         } catch (osmium::geom::geometry_error&) {
-            m_out << "INVALID\n";
+            m_out << "INVALID\"\n}";
         }
         try {
             std::unique_ptr<OGRMultiPolygon> ogr_polygon = m_ogr_factory.create_multipolygon(area);
