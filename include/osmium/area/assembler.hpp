@@ -217,6 +217,29 @@ namespace osmium {
                 }
             }
 
+            void add_common_tags(osmium::osm::TagListBuilder& tl_builder, std::set<const osmium::Way*>& ways) const {
+                std::map<std::string, size_t> counter;
+                for (const osmium::Way* way : ways) {
+                    for (auto& tag : way->tags()) {
+                        std::string kv{tag.key()};
+                        kv.append(1, '\0');
+                        kv.append(tag.value());
+                        ++counter[kv];
+                    }
+                }
+
+                size_t num_ways = ways.size();
+                for (auto& t_c : counter) {
+                    if (m_debug) {
+                        std::cerr << "        tag " << t_c.first << " is used " << t_c.second << " times in " << num_ways << " ways\n";
+                    }
+                    if (t_c.second == num_ways) {
+                        size_t len = std::strlen(t_c.first.c_str());
+                        tl_builder.add_tag(t_c.first.c_str(), t_c.first.c_str() + len + 1);
+                    }
+                }
+            }
+
             void add_tags_to_area(osmium::osm::AreaBuilder& builder, const osmium::Relation& relation) const {
                 osmium::tags::KeyFilter filter(true);
                 filter.add(false, "type").add(false, "created_by").add(false, "source").add(false, "note");
@@ -253,7 +276,7 @@ namespace osmium {
                     }
                     if (ways.size() == 1) {
                         if (m_debug) {
-                            std::cerr << "      only one outer ways\n";
+                            std::cerr << "      only one outer way\n";
                         }
                         osmium::osm::TagListBuilder tl_builder(builder.buffer(), &builder);
                         for (const osmium::Tag& tag : (*ways.begin())->tags()) {
@@ -263,6 +286,8 @@ namespace osmium {
                         if (m_debug) {
                             std::cerr << "      multiple outer ways, get common tags\n";
                         }
+                        osmium::osm::TagListBuilder tl_builder(builder.buffer(), &builder);
+                        add_common_tags(tl_builder, ways);
                     }
                 }
             }
