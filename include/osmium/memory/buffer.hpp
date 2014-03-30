@@ -257,6 +257,13 @@ namespace osmium {
             }
 
             /**
+             * Roll back changes in buffer to last committed state.
+             */
+            void rollback() {
+                m_written = m_committed;
+            }
+
+            /**
              * Clear the buffer.
              *
              * @return Number of bytes in the buffer before it was cleared.

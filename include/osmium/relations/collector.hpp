@@ -82,13 +82,13 @@ namespace osmium {
          *
          * @tparam TCollector Derived class of this class.
          *
-         * @tparam N Are we interested in member nodes?
+         * @tparam TNodes Are we interested in member nodes?
          *
-         * @tparam W Are we interested in member ways?
+         * @tparam TWays Are we interested in member ways?
          *
-         * @tparam R Are we interested in member relations?
+         * @tparam TRelations Are we interested in member relations?
          */
-        template <class TCollector, bool N, bool W, bool R>
+        template <class TCollector, bool TNodes, bool TWays, bool TRelations>
         class Collector {
 
             /**
@@ -190,11 +190,11 @@ namespace osmium {
 
                 HandlerPass2(TCollector& collector) :
                     m_collector(collector),
-                    m_want_types((N?1:0) + (W?1:0) + (R?1:0)) {
+                    m_want_types((TNodes?1:0) + (TWays?1:0) + (TRelations?1:0)) {
                 }
 
                 void node(const osmium::Node& node) const {
-                    if (N) {
+                    if (TNodes) {
                         if (! find_and_add_object(node)) {
                             m_collector.node_not_in_any_relation(node);
                         }
@@ -202,7 +202,7 @@ namespace osmium {
                 }
 
                 void way(const osmium::Way& way) const {
-                    if (W) {
+                    if (TWays) {
                         if (! find_and_add_object(way)) {
                             m_collector.way_not_in_any_relation(way);
                         }
@@ -210,7 +210,7 @@ namespace osmium {
                 }
 
                 void relation(const osmium::Relation& relation) const {
-                    if (R) {
+                    if (TRelations) {
                         if (! find_and_add_object(relation)) {
                             m_collector.relation_not_in_any_relation(relation);
                         }
@@ -278,7 +278,7 @@ namespace osmium {
         protected:
 
             std::vector<MemberMeta>& member_meta(const item_type type) {
-                return m_member_meta[static_cast<int>(type) - 1];
+                return m_member_meta[static_cast<uint32_t>(type) - 1];
             }
 
             const std::vector<RelationMeta>& relations() const {
@@ -398,9 +398,12 @@ namespace osmium {
                     ++n;
                 }
 
-                if (!relation_meta.has_all_members()) {
+                assert(offset == m_buffer.committed());
+                if (relation_meta.has_all_members()) {
+                    m_buffer.rollback();
+                } else {
                     m_buffer.commit();
-                    m_relations.push_back(relation_meta);
+                    m_relations.emplace_back(relation_meta);
 //                    std::cerr << "added relation id=" << relation.id() << "\n";
                 }
             }

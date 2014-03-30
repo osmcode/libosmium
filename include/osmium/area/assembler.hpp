@@ -109,6 +109,7 @@ namespace osmium {
             void extract_segments_from_ways(const osmium::Relation& relation, const std::vector<size_t>& members, const osmium::memory::Buffer& in_buffer) {
                 auto memit = relation.members().begin();
                 for (size_t offset : members) {
+                    assert(offset > 0);
                     const osmium::Way& way = in_buffer.get<const osmium::Way>(offset);
                     extract_segments_from_way(way, memit->role());
                     ++memit;
@@ -774,6 +775,7 @@ namespace osmium {
                 if (m_inner_outer_mismatches == 0) {
                     auto memit = relation.members().begin();
                     for (size_t offset : members) {
+                        assert(offset > 0);
                         if (!std::strcmp(memit->role(), "inner")) {
                             const osmium::Way& way = in_buffer.get<const osmium::Way>(offset);
                             if (way.is_closed() && way.tags().size() > 0) {

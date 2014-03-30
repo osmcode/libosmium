@@ -98,7 +98,7 @@ namespace osmium {
          * Used to sort a vector of MemberMeta objects and to later find
          * them using binary search.
          */
-        static inline bool operator<(const MemberMeta& a, const MemberMeta& b) {
+        inline bool operator<(const MemberMeta& a, const MemberMeta& b) {
             return a.member_id() < b.member_id();
         }
 
