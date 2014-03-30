@@ -61,13 +61,13 @@ multipolygon.db: testdata-multipolygon
 	rm -f multipolygon.db multipolygon-tests.json
 	./testdata-multipolygon $(TESTDATA_DIR)/grid/data/all.osm
 
-compare-areas.out: $(TESTDATA_DIR)/grid/data/tests.json multipolygon-tests.json
+compare-areas.log: $(TESTDATA_DIR)/grid/data/tests.json multipolygon-tests.json
 	$(TESTDATA_DIR)/bin/compare-areas.rb $^
 
-multipolygon: multipolygon.db compare-areas.out
+multipolygon: multipolygon.db compare-areas.log
 
 clean-multipolygon:
-	rm -f testdata-multipolygon multipolygon.db multipolygon-tests.json compare-areas.out
+	rm -f testdata-multipolygon multipolygon.db multipolygon-tests.json compare-areas.log
 
 # --------------
 

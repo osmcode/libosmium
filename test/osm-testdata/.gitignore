@@ -8,4 +8,4 @@ multipolygon-tests.json
 testdata-testcases
 tests-include.hpp
 tests-run.hpp
-compare-areas.out
+compare-areas.log
