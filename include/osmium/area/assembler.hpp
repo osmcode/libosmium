@@ -784,9 +784,15 @@ namespace osmium {
                                 osmium::tags::KeyFilter::iterator fi_begin(filter, way.tags().begin(), way.tags().end());
                                 osmium::tags::KeyFilter::iterator fi_end(filter, way.tags().end(), way.tags().end());
 
-                                if (std::distance(fi_begin, fi_end) > 0) {
-                                    // XXX check for same tags as area here
-                                    operator()(way, out_buffer);
+                                size_t d = std::distance(fi_begin, fi_end);
+                                if (d > 0) {
+                                    const osmium::TagList& area_tags = builder.object().tags(); // tags of the area we just built
+                                    osmium::tags::KeyFilter::iterator area_fi_begin(filter, area_tags.begin(), area_tags.end());
+                                    osmium::tags::KeyFilter::iterator area_fi_end(filter, area_tags.end(), area_tags.end());
+
+                                    if (!std::equal(fi_begin, fi_end, area_fi_begin) || d != std::distance(area_fi_begin, area_fi_end)) {
+                                        operator()(way, out_buffer);
+                                    }
                                 }
                             }
                         }
