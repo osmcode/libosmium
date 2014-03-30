@@ -92,7 +92,7 @@ namespace osmium {
             void extract_segments_from_way(const osmium::Way& way, const char* role) {
                 osmium::NodeRef last_nr;
                 for (osmium::NodeRef nr : way.nodes()) {
-                    if (last_nr.location() && last_nr != nr) {
+                    if (last_nr.location() && last_nr.location() != nr.location()) {
                         m_segments.push_back(NodeRefSegment(last_nr, nr, role, &way));
                     }
                     last_nr = nr;
@@ -807,11 +807,6 @@ namespace osmium {
                 // Now all of these segments will be sorted from bottom left
                 // to top right.
                 std::sort(m_segments.begin(), m_segments.end());
-
-                // remove empty segments
-/*                m_segments.erase(std::remove_if(m_segments.begin(), m_segments.end(), [](osmium::UndirectedSegment& segment) {
-                    return segment.first() == segment.second();
-                }));*/
 
                 find_and_erase_duplicate_segments();
 
