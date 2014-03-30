@@ -87,6 +87,8 @@ namespace osmium {
             std::vector<ProtoRing*> m_outer_rings;
             std::vector<ProtoRing*> m_inner_rings;
 
+            int m_inner_outer_mismatches { 0 };
+
             void extract_segments_from_way(const osmium::Way& way, const char* role) {
                 osmium::NodeRef last_nr;
                 for (osmium::NodeRef nr : way.nodes()) {
@@ -612,17 +614,17 @@ namespace osmium {
             }
 
             void check_inner_outer_roles() {
-                if (!m_debug && !m_remember_problems) {
-                    return;
-                }
-
                 if (m_debug) {
                     std::cerr << "    check_inner_outer_roles\n";
                 }
+
                 for (auto ringptr : m_outer_rings) {
                     for (auto segment : ringptr->segments()) {
                         if (!segment.role_outer()) {
-                            std::cerr << "      segment " << segment << " from way " << segment.way()->id() << " should have role 'outer'\n";
+                            ++m_inner_outer_mismatches;
+                            if (m_debug) {
+                                std::cerr << "      segment " << segment << " from way " << segment.way()->id() << " should have role 'outer'\n";
+                            }
                             if (m_remember_problems) {
                                 m_problem_lines.emplace_back(ProblemLine(osmium::area::Problem::problem_type::role_should_be_outer, m_object_id, segment.way()->id(), segment.first().location(), segment.second().location()));
                             }
@@ -632,7 +634,10 @@ namespace osmium {
                 for (auto ringptr : m_inner_rings) {
                     for (auto segment : ringptr->segments()) {
                         if (!segment.role_inner()) {
-                            std::cerr << "      segment " << segment << " from way " << segment.way()->id() << " should have role 'inner'\n";
+                            ++m_inner_outer_mismatches;
+                            if (m_debug) {
+                                std::cerr << "      segment " << segment << " from way " << segment.way()->id() << " should have role 'inner'\n";
+                            }
                             if (m_remember_problems) {
                                 m_problem_lines.emplace_back(ProblemLine(osmium::area::Problem::problem_type::role_should_be_inner, m_object_id, segment.way()->id(), segment.first().location(), segment.second().location()));
                             }
@@ -693,6 +698,7 @@ namespace osmium {
                 m_outer_rings.clear();
                 m_inner_rings.clear();
                 m_object_id = id;
+                m_inner_outer_mismatches = 0;
             }
 
             /**
