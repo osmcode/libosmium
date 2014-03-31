@@ -569,12 +569,21 @@ namespace osmium {
                 return false;
             }
 
-            int count_segments(std::vector<NodeRefSegment>::iterator it, std::vector<NodeRefSegment>::iterator end, const osmium::NodeRef& node_ref) {
+            int count_segments(std::vector<NodeRefSegment>::iterator it, std::vector<NodeRefSegment>::iterator end, const osmium::NodeRef& node_ref, const ProtoRing& ring) {
                 if (m_debug) {
                     std::cerr << "    count_segments for " << node_ref << "\n";
                 }
                 int count = 0;
+                int above = 0;
                 while (it != end) {
+                    if (it->first().location().x() > node_ref.location().x()) {
+                        break;
+                    }
+                    if (ring.contains(*it)) {
+                        ++it;
+                        continue;
+                    }
+
                     if (m_debug) {
                         std::cerr << "      segments for count: " << *it;
                     }
@@ -588,11 +597,22 @@ namespace osmium {
                             std::cerr << " not counted\n";
                         }
                     }
+                    if (it->first().location() == node_ref.location()) {
+                        if (it->second().location().y() > node_ref.location().y()) {
+                            ++above;
+                        }
+                    }
+                    if (it->second().location() == node_ref.location()) {
+                        if (it->first().location().y() > node_ref.location().y()) {
+                            ++above;
+                        }
+                    }
                     ++it;
                 }
                 if (m_debug) {
-                    std::cerr << "      count=" << count << "\n";
+                    std::cerr << "      count=" << count << " above=" << above << "\n";
                 }
+                count += above % 2;
                 return count;
             }
 
@@ -601,16 +621,8 @@ namespace osmium {
                 if (m_debug) {
                     std::cerr << "    check_inner_outer min_node=" << min_node << "\n";
                 }
-                for (auto it = m_segments.begin(); it != m_segments.end(); ++it) {
-                    if (has_same_location(it->first(), min_node)) {
-                        if (count_segments(m_segments.begin(), it, min_node) % 2) {
-                            ring.set_inner();
-                        }
-                        return;
-                    }
-                    if (has_same_location(it->second(), min_node)) {
-                        std::cerr << "SECOND loc: " << *it << "\n";
-                    }
+                if (count_segments(m_segments.begin(), m_segments.end(), min_node, ring) % 2) {
+                    ring.set_inner();
                 }
             }
 

@@ -250,6 +250,15 @@ namespace osmium {
                     }
                 }
 
+                bool contains(const osmium::area::NodeRefSegment& segment) const {
+                    for (auto& s : m_segments) {
+                        if (s == segment || (s.first() == segment.second() && s.second() == segment.first())) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+
             }; // class ProtoRing
 
             inline std::ostream& operator<<(std::ostream& out, const ProtoRing& ring) {

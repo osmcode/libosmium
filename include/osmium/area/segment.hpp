@@ -104,19 +104,27 @@ namespace osmium {
             }
 
             bool to_left_of(const osmium::Location loc) const {
-                auto mm = std::minmax(first().location(), second().location(), [](const osmium::Location a, const osmium::Location b){
-                    return a.y() < b.y();
-                });
-                auto y = loc.y();
-                if (mm.first.y() >= y || y > mm.second.y() || first().location().x() > loc.x()) {
+//                std::cerr << "segment " << first() << "--" << second() << " to_left_of(" << loc << "\n";
+
+                if (first().location() == loc || second().location() == loc) {
                     return false;
                 }
-                double ax = mm.first.x();
-                double bx = mm.second.x();
-                double lx = loc.x();
-                double ay = mm.first.y();
-                double by = mm.second.y();
-                double ly = loc.y();
+
+                auto mm = std::minmax(first().location(), second().location(), [](const osmium::Location a, const osmium::Location b) {
+                    return a.y() < b.y();
+                });
+
+                if (mm.first.y() >= loc.y() || mm.second.y() < loc.y() || first().location().x() > loc.x()) {
+//                    std::cerr << "  false\n";
+                    return false;
+                }
+
+                int64_t ax = mm.first.x();
+                int64_t bx = mm.second.x();
+                int64_t lx = loc.x();
+                int64_t ay = mm.first.y();
+                int64_t by = mm.second.y();
+                int64_t ly = loc.y();
                 return ((bx - ax)*(ly - ay) - (by - ay)*(lx - ax)) <= 0;
             }
 

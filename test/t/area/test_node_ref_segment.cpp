@@ -74,11 +74,25 @@ BOOST_AUTO_TEST_CASE(to_left_of) {
     BOOST_CHECK_EQUAL(osmium::area::NodeRefSegment({0, {0.0, 2.0}}, {1, {2.0, 2.0}}, nullptr, nullptr).to_left_of(loc), false);
 
     BOOST_CHECK_EQUAL(osmium::area::NodeRefSegment({0, {2.0, 0.0}}, {1, {2.0, 4.0}}, nullptr, nullptr).to_left_of(loc), true);
-//    BOOST_CHECK_EQUAL(osmium::area::NodeRefSegment({0, {2.0, 0.0}}, {1, {2.0, 2.0}}, nullptr, nullptr).to_left_of(loc), false);
+    BOOST_CHECK_EQUAL(osmium::area::NodeRefSegment({0, {2.0, 0.0}}, {1, {2.0, 2.0}}, nullptr, nullptr).to_left_of(loc), false);
     BOOST_CHECK_EQUAL(osmium::area::NodeRefSegment({0, {2.0, 2.0}}, {1, {2.0, 4.0}}, nullptr, nullptr).to_left_of(loc), false);
 
     BOOST_CHECK_EQUAL(osmium::area::NodeRefSegment({0, {0.0, 0.0}}, {1, {0.0, 1.0}}, nullptr, nullptr).to_left_of(loc), false);
     BOOST_CHECK_EQUAL(osmium::area::NodeRefSegment({0, {1.0, 0.0}}, {1, {0.0, 1.0}}, nullptr, nullptr).to_left_of(loc), false);
+
+    BOOST_CHECK_EQUAL(osmium::area::NodeRefSegment({0, {0.0, 0.0}}, {1, {1.0, 3.0}}, nullptr, nullptr).to_left_of(loc), true);
+    BOOST_CHECK_EQUAL(osmium::area::NodeRefSegment({0, {0.0, 2.0}}, {1, {2.0, 0.0}}, nullptr, nullptr).to_left_of(loc), true);
+    BOOST_CHECK_EQUAL(osmium::area::NodeRefSegment({0, {0.0, 2.0}}, {1, {3.0, 4.0}}, nullptr, nullptr).to_left_of(loc), false);
+
+    BOOST_CHECK_EQUAL(osmium::area::NodeRefSegment({0, {1.0, 0.0}}, {1, {1.0, 2.0}}, nullptr, nullptr).to_left_of(loc), true);
+    BOOST_CHECK_EQUAL(osmium::area::NodeRefSegment({0, {0.0, 2.0}}, {1, {1.0, 2.0}}, nullptr, nullptr).to_left_of(loc), false);
+    BOOST_CHECK_EQUAL(osmium::area::NodeRefSegment({0, {0.0, 2.0}}, {1, {1.0, 4.0}}, nullptr, nullptr).to_left_of(loc), false);
+
+    BOOST_CHECK_EQUAL(osmium::area::NodeRefSegment({0, {0.0, 0.0}}, {1, {0.0, 2.0}}, nullptr, nullptr).to_left_of(loc), true);
+    BOOST_CHECK_EQUAL(osmium::area::NodeRefSegment({0, {0.0, 2.0}}, {1, {4.0, 4.0}}, nullptr, nullptr).to_left_of(loc), false);
+
+    BOOST_CHECK_EQUAL(osmium::area::NodeRefSegment({0, {0.0, 1.0}}, {1, {2.0, 2.0}}, nullptr, nullptr).to_left_of(loc), false);
+    BOOST_CHECK_EQUAL(osmium::area::NodeRefSegment({0, {2.0, 2.0}}, {1, {4.0, 0.0}}, nullptr, nullptr).to_left_of(loc), false);
 }
 
 BOOST_AUTO_TEST_CASE(ordering) {
