@@ -569,59 +569,50 @@ namespace osmium {
                 return false;
             }
 
-            int count_segments(std::vector<NodeRefSegment>::iterator it, std::vector<NodeRefSegment>::iterator end, const osmium::NodeRef& node_ref, const ProtoRing& ring) {
-                if (m_debug) {
-                    std::cerr << "    count_segments for " << node_ref << "\n";
-                }
-                int count = 0;
-                int above = 0;
-                while (it != end) {
-                    if (it->first().location().x() > node_ref.location().x()) {
-                        break;
-                    }
-                    if (ring.contains(*it)) {
-                        ++it;
-                        continue;
-                    }
-
-                    if (m_debug) {
-                        std::cerr << "      segments for count: " << *it;
-                    }
-                    if (it->to_left_of(node_ref.location())) {
-                        ++count;
-                        if (m_debug) {
-                            std::cerr << " counted\n";
-                        }
-                    } else {
-                        if (m_debug) {
-                            std::cerr << " not counted\n";
-                        }
-                    }
-                    if (it->first().location() == node_ref.location()) {
-                        if (it->second().location().y() > node_ref.location().y()) {
-                            ++above;
-                        }
-                    }
-                    if (it->second().location() == node_ref.location()) {
-                        if (it->first().location().y() > node_ref.location().y()) {
-                            ++above;
-                        }
-                    }
-                    ++it;
-                }
-                if (m_debug) {
-                    std::cerr << "      count=" << count << " above=" << above << "\n";
-                }
-                count += above % 2;
-                return count;
-            }
-
             void check_inner_outer(ProtoRing& ring) {
                 const osmium::NodeRef& min_node = ring.min_node();
                 if (m_debug) {
                     std::cerr << "    check_inner_outer min_node=" << min_node << "\n";
                 }
-                if (count_segments(m_segments.begin(), m_segments.end(), min_node, ring) % 2) {
+
+                int count = 0;
+                int above = 0;
+
+                for (auto it = m_segments.begin(); it != m_segments.end() && it->first().location().x() <= min_node.location().x(); ++it) {
+                    if (!ring.contains(*it)) {
+                        if (m_debug) {
+                            std::cerr << "      segments for count: " << *it;
+                        }
+                        if (it->to_left_of(min_node.location())) {
+                            ++count;
+                            if (m_debug) {
+                                std::cerr << " counted\n";
+                            }
+                        } else {
+                            if (m_debug) {
+                                std::cerr << " not counted\n";
+                            }
+                        }
+                        if (it->first().location() == min_node.location()) {
+                            if (it->second().location().y() > min_node.location().y()) {
+                                ++above;
+                            }
+                        }
+                        if (it->second().location() == min_node.location()) {
+                            if (it->first().location().y() > min_node.location().y()) {
+                                ++above;
+                            }
+                        }
+                    }
+                }
+
+                if (m_debug) {
+                    std::cerr << "      count=" << count << " above=" << above << "\n";
+                }
+
+                count += above % 2;
+
+                if (count % 2) {
                     ring.set_inner();
                 }
             }
