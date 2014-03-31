@@ -28,11 +28,12 @@ typedef osmium::handler::NodeLocationsForWays<index_pos_type, index_neg_type> lo
 int main(int argc, char* argv[]) {
 
     if (argc != 2) {
-        std::cerr << "Usage: testdata-read TEST-DIRECTORY\n";
+        std::cerr << "Usage: testdata-testcases TEST-DIRECTORY\n";
         exit(3);
     }
 
     std::string directory = argv[1];
+    std::cout << "Running tests from '" << directory << "'\n";
 
 #include "tests-run.hpp"
 
