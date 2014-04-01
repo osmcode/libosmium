@@ -51,6 +51,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/area/segment.hpp>
 #include <osmium/area/problem.hpp>
 #include <osmium/area/detail/proto_ring.hpp>
+#include <osmium/area/detail/segment_list.hpp>
 
 namespace osmium {
 
@@ -76,7 +77,7 @@ namespace osmium {
             bool m_debug { false };
 
             // The way segments
-            std::vector<NodeRefSegment> m_segments;
+            osmium::area::detail::SegmentList m_segment_list;
 
             // The rings we are building from the way segments
             std::list<ProtoRing> m_rings;
@@ -88,58 +89,6 @@ namespace osmium {
             std::vector<ProtoRing*> m_inner_rings;
 
             int m_inner_outer_mismatches { 0 };
-
-            /**
-             * Extract segments from a way. Segments are the connection between
-             * two nodes and they all have their smaller coordinate at the
-             * beginning of the segment. Smaller, in this case, means smaller x
-             * coordinate, and if they are the same smaller y coordinate.
-             *
-             * Segments connecting two nodes with the same location (ie same
-             * node or different node with same location) are removed.
-             */
-            void extract_segments_from_way(const osmium::Way& way, const char* role) {
-                osmium::NodeRef last_nr;
-                for (const osmium::NodeRef& nr : way.nodes()) {
-                    if (last_nr.location() && last_nr.location() != nr.location()) {
-                        m_segments.emplace_back(NodeRefSegment(last_nr, nr, role, &way));
-                    }
-                    last_nr = nr;
-                }
-            }
-
-            /**
-             * Extract all segments from all ways that make up this
-             * multipolygon relation.
-             */
-            void extract_segments_from_ways(const osmium::Relation& relation, const std::vector<size_t>& members, const osmium::memory::Buffer& in_buffer) {
-                auto member_it = relation.members().begin();
-                for (size_t offset : members) {
-                    assert(offset > 0);
-                    const osmium::Way& way = in_buffer.get<const osmium::Way>(offset);
-                    extract_segments_from_way(way, member_it->role());
-                    ++member_it;
-                }
-            }
-
-            /**
-             * Find duplicate segments (ie same start and end point) and
-             * remove them. This will always remove pairs of the same
-             * segment. So if there are three, for instance, two will be
-             * removed and one will be left.
-             */
-            void find_and_erase_duplicate_segments() {
-                while (true) {
-                    std::vector<NodeRefSegment>::iterator found = std::adjacent_find(m_segments.begin(), m_segments.end());
-                    if (found == m_segments.end()) {
-                        return;
-                    }
-                    if (m_debug) {
-                        std::cerr << "  erase duplicate segment: " << *found << "\n";
-                    }
-                    m_segments.erase(found, found+2);
-                }
-            }
 
             /**
              * Checks whether the given NodeRefs have the same location.
@@ -164,15 +113,15 @@ namespace osmium {
              * @returns true if there are intersections.
              */
             bool find_intersections() {
-                if (m_segments.begin() == m_segments.end()) {
+                if (m_segment_list.empty()) {
                     return false;
                 }
 
                 bool found_intersections = false;
 
-                for (auto it1 = m_segments.begin(); it1 != m_segments.end()-1; ++it1) {
+                for (auto it1 = m_segment_list.begin(); it1 != m_segment_list.end()-1; ++it1) {
                     const NodeRefSegment& s1 = *it1;
-                    for (auto it2 = it1+1; it2 != m_segments.end(); ++it2) {
+                    for (auto it2 = it1+1; it2 != m_segment_list.end(); ++it2) {
                         const NodeRefSegment& s2 = *it2;
                         if (s1 == s2) {
                             if (m_debug) {
@@ -584,7 +533,7 @@ namespace osmium {
                 int count = 0;
                 int above = 0;
 
-                for (auto it = m_segments.begin(); it != m_segments.end() && it->first().location().x() <= min_node.location().x(); ++it) {
+                for (auto it = m_segment_list.begin(); it != m_segment_list.end() && it->first().location().x() <= min_node.location().x(); ++it) {
                     if (!ring.contains(*it)) {
                         if (m_debug) {
                             std::cerr << "      segments for count: " << *it;
@@ -668,6 +617,7 @@ namespace osmium {
              */
             void enable_debug_output(bool debug=true) {
                 m_debug = debug;
+                m_segment_list.enable_debug_output(debug);
             }
 
             /**
@@ -703,7 +653,7 @@ namespace osmium {
             }
 
             void init_assembler(osmium::object_id_type id) {
-                m_segments.clear();
+                m_segment_list.clear();
                 m_rings.clear();
                 m_outer_rings.clear();
                 m_inner_rings.clear();
@@ -724,10 +674,10 @@ namespace osmium {
                     }
                 }
 
-                extract_segments_from_way(way, "outer");
+                m_segment_list.extract_segments_from_way(way, "outer");
 
                 if (m_debug) {
-                    std::cerr << "\nBuild way id()=" << way.id() << " segments.size()=" << m_segments.size() << "\n";
+                    std::cerr << "\nBuild way id()=" << way.id() << " segments.size()=" << m_segment_list.size() << "\n";
                 }
 
                 // Now create the Area object and add the attributes and tags
@@ -755,10 +705,10 @@ namespace osmium {
             void operator()(const osmium::Relation& relation, const std::vector<size_t>& members, const osmium::memory::Buffer& in_buffer, osmium::memory::Buffer& out_buffer) {
                 init_assembler(relation.id());
 
-                extract_segments_from_ways(relation, members, in_buffer);
+                m_segment_list.extract_segments_from_ways(relation, members, in_buffer);
 
                 if (m_debug) {
-                    std::cerr << "\nBuild relation id()=" << relation.id() << " members.size()=" << members.size() << " segments.size()=" << m_segments.size() << "\n";
+                    std::cerr << "\nBuild relation id()=" << relation.id() << " members.size()=" << members.size() << " segments.size()=" << m_segment_list.size() << "\n";
                 }
 
                 // Now create the Area object and add the attributes and tags
@@ -815,9 +765,9 @@ namespace osmium {
             bool stage2() {
                 // Now all of these segments will be sorted from bottom left
                 // to top right.
-                std::sort(m_segments.begin(), m_segments.end());
+                m_segment_list.sort();
 
-                find_and_erase_duplicate_segments();
+                m_segment_list.erase_duplicate_segments();
 
                 // Now we look for segments crossing each other. If there are
                 // any, the multipolygon is invalid.
@@ -830,15 +780,15 @@ namespace osmium {
                 // Now iterator over all segments and add them to rings. Each segment
                 // is tacked on to either end of an existing ring if possible, or a
                 // new ring is started with it.
-                for (auto it = m_segments.begin(); it != m_segments.end(); ++it) {
+                for (const auto& segment : m_segment_list) {
                     if (m_debug) {
-                        std::cerr << "  checking segment " << *it << "\n";
+                        std::cerr << "  checking segment " << segment << "\n";
                     }
-                    if (!add_to_existing_ring(*it)) {
+                    if (!add_to_existing_ring(segment)) {
                         if (m_debug) {
-                            std::cerr << "    new ring for segment " << *it << "\n";
+                            std::cerr << "    new ring for segment " << segment << "\n";
                         }
-                        m_rings.emplace_back(ProtoRing(*it));
+                        m_rings.emplace_back(ProtoRing(segment));
                     }
                 }
 

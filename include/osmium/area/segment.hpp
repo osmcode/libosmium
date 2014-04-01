@@ -47,8 +47,11 @@ namespace osmium {
     namespace area {
 
         /**
-         * This helper class for the Assembler class models a segment
-         * (connection between two nodes).
+         * This helper class for the Assembler class models a segment.
+         * Segments are the connection between
+         * two nodes and they all have their smaller coordinate at the
+         * beginning of the segment. Smaller, in this case, means smaller x
+         * coordinate, and if they are the same smaller y coordinate.
          */
         class NodeRefSegment : boost::less_than_comparable<NodeRefSegment> {
 
