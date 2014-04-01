@@ -89,11 +89,20 @@ namespace osmium {
 
             int m_inner_outer_mismatches { 0 };
 
+            /**
+             * Extract segments from a way. Segments are the connection between
+             * two nodes and they all have their smaller coordinate at the
+             * beginning of the segment. Smaller, in this case, means smaller x
+             * coordinate, and if they are the same smaller y coordinate.
+             *
+             * Segments connecting two nodes with the same location (ie same
+             * node or different node with same location) are removed.
+             */
             void extract_segments_from_way(const osmium::Way& way, const char* role) {
                 osmium::NodeRef last_nr;
-                for (osmium::NodeRef nr : way.nodes()) {
+                for (const osmium::NodeRef& nr : way.nodes()) {
                     if (last_nr.location() && last_nr.location() != nr.location()) {
-                        m_segments.push_back(NodeRefSegment(last_nr, nr, role, &way));
+                        m_segments.emplace_back(NodeRefSegment(last_nr, nr, role, &way));
                     }
                     last_nr = nr;
                 }
@@ -101,18 +110,15 @@ namespace osmium {
 
             /**
              * Extract all segments from all ways that make up this
-             * multipolygon relation. The segments all have their smaller
-             * coordinate at the beginning of the segment. Smaller, in this
-             * case, means smaller x coordinate, and if they are the same
-             * smaller y coordinate.
+             * multipolygon relation.
              */
             void extract_segments_from_ways(const osmium::Relation& relation, const std::vector<size_t>& members, const osmium::memory::Buffer& in_buffer) {
-                auto memit = relation.members().begin();
+                auto member_it = relation.members().begin();
                 for (size_t offset : members) {
                     assert(offset > 0);
                     const osmium::Way& way = in_buffer.get<const osmium::Way>(offset);
-                    extract_segments_from_way(way, memit->role());
-                    ++memit;
+                    extract_segments_from_way(way, member_it->role());
+                    ++member_it;
                 }
             }
 
@@ -126,7 +132,7 @@ namespace osmium {
                 while (true) {
                     std::vector<NodeRefSegment>::iterator found = std::adjacent_find(m_segments.begin(), m_segments.end());
                     if (found == m_segments.end()) {
-                        break;
+                        return;
                     }
                     if (m_debug) {
                         std::cerr << "  erase duplicate segment: " << *found << "\n";
