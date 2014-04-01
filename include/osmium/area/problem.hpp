@@ -1,5 +1,5 @@
-#ifndef OSMIUM_AREA_PROBLEM
-#define OSMIUM_AREA_PROBLEM
+#ifndef OSMIUM_AREA_PROBLEM_HPP
+#define OSMIUM_AREA_PROBLEM_HPP
 
 /*
 
@@ -166,4 +166,4 @@ namespace osmium {
 
 } // namespace osmium
 
-#endif // OSMIUM_AREA_PROBLEM
+#endif // OSMIUM_AREA_PROBLEM_HPP

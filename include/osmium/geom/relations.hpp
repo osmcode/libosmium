@@ -1,5 +1,5 @@
-#ifndef OSMIUM_GEOM_RELATIONS
-#define OSMIUM_GEOM_RELATIONS
+#ifndef OSMIUM_GEOM_RELATIONS_HPP
+#define OSMIUM_GEOM_RELATIONS_HPP
 
 /*
 
@@ -54,4 +54,4 @@ namespace osmium {
 
 } // namespace osmium
 
-#endif // OSMIUM_GEOM_RELATIONS
+#endif // OSMIUM_GEOM_RELATIONS_HPP

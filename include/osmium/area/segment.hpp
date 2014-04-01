@@ -1,5 +1,5 @@
-#ifndef OSMIUM_AREA_SEGMENT
-#define OSMIUM_AREA_SEGMENT
+#ifndef OSMIUM_AREA_SEGMENT_HPP
+#define OSMIUM_AREA_SEGMENT_HPP
 
 /*
 
@@ -229,4 +229,4 @@ namespace osmium {
 
 } // namespace osmium
 
-#endif // OSMIUM_AREA_SEGMENT
+#endif // OSMIUM_AREA_SEGMENT_HPP
