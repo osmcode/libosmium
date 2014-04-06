@@ -58,7 +58,7 @@ namespace osmium {
             friend class GeometryFactory;
 
             /// OSM data always uses SRID 4326 (WGS84).
-            static constexpr int srid = 4326;
+            static constexpr uint32_t srid = 4326;
 
         public:
 
@@ -110,7 +110,7 @@ namespace osmium {
             void str_push(std::string& str, T data) {
                 size_t size = str.size();
                 str.resize(size + sizeof(T));
-                std::memcpy(const_cast<char *>(&str[size]), reinterpret_cast<char*>(&data), sizeof(data));
+                std::memcpy(const_cast<char *>(&str[size]), reinterpret_cast<char*>(&data), sizeof(T));
             }
 
             std::string convert_to_hex(std::string& str) {
@@ -172,7 +172,7 @@ namespace osmium {
                 } else {
                     std::string data;
                     std::swap(data, m_data);
-                    memcpy(&data[5], &m_points, sizeof(uint32_t));
+                    memcpy(&data[5 + (m_ewkb ? 4 : 0)], &m_points, sizeof(uint32_t));
 
                     if (m_hex) {
                         return convert_to_hex(data);

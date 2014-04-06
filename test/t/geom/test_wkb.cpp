@@ -69,6 +69,25 @@ BOOST_AUTO_TEST_CASE(linestring) {
     }
 }
 
+BOOST_AUTO_TEST_CASE(linestring_ewkb) {
+    osmium::geom::WKBFactory factory(true);
+    factory.set_hex_mode();
+
+    osmium::memory::Buffer buffer(10000);
+    osmium::Way& way = buffer_add_way(buffer,
+        "foo",
+        {},
+        {
+            {1, {3.2, 4.2}},
+            {3, {3.5, 4.7}},
+            {4, {3.5, 4.7}},
+            {2, {3.6, 4.9}}
+        });
+
+    std::string ewkb {factory.create_linestring(way.nodes())};
+    BOOST_CHECK_EQUAL(std::string{"0102000020e6100000030000009a99999999990940cdcccccccccc10400000000000000c40cdcccccccccc1240cdcccccccccc0c409a99999999991340"}, ewkb);
+}
+
 BOOST_AUTO_TEST_CASE(empty_linestring) {
     osmium::geom::WKBFactory factory;
     factory.set_hex_mode();
