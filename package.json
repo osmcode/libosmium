@@ -7,7 +7,7 @@
     "contributors": [
         "Jochen Topf <joto>"
     ],
-    "version": "0.1.1",
+    "version": "0.1.2",
     "main": "./lib/osmium.js",
     "bugs": {
         "email": "dane@mapbox.com",
@@ -29,7 +29,7 @@
         "host": "https://node-osmium.s3.amazonaws.com"
     },
     "dependencies": {
-        "node-pre-gyp": "~0.5.1"
+        "node-pre-gyp": "~0.5.10"
     },
     "bundledDependencies":["node-pre-gyp"],
     "devDependencies": {

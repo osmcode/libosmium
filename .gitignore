@@ -1,5 +1,5 @@
 node_modules
-lib/osmium.node
+lib/binding
 .DS_Store
 build
 berlin-latest.osm.pbf
