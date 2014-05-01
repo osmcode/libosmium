@@ -69,8 +69,8 @@ namespace osmium {
                 SegmentList(const SegmentList& other) = delete;
                 SegmentList(SegmentList&& other) = delete;
 
-                const SegmentList& operator=(const SegmentList& other) = delete;
-                const SegmentList& operator=(SegmentList&& other) = delete;
+                SegmentList& operator=(const SegmentList& other) = delete;
+                SegmentList& operator=(SegmentList&& other) = delete;
 
                 /// The number of segments in the list.
                 size_t size() const {
