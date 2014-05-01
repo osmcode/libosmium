@@ -12,7 +12,7 @@ Provides a bindings to the [libosmium](https://github.com/osmcode/libosmium) C++
 
 # Installing
 
-By default, binaries are provided and no external depedencies and no compile is needed.
+By default, binaries are provided and no external depedencies or compile is needed.
 
 Just do:
 
