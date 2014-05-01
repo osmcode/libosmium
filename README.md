@@ -73,26 +73,24 @@ Set depedencies up on Ubuntu Precise (12.04) like:
     sudo apt-add-repository --yes ppa:mapnik/boost
     sudo apt-add-repository --yes ppa:ubuntu-toolchain-r/test
     sudo apt-get -y update
-    sudo apt-get -y install git gcc-4.7 g++-4.7 build-essential nodejs libboost-dev zlib1g-dev protobuf-compiler libprotobuf-lite7 libprotobuf-dev libexpat1-dev libsparsehash-dev
-    export CC=gcc-4.7
-    export CXX=g++-4.7
+    sudo apt-get -y install git gcc-4.8 g++-4.8 build-essential nodejs libboost-dev zlib1g-dev protobuf-compiler libprotobuf-lite7 libprotobuf-dev libexpat1-dev libsparsehash-dev
+    export CC=gcc-4.8
+    export CXX=g++-4.8
     git clone https://github.com/scrosby/OSM-binary.git
     cd OSM-binary/src
     make && sudo make install
 
-Set depedencies up on OS X like:
+Set dependencies up on OS X like:
 
     git clone https://github.com/mapnik/mapnik-packaging.git
     cd mapnik-packaging/osx
-    # open the settings and make `export CXX11=true`
     export CXX11=true
     source MacOSX.sh
-    ./scripts/download_deps.sh
+    ./scripts/build_bzip2.sh
+    ./scripts/build_expat.sh
     ./scripts/build_google_sparsetable.sh
-    ./scripts/build_icu.sh
-    ./scripts/build_boost.sh
+    ./scripts/build_boost.sh --with-test --with-program_options
     ./scripts/build_protobuf.sh
-    ./scripts/build_node.sh
     ./scripts/build_osm-pbf.sh
     # NOTE: in the same terminal then run the build commands
     # Or from a different terminal re-run `source MacOSX.sh`
