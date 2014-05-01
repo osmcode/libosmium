@@ -12,8 +12,10 @@
           },
           'Release': {
               'xcode_settings': {
-                'GCC_OPTIMIZATION_LEVEL': 's',
-                'OTHER_CPLUSPLUSFLAGS':['-gline-tables-only','-fno-omit-frame-pointer'],
+                'GCC_OPTIMIZATION_LEVEL': '3',
+                'GCC_GENERATE_DEBUGGING_SYMBOLS': 'NO',
+                'DEAD_CODE_STRIPPING': 'YES',
+                'GCC_INLINES_ARE_PRIVATE_EXTERN': 'YES'
               },
               'ldflags': [
                     '-Wl,-s'
