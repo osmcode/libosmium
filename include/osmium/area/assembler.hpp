@@ -48,10 +48,10 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/relation.hpp>
 #include <osmium/tags/key_filter.hpp>
 
-#include <osmium/area/segment.hpp>
-#include <osmium/area/problem.hpp>
 #include <osmium/area/detail/proto_ring.hpp>
 #include <osmium/area/detail/segment_list.hpp>
+#include <osmium/area/problem_reporter.hpp>
+#include <osmium/area/segment.hpp>
 
 namespace osmium {
 
@@ -66,12 +66,7 @@ namespace osmium {
          */
         class Assembler {
 
-            // Problems found when assembling areas
-            std::vector<ProblemPoint> m_problem_points {};
-            std::vector<ProblemLine> m_problem_lines {};
-
-            // Enables list of problems to be kept
-            bool m_remember_problems { false };
+            osmium::area::ProblemReporter* m_problem_reporter;
 
             // Enables debug output to stderr
             bool m_debug { false };
@@ -94,15 +89,16 @@ namespace osmium {
              * Checks whether the given NodeRefs have the same location.
              * Uses the actual location for the test, not the id. If both
              * have the same location, but not the same id, a problem
-             * point will be added to the list of problem points (unless
-             * m_remember_problems is false).
+             * point will be added to the list of problem points.
              */
             bool has_same_location(const osmium::NodeRef& nr1, const osmium::NodeRef& nr2) {
                 if (nr1.location() != nr2.location()) {
                     return false;
                 }
-                if (m_remember_problems && nr1.ref() != nr2.ref()) {
-                    m_problem_points.emplace_back(ProblemPoint(osmium::area::Problem::problem_type::duplicate_node, nr1.ref(), nr2.ref(), nr1.location()));
+                if (nr1.ref() != nr2.ref()) {
+                    if (m_problem_reporter) {
+                        m_problem_reporter->report_duplicate_node(nr1.ref(), nr2.ref(), nr1.location());
+                    }
                 }
                 return true;
             }
@@ -138,10 +134,8 @@ namespace osmium {
                                     if (m_debug) {
                                         std::cerr << "  segments " << s1 << " and " << s2 << " intersecting at " << intersection << "\n";
                                     }
-                                    if (m_remember_problems) {
-                                        m_problem_points.emplace_back(ProblemPoint(osmium::area::Problem::problem_type::intersection, m_object_id, 0, intersection));
-                                        m_problem_lines.emplace_back(ProblemLine(osmium::area::Problem::problem_type::intersection, m_object_id, s1.way()->id(), s1.first().location(), s1.second().location()));
-                                        m_problem_lines.emplace_back(ProblemLine(osmium::area::Problem::problem_type::intersection, m_object_id, s2.way()->id(), s2.first().location(), s2.second().location()));
+                                    if (m_problem_reporter) {
+                                        m_problem_reporter->report_intersection(m_object_id, s1.way()->id(), s1.first().location(), s1.second().location(), s2.way()->id(), s2.first().location(), s2.second().location(), intersection);
                                     }
                                 }
                             }
@@ -263,9 +257,8 @@ namespace osmium {
                 for (auto& ring : m_rings) {
                     if (!ring.closed()) {
                         open_rings = true;
-                        if (m_remember_problems) {
-                            m_problem_points.emplace_back(ProblemPoint(osmium::area::Problem::problem_type::ring_not_closed, m_object_id, ring.first_segment().first()));
-                            m_problem_points.emplace_back(ProblemPoint(osmium::area::Problem::problem_type::ring_not_closed, m_object_id, ring.last_segment().second()));
+                        if (m_problem_reporter) {
+                            m_problem_reporter->report_ring_not_closed(m_object_id, ring.first_segment().first().location(), ring.last_segment().second().location());
                         }
                     }
                 }
@@ -584,8 +577,8 @@ namespace osmium {
                             if (m_debug) {
                                 std::cerr << "      segment " << segment << " from way " << segment.way()->id() << " should have role 'outer'\n";
                             }
-                            if (m_remember_problems) {
-                                m_problem_lines.emplace_back(ProblemLine(osmium::area::Problem::problem_type::role_should_be_outer, m_object_id, segment.way()->id(), segment.first().location(), segment.second().location()));
+                            if (m_problem_reporter) {
+                                m_problem_reporter->report_role_should_be_outer(m_object_id, segment.way()->id(), segment.first().location(), segment.second().location());
                             }
                         }
                     }
@@ -597,8 +590,8 @@ namespace osmium {
                             if (m_debug) {
                                 std::cerr << "      segment " << segment << " from way " << segment.way()->id() << " should have role 'inner'\n";
                             }
-                            if (m_remember_problems) {
-                                m_problem_lines.emplace_back(ProblemLine(osmium::area::Problem::problem_type::role_should_be_inner, m_object_id, segment.way()->id(), segment.first().location(), segment.second().location()));
+                            if (m_problem_reporter) {
+                                m_problem_reporter->report_role_should_be_inner(m_object_id, segment.way()->id(), segment.first().location(), segment.second().location());
                             }
                         }
                     }
@@ -607,7 +600,9 @@ namespace osmium {
 
         public:
 
-            Assembler() = default;
+            Assembler(osmium::area::ProblemReporter* problem_reporter = nullptr) :
+                m_problem_reporter(problem_reporter) {
+            }
 
             ~Assembler() = default;
 
@@ -618,38 +613,6 @@ namespace osmium {
             void enable_debug_output(bool debug=true) {
                 m_debug = debug;
                 m_segment_list.enable_debug_output(debug);
-            }
-
-            /**
-             * Enable or disable collection of problems in the input data.
-             * If this is enabled the assembler will keep a list of all
-             * problems found (such as self-intersections and unclosed rings).
-             * This creates some overhead so it is disabled by default.
-             */
-            void remember_problems(bool remember=true) {
-                m_remember_problems = remember;
-            }
-
-            /**
-             * Clear the list of problems that have been found.
-             */
-            void clear_problems() {
-                m_problem_points.clear();
-                m_problem_lines.clear();
-            }
-
-            /**
-             * Get the list of problem points found so far in the input data.
-             */
-            const std::vector<ProblemPoint>& problem_points() const {
-                return m_problem_points;
-            }
-
-            /**
-             * Get the list of problem lines found so far in the input data.
-             */
-            const std::vector<ProblemLine>& problem_lines() const {
-                return m_problem_lines;
             }
 
             void init_assembler(osmium::object_id_type id) {
@@ -668,9 +631,9 @@ namespace osmium {
             void operator()(const osmium::Way& way, osmium::memory::Buffer& out_buffer) {
                 init_assembler(way.id());
 
-                if (m_remember_problems) {
-                    if (!way.ends_have_same_id()) {
-                        m_problem_points.emplace_back(ProblemPoint(osmium::area::Problem::problem_type::duplicate_node, way.nodes().front().ref(), way.nodes().back().ref(), way.nodes().front().location()));
+                if (!way.ends_have_same_id()) {
+                    if (m_problem_reporter) {
+                        m_problem_reporter->report_duplicate_node(way.nodes().front().ref(), way.nodes().back().ref(), way.nodes().front().location());
                     }
                 }
 
@@ -745,7 +708,7 @@ namespace osmium {
                                 osmium::tags::KeyFilter::iterator fi_begin(filter, way.tags().begin(), way.tags().end());
                                 osmium::tags::KeyFilter::iterator fi_end(filter, way.tags().end(), way.tags().end());
 
-                                size_t d = std::distance(fi_begin, fi_end);
+                                auto d = std::distance(fi_begin, fi_end);
                                 if (d > 0) {
                                     const osmium::TagList& area_tags = builder.object().tags(); // tags of the area we just built
                                     osmium::tags::KeyFilter::iterator area_fi_begin(filter, area_tags.begin(), area_tags.end());

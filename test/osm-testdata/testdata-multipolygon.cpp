@@ -13,6 +13,7 @@
 
 #include <osmium/area/assembler.hpp>
 #include <osmium/area/collector.hpp>
+#include <osmium/area/problem_reporter_ogr.hpp>
 #include <osmium/geom/ogr.hpp>
 #include <osmium/geom/wkt.hpp>
 #include <osmium/handler.hpp>
@@ -52,8 +53,6 @@ class TestHandler : public osmium::handler::Handler {
     OGRLayer* m_layer_point;
     OGRLayer* m_layer_linestring;
     OGRLayer* m_layer_polygon;
-    OGRLayer* m_layer_perror;
-    OGRLayer* m_layer_lerror;
 
     osmium::geom::OGRFactory m_ogr_factory {};
     osmium::geom::WKTFactory m_wkt_factory {};
@@ -64,24 +63,9 @@ class TestHandler : public osmium::handler::Handler {
 
 public:
 
-    TestHandler(const std::string& driver_name, const std::string& filename) :
+    TestHandler(OGRDataSource* data_source) :
+        m_data_source(data_source),
         m_out("multipolygon-tests.json") {
-
-        OGRRegisterAll();
-
-        OGRSFDriver* driver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(driver_name.c_str());
-        if (!driver) {
-            std::cerr << driver_name << " driver not available.\n";
-            exit(1);
-        }
-
-        CPLSetConfigOption("OGR_SQLITE_SYNCHRONOUS", "FALSE");
-        const char* options[] = { "SPATIALITE=TRUE", nullptr };
-        m_data_source = driver->CreateDataSource(filename.c_str(), const_cast<char**>(options));
-        if (!m_data_source) {
-            std::cerr << "Creation of output file failed.\n";
-            exit(1);
-        }
 
         OGRSpatialReference sparef;
         sparef.SetWellKnownGeogCS("WGS84");
@@ -157,76 +141,10 @@ public:
             std::cerr << "Creating from_type field failed.\n";
             exit(1);
         }
-
-        /**************/
-
-        m_layer_perror = m_data_source->CreateLayer("perrors", &sparef, wkbPoint, nullptr);
-        if (!m_layer_perror) {
-            std::cerr << "Layer creation failed.\n";
-            exit(1);
-        }
-
-        OGRFieldDefn layer_perror_field_id1("id1", OFTReal);
-        layer_perror_field_id1.SetWidth(10);
-
-        if (m_layer_perror->CreateField(&layer_perror_field_id1) != OGRERR_NONE) {
-            std::cerr << "Creating id1 field failed.\n";
-            exit(1);
-        }
-
-        OGRFieldDefn layer_perror_field_id2("id2", OFTReal);
-        layer_perror_field_id2.SetWidth(10);
-
-        if (m_layer_perror->CreateField(&layer_perror_field_id2) != OGRERR_NONE) {
-            std::cerr << "Creating id2 field failed.\n";
-            exit(1);
-        }
-
-        OGRFieldDefn layer_perror_field_problem_type("problem_type", OFTString);
-        layer_perror_field_problem_type.SetWidth(30);
-
-        if (m_layer_perror->CreateField(&layer_perror_field_problem_type) != OGRERR_NONE) {
-            std::cerr << "Creating problem_type field failed.\n";
-            exit(1);
-        }
-
-        /**************/
-
-        m_layer_lerror = m_data_source->CreateLayer("lerrors", &sparef, wkbLineString, nullptr);
-        if (!m_layer_lerror) {
-            std::cerr << "Layer creation failed.\n";
-            exit(1);
-        }
-
-        OGRFieldDefn layer_lerror_field_id1("id1", OFTReal);
-        layer_lerror_field_id1.SetWidth(10);
-
-        if (m_layer_lerror->CreateField(&layer_lerror_field_id1) != OGRERR_NONE) {
-            std::cerr << "Creating id1 field failed.\n";
-            exit(1);
-        }
-
-        OGRFieldDefn layer_lerror_field_id2("id2", OFTReal);
-        layer_lerror_field_id2.SetWidth(10);
-
-        if (m_layer_lerror->CreateField(&layer_lerror_field_id2) != OGRERR_NONE) {
-            std::cerr << "Creating id2 field failed.\n";
-            exit(1);
-        }
-
-        OGRFieldDefn layer_lerror_field_problem_type("problem_type", OFTString);
-        layer_lerror_field_problem_type.SetWidth(30);
-
-        if (m_layer_lerror->CreateField(&layer_lerror_field_problem_type) != OGRERR_NONE) {
-            std::cerr << "Creating problem_type field failed.\n";
-            exit(1);
-        }
     }
 
     ~TestHandler() {
         m_out << "\n]\n";
-        OGRDataSource::DestroyDataSource(m_data_source);
-        OGRCleanupAll();
     }
 
     void node(const osmium::Node& node) {
@@ -314,47 +232,7 @@ public:
         }
     }
 
-    void write_problem_points(const std::vector<osmium::area::ProblemPoint>& problems) {
-        for (auto& problem : problems) {
-            OGRFeature* feature = OGRFeature::CreateFeature(m_layer_perror->GetLayerDefn());
-            std::unique_ptr<OGRPoint> ogr_point = m_ogr_factory.create_point(problem.location());
-            feature->SetGeometry(ogr_point.get());
-            feature->SetField("id1", static_cast<double>(problem.id1()));
-            feature->SetField("id2", static_cast<double>(problem.id2()));
-            feature->SetField("problem_type", problem.type_string().c_str());
-
-            if (m_layer_perror->CreateFeature(feature) != OGRERR_NONE) {
-                std::cerr << "Failed to create feature.\n";
-                exit(1);
-            }
-
-            OGRFeature::DestroyFeature(feature);
-        }
-    }
-
-    void write_problem_lines(const std::vector<osmium::area::ProblemLine>& problems) {
-        for (auto& problem : problems) {
-            std::unique_ptr<OGRPoint> ogr_point1 = m_ogr_factory.create_point(problem.segment().first());
-            std::unique_ptr<OGRPoint> ogr_point2 = m_ogr_factory.create_point(problem.segment().second());
-            std::unique_ptr<OGRLineString> ogr_linestring = std::unique_ptr<OGRLineString>(new OGRLineString());
-            ogr_linestring->addPoint(ogr_point1.get());
-            ogr_linestring->addPoint(ogr_point2.get());
-            OGRFeature* feature = OGRFeature::CreateFeature(m_layer_lerror->GetLayerDefn());
-            feature->SetGeometry(ogr_linestring.get());
-            feature->SetField("id1", static_cast<double>(problem.id1()));
-            feature->SetField("id2", static_cast<double>(problem.id2()));
-            feature->SetField("problem_type", problem.type_string().c_str());
-
-            if (m_layer_lerror->CreateFeature(feature) != OGRERR_NONE) {
-                std::cerr << "Failed to create feature.\n";
-                exit(1);
-            }
-
-            OGRFeature::DestroyFeature(feature);
-        }
-    }
-
-};
+}; // class TestHandler
 
 /* ================================================== */
 
@@ -365,6 +243,26 @@ void print_help() {
               << "\nOptions:\n" \
               << "  -h, --help           This help message\n" \
               << "  -f, --format=FORMAT  Output OGR format (Default: 'SQLite')\n";
+}
+
+OGRDataSource* initialize_database(const std::string& output_format, const std::string& output_filename) {
+    OGRRegisterAll();
+
+    OGRSFDriver* driver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(output_format.c_str());
+    if (!driver) {
+        std::cerr << output_format << " driver not available.\n";
+        exit(1);
+    }
+
+    CPLSetConfigOption("OGR_SQLITE_SYNCHRONOUS", "FALSE");
+    const char* options[] = { "SPATIALITE=TRUE", nullptr };
+    OGRDataSource* data_source = driver->CreateDataSource(output_filename.c_str(), const_cast<char**>(options));
+    if (!data_source) {
+        std::cerr << "Creation of output file failed.\n";
+        exit(1);
+    }
+
+    return data_source;
 }
 
 int main(int argc, char* argv[]) {
@@ -409,10 +307,13 @@ int main(int argc, char* argv[]) {
         input_filename = "-";
     }
 
+
+    OGRDataSource* data_source = initialize_database(output_format, output_filename);
+
     typedef osmium::area::Assembler area_assembler_type;
-    area_assembler_type assembler;
+    osmium::area::ProblemReporterOGR problem_reporter(data_source);
+    area_assembler_type assembler(&problem_reporter);
     assembler.enable_debug_output();
-    assembler.remember_problems();
     osmium::area::Collector<area_assembler_type> collector(assembler);
 
     std::cerr << "Pass 1...\n";
@@ -425,7 +326,7 @@ int main(int argc, char* argv[]) {
     location_handler_type location_handler(index_pos, index_neg);
     location_handler.ignore_errors();
 
-    TestHandler ogr_handler(output_format, output_filename);
+    TestHandler ogr_handler(data_source);
 
     std::cerr << "Pass 2...\n";
     osmium::io::Reader reader2(input_filename);
@@ -435,7 +336,9 @@ int main(int argc, char* argv[]) {
 
     osmium::apply(collector, ogr_handler);
 
-    ogr_handler.write_problem_points(assembler.problem_points());
-    ogr_handler.write_problem_lines(assembler.problem_lines());
+    problem_reporter.output_reports();
+
+    OGRDataSource::DestroyDataSource(data_source);
+    OGRCleanupAll();
 }
 
