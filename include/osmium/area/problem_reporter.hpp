@@ -42,6 +42,17 @@ namespace osmium {
 
     namespace area {
 
+        /**
+         * When assembling a multipolygon/area from a multipolygon relation
+         * or a closed way several problems can be detected. This includes
+         * intersections between lines, wrong role attributes on relation
+         * members etc. These problems are reported by the area::Assembler
+         * class to the ProblemReporter class or one of its child classes.
+         *
+         * This is the parent class which does nothing with the reports.
+         * Child classes are expected to implement different ways of
+         * reporting the problems.
+         */
         class ProblemReporter {
 
         public:

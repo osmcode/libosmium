@@ -44,13 +44,17 @@ DEALINGS IN THE SOFTWARE.
 #pragma GCC diagnostic pop
 
 #include <osmium/geom/ogr.hpp>
-#include <osmium/area/problem_reporter_collector.hpp>
+#include <osmium/area/problem_reporter.hpp>
 
 namespace osmium {
 
     namespace area {
 
-        class ProblemReporterOGR : public ProblemReporterCollector {
+        /**
+         * Report problems when assembling areas by adding them to
+         * layers in an OGR datasource.
+         */
+        class ProblemReporterOGR : public ProblemReporter {
 
             osmium::geom::OGRFactory m_ogr_factory {};
 
@@ -58,6 +62,40 @@ namespace osmium {
 
             OGRLayer* m_layer_perror;
             OGRLayer* m_layer_lerror;
+
+            void write_point(const char* problem_type, osmium::object_id_type id1, osmium::object_id_type id2, osmium::Location location) {
+                OGRFeature* feature = OGRFeature::CreateFeature(m_layer_perror->GetLayerDefn());
+                std::unique_ptr<OGRPoint> ogr_point = m_ogr_factory.create_point(location);
+                feature->SetGeometry(ogr_point.get());
+                feature->SetField("id1", static_cast<double>(id1));
+                feature->SetField("id2", static_cast<double>(id2));
+                feature->SetField("problem_type", problem_type);
+
+                if (m_layer_perror->CreateFeature(feature) != OGRERR_NONE) {
+                    std::runtime_error("Failed to create feature on layer 'perrors'");
+                }
+
+                OGRFeature::DestroyFeature(feature);
+            }
+
+            void write_line(const char* problem_type, osmium::object_id_type id1, osmium::object_id_type id2, osmium::Location loc1, osmium::Location loc2) {
+                std::unique_ptr<OGRPoint> ogr_point1 = m_ogr_factory.create_point(loc1);
+                std::unique_ptr<OGRPoint> ogr_point2 = m_ogr_factory.create_point(loc2);
+                std::unique_ptr<OGRLineString> ogr_linestring = std::unique_ptr<OGRLineString>(new OGRLineString());
+                ogr_linestring->addPoint(ogr_point1.get());
+                ogr_linestring->addPoint(ogr_point2.get());
+                OGRFeature* feature = OGRFeature::CreateFeature(m_layer_lerror->GetLayerDefn());
+                feature->SetGeometry(ogr_linestring.get());
+                feature->SetField("id1", static_cast<double>(id1));
+                feature->SetField("id2", static_cast<double>(id2));
+                feature->SetField("problem_type", problem_type);
+
+                if (m_layer_lerror->CreateFeature(feature) != OGRERR_NONE) {
+                    std::runtime_error("Failed to create feature on layer 'lerrors'");
+                }
+
+                OGRFeature::DestroyFeature(feature);
+            }
 
         public:
 
@@ -124,40 +162,28 @@ namespace osmium {
 
             virtual ~ProblemReporterOGR() = default;
 
-            void output_reports() {
-                for (auto& problem : m_problem_points) {
-                    OGRFeature* feature = OGRFeature::CreateFeature(m_layer_perror->GetLayerDefn());
-                    std::unique_ptr<OGRPoint> ogr_point = m_ogr_factory.create_point(problem.location());
-                    feature->SetGeometry(ogr_point.get());
-                    feature->SetField("id1", static_cast<double>(problem.id1()));
-                    feature->SetField("id2", static_cast<double>(problem.id2()));
-                    feature->SetField("problem_type", problem.type_string().c_str());
+            void report_duplicate_node(osmium::object_id_type node_id1, osmium::object_id_type node_id2, osmium::Location location) override {
+                write_point("duplicate_node", node_id1, node_id2, location);
+            }
 
-                    if (m_layer_perror->CreateFeature(feature) != OGRERR_NONE) {
-                        std::runtime_error("Failed to create feature on layer 'perrors'");
-                    }
+            void report_intersection(osmium::object_id_type object_id, osmium::object_id_type way1_id, osmium::Location way1_seg_start, osmium::Location way1_seg_end,
+                                                                       osmium::object_id_type way2_id, osmium::Location way2_seg_start, osmium::Location way2_seg_end, osmium::Location intersection) override {
+                write_point("intersection", object_id, 0, intersection);
+                write_line("intersection", object_id, way1_id, way1_seg_start, way1_seg_end);
+                write_line("intersection", object_id, way2_id, way2_seg_start, way2_seg_end);
+            }
 
-                    OGRFeature::DestroyFeature(feature);
-                }
+            void report_ring_not_closed(osmium::object_id_type object_id, osmium::Location end1, osmium::Location end2) override {
+                write_point("ring_not_closed", object_id, 0, end1);
+                write_point("ring_not_closed", object_id, 0, end2);
+            }
 
-                for (auto& problem : m_problem_lines) {
-                    std::unique_ptr<OGRPoint> ogr_point1 = m_ogr_factory.create_point(problem.segment().first());
-                    std::unique_ptr<OGRPoint> ogr_point2 = m_ogr_factory.create_point(problem.segment().second());
-                    std::unique_ptr<OGRLineString> ogr_linestring = std::unique_ptr<OGRLineString>(new OGRLineString());
-                    ogr_linestring->addPoint(ogr_point1.get());
-                    ogr_linestring->addPoint(ogr_point2.get());
-                    OGRFeature* feature = OGRFeature::CreateFeature(m_layer_lerror->GetLayerDefn());
-                    feature->SetGeometry(ogr_linestring.get());
-                    feature->SetField("id1", static_cast<double>(problem.id1()));
-                    feature->SetField("id2", static_cast<double>(problem.id2()));
-                    feature->SetField("problem_type", problem.type_string().c_str());
+            void report_role_should_be_outer(osmium::object_id_type object_id, osmium::object_id_type way_id, osmium::Location seg_start, osmium::Location seg_end) override {
+                write_line("role_should_be_outer", object_id, way_id, seg_start, seg_end);
+            }
 
-                    if (m_layer_lerror->CreateFeature(feature) != OGRERR_NONE) {
-                        std::runtime_error("Failed to create feature on layer 'lerrors'");
-                    }
-
-                    OGRFeature::DestroyFeature(feature);
-                }
+            void report_role_should_be_inner(osmium::object_id_type object_id, osmium::object_id_type way_id, osmium::Location seg_start, osmium::Location seg_end) override {
+                write_line("role_should_be_inner", object_id, way_id, seg_start, seg_end);
             }
 
         }; // class ProblemReporterOGR

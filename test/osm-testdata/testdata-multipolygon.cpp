@@ -336,8 +336,6 @@ int main(int argc, char* argv[]) {
 
     osmium::apply(collector, ogr_handler);
 
-    problem_reporter.output_reports();
-
     OGRDataSource::DestroyDataSource(data_source);
     OGRCleanupAll();
 }
