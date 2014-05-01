@@ -1,30 +1,71 @@
-language: node_js
+language: cpp
 
-node_js:
- - "0.10"
+compiler:
+ - gcc
+
+env:
+  matrix:
+   # static_build == portable, statically linked OSRM and deps
+   # shared_build == non-portable, shared libraries via package manager
+   - NODE_NVM_VERSION="0.10" RUN_BUILD="static_build"
+   - NODE_NVM_VERSION="0.10" RUN_BUILD="shared_build"
+  global:
+   - secure: KitzGZjoDblX/3heajcvssGz0JnJ/k02dr2tu03ksUV+6MogC3RSQudqyKY57+f8VyZrcllN/UOlJ0Q/3iG38Oz8DljC+7RZxtkVmE1SFBoOezKCdhcvWM12G3uqPs7hhrRxuUgIh0C//YXEkulUrqa2H1Aj2xeen4E3FAqEoy0=
+   - secure: WLGmxl6VTVWhXGm6X83GYNYzPNsvTD+9usJOKM5YBLAdG7cnOBQBNiCCUKc9OZMMZVUr3ec2/iigakH5Y8Yc+U6AlWKzlORyqWLuk4nFuoedu62x6ocQkTkuOc7mHiYhKd21xTGMYauaZRS6kugv4xkpGES2UjI2T8cjZ+LN2jU=
+   - secure: Atz+Zcl9Faw1OvUEv5vK3aYXGWQS8dvDd4nLQ/2XU0doVKjsNvFxVWtBFvE91yvbnJnkSR6IrD6U4I3RQkmaEZ4s37nipHZ1nkuPlSucV0SamAwOcO4Wm+D0yrlPAt/bDQHlAojY1UE98U0oqDKfkBvLwdzIGvv0qISR/W/8rLI=
 
 before_install:
- # we need c++11 compatible g++
- - sudo apt-add-repository --yes ppa:ubuntu-toolchain-r/test
- - sudo apt-get -y update
- - sudo apt-get -y install gcc-4.7 g++-4.7
- # first test install of binary
-# - npm install --verbose
-# - make test
+# check if tag exists and matches package.json
+- scripts/validate_tag.sh
+# get commit message
+- COMMIT_MESSAGE=$(git show -s --format=%B $TRAVIS_COMMIT | tr -d '\n')
+# put node-pre-gyp on path
+- export PATH=./node_modules/.bin/:$PATH
+# here we set up the node version on the fly based on the matrix value.
+# This is done manually so that it is easy to flip the 'language' to
+# objective-c in another branch (to run the same travis.yml on OS X)
+- git clone https://github.com/creationix/nvm.git ../.nvm
+- source ../.nvm/nvm.sh
+- nvm install $NODE_NVM_VERSION
+- nvm use $NODE_NVM_VERSION
+- node --version
+- npm --version
 
 install:
- # next test source compile, so get dependencies
- - sudo apt-add-repository --yes ppa:mapnik/boost
- - sudo apt-get -y update -qq
- - sudo apt-get -y install git build-essential libboost-dev zlib1g-dev protobuf-compiler libprotobuf-lite7 libprotobuf-dev libexpat1-dev libsparsehash-dev
- - git clone https://github.com/scrosby/OSM-binary.git
- - cd OSM-binary/src
- - make && sudo make install
- - cd ../../
+# set a few env settings for the static build script
+- NODE_MODULE_ROOT=$(pwd)
+- TMP_DEPS_DIR=$(mktemp -d -t XXXXXXXXXXX)
+# WARNING: this script modifies the environment
+- source ./scripts/${RUN_BUILD}.sh
+- cd ${NODE_MODULE_ROOT}
 
 before_script:
- - git clone https://github.com/osmcode/libosmium.git ../libosmium
- - CXX=g++-4.7 npm install --build-from-source
+- npm install mocha aws-sdk
+# install from source, ensure this works first
+- git clone https://github.com/osmcode/libosmium.git ../libosmium
+- npm install --build-from-source
+- if [[ `uname -s` == 'Darwin' ]]; then otool -L ./lib/binding/* || true; fi
+- if [[ `uname -s` == 'Linux' ]]; then readelf -d ./lib/binding/* || true; fi
+- npm test
 
 script:
- - make test
+# now we publish the binary, if needed
+- PUBLISH_BINARY=false
+# check if this is a git tag built statically to be portable
+- if [[ $RUN_BUILD == "static_build" ]] && [[ $TRAVIS_BRANCH == `git describe --tags --always HEAD` ]]; then echo PUBLISH_BINARY;PUBLISH_BINARY=true; fi;
+# or check if we are manually requesting binary publishing via a commit keyword
+- if [[ $RUN_BUILD == "static_build" ]] && test "${COMMIT_MESSAGE#*'[publish binary]'}" != "$COMMIT_MESSAGE"; then echo PUBLISH_BINARY;PUBLISH_BINARY=true; fi;
+# if either are true, then publish the binary
+# Note: this publishing is done here, in the 'script' section, instead of the 'after_success'
+# since we want any failure here to stop the build immediately
+- if [[ $PUBLISH_BINARY == true ]]; then node-pre-gyp package publish; fi
+# now clean up to prepare to re-install from remote binary
+- node-pre-gyp clean
+# now install from published binary
+# Note: we capture the error here so that if the install fails we can unpublish
+- INSTALL_RESULT=0
+- if [[ $PUBLISH_BINARY == true ]]; then INSTALL_RESULT=$(npm install --fallback-to-build=false > /dev/null)$? || true; fi
+# if install returned non zero (errored) then we first unpublish and then call false so travis will bail at this line
+- if [[ $INSTALL_RESULT != 0 ]]; then echo "returned $INSTALL_RESULT";node-pre-gyp unpublish;false; fi
+# If success then we arrive here so lets clean up
+- node-pre-gyp clean
