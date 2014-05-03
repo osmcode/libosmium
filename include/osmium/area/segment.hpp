@@ -113,7 +113,7 @@ namespace osmium {
                     return false;
                 }
 
-                auto mm = std::minmax(first().location(), second().location(), [](const osmium::Location a, const osmium::Location b) {
+                std::pair<osmium::Location, osmium::Location> mm = std::minmax(first().location(), second().location(), [](const osmium::Location a, const osmium::Location b) {
                     return a.y() < b.y();
                 });
 
