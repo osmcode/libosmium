@@ -7,6 +7,8 @@ compiler:
 before_install:
  # we need at least g++-4.8 for c++11 features
  - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+ # try new boost version
+ - sudo add-apt-repository -y ppa:boost-latest/ppa && sudo apt-get -y boost1.55
  - sudo apt-get update -y
 
 install:
