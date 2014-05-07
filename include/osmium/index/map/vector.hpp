@@ -126,7 +126,7 @@ namespace osmium {
                 ~VectorBasedSparseMap() override final = default;
 
                 void set(const TKey key, const TValue value) override final {
-                    m_vector.emplace_back(key, value);
+                    m_vector.push_back(element_type(key, value));
                 }
 
                 const TValue get(const TKey key) const override final {

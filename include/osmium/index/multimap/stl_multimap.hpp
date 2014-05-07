@@ -81,11 +81,11 @@ namespace osmium {
                 ~StlMultimap() noexcept override final = default;
 
                 void unsorted_set(const TKey key, const TValue value) {
-                    m_elements.insert(std::make_pair(key, value));
+                    m_elements.emplace(key, value);
                 }
 
                 void set(const TKey key, const TValue value) override final {
-                    m_elements.insert(std::make_pair(key, value));
+                    m_elements.emplace(key, value);
                 }
 
                 std::pair<iterator, iterator> get_all(const TKey key) {
