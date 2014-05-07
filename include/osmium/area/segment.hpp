@@ -53,7 +53,7 @@ namespace osmium {
          * beginning of the segment. Smaller, in this case, means smaller x
          * coordinate, and if they are the same smaller y coordinate.
          */
-        class NodeRefSegment : boost::less_than_comparable<NodeRefSegment> {
+        class NodeRefSegment : boost::totally_ordered<NodeRefSegment> {
 
             osmium::NodeRef m_first;
             osmium::NodeRef m_second;

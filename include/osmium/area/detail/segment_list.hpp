@@ -178,24 +178,22 @@ namespace osmium {
                         const NodeRefSegment& s1 = *it1;
                         for (auto it2 = it1+1; it2 != m_segments.end(); ++it2) {
                             const NodeRefSegment& s2 = *it2;
-                            if (s1 == s2) {
-                                if (m_debug) {
-                                    std::cerr << "  found overlap on segment " << s1 << "\n";
-                                }
-                            } else {
-                                if (outside_x_range(s2, s1)) {
-                                    break;
-                                }
-                                if (y_range_overlap(s1, s2)) {
-                                    osmium::Location intersection = calculate_intersection(s1, s2);
-                                    if (intersection) {
-                                        found_intersections = true;
-                                        if (m_debug) {
-                                            std::cerr << "  segments " << s1 << " and " << s2 << " intersecting at " << intersection << "\n";
-                                        }
-                                        if (problem_reporter) {
-                                            problem_reporter->report_intersection(s1.way()->id(), s1.first().location(), s1.second().location(), s2.way()->id(), s2.first().location(), s2.second().location(), intersection);
-                                        }
+
+                            assert(s1 != s2); // erase_duplicate_segments() should have made sure of that
+
+                            if (outside_x_range(s2, s1)) {
+                                break;
+                            }
+
+                            if (y_range_overlap(s1, s2)) {
+                                osmium::Location intersection = calculate_intersection(s1, s2);
+                                if (intersection) {
+                                    found_intersections = true;
+                                    if (m_debug) {
+                                        std::cerr << "  segments " << s1 << " and " << s2 << " intersecting at " << intersection << "\n";
+                                    }
+                                    if (problem_reporter) {
+                                        problem_reporter->report_intersection(s1.way()->id(), s1.first().location(), s1.second().location(), s2.way()->id(), s2.first().location(), s2.second().location(), intersection);
                                     }
                                 }
                             }
