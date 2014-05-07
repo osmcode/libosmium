@@ -140,7 +140,7 @@ namespace osmium {
             bool has_all_members() const {
                 return m_need_members == 0;
             }
-        
+
         }; // class RelationMeta
 
         /**

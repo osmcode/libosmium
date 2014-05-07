@@ -58,7 +58,7 @@ namespace osmium {
         public:
 
             ProblemReporter() = default;
-            
+
             virtual ~ProblemReporter() = default;
 
             /**
@@ -96,7 +96,7 @@ namespace osmium {
              */
             virtual void report_ring_not_closed(osmium::object_id_type /*object_id*/, osmium::Location /*end1*/, osmium::Location /*end2*/) {
             }
-           
+
             /**
              * Report a segment that should have role "outer", but has a different role.
              *
@@ -104,7 +104,7 @@ namespace osmium {
              * @param way_id         ID of the way this segment is in.
              * @param seg_start      Start of the segment with the wrong role.
              * @param seg_end        End of the segment with the wrong role.
-             */ 
+             */
             virtual void report_role_should_be_outer(osmium::object_id_type /*object_id*/, osmium::object_id_type /*way_id*/, osmium::Location /*seg_start*/, osmium::Location /*seg_end*/) {
             }
 
@@ -115,7 +115,7 @@ namespace osmium {
              * @param way_id         ID of the way this segment is in.
              * @param seg_start      Start of the segment with the wrong role.
              * @param seg_end        End of the segment with the wrong role.
-             */ 
+             */
             virtual void report_role_should_be_inner(osmium::object_id_type /*object_id*/, osmium::object_id_type /*way_id*/, osmium::Location /*seg_start*/, osmium::Location /*seg_end*/) {
             }
 

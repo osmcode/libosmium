@@ -55,11 +55,11 @@ namespace osmium {
             class SegmentList {
 
                 typedef std::vector<NodeRefSegment> slist_type;
-                
+
                 slist_type m_segments {};
 
                 bool m_debug { false };
- 
+
             public:
 
                 SegmentList() = default;

@@ -69,7 +69,7 @@ namespace osmium {
             void report_ring_not_closed(osmium::object_id_type object_id, osmium::Location end1, osmium::Location end2) override {
                 m_out << "DATA PROBLEM: ring not closed: object_id=" << object_id << " end1=" << end1 << " end2=" << end2 << "\n";
             }
-            
+
             void report_role_should_be_outer(osmium::object_id_type object_id, osmium::object_id_type way_id, osmium::Location seg_start, osmium::Location seg_end) override {
                 m_out << "DATA PROBLEM: role should be outer: object_id=" << object_id << " way_id=" << way_id << " seg_start=" << seg_start << " seg_end=" << seg_end << "\n";
             }
