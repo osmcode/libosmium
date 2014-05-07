@@ -59,7 +59,7 @@ class TestHandler : public osmium::handler::Handler {
 
     std::ofstream m_out;
 
-    bool m_first_out{true};
+    bool m_first_out {true};
 
 public:
 

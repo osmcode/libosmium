@@ -130,7 +130,9 @@ namespace osmium {
                 }
 
                 const TValue get(const TKey key) const override final {
-                    const element_type element {key, TValue {}};
+                    const element_type element {
+                        key, TValue {}
+                    };
                     const auto result = std::lower_bound(m_vector.begin(), m_vector.end(), element, [](const element_type& a, const element_type& b) {
                         return a.first < b.first;
                     });

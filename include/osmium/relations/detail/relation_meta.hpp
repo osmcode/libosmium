@@ -131,7 +131,7 @@ namespace osmium {
                 m_member_offsets.erase(
                     std::remove(m_member_offsets.begin(), m_member_offsets.end(), -1),
                     m_member_offsets.end()
-                    );
+                );
             }
 
             /**

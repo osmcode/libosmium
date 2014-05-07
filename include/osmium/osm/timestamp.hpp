@@ -72,7 +72,9 @@ namespace osmium {
          */
         explicit Timestamp(const char* timestamp) {
 #ifndef WIN32
-            struct tm tm { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+            struct tm tm {
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+            };
             if (strptime(timestamp, timestamp_format(), &tm) == nullptr) {
                 throw std::invalid_argument("can't parse timestamp");
             }
@@ -107,7 +109,9 @@ namespace osmium {
             if (m_timestamp == 0) {
                 return std::string("");
             }
-            struct tm tm { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+            struct tm tm {
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+            };
             time_t sse = seconds_since_epoch();
             gmtime_r(&sse, &tm);
             std::string s(timestamp_length, '\0');

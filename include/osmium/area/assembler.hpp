@@ -173,7 +173,7 @@ namespace osmium {
                 std::map<std::string, size_t> counter;
                 for (const osmium::Way* way : ways) {
                     for (auto& tag : way->tags()) {
-                        std::string kv{tag.key()};
+                        std::string kv {tag.key()};
                         kv.append(1, '\0');
                         kv.append(tag.value());
                         ++counter[kv];

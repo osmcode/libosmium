@@ -75,7 +75,9 @@ namespace osmium {
                 }
 
                 std::pair<iterator, iterator> get_all(const TKey key) {
-                    const element_type element {key, TValue {}};
+                    const element_type element {
+                        key, TValue {}
+                    };
                     return std::equal_range(m_vector.begin(), m_vector.end(), element, [](const element_type& a, const element_type& b) {
                         return a.first < b.first;
                     });
