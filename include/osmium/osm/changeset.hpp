@@ -5,7 +5,7 @@
 
 This file is part of Osmium (http://osmcode.org/libosmium).
 
-Copyright 2013 Jochen Topf <jochen@topf.org> and others (see README).
+Copyright 2013,2014 Jochen Topf <jochen@topf.org> and others (see README).
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -53,7 +53,7 @@ namespace osmium {
         template <class T> class ObjectBuilder;
     }
 
-    class Changeset : public osmium::OSMEntity, boost::less_than_comparable<Changeset> {
+    class Changeset : public osmium::OSMEntity, boost::totally_ordered<Changeset> {
 
         friend class osmium::memory::ObjectBuilder<osmium::Changeset>;
 
@@ -187,7 +187,7 @@ namespace osmium {
         }
 
         bool open() const noexcept {
-            return m_closed_at != 0;
+            return m_closed_at == osmium::Timestamp();
         }
 
         bool closed() const noexcept {
@@ -300,6 +300,20 @@ namespace osmium {
         }
 
     }; // Changeset
+
+    /**
+     * Changesets are equal if their IDs are equal.
+     */
+    inline bool operator==(const Changeset& lhs, const Changeset& rhs) {
+        return lhs.id() == rhs.id();
+    }
+
+    /**
+     * Changesets can be ordered by id.
+     */
+    inline bool operator<(const Changeset& lhs, const Changeset& rhs) {
+        return lhs.id() < rhs.id();
+    }
 
 } // namespace osmium
 

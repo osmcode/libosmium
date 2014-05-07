@@ -86,4 +86,12 @@ inline osmium::Area& buffer_add_area(osmium::memory::Buffer& buffer, const char*
     return builder.object();
 }
 
+inline osmium::Changeset& buffer_add_changeset(osmium::memory::Buffer& buffer, const char* user, const std::vector<std::pair<const char*, const char*>>& tags) {
+    osmium::osm::ChangesetBuilder builder(buffer);
+    builder.add_user(user);
+    add_tags(buffer, builder, tags);
+    buffer.commit();
+    return builder.object();
+}
+
 #endif // TEST_HELPER_HPP
