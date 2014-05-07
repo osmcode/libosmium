@@ -380,23 +380,25 @@ namespace osmium {
                 return true;
             }
 
-            void combine_rings(const NodeRefSegment& segment, ProtoRing& ring, bool at_end) {
+            void combine_rings_front(const NodeRefSegment& segment, ProtoRing& ring) {
                 if (m_debug) {
-                    std::cerr << " => match at " << (at_end ? "end" : "start") << " of ring\n";
+                    std::cerr << " => match at front of ring\n";
                 }
+                ring.add_segment_front(segment);
+                has_closed_subring_start(ring, segment.first());
+                if (possibly_combine_rings_start(ring)) {
+                    check_for_closed_subring(ring);
+                }
+            }
 
-                if (at_end) {
-                    ring.add_segment_back(segment);
-                    has_closed_subring_end(ring, segment.second());
-                    if (possibly_combine_rings_end(ring)) {
-                        check_for_closed_subring(ring);
-                    }
-                } else {
-                    ring.add_segment_front(segment);
-                    has_closed_subring_start(ring, segment.first());
-                    if (possibly_combine_rings_start(ring)) {
-                        check_for_closed_subring(ring);
-                    }
+            void combine_rings_back(const NodeRefSegment& segment, ProtoRing& ring) {
+                if (m_debug) {
+                    std::cerr << " => match at back of ring\n";
+                }
+                ring.add_segment_back(segment);
+                has_closed_subring_end(ring, segment.second());
+                if (possibly_combine_rings_end(ring)) {
+                    check_for_closed_subring(ring);
                 }
             }
 
@@ -437,21 +439,21 @@ namespace osmium {
                         }
                     } else {
                         if (has_same_location(ring.get_segment_back().second(), segment.first())) {
-                            combine_rings(segment, ring, true);
+                            combine_rings_back(segment, ring);
                             return true;
                         }
                         if (has_same_location(ring.get_segment_back().second(), segment.second())) {
                             segment.swap_locations();
-                            combine_rings(segment, ring, true);
+                            combine_rings_back(segment, ring);
                             return true;
                         }
                         if (has_same_location(ring.get_segment_front().first(), segment.first())) {
                             segment.swap_locations();
-                            combine_rings(segment, ring, false);
+                            combine_rings_front(segment, ring);
                             return true;
                         }
                         if (has_same_location(ring.get_segment_front().first(), segment.second())) {
-                            combine_rings(segment, ring, false);
+                            combine_rings_front(segment, ring);
                             return true;
                         }
                         if (m_debug) {
