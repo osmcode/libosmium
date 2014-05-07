@@ -341,7 +341,7 @@ namespace osmium {
                             std::cerr << "          " << new_ring << "\n";
                             std::cerr << "          " << ring << "\n";
                         }
-                        m_rings.push_back(new_ring);
+                        m_rings.push_back(std::move(new_ring));
                         return true;
                     }
                 }
@@ -577,7 +577,7 @@ namespace osmium {
                         if (m_debug) {
                             std::cerr << "    new ring for segment " << segment << "\n";
                         }
-                        m_rings.emplace_back(ProtoRing(segment));
+                        m_rings.emplace_back(segment);
                     }
                 }
 

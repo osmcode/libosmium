@@ -122,7 +122,7 @@ namespace osmium {
                     int n=0;
                     for (const TValue value : m_elements) {
                         if (value != TValue()) {
-                            v.push_back(std::make_pair(n, value));
+                            v.emplace_back(n, value);
                         }
                         ++n;
                     }

@@ -122,7 +122,7 @@ namespace osmium {
                     osmium::NodeRef last_nr;
                     for (const osmium::NodeRef& nr : way.nodes()) {
                         if (last_nr.location() && last_nr.location() != nr.location()) {
-                            m_segments.emplace_back(NodeRefSegment(last_nr, nr, role, &way));
+                            m_segments.emplace_back(last_nr, nr, role, &way);
                         }
                         last_nr = nr;
                     }

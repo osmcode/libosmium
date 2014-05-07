@@ -133,7 +133,7 @@ namespace osmium {
                 void dump_as_list(const int fd) const {
                     std::vector<element_type> v;
                     for (const auto& element : m_elements) {
-                        v.push_back(element_type(element.first, element.second));
+                        v.emplace_back(element.first, element.second);
                     }
 //                    std::copy(m_elements.cbegin(), m_elements.cend(), std::back_inserter(v));
                     std::sort(v.begin(), v.end());

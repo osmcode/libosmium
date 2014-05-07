@@ -67,11 +67,11 @@ namespace osmium {
             public:
 
                 void set(const TKey key, const TValue value) override final {
-                    m_vector.push_back(element_type(key, value));
+                    m_vector.emplace_back(key, value);
                 }
 
                 void unsorted_set(const TKey key, const TValue value) {
-                    m_vector.push_back(element_type(key, value));
+                    m_vector.emplace_back(key, value);
                 }
 
                 std::pair<iterator, iterator> get_all(const TKey key) {

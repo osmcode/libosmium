@@ -70,7 +70,7 @@ namespace osmium {
             }
 
             KeyFilter& add(bool result, const char* key) {
-                m_rules.emplace_back(Rule(result, key));
+                m_rules.emplace_back(result, key);
                 return *this;
             }
 
