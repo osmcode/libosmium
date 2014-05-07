@@ -200,8 +200,7 @@ namespace osmium {
 
             /**
              * Go through all the rings and find rings that are not closed.
-             * Problem objects are created for the end points of the open
-             * rings and placed into the m_problems collection.
+             * Problems are reported through the problem reporter.
              *
              * @returns true if any rings were not closed, false otherwise
              */
@@ -552,140 +551,11 @@ namespace osmium {
                 }
             }
 
-        public:
-
-            Assembler(osmium::area::ProblemReporter* problem_reporter = nullptr) :
-                m_problem_reporter(problem_reporter) {
-            }
-
-            ~Assembler() = default;
-
             /**
-             * Enable or disable debug output to stderr. This is for Osmium
-             * developers only.
+             * Create rings from segments.
              */
-            void enable_debug_output(bool debug=true) {
-                m_debug = debug;
-                m_segment_list.enable_debug_output(debug);
-            }
-
-            void init_assembler(osmium::item_type object_type, osmium::object_id_type object_id) {
-                m_segment_list.clear();
-                m_rings.clear();
-                m_outer_rings.clear();
-                m_inner_rings.clear();
-                m_inner_outer_mismatches = 0;
-                if (m_problem_reporter) {
-                    m_problem_reporter->set_object(object_type, object_id);
-                }
-            }
-
-            /**
-             * Assemble an area from the given way.
-             * The resulting area is put into the out_buffer.
-             */
-            void operator()(const osmium::Way& way, osmium::memory::Buffer& out_buffer) {
-                init_assembler(osmium::item_type::way, way.id());
-
-                if (!way.ends_have_same_id()) {
-                    if (m_problem_reporter) {
-                        m_problem_reporter->report_duplicate_node(way.nodes().front().ref(), way.nodes().back().ref(), way.nodes().front().location());
-                    }
-                }
-
-                m_segment_list.extract_segments_from_way(way, "outer");
-
-                if (m_debug) {
-                    std::cerr << "\nBuild way id()=" << way.id() << " segments.size()=" << m_segment_list.size() << "\n";
-                }
-
-                // Now create the Area object and add the attributes and tags
-                // from the relation.
-                osmium::osm::AreaBuilder builder(out_buffer);
-                initialize_area_from_object(builder, way, 0);
-
-                out_buffer.commit();
-
-                if (!stage2()) {
-                    return;
-                }
-
-                add_tags_to_area(builder, way);
-
-                add_rings_to_area(builder);
-            }
-
-            /**
-             * Assemble an area from the given relation and its members.
-             * All members are to be found in the in_buffer at the offsets
-             * given by the members parameter.
-             * The resulting area is put into the out_buffer.
-             */
-            void operator()(const osmium::Relation& relation, const std::vector<size_t>& members, const osmium::memory::Buffer& in_buffer, osmium::memory::Buffer& out_buffer) {
-                init_assembler(osmium::item_type::relation, relation.id());
-
-                m_segment_list.extract_segments_from_ways(relation, members, in_buffer);
-
-                if (m_debug) {
-                    std::cerr << "\nBuild relation id()=" << relation.id() << " members.size()=" << members.size() << " segments.size()=" << m_segment_list.size() << "\n";
-                }
-
-                // Now create the Area object and add the attributes and tags
-                // from the relation.
-                osmium::osm::AreaBuilder builder(out_buffer);
-                initialize_area_from_object(builder, relation, 1);
-
-                // From now on we have an area object without any rings in it.
-                // Areas without rings are "defined" to be invalid. We commit
-                // this area and the caller of the assembler will see the
-                // invalid area. If all goes well, we later add the rings, commit
-                // again, and thus make a valid area out of it.
-                out_buffer.commit();
-
-                if (!stage2()) {
-                    return;
-                }
-
-                add_tags_to_area(builder, relation);
-
-                add_rings_to_area(builder);
-
-                if (m_inner_outer_mismatches == 0) {
-                    auto memit = relation.members().begin();
-                    for (size_t offset : members) {
-                        assert(offset > 0);
-                        if (!std::strcmp(memit->role(), "inner")) {
-                            const osmium::Way& way = in_buffer.get<const osmium::Way>(offset);
-                            if (way.is_closed() && way.tags().size() > 0) {
-                                osmium::tags::KeyFilter filter(true);
-                                filter.add(false, "created_by").add(false, "source").add(false, "note");
-                                filter.add(false, "test:id").add(false, "test:section");
-
-                                osmium::tags::KeyFilter::iterator fi_begin(filter, way.tags().begin(), way.tags().end());
-                                osmium::tags::KeyFilter::iterator fi_end(filter, way.tags().end(), way.tags().end());
-
-                                auto d = std::distance(fi_begin, fi_end);
-                                if (d > 0) {
-                                    const osmium::TagList& area_tags = builder.object().tags(); // tags of the area we just built
-                                    osmium::tags::KeyFilter::iterator area_fi_begin(filter, area_tags.begin(), area_tags.end());
-                                    osmium::tags::KeyFilter::iterator area_fi_end(filter, area_tags.end(), area_tags.end());
-
-                                    if (!std::equal(fi_begin, fi_end, area_fi_begin) || d != std::distance(area_fi_begin, area_fi_end)) {
-                                        operator()(way, out_buffer);
-                                    }
-                                }
-                            }
-                        }
-                        ++memit;
-                    }
-                }
-            }
-
-            bool stage2() {
-                // Now all of these segments will be sorted from bottom left
-                // to top right.
+            bool create_rings() {
                 m_segment_list.sort();
-
                 m_segment_list.erase_duplicate_segments();
 
                 // Now we look for segments crossing each other. If there are
@@ -774,6 +644,135 @@ namespace osmium {
                 check_inner_outer_roles();
 
                 return true;
+            }
+
+        public:
+
+            Assembler(osmium::area::ProblemReporter* problem_reporter = nullptr) :
+                m_problem_reporter(problem_reporter) {
+            }
+
+            ~Assembler() = default;
+
+            /**
+             * Enable or disable debug output to stderr. This is for Osmium
+             * developers only.
+             */
+            void enable_debug_output(bool debug=true) {
+                m_debug = debug;
+                m_segment_list.enable_debug_output(debug);
+            }
+
+            void init_assembler(osmium::item_type object_type, osmium::object_id_type object_id) {
+                m_segment_list.clear();
+                m_rings.clear();
+                m_outer_rings.clear();
+                m_inner_rings.clear();
+                m_inner_outer_mismatches = 0;
+                if (m_problem_reporter) {
+                    m_problem_reporter->set_object(object_type, object_id);
+                }
+            }
+
+            /**
+             * Assemble an area from the given way.
+             * The resulting area is put into the out_buffer.
+             */
+            void operator()(const osmium::Way& way, osmium::memory::Buffer& out_buffer) {
+                init_assembler(osmium::item_type::way, way.id());
+
+                if (!way.ends_have_same_id()) {
+                    if (m_problem_reporter) {
+                        m_problem_reporter->report_duplicate_node(way.nodes().front().ref(), way.nodes().back().ref(), way.nodes().front().location());
+                    }
+                }
+
+                m_segment_list.extract_segments_from_way(way, "outer");
+
+                if (m_debug) {
+                    std::cerr << "\nBuild way id()=" << way.id() << " segments.size()=" << m_segment_list.size() << "\n";
+                }
+
+                // Now create the Area object and add the attributes and tags
+                // from the relation.
+                osmium::osm::AreaBuilder builder(out_buffer);
+                initialize_area_from_object(builder, way, 0);
+
+                out_buffer.commit();
+
+                if (!create_rings()) {
+                    return;
+                }
+
+                add_tags_to_area(builder, way);
+
+                add_rings_to_area(builder);
+            }
+
+            /**
+             * Assemble an area from the given relation and its members.
+             * All members are to be found in the in_buffer at the offsets
+             * given by the members parameter.
+             * The resulting area is put into the out_buffer.
+             */
+            void operator()(const osmium::Relation& relation, const std::vector<size_t>& members, const osmium::memory::Buffer& in_buffer, osmium::memory::Buffer& out_buffer) {
+                init_assembler(osmium::item_type::relation, relation.id());
+
+                m_segment_list.extract_segments_from_ways(relation, members, in_buffer);
+
+                if (m_debug) {
+                    std::cerr << "\nBuild relation id()=" << relation.id() << " members.size()=" << members.size() << " segments.size()=" << m_segment_list.size() << "\n";
+                }
+
+                // Now create the Area object and add the attributes and tags
+                // from the relation.
+                osmium::osm::AreaBuilder builder(out_buffer);
+                initialize_area_from_object(builder, relation, 1);
+
+                // From now on we have an area object without any rings in it.
+                // Areas without rings are "defined" to be invalid. We commit
+                // this area and the caller of the assembler will see the
+                // invalid area. If all goes well, we later add the rings, commit
+                // again, and thus make a valid area out of it.
+                out_buffer.commit();
+
+                if (!create_rings()) {
+                    return;
+                }
+
+                add_tags_to_area(builder, relation);
+
+                add_rings_to_area(builder);
+
+                if (m_inner_outer_mismatches == 0) {
+                    auto memit = relation.members().begin();
+                    for (size_t offset : members) {
+                        assert(offset > 0);
+                        if (!std::strcmp(memit->role(), "inner")) {
+                            const osmium::Way& way = in_buffer.get<const osmium::Way>(offset);
+                            if (way.is_closed() && way.tags().size() > 0) {
+                                osmium::tags::KeyFilter filter(true);
+                                filter.add(false, "created_by").add(false, "source").add(false, "note");
+                                filter.add(false, "test:id").add(false, "test:section");
+
+                                osmium::tags::KeyFilter::iterator fi_begin(filter, way.tags().begin(), way.tags().end());
+                                osmium::tags::KeyFilter::iterator fi_end(filter, way.tags().end(), way.tags().end());
+
+                                auto d = std::distance(fi_begin, fi_end);
+                                if (d > 0) {
+                                    const osmium::TagList& area_tags = builder.object().tags(); // tags of the area we just built
+                                    osmium::tags::KeyFilter::iterator area_fi_begin(filter, area_tags.begin(), area_tags.end());
+                                    osmium::tags::KeyFilter::iterator area_fi_end(filter, area_tags.end(), area_tags.end());
+
+                                    if (!std::equal(fi_begin, fi_end, area_fi_begin) || d != std::distance(area_fi_begin, area_fi_end)) {
+                                        operator()(way, out_buffer);
+                                    }
+                                }
+                            }
+                        }
+                        ++memit;
+                    }
+                }
             }
 
         }; // class Assembler
