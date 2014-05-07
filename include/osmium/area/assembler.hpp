@@ -305,7 +305,6 @@ namespace osmium {
                     std::cerr << "          " << ring << "\n";
                 }
                 m_rings.push_back(std::move(new_ring));
-                return true;
             }
 
             bool has_closed_subring_back(ProtoRing& ring, const NodeRef& nr) {
