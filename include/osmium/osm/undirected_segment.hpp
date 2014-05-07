@@ -5,7 +5,7 @@
 
 This file is part of Osmium (http://osmcode.org/libosmium).
 
-Copyright 2013 Jochen Topf <jochen@topf.org> and others (see README).
+Copyright 2013,2014 Jochen Topf <jochen@topf.org> and others (see README).
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -45,7 +45,7 @@ namespace osmium {
      * always equal or "smaller" than the second Location, ie to the left
      * and down.
      */
-    class UndirectedSegment : boost::less_than_comparable<UndirectedSegment>, public Segment {
+    class UndirectedSegment : boost::totally_ordered<UndirectedSegment>, public Segment {
 
     public:
 
