@@ -1,5 +1,7 @@
 # Osmium Library
 
+http://osmcode.org/libosmium
+
 A fast and flexible C++ library for working with OpenStreetMap data.
 
 NOTE: This is an alpha version of the next-generation Osmium. For production
@@ -111,8 +113,8 @@ on http://clang.llvm.org/ .
 
 ## Testing
 
-there are a few unit tests using the boost unit test framework in the "test"
-directory. many more tests are needed, any help appreciated.
+There are a few unit tests using the boost unit test framework in the "test"
+directory. Many more tests are needed, any help appreciated.
 
 Run "make test" from the main directory or go to the "test" directory and type
 

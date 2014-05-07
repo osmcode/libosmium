@@ -1,3 +1,10 @@
+/*
+
+  Example program to look at Osmium indexes on disk.
+
+  The code in this example file is released into the Public Domain.
+
+*/
 
 #include <fcntl.h>
 #include <iomanip>
