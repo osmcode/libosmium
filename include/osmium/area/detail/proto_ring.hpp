@@ -72,7 +72,7 @@ namespace osmium {
 
                 ProtoRing(const NodeRefSegment& segment) :
                     m_segments() {
-                    add_segment_end(segment);
+                    add_segment_back(segment);
                 }
 
                 ProtoRing(segments_type::const_iterator sbegin, segments_type::const_iterator send) :
@@ -100,27 +100,27 @@ namespace osmium {
                     m_segments.erase(sbegin, send);
                 }
 
-                void add_segment_end(const NodeRefSegment& segment) {
-                    m_segments.push_back(segment);
-                }
-
-                void add_segment_start(const NodeRefSegment& segment) {
+                void add_segment_front(const NodeRefSegment& segment) {
                     m_segments.insert(m_segments.begin(), segment);
                 }
 
-                const NodeRefSegment& first_segment() const {
+                void add_segment_back(const NodeRefSegment& segment) {
+                    m_segments.push_back(segment);
+                }
+
+                const NodeRefSegment& get_segment_front() const {
                     return m_segments.front();
                 }
 
-                NodeRefSegment& first_segment() {
+                NodeRefSegment& get_segment_front() {
                     return m_segments.front();
                 }
 
-                const NodeRefSegment& last_segment() const {
+                const NodeRefSegment& get_segment_back() const {
                     return m_segments.back();
                 }
 
-                NodeRefSegment& last_segment() {
+                NodeRefSegment& get_segment_back() {
                     return m_segments.back();
                 }
 

@@ -211,7 +211,7 @@ namespace osmium {
                     if (!ring.closed()) {
                         open_rings = true;
                         if (m_problem_reporter) {
-                            m_problem_reporter->report_ring_not_closed(ring.first_segment().first().location(), ring.last_segment().second().location());
+                            m_problem_reporter->report_ring_not_closed(ring.get_segment_front().first().location(), ring.get_segment_back().second().location());
                         }
                     }
                 }
@@ -227,14 +227,14 @@ namespace osmium {
              * true.
              */
             bool possibly_combine_rings_end(ProtoRing& ring) {
-                const osmium::NodeRef& nr = ring.last_segment().second();
+                const osmium::NodeRef& nr = ring.get_segment_back().second();
 
                 if (m_debug) {
                     std::cerr << "      combine_rings_end\n";
                 }
                 for (auto it = m_rings.begin(); it != m_rings.end(); ++it) {
                     if (&*it != &ring && !it->closed()) {
-                        if (has_same_location(nr, it->first_segment().first())) {
+                        if (has_same_location(nr, it->get_segment_front().first())) {
                             if (m_debug) {
                                 std::cerr << "      ring.last=it->first\n";
                             }
@@ -242,7 +242,7 @@ namespace osmium {
                             m_rings.erase(it);
                             return true;
                         }
-                        if (has_same_location(nr, it->last_segment().second())) {
+                        if (has_same_location(nr, it->get_segment_back().second())) {
                             if (m_debug) {
                                 std::cerr << "      ring.last=it->last\n";
                             }
@@ -263,14 +263,14 @@ namespace osmium {
              * true.
              */
             bool possibly_combine_rings_start(ProtoRing& ring) {
-                const osmium::NodeRef& nr = ring.first_segment().first();
+                const osmium::NodeRef& nr = ring.get_segment_front().first();
 
                 if (m_debug) {
                     std::cerr << "      combine_rings_start\n";
                 }
                 for (auto it = m_rings.begin(); it != m_rings.end(); ++it) {
                     if (&*it != &ring && !it->closed()) {
-                        if (has_same_location(nr, it->last_segment().second())) {
+                        if (has_same_location(nr, it->get_segment_back().second())) {
                             if (m_debug) {
                                 std::cerr << "      ring.first=it->last\n";
                             }
@@ -279,7 +279,7 @@ namespace osmium {
                             m_rings.erase(it);
                             return true;
                         }
-                        if (has_same_location(nr, it->first_segment().first())) {
+                        if (has_same_location(nr, it->get_segment_front().first())) {
                             if (m_debug) {
                                 std::cerr << "      ring.first=it->first\n";
                             }
@@ -392,13 +392,13 @@ namespace osmium {
                 }
 
                 if (at_end) {
-                    ring.add_segment_end(segment);
+                    ring.add_segment_back(segment);
                     has_closed_subring_end(ring, segment);
                     if (possibly_combine_rings_end(ring)) {
                         check_for_closed_subring(ring);
                     }
                 } else {
-                    ring.add_segment_start(segment);
+                    ring.add_segment_front(segment);
                     has_closed_subring_start(ring, segment);
                     if (possibly_combine_rings_start(ring)) {
                         check_for_closed_subring(ring);
@@ -416,13 +416,13 @@ namespace osmium {
                         std::cerr << "    ring " << *ring << " is outer\n";
                     }
                     osmium::osm::OuterRingBuilder ring_builder(builder.buffer(), &builder);
-                    ring_builder.add_node_ref(ring->first_segment().first());
+                    ring_builder.add_node_ref(ring->get_segment_front().first());
                     for (auto& segment : ring->segments()) {
                         ring_builder.add_node_ref(segment.second());
                     }
                     for (ProtoRing* inner : ring->inner_rings()) {
                         osmium::osm::InnerRingBuilder ring_builder(builder.buffer(), &builder);
-                        ring_builder.add_node_ref(inner->first_segment().first());
+                        ring_builder.add_node_ref(inner->get_segment_front().first());
                         for (auto& segment : inner->segments()) {
                             ring_builder.add_node_ref(segment.second());
                         }
@@ -442,21 +442,21 @@ namespace osmium {
                             std::cerr << " => ring CLOSED\n";
                         }
                     } else {
-                        if (has_same_location(ring.last_segment().second(), segment.first())) {
+                        if (has_same_location(ring.get_segment_back().second(), segment.first())) {
                             combine_rings(segment, ring, true);
                             return true;
                         }
-                        if (has_same_location(ring.last_segment().second(), segment.second())) {
+                        if (has_same_location(ring.get_segment_back().second(), segment.second())) {
                             segment.swap_locations();
                             combine_rings(segment, ring, true);
                             return true;
                         }
-                        if (has_same_location(ring.first_segment().first(), segment.first())) {
+                        if (has_same_location(ring.get_segment_front().first(), segment.first())) {
                             segment.swap_locations();
                             combine_rings(segment, ring, false);
                             return true;
                         }
-                        if (has_same_location(ring.first_segment().first(), segment.second())) {
+                        if (has_same_location(ring.get_segment_front().first(), segment.second())) {
                             combine_rings(segment, ring, false);
                             return true;
                         }
