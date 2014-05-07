@@ -293,55 +293,49 @@ namespace osmium {
                 return false;
             }
 
-            bool has_closed_subring_end(ProtoRing& ring, const NodeRefSegment& segment) {
+            void split_off_subring(osmium::area::detail::ProtoRing& ring, osmium::area::detail::ProtoRing::segments_type::iterator it, osmium::area::detail::ProtoRing::segments_type::iterator it_begin, osmium::area::detail::ProtoRing::segments_type::iterator it_end) {
+                if (m_debug) {
+                    std::cerr << "        subring found at: " << *it << "\n";
+                }
+                ProtoRing new_ring(it_begin, it_end);
+                ring.remove_segments(it_begin, it_end);
+                if (m_debug) {
+                    std::cerr << "        split into two rings:\n";
+                    std::cerr << "          " << new_ring << "\n";
+                    std::cerr << "          " << ring << "\n";
+                }
+                m_rings.push_back(std::move(new_ring));
+                return true;
+            }
+
+            bool has_closed_subring_end(ProtoRing& ring, const NodeRef& nr) {
                 if (ring.segments().size() < 3) {
                     return false;
                 }
                 if (m_debug) {
                     std::cerr << "      has_closed_subring_end()\n";
                 }
-                const osmium::NodeRef& nr = segment.second();
                 auto end = ring.segments().end();
                 for (auto it = ring.segments().begin() + 1; it != end - 1; ++it) {
                     if (has_same_location(nr, it->first())) {
-                        if (m_debug) {
-                            std::cerr << "        subring found at: " << *it << "\n";
-                        }
-                        ProtoRing new_ring(it, end);
-                        ring.remove_segments(it, end);
-                        if (m_debug) {
-                            std::cerr << "        split into two rings:\n";
-                            std::cerr << "          " << new_ring << "\n";
-                            std::cerr << "          " << ring << "\n";
-                        }
-                        m_rings.emplace_back(new_ring);
+                        split_off_subring(ring, it, it, end);
                         return true;
                     }
                 }
                 return false;
             }
 
-            bool has_closed_subring_start(ProtoRing& ring, const NodeRefSegment& segment) {
+            bool has_closed_subring_start(ProtoRing& ring, const NodeRef& nr) {
                 if (ring.segments().size() < 3) {
                     return false;
                 }
                 if (m_debug) {
                     std::cerr << "      has_closed_subring_start()\n";
                 }
-                const osmium::NodeRef& nr = segment.first();
-                for (auto it = ring.segments().begin() + 1; it != ring.segments().end() - 1; ++it) {
+                auto end = ring.segments().end();
+                for (auto it = ring.segments().begin() + 1; it != end - 1; ++it) {
                     if (has_same_location(nr, it->second())) {
-                        if (m_debug) {
-                            std::cerr << "        subring found at: " << *it << "\n";
-                        }
-                        ProtoRing new_ring(ring.segments().begin(), it+1);
-                        ring.remove_segments(ring.segments().begin(), it+1);
-                        if (m_debug) {
-                            std::cerr << "        split into two rings:\n";
-                            std::cerr << "          " << new_ring << "\n";
-                            std::cerr << "          " << ring << "\n";
-                        }
-                        m_rings.push_back(std::move(new_ring));
+                        split_off_subring(ring, it, ring.segments().begin(), it+1);
                         return true;
                     }
                 }
@@ -393,13 +387,13 @@ namespace osmium {
 
                 if (at_end) {
                     ring.add_segment_back(segment);
-                    has_closed_subring_end(ring, segment);
+                    has_closed_subring_end(ring, segment.second());
                     if (possibly_combine_rings_end(ring)) {
                         check_for_closed_subring(ring);
                     }
                 } else {
                     ring.add_segment_front(segment);
-                    has_closed_subring_start(ring, segment);
+                    has_closed_subring_start(ring, segment.first());
                     if (possibly_combine_rings_start(ring)) {
                         check_for_closed_subring(ring);
                     }
