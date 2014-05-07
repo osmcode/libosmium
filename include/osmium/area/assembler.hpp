@@ -101,49 +101,6 @@ namespace osmium {
             }
 
             /**
-             * Find intersection between segments.
-             *
-             * @returns true if there are intersections.
-             */
-            bool find_intersections() {
-                if (m_segment_list.empty()) {
-                    return false;
-                }
-
-                bool found_intersections = false;
-
-                for (auto it1 = m_segment_list.begin(); it1 != m_segment_list.end()-1; ++it1) {
-                    const NodeRefSegment& s1 = *it1;
-                    for (auto it2 = it1+1; it2 != m_segment_list.end(); ++it2) {
-                        const NodeRefSegment& s2 = *it2;
-                        if (s1 == s2) {
-                            if (m_debug) {
-                                std::cerr << "  found overlap on segment " << s1 << "\n";
-                            }
-                        } else {
-                            if (outside_x_range(s2, s1)) {
-                                break;
-                            }
-                            if (y_range_overlap(s1, s2)) {
-                                osmium::Location intersection = calculate_intersection(s1, s2);
-                                if (intersection) {
-                                    found_intersections = true;
-                                    if (m_debug) {
-                                        std::cerr << "  segments " << s1 << " and " << s2 << " intersecting at " << intersection << "\n";
-                                    }
-                                    if (m_problem_reporter) {
-                                        m_problem_reporter->report_intersection(s1.way()->id(), s1.first().location(), s1.second().location(), s2.way()->id(), s2.first().location(), s2.second().location(), intersection);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                return found_intersections;
-            }
-
-            /**
              * Initialize area attributes and tags from the attributes and tags
              * of the given object.
              */
@@ -735,7 +692,7 @@ namespace osmium {
                 // any, the multipolygon is invalid.
                 // In the future this could be improved by trying to fix those
                 // cases.
-                if (find_intersections()) {
+                if (m_segment_list.find_intersections(m_problem_reporter)) {
                     return false;
                 }
 
