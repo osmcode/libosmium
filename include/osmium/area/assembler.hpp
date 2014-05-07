@@ -77,9 +77,6 @@ namespace osmium {
             // The rings we are building from the way segments
             std::list<ProtoRing> m_rings;
 
-            // ID of the relation/way we are currently working on
-            osmium::object_id_type m_object_id;
-
             std::vector<ProtoRing*> m_outer_rings;
             std::vector<ProtoRing*> m_inner_rings;
 
@@ -135,7 +132,7 @@ namespace osmium {
                                         std::cerr << "  segments " << s1 << " and " << s2 << " intersecting at " << intersection << "\n";
                                     }
                                     if (m_problem_reporter) {
-                                        m_problem_reporter->report_intersection(m_object_id, s1.way()->id(), s1.first().location(), s1.second().location(), s2.way()->id(), s2.first().location(), s2.second().location(), intersection);
+                                        m_problem_reporter->report_intersection(s1.way()->id(), s1.first().location(), s1.second().location(), s2.way()->id(), s2.first().location(), s2.second().location(), intersection);
                                     }
                                 }
                             }
@@ -258,7 +255,7 @@ namespace osmium {
                     if (!ring.closed()) {
                         open_rings = true;
                         if (m_problem_reporter) {
-                            m_problem_reporter->report_ring_not_closed(m_object_id, ring.first_segment().first().location(), ring.last_segment().second().location());
+                            m_problem_reporter->report_ring_not_closed(ring.first_segment().first().location(), ring.last_segment().second().location());
                         }
                     }
                 }
@@ -578,7 +575,7 @@ namespace osmium {
                                 std::cerr << "      segment " << segment << " from way " << segment.way()->id() << " should have role 'outer'\n";
                             }
                             if (m_problem_reporter) {
-                                m_problem_reporter->report_role_should_be_outer(m_object_id, segment.way()->id(), segment.first().location(), segment.second().location());
+                                m_problem_reporter->report_role_should_be_outer(segment.way()->id(), segment.first().location(), segment.second().location());
                             }
                         }
                     }
@@ -591,7 +588,7 @@ namespace osmium {
                                 std::cerr << "      segment " << segment << " from way " << segment.way()->id() << " should have role 'inner'\n";
                             }
                             if (m_problem_reporter) {
-                                m_problem_reporter->report_role_should_be_inner(m_object_id, segment.way()->id(), segment.first().location(), segment.second().location());
+                                m_problem_reporter->report_role_should_be_inner(segment.way()->id(), segment.first().location(), segment.second().location());
                             }
                         }
                     }
@@ -615,13 +612,15 @@ namespace osmium {
                 m_segment_list.enable_debug_output(debug);
             }
 
-            void init_assembler(osmium::object_id_type id) {
+            void init_assembler(osmium::item_type object_type, osmium::object_id_type object_id) {
                 m_segment_list.clear();
                 m_rings.clear();
                 m_outer_rings.clear();
                 m_inner_rings.clear();
-                m_object_id = id;
                 m_inner_outer_mismatches = 0;
+                if (m_problem_reporter) {
+                    m_problem_reporter->set_object(object_type, object_id);
+                }
             }
 
             /**
@@ -629,7 +628,7 @@ namespace osmium {
              * The resulting area is put into the out_buffer.
              */
             void operator()(const osmium::Way& way, osmium::memory::Buffer& out_buffer) {
-                init_assembler(way.id());
+                init_assembler(osmium::item_type::way, way.id());
 
                 if (!way.ends_have_same_id()) {
                     if (m_problem_reporter) {
@@ -666,7 +665,7 @@ namespace osmium {
              * The resulting area is put into the out_buffer.
              */
             void operator()(const osmium::Relation& relation, const std::vector<size_t>& members, const osmium::memory::Buffer& in_buffer, osmium::memory::Buffer& out_buffer) {
-                init_assembler(relation.id());
+                init_assembler(osmium::item_type::relation, relation.id());
 
                 m_segment_list.extract_segments_from_ways(relation, members, in_buffer);
 
