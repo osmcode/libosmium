@@ -226,11 +226,11 @@ namespace osmium {
              * If the rings can be combined they are and the function returns
              * true.
              */
-            bool possibly_combine_rings_end(ProtoRing& ring) {
+            bool possibly_combine_rings_back(ProtoRing& ring) {
                 const osmium::NodeRef& nr = ring.get_segment_back().second();
 
                 if (m_debug) {
-                    std::cerr << "      combine_rings_end\n";
+                    std::cerr << "      possibly_combine_rings_back()\n";
                 }
                 for (auto it = m_rings.begin(); it != m_rings.end(); ++it) {
                     if (&*it != &ring && !it->closed()) {
@@ -262,11 +262,11 @@ namespace osmium {
              * If the rings can be combined they are and the function returns
              * true.
              */
-            bool possibly_combine_rings_start(ProtoRing& ring) {
+            bool possibly_combine_rings_front(ProtoRing& ring) {
                 const osmium::NodeRef& nr = ring.get_segment_front().first();
 
                 if (m_debug) {
-                    std::cerr << "      combine_rings_start\n";
+                    std::cerr << "      possibly_combine_rings_front()\n";
                 }
                 for (auto it = m_rings.begin(); it != m_rings.end(); ++it) {
                     if (&*it != &ring && !it->closed()) {
@@ -308,12 +308,12 @@ namespace osmium {
                 return true;
             }
 
-            bool has_closed_subring_end(ProtoRing& ring, const NodeRef& nr) {
+            bool has_closed_subring_back(ProtoRing& ring, const NodeRef& nr) {
                 if (ring.segments().size() < 3) {
                     return false;
                 }
                 if (m_debug) {
-                    std::cerr << "      has_closed_subring_end()\n";
+                    std::cerr << "      has_closed_subring_back()\n";
                 }
                 auto end = ring.segments().end();
                 for (auto it = ring.segments().begin() + 1; it != end - 1; ++it) {
@@ -325,12 +325,12 @@ namespace osmium {
                 return false;
             }
 
-            bool has_closed_subring_start(ProtoRing& ring, const NodeRef& nr) {
+            bool has_closed_subring_front(ProtoRing& ring, const NodeRef& nr) {
                 if (ring.segments().size() < 3) {
                     return false;
                 }
                 if (m_debug) {
-                    std::cerr << "      has_closed_subring_start()\n";
+                    std::cerr << "      has_closed_subring_front()\n";
                 }
                 auto end = ring.segments().end();
                 for (auto it = ring.segments().begin() + 1; it != end - 1; ++it) {
@@ -385,8 +385,8 @@ namespace osmium {
                     std::cerr << " => match at front of ring\n";
                 }
                 ring.add_segment_front(segment);
-                has_closed_subring_start(ring, segment.first());
-                if (possibly_combine_rings_start(ring)) {
+                has_closed_subring_front(ring, segment.first());
+                if (possibly_combine_rings_front(ring)) {
                     check_for_closed_subring(ring);
                 }
             }
@@ -396,8 +396,8 @@ namespace osmium {
                     std::cerr << " => match at back of ring\n";
                 }
                 ring.add_segment_back(segment);
-                has_closed_subring_end(ring, segment.second());
-                if (possibly_combine_rings_end(ring)) {
+                has_closed_subring_back(ring, segment.second());
+                if (possibly_combine_rings_back(ring)) {
                     check_for_closed_subring(ring);
                 }
             }
