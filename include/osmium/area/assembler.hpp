@@ -49,9 +49,9 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/tags/key_filter.hpp>
 
 #include <osmium/area/detail/proto_ring.hpp>
+#include <osmium/area/detail/node_ref_segment.hpp>
 #include <osmium/area/detail/segment_list.hpp>
 #include <osmium/area/problem_reporter.hpp>
-#include <osmium/area/segment.hpp>
 
 namespace osmium {
 
@@ -349,7 +349,7 @@ namespace osmium {
                 osmium::area::detail::ProtoRing::segments_type segments(ring.segments().size());
                 std::copy(ring.segments().begin(), ring.segments().end(), segments.begin());
                 std::sort(segments.begin(), segments.end());
-                auto it = std::adjacent_find(segments.begin(), segments.end(), [this](const NodeRefSegment& s1, const NodeRefSegment& s2) {
+                auto it = std::adjacent_find(segments.begin(), segments.end(), [this](const osmium::area::detail::NodeRefSegment& s1, const osmium::area::detail::NodeRefSegment& s2) {
                     return has_same_location(s1.first(), s2.first());
                 });
                 if (it == segments.end()) {
@@ -379,7 +379,7 @@ namespace osmium {
                 return true;
             }
 
-            void combine_rings_front(const NodeRefSegment& segment, ProtoRing& ring) {
+            void combine_rings_front(const osmium::area::detail::NodeRefSegment& segment, ProtoRing& ring) {
                 if (m_debug) {
                     std::cerr << " => match at front of ring\n";
                 }
@@ -390,7 +390,7 @@ namespace osmium {
                 }
             }
 
-            void combine_rings_back(const NodeRefSegment& segment, ProtoRing& ring) {
+            void combine_rings_back(const osmium::area::detail::NodeRefSegment& segment, ProtoRing& ring) {
                 if (m_debug) {
                     std::cerr << " => match at back of ring\n";
                 }
@@ -426,7 +426,7 @@ namespace osmium {
                 }
             }
 
-            bool add_to_existing_ring(NodeRefSegment segment) {
+            bool add_to_existing_ring(osmium::area::detail::NodeRefSegment segment) {
                 int n=0;
                 for (auto& ring : m_rings) {
                     if (m_debug) {

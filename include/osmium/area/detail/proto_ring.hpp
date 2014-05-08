@@ -5,7 +5,7 @@
 
 This file is part of Osmium (http://osmcode.org/libosmium).
 
-Copyright 2013,2014 Jochen Topf <jochen@topf.org> and others (see README).
+Copyright 2014 Jochen Topf <jochen@topf.org> and others (see README).
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -41,7 +41,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/osm/noderef.hpp>
 #include <osmium/osm/ostream.hpp>
-#include <osmium/area/segment.hpp>
+#include <osmium/area/detail/node_ref_segment.hpp>
 
 namespace osmium {
 
@@ -56,7 +56,7 @@ namespace osmium {
 
             public:
 
-                typedef std::vector<osmium::area::NodeRefSegment> segments_type;
+                typedef std::vector<NodeRefSegment> segments_type;
 
             private:
 
@@ -250,7 +250,7 @@ namespace osmium {
                     }
                 }
 
-                bool contains(const osmium::area::NodeRefSegment& segment) const {
+                bool contains(const NodeRefSegment& segment) const {
                     for (auto& s : m_segments) {
                         if (s == segment || (s.first() == segment.second() && s.second() == segment.first())) {
                             return true;

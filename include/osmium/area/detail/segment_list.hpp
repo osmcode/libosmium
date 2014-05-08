@@ -38,7 +38,7 @@ DEALINGS IN THE SOFTWARE.
 #include <vector>
 
 #include <osmium/area/problem_reporter.hpp>
-#include <osmium/area/segment.hpp>
+#include <osmium/area/detail/node_ref_segment.hpp>
 #include <osmium/memory/buffer.hpp>
 #include <osmium/osm/relation.hpp>
 #include <osmium/osm/way.hpp>
