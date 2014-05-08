@@ -310,11 +310,10 @@ int main(int argc, char* argv[]) {
 
     OGRDataSource* data_source = initialize_database(output_format, output_filename);
 
-    typedef osmium::area::Assembler area_assembler_type;
     osmium::area::ProblemReporterOGR problem_reporter(data_source);
-    area_assembler_type assembler(&problem_reporter);
-    assembler.enable_debug_output();
-    osmium::area::Collector<area_assembler_type> collector(assembler);
+    osmium::area::Assembler::config_type assembler_config(&problem_reporter);
+    assembler_config.enable_debug_output();
+    osmium::area::Collector<osmium::area::Assembler> collector(assembler_config);
 
     std::cerr << "Pass 1...\n";
     osmium::io::Reader reader1(input_filename);

@@ -59,11 +59,13 @@ namespace osmium {
 
                 slist_type m_segments {};
 
-                bool m_debug { false };
+                bool m_debug;
 
             public:
 
-                SegmentList() = default;
+                SegmentList(bool debug) :
+                    m_debug(debug) {
+                }
 
                 ~SegmentList() = default;
 

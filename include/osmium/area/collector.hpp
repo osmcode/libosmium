@@ -67,15 +67,16 @@ namespace osmium {
 
             typedef typename osmium::relations::Collector<osmium::area::Collector<TAssembler>, false, true, false> collector_type;
 
-            TAssembler& m_assembler;
+            typedef typename TAssembler::config_type assembler_config_type;
+            const assembler_config_type m_assembler_config;
 
             osmium::memory::Buffer m_output_buffer;
 
         public:
 
-            Collector(TAssembler& assembler) :
+            Collector(const assembler_config_type& assembler_config) :
                 collector_type(),
-                m_assembler(assembler),
+                m_assembler_config(assembler_config),
                 m_output_buffer(1024*1024, true) {
             }
 
@@ -118,14 +119,16 @@ namespace osmium {
              */
             void way_not_in_any_relation(const osmium::Way& way) {
                 if (way.ends_have_same_location() && way.nodes().size() > 3) { // way is closed and has enough nodes, build simple multipolygon
-                    m_assembler(way, m_output_buffer);
+                    TAssembler assembler(m_assembler_config);
+                    assembler(way, m_output_buffer);
                 }
             }
 
             void complete_relation(osmium::relations::RelationMeta& relation_meta) {
                 relation_meta.remove_empty_members();
                 const osmium::Relation& relation = this->get_relation(relation_meta);
-                m_assembler(relation, relation_meta.member_offsets(), this->buffer(), m_output_buffer);
+                TAssembler assembler(m_assembler_config);
+                assembler(relation, relation_meta.member_offsets(), this->buffer(), m_output_buffer);
             }
 
             void done() {
