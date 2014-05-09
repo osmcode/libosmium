@@ -64,10 +64,11 @@ namespace osmium {
             osmium::area::ProblemReporter* problem_reporter;
 
             // Enables debug output to stderr
-            bool debug { false };
+            bool debug;
 
-            AssemblerConfig(osmium::area::ProblemReporter* pr = nullptr) :
-                problem_reporter(pr) {
+            AssemblerConfig(osmium::area::ProblemReporter* pr = nullptr, bool d=false) :
+                problem_reporter(pr),
+                debug(d) {
             }
 
             ~AssemblerConfig() = default;
