@@ -5,7 +5,7 @@
 
 This file is part of Osmium (http://osmcode.org/libosmium).
 
-Copyright 2013,2014 Jochen Topf <jochen@topf.org> and others (see README).
+Copyright 2014 Jochen Topf <jochen@topf.org> and others (see README).
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -60,7 +60,7 @@ namespace osmium {
          * The actual assembling of the areas is done by the assembler
          * class given as template argument.
          *
-         * @tparam TAssembler MultiPolygon Assembler class.
+         * @tparam TAssembler Multipolygon Assembler class.
          */
         template <class TAssembler>
         class Collector : public osmium::relations::Collector<osmium::area::Collector<TAssembler>, false, true, false> {
@@ -84,7 +84,7 @@ namespace osmium {
              * We are interested in all relations tagged with type=multipolygon or
              * type=boundary.
              *
-             * Overwritten from the osmium::relations::Collector class.
+             * Overwritten from the base class.
              */
             bool keep_relation(const osmium::Relation& relation) const {
                 const char* type = relation.tags().get_value_by_key("type");
@@ -102,23 +102,22 @@ namespace osmium {
             }
 
             /**
-             * We are only interested in members of type way.
-             *
-             * Overwritten from the osmium::relations::Collector class.
+             * Overwritten from the base class.
              */
             bool keep_member(const osmium::relations::RelationMeta& /*relation_meta*/, const osmium::RelationMember& member) const {
+                // We are only interested in members of type way.
                 return member.type() == osmium::item_type::way;
             }
 
             /**
              * This is called when a way is not in any multipolygon
              * relation.
-             * If the way is closed and has enough nodes it might be
-             * an area in its own right, so we copy it to the output
-             * buffer and change its type to area.
+             *
+             * Overwritten from the base class.
              */
             void way_not_in_any_relation(const osmium::Way& way) {
-                if (way.ends_have_same_location() && way.nodes().size() > 3) { // way is closed and has enough nodes, build simple multipolygon
+                if (way.ends_have_same_location() && way.nodes().size() > 3) {
+                    // way is closed and has enough nodes, build simple multipolygon
                     TAssembler assembler(m_assembler_config);
                     assembler(way, m_output_buffer);
                 }
