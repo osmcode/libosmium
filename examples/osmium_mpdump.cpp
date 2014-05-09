@@ -45,9 +45,8 @@ int main(int argc, char* argv[]) {
 
     osmium::io::File infile(argv[1]);
 
-    typedef osmium::area::Assembler area_assembler_type;
-    area_assembler_type assembler;
-    osmium::area::Collector<area_assembler_type> collector(assembler);
+    osmium::area::Assembler::config_type assembler_config;
+    osmium::area::Collector<osmium::area::Assembler> collector(assembler_config);
 
     std::cout << "Pass 1...\n";
     osmium::io::Reader reader1(infile, osmium::osm_entity::flags::relation);
