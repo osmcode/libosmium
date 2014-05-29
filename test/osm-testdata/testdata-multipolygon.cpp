@@ -325,12 +325,12 @@ int main(int argc, char* argv[]) {
     location_handler_type location_handler(index_pos, index_neg);
     location_handler.ignore_errors();
 
-    TestHandler ogr_handler(data_source);
+    TestHandler test_handler(data_source);
 
     std::cerr << "Pass 2...\n";
     osmium::io::Reader reader2(input_filename);
-    osmium::apply(reader2, location_handler, ogr_handler, collector.handler([&ogr_handler](const osmium::memory::Buffer& area_buffer) {
-        osmium::apply(area_buffer, ogr_handler);
+    osmium::apply(reader2, location_handler, test_handler, collector.handler([&test_handler](const osmium::memory::Buffer& area_buffer) {
+        osmium::apply(area_buffer, test_handler);
     }));
     reader2.close();
     std::cerr << "Pass 2 done\n";
