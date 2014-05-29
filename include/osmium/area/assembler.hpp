@@ -754,7 +754,6 @@ namespace osmium {
                 if (m_inner_outer_mismatches == 0) {
                     auto memit = relation.members().begin();
                     for (size_t offset : members) {
-                        assert(offset > 0);
                         if (!std::strcmp(memit->role(), "inner")) {
                             const osmium::Way& way = in_buffer.get<const osmium::Way>(offset);
                             if (way.is_closed() && way.tags().size() > 0) {

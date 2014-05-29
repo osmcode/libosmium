@@ -150,9 +150,9 @@ namespace osmium {
                         return false;
                     }
 
-                    size_t pos = m_collector.buffer().committed();
-                    m_collector.buffer().add_item(object);
-                    m_collector.buffer().commit();
+                    size_t pos = m_collector.members_buffer().committed();
+                    m_collector.members_buffer().add_item(object);
+                    m_collector.members_buffer().commit();
 
                     for (auto it = range.first; it != range.second; ++it) {
                         const MemberMeta& member_meta = *it;
@@ -250,9 +250,11 @@ namespace osmium {
 
             HandlerPass2 m_handler_pass2;
 
-            // All relations and members we are interested in will be kept
-            // in this buffer
-            osmium::memory::Buffer m_buffer;
+            // All relations we are interested in will be kept in this buffer
+            osmium::memory::Buffer m_relations_buffer;
+
+            // All members we are interested in will be kept in this buffer
+            osmium::memory::Buffer m_members_buffer;
 
             /// Vector with all relations we are interested in
             std::vector<RelationMeta> m_relations;
@@ -273,7 +275,8 @@ namespace osmium {
              */
             Collector() :
                 m_handler_pass2(*static_cast<TCollector*>(this)),
-                m_buffer(1024*1024, true),
+                m_relations_buffer(1024*1024, true),
+                m_members_buffer(1024*1024, true),
                 m_relations(),
                 m_member_meta() {
             }
@@ -378,7 +381,7 @@ namespace osmium {
              * Get the relation from a relation_meta.
              */
             const osmium::Relation& get_relation(const RelationMeta& relation_meta) const {
-                return m_buffer.get<osmium::Relation>(relation_meta.relation_offset());
+                return m_relations_buffer.get<osmium::Relation>(relation_meta.relation_offset());
             }
 
             /**
@@ -390,8 +393,8 @@ namespace osmium {
              * collector.
              */
             void add_relation(const osmium::Relation& relation) {
-                size_t offset = m_buffer.committed();
-                m_buffer.add_item(relation);
+                size_t offset = m_relations_buffer.committed();
+                m_relations_buffer.add_item(relation);
 
                 RelationMeta relation_meta(offset, relation.members().size());
 
@@ -405,11 +408,11 @@ namespace osmium {
                     ++n;
                 }
 
-                assert(offset == m_buffer.committed());
+                assert(offset == m_relations_buffer.committed());
                 if (relation_meta.has_all_members()) {
-                    m_buffer.rollback();
+                    m_relations_buffer.rollback();
                 } else {
-                    m_buffer.commit();
+                    m_relations_buffer.commit();
                     m_relations.emplace_back(relation_meta);
 //                    std::cerr << "added relation id=" << relation.id() << "\n";
                 }
@@ -435,7 +438,8 @@ namespace osmium {
                 uint64_t nmembers = m_member_meta[0].capacity() + m_member_meta[1].capacity() + m_member_meta[2].capacity();
                 uint64_t members = nmembers * sizeof(MemberMeta);
                 uint64_t relations = m_relations.capacity() * sizeof(RelationMeta);
-                uint64_t buffer = m_buffer.capacity();
+                uint64_t relations_buffer_capacity = m_relations_buffer.capacity();
+                uint64_t members_buffer_capacity = m_members_buffer.capacity();
 
                 uint64_t relation_member_offset_size = 0;
                 for (const auto& relation_meta : m_relations) {
@@ -454,11 +458,12 @@ namespace osmium {
                 std::cout << "  nR * sRM       = " << relations << "\n";
                 std::cout << "  member_offsets = " << relation_member_offset_size * sizeof(size_t) << "\n";
                 std::cout << "  nM * sMM       = " << members << "\n";
-                std::cout << "  buffer         = " << buffer << "\n";
-                std::cout << "  total          = " << buffer + relations + members +  relation_member_offset_size * sizeof(size_t) << "\n";
+                std::cout << "  relations_buffer_capacity = " << relations_buffer_capacity << "\n";
+                std::cout << "  members_buffer_capacity   = " << members_buffer_capacity << "\n";
+                std::cout << "  total          = " << relations_buffer_capacity + members_buffer_capacity + relations + members +  relation_member_offset_size * sizeof(size_t) << "\n";
                 std::cout << "  =============================================\n";
 
-                return buffer + relations + members;
+                return relations_buffer_capacity + members_buffer_capacity + relations + members;
             }
 
             /**
@@ -469,8 +474,8 @@ namespace osmium {
                 return m_handler_pass2;
             }
 
-            osmium::memory::Buffer& buffer() {
-                return m_buffer;
+            osmium::memory::Buffer& members_buffer() {
+                return m_members_buffer;
             }
 
             template <class TSource>

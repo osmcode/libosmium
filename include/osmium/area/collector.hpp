@@ -141,7 +141,7 @@ namespace osmium {
                 relation_meta.remove_empty_members();
                 const osmium::Relation& relation = this->get_relation(relation_meta);
                 TAssembler assembler(m_assembler_config);
-                assembler(relation, relation_meta.member_offsets(), this->buffer(), m_output_buffer);
+                assembler(relation, relation_meta.member_offsets(), this->members_buffer(), m_output_buffer);
                 possibly_flush_output_buffer();
             }
 
