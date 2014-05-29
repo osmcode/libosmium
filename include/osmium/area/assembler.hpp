@@ -435,10 +435,12 @@ namespace osmium {
                     if (debug()) {
                         std::cerr << "    ring " << *ring << " is outer\n";
                     }
-                    osmium::osm::OuterRingBuilder ring_builder(builder.buffer(), &builder);
-                    ring_builder.add_node_ref(ring->get_segment_front().first());
-                    for (auto& segment : ring->segments()) {
-                        ring_builder.add_node_ref(segment.second());
+                    {
+                        osmium::osm::OuterRingBuilder ring_builder(builder.buffer(), &builder);
+                        ring_builder.add_node_ref(ring->get_segment_front().first());
+                        for (auto& segment : ring->segments()) {
+                            ring_builder.add_node_ref(segment.second());
+                        }
                     }
                     for (ProtoRing* inner : ring->inner_rings()) {
                         osmium::osm::InnerRingBuilder ring_builder(builder.buffer(), &builder);
@@ -447,7 +449,6 @@ namespace osmium {
                             ring_builder.add_node_ref(segment.second());
                         }
                     }
-                    builder.buffer().commit();
                 }
             }
 
@@ -700,18 +701,16 @@ namespace osmium {
 
                 // Now create the Area object and add the attributes and tags
                 // from the relation.
-                osmium::osm::AreaBuilder builder(out_buffer);
-                initialize_area_from_object(builder, way, 0);
+                {
+                    osmium::osm::AreaBuilder builder(out_buffer);
+                    initialize_area_from_object(builder, way, 0);
 
-                out_buffer.commit();
-
-                if (!create_rings()) {
-                    return;
+                    if (create_rings()) {
+                        add_tags_to_area(builder, way);
+                        add_rings_to_area(builder);
+                    }
                 }
-
-                add_tags_to_area(builder, way);
-
-                add_rings_to_area(builder);
+                out_buffer.commit();
             }
 
             /**
@@ -731,25 +730,22 @@ namespace osmium {
                     std::cerr << "\nBuild relation id()=" << relation.id() << " members.size()=" << members.size() << " segments.size()=" << m_segment_list.size() << "\n";
                 }
 
+                size_t area_offset = out_buffer.committed();
+
                 // Now create the Area object and add the attributes and tags
                 // from the relation.
-                osmium::osm::AreaBuilder builder(out_buffer);
-                initialize_area_from_object(builder, relation, 1);
+                {
+                    osmium::osm::AreaBuilder builder(out_buffer);
+                    initialize_area_from_object(builder, relation, 1);
 
-                // From now on we have an area object without any rings in it.
-                // Areas without rings are "defined" to be invalid. We commit
-                // this area and the caller of the assembler will see the
-                // invalid area. If all goes well, we later add the rings, commit
-                // again, and thus make a valid area out of it.
+                    if (create_rings()) {
+                        add_tags_to_area(builder, relation);
+                        add_rings_to_area(builder);
+                    }
+                }
                 out_buffer.commit();
 
-                if (!create_rings()) {
-                    return;
-                }
-
-                add_tags_to_area(builder, relation);
-
-                add_rings_to_area(builder);
+                const osmium::TagList& area_tags = out_buffer.get<osmium::Area>(area_offset).tags(); // tags of the area we just built
 
                 if (m_inner_outer_mismatches == 0) {
                     auto memit = relation.members().begin();
@@ -766,7 +762,6 @@ namespace osmium {
 
                                 auto d = std::distance(fi_begin, fi_end);
                                 if (d > 0) {
-                                    const osmium::TagList& area_tags = builder.object().tags(); // tags of the area we just built
                                     osmium::tags::KeyFilter::iterator area_fi_begin(filter, area_tags.begin(), area_tags.end());
                                     osmium::tags::KeyFilter::iterator area_fi_end(filter, area_tags.end(), area_tags.end());
 
