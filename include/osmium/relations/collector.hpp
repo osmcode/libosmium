@@ -37,6 +37,7 @@ DEALINGS IN THE SOFTWARE.
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
+#include <iomanip>
 #include <iostream>
 #include <vector>
 
@@ -446,22 +447,25 @@ namespace osmium {
                     relation_member_offset_size += relation_meta.member_offsets().capacity();
                 }
 
-                std::cout << "  nR  = m_relations.capacity()             = " << m_relations.capacity() << "\n";
-                std::cout << "  nMN = m_member_meta[NODE].capacity()     = " << m_member_meta[0].capacity() << "\n";
-                std::cout << "  nMW = m_member_meta[WAY].capacity()      = " << m_member_meta[1].capacity() << "\n";
-                std::cout << "  nMR = m_member_meta[RELATION].capacity() = " << m_member_meta[2].capacity() << "\n";
-                std::cout << "  nM  = m_member_meta[*].capacity()        = " << nmembers << "\n";
+                std::cout << "  nR  = m_relations.capacity() ........... = " << std::setw(12) << m_relations.capacity() << "\n";
+                std::cout << "  nMN = m_member_meta[NODE].capacity() ... = " << std::setw(12) << m_member_meta[0].capacity() << "\n";
+                std::cout << "  nMW = m_member_meta[WAY].capacity() .... = " << std::setw(12) << m_member_meta[1].capacity() << "\n";
+                std::cout << "  nMR = m_member_meta[RELATION].capacity() = " << std::setw(12) << m_member_meta[2].capacity() << "\n";
+                std::cout << "  nM  = m_member_meta[*].capacity() ...... = " << std::setw(12) << nmembers << "\n";
 
-                std::cout << "  sRM = sizeof(RelationMeta) = " << sizeof(RelationMeta) << "\n";
-                std::cout << "  sMM = sizeof(MemberMeta)   = " << sizeof(MemberMeta) << "\n";
+                std::cout << "  sRM = sizeof(RelationMeta) ............. = " << std::setw(12) << sizeof(RelationMeta) << "\n";
+                std::cout << "  sMM = sizeof(MemberMeta) ............... = " << std::setw(12) << sizeof(MemberMeta) << "\n\n";
 
-                std::cout << "  nR * sRM       = " << relations << "\n";
-                std::cout << "  member_offsets = " << relation_member_offset_size * sizeof(size_t) << "\n";
-                std::cout << "  nM * sMM       = " << members << "\n";
-                std::cout << "  relations_buffer_capacity = " << relations_buffer_capacity << "\n";
-                std::cout << "  members_buffer_capacity   = " << members_buffer_capacity << "\n";
-                std::cout << "  total          = " << relations_buffer_capacity + members_buffer_capacity + relations + members +  relation_member_offset_size * sizeof(size_t) << "\n";
-                std::cout << "  =============================================\n";
+                std::cout << "  nR * sRM ............................... = " << std::setw(12) << relations << "\n";
+                std::cout << "  member_offsets ......................... = " << std::setw(12) << relation_member_offset_size * sizeof(size_t) << "\n";
+                std::cout << "  nM * sMM ............................... = " << std::setw(12) << members << "\n";
+                std::cout << "  relations_buffer_capacity .............. = " << std::setw(12) << relations_buffer_capacity << "\n";
+                std::cout << "  members_buffer_capacity ................ = " << std::setw(12) << members_buffer_capacity << "\n";
+
+                uint64_t total = relations + relation_member_offset_size * sizeof(size_t) + members + relations_buffer_capacity + members_buffer_capacity;
+
+                std::cout << "  total .................................. = " << std::setw(12) << total << "\n";
+                std::cout << "  =======================================================\n";
 
                 return relations_buffer_capacity + members_buffer_capacity + relations + members;
             }
