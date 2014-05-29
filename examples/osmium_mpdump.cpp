@@ -66,13 +66,13 @@ int main(int argc, char* argv[]) {
 
     std::cout << "Pass 2...\n";
     osmium::io::Reader reader2(infile);
-    osmium::apply(reader2, location_handler, collector.handler());
+    osmium::apply(reader2, location_handler, collector.handler([&dump](const osmium::memory::Buffer& buffer) {
+        osmium::apply(buffer, dump);
+    }));
     std::cout << "Pass 2 done\n";
 
     std::cout << "Memory:\n";
     collector.used_memory();
-
-    osmium::apply(collector, dump);
 
     google::protobuf::ShutdownProtobufLibrary();
 }
