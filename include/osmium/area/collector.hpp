@@ -72,6 +72,19 @@ namespace osmium {
 
             osmium::memory::Buffer m_output_buffer;
 
+            void flush_output_buffer() {
+                if (this->callback()) {
+                    this->callback()(m_output_buffer);
+                    m_output_buffer.clear();
+                }
+            }
+
+            void possibly_flush_output_buffer() {
+                if (m_output_buffer.committed() > 1024*100) {
+                    flush_output_buffer();
+                }
+            }
+
         public:
 
             Collector(const assembler_config_type& assembler_config) :
@@ -120,6 +133,7 @@ namespace osmium {
                     // way is closed and has enough nodes, build simple multipolygon
                     TAssembler assembler(m_assembler_config);
                     assembler(way, m_output_buffer);
+                    possibly_flush_output_buffer();
                 }
             }
 
@@ -128,9 +142,11 @@ namespace osmium {
                 const osmium::Relation& relation = this->get_relation(relation_meta);
                 TAssembler assembler(m_assembler_config);
                 assembler(relation, relation_meta.member_offsets(), this->buffer(), m_output_buffer);
+                possibly_flush_output_buffer();
             }
 
             void done() {
+                flush_output_buffer();
                 collector_type::clean_assembled_relations();
                 if (! collector_type::relations().empty()) {
                     std::cerr << "Warning! Some member ways missing for these multipolygon relations:";

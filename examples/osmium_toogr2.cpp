@@ -311,11 +311,13 @@ int main(int argc, char* argv[]) {
 
     std::cerr << "Pass 2...\n";
     osmium::io::Reader reader2(input_filename);
-    osmium::apply(reader2, location_handler, ogr_handler, collector.handler());
+
+    osmium::apply(reader2, location_handler, ogr_handler, collector.handler([&ogr_handler](const osmium::memory::Buffer& area_buffer) {
+        osmium::apply(area_buffer, ogr_handler);
+    }));
+
     reader2.close();
     std::cerr << "Pass 2 done\n";
-
-    osmium::apply(collector, ogr_handler);
 
     google::protobuf::ShutdownProtobufLibrary();
 }

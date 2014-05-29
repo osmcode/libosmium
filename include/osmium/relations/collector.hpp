@@ -263,6 +263,9 @@ namespace osmium {
              */
             std::vector<MemberMeta> m_member_meta[3];
 
+            typedef std::function<void(const osmium::memory::Buffer&)> callback_func_type;
+            callback_func_type m_callback;
+
         public:
 
             /**
@@ -279,6 +282,10 @@ namespace osmium {
 
             std::vector<MemberMeta>& member_meta(const item_type type) {
                 return m_member_meta[static_cast<uint32_t>(type) - 1];
+            }
+
+            callback_func_type callback() {
+                return m_callback;
             }
 
             const std::vector<RelationMeta>& relations() const {
@@ -457,7 +464,8 @@ namespace osmium {
             /**
              * Return reference to second pass handler.
              */
-            HandlerPass2& handler() {
+            HandlerPass2& handler(const callback_func_type& callback = nullptr) {
+                m_callback = callback;
                 return m_handler_pass2;
             }
 
