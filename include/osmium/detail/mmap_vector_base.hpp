@@ -75,6 +75,10 @@ namespace osmium {
                 m_data(osmium::detail::typed_mmap<T>::grow_and_map(capacity, m_fd)) {
             }
 
+            void data(T* data) {
+                m_data = data;
+            }
+
         public:
 
             typedef T value_type;
