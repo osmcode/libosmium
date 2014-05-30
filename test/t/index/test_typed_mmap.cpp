@@ -5,7 +5,7 @@
 #include <boost/test/output_test_stream.hpp>
 using boost::test_tools::output_test_stream;
 
-#include <osmium/detail/typed_mmap.hpp>
+#include <osmium/index/detail/typed_mmap.hpp>
 
 BOOST_AUTO_TEST_SUITE(TypedMmap)
 
