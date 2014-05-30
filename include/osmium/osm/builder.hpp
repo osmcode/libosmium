@@ -33,6 +33,8 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <new>
+
 #include <osmium/memory/builder.hpp>
 #include <osmium/osm.hpp>
 #include <osmium/osm/entity.hpp>

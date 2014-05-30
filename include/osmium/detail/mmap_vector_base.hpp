@@ -34,6 +34,7 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <cstddef>
+#include <new>
 #include <stdexcept>
 
 #include <osmium/detail/typed_mmap.hpp>
