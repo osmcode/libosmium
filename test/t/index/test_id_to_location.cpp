@@ -101,6 +101,8 @@ BOOST_AUTO_TEST_CASE(DenseMapMmap) {
     index_type index2;
     test_func_real<index_type>(index2);
 }
+#else
+# pragma message "not running 'DenseMapMmap' test case on this machine"
 #endif
 
 BOOST_AUTO_TEST_CASE(DenseMapFile) {
