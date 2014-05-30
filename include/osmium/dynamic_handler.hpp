@@ -33,6 +33,9 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <memory>
+#include <utility>
+
 #include <osmium/handler.hpp>
 
 namespace osmium {
@@ -106,7 +109,7 @@ auto _name_##_dispatch(THandler& handler, int) -> decltype(handler._name_(), voi
     handler._name_(); \
 } \
 template <class THandler> \
-void _name_##_dispatch(THandler& handler, long) {}
+void _name_##_dispatch(THandler&, long) {}
 
 #define HANDLER_DISPATCH1(_name_, _type_) \
 template <class THandler> \

@@ -47,7 +47,7 @@ DEALINGS IN THE SOFTWARE.
     }; \
     template <int SIZE, class THandlers> \
     struct call_ ## _func_<SIZE, SIZE, THandlers> { \
-        void operator()(THandlers& handlers) {} \
+        void operator()(THandlers&) {} \
     };
 
 #define OSMIUM_CHAIN_HANDLER_CALL2(_func_, _type_) \
@@ -60,7 +60,7 @@ DEALINGS IN THE SOFTWARE.
     }; \
     template <int SIZE, class THandlers> \
     struct call_ ## _func_<SIZE, SIZE, THandlers> { \
-        void operator()(THandlers& handlers, osmium::_type_&) {} \
+        void operator()(THandlers&, osmium::_type_&) {} \
     };
 
 namespace osmium {
@@ -77,21 +77,21 @@ namespace osmium {
             typedef std::tuple<THandler&...> handlers_type;
             handlers_type m_handlers;
 
-            OSMIUM_CHAIN_HANDLER_CALL1(init);
-            OSMIUM_CHAIN_HANDLER_CALL1(before_nodes);
-            OSMIUM_CHAIN_HANDLER_CALL1(after_nodes);
-            OSMIUM_CHAIN_HANDLER_CALL1(before_ways);
-            OSMIUM_CHAIN_HANDLER_CALL1(after_ways);
-            OSMIUM_CHAIN_HANDLER_CALL1(before_relations);
-            OSMIUM_CHAIN_HANDLER_CALL1(after_relations);
-            OSMIUM_CHAIN_HANDLER_CALL1(before_changesets);
-            OSMIUM_CHAIN_HANDLER_CALL1(after_changesets);
-            OSMIUM_CHAIN_HANDLER_CALL1(done);
+            OSMIUM_CHAIN_HANDLER_CALL1(init)
+            OSMIUM_CHAIN_HANDLER_CALL1(before_nodes)
+            OSMIUM_CHAIN_HANDLER_CALL1(after_nodes)
+            OSMIUM_CHAIN_HANDLER_CALL1(before_ways)
+            OSMIUM_CHAIN_HANDLER_CALL1(after_ways)
+            OSMIUM_CHAIN_HANDLER_CALL1(before_relations)
+            OSMIUM_CHAIN_HANDLER_CALL1(after_relations)
+            OSMIUM_CHAIN_HANDLER_CALL1(before_changesets)
+            OSMIUM_CHAIN_HANDLER_CALL1(after_changesets)
+            OSMIUM_CHAIN_HANDLER_CALL1(done)
 
-            OSMIUM_CHAIN_HANDLER_CALL2(node, Node);
-            OSMIUM_CHAIN_HANDLER_CALL2(way, Way);
-            OSMIUM_CHAIN_HANDLER_CALL2(relation, Relation);
-            OSMIUM_CHAIN_HANDLER_CALL2(changeset, Changeset);
+            OSMIUM_CHAIN_HANDLER_CALL2(node, Node)
+            OSMIUM_CHAIN_HANDLER_CALL2(way, Way)
+            OSMIUM_CHAIN_HANDLER_CALL2(relation, Relation)
+            OSMIUM_CHAIN_HANDLER_CALL2(changeset, Changeset)
 
         public:
 
