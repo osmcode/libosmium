@@ -1,5 +1,5 @@
-#ifndef OSMIUM_DETAIL_MMAP_VECTOR_ANON_HPP
-#define OSMIUM_DETAIL_MMAP_VECTOR_ANON_HPP
+#ifndef OSMIUM_DETAIL_MMAP_VECTOR_FILE_HPP
+#define OSMIUM_DETAIL_MMAP_VECTOR_FILE_HPP
 
 /*
 
@@ -33,46 +33,51 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#ifdef __linux__
-
 #include <cstddef>
 
-#include <osmium/detail/typed_mmap.hpp>
-#include <osmium/detail/mmap_vector_base.hpp>
+#include <osmium/index/detail/typed_mmap.hpp>
+#include <osmium/index/detail/mmap_vector_base.hpp>
+#include <osmium/index/detail/tmpfile.hpp>
 
 namespace osmium {
 
     namespace detail {
 
         /**
-        * This class looks and behaves like STL vector, but uses mmap internally.
+        * This class looks and behaves like STL vector, but mmap's a file internally.
         */
         template <typename T>
-        class mmap_vector_anon : public mmap_vector_base<T, mmap_vector_anon> {
+        class mmap_vector_file : public mmap_vector_base<T, mmap_vector_file> {
 
         public:
 
-            mmap_vector_anon() :
-                mmap_vector_base<T, osmium::detail::mmap_vector_anon>(
-                    -1,
+            mmap_vector_file() :
+                mmap_vector_base<T, osmium::detail::mmap_vector_file>(
+                    osmium::detail::create_tmp_file(),
                     osmium::detail::mmap_vector_size_increment,
-                    0,
-                    osmium::detail::typed_mmap<T>::map(osmium::detail::mmap_vector_size_increment)) {
+                    0) {
+            }
+
+            mmap_vector_file(int fd) :
+                mmap_vector_base<T, osmium::detail::mmap_vector_file>(
+                    fd,
+                    osmium::detail::typed_mmap<T>::file_size(fd) == 0 ? osmium::detail::mmap_vector_size_increment : osmium::detail::typed_mmap<T>::file_size(fd),
+                    osmium::detail::typed_mmap<T>::file_size(fd)) {
             }
 
             void reserve(size_t new_capacity) {
                 if (new_capacity > this->capacity()) {
-                    this->data(osmium::detail::typed_mmap<T>::remap(this->data(), this->capacity(), new_capacity));
+                    osmium::detail::typed_mmap<T>::unmap(this->data(), this->capacity());
+                    osmium::detail::typed_mmap<T>::grow_file(new_capacity, this->m_fd);
+                    osmium::detail::typed_mmap<T>::map(new_capacity, this->m_fd);
                     this->m_capacity = new_capacity;
                 }
             }
 
-        }; // class mmap_vector_anon
+        }; // class mmap_vector_file
 
     } // namespace detail
 
 } // namespace osmium
 
-#endif // __linux__
-
-#endif // OSMIUM_DETAIL_MMAP_VECTOR_ANON_HPP
+#endif // OSMIUM_DETAIL_MMAP_VECTOR_FILE_HPP
