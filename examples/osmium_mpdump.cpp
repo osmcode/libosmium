@@ -9,11 +9,14 @@
 
 #include <iostream>
 
+#include <getopt.h>
+
 #include <osmium/io/any_input.hpp>
 
 #include <osmium/index/map/dummy.hpp>
 #include <osmium/index/map/sparse_table.hpp>
 #include <osmium/handler/node_locations_for_ways.hpp>
+#include <osmium/dynamic_handler.hpp>
 #include <osmium/area/collector.hpp>
 #include <osmium/area/assembler.hpp>
 #include <osmium/visitor.hpp>
@@ -28,22 +31,67 @@ class WKTDump : public osmium::handler::Handler {
 
     osmium::geom::WKTFactory m_factory{};
 
+    std::ostream& m_out;
+
 public:
 
+    WKTDump(std::ostream& out) :
+        m_out(out) {
+    }
+
     void area(const osmium::Area& area) {
-        std::cout << m_factory.create_multipolygon(area) << "\n";
+        m_out << m_factory.create_multipolygon(area) << "\n";
     }
 
 }; // class WKTDump
 
-int main(int argc, char* argv[]) {
+void print_help() {
+    std::cout << "osmium_mpdump [OPTIONS] OSMFILE\n\n"
+              << "Read OSMFILE and build multipolygons from it.\n"
+              << "\nOptions:\n"
+              << "  -h, --help           This help message\n"
+              << "  -w, --dump-wkt       Dump area geometries as WKT\n"
+              << "  -o, --dump-objects   Dump area objects\n";
+}
 
-    if (argc != 2) {
-        std::cerr << "Usage: " << argv[0] << " OSMFILE\n";
+int main(int argc, char* argv[]) {
+    static struct option long_options[] = {
+        {"help",         no_argument, 0, 'h'},
+        {"dump-wkt",     no_argument, 0, 'w'},
+        {"dump-objects", no_argument, 0, 'o'},
+        {0, 0, 0, 0}
+    };
+
+    osmium::handler::DynamicHandler handler;
+
+    while (true) {
+        int c = getopt_long(argc, argv, "hwo", long_options, 0);
+        if (c == -1) {
+            break;
+        }
+
+        switch (c) {
+            case 'h':
+                print_help();
+                exit(0);
+            case 'w':
+                handler.set<WKTDump>(std::cout);
+                break;
+            case 'o':
+                handler.set<osmium::osm::Dump>(std::cout);
+                break;
+            default:
+                exit(1);
+        }
+    }
+
+    int remaining_args = argc - optind;
+    if (remaining_args != 1) {
+        std::cerr << "Usage: " << argv[0] << " [OPTIONS] OSMFILE\n";
         exit(1);
     }
 
-    osmium::io::File infile(argv[1]);
+    osmium::io::File infile(argv[optind]);
 
     osmium::area::Assembler::config_type assembler_config;
     osmium::area::Collector<osmium::area::Assembler> collector(assembler_config);
@@ -61,13 +109,10 @@ int main(int argc, char* argv[]) {
     location_handler_type location_handler(index_pos, index_neg);
     location_handler.ignore_errors(); // XXX
 
-    osmium::osm::Dump dump(std::cout);
-    WKTDump wktdump;
-
     std::cout << "Pass 2...\n";
     osmium::io::Reader reader2(infile);
-    osmium::apply(reader2, location_handler, collector.handler([&dump](const osmium::memory::Buffer& buffer) {
-        osmium::apply(buffer, dump);
+    osmium::apply(reader2, location_handler, collector.handler([&handler](const osmium::memory::Buffer& buffer) {
+        osmium::apply(buffer, handler);
     }));
     std::cout << "Pass 2 done\n";
 
