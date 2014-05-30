@@ -42,10 +42,10 @@ LIB_SHAPE  := -lshp $(LIB_GEOS)
 LIB_PRGOPT := -lboost_program_options
 
 PROGRAMS := \
+    osmium_area_test \
     osmium_convert \
     osmium_debug \
     osmium_index \
-    osmium_mpdump \
     osmium_read \
     osmium_serdump \
     osmium_toogr \
@@ -64,6 +64,9 @@ PROGRAMS := \
 
 all: $(PROGRAMS)
 
+osmium_area_test: osmium_area_test.cpp
+	$(CXX) $(CXXFLAGS) $(CXXFLAGS_WARNINGS) -o $@ $< $(LDFLAGS) $(LIB_IO)
+
 osmium_convert: osmium_convert.cpp
 	$(CXX) $(CXXFLAGS) $(CXXFLAGS_WARNINGS) -o $@ $< $(LDFLAGS) $(LIB_IO)
 
@@ -77,9 +80,6 @@ osmium_read: osmium_read.cpp
 	$(CXX) $(CXXFLAGS) $(CXXFLAGS_WARNINGS) -o $@ $< $(LDFLAGS) $(LIB_IO)
 
 osmium_find_bbox: osmium_find_bbox.cpp
-	$(CXX) $(CXXFLAGS) $(CXXFLAGS_WARNINGS) -o $@ $< $(LDFLAGS) $(LIB_IO)
-
-osmium_mpdump: osmium_mpdump.cpp
 	$(CXX) $(CXXFLAGS) $(CXXFLAGS_WARNINGS) -o $@ $< $(LDFLAGS) $(LIB_IO)
 
 osmium_range_from_history: osmium_range_from_history.cpp

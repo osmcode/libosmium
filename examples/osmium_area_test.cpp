@@ -46,7 +46,7 @@ public:
 }; // class WKTDump
 
 void print_help() {
-    std::cout << "osmium_mpdump [OPTIONS] OSMFILE\n\n"
+    std::cout << "osmium_area_test [OPTIONS] OSMFILE\n\n"
               << "Read OSMFILE and build multipolygons from it.\n"
               << "\nOptions:\n"
               << "  -h, --help           This help message\n"
