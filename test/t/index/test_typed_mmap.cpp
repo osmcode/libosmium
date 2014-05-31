@@ -28,7 +28,7 @@ BOOST_AUTO_TEST_CASE(MmapSizeZero) {
 }
 
 BOOST_AUTO_TEST_CASE(MmapHugeSize) {
-    BOOST_CHECK_THROW(osmium::detail::typed_mmap<uint64_t>::map(1024L * 1024L * 1024L * 1024L), std::system_error);
+    BOOST_CHECK_THROW(osmium::detail::typed_mmap<uint64_t>::map(1L << 50), std::system_error);
 }
 
 #ifdef __linux__
