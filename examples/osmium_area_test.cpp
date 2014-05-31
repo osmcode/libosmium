@@ -40,7 +40,11 @@ public:
     }
 
     void area(const osmium::Area& area) {
-        m_out << m_factory.create_multipolygon(area) << "\n";
+        try {
+            m_out << m_factory.create_multipolygon(area) << "\n";
+        } catch (osmium::geom::geometry_error) {
+            m_out << "GEOMETRY ERROR\n";
+        }
     }
 
 }; // class WKTDump
