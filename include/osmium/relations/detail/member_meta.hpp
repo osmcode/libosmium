@@ -58,13 +58,13 @@ namespace osmium {
              * Position of the relation this member is a part of in the
              * m_relations vector.
              */
-            unsigned int m_relation_pos;
+            size_t m_relation_pos;
 
             /**
              * Position of this member in the list of members of the
              * relation this member is a part of.
              */
-            int m_member_pos;
+            size_t m_member_pos;
 
         public:
 
@@ -73,7 +73,7 @@ namespace osmium {
              * member_pos is used to create dummy MemberMeta that can be compared
              * to the MemberMeta in the vectors using the equal_range algorithm.
              */
-            MemberMeta(osmium::object_id_type member_id, int relation_pos=0, int member_pos=0) :
+            MemberMeta(osmium::object_id_type member_id, size_t relation_pos=0, size_t member_pos=0) :
                 m_member_id(member_id),
                 m_relation_pos(relation_pos),
                 m_member_pos(member_pos) {
@@ -83,11 +83,11 @@ namespace osmium {
                 return m_member_id;
             }
 
-            unsigned int relation_pos() const {
+            size_t relation_pos() const {
                 return m_relation_pos;
             }
 
-            int member_pos() const {
+            size_t member_pos() const {
                 return m_member_pos;
             }
 
