@@ -370,8 +370,7 @@ namespace osmium {
                 int n=0;
                 for (auto& member : m_relations_buffer.get<osmium::Relation>(offset).members()) {
                     if (static_cast<TCollector*>(this)->keep_member(relation_meta, member)) {
-                        MemberMeta mm(member.ref(), m_relations.size(), n);
-                        member_meta(member.type()).push_back(mm);
+                        member_meta(member.type()).emplace_back(member.ref(), m_relations.size(), n);
                         relation_meta.increment_need_members();
                     } else {
                         member.ref(0); // set member id to zero to indicate we are not interested
