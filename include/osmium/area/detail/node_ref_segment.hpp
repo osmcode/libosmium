@@ -108,10 +108,10 @@ namespace osmium {
                     return m_second;
                 }
 
-                bool to_left_of(const osmium::Location loc) const {
-    //                std::cerr << "segment " << first() << "--" << second() << " to_left_of(" << loc << "\n";
+                bool to_left_of(const osmium::Location location) const {
+    //                std::cerr << "segment " << first() << "--" << second() << " to_left_of(" << location << "\n";
 
-                    if (first().location() == loc || second().location() == loc) {
+                    if (first().location() == location || second().location() == location) {
                         return false;
                     }
 
@@ -119,17 +119,17 @@ namespace osmium {
                         return a.y() < b.y();
                     });
 
-                    if (mm.first.y() >= loc.y() || mm.second.y() < loc.y() || first().location().x() > loc.x()) {
+                    if (mm.first.y() >= location.y() || mm.second.y() < location.y() || first().location().x() > location.x()) {
     //                    std::cerr << "  false\n";
                         return false;
                     }
 
                     int64_t ax = mm.first.x();
                     int64_t bx = mm.second.x();
-                    int64_t lx = loc.x();
+                    int64_t lx = location.x();
                     int64_t ay = mm.first.y();
                     int64_t by = mm.second.y();
-                    int64_t ly = loc.y();
+                    int64_t ly = location.y();
                     return ((bx - ax)*(ly - ay) - (by - ay)*(lx - ax)) <= 0;
                 }
 
