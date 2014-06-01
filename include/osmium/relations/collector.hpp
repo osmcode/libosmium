@@ -172,21 +172,6 @@ namespace osmium {
                     return true;
                 }
 
-                /**
-                 * This method is called from the after_* methods. It reclaimes
-                 * memory that's not needed any more and calls done() on the
-                 * collector if all objects of all types we are interested in
-                 * have been seen, ie if the input data is exhausted.
-                 */
-                void after(osmium::item_type type) {
-                    // clear all memory used by m_member_meta of this type
-                    m_collector.member_meta(type).clear();
-                    m_collector.member_meta(type).shrink_to_fit();
-                    if (--m_want_types == 0) {
-                        m_collector.done();
-                    }
-                }
-
             public:
 
                 HandlerPass2(TCollector& collector) :
@@ -217,25 +202,7 @@ namespace osmium {
                         }
                     }
                 }
-/*
-                void after_nodes() {
-                    if (N) {
-                        after(osmium::item_type::node);
-                    }
-                }
 
-                void after_ways() {
-                    if (W) {
-                        after(osmium::item_type::way);
-                    }
-                }
-
-                void after_relations() {
-                    if (R) {
-                        after(osmium::item_type::relation);
-                    }
-                }
-*/
                 void done() {
                     // clear all memory used by m_member_meta of this type
                     m_collector.member_meta(osmium::item_type::node).clear();
