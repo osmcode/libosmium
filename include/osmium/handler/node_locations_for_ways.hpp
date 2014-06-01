@@ -69,6 +69,8 @@ namespace osmium {
 
             bool m_ignore_errors {false};
 
+            bool m_must_sort {false};
+
             // It is okay to have this static dummy instance, even when using several threads,
             // because it is read-only.
             static dummy_type& get_dummy() {
@@ -97,17 +99,13 @@ namespace osmium {
              * Store the location of the node in the storage.
              */
             void node(const osmium::Node& node) {
+                m_must_sort = true;
                 const osmium::object_id_type id = node.id();
                 if (id >= 0) {
                     m_storage_pos.set(id, node.location());
                 } else {
                     m_storage_neg.set(-id, node.location());
                 }
-            }
-
-            void after_nodes() {
-                m_storage_pos.sort();
-                m_storage_neg.sort();
             }
 
             /**
@@ -121,7 +119,12 @@ namespace osmium {
              * Retrieve locations of all nodes in the way from storage and add
              * them to the way object.
              */
-            void way(osmium::Way& way) const {
+            void way(osmium::Way& way) {
+                if (m_must_sort) {
+                    m_storage_pos.sort();
+                    m_storage_neg.sort();
+                    m_must_sort = false;
+                }
                 bool error = false;
                 for (auto& wn : way.nodes()) {
                     try {
