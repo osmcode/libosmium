@@ -70,6 +70,31 @@ namespace node_osmium {
         return Undefined();
     }
 
+    void JSHandler::print_error_message(TryCatch& trycatch) {
+        Handle<Value> exception = trycatch.Exception();
+        String::AsciiValue exception_str(exception);
+        v8::Handle<v8::Message> message = trycatch.Message();
+        if (message.IsEmpty()) {
+            std::cerr << *exception_str << std::endl;
+        } else {
+            v8::String::Utf8Value filename(message->GetScriptResourceName());
+            std::cerr << *filename << ":" << message->GetLineNumber() << ": " << *exception_str << std::endl;
+
+            v8::String::Utf8Value sourceline(message->GetSourceLine());
+            std::cerr << *sourceline << std::endl;
+
+            int start = message->GetStartColumn();
+            int end = message->GetEndColumn();
+            for (int i = 0; i < start; i++) {
+                std::cerr << " ";
+            }
+            for (int i = start; i < end; i++) {
+                std::cerr << "^";
+            }
+            std::cerr << std::endl;
+        }
+    }
+
     Handle<Value> JSHandler::options(const Arguments& args) {
         if (args.Length() == 1) {
             if (args[0]->IsObject()) {
@@ -167,9 +192,7 @@ namespace node_osmium {
                     TryCatch trycatch;
                     Handle<Value> v = node_cb->Call(Context::GetCurrent()->Global(), argc, argv);
                     if (v.IsEmpty()) {
-                        Handle<Value> exception = trycatch.Exception();
-                        String::AsciiValue exception_str(exception);
-                        printf("Exception: %s\n", *exception_str);
+                        print_error_message(trycatch);
                         exit(1);
                     }
                 }
@@ -185,9 +208,7 @@ namespace node_osmium {
                     TryCatch trycatch;
                     Handle<Value> v = way_cb->Call(Context::GetCurrent()->Global(), argc, argv);
                     if (v.IsEmpty()) {
-                        Handle<Value> exception = trycatch.Exception();
-                        String::AsciiValue exception_str(exception);
-                        printf("Exception: %s\n", *exception_str);
+                        print_error_message(trycatch);
                         exit(1);
                     }
                 }
@@ -203,9 +224,7 @@ namespace node_osmium {
                     TryCatch trycatch;
                     Handle<Value> v = relation_cb->Call(Context::GetCurrent()->Global(), argc, argv);
                     if (v.IsEmpty()) {
-                        Handle<Value> exception = trycatch.Exception();
-                        String::AsciiValue exception_str(exception);
-                        printf("Exception: %s\n", *exception_str);
+                        print_error_message(trycatch);
                         exit(1);
                     }
                 }
@@ -221,9 +240,7 @@ namespace node_osmium {
             TryCatch trycatch;
             Handle<Value> v = init_cb->Call(Context::GetCurrent()->Global(), 0, argv);
             if (v.IsEmpty()) {
-                Handle<Value> exception = trycatch.Exception();
-                String::AsciiValue exception_str(exception);
-                printf("Exception: %s\n", *exception_str);
+                print_error_message(trycatch);
                 exit(1);
             }
         }
@@ -235,9 +252,7 @@ namespace node_osmium {
             TryCatch trycatch;
             Handle<Value> v = before_nodes_cb->Call(Context::GetCurrent()->Global(), 0, argv);
             if (v.IsEmpty()) {
-                Handle<Value> exception = trycatch.Exception();
-                String::AsciiValue exception_str(exception);
-                printf("Exception: %s\n", *exception_str);
+                print_error_message(trycatch);
                 exit(1);
             }
         }
@@ -249,9 +264,7 @@ namespace node_osmium {
             TryCatch trycatch;
             Handle<Value> v = after_nodes_cb->Call(Context::GetCurrent()->Global(), 0, argv);
             if (v.IsEmpty()) {
-                Handle<Value> exception = trycatch.Exception();
-                String::AsciiValue exception_str(exception);
-                printf("Exception: %s\n", *exception_str);
+                print_error_message(trycatch);
                 exit(1);
             }
         }
@@ -263,9 +276,7 @@ namespace node_osmium {
             TryCatch trycatch;
             Handle<Value> v = before_ways_cb->Call(Context::GetCurrent()->Global(), 0, argv);
             if (v.IsEmpty()) {
-                Handle<Value> exception = trycatch.Exception();
-                String::AsciiValue exception_str(exception);
-                printf("Exception: %s\n", *exception_str);
+                print_error_message(trycatch);
                 exit(1);
             }
         }
@@ -277,9 +288,7 @@ namespace node_osmium {
             TryCatch trycatch;
             Handle<Value> v = after_ways_cb->Call(Context::GetCurrent()->Global(), 0, argv);
             if (v.IsEmpty()) {
-                Handle<Value> exception = trycatch.Exception();
-                String::AsciiValue exception_str(exception);
-                printf("Exception: %s\n", *exception_str);
+                print_error_message(trycatch);
                 exit(1);
             }
         }
@@ -291,9 +300,7 @@ namespace node_osmium {
             TryCatch trycatch;
             Handle<Value> v = before_relations_cb->Call(Context::GetCurrent()->Global(), 0, argv);
             if (v.IsEmpty()) {
-                Handle<Value> exception = trycatch.Exception();
-                String::AsciiValue exception_str(exception);
-                printf("Exception: %s\n", *exception_str);
+                print_error_message(trycatch);
                 exit(1);
             }
         }
@@ -305,9 +312,7 @@ namespace node_osmium {
             TryCatch trycatch;
             Handle<Value> v = after_relations_cb->Call(Context::GetCurrent()->Global(), 0, argv);
             if (v.IsEmpty()) {
-                Handle<Value> exception = trycatch.Exception();
-                String::AsciiValue exception_str(exception);
-                printf("Exception: %s\n", *exception_str);
+                print_error_message(trycatch);
                 exit(1);
             }
         }
@@ -319,9 +324,7 @@ namespace node_osmium {
             TryCatch trycatch;
             Handle<Value> v = before_changesets_cb->Call(Context::GetCurrent()->Global(), 0, argv);
             if (v.IsEmpty()) {
-                Handle<Value> exception = trycatch.Exception();
-                String::AsciiValue exception_str(exception);
-                printf("Exception: %s\n", *exception_str);
+                print_error_message(trycatch);
                 exit(1);
             }
         }
@@ -333,9 +336,7 @@ namespace node_osmium {
             TryCatch trycatch;
             Handle<Value> v = after_changesets_cb->Call(Context::GetCurrent()->Global(), 0, argv);
             if (v.IsEmpty()) {
-                Handle<Value> exception = trycatch.Exception();
-                String::AsciiValue exception_str(exception);
-                printf("Exception: %s\n", *exception_str);
+                print_error_message(trycatch);
                 exit(1);
             }
         }
@@ -347,9 +348,7 @@ namespace node_osmium {
             TryCatch trycatch;
             Handle<Value> v = done_cb->Call(Context::GetCurrent()->Global(), 0, argv);
             if (v.IsEmpty()) {
-                Handle<Value> exception = trycatch.Exception();
-                String::AsciiValue exception_str(exception);
-                printf("Exception: %s\n", *exception_str);
+                print_error_message(trycatch);
                 exit(1);
             }
         }

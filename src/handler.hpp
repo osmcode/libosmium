@@ -14,6 +14,8 @@ namespace node_osmium {
 
     class JSHandler : public node::ObjectWrap {
 
+        void print_error_message(TryCatch& trycatch);
+
     public:
 
         static Persistent<FunctionTemplate> constructor;
