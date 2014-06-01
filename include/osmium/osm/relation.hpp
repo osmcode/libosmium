@@ -115,6 +115,11 @@ namespace osmium {
             return m_ref;
         }
 
+        RelationMember& ref(object_id_type ref) {
+            m_ref = ref;
+            return *this;
+        }
+
         unsigned_object_id_type positive_ref() const {
             return std::abs(m_ref);
         }

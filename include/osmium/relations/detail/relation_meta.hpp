@@ -52,9 +52,6 @@ namespace osmium {
          */
         class RelationMeta {
 
-            /// Vector for relation member offsets
-            std::vector<size_t> m_member_offsets;
-
             /// The relation we are assembling.
             size_t m_relation_offset;
 
@@ -73,12 +70,10 @@ namespace osmium {
              * that have been completed.
              */
             RelationMeta() :
-                m_member_offsets(),
                 m_relation_offset(0) {
             }
 
-            RelationMeta(size_t relation_offset, size_t relation_num_members) :
-                m_member_offsets(relation_num_members, -1),
+            RelationMeta(size_t relation_offset) :
                 m_relation_offset(relation_offset) {
             }
 
@@ -97,41 +92,13 @@ namespace osmium {
             }
 
             /**
-             * Add member. This stores the offset to the member object in a
-             * buffer. It also decrements the "members needed" counter.
+             * This decrements the "members needed" counter.
              *
              * @return true if relation is complete, false otherwise
              */
             bool add_member(size_t offset, size_t n) {
                 assert(m_need_members > 0);
-                assert(n < m_member_offsets.size());
-                m_member_offsets[n] = offset;
                 return --m_need_members == 0;
-            }
-
-            /**
-             * Get a vector reference with offsets to all member objects.
-             * Note that the pointers can be empty if a member object is of a type
-             * we have not requested from the collector (or if it was not in the
-             * input).
-             */
-            std::vector<size_t>& member_offsets() {
-                return m_member_offsets;
-            }
-
-            const std::vector<size_t>& member_offsets() const {
-                return m_member_offsets;
-            }
-
-            /**
-             * Remove all empty members offsets. These are all the members not
-             * found in the input or of the types we are not interested in.
-             */
-            void remove_empty_members() {
-                m_member_offsets.erase(
-                    std::remove(m_member_offsets.begin(), m_member_offsets.end(), -1),
-                    m_member_offsets.end()
-                );
             }
 
             /**

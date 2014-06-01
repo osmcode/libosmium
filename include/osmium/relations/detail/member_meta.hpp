@@ -66,6 +66,11 @@ namespace osmium {
              */
             size_t m_member_pos;
 
+            /**
+             * Offset in the buffer where the object is stored.
+             */
+            size_t m_buffer_offset { 0 };
+
         public:
 
             /**
@@ -89,6 +94,14 @@ namespace osmium {
 
             size_t member_pos() const {
                 return m_member_pos;
+            }
+
+            size_t buffer_offset() const {
+                return m_buffer_offset;
+            }
+
+            void buffer_offset(size_t offset) {
+                m_buffer_offset = offset;
             }
 
         }; // class MemberMeta

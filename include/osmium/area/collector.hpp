@@ -138,10 +138,15 @@ namespace osmium {
             }
 
             void complete_relation(osmium::relations::RelationMeta& relation_meta) {
-                relation_meta.remove_empty_members();
                 const osmium::Relation& relation = this->get_relation(relation_meta);
+                std::vector<size_t> offsets;
+                for (const auto& member : relation.members()) {
+                    if (member.ref() != 0) {
+                        offsets.push_back(this->get_offset(member.type(), member.ref()));
+                    }
+                }
                 TAssembler assembler(m_assembler_config);
-                assembler(relation, relation_meta.member_offsets(), this->members_buffer(), m_output_buffer);
+                assembler(relation, offsets, this->members_buffer(), m_output_buffer);
                 possibly_flush_output_buffer();
             }
 
