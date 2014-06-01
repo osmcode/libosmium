@@ -36,7 +36,7 @@ namespace testcase_101 {
             CheckWKTHandler check_wkt_handler(dirname, 101);
             TestHandler test_handler;
 
-            osmium::apply(reader, check_basics_handler, test_handler);
+            osmium::apply(reader, check_basics_handler, check_wkt_handler, test_handler);
 
             return true;
         }

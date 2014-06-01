@@ -53,6 +53,15 @@ public:
         read_wkt_file(filename + "ways.wkt");
     }
 
+    ~CheckWKTHandler() {
+        if (!m_geometries.empty()) {
+            for (const auto& geom : m_geometries) {
+                std::cerr << "geometry id " << geom.first << " not in data.osm.\n";
+            }
+            exit(1);
+        }
+    }
+
     void node(const osmium::Node& node) {
         const std::string wkt = m_geometries[node.id()];
         assert(wkt != "" && "Missing geometry for node in nodes.wkt");
@@ -69,10 +78,6 @@ public:
         std::string this_wkt = m_factory.create_linestring(way);
         assert(wkt == this_wkt && "wkt geometries don't match");
         m_geometries.erase(way.id());
-    }
-
-    void done() {
-        assert(m_geometries.empty() && "nodes.wkt or ways.wkt contain geometries not in data.osm");
     }
 
 }; // CheckWKTHandler

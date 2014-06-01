@@ -31,7 +31,7 @@ class CheckBasicsHandler : public osmium::handler::Handler {
     // checked for duplicates.
     std::unordered_set<osmium::object_id_type> m_ids {};
 
-    // Check id is in range [min, max] and that id isn't more than once in input.
+    // Check id is in range [min, max] and that it isn't more than once in input.
     void id_check(osmium::object_id_type id, osmium::object_id_type min, osmium::object_id_type max) {
         if (id < m_id_range + min || id > m_id_range + max) {
             std::cerr << "  id " << id << " out of range for this test case\n";
@@ -57,6 +57,21 @@ public:
         m_num_relations(relations) {
     }
 
+    ~CheckBasicsHandler() {
+        if (m_num_nodes != 0) {
+            std::cerr << "  wrong number of nodes in data.osm\n";
+            exit(1);
+        }
+        if (m_num_ways != 0) {
+            std::cerr << "  wrong number of ways in data.osm\n";
+            exit(1);
+        }
+        if (m_num_relations != 0) {
+            std::cerr << "  wrong number of relations in data.osm\n";
+            exit(1);
+        }
+    }
+
     void node(const osmium::Node& node) {
         id_check(node.id(), 0, 799);
         --m_num_nodes;
@@ -70,21 +85,6 @@ public:
     void relations(const osmium::Relation& relation) {
         id_check(relation.id(), 900, 999);
         --m_num_relations;
-    }
-
-    void done() {
-        if (m_num_nodes != 0) {
-            std::cerr << "  wrong number of nodes in data.osm\n";
-            exit(1);
-        }
-        if (m_num_ways != 0) {
-            std::cerr << "  wrong number of ways in data.osm\n";
-            exit(1);
-        }
-        if (m_num_relations != 0) {
-            std::cerr << "  wrong number of relations in data.osm\n";
-            exit(1);
-        }
     }
 
 }; // CheckBasicsHandler
