@@ -12,7 +12,7 @@ Provides a bindings to the [libosmium](https://github.com/osmcode/libosmium) C++
 
 # Installing
 
-By default, binaries are provided and no external depedencies or compile is needed.
+By default, binaries are provided and no external dependencies or compile is needed.
 
 Just do:
 
@@ -30,11 +30,15 @@ var osmium = require('osmium');
 var file = new osmium.File("test/data/winthrop.osm");
 var reader = new osmium.Reader(file);
 console.log(reader.header())
+```
+
+Result:
+```
 { generator: 'CGImap 0.2.0',
   bounds: [ -120.2024, 48.4636, -120.1569, 48.4869 ] }
 ```
 
-## Parse a `.pbf` file and create a node handler callback to count total nodes
+## Parse an OSM file and create a node handler callback to count total nodes
 
 ```js
 var osmium = require('osmium');
@@ -47,6 +51,10 @@ handler.on('node',function(node) {
 });
 reader.apply(handler);
 console.log(nodes);
+```
+
+Result:
+```
 1525
 ```
 
@@ -67,7 +75,9 @@ If you wish to develop on `node-osmium` you can check out the code and then buil
  - Protocol buffers
  - zlib
 
-Set depedencies up on Ubuntu Precise (12.04) like:
+See also the dependency information for the Osmium library.
+
+Set dependencies up on Ubuntu Precise (12.04) like:
 
     sudo apt-add-repository --yes ppa:chris-lea/node.js
     sudo apt-add-repository --yes ppa:mapnik/boost
