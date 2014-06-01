@@ -2,7 +2,7 @@
   "includes": [ "common.gypi" ],
   "variables": {
       "module_name":"osmium",
-      "module_path":"./lib/"
+      "module_path":"./lib/binding"
   },
   "targets": [
     {
