@@ -54,8 +54,8 @@ namespace osmium {
 
         namespace detail {
 
-            template <class TVisitor>
-            inline void switch_on_type(TVisitor& visitor, const osmium::DiffObject& diff, std::false_type) {
+            template <class TVisitor, typename std::enable_if<!std::is_base_of<osmium::diff_handler::DiffHandler, TVisitor>::value, int>::type = 0>
+            inline void switch_on_type(TVisitor& visitor, const osmium::DiffObject& diff) {
                 switch (diff.type()) {
                     case osmium::item_type::node:
                         visitor(static_cast<const osmium::DiffNode&>(diff));
@@ -71,8 +71,8 @@ namespace osmium {
                 }
             }
 
-            template <class TVisitor>
-            inline void switch_on_type(TVisitor& visitor, const osmium::DiffObject& diff, std::true_type) {
+            template <class TVisitor, typename std::enable_if<std::is_base_of<osmium::diff_handler::DiffHandler, TVisitor>::value, int>::type = 0>
+            inline void switch_on_type(TVisitor& visitor, const osmium::DiffObject& diff) {
                 switch (diff.type()) {
                     case osmium::item_type::node:
                         visitor.node(static_cast<const osmium::DiffNode&>(diff));
@@ -90,7 +90,7 @@ namespace osmium {
 
             template <class TVisitor>
             inline void apply_diff_iterator_recurse(const osmium::DiffObject& diff, TVisitor& visitor) {
-                switch_on_type(visitor, diff, std::is_base_of<osmium::diff_handler::DiffHandler, TVisitor>());
+                switch_on_type(visitor, diff);
             }
 
             template <class TVisitor, class ...TRest>

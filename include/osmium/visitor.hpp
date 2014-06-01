@@ -65,8 +65,8 @@ namespace osmium {
             template <typename T, typename U>
             using MaybeConst = typename std::conditional<std::is_const<T>::value, typename std::add_const<U>::type, U>::type;
 
-            template <class TVisitor, typename TItem>
-            inline void switch_on_type(TVisitor& visitor, TItem& item, std::false_type) {
+            template <class TVisitor, typename TItem, typename std::enable_if<!std::is_base_of<osmium::handler::Handler, TVisitor>::value, int>::type = 0>
+            inline void switch_on_type(TVisitor& visitor, TItem& item) {
                 switch (item.type()) {
                     case osmium::item_type::node:
                         visitor(static_cast<MaybeConst<TItem, osmium::Node>&>(item));
@@ -104,8 +104,8 @@ namespace osmium {
                 }
             }
 
-            template <class TVisitor, class TItem>
-            inline void switch_on_type(TVisitor& visitor, TItem& item, std::true_type) {
+            template <class TVisitor, class TItem, typename std::enable_if<std::is_base_of<osmium::handler::Handler, TVisitor>::value, int>::type = 0>
+            inline void switch_on_type(TVisitor& visitor, TItem& item) {
                 switch (item.type()) {
                     case osmium::item_type::node:
                         visitor.node(static_cast<MaybeConst<TItem, osmium::Node>&>(item));
@@ -127,8 +127,8 @@ namespace osmium {
                 }
             }
 
-            template <class TVisitor>
-            inline void switch_on_type(TVisitor& visitor, osmium::Object& item, std::true_type) {
+            template <class TVisitor, typename std::enable_if<std::is_base_of<osmium::handler::Handler, TVisitor>::value, int>::type = 0>
+            inline void switch_on_type(TVisitor& visitor, osmium::Object& item) {
                 switch (item.type()) {
                     case osmium::item_type::node:
                         visitor.node(static_cast<osmium::Node&>(item));
@@ -147,8 +147,8 @@ namespace osmium {
                 }
             }
 
-            template <class TVisitor>
-            inline void switch_on_type(TVisitor& visitor, const osmium::Object& item, std::true_type) {
+            template <class TVisitor, typename std::enable_if<std::is_base_of<osmium::handler::Handler, TVisitor>::value, int>::type = 0>
+            inline void switch_on_type(TVisitor& visitor, const osmium::Object& item) {
                 switch (item.type()) {
                     case osmium::item_type::node:
                         visitor.node(static_cast<const osmium::Node&>(item));
@@ -169,7 +169,7 @@ namespace osmium {
 
             template <class TVisitor, class TItem>
             inline void apply_item_recurse(TItem& item, TVisitor& visitor) {
-                switch_on_type(visitor, item, std::is_base_of<osmium::handler::Handler, TVisitor>());
+                switch_on_type(visitor, item);
             }
 
             template <class TVisitor, class TItem, class ...TRest>
