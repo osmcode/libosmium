@@ -5,7 +5,7 @@
 
 This file is part of Osmium (http://osmcode.org/libosmium).
 
-Copyright 2013 Jochen Topf <jochen@topf.org> and others (see README).
+Copyright 2013,2014 Jochen Topf <jochen@topf.org> and others (see README).
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -53,33 +53,6 @@ namespace osmium {
             }
 
             void relation(const osmium::DiffRelation&) const {
-            }
-
-            void init() const {
-            }
-
-            void before_nodes() const {
-            }
-
-            void after_nodes() const {
-            }
-
-            void before_ways() const {
-            }
-
-            void after_ways() const {
-            }
-
-            void before_relations() const {
-            }
-
-            void after_relations() const {
-            }
-
-            void before_changesets() const {
-            }
-
-            void after_changesets() const {
             }
 
             void done() const {

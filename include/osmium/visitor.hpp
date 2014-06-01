@@ -178,62 +178,19 @@ namespace osmium {
                 apply_item_recurse(item, more...);
             }
 
-            template <class TVisitor>
-            inline void switch_on_type_before_after(osmium::item_type /*last*/, osmium::item_type /*current*/, TVisitor& /*visitor*/, std::false_type) {
-                // intentionally left blank
+            template <class TVisitor, typename std::enable_if<!std::is_base_of<osmium::handler::Handler, TVisitor>::value, int>::type = 0>
+            inline void done_recurse(TVisitor&) {
             }
 
-            template <class TVisitor>
-            inline void switch_on_type_before_after(osmium::item_type last, osmium::item_type current, TVisitor& visitor, std::true_type) {
-                switch (last) {
-                    case osmium::item_type::undefined:
-                        visitor.init();
-                        break;
-                    case osmium::item_type::node:
-                        visitor.after_nodes();
-                        break;
-                    case osmium::item_type::way:
-                        visitor.after_ways();
-                        break;
-                    case osmium::item_type::relation:
-                        visitor.after_relations();
-                        break;
-                    case osmium::item_type::changeset:
-                        visitor.after_changesets();
-                        break;
-                    default:
-                        break;
-                }
-                switch (current) {
-                    case osmium::item_type::undefined:
-                        visitor.done();
-                        break;
-                    case osmium::item_type::node:
-                        visitor.before_nodes();
-                        break;
-                    case osmium::item_type::way:
-                        visitor.before_ways();
-                        break;
-                    case osmium::item_type::relation:
-                        visitor.before_relations();
-                        break;
-                    case osmium::item_type::changeset:
-                        visitor.before_changesets();
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-            template <class TVisitor>
-            inline void apply_before_and_after_recurse(osmium::item_type last, osmium::item_type current, TVisitor& visitor) {
-                switch_on_type_before_after(last, current, visitor, std::is_base_of<osmium::handler::Handler, TVisitor>());
+            template <class TVisitor, typename std::enable_if<std::is_base_of<osmium::handler::Handler, TVisitor>::value, int>::type = 0>
+            inline void done_recurse(TVisitor& visitor) {
+                visitor.done();
             }
 
             template <class TVisitor, class ...TRest>
-            inline void apply_before_and_after_recurse(osmium::item_type last, osmium::item_type current, TVisitor& visitor, TRest&... more) {
-                apply_before_and_after_recurse(last, current, visitor);
-                apply_before_and_after_recurse(last, current, more...);
+            inline void done_recurse(TVisitor& visitor, TRest&... more) {
+                done_recurse(visitor);
+                done_recurse(more...);
             }
 
         } // namespace detail
@@ -252,15 +209,10 @@ namespace osmium {
 
     template <class TIterator, class ...TVisitors>
     inline void apply(TIterator it, TIterator end, TVisitors&... visitors) {
-        osmium::item_type last_type = osmium::item_type::undefined;
         for (; it != end; ++it) {
-            if (last_type != it->type()) {
-                osmium::visitor::detail::apply_before_and_after_recurse(last_type, it->type(), visitors...);
-                last_type = it->type();
-            }
             osmium::visitor::detail::apply_item_recurse(*it, visitors...);
         }
-        osmium::visitor::detail::apply_before_and_after_recurse(last_type, osmium::item_type::undefined, visitors...);
+        osmium::visitor::detail::done_recurse(visitors...);
     }
 
     template <class TSource, class ...TVisitors>

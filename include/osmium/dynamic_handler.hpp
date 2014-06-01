@@ -66,33 +66,6 @@ namespace osmium {
                 virtual void changeset(const osmium::Changeset&) {
                 }
 
-                virtual void init() {
-                }
-
-                virtual void before_nodes() {
-                }
-
-                virtual void after_nodes() {
-                }
-
-                virtual void before_ways() {
-                }
-
-                virtual void after_ways() {
-                }
-
-                virtual void before_relations() {
-                }
-
-                virtual void after_relations() {
-                }
-
-                virtual void before_changesets() {
-                }
-
-                virtual void after_changesets() {
-                }
-
                 virtual void done() {
                 }
 
@@ -127,15 +100,6 @@ auto _name_##_dispatch(THandler& handler, const osmium::_type_& object, long) ->
             HANDLER_DISPATCH1(changeset, Changeset);
             HANDLER_DISPATCH1(area, Area);
 
-            HANDLER_DISPATCH0(init);
-            HANDLER_DISPATCH0(before_nodes);
-            HANDLER_DISPATCH0(after_nodes);
-            HANDLER_DISPATCH0(before_ways);
-            HANDLER_DISPATCH0(after_ways);
-            HANDLER_DISPATCH0(before_relations);
-            HANDLER_DISPATCH0(after_relations);
-            HANDLER_DISPATCH0(before_changesets);
-            HANDLER_DISPATCH0(after_changesets);
             HANDLER_DISPATCH0(done);
 
             template <class THandler>
@@ -168,42 +132,6 @@ auto _name_##_dispatch(THandler& handler, const osmium::_type_& object, long) ->
 
                 void changeset(const osmium::Changeset& changeset) override final {
                     changeset_dispatch(m_handler, changeset, 0);
-                }
-
-                void init() override final {
-                    init_dispatch(m_handler, 0);
-                }
-
-                void before_nodes() override final {
-                    before_nodes_dispatch(m_handler, 0);
-                }
-
-                void after_nodes() override final {
-                    after_nodes_dispatch(m_handler, 0);
-                }
-
-                void before_ways() override final {
-                    before_ways_dispatch(m_handler, 0);
-                }
-
-                void after_ways() override final {
-                    after_ways_dispatch(m_handler, 0);
-                }
-
-                void before_relations() override final {
-                    before_relations_dispatch(m_handler, 0);
-                }
-
-                void after_relations() override final {
-                    after_relations_dispatch(m_handler, 0);
-                }
-
-                void before_changesets() override final {
-                    before_changesets_dispatch(m_handler, 0);
-                }
-
-                void after_changesets() override final {
-                    after_changesets_dispatch(m_handler, 0);
                 }
 
                 void done() override final {
@@ -248,42 +176,6 @@ auto _name_##_dispatch(THandler& handler, const osmium::_type_& object, long) ->
 
             void changeset(const osmium::Changeset& changeset) {
                 m_impl->changeset(changeset);
-            }
-
-            void init() {
-                m_impl->init();
-            }
-
-            void before_nodes() {
-                m_impl->before_nodes();
-            }
-
-            void after_nodes() {
-                m_impl->after_nodes();
-            }
-
-            void before_ways() {
-                m_impl->before_ways();
-            }
-
-            void after_ways() {
-                m_impl->after_ways();
-            }
-
-            void before_relations() {
-                m_impl->before_relations();
-            }
-
-            void after_relations() {
-                m_impl->after_relations();
-            }
-
-            void before_changesets() {
-                m_impl->before_changesets();
-            }
-
-            void after_changesets() {
-                m_impl->after_changesets();
             }
 
             void done() {

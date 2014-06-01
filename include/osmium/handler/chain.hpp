@@ -77,21 +77,13 @@ namespace osmium {
             typedef std::tuple<THandler&...> handlers_type;
             handlers_type m_handlers;
 
-            OSMIUM_CHAIN_HANDLER_CALL1(init)
-            OSMIUM_CHAIN_HANDLER_CALL1(before_nodes)
-            OSMIUM_CHAIN_HANDLER_CALL1(after_nodes)
-            OSMIUM_CHAIN_HANDLER_CALL1(before_ways)
-            OSMIUM_CHAIN_HANDLER_CALL1(after_ways)
-            OSMIUM_CHAIN_HANDLER_CALL1(before_relations)
-            OSMIUM_CHAIN_HANDLER_CALL1(after_relations)
-            OSMIUM_CHAIN_HANDLER_CALL1(before_changesets)
-            OSMIUM_CHAIN_HANDLER_CALL1(after_changesets)
             OSMIUM_CHAIN_HANDLER_CALL1(done)
 
             OSMIUM_CHAIN_HANDLER_CALL2(node, Node)
             OSMIUM_CHAIN_HANDLER_CALL2(way, Way)
             OSMIUM_CHAIN_HANDLER_CALL2(relation, Relation)
             OSMIUM_CHAIN_HANDLER_CALL2(changeset, Changeset)
+            OSMIUM_CHAIN_HANDLER_CALL2(area, Area)
 
         public:
 
@@ -99,56 +91,24 @@ namespace osmium {
                 m_handlers(handlers...) {
             }
 
-            void init() {
-                call_init<0, sizeof...(THandler), handlers_type>()(m_handlers);
-            }
-
-            void before_nodes() {
-                call_before_nodes<0, sizeof...(THandler), handlers_type>()(m_handlers);
-            }
-
             void node(osmium::Node& node) {
                 call_node<0, sizeof...(THandler), handlers_type>()(m_handlers, node);
-            }
-
-            void after_nodes() {
-                call_after_nodes<0, sizeof...(THandler), handlers_type>()(m_handlers);
-            }
-
-            void before_ways() {
-                call_before_ways<0, sizeof...(THandler), handlers_type>()(m_handlers);
             }
 
             void way(osmium::Way& way) {
                 call_way<0, sizeof...(THandler), handlers_type>()(m_handlers, way);
             }
 
-            void after_ways() {
-                call_after_ways<0, sizeof...(THandler), handlers_type>()(m_handlers);
-            }
-
-            void before_relations() {
-                call_before_relations<0, sizeof...(THandler), handlers_type>()(m_handlers);
-            }
-
             void relation(osmium::Relation& relation) {
                 call_relation<0, sizeof...(THandler), handlers_type>()(m_handlers, relation);
-            }
-
-            void after_relations() {
-                call_after_relations<0, sizeof...(THandler), handlers_type>()(m_handlers);
-            }
-
-            void before_changesets()  {
-                call_before_changesets<0, sizeof...(THandler), handlers_type>()(m_handlers);
             }
 
             void changeset( osmium::Changeset& changeset) {
                 call_changeset<0, sizeof...(THandler), handlers_type>()(m_handlers, changeset);
             }
 
-            void after_changesets()  {
-                call_after_changesets<0, sizeof...(THandler), handlers_type>()(m_handlers);
+            void area(osmium::Area& area) {
+                call_area<0, sizeof...(THandler), handlers_type>()(m_handlers, area);
             }
 
             void done() {
