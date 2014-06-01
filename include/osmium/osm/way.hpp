@@ -55,8 +55,6 @@ namespace osmium {
 
     public:
 
-        static constexpr osmium::item_type itemtype = osmium::item_type::way_node_list;
-
         WayNodeList():
             osmium::memory::Collection<NodeRef, osmium::item_type::way_node_list>() {
         }
