@@ -146,10 +146,13 @@ public:
             exit(1);
         }
 
-//        m_layer_polygon->StartTransaction();
+        m_layer_polygon->StartTransaction();
     }
 
     ~MyOGRHandler() {
+        m_layer_polygon->CommitTransaction();
+        m_layer_linestring->CommitTransaction();
+        m_layer_point->CommitTransaction();
         OGRDataSource::DestroyDataSource(m_data_source);
         OGRCleanupAll();
     }
@@ -172,10 +175,6 @@ public:
         }
     }
 
-    void after_nodes() {
-        m_layer_point->CommitTransaction();
-    }
-
     void way(const osmium::Way& way) {
         const char* highway = way.tags().get_value_by_key("highway");
         if (highway) {
@@ -196,10 +195,6 @@ public:
                 std::cerr << "Ignoring illegal geometry for way " << way.id() << ".\n";
             }
         }
-    }
-
-    void after_ways() {
-        m_layer_linestring->CommitTransaction();
     }
 
     void area(const osmium::Area& area) {
