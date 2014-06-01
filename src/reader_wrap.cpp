@@ -133,8 +133,15 @@ namespace node_osmium {
             m_current(current) {
         }
 
-        template <class TVisitor>
-        void operator()(TVisitor& visitor) const {
+        // The operator() is overloaded just for location_handler and
+        // for JSHandler. Currently these are the only handlers allowed
+        // anyways. But this needs to be fixed at some point to allow
+        // any handler. Unfortunately a template function is not allowed
+        // here.
+        void operator()(location_handler_type& visitor) const {
+        }
+
+        void operator()(JSHandler& visitor) const {
             switch (m_last) {
                 case osmium::item_type::undefined:
                     visitor.init();
