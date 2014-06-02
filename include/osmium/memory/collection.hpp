@@ -84,6 +84,10 @@ namespace osmium {
                 return m_data != rhs.m_data;
             }
 
+            unsigned char* data() const {
+                return m_data;
+            }
+
             TMember& operator*() const {
                 return *reinterpret_cast<TMember*>(m_data);
             }
