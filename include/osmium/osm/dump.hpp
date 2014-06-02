@@ -39,6 +39,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/memory/collection.hpp>
 #include <osmium/memory/item.hpp>
+#include <osmium/osm/area.hpp>
 #include <osmium/osm/changeset.hpp>
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/node.hpp>
