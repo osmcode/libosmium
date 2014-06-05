@@ -37,7 +37,7 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
-    enum class item_type : uint32_t {
+    enum class item_type : uint16_t {
 
         undefined                              = 0x00,
         node                                   = 0x01,

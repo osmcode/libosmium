@@ -48,7 +48,7 @@ namespace osmium {
 
     inline std::ostream& operator<<(std::ostream& out, const item_type item_type) {
         std::ios_base::fmtflags old_flags = out.flags(std::ios::hex | std::ios::showbase);
-        out << static_cast<uint32_t>(item_type);
+        out << static_cast<uint16_t>(item_type);
         out.flags(old_flags);
         return out;
     }

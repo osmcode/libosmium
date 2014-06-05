@@ -39,7 +39,7 @@ DEALINGS IN THE SOFTWARE.
 namespace osmium {
 
     // forward declaration, see osmium/osm/item_type.hpp for declaration
-    enum class item_type : uint32_t;
+    enum class item_type : uint16_t;
 
     namespace memory {
 
@@ -95,6 +95,7 @@ namespace osmium {
 
             item_size_type m_size;
             item_type m_type;
+            uint16_t m_deleted:1;
 
             template <class TMember>
             friend class CollectionIterator;
@@ -146,8 +147,17 @@ namespace osmium {
                 return m_type;
             }
 
+            bool deleted() const {
+                return m_deleted;
+            }
+
+            void deleted(bool deleted) {
+                m_deleted = deleted;
+            }
+
         }; // class Item
 
+        static_assert(sizeof(Item) == 8, "Class osmium::Item has wrong size!");
         static_assert(sizeof(Item) % align_bytes == 0, "Class osmium::Item has wrong size to be aligned properly!");
 
     } // namespace memory
