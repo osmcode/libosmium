@@ -406,6 +406,42 @@ namespace osmium {
                 swap(lhs.m_committed, rhs.m_committed);
             }
 
+            /**
+             * Purge deleted items from the buffer. This is done by moving all
+             * non-deleted items forward in the buffer overwriting deleted
+             * items and then correcting the m_written and m_committed numbers.
+             *
+             * Note that calling this function invalidates all iterators on this
+             * buffer and all offsets in this buffer.
+             *
+             * For every non-deleted item that moves its position, the function
+             * 'moving_in_buffer' is called on the given callback object with
+             * the old and new offsets in the buffer where the object used to
+             * be and is now, respectively. This call can be used to update any
+             * indexes.
+             */
+            template <class TCallbackClass>
+            void purge_deleted(TCallbackClass* callback) {
+                iterator it_write = begin();
+
+                iterator next;
+                for (iterator it_read = begin(); it_read != end(); it_read = next) {
+                    next = std::next(it_read);
+                    if (!it_read->deleted()) {
+                        if (it_read != it_write) {
+                            size_t old_offset = it_read->data() - data();
+                            size_t new_offset = it_write->data() - data();
+                            callback->moving_in_buffer(old_offset, new_offset);
+                            std::memmove(it_write->data(), it_read->data(), it_read->padded_size());
+                        }
+                        ++it_write;
+                    }
+                }
+
+                m_written = it_write->data() - data();
+                m_committed = m_written;
+            }
+
         }; // class Buffer
 
         inline bool operator==(const Buffer& lhs, const Buffer& rhs) {

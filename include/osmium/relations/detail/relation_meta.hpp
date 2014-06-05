@@ -93,12 +93,10 @@ namespace osmium {
 
             /**
              * This decrements the "members needed" counter.
-             *
-             * @return true if relation is complete, false otherwise
              */
-            bool add_member(size_t offset, size_t n) {
+            void got_one_member() {
                 assert(m_need_members > 0);
-                return --m_need_members == 0;
+                --m_need_members;
             }
 
             /**
