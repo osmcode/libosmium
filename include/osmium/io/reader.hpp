@@ -161,7 +161,11 @@ namespace osmium {
 
                     ::open("/dev/null", O_RDONLY); // stdin
                     ::open("/dev/null", O_WRONLY); // stderr
-                    if (::execlp(command.c_str(), command.c_str(), filename.c_str(), nullptr) < 0) {
+                    // hack: -g switches off globbing in curl which allows [] to be used in file names
+                    // this is important for XAPI URLs
+                    // in theory this execute() function could be used for other commands, but it is
+                    // only used for curl at the moment, so this is okay.
+                    if (::execlp(command.c_str(), command.c_str(), "-g", filename.c_str(), nullptr) < 0) {
                         exit(1);
                     }
                 }
