@@ -72,7 +72,7 @@ namespace osmium {
             /* Point */
 
             point_type make_point(const osmium::Location location) {
-                return std::move(std::unique_ptr<OGRPoint>(new OGRPoint(location.lon(), location.lat())));
+                return point_type(new OGRPoint(location.lon(), location.lat()));
             }
 
             /* LineString */

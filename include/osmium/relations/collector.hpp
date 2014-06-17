@@ -396,7 +396,7 @@ namespace osmium {
                     m_relations_buffer.rollback();
                 } else {
                     m_relations_buffer.commit();
-                    m_relations.emplace_back(relation_meta);
+                    m_relations.push_back(std::move(relation_meta));
 //                    std::cerr << "added relation id=" << relation.id() << "\n";
                 }
             }
