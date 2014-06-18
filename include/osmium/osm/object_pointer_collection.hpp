@@ -64,7 +64,7 @@ namespace osmium {
          *   osmium::apply(buffer, objects);
          *
          */
-        class ObjectPointerCollection {
+        class ObjectPointerCollection : public osmium::handler::Handler {
 
             std::vector<osmium::Object*> m_objects;
 
@@ -77,10 +77,7 @@ namespace osmium {
                 m_objects() {
             }
 
-            void operator()(osmium::memory::Item&) const {
-            }
-
-            void operator()(osmium::Object& object) {
+            void object(osmium::Object& object) {
                 m_objects.push_back(&object);
             }
 

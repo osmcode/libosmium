@@ -35,17 +35,26 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
+    class Object;
     class Node;
     class Way;
     class Relation;
     class Area;
     class Changeset;
+    class TagList;
+    class WayNodeList;
+    class RelationMemberList;
+    class OuterRing;
+    class InnerRing;
 
     namespace handler {
 
         class Handler {
 
         public:
+
+            void object(const osmium::Object&) const {
+            }
 
             void node(const osmium::Node&) const {
             }
@@ -60,6 +69,21 @@ namespace osmium {
             }
 
             void changeset(const osmium::Changeset&) const {
+            }
+
+            void tag_list(const osmium::TagList&) const {
+            }
+
+            void way_node_list(const osmium::WayNodeList&) const {
+            }
+
+            void relation_member_list(const osmium::RelationMemberList&) const {
+            }
+
+            void outer_ring(const osmium::OuterRing&) const {
+            }
+
+            void inner_ring(const osmium::InnerRing&) const {
             }
 
             void done() const {

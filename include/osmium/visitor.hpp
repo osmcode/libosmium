@@ -65,102 +65,43 @@ namespace osmium {
             template <typename T, typename U>
             using MaybeConst = typename std::conditional<std::is_const<T>::value, typename std::add_const<U>::type, U>::type;
 
-            template <class TVisitor, typename TItem, typename std::enable_if<!std::is_base_of<osmium::handler::Handler, TVisitor>::value, int>::type = 0>
+            template <class TVisitor, class TItem>
             inline void switch_on_type(TVisitor& visitor, TItem& item) {
                 switch (item.type()) {
                     case osmium::item_type::node:
-                        visitor(static_cast<MaybeConst<TItem, osmium::Node>&>(item));
-                        break;
-                    case osmium::item_type::way:
-                        visitor(static_cast<MaybeConst<TItem, osmium::Way>&>(item));
-                        break;
-                    case osmium::item_type::relation:
-                        visitor(static_cast<MaybeConst<TItem, osmium::Relation>&>(item));
-                        break;
-                    case osmium::item_type::area:
-                        visitor(static_cast<MaybeConst<TItem, osmium::Area>&>(item));
-                        break;
-                    case osmium::item_type::changeset:
-                        visitor(static_cast<MaybeConst<TItem, osmium::Changeset>&>(item));
-                        break;
-                    case osmium::item_type::tag_list:
-                        visitor(static_cast<MaybeConst<TItem, osmium::TagList>&>(item));
-                        break;
-                    case osmium::item_type::way_node_list:
-                        visitor(static_cast<MaybeConst<TItem, osmium::WayNodeList>&>(item));
-                        break;
-                    case osmium::item_type::relation_member_list:
-                    case osmium::item_type::relation_member_list_with_full_members:
-                        visitor(static_cast<MaybeConst<TItem, osmium::RelationMemberList>&>(item));
-                        break;
-                    case osmium::item_type::outer_ring:
-                        visitor(static_cast<MaybeConst<TItem, osmium::OuterRing>&>(item));
-                        break;
-                    case osmium::item_type::inner_ring:
-                        visitor(static_cast<MaybeConst<TItem, osmium::InnerRing>&>(item));
-                        break;
-                    default:
-                        throw std::runtime_error("unknown type");
-                }
-            }
-
-            template <class TVisitor, class TItem, typename std::enable_if<std::is_base_of<osmium::handler::Handler, TVisitor>::value, int>::type = 0>
-            inline void switch_on_type(TVisitor& visitor, TItem& item) {
-                switch (item.type()) {
-                    case osmium::item_type::node:
+                        visitor.object(static_cast<MaybeConst<TItem, osmium::Object>&>(item));
                         visitor.node(static_cast<MaybeConst<TItem, osmium::Node>&>(item));
                         break;
                     case osmium::item_type::way:
+                        visitor.object(static_cast<MaybeConst<TItem, osmium::Object>&>(item));
                         visitor.way(static_cast<MaybeConst<TItem, osmium::Way>&>(item));
                         break;
                     case osmium::item_type::relation:
+                        visitor.object(static_cast<MaybeConst<TItem, osmium::Object>&>(item));
                         visitor.relation(static_cast<MaybeConst<TItem, osmium::Relation>&>(item));
                         break;
                     case osmium::item_type::area:
+                        visitor.object(static_cast<MaybeConst<TItem, osmium::Object>&>(item));
                         visitor.area(static_cast<MaybeConst<TItem, osmium::Area>&>(item));
                         break;
                     case osmium::item_type::changeset:
                         visitor.changeset(static_cast<MaybeConst<TItem, osmium::Changeset>&>(item));
                         break;
-                    default:
-                        throw std::runtime_error("unknown type");
-                }
-            }
-
-            template <class TVisitor, typename std::enable_if<std::is_base_of<osmium::handler::Handler, TVisitor>::value, int>::type = 0>
-            inline void switch_on_type(TVisitor& visitor, osmium::Object& item) {
-                switch (item.type()) {
-                    case osmium::item_type::node:
-                        visitor.node(static_cast<osmium::Node&>(item));
+                    case osmium::item_type::tag_list:
+                        visitor.tag_list(static_cast<MaybeConst<TItem, osmium::TagList>&>(item));
                         break;
-                    case osmium::item_type::way:
-                        visitor.way(static_cast<osmium::Way&>(item));
+                    case osmium::item_type::way_node_list:
+                        visitor.way_node_list(static_cast<MaybeConst<TItem, osmium::WayNodeList>&>(item));
                         break;
-                    case osmium::item_type::relation:
-                        visitor.relation(static_cast<osmium::Relation&>(item));
+                    case osmium::item_type::relation_member_list:
+                    case osmium::item_type::relation_member_list_with_full_members:
+                        visitor.relation_member_list(static_cast<MaybeConst<TItem, osmium::RelationMemberList>&>(item));
                         break;
-                    case osmium::item_type::area:
-                        visitor.area(static_cast<osmium::Area&>(item));
+                    case osmium::item_type::outer_ring:
+                        visitor.outer_ring(static_cast<MaybeConst<TItem, osmium::OuterRing>&>(item));
                         break;
-                    default:
-                        throw std::runtime_error("unknown type");
-                }
-            }
-
-            template <class TVisitor, typename std::enable_if<std::is_base_of<osmium::handler::Handler, TVisitor>::value, int>::type = 0>
-            inline void switch_on_type(TVisitor& visitor, const osmium::Object& item) {
-                switch (item.type()) {
-                    case osmium::item_type::node:
-                        visitor.node(static_cast<const osmium::Node&>(item));
-                        break;
-                    case osmium::item_type::way:
-                        visitor.way(static_cast<const osmium::Way&>(item));
-                        break;
-                    case osmium::item_type::relation:
-                        visitor.relation(static_cast<const osmium::Relation&>(item));
-                        break;
-                    case osmium::item_type::area:
-                        visitor.area(static_cast<const osmium::Area&>(item));
+                    case osmium::item_type::inner_ring:
+                        visitor.inner_ring(static_cast<MaybeConst<TItem, osmium::InnerRing>&>(item));
                         break;
                     default:
                         throw std::runtime_error("unknown type");
