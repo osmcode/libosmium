@@ -45,7 +45,7 @@ all:
 .PHONY: clean install check test indent
 
 clean:
-	rm -fr check-includes doc/html test/tests
+	rm -fr check-includes doc/html doc/xml doc/classes.txt test/tests tests/test_*.o
 
 check:
 	cppcheck --std=c++11 $(CPPCHECK_OPTIONS) -I include $(INCLUDE_FILES) */*.cpp test/t/*/test_*.cpp test/osm-testdata/*.cpp
