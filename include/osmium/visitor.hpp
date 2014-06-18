@@ -65,72 +65,72 @@ namespace osmium {
             template <typename T, typename U>
             using MaybeConst = typename std::conditional<std::is_const<T>::value, typename std::add_const<U>::type, U>::type;
 
-            template <class TVisitor, class TItem>
-            inline void switch_on_type(TVisitor& visitor, TItem& item) {
+            template <class THandler, class TItem>
+            inline void switch_on_type(THandler& handler, TItem& item) {
                 switch (item.type()) {
                     case osmium::item_type::node:
-                        visitor.object(static_cast<MaybeConst<TItem, osmium::Object>&>(item));
-                        visitor.node(static_cast<MaybeConst<TItem, osmium::Node>&>(item));
+                        handler.object(static_cast<MaybeConst<TItem, osmium::Object>&>(item));
+                        handler.node(static_cast<MaybeConst<TItem, osmium::Node>&>(item));
                         break;
                     case osmium::item_type::way:
-                        visitor.object(static_cast<MaybeConst<TItem, osmium::Object>&>(item));
-                        visitor.way(static_cast<MaybeConst<TItem, osmium::Way>&>(item));
+                        handler.object(static_cast<MaybeConst<TItem, osmium::Object>&>(item));
+                        handler.way(static_cast<MaybeConst<TItem, osmium::Way>&>(item));
                         break;
                     case osmium::item_type::relation:
-                        visitor.object(static_cast<MaybeConst<TItem, osmium::Object>&>(item));
-                        visitor.relation(static_cast<MaybeConst<TItem, osmium::Relation>&>(item));
+                        handler.object(static_cast<MaybeConst<TItem, osmium::Object>&>(item));
+                        handler.relation(static_cast<MaybeConst<TItem, osmium::Relation>&>(item));
                         break;
                     case osmium::item_type::area:
-                        visitor.object(static_cast<MaybeConst<TItem, osmium::Object>&>(item));
-                        visitor.area(static_cast<MaybeConst<TItem, osmium::Area>&>(item));
+                        handler.object(static_cast<MaybeConst<TItem, osmium::Object>&>(item));
+                        handler.area(static_cast<MaybeConst<TItem, osmium::Area>&>(item));
                         break;
                     case osmium::item_type::changeset:
-                        visitor.changeset(static_cast<MaybeConst<TItem, osmium::Changeset>&>(item));
+                        handler.changeset(static_cast<MaybeConst<TItem, osmium::Changeset>&>(item));
                         break;
                     case osmium::item_type::tag_list:
-                        visitor.tag_list(static_cast<MaybeConst<TItem, osmium::TagList>&>(item));
+                        handler.tag_list(static_cast<MaybeConst<TItem, osmium::TagList>&>(item));
                         break;
                     case osmium::item_type::way_node_list:
-                        visitor.way_node_list(static_cast<MaybeConst<TItem, osmium::WayNodeList>&>(item));
+                        handler.way_node_list(static_cast<MaybeConst<TItem, osmium::WayNodeList>&>(item));
                         break;
                     case osmium::item_type::relation_member_list:
                     case osmium::item_type::relation_member_list_with_full_members:
-                        visitor.relation_member_list(static_cast<MaybeConst<TItem, osmium::RelationMemberList>&>(item));
+                        handler.relation_member_list(static_cast<MaybeConst<TItem, osmium::RelationMemberList>&>(item));
                         break;
                     case osmium::item_type::outer_ring:
-                        visitor.outer_ring(static_cast<MaybeConst<TItem, osmium::OuterRing>&>(item));
+                        handler.outer_ring(static_cast<MaybeConst<TItem, osmium::OuterRing>&>(item));
                         break;
                     case osmium::item_type::inner_ring:
-                        visitor.inner_ring(static_cast<MaybeConst<TItem, osmium::InnerRing>&>(item));
+                        handler.inner_ring(static_cast<MaybeConst<TItem, osmium::InnerRing>&>(item));
                         break;
                     default:
                         throw std::runtime_error("unknown type");
                 }
             }
 
-            template <class TVisitor, class TItem>
-            inline void apply_item_recurse(TItem& item, TVisitor& visitor) {
-                switch_on_type(visitor, item);
+            template <class THandler, class TItem>
+            inline void apply_item_recurse(TItem& item, THandler& handler) {
+                switch_on_type(handler, item);
             }
 
-            template <class TVisitor, class TItem, class ...TRest>
-            inline void apply_item_recurse(TItem& item, TVisitor& visitor, TRest&... more) {
-                apply_item_recurse(item, visitor);
+            template <class THandler, class TItem, class ...TRest>
+            inline void apply_item_recurse(TItem& item, THandler& handler, TRest&... more) {
+                apply_item_recurse(item, handler);
                 apply_item_recurse(item, more...);
             }
 
-            template <class TVisitor, typename std::enable_if<!std::is_base_of<osmium::handler::Handler, TVisitor>::value, int>::type = 0>
-            inline void done_recurse(TVisitor&) {
+            template <class THandler, typename std::enable_if<!std::is_base_of<osmium::handler::Handler, THandler>::value, int>::type = 0>
+            inline void done_recurse(THandler&) {
             }
 
-            template <class TVisitor, typename std::enable_if<std::is_base_of<osmium::handler::Handler, TVisitor>::value, int>::type = 0>
-            inline void done_recurse(TVisitor& visitor) {
-                visitor.done();
+            template <class THandler, typename std::enable_if<std::is_base_of<osmium::handler::Handler, THandler>::value, int>::type = 0>
+            inline void done_recurse(THandler& handler) {
+                handler.done();
             }
 
-            template <class TVisitor, class ...TRest>
-            inline void done_recurse(TVisitor& visitor, TRest&... more) {
-                done_recurse(visitor);
+            template <class THandler, class ...TRest>
+            inline void done_recurse(THandler& handler, TRest&... more) {
+                done_recurse(handler);
                 done_recurse(more...);
             }
 
@@ -138,39 +138,39 @@ namespace osmium {
 
     } // namespace visitor
 
-    template <class ...TVisitors>
-    inline void apply_item(const osmium::memory::Item& item, TVisitors&... visitors) {
-        osmium::visitor::detail::apply_item_recurse(item, visitors...);
+    template <class ...THandlers>
+    inline void apply_item(const osmium::memory::Item& item, THandlers&... handlers) {
+        osmium::visitor::detail::apply_item_recurse(item, handlers...);
     }
 
-    template <class ...TVisitors>
-    inline void apply_item(osmium::memory::Item& item, TVisitors&... visitors) {
-        osmium::visitor::detail::apply_item_recurse(item, visitors...);
+    template <class ...THandlers>
+    inline void apply_item(osmium::memory::Item& item, THandlers&... handlers) {
+        osmium::visitor::detail::apply_item_recurse(item, handlers...);
     }
 
-    template <class TIterator, class ...TVisitors>
-    inline void apply(TIterator it, TIterator end, TVisitors&... visitors) {
+    template <class TIterator, class ...THandlers>
+    inline void apply(TIterator it, TIterator end, THandlers&... handlers) {
         for (; it != end; ++it) {
-            osmium::visitor::detail::apply_item_recurse(*it, visitors...);
+            osmium::visitor::detail::apply_item_recurse(*it, handlers...);
         }
-        osmium::visitor::detail::done_recurse(visitors...);
+        osmium::visitor::detail::done_recurse(handlers...);
     }
 
-    template <class TSource, class ...TVisitors>
-    inline void apply(TSource& source, TVisitors&... visitors) {
+    template <class TSource, class ...THandlers>
+    inline void apply(TSource& source, THandlers&... handlers) {
         apply(osmium::io::InputIterator<TSource> {source},
               osmium::io::InputIterator<TSource> {},
-              visitors...);
+              handlers...);
     }
 
-    template <class ...TVisitors>
-    inline void apply(osmium::memory::Buffer& buffer, TVisitors&... visitors) {
-        apply(buffer.begin(), buffer.end(), visitors...);
+    template <class ...THandlers>
+    inline void apply(osmium::memory::Buffer& buffer, THandlers&... handlers) {
+        apply(buffer.begin(), buffer.end(), handlers...);
     }
 
-    template <class ...TVisitors>
-    inline void apply(const osmium::memory::Buffer& buffer, TVisitors&... visitors) {
-        apply(buffer.cbegin(), buffer.cend(), visitors...);
+    template <class ...THandlers>
+    inline void apply(const osmium::memory::Buffer& buffer, THandlers&... handlers) {
+        apply(buffer.cbegin(), buffer.cend(), handlers...);
     }
 
 } // namespace osmium
