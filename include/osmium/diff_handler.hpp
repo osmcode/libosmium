@@ -55,9 +55,6 @@ namespace osmium {
             void relation(const osmium::DiffRelation&) const {
             }
 
-            void done() const {
-            }
-
         }; // class DiffHandler
 
     } // namespace diff_handler
