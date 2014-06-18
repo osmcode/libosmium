@@ -5,7 +5,7 @@
 
 This file is part of Osmium (http://osmcode.org/libosmium).
 
-Copyright 2013 Jochen Topf <jochen@topf.org> and others (see README).
+Copyright 2013,2014 Jochen Topf <jochen@topf.org> and others (see README).
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -554,7 +554,9 @@ namespace osmium {
                 /**
                  * Instantiate XML Parser
                  *
-                 * @param file osmium::io::File instance.
+                 * @param file osmium::io::File instance describing file to be read from.
+                 * @param read_which_entities Which types of OSM entities (nodes, ways, relations, changesets) should be parsed?
+                 * @param input_queue String queue where data is read from.
                  */
                 XMLInputFormat(const osmium::io::File& file, osmium::osm_entity::flags read_which_entities, osmium::thread::Queue<std::string>& input_queue) :
                     osmium::io::detail::InputFormat(file, read_which_entities, input_queue),
