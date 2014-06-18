@@ -45,60 +45,60 @@ namespace osmium {
 
     namespace {
 
-        template <class TVisitor>
-        inline void apply_diff_iterator_recurse(const osmium::DiffObject& diff, TVisitor& visitor) {
+        template <class THandler>
+        inline void apply_diff_iterator_recurse(const osmium::DiffObject& diff, THandler& handler) {
             switch (diff.type()) {
                 case osmium::item_type::node:
-                    visitor.node(static_cast<const osmium::DiffNode&>(diff));
+                    handler.node(static_cast<const osmium::DiffNode&>(diff));
                     break;
                 case osmium::item_type::way:
-                    visitor.way(static_cast<const osmium::DiffWay&>(diff));
+                    handler.way(static_cast<const osmium::DiffWay&>(diff));
                     break;
                 case osmium::item_type::relation:
-                    visitor.relation(static_cast<const osmium::DiffRelation&>(diff));
+                    handler.relation(static_cast<const osmium::DiffRelation&>(diff));
                     break;
                 default:
                     throw std::runtime_error("unknown type");
             }
         }
 
-        template <class TVisitor, class ...TRest>
-        inline void apply_diff_iterator_recurse(const osmium::DiffObject& diff, TVisitor& visitor, TRest&... more) {
-            apply_diff_iterator_recurse(diff, visitor);
+        template <class THandler, class ...TRest>
+        inline void apply_diff_iterator_recurse(const osmium::DiffObject& diff, THandler& handler, TRest&... more) {
+            apply_diff_iterator_recurse(diff, handler);
             apply_diff_iterator_recurse(diff, more...);
         }
 
     } // anonymous namespace
 
-    template <class TIterator, class ...TVisitors>
-    inline void apply_diff(TIterator it, TIterator end, TVisitors&... visitors) {
+    template <class TIterator, class ...THandlers>
+    inline void apply_diff(TIterator it, TIterator end, THandlers&... handlers) {
         typedef osmium::DiffIterator<TIterator> diff_iterator;
 
         diff_iterator dit(it, end);
         diff_iterator dend(end, end);
 
         for (; dit != dend; ++dit) {
-            apply_diff_iterator_recurse(*dit, visitors...);
+            apply_diff_iterator_recurse(*dit, handlers...);
         }
     }
 
     class Object;
 
-    template <class TSource, class ...TVisitors>
-    inline void apply_diff(TSource& source, TVisitors&... visitors) {
+    template <class TSource, class ...THandlers>
+    inline void apply_diff(TSource& source, THandlers&... handlers) {
         apply_diff(osmium::io::InputIterator<TSource, osmium::Object> {source},
                    osmium::io::InputIterator<TSource, osmium::Object> {},
-                   visitors...);
+                   handlers...);
     }
 
-    template <class ...TVisitors>
-    inline void apply_diff(osmium::memory::Buffer& buffer, TVisitors&... visitors) {
-        apply_diff(buffer.begin(), buffer.end(), visitors...);
+    template <class ...THandlers>
+    inline void apply_diff(osmium::memory::Buffer& buffer, THandlers&... handlers) {
+        apply_diff(buffer.begin(), buffer.end(), handlers...);
     }
 
-    template <class ...TVisitors>
-    inline void apply_diff(const osmium::memory::Buffer& buffer, TVisitors&... visitors) {
-        apply_diff(buffer.cbegin(), buffer.cend(), visitors...);
+    template <class ...THandlers>
+    inline void apply_diff(const osmium::memory::Buffer& buffer, THandlers&... handlers) {
+        apply_diff(buffer.cbegin(), buffer.cend(), handlers...);
     }
 
 } // namespace osmium
