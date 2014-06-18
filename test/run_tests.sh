@@ -27,7 +27,7 @@ fi
 COMPILE="$CXX -I../include -I. $CXXFLAGS $CXXFLAGS_WARNINGS -o tests $LDFLAGS"
 
 if [ "x$1" = "x-v" ]; then
-    VALGRIND="valgrind --leak-check=full --show-reachable=yes"
+    VALGRIND="valgrind --leak-check=full --show-reachable=yes --suppressions=valgrind.supp --error-exitcode=1"
     shift
 else
     VALGRIND=""
