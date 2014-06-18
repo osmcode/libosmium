@@ -58,7 +58,8 @@ test_file () {
     FILES="test_main.o test_utils.o $1"
     eval OPTS_CFLAGS=`../get_options.sh --cflags $1`
     eval OPTS_LIBS=`../get_options.sh --libs $1`
-    echo -n "Checking $BOLD$1$NORM..."
+    msg=`echo "Checking $BOLD$1$NORM................................................." | cut -c1-60`
+    echo -n "$msg "
     if ! output=$($COMPILE $FILES $OPTS_CFLAGS $OPTS_LIBS -DBOOST_TEST_DYN_LINK $LDFLAGS -lboost_unit_test_framework 2>&1 ); then
         echo "$DARKRED[COMPILE ERROR]$NORM"
         TESTS_COMPILE_ERROR=$(($TESTS_COMPILE_ERROR+1))
