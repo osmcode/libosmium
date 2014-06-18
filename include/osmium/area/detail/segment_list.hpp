@@ -165,7 +165,6 @@ namespace osmium {
                 /**
                  * Find intersection between segments.
                  *
-                 * @param object_id ID of the (way or multipolygon relation) object we are trying to build.
                  * @param problem_reporter Any intersections found are reported to this object.
                  * @returns true if there are intersections.
                  */

@@ -74,12 +74,14 @@ namespace osmium {
         public:
 
             /**
-             * Create File using type and encoding from filename. If you want
-             * to overwrite these settings you can change them later.
+             * Create File using type and encoding from filename or given
+             * format specification.
              *
              * @param filename Filename including suffix. The type and encoding
              *                 of the file will be taken from the suffix.
              *                 An empty filename or "-" means stdin or stdout.
+             * @param format File format as string. See the description of the
+             *               parse_format() function for details.
              */
             File(const std::string& filename = "", const std::string& format = "") :
                 Options(),

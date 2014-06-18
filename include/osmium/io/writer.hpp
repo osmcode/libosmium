@@ -108,6 +108,9 @@ namespace osmium {
              * @param header Optional header data. If this is not given sensible
              *               defaults will be used. See the default constructor
              *               of osmium::io::Header for details.
+             * @param allow_overwrite Allow overwriting of existing file? Can be
+             *               osmium::io::overwrite::allow or osmium::io::overwrite::no+
+             *               (default).
              *
              * @throws std::runtime_error If the file could not be opened.
              * @throws std::system_error If the file could not be opened.
