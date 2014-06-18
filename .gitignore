@@ -1,5 +1,4 @@
 core
-doc/html
 check-includes
 *.swp
 test/tests

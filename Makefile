@@ -102,6 +102,9 @@ doc: doc/html/files.html
 
 doc/html/files.html: $(INCLUDE_FILES) doc/Doxyfile doc/doc.txt doc/osmium.css
 
+doc/classes.txt: doc
+	xmlstarlet sel -t -i "/doxygen/compounddef/@prot='public'" -i "not(/doxygen/compounddef/templateparamlist)" -v "/doxygen/compounddef/compoundname/text()" -n doc/xml/classosmium_1_1* >$@
+
 install-doc: doc
 	install -m 755 -g $(INSTALL_GROUP) -o $(INSTALL_USER) -d $(DESTDIR)/usr/share/doc/libosmium-dev
 	cp -r doc/html $(DESTDIR)/usr/share/doc/libosmium-dev
