@@ -5,7 +5,7 @@
 
 This file is part of Osmium (http://osmcode.org/libosmium).
 
-Copyright 2013 Jochen Topf <jochen@topf.org> and others (see README).
+Copyright 2013,2014 Jochen Topf <jochen@topf.org> and others (see README).
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -42,6 +42,8 @@ DEALINGS IN THE SOFTWARE.
 #include <system_error>
 #include <unistd.h>
 
+#include <osmium/io/overwrite.hpp>
+
 namespace osmium {
 
     namespace io {
@@ -61,12 +63,12 @@ namespace osmium {
              * @return File descriptor of open file.
              * @throws system_error if the file can't be opened.
              */
-            inline int open_for_writing(const std::string& filename, bool allow_overwrite=false) {
+            inline int open_for_writing(const std::string& filename, osmium::io::overwrite allow_overwrite = osmium::io::overwrite::no) {
                 if (filename == "" || filename == "-") {
                     return 1; // stdout
                 } else {
                     int flags = O_WRONLY | O_CREAT;
-                    if (allow_overwrite) {
+                    if (allow_overwrite == osmium::io::overwrite::allow) {
                         flags |= O_TRUNC;
                     } else {
                         flags |= O_EXCL;

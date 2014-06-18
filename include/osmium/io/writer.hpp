@@ -5,7 +5,7 @@
 
 This file is part of Osmium (http://osmcode.org/libosmium).
 
-Copyright 2013 Jochen Topf <jochen@topf.org> and others (see README).
+Copyright 2013,2014 Jochen Topf <jochen@topf.org> and others (see README).
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -43,6 +43,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/io/detail/read_write.hpp>
 #include <osmium/io/file.hpp>
 #include <osmium/io/header.hpp>
+#include <osmium/io/overwrite.hpp>
 #include <osmium/thread/checked_task.hpp>
 #include <osmium/thread/name.hpp>
 
@@ -111,7 +112,7 @@ namespace osmium {
              * @throws std::runtime_error If the file could not be opened.
              * @throws std::system_error If the file could not be opened.
              */
-            explicit Writer(const osmium::io::File& file, const osmium::io::Header& header = osmium::io::Header(), bool allow_overwrite=false) :
+            explicit Writer(const osmium::io::File& file, const osmium::io::Header& header = osmium::io::Header(), overwrite allow_overwrite = overwrite::no) :
                 m_file(file),
                 m_output(osmium::io::detail::OutputFormatFactory::instance().create_output(m_file, m_output_queue)),
                 m_compressor(osmium::io::CompressionFactory::instance().create_compressor(file.compression(), osmium::io::detail::open_for_writing(m_file.filename(), allow_overwrite))),
@@ -119,11 +120,11 @@ namespace osmium {
                 m_output->write_header(header);
             }
 
-            explicit Writer(const std::string& filename, const osmium::io::Header& header = osmium::io::Header(), bool allow_overwrite=false) :
+            explicit Writer(const std::string& filename, const osmium::io::Header& header = osmium::io::Header(), overwrite allow_overwrite = overwrite::no) :
                 Writer(osmium::io::File(filename), header, allow_overwrite) {
             }
 
-            explicit Writer(const char* filename, const osmium::io::Header& header = osmium::io::Header(), bool allow_overwrite=false) :
+            explicit Writer(const char* filename, const osmium::io::Header& header = osmium::io::Header(), overwrite allow_overwrite = overwrite::no) :
                 Writer(osmium::io::File(filename), header, allow_overwrite) {
             }
 
