@@ -34,7 +34,6 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <stdexcept>
-#include <type_traits>
 
 #include <osmium/io/input_iterator.hpp>
 #include <osmium/memory/buffer.hpp>
