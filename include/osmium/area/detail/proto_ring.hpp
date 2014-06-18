@@ -39,7 +39,7 @@ DEALINGS IN THE SOFTWARE.
 #include <set>
 #include <vector>
 
-#include <osmium/osm/noderef.hpp>
+#include <osmium/osm/node_ref.hpp>
 #include <osmium/osm/ostream.hpp>
 #include <osmium/area/detail/node_ref_segment.hpp>
 

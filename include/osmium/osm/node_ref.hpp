@@ -1,5 +1,5 @@
-#ifndef OSMIUM_OSM_NODEREF_HPP
-#define OSMIUM_OSM_NODEREF_HPP
+#ifndef OSMIUM_OSM_NODE_REF_HPP
+#define OSMIUM_OSM_NODE_REF_HPP
 
 /*
 
@@ -150,4 +150,4 @@ namespace osmium {
 
 } // namespace osmium
 
-#endif // OSMIUM_OSM_NODEREF_HPP
+#endif // OSMIUM_OSM_NODE_REF_HPP

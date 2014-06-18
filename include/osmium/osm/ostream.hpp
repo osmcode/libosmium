@@ -39,7 +39,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/box.hpp>
 #include <osmium/osm/item_type.hpp>
 #include <osmium/osm/location.hpp>
-#include <osmium/osm/noderef.hpp>
+#include <osmium/osm/node_ref.hpp>
 #include <osmium/osm/segment.hpp>
 #include <osmium/osm/tag.hpp>
 #include <osmium/osm/undirected_segment.hpp>

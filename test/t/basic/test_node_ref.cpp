@@ -3,7 +3,7 @@
 #endif
 #include <boost/test/unit_test.hpp>
 
-#include <osmium/osm/noderef.hpp>
+#include <osmium/osm/node_ref.hpp>
 #include <osmium/osm/ostream.hpp>
 
 BOOST_AUTO_TEST_SUITE(NodeRef)

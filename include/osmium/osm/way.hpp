@@ -42,7 +42,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/object.hpp>
 #include <osmium/osm/types.hpp>
-#include <osmium/osm/noderef.hpp>
+#include <osmium/osm/node_ref.hpp>
 
 namespace osmium {
 

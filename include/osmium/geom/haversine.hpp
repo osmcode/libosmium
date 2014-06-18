@@ -38,7 +38,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/memory/collection.hpp>
 #include <osmium/osm/location.hpp>
-#include <osmium/osm/noderef.hpp>
+#include <osmium/osm/node_ref.hpp>
 #include <osmium/osm/way.hpp>
 
 namespace osmium {

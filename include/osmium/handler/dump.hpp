@@ -43,7 +43,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/changeset.hpp>
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/node.hpp>
-#include <osmium/osm/noderef.hpp>
+#include <osmium/osm/node_ref.hpp>
 #include <osmium/osm/object.hpp>
 #include <osmium/osm/ostream.hpp>
 #include <osmium/osm/relation.hpp>

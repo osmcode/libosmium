@@ -40,7 +40,7 @@ DEALINGS IN THE SOFTWARE.
 #include <boost/operators.hpp>
 
 #include <osmium/osm/location.hpp>
-#include <osmium/osm/noderef.hpp>
+#include <osmium/osm/node_ref.hpp>
 #include <osmium/osm/ostream.hpp>
 
 namespace osmium {

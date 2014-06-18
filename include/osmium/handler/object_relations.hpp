@@ -35,7 +35,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/handler.hpp>
 #include <osmium/index/multimap.hpp>
-#include <osmium/osm/noderef.hpp>
+#include <osmium/osm/node_ref.hpp>
 #include <osmium/osm/item_type.hpp>
 #include <osmium/osm/relation.hpp>
 #include <osmium/osm/types.hpp>

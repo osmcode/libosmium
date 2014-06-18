@@ -39,7 +39,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/index/map/dummy.hpp>
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/node.hpp>
-#include <osmium/osm/noderef.hpp>
+#include <osmium/osm/node_ref.hpp>
 #include <osmium/osm/types.hpp>
 #include <osmium/osm/way.hpp>
 
