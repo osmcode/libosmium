@@ -133,6 +133,11 @@ http://osmcode.org/osm-testdata/ . Go into the test/osm-testdata directory
 and type 'make' to run them all.
 
 
+## Switching from the old Osmium
+
+See `README-changes-from-old-osmium`.
+
+
 ## License
 
 The Osmium Library is available under the Boost Software License. See

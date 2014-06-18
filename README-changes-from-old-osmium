@@ -3,12 +3,15 @@ Changes from old versions of Osmium
 ===================================
 
 This version has some substantial changes and users of Osmium will have to
-rewrite their code.
+rewrite their code. Use the examples provided in the "example" directory
+or in the osmium-contrib repository to get an idea what needs changing.
+These examples are often similar to the examples provided with the old
+Osmium so they should give you an idea how your code has to change.
 
 Here are some of the more important changes:
 
 * Osmium now needs C++11. It will not work with older compilers. You need
-  at least GCC 4.7 or clang (LLVM) 3.2.
+  at least GCC 4.7.3 or clang (LLVM) 3.2.
 
 * Namespaces are now all lower case. Everything is in the "osmium" namespace
   or sub-namespaces of it. Many classes and functions have been moved to
@@ -20,11 +23,11 @@ Here are some of the more important changes:
   for memory management and makes Osmium faster and easier to parallelize.
 
 * Usually you don't act on single OSM objects any more, but on groups of
-  them in a Buffer. Handlers act on buffers.
+  them in a Buffer.
 
 * The way reading and writing of OSM data is done is much simpler. Use the
   Reader and Writer classes as they hide much of the detail and have much
-  nicer interfaces than the Input/Output classes.
+  nicer interfaces than the old Input/Output classes.
 
 * The class Osmium::OSM::Position was renamed to osmium::Location. This
   better reflects that it is a location on the planet we are talking about.
