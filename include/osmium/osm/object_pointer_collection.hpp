@@ -78,7 +78,7 @@ namespace osmium {
                 m_objects() {
             }
 
-            void object(osmium::Object& object) {
+            void osm_object(osmium::Object& object) {
                 m_objects.push_back(&object);
             }
 

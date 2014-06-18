@@ -53,7 +53,7 @@ namespace osmium {
 
         public:
 
-            void object(const osmium::Object&) const {
+            void osm_object(const osmium::Object&) const {
             }
 
             void node(const osmium::Node&) const {
