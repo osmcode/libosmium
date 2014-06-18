@@ -57,45 +57,45 @@ namespace osmium {
     namespace {
 
         template <typename T, typename U>
-        using MaybeConst = typename std::conditional<std::is_const<T>::value, typename std::add_const<U>::type, U>::type;
+        using ConstIfConst = typename std::conditional<std::is_const<T>::value, typename std::add_const<U>::type, U>::type;
 
         template <class THandler, class TItem>
         inline void apply_item_recurse(TItem& item, THandler& handler) {
             switch (item.type()) {
                 case osmium::item_type::node:
-                    handler.object(static_cast<MaybeConst<TItem, osmium::Object>&>(item));
-                    handler.node(static_cast<MaybeConst<TItem, osmium::Node>&>(item));
+                    handler.object(static_cast<ConstIfConst<TItem, osmium::Object>&>(item));
+                    handler.node(static_cast<ConstIfConst<TItem, osmium::Node>&>(item));
                     break;
                 case osmium::item_type::way:
-                    handler.object(static_cast<MaybeConst<TItem, osmium::Object>&>(item));
-                    handler.way(static_cast<MaybeConst<TItem, osmium::Way>&>(item));
+                    handler.object(static_cast<ConstIfConst<TItem, osmium::Object>&>(item));
+                    handler.way(static_cast<ConstIfConst<TItem, osmium::Way>&>(item));
                     break;
                 case osmium::item_type::relation:
-                    handler.object(static_cast<MaybeConst<TItem, osmium::Object>&>(item));
-                    handler.relation(static_cast<MaybeConst<TItem, osmium::Relation>&>(item));
+                    handler.object(static_cast<ConstIfConst<TItem, osmium::Object>&>(item));
+                    handler.relation(static_cast<ConstIfConst<TItem, osmium::Relation>&>(item));
                     break;
                 case osmium::item_type::area:
-                    handler.object(static_cast<MaybeConst<TItem, osmium::Object>&>(item));
-                    handler.area(static_cast<MaybeConst<TItem, osmium::Area>&>(item));
+                    handler.object(static_cast<ConstIfConst<TItem, osmium::Object>&>(item));
+                    handler.area(static_cast<ConstIfConst<TItem, osmium::Area>&>(item));
                     break;
                 case osmium::item_type::changeset:
-                    handler.changeset(static_cast<MaybeConst<TItem, osmium::Changeset>&>(item));
+                    handler.changeset(static_cast<ConstIfConst<TItem, osmium::Changeset>&>(item));
                     break;
                 case osmium::item_type::tag_list:
-                    handler.tag_list(static_cast<MaybeConst<TItem, osmium::TagList>&>(item));
+                    handler.tag_list(static_cast<ConstIfConst<TItem, osmium::TagList>&>(item));
                     break;
                 case osmium::item_type::way_node_list:
-                    handler.way_node_list(static_cast<MaybeConst<TItem, osmium::WayNodeList>&>(item));
+                    handler.way_node_list(static_cast<ConstIfConst<TItem, osmium::WayNodeList>&>(item));
                     break;
                 case osmium::item_type::relation_member_list:
                 case osmium::item_type::relation_member_list_with_full_members:
-                    handler.relation_member_list(static_cast<MaybeConst<TItem, osmium::RelationMemberList>&>(item));
+                    handler.relation_member_list(static_cast<ConstIfConst<TItem, osmium::RelationMemberList>&>(item));
                     break;
                 case osmium::item_type::outer_ring:
-                    handler.outer_ring(static_cast<MaybeConst<TItem, osmium::OuterRing>&>(item));
+                    handler.outer_ring(static_cast<ConstIfConst<TItem, osmium::OuterRing>&>(item));
                     break;
                 case osmium::item_type::inner_ring:
-                    handler.inner_ring(static_cast<MaybeConst<TItem, osmium::InnerRing>&>(item));
+                    handler.inner_ring(static_cast<ConstIfConst<TItem, osmium::InnerRing>&>(item));
                     break;
                 default:
                     throw std::runtime_error("unknown type");
