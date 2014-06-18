@@ -1,5 +1,5 @@
-#ifndef OSMIUM_OSM_DUMP_HPP
-#define OSMIUM_OSM_DUMP_HPP
+#ifndef OSMIUM_HANDLER_DUMP_HPP
+#define OSMIUM_HANDLER_DUMP_HPP
 
 /*
 
@@ -54,7 +54,7 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
-    namespace osm {
+    namespace handler {
 
         class Dump : public osmium::handler::Handler {
 
@@ -267,8 +267,8 @@ namespace osmium {
 
         }; // class Dump
 
-    } // namespace osm
+    } // namespace handler
 
 } // namespace osmium
 
-#endif // OSMIUM_OSM_DUMP_HPP
+#endif // OSMIUM_HANDLER_DUMP_HPP
