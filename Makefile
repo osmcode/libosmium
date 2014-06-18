@@ -15,7 +15,7 @@ ifeq ($(OS),Darwin)
 	LDFLAGS += -stdlib=libc++
 endif
 
-INCLUDE_FILES := $(shell find include -name \*.hpp | sort)
+INCLUDE_FILES := $(shell find include/osmium -name \*.hpp | sort)
 
 WARNINGFLAGS := -Wall -Wextra -pedantic -Wredundant-decls -Wdisabled-optimization -Wctor-dtor-privacy -Wnon-virtual-dtor -Woverloaded-virtual -Wsign-promo -Winline -Wold-style-cast
 #WARNINGFLAGS += -Weffc++
