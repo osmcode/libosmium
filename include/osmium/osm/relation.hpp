@@ -47,17 +47,14 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
-    namespace memory {
+    namespace builder {
         template <class T> class ObjectBuilder;
-    }
-
-    namespace osm {
         class RelationMemberListBuilder;
     }
 
     class RelationMember : public osmium::memory::detail::ItemHelper {
 
-        friend class osmium::osm::RelationMemberListBuilder;
+        friend class osmium::builder::RelationMemberListBuilder;
 
         object_id_type   m_ref;
         item_type        m_type;
@@ -163,7 +160,7 @@ namespace osmium {
 
     class Relation : public Object {
 
-        friend class osmium::memory::ObjectBuilder<osmium::Relation>;
+        friend class osmium::builder::ObjectBuilder<osmium::Relation>;
 
         Relation() :
             Object(sizeof(Relation), osmium::item_type::relation) {

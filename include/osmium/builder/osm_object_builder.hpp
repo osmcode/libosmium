@@ -1,5 +1,5 @@
-#ifndef OSMIUM_OSM_BUILDER_HPP
-#define OSMIUM_OSM_BUILDER_HPP
+#ifndef OSMIUM_BUILDER_OSM_OBJECT_BUILDER_HPP
+#define OSMIUM_BUILDER_OSM_OBJECT_BUILDER_HPP
 
 /*
 
@@ -36,7 +36,7 @@ DEALINGS IN THE SOFTWARE.
 #include <cstring>
 #include <new>
 
-#include <osmium/memory/builder.hpp>
+#include <osmium/builder/builder.hpp>
 #include <osmium/osm.hpp>
 #include <osmium/osm/entity.hpp>
 #include <osmium/osm/item_type.hpp>
@@ -52,17 +52,17 @@ namespace osmium {
         class Buffer;
     }
 
-    namespace osm {
+    namespace builder {
 
         template <class T>
-        class OSMObjectBuilder : public osmium::memory::ObjectBuilder<T> {
+        class OSMObjectBuilder : public ObjectBuilder<T> {
 
         public:
 
-            OSMObjectBuilder(osmium::memory::Buffer& buffer, osmium::memory::Builder* parent=nullptr) :
-                osmium::memory::ObjectBuilder<T>(buffer, parent) {
-                static_cast<osmium::memory::Builder*>(this)->reserve_space_for<string_size_type>();
-                static_cast<osmium::memory::Builder*>(this)->add_size(sizeof(string_size_type));
+            OSMObjectBuilder(osmium::memory::Buffer& buffer, Builder* parent=nullptr) :
+                ObjectBuilder<T>(buffer, parent) {
+                static_cast<Builder*>(this)->reserve_space_for<string_size_type>();
+                static_cast<Builder*>(this)->add_size(sizeof(string_size_type));
             }
 
         }; // class OSMObjectBuilder
@@ -72,14 +72,14 @@ namespace osmium {
         typedef OSMObjectBuilder<osmium::Relation> RelationBuilder;
         typedef OSMObjectBuilder<osmium::Area> AreaBuilder;
 
-        typedef osmium::memory::ObjectBuilder<osmium::Changeset> ChangesetBuilder;
+        typedef ObjectBuilder<osmium::Changeset> ChangesetBuilder;
 
-        class TagListBuilder : public osmium::memory::ObjectBuilder<TagList> {
+        class TagListBuilder : public ObjectBuilder<TagList> {
 
         public:
 
             TagListBuilder(osmium::memory::Buffer& buffer, Builder* parent=nullptr) :
-                osmium::memory::ObjectBuilder<TagList>(buffer, parent) {
+                ObjectBuilder<TagList>(buffer, parent) {
             }
 
             ~TagListBuilder() {
@@ -92,12 +92,12 @@ namespace osmium {
 
         }; // class TagListBuilder
 
-        class WayNodeListBuilder : public osmium::memory::ObjectBuilder<WayNodeList> {
+        class WayNodeListBuilder : public ObjectBuilder<WayNodeList> {
 
         public:
 
             WayNodeListBuilder(osmium::memory::Buffer& buffer, Builder* parent=nullptr) :
-                osmium::memory::ObjectBuilder<WayNodeList>(buffer, parent) {
+                ObjectBuilder<WayNodeList>(buffer, parent) {
             }
 
             ~WayNodeListBuilder() {
@@ -115,12 +115,12 @@ namespace osmium {
 
         }; // class WayNodeListBuilder
 
-        class OuterRingBuilder : public osmium::memory::ObjectBuilder<OuterRing> {
+        class OuterRingBuilder : public ObjectBuilder<OuterRing> {
 
         public:
 
             OuterRingBuilder(osmium::memory::Buffer& buffer, Builder* parent=nullptr) :
-                osmium::memory::ObjectBuilder<OuterRing>(buffer, parent) {
+                ObjectBuilder<OuterRing>(buffer, parent) {
             }
 
             ~OuterRingBuilder() {
@@ -138,12 +138,12 @@ namespace osmium {
 
         }; // class OuterRingBuilder
 
-        class InnerRingBuilder : public osmium::memory::ObjectBuilder<InnerRing> {
+        class InnerRingBuilder : public ObjectBuilder<InnerRing> {
 
         public:
 
             InnerRingBuilder(osmium::memory::Buffer& buffer, Builder* parent=nullptr) :
-                osmium::memory::ObjectBuilder<InnerRing>(buffer, parent) {
+                ObjectBuilder<InnerRing>(buffer, parent) {
             }
 
             ~InnerRingBuilder() {
@@ -161,7 +161,7 @@ namespace osmium {
 
         }; // class InnerRingBuilder
 
-        class RelationMemberListBuilder : public osmium::memory::ObjectBuilder<RelationMemberList> {
+        class RelationMemberListBuilder : public ObjectBuilder<RelationMemberList> {
 
             void add_role(osmium::RelationMember* member, const char* role) {
                 member->set_role_size(std::strlen(role) + 1);
@@ -172,7 +172,7 @@ namespace osmium {
         public:
 
             RelationMemberListBuilder(osmium::memory::Buffer& buffer, Builder* parent=nullptr) :
-                osmium::memory::ObjectBuilder<RelationMemberList>(buffer, parent) {
+                ObjectBuilder<RelationMemberList>(buffer, parent) {
             }
 
             ~RelationMemberListBuilder() {
@@ -191,8 +191,8 @@ namespace osmium {
 
         }; // class RelationMemberListBuilder
 
-    } // namespace osm
+    } // namespace builder
 
 } // namespace osmium
 
-#endif // OSMIUM_OSM_BUILDER_HPP
+#endif // OSMIUM_BUILDER_OSM_OBJECT_BUILDER_HPP

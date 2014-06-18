@@ -46,7 +46,7 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
-    namespace memory {
+    namespace builder {
         template <class T> class ObjectBuilder;
     }
 
@@ -97,7 +97,7 @@ namespace osmium {
 
     class Way : public Object {
 
-        friend class osmium::memory::ObjectBuilder<osmium::Way>;
+        friend class osmium::builder::ObjectBuilder<osmium::Way>;
 
         Way() :
             Object(sizeof(Way), osmium::item_type::way) {

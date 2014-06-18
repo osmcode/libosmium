@@ -1,5 +1,5 @@
-#ifndef OSMIUM_MEMORY_BUILDER_HPP
-#define OSMIUM_MEMORY_BUILDER_HPP
+#ifndef OSMIUM_BUILDER_BUILDER_HPP
+#define OSMIUM_BUILDER_BUILDER_HPP
 
 /*
 
@@ -44,11 +44,11 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
-    namespace memory {
+    namespace builder {
 
         class Builder {
 
-            Buffer& m_buffer;
+            osmium::memory::Buffer& m_buffer;
             Builder* m_parent;
             size_t m_item_offset;
 
@@ -60,7 +60,7 @@ namespace osmium {
 
         protected:
 
-            Builder(Buffer& buffer, Builder* parent, size_t size) :
+            Builder(osmium::memory::Buffer& buffer, Builder* parent, size_t size) :
                 m_buffer(buffer),
                 m_parent(parent),
                 m_item_offset(buffer.written()) {
@@ -74,7 +74,7 @@ namespace osmium {
             ~Builder() = default;
 
             osmium::memory::Item& item() const {
-                return *reinterpret_cast<Item*>(m_buffer.data() + m_item_offset);
+                return *reinterpret_cast<osmium::memory::Item*>(m_buffer.data() + m_item_offset);
             }
 
             /**
@@ -91,14 +91,14 @@ namespace osmium {
              *
              */
             void add_padding(bool self=false) {
-                size_t padding = align_bytes - (size() % align_bytes);
-                if (padding != align_bytes) {
+                size_t padding = osmium::memory::align_bytes - (size() % osmium::memory::align_bytes);
+                if (padding != osmium::memory::align_bytes) {
                     std::memset(m_buffer.reserve_space(padding), 0, padding);
                     if (self) {
                         add_size(padding);
                     } else if (m_parent) {
                         m_parent->add_size(padding);
-                        assert(m_parent->size() % align_bytes == 0);
+                        assert(m_parent->size() % osmium::memory::align_bytes == 0);
                     }
                 }
             }
@@ -152,7 +152,7 @@ namespace osmium {
 
         public:
 
-            ObjectBuilder(Buffer& buffer, Builder* parent=nullptr) :
+            ObjectBuilder(osmium::memory::Buffer& buffer, Builder* parent=nullptr) :
                 Builder(buffer, parent, sizeof(T)) {
                 new (&item()) T();
             }
@@ -169,8 +169,8 @@ namespace osmium {
 
         }; // class ObjectBuilder
 
-    } // namespace memory
+    } // namespace builder
 
 } // namespace osmium
 
-#endif // OSMIUM_MEMORY_BUILDER_HPP
+#endif // OSMIUM_BUILDER_BUILDER_HPP

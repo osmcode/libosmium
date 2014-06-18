@@ -46,7 +46,7 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
-    namespace memory {
+    namespace builder {
         template <class T> class ObjectBuilder;
     }
 
@@ -92,7 +92,7 @@ namespace osmium {
 
     class Area : public Object {
 
-        friend class osmium::memory::ObjectBuilder<osmium::Area>;
+        friend class osmium::builder::ObjectBuilder<osmium::Area>;
 
         Area() :
             Object(sizeof(Area), osmium::item_type::area) {

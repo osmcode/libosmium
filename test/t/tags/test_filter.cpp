@@ -3,8 +3,8 @@
 #endif
 #include <boost/test/unit_test.hpp>
 
+#include <osmium/builder/osm_object_builder.hpp>
 #include <osmium/memory/buffer.hpp>
-#include <osmium/osm/builder.hpp>
 #include <osmium/osm/tag.hpp>
 #include <osmium/osm/ostream.hpp>
 #include <osmium/tags/key_filter.hpp>
@@ -19,7 +19,7 @@ BOOST_AUTO_TEST_CASE(KeyFilter) {
 
     osmium::memory::Buffer buffer(10240);
     {
-        osmium::osm::TagListBuilder tl_builder(buffer);
+        osmium::builder::TagListBuilder tl_builder(buffer);
         tl_builder.add_tag("highway", "primary");
         tl_builder.add_tag("name", "Main Street");
         tl_builder.add_tag("source", "GPS");
@@ -48,7 +48,7 @@ BOOST_AUTO_TEST_CASE(KeyValueFilter) {
 
     osmium::memory::Buffer buffer(10240);
     {
-        osmium::osm::TagListBuilder tl_builder(buffer);
+        osmium::builder::TagListBuilder tl_builder(buffer);
         tl_builder.add_tag("highway", "primary");
         tl_builder.add_tag("highway", "secondary");
         tl_builder.add_tag("railway", "tram");

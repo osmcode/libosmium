@@ -39,13 +39,13 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
-    namespace memory {
+    namespace builder {
         template <class T> class ObjectBuilder;
     }
 
     class Node : public Object {
 
-        friend class osmium::memory::ObjectBuilder<osmium::Node>;
+        friend class osmium::builder::ObjectBuilder<osmium::Node>;
 
         osmium::Location m_location {};
 

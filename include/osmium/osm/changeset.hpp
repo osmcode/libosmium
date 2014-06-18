@@ -49,13 +49,13 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
-    namespace memory {
+    namespace builder {
         template <class T> class ObjectBuilder;
     }
 
     class Changeset : public osmium::OSMEntity, boost::totally_ordered<Changeset> {
 
-        friend class osmium::memory::ObjectBuilder<osmium::Changeset>;
+        friend class osmium::builder::ObjectBuilder<osmium::Changeset>;
 
         osmium::Timestamp m_created_at {};
         osmium::Timestamp m_closed_at {};

@@ -41,6 +41,10 @@ namespace osmium {
     // forward declaration, see osmium/osm/item_type.hpp for declaration
     enum class item_type : uint16_t;
 
+    namespace builder {
+        class Builder;
+    }
+
     namespace memory {
 
         // align datastructures to this many bytes
@@ -87,8 +91,6 @@ namespace osmium {
 
         } // namespace detail
 
-        class Builder;
-
         typedef uint32_t item_size_type;
 
         class Item : public osmium::memory::detail::ItemHelper {
@@ -100,7 +102,7 @@ namespace osmium {
             template <class TMember>
             friend class CollectionIterator;
 
-            friend class Builder;
+            friend class osmium::builder::Builder;
 
             unsigned char* next() {
                 return data() + padded_size();

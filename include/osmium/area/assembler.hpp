@@ -40,9 +40,9 @@ DEALINGS IN THE SOFTWARE.
 #include <map>
 #include <vector>
 
+#include <osmium/builder/osm_object_builder.hpp>
 #include <osmium/memory/buffer.hpp>
 #include <osmium/osm/area.hpp>
-#include <osmium/osm/builder.hpp>
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/ostream.hpp>
 #include <osmium/osm/relation.hpp>
@@ -129,7 +129,7 @@ namespace osmium {
              * Initialize area attributes and tags from the attributes and tags
              * of the given object.
              */
-            void initialize_area_from_object(osmium::osm::AreaBuilder& builder, const osmium::Object& object, int id_offset) const {
+            void initialize_area_from_object(osmium::builder::AreaBuilder& builder, const osmium::Object& object, int id_offset) const {
                 osmium::Area& area = builder.object();
                 area.id(object.id() * 2 + id_offset);
                 area.version(object.version());
@@ -141,14 +141,14 @@ namespace osmium {
                 builder.add_user(object.user());
             }
 
-            void add_tags_to_area(osmium::osm::AreaBuilder& builder, const osmium::Way& way) const {
-                osmium::osm::TagListBuilder tl_builder(builder.buffer(), &builder);
+            void add_tags_to_area(osmium::builder::AreaBuilder& builder, const osmium::Way& way) const {
+                osmium::builder::TagListBuilder tl_builder(builder.buffer(), &builder);
                 for (const osmium::Tag& tag : way.tags()) {
                     tl_builder.add_tag(tag.key(), tag.value());
                 }
             }
 
-            void add_common_tags(osmium::osm::TagListBuilder& tl_builder, std::set<const osmium::Way*>& ways) const {
+            void add_common_tags(osmium::builder::TagListBuilder& tl_builder, std::set<const osmium::Way*>& ways) const {
                 std::map<std::string, size_t> counter;
                 for (const osmium::Way* way : ways) {
                     for (auto& tag : way->tags()) {
@@ -171,7 +171,7 @@ namespace osmium {
                 }
             }
 
-            void add_tags_to_area(osmium::osm::AreaBuilder& builder, const osmium::Relation& relation) const {
+            void add_tags_to_area(osmium::builder::AreaBuilder& builder, const osmium::Relation& relation) const {
                 osmium::tags::KeyFilter filter(true);
                 filter.add(false, "type").add(false, "created_by").add(false, "source").add(false, "note");
                 filter.add(false, "test:id").add(false, "test:section");
@@ -191,7 +191,7 @@ namespace osmium {
                     }
 
                     // write out all tags except type=*
-                    osmium::osm::TagListBuilder tl_builder(builder.buffer(), &builder);
+                    osmium::builder::TagListBuilder tl_builder(builder.buffer(), &builder);
                     for (const osmium::Tag& tag : relation.tags()) {
                         if (strcmp(tag.key(), "type")) {
                             tl_builder.add_tag(tag.key(), tag.value());
@@ -209,7 +209,7 @@ namespace osmium {
                         if (debug()) {
                             std::cerr << "      only one outer way\n";
                         }
-                        osmium::osm::TagListBuilder tl_builder(builder.buffer(), &builder);
+                        osmium::builder::TagListBuilder tl_builder(builder.buffer(), &builder);
                         for (const osmium::Tag& tag : (*ways.begin())->tags()) {
                             tl_builder.add_tag(tag.key(), tag.value());
                         }
@@ -217,7 +217,7 @@ namespace osmium {
                         if (debug()) {
                             std::cerr << "      multiple outer ways, get common tags\n";
                         }
-                        osmium::osm::TagListBuilder tl_builder(builder.buffer(), &builder);
+                        osmium::builder::TagListBuilder tl_builder(builder.buffer(), &builder);
                         add_common_tags(tl_builder, ways);
                     }
                 }
@@ -430,20 +430,20 @@ namespace osmium {
              * Append each outer ring together with its inner rings to the
              * area in the buffer.
              */
-            void add_rings_to_area(osmium::osm::AreaBuilder& builder) const {
+            void add_rings_to_area(osmium::builder::AreaBuilder& builder) const {
                 for (const ProtoRing* ring : m_outer_rings) {
                     if (debug()) {
                         std::cerr << "    ring " << *ring << " is outer\n";
                     }
                     {
-                        osmium::osm::OuterRingBuilder ring_builder(builder.buffer(), &builder);
+                        osmium::builder::OuterRingBuilder ring_builder(builder.buffer(), &builder);
                         ring_builder.add_node_ref(ring->get_segment_front().first());
                         for (auto& segment : ring->segments()) {
                             ring_builder.add_node_ref(segment.second());
                         }
                     }
                     for (ProtoRing* inner : ring->inner_rings()) {
-                        osmium::osm::InnerRingBuilder ring_builder(builder.buffer(), &builder);
+                        osmium::builder::InnerRingBuilder ring_builder(builder.buffer(), &builder);
                         ring_builder.add_node_ref(inner->get_segment_front().first());
                         for (auto& segment : inner->segments()) {
                             ring_builder.add_node_ref(segment.second());
@@ -702,7 +702,7 @@ namespace osmium {
                 // Now create the Area object and add the attributes and tags
                 // from the relation.
                 {
-                    osmium::osm::AreaBuilder builder(out_buffer);
+                    osmium::builder::AreaBuilder builder(out_buffer);
                     initialize_area_from_object(builder, way, 0);
 
                     if (create_rings()) {
@@ -735,7 +735,7 @@ namespace osmium {
                 // Now create the Area object and add the attributes and tags
                 // from the relation.
                 {
-                    osmium::osm::AreaBuilder builder(out_buffer);
+                    osmium::builder::AreaBuilder builder(out_buffer);
                     initialize_area_from_object(builder, relation, 1);
 
                     if (create_rings()) {
