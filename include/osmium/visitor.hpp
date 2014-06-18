@@ -60,7 +60,7 @@ namespace osmium {
         using MaybeConst = typename std::conditional<std::is_const<T>::value, typename std::add_const<U>::type, U>::type;
 
         template <class THandler, class TItem>
-        inline void switch_on_type(THandler& handler, TItem& item) {
+        inline void apply_item_recurse(TItem& item, THandler& handler) {
             switch (item.type()) {
                 case osmium::item_type::node:
                     handler.object(static_cast<MaybeConst<TItem, osmium::Object>&>(item));
@@ -100,11 +100,6 @@ namespace osmium {
                 default:
                     throw std::runtime_error("unknown type");
             }
-        }
-
-        template <class THandler, class TItem>
-        inline void apply_item_recurse(TItem& item, THandler& handler) {
-            switch_on_type(handler, item);
         }
 
         template <class THandler, class TItem, class ...TRest>
