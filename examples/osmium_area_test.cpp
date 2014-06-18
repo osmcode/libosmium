@@ -12,7 +12,7 @@
 #include <getopt.h>
 
 #include <osmium/area/assembler.hpp>
-#include <osmium/area/collector.hpp>
+#include <osmium/area/multipolygon_collector.hpp>
 #include <osmium/dynamic_handler.hpp>
 #include <osmium/geom/wkt.hpp>
 #include <osmium/handler/dump.hpp>
@@ -97,7 +97,7 @@ int main(int argc, char* argv[]) {
     osmium::io::File infile(argv[optind]);
 
     osmium::area::Assembler::config_type assembler_config;
-    osmium::area::Collector<osmium::area::Assembler> collector(assembler_config);
+    osmium::area::MultipolygonCollector<osmium::area::Assembler> collector(assembler_config);
 
     std::cout << "Pass 1...\n";
     osmium::io::Reader reader1(infile, osmium::osm_entity::flags::relation);

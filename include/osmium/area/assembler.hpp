@@ -85,8 +85,8 @@ namespace osmium {
 
         /**
          * Assembles area objects from multipolygon relations and their
-         * members. This is called by the Collector object after all
-         * members have been collected.
+         * members. This is called by the MultipolygonCollector object
+         * after all members have been collected.
          */
         class Assembler {
 

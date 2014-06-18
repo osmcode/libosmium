@@ -28,7 +28,7 @@
 
 #include <osmium/handler/node_locations_for_ways.hpp>
 #include <osmium/visitor.hpp>
-#include <osmium/area/collector.hpp>
+#include <osmium/area/multipolygon_collector.hpp>
 #include <osmium/area/assembler.hpp>
 
 #include <osmium/geom/ogr.hpp>
@@ -290,7 +290,7 @@ int main(int argc, char* argv[]) {
 
     osmium::area::Assembler::config_type assembler_config;
     assembler_config.enable_debug_output(debug);
-    osmium::area::Collector<osmium::area::Assembler> collector(assembler_config);
+    osmium::area::MultipolygonCollector<osmium::area::Assembler> collector(assembler_config);
 
     std::cerr << "Pass 1...\n";
     osmium::io::Reader reader1(input_filename);

@@ -1,5 +1,5 @@
-#ifndef OSMIUM_AREA_COLLECTOR_HPP
-#define OSMIUM_AREA_COLLECTOR_HPP
+#ifndef OSMIUM_AREA_MULTIPOLYGON_COLLECTOR_HPP
+#define OSMIUM_AREA_MULTIPOLYGON_COLLECTOR_HPP
 
 /*
 
@@ -68,9 +68,9 @@ namespace osmium {
          * @tparam TAssembler Multipolygon Assembler class.
          */
         template <class TAssembler>
-        class Collector : public osmium::relations::Collector<osmium::area::Collector<TAssembler>, false, true, false> {
+        class MultipolygonCollector : public osmium::relations::Collector<MultipolygonCollector<TAssembler>, false, true, false> {
 
-            typedef typename osmium::relations::Collector<osmium::area::Collector<TAssembler>, false, true, false> collector_type;
+            typedef typename osmium::relations::Collector<MultipolygonCollector<TAssembler>, false, true, false> collector_type;
 
             typedef typename TAssembler::config_type assembler_config_type;
             const assembler_config_type m_assembler_config;
@@ -92,7 +92,7 @@ namespace osmium {
 
         public:
 
-            Collector(const assembler_config_type& assembler_config) :
+            MultipolygonCollector(const assembler_config_type& assembler_config) :
                 collector_type(),
                 m_assembler_config(assembler_config),
                 m_output_buffer(1024*1024, true) {
@@ -195,10 +195,10 @@ namespace osmium {
                 return buffer;
             }
 
-        }; // class Collector
+        }; // class MultipolygonCollector
 
     } // namespace area
 
 } // namespace osmium
 
-#endif // OSMIUM_AREA_COLLECTOR_HPP
+#endif // OSMIUM_AREA_MULTIPOLYGON_COLLECTOR_HPP

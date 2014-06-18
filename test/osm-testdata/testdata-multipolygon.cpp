@@ -12,7 +12,7 @@
 #pragma GCC diagnostic pop
 
 #include <osmium/area/assembler.hpp>
-#include <osmium/area/collector.hpp>
+#include <osmium/area/multipolygon_collector.hpp>
 #include <osmium/area/problem_reporter_ogr.hpp>
 #include <osmium/geom/ogr.hpp>
 #include <osmium/geom/wkt.hpp>
@@ -313,7 +313,7 @@ int main(int argc, char* argv[]) {
     osmium::area::ProblemReporterOGR problem_reporter(data_source);
     osmium::area::Assembler::config_type assembler_config(&problem_reporter);
     assembler_config.enable_debug_output();
-    osmium::area::Collector<osmium::area::Assembler> collector(assembler_config);
+    osmium::area::MultipolygonCollector<osmium::area::Assembler> collector(assembler_config);
 
     std::cerr << "Pass 1...\n";
     osmium::io::Reader reader1(input_filename);
