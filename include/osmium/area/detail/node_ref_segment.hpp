@@ -34,9 +34,12 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <algorithm>
+#include <cstring>
+#include <utility>
 
 #include <boost/operators.hpp>
 
+#include <osmium/osm/location.hpp>
 #include <osmium/osm/noderef.hpp>
 #include <osmium/osm/ostream.hpp>
 

@@ -33,8 +33,12 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
 #include <cstring>
 #include <iostream>
+#include <vector>
 
 #include <osmium/memory/buffer.hpp>
 #include <osmium/osm/item_type.hpp>
@@ -42,6 +46,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/tag.hpp>
 #include <osmium/osm/way.hpp>
 #include <osmium/relations/collector.hpp>
+#include <osmium/relations/detail/member_meta.hpp>
 #include <osmium/relations/detail/relation_meta.hpp>
 
 namespace osmium {

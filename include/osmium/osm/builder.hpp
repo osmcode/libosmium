@@ -33,6 +33,7 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <cstring>
 #include <new>
 
 #include <osmium/memory/builder.hpp>
@@ -40,11 +41,16 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/entity.hpp>
 #include <osmium/osm/item_type.hpp>
 #include <osmium/osm/location.hpp>
+#include <osmium/osm/noderef.hpp>
 #include <osmium/osm/object.hpp>
 #include <osmium/osm/tag.hpp>
 #include <osmium/osm/types.hpp>
 
 namespace osmium {
+
+    namespace memory {
+        class Buffer;
+    }
 
     namespace osm {
 

@@ -5,7 +5,7 @@
 
 This file is part of Osmium (http://osmcode.org/libosmium).
 
-Copyright 2013 Jochen Topf <jochen@topf.org> and others (see README).
+Copyright 2013,2014 Jochen Topf <jochen@topf.org> and others (see README).
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -39,6 +39,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/index/map/dummy.hpp>
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/node.hpp>
+#include <osmium/osm/noderef.hpp>
 #include <osmium/osm/types.hpp>
 #include <osmium/osm/way.hpp>
 

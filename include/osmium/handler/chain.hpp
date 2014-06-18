@@ -65,6 +65,12 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
+    class Node;
+    class Way;
+    class Relation;
+    class Area;
+    class Changeset;
+
     namespace handler {
 
         /**

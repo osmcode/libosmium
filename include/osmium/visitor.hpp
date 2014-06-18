@@ -34,24 +34,29 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <stdexcept>
+#include <type_traits>
 
 #include <osmium/io/input_iterator.hpp>
 #include <osmium/memory/buffer.hpp>
-#include <osmium/memory/item.hpp>
-#include <osmium/osm/changeset.hpp>
 #include <osmium/osm/item_type.hpp>
-#include <osmium/osm/node.hpp>
-#include <osmium/osm/object.hpp>
-#include <osmium/osm/relation.hpp>
-#include <osmium/osm/tag.hpp>
-#include <osmium/osm/way.hpp>
-#include <osmium/osm/area.hpp>
-
-// IWYU pragma: no_forward_declare osmium::Changeset
-// IWYU pragma: no_forward_declare osmium::TagList
-// IWYU pragma: no_forward_declare osmium::memory::Item
 
 namespace osmium {
+
+    class Object;
+    class Node;
+    class Way;
+    class Relation;
+    class Area;
+    class Changeset;
+    class TagList;
+    class WayNodeList;
+    class RelationMemberList;
+    class OuterRing;
+    class InnerRing;
+
+    namespace memory {
+        class Item;
+    }
 
     namespace {
 

@@ -34,10 +34,10 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <sstream>
+#include <stdexcept>
 
 #include <osmium/area/problem_reporter_stream.hpp>
 #include <osmium/osm/location.hpp>
-#include <osmium/osm/ostream.hpp>
 #include <osmium/osm/types.hpp>
 
 namespace osmium {

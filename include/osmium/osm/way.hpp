@@ -35,7 +35,6 @@ DEALINGS IN THE SOFTWARE.
 
 #include <cassert>
 #include <cstddef>
-#include <cstdlib>
 
 #include <osmium/memory/collection.hpp>
 #include <osmium/memory/item.hpp>

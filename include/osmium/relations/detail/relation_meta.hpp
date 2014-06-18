@@ -33,11 +33,9 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <algorithm>
 #include <cassert>
 #include <cstddef>
 #include <functional>
-#include <vector>
 
 namespace osmium {
 

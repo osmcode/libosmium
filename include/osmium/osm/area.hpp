@@ -35,15 +35,13 @@ DEALINGS IN THE SOFTWARE.
 
 #include <cassert>
 #include <cstddef>
-#include <cstdlib>
+#include <utility>
 
 #include <osmium/memory/collection.hpp>
 #include <osmium/memory/item.hpp>
 #include <osmium/osm/item_type.hpp>
-#include <osmium/osm/location.hpp>
 #include <osmium/osm/object.hpp>
 #include <osmium/osm/types.hpp>
-#include <osmium/osm/way.hpp>
 #include <osmium/osm/noderef.hpp>
 
 namespace osmium {

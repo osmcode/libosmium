@@ -37,15 +37,16 @@ DEALINGS IN THE SOFTWARE.
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
+#include <functional>
 #include <iomanip>
 #include <iostream>
 #include <vector>
 
 #include <osmium/osm/item_type.hpp>
 #include <osmium/osm/object.hpp>
+#include <osmium/osm/types.hpp>
 #include <osmium/handler.hpp>
 #include <osmium/memory/buffer.hpp>
-#include <osmium/osm/relation.hpp>
 #include <osmium/visitor.hpp>
 
 #include <osmium/relations/detail/relation_meta.hpp>
@@ -55,6 +56,8 @@ namespace osmium {
 
     class Node;
     class Way;
+    class Relation;
+    class RelationMember;
 
     /**
      * @brief Namespace for code related to OSM relations

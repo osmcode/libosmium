@@ -43,8 +43,13 @@ DEALINGS IN THE SOFTWARE.
 # include <ogrsf_frmts.h>
 #pragma GCC diagnostic pop
 
-#include <osmium/geom/ogr.hpp>
+#include <memory>
+#include <stdexcept>
+
 #include <osmium/area/problem_reporter.hpp>
+#include <osmium/geom/ogr.hpp>
+#include <osmium/osm/location.hpp>
+#include <osmium/osm/types.hpp>
 
 namespace osmium {
 
