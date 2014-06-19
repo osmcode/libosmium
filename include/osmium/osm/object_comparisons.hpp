@@ -118,7 +118,7 @@ namespace osmium {
                 return lhs.type() < rhs.type();
             }
             return (lhs.id() == rhs.id() && lhs.version() > rhs.version()) ||
-                    lhs.positive_id() < rhs.positive_id();
+                   lhs.positive_id() < rhs.positive_id();
         }
 
         bool operator()(const osmium::Object* lhs, const osmium::Object* rhs) const {

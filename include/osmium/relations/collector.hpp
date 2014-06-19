@@ -351,7 +351,7 @@ namespace osmium {
                 m_relations.erase(
                     std::remove_if(m_relations.begin(), m_relations.end(), has_all_members()),
                     m_relations.end()
-                    );
+                );
             }
 
             const osmium::Relation& get_relation(size_t offset) const {
