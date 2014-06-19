@@ -42,6 +42,9 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
+    /**
+     * @brief Code related to working with OSM tags
+     */
     namespace tags {
 
         class KeyFilter : public std::unary_function<const osmium::Tag&, bool> {

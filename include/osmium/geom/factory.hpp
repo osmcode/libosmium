@@ -48,7 +48,7 @@ DEALINGS IN THE SOFTWARE.
 namespace osmium {
 
     /**
-     * @brief Namespace for everything related to geometry.
+     * @brief Everything related to geometry handling.
      */
     namespace geom {
 

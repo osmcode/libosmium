@@ -47,7 +47,7 @@ DEALINGS IN THE SOFTWARE.
 namespace osmium {
 
     /**
-     * @brief Namespace for memory management.
+     * @brief Memory management of items in buffers and iterators over this data.
      */
     namespace memory {
 

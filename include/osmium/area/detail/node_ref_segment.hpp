@@ -49,6 +49,9 @@ namespace osmium {
 
     namespace area {
 
+        /**
+         * @brief Namespace for Osmium internal use
+         */
         namespace detail {
 
             /**

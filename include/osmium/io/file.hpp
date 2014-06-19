@@ -48,7 +48,7 @@ DEALINGS IN THE SOFTWARE.
 namespace osmium {
 
     /**
-     * @brief Namespace for everything related to input and output of OSM data.
+     * @brief Everything related to input and output of OSM data.
      */
     namespace io {
 

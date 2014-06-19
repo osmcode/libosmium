@@ -37,6 +37,9 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
+    /**
+     * @brief Osmium diff handlers provide access to differences between OSM object versions
+     */
     namespace diff_handler {
 
         class DiffHandler {

@@ -60,7 +60,7 @@ namespace osmium {
     class RelationMember;
 
     /**
-     * @brief Namespace for code related to OSM relations
+     * @brief Code related to the assembly of OSM relations
      */
     namespace relations {
 

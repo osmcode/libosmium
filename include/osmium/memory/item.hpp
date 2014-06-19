@@ -55,7 +55,7 @@ namespace osmium {
         }
 
         /**
-         * @brief Internal namespace.
+         * @brief Namespace for Osmium internal use
          */
         namespace detail {
 

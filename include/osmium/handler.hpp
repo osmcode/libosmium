@@ -47,6 +47,9 @@ namespace osmium {
     class OuterRing;
     class InnerRing;
 
+    /**
+     * @brief Osmium handlers provide callbacks for OSM objects
+     */
     namespace handler {
 
         class Handler {

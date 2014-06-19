@@ -5,7 +5,7 @@
 
 This file is part of Osmium (http://osmcode.org/libosmium).
 
-Copyright 2013 Jochen Topf <jochen@topf.org> and others (see README).
+Copyright 2013,2014 Jochen Topf <jochen@topf.org> and others (see README).
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -39,10 +39,13 @@ DEALINGS IN THE SOFTWARE.
 namespace osmium {
 
     /**
-     * @brief Namespace for classes indexing OSM data.
+     * @brief Indexing of OSM data, Locations, etc.
      */
     namespace index {
 
+        /**
+         * @brief Key-value containers with unique values for a key
+         */
         namespace map {
 
             /**

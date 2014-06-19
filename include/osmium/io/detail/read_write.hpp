@@ -49,7 +49,7 @@ namespace osmium {
     namespace io {
 
         /**
-         * @brief Internal namespace.
+         * @brief Namespace for Osmium internal use
          */
         namespace detail {
 
