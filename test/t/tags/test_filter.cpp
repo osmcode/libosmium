@@ -50,7 +50,6 @@ BOOST_AUTO_TEST_CASE(KeyValueFilter) {
     {
         osmium::builder::TagListBuilder tl_builder(buffer);
         tl_builder.add_tag("highway", "primary");
-        tl_builder.add_tag("highway", "secondary");
         tl_builder.add_tag("railway", "tram");
         tl_builder.add_tag("source", "GPS");
     }
@@ -60,12 +59,10 @@ BOOST_AUTO_TEST_CASE(KeyValueFilter) {
     const osmium::Tag& t1 = *(tl.begin());
     const osmium::Tag& t2 = *(std::next(tl.begin(), 1));
     const osmium::Tag& t3 = *(std::next(tl.begin(), 2));
-    const osmium::Tag& t4 = *(std::next(tl.begin(), 3));
 
     BOOST_CHECK_EQUAL(filter(t1), true);
-    BOOST_CHECK_EQUAL(filter(t2), false);
-    BOOST_CHECK_EQUAL(filter(t3), true);
-    BOOST_CHECK_EQUAL(filter(t4), false);
+    BOOST_CHECK_EQUAL(filter(t2), true);
+    BOOST_CHECK_EQUAL(filter(t3), false);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
