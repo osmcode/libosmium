@@ -46,6 +46,7 @@ all:
 
 clean:
 	rm -fr check-includes doc/html doc/xml doc/classes.txt test/tests tests/test_*.o
+	$(MAKE) -C test/osm-testdata clean
 
 check:
 	cppcheck --std=c++11 $(CPPCHECK_OPTIONS) -I include $(INCLUDE_FILES) */*.cpp test/t/*/test_*.cpp test/osm-testdata/*.cpp
@@ -82,6 +83,7 @@ check-includes: $(INCLUDE_FILES)
 
 test:
 	(cd test && ./run_tests.sh)
+	$(MAKE) -C test/osm-testdata test
 
 iwyu:
 	for FILE in $(INCLUDE_FILES); do \
