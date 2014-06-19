@@ -53,4 +53,19 @@ BOOST_AUTO_TEST_CASE(can_be_created_from_callback) {
     BOOST_CHECK(!strcmp("true", std::next(tl.begin(), 1)->value()));
 }
 
+BOOST_AUTO_TEST_CASE(can_get_tag_with_get_value_by_key) {
+    osmium::memory::Buffer buffer(10240);
+
+    const osmium::TagList& tl = osmium::tags::create_tag_list(buffer, [](osmium::builder::TagListBuilder& tlb) {
+        tlb.add_tag("highway", "primary");
+        tlb.add_tag("bridge", "true");
+    });
+
+    BOOST_CHECK(!strcmp("primary", tl.get_value_by_key("highway")));
+    BOOST_CHECK(nullptr == tl.get_value_by_key("name"));
+    BOOST_CHECK(!strcmp("foo", tl.get_value_by_key("name", "foo")));
+
+    BOOST_CHECK(!strcmp("true", tl["bridge"]));
+}
+
 BOOST_AUTO_TEST_SUITE_END()

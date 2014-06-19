@@ -158,13 +158,13 @@ public:
     }
 
     void node(const osmium::Node& node) {
-        const char* amenity = node.tags().get_value_by_key("amenity");
+        const char* amenity = node.tags()["amenity"];
         if (amenity && !strcmp(amenity, "post_box")) {
             OGRFeature* feature = OGRFeature::CreateFeature(m_layer_point->GetLayerDefn());
             std::unique_ptr<OGRPoint> ogr_point = m_factory.create_point(node);
             feature->SetGeometry(ogr_point.get());
             feature->SetField("id", static_cast<double>(node.id()));
-            feature->SetField("operator", node.tags().get_value_by_key("operator"));
+            feature->SetField("operator", node.tags()["operator"]);
 
             if (m_layer_point->CreateFeature(feature) != OGRERR_NONE) {
                 std::cerr << "Failed to create feature.\n";
@@ -176,7 +176,7 @@ public:
     }
 
     void way(const osmium::Way& way) {
-        const char* highway = way.tags().get_value_by_key("highway");
+        const char* highway = way.tags()["highway"];
         if (highway) {
             try {
                 std::unique_ptr<OGRLineString> ogr_linestring = m_factory.create_linestring(way);
@@ -198,7 +198,7 @@ public:
     }
 
     void area(const osmium::Area& area) {
-        const char* building = area.tags().get_value_by_key("building");
+        const char* building = area.tags()["building"];
         if (building) {
             try {
                 std::unique_ptr<OGRMultiPolygon> ogr_polygon = m_factory.create_multipolygon(area);

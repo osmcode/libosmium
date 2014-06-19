@@ -116,6 +116,10 @@ namespace osmium {
             }
         }
 
+        const char* operator[](const char* key) const noexcept {
+            return get_value_by_key(key);
+        }
+
     }; // class TagList
 
     static_assert(sizeof(TagList) % osmium::memory::align_bytes == 0, "Class osmium::TagList has wrong size to be aligned properly!");
