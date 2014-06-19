@@ -9,8 +9,8 @@
 #include <osmium/osm/tag.hpp>
 #include <osmium/osm/ostream.hpp>
 #include <osmium/tags/taglist.hpp>
-#include <osmium/tags/key_filter.hpp>
-#include <osmium/tags/key_value_filter.hpp>
+#include <osmium/tags/filter.hpp>
+#include <osmium/tags/regex_filter.hpp>
 
 BOOST_AUTO_TEST_SUITE(Filter)
 
@@ -166,6 +166,51 @@ BOOST_AUTO_TEST_CASE(KeyValueFilter_matches_against_taglist_with_any_called_with
 
     BOOST_CHECK(osmium::tags::match_any_of(tag_list,
         osmium::tags::KeyValueFilter().add(true, "highway", "primary").add(true, "name")));
+}
+
+BOOST_AUTO_TEST_CASE(RegexFilter_matches_some_tags) {
+    osmium::tags::RegexFilter filter(false);
+    filter.add(true, "highway", std::regex(".*_link"));
+
+    osmium::memory::Buffer buffer(10240);
+    const osmium::TagList& tag_list1 = osmium::tags::create_tag_list(buffer, {
+        { "highway", "primary_link" },
+        { "source", "GPS" }
+    });
+    const osmium::TagList& tag_list2 = osmium::tags::create_tag_list(buffer, {
+        { "highway", "primary" },
+        { "source", "GPS" }
+    });
+
+    check_filter(tag_list1, filter, {true, false});
+    check_filter(tag_list2, filter, {false, false});
+}
+
+BOOST_AUTO_TEST_CASE(RegexFilter_matches_some_tags_with_lvalue_regex) {
+    osmium::tags::RegexFilter filter(false);
+    std::regex r(".*straße");
+    filter.add(true, "name", r);
+
+    osmium::memory::Buffer buffer(10240);
+    const osmium::TagList& tag_list = osmium::tags::create_tag_list(buffer, {
+        { "highway", "primary" },
+        { "name", "Hauptstraße" }
+    });
+
+    check_filter(tag_list, filter, {false, true});
+}
+
+BOOST_AUTO_TEST_CASE(KeyPrefixFilter_matches_some_tags) {
+    osmium::tags::KeyPrefixFilter filter(false);
+    filter.add(true, "name:");
+
+    osmium::memory::Buffer buffer(10240);
+    const osmium::TagList& tag_list = osmium::tags::create_tag_list(buffer, {
+        { "highway", "primary" },
+        { "name:de", "Hauptstraße" }
+    });
+
+    check_filter(tag_list, filter, {false, true});
 }
 
 BOOST_AUTO_TEST_SUITE_END()

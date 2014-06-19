@@ -46,7 +46,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/ostream.hpp>
 #include <osmium/osm/relation.hpp>
-#include <osmium/tags/key_filter.hpp>
+#include <osmium/tags/filter.hpp>
 
 #include <osmium/area/detail/proto_ring.hpp>
 #include <osmium/area/detail/node_ref_segment.hpp>

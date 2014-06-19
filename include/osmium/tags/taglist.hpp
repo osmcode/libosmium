@@ -47,6 +47,9 @@ namespace osmium {
 
     class TagList;
 
+    /**
+     * @brief Code related to working with OSM tags
+     */
     namespace tags {
 
         inline const osmium::TagList& create_tag_list(osmium::memory::Buffer& buffer, std::initializer_list<std::pair<const char*, const char*>> tags) {
