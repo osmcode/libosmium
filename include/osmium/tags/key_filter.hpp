@@ -67,7 +67,7 @@ namespace osmium {
 
             typedef boost::filter_iterator<KeyFilter, osmium::TagList::const_iterator> iterator;
 
-            KeyFilter(bool default_result) :
+            KeyFilter(bool default_result = false) :
                 m_rules(),
                 m_default_result(default_result) {
             }
