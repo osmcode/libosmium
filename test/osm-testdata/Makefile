@@ -40,6 +40,8 @@ TESTDATA_DIR := ../../../osm-testdata
 
 all: overview multipolygon testcases xml
 
+test: clean all
+
 # --------------
 
 testdata-overview: testdata-overview.cpp
@@ -59,7 +61,7 @@ testdata-multipolygon: testdata-multipolygon.cpp
 
 multipolygon.db: testdata-multipolygon
 	rm -f multipolygon.db multipolygon-tests.json
-	./testdata-multipolygon $(TESTDATA_DIR)/grid/data/all.osm
+	./testdata-multipolygon $(TESTDATA_DIR)/grid/data/all.osm >multipolygon.log 2>&1
 
 compare-areas.log: $(TESTDATA_DIR)/grid/data/tests.json multipolygon-tests.json
 	$(TESTDATA_DIR)/bin/compare-areas.rb $^
@@ -67,7 +69,7 @@ compare-areas.log: $(TESTDATA_DIR)/grid/data/tests.json multipolygon-tests.json
 multipolygon: multipolygon.db compare-areas.log
 
 clean-multipolygon:
-	rm -f testdata-multipolygon multipolygon.db multipolygon-tests.json compare-areas.log
+	rm -f testdata-multipolygon multipolygon.db multipolygon.log multipolygon-tests.json compare-areas.log
 
 # --------------
 
