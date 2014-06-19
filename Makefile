@@ -97,12 +97,12 @@ indent:
 	astyle --style=java --indent-namespaces --indent-switches --pad-header --lineend=linux --suffix=none --recursive include/\*.hpp examples/\*.cpp test/\*.cpp
 #	astyle --style=java --indent-namespaces --indent-switches --pad-header --unpad-paren --align-pointer=type --lineend=linux --suffix=none --recursive include/\*.hpp examples/\*.cpp test/\*.cpp
 
-doc: doc/html/files.html
-	doxygen doc/Doxyfile >/dev/null
+doc: doc/html/files.html doc/classes.txt
 
 doc/html/files.html: $(INCLUDE_FILES) doc/Doxyfile doc/doc.txt doc/osmium.css
+	doxygen doc/Doxyfile >/dev/null
 
-doc/classes.txt: doc
+doc/classes.txt: doc/xml/classosmium_1_1*
 	xmlstarlet sel -t -i "/doxygen/compounddef/@prot='public'" -v "/doxygen/compounddef/compoundname/text()" -n doc/xml/classosmium_1_1* >$@
 
 install-doc: doc
