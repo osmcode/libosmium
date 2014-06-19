@@ -55,7 +55,7 @@ namespace osmium {
          * assert(! (entities & osmium::osm_entity_bits::changeset));
          * @endcode
          */
-        enum type : char {
+        enum type : unsigned char {
 
             nothing    = 0x00,
             node       = 0x01,
