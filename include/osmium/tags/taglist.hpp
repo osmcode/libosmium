@@ -33,6 +33,7 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <algorithm>
 #include <cstddef>
 #include <initializer_list>
 #include <functional>
@@ -80,6 +81,21 @@ namespace osmium {
             }
             buffer.commit();
             return buffer.get<const osmium::TagList>(pos);
+        }
+
+        template <class TFilter>
+        inline bool match_any_of(const osmium::TagList& tag_list, TFilter&& filter) {
+            return std::any_of(tag_list.begin(), tag_list.end(), std::forward<TFilter>(filter));
+        }
+
+        template <class TFilter>
+        inline bool match_all_of(const osmium::TagList& tag_list, TFilter&& filter) {
+            return std::all_of(tag_list.begin(), tag_list.end(), std::forward<TFilter>(filter));
+        }
+
+        template <class TFilter>
+        inline bool match_none_of(const osmium::TagList& tag_list, TFilter&& filter) {
+            return std::none_of(tag_list.begin(), tag_list.end(), std::forward<TFilter>(filter));
         }
 
     } // namespace tags
