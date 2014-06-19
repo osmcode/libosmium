@@ -36,7 +36,7 @@ DEALINGS IN THE SOFTWARE.
 #include <stdexcept>
 #include <type_traits>
 
-#include <osmium/io/input_iterator.hpp>
+#include <osmium/io/reader_iterator.hpp>
 #include <osmium/memory/buffer.hpp>
 #include <osmium/osm/item_type.hpp>
 
@@ -143,16 +143,9 @@ namespace osmium {
         done_recurse(handlers...);
     }
 
-    template <class TSource, class ...THandlers>
-    inline void apply(TSource& source, THandlers&... handlers) {
-        apply(osmium::io::InputIterator<TSource> {source},
-              osmium::io::InputIterator<TSource> {},
-              handlers...);
-    }
-
-    template <class ...THandlers>
-    inline void apply(osmium::memory::Buffer& buffer, THandlers&... handlers) {
-        apply(buffer.begin(), buffer.end(), handlers...);
+    template <class TContainer, class ...THandlers>
+    inline void apply(TContainer& c, THandlers&... handlers) {
+        apply(std::begin(c), std::end(c), handlers...);
     }
 
     template <class ...THandlers>
