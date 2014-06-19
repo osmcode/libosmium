@@ -111,7 +111,10 @@ namespace osmium {
          *
          * @return true if this relation is complete, false otherwise.
          */
-        struct has_all_members : public std::unary_function<RelationMeta, bool> {
+        struct has_all_members {
+
+            typedef RelationMeta& argument_type;
+            typedef bool result_type;
 
             bool operator()(RelationMeta& relation_info) const {
                 return relation_info.has_all_members();

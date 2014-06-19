@@ -44,7 +44,7 @@ namespace osmium {
 
     namespace tags {
 
-        class KeyValueFilter : public std::unary_function<const osmium::Tag&, bool> {
+        class KeyValueFilter {
 
             struct Rule {
                 std::string key;
@@ -64,6 +64,8 @@ namespace osmium {
 
         public:
 
+            typedef const osmium::Tag& argument_type;
+            typedef bool result_type;
             typedef boost::filter_iterator<KeyValueFilter, osmium::TagList::const_iterator> iterator;
 
             KeyValueFilter(bool default_result = false) :
