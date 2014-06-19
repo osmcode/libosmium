@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_CASE(can_be_created_from_map) {
     BOOST_CHECK(!strcmp("Main Street", std::next(tl.begin(), 1)->value()));
 }
 
-BOOST_AUTO_TEST_CASE(can_be_created_from_callback) {
+BOOST_AUTO_TEST_CASE(can_be_created_with_callback) {
     osmium::memory::Buffer buffer(10240);
 
     const osmium::TagList& tl = osmium::tags::create_tag_list(buffer, [](osmium::builder::TagListBuilder& tlb) {
@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_CASE(can_be_created_from_callback) {
     BOOST_CHECK(!strcmp("true", std::next(tl.begin(), 1)->value()));
 }
 
-BOOST_AUTO_TEST_CASE(can_get_tag_with_get_value_by_key) {
+BOOST_AUTO_TEST_CASE(returns_value_by_key) {
     osmium::memory::Buffer buffer(10240);
 
     const osmium::TagList& tl = osmium::tags::create_tag_list(buffer, [](osmium::builder::TagListBuilder& tlb) {
