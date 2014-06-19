@@ -5,7 +5,7 @@
 
 This file is part of Osmium (http://osmcode.org/libosmium).
 
-Copyright 2013 Jochen Topf <jochen@topf.org> and others (see README).
+Copyright 2013,2014 Jochen Topf <jochen@topf.org> and others (see README).
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -39,16 +39,23 @@ DEALINGS IN THE SOFTWARE.
 namespace osmium {
 
     /*
-    * The following typedefs are chosen so that they can represent all needed
-    * numbers and still be reasonably space efficient. As the OSM database
-    * needs 64 bit IDs for nodes, this size is used for all object IDs.
-    */
-    typedef int64_t  object_id_type;          ///< type for OSM object (node, way, or relation) IDs
-    typedef uint64_t unsigned_object_id_type; ///< type for OSM object (node, way, or relation) IDs where we only allow positive IDs
-    typedef uint32_t object_version_type;     ///< type for OSM object version number
-    typedef uint32_t changeset_id_type;       ///< type for OSM changeset IDs
-    typedef uint32_t user_id_type;            ///< type for OSM user IDs
-    typedef uint32_t num_changes_type;        ///< type for changeset num_changes
+     * The following typedefs are chosen so that they can represent all needed
+     * numbers and still be reasonably space efficient. As the OSM database
+     * needs 64 bit IDs for nodes, this size is used for all object IDs.
+     */
+    typedef int64_t  object_id_type;          ///< Type for OSM object (node, way, or relation) IDs.
+    typedef uint64_t unsigned_object_id_type; ///< Type for OSM object (node, way, or relation) IDs where we only allow positive IDs.
+    typedef uint32_t object_version_type;     ///< Type for OSM object version number.
+    typedef uint32_t changeset_id_type;       ///< Type for OSM changeset IDs.
+    typedef uint32_t user_id_type;            ///< Type for OSM user IDs.
+    typedef uint32_t num_changes_type;        ///< Type for changeset num_changes.
+
+    /**
+     * Size for strings in OSM data such as user names, tag keys, roles, etc.
+     * In Osmium they can be up to 2^16 bytes long, but OSM usually has lower
+     * defined limits.
+     */
+    typedef uint16_t string_size_type;
 
 #ifdef _MSC_VER
 # define atoll(x) (_atoi64(x))

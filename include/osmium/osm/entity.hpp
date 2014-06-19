@@ -5,7 +5,7 @@
 
 This file is part of Osmium (http://osmcode.org/libosmium).
 
-Copyright 2013 Jochen Topf <jochen@topf.org> and others (see README).
+Copyright 2013,2014 Jochen Topf <jochen@topf.org> and others (see README).
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -39,9 +39,9 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
-    // strings can be up to 2^16 characters long
-    typedef uint16_t string_size_type;
-
+    /**
+     * OSMEntity is the parent class for the OSM Object class and the Changeset class.
+     */
     class OSMEntity : public osmium::memory::Item {
 
     public:
