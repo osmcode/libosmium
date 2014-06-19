@@ -44,7 +44,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/io/file_format.hpp>
 #include <osmium/io/header.hpp>
 #include <osmium/memory/buffer.hpp>
-#include <osmium/osm/entity_flags.hpp>
+#include <osmium/osm/entity_bits.hpp>
 
 namespace osmium {
 
@@ -68,11 +68,11 @@ namespace osmium {
             protected:
 
                 osmium::io::File m_file;
-                osmium::osm_entity::flags m_read_which_entities;
+                osmium::osm_entity_bits::type m_read_which_entities;
                 osmium::thread::Queue<std::string>& m_input_queue;
                 osmium::io::Header m_header {};
 
-                InputFormat(const osmium::io::File& file, osmium::osm_entity::flags read_which_entities, osmium::thread::Queue<std::string>& input_queue) :
+                InputFormat(const osmium::io::File& file, osmium::osm_entity_bits::type read_which_entities, osmium::thread::Queue<std::string>& input_queue) :
                     m_file(file),
                     m_read_which_entities(read_which_entities),
                     m_input_queue(input_queue) {
@@ -114,7 +114,7 @@ namespace osmium {
 
             public:
 
-                typedef std::function<osmium::io::detail::InputFormat*(const osmium::io::File&, osmium::osm_entity::flags read_which_entities, osmium::thread::Queue<std::string>&)> create_input_type;
+                typedef std::function<osmium::io::detail::InputFormat*(const osmium::io::File&, osmium::osm_entity_bits::type read_which_entities, osmium::thread::Queue<std::string>&)> create_input_type;
 
             private:
 
@@ -140,7 +140,7 @@ namespace osmium {
                     return true;
                 }
 
-                std::unique_ptr<osmium::io::detail::InputFormat> create_input(const osmium::io::File& file, osmium::osm_entity::flags read_which_entities, osmium::thread::Queue<std::string>& input_queue) {
+                std::unique_ptr<osmium::io::detail::InputFormat> create_input(const osmium::io::File& file, osmium::osm_entity_bits::type read_which_entities, osmium::thread::Queue<std::string>& input_queue) {
                     file.check();
 
                     auto it = m_callbacks.find(file.format());

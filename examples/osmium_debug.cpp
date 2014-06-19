@@ -20,15 +20,15 @@ int main(int argc, char* argv[]) {
         exit(1);
     }
 
-    osmium::osm_entity::flags read_types = osmium::osm_entity::flags::all;
+    osmium::osm_entity_bits::type read_types = osmium::osm_entity_bits::all;
 
     if (argc == 3) {
-        read_types = osmium::osm_entity::flags::nothing;
+        read_types = osmium::osm_entity_bits::nothing;
         std::string types = argv[2];
-        if (types.find('n') != std::string::npos) read_types |= osmium::osm_entity::flags::node;
-        if (types.find('w') != std::string::npos) read_types |= osmium::osm_entity::flags::way;
-        if (types.find('r') != std::string::npos) read_types |= osmium::osm_entity::flags::relation;
-        if (types.find('c') != std::string::npos) read_types |= osmium::osm_entity::flags::changeset;
+        if (types.find('n') != std::string::npos) read_types |= osmium::osm_entity_bits::node;
+        if (types.find('w') != std::string::npos) read_types |= osmium::osm_entity_bits::way;
+        if (types.find('r') != std::string::npos) read_types |= osmium::osm_entity_bits::relation;
+        if (types.find('c') != std::string::npos) read_types |= osmium::osm_entity_bits::changeset;
     }
 
     osmium::io::Reader reader(argv[1], read_types);

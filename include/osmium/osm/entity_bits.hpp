@@ -1,5 +1,5 @@
-#ifndef OSMIUM_OSM_ENTITY_FLAGS_HPP
-#define OSMIUM_OSM_ENTITY_FLAGS_HPP
+#ifndef OSMIUM_OSM_ENTITY_BITS_HPP
+#define OSMIUM_OSM_ENTITY_BITS_HPP
 
 /*
 
@@ -35,40 +35,59 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
-    namespace osm_entity {
+    /**
+     * @brief Bitfield for OSM entity types.
+     */
+    namespace osm_entity_bits {
 
-        enum flags {
+        /**
+         * Describes zero or more OSM entities.
+         *
+         * Usage:
+         *
+         * @code{.cpp}
+         * osmium::osm_entity_bits::type entities = osmium::osm_entity_bits::node | osmium::osm_entity_bits::way;
+         *
+         * entities |= osmium::osm_entity_bits::relation;
+         *
+         * assert(entities & osmium::osm_entity_bits::object);
+         *
+         * assert(! (entities & osmium::osm_entity_bits::changeset));
+         * @endcode
+         */
+        enum type : char {
 
-            nothing   = 0x00,
-            node      = 0x01,
-            way       = 0x02,
-            relation  = 0x04,
-            area      = 0x08,
-            changeset = 0x10,
-            all       = 0x1f
+            nothing    = 0x00,
+            node       = 0x01,
+            way        = 0x02,
+            relation   = 0x04,
+            area       = 0x08,
+            object     = 0x0f, ///< node, way, relation, or area object
+            changeset  = 0x10,
+            all        = 0x1f  ///< object or changeset
 
-        }; // enum flags
+        }; // enum type
 
-        inline flags operator|(const flags lhs, const flags rhs) {
-            return static_cast<flags>(static_cast<int>(lhs) | static_cast<int> (rhs));
+        inline type operator|(const type lhs, const type rhs) {
+            return static_cast<type>(static_cast<int>(lhs) | static_cast<int> (rhs));
         }
 
-        inline flags& operator|=(flags& lhs, const flags rhs) {
+        inline type& operator|=(type& lhs, const type rhs) {
             lhs = lhs | rhs;
             return lhs;
         }
 
-        inline flags operator&(const flags lhs, const flags rhs) {
-            return static_cast<flags>(static_cast<int>(lhs) & static_cast<int> (rhs));
+        inline type operator&(const type lhs, const type rhs) {
+            return static_cast<type>(static_cast<int>(lhs) & static_cast<int> (rhs));
         }
 
-        inline flags operator&=(flags& lhs, const flags rhs) {
+        inline type operator&=(type& lhs, const type rhs) {
             lhs = lhs & rhs;
             return lhs;
         }
 
-    } // namespace osm_entity
+    } // namespace osm_entity_bits
 
 } // namespace osmium
 
-#endif // OSMIUM_OSM_ENTITY_FLAGS_HPP
+#endif // OSMIUM_OSM_ENTITY_BITS_HPP

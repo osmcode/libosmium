@@ -100,7 +100,7 @@ int main(int argc, char* argv[]) {
     osmium::area::MultipolygonCollector<osmium::area::Assembler> collector(assembler_config);
 
     std::cout << "Pass 1...\n";
-    osmium::io::Reader reader1(infile, osmium::osm_entity::flags::relation);
+    osmium::io::Reader reader1(infile, osmium::osm_entity_bits::relation);
     collector.read_relations(reader1);
     std::cout << "Pass 1 done\n";
 

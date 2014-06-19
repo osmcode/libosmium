@@ -63,7 +63,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/memory/buffer.hpp>
 #include <osmium/osm.hpp>
 #include <osmium/osm/box.hpp>
-#include <osmium/osm/entity_flags.hpp>
+#include <osmium/osm/entity_bits.hpp>
 #include <osmium/osm/item_type.hpp>
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/object.hpp>
@@ -127,7 +127,7 @@ namespace osmium {
 
                 bool m_promise_fulfilled;
 
-                osmium::osm_entity::flags m_read_types;
+                osmium::osm_entity_bits::type m_read_types;
 
                 size_t m_max_queue_size;
 
@@ -135,7 +135,7 @@ namespace osmium {
 
             public:
 
-                XMLParser(osmium::thread::Queue<std::string>& input_queue, osmium::thread::Queue<osmium::memory::Buffer>& queue, std::promise<osmium::io::Header>& header_promise, osmium::osm_entity::flags read_types, std::atomic<bool>& done) :
+                XMLParser(osmium::thread::Queue<std::string>& input_queue, osmium::thread::Queue<osmium::memory::Buffer>& queue, std::promise<osmium::io::Header>& header_promise, osmium::osm_entity_bits::type read_types, std::atomic<bool>& done) :
                     m_context(context::root),
                     m_last_context(context::root),
                     m_in_delete_section(false),
@@ -279,7 +279,7 @@ namespace osmium {
                 void header_is_done() {
                     if (!m_promise_fulfilled) {
                         m_header_promise.set_value(m_header);
-                        if (m_read_types == osmium::osm_entity::flags::nothing) {
+                        if (m_read_types == osmium::osm_entity_bits::nothing) {
                             throw ParserIsDone();
                         }
                         m_promise_fulfilled = true;
@@ -314,7 +314,7 @@ namespace osmium {
                                 assert(!m_tl_builder);
                                 if (!strcmp(element, "node")) {
                                     header_is_done();
-                                    if (m_read_types & osmium::osm_entity::flags::node) {
+                                    if (m_read_types & osmium::osm_entity_bits::node) {
                                         m_node_builder = std::unique_ptr<osmium::builder::NodeBuilder>(new osmium::builder::NodeBuilder(m_buffer));
                                         m_node_builder->add_user(init_object(m_node_builder->object(), attrs));
                                         m_context = context::node;
@@ -323,7 +323,7 @@ namespace osmium {
                                     }
                                 } else if (!strcmp(element, "way")) {
                                     header_is_done();
-                                    if (m_read_types & osmium::osm_entity::flags::way) {
+                                    if (m_read_types & osmium::osm_entity_bits::way) {
                                         m_way_builder = std::unique_ptr<osmium::builder::WayBuilder>(new osmium::builder::WayBuilder(m_buffer));
                                         m_way_builder->add_user(init_object(m_way_builder->object(), attrs));
                                         m_context = context::way;
@@ -332,7 +332,7 @@ namespace osmium {
                                     }
                                 } else if (!strcmp(element, "relation")) {
                                     header_is_done();
-                                    if (m_read_types & osmium::osm_entity::flags::relation) {
+                                    if (m_read_types & osmium::osm_entity_bits::relation) {
                                         m_relation_builder = std::unique_ptr<osmium::builder::RelationBuilder>(new osmium::builder::RelationBuilder(m_buffer));
                                         m_relation_builder->add_user(init_object(m_relation_builder->object(), attrs));
                                         m_context = context::relation;
@@ -341,7 +341,7 @@ namespace osmium {
                                     }
                                 } else if (!strcmp(element, "changeset")) {
                                     header_is_done();
-                                    if (m_read_types & osmium::osm_entity::flags::changeset) {
+                                    if (m_read_types & osmium::osm_entity_bits::changeset) {
                                         m_changeset_builder = std::unique_ptr<osmium::builder::ChangesetBuilder>(new osmium::builder::ChangesetBuilder(m_buffer));
                                         init_changeset(m_changeset_builder.get(), attrs);
                                         m_context = context::changeset;
@@ -558,7 +558,7 @@ namespace osmium {
                  * @param read_which_entities Which types of OSM entities (nodes, ways, relations, changesets) should be parsed?
                  * @param input_queue String queue where data is read from.
                  */
-                XMLInputFormat(const osmium::io::File& file, osmium::osm_entity::flags read_which_entities, osmium::thread::Queue<std::string>& input_queue) :
+                XMLInputFormat(const osmium::io::File& file, osmium::osm_entity_bits::type read_which_entities, osmium::thread::Queue<std::string>& input_queue) :
                     osmium::io::detail::InputFormat(file, read_which_entities, input_queue),
                     m_queue(),
                     m_done(false),
@@ -596,7 +596,7 @@ namespace osmium {
             namespace {
 
                 const bool registered_xml_input = osmium::io::detail::InputFormatFactory::instance().register_input_format(osmium::io::file_format::xml,
-                    [](const osmium::io::File& file, osmium::osm_entity::flags read_which_entities, osmium::thread::Queue<std::string>& input_queue) {
+                    [](const osmium::io::File& file, osmium::osm_entity_bits::type read_which_entities, osmium::thread::Queue<std::string>& input_queue) {
                         return new osmium::io::detail::XMLInputFormat(file, read_which_entities, input_queue);
                 });
 
