@@ -5,7 +5,7 @@
 
 This file is part of Osmium (http://osmcode.org/libosmium).
 
-Copyright 2013 Jochen Topf <jochen@topf.org> and others (see README).
+Copyright 2013,2014 Jochen Topf <jochen@topf.org> and others (see README).
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -59,62 +59,73 @@ namespace osmium {
                lhs.version() == rhs.version();
     }
 
-    namespace osm {
+    /**
+     * Function object class for comparing OSM objects for equality by type, id, and version.
+     */
+    struct object_equal_type_id_version {
 
-        struct object_equal_type_id_version {
+        bool operator()(const osmium::Object& lhs, const osmium::Object& rhs) const {
+            return lhs == rhs;
+        }
 
-            bool operator()(const osmium::Object& lhs, const osmium::Object& rhs) const {
-                return lhs == rhs;
+        bool operator()(const osmium::Object* lhs, const osmium::Object* rhs) const {
+            return *lhs == *rhs;
+        }
+
+    };
+
+    /**
+     * Function object class for comparing OSM objects for equality by type and id,
+     * ignoring the version.
+     */
+    struct object_equal_type_id {
+
+        bool operator()(const osmium::Object& lhs, const osmium::Object& rhs) const {
+            return lhs.type() == rhs.type() &&
+                   lhs.id() == rhs.id();
+        }
+
+        bool operator()(const osmium::Object* lhs, const osmium::Object* rhs) const {
+            return operator()(*lhs, *rhs);
+        }
+
+    };
+
+    /**
+     * Function object class for ordering OSM objects by type, id, and version.
+     */
+    struct object_order_type_id_version {
+
+        bool operator()(const osmium::Object& lhs, const osmium::Object& rhs) const {
+            return lhs < rhs;
+        }
+
+        bool operator()(const osmium::Object* lhs, const osmium::Object* rhs) const {
+            return *lhs < *rhs;
+        }
+
+    };
+
+    /**
+     * Function object class for ordering OSM objects by type, id, and reverse version,
+     * ie objects are ordered by type and id, but later versions of an object are
+     * ordered before earlier versions of the same object.
+     */
+    struct object_order_type_id_reverse_version {
+
+        bool operator()(const osmium::Object& lhs, const osmium::Object& rhs) const {
+            if (lhs.type() != rhs.type()) {
+                return lhs.type() < rhs.type();
             }
+            return (lhs.id() == rhs.id() && lhs.version() > rhs.version()) ||
+                    lhs.positive_id() < rhs.positive_id();
+        }
 
-            bool operator()(const osmium::Object* lhs, const osmium::Object* rhs) const {
-                return *lhs == *rhs;
-            }
+        bool operator()(const osmium::Object* lhs, const osmium::Object* rhs) const {
+            return operator()(*lhs, *rhs);
+        }
 
-        };
-
-        struct object_equal_type_id {
-
-            bool operator()(const osmium::Object& lhs, const osmium::Object& rhs) const {
-                return lhs.type() == rhs.type() &&
-                       lhs.id() == rhs.id();
-            }
-
-            bool operator()(const osmium::Object* lhs, const osmium::Object* rhs) const {
-                return operator()(*lhs, *rhs);
-            }
-
-        };
-
-        struct object_order_type_id_version {
-
-            bool operator()(const osmium::Object& lhs, const osmium::Object& rhs) const {
-                return lhs < rhs;
-            }
-
-            bool operator()(const osmium::Object* lhs, const osmium::Object* rhs) const {
-                return *lhs < *rhs;
-            }
-
-        };
-
-        struct object_order_type_id_reverse_version {
-
-            bool operator()(const osmium::Object& lhs, const osmium::Object& rhs) const {
-                if (lhs.type() != rhs.type()) {
-                    return lhs.type() < rhs.type();
-                }
-                return (lhs.id() == rhs.id() && lhs.version() > rhs.version()) ||
-                       lhs.positive_id() < rhs.positive_id();
-            }
-
-            bool operator()(const osmium::Object* lhs, const osmium::Object* rhs) const {
-                return operator()(*lhs, *rhs);
-            }
-
-        };
-
-    } // namespace osm
+    };
 
 } // namespace osmium
 

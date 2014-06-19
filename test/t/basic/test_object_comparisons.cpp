@@ -132,20 +132,20 @@ BOOST_AUTO_TEST_CASE(order_types) {
     BOOST_CHECK_EQUAL(true, way < relation);
     BOOST_CHECK_EQUAL(true, node1 < relation);
 
-    BOOST_CHECK_EQUAL(true, osmium::osm::object_order_type_id_version()(node1, node2));
-    BOOST_CHECK_EQUAL(true, osmium::osm::object_order_type_id_reverse_version()(node2, node1));
-    BOOST_CHECK_EQUAL(true, osmium::osm::object_order_type_id_version()(node1, way));
-    BOOST_CHECK_EQUAL(true, osmium::osm::object_order_type_id_reverse_version()(node1, way));
+    BOOST_CHECK_EQUAL(true, osmium::object_order_type_id_version()(node1, node2));
+    BOOST_CHECK_EQUAL(true, osmium::object_order_type_id_reverse_version()(node2, node1));
+    BOOST_CHECK_EQUAL(true, osmium::object_order_type_id_version()(node1, way));
+    BOOST_CHECK_EQUAL(true, osmium::object_order_type_id_reverse_version()(node1, way));
 
-    BOOST_CHECK_EQUAL(false, osmium::osm::object_equal_type_id_version()(node1, node2));
-    BOOST_CHECK_EQUAL(true, osmium::osm::object_equal_type_id_version()(node2, node3));
+    BOOST_CHECK_EQUAL(false, osmium::object_equal_type_id_version()(node1, node2));
+    BOOST_CHECK_EQUAL(true, osmium::object_equal_type_id_version()(node2, node3));
 
-    BOOST_CHECK_EQUAL(true, osmium::osm::object_equal_type_id()(node1, node2));
-    BOOST_CHECK_EQUAL(true, osmium::osm::object_equal_type_id()(node2, node3));
+    BOOST_CHECK_EQUAL(true, osmium::object_equal_type_id()(node1, node2));
+    BOOST_CHECK_EQUAL(true, osmium::object_equal_type_id()(node2, node3));
 
-    BOOST_CHECK_EQUAL(false, osmium::osm::object_equal_type_id_version()(node1, way));
-    BOOST_CHECK_EQUAL(false, osmium::osm::object_equal_type_id_version()(node1, relation));
-    BOOST_CHECK_EQUAL(false, osmium::osm::object_equal_type_id()(node1, relation));
+    BOOST_CHECK_EQUAL(false, osmium::object_equal_type_id_version()(node1, way));
+    BOOST_CHECK_EQUAL(false, osmium::object_equal_type_id_version()(node1, relation));
+    BOOST_CHECK_EQUAL(false, osmium::object_equal_type_id()(node1, relation));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
