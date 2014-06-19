@@ -157,6 +157,7 @@ namespace osmium {
 
     }; // class RelationMemberList
 
+    static_assert(sizeof(RelationMemberList) % osmium::memory::align_bytes == 0, "Class osmium::RelationMemberList has wrong size to be aligned properly!");
 
     class Relation : public Object {
 

@@ -37,7 +37,9 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
-    /// Bounding box.
+    /**
+     * Bounding box.
+     */
     class Box {
 
         osmium::Location m_bottom_left;

@@ -53,7 +53,7 @@ DEALINGS IN THE SOFTWARE.
 namespace osmium {
 
     /**
-     * OSM Object (Node, Way, or Relation).
+     * OSM Object (Node, Way, Relation, or Area).
      */
     class Object : public osmium::OSMEntity, boost::totally_ordered<Object> {
 

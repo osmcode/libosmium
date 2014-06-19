@@ -50,6 +50,9 @@ namespace osmium {
         template <class T> class ObjectBuilder;
     }
 
+    /**
+     * An outer ring of an Area.
+     */
     class OuterRing : public osmium::memory::Collection<NodeRef, osmium::item_type::outer_ring> {
 
     public:
@@ -70,6 +73,11 @@ namespace osmium {
 
     }; // class OuterRing
 
+    static_assert(sizeof(OuterRing) % osmium::memory::align_bytes == 0, "Class osmium::OuterRing has wrong size to be aligned properly!");
+
+    /**
+     * An inner ring of an Area.
+     */
     class InnerRing : public osmium::memory::Collection<NodeRef, osmium::item_type::inner_ring> {
 
     public:
@@ -90,6 +98,11 @@ namespace osmium {
 
     }; // class InnerRing
 
+    static_assert(sizeof(InnerRing) % osmium::memory::align_bytes == 0, "Class osmium::InnerRing has wrong size to be aligned properly!");
+
+    /**
+     * An OSM area created out of a closed way or a multipolygon relation.
+     */
     class Area : public Object {
 
         friend class osmium::builder::ObjectBuilder<osmium::Area>;

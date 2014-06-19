@@ -50,6 +50,9 @@ namespace osmium {
         template <class T> class ObjectBuilder;
     }
 
+    /**
+     * List of node references (id and location) in a way.
+     */
     class WayNodeList : public osmium::memory::Collection<NodeRef, osmium::item_type::way_node_list> {
 
     public:
@@ -94,6 +97,7 @@ namespace osmium {
 
     }; // class WayNodeList
 
+    static_assert(sizeof(WayNodeList) % osmium::memory::align_bytes == 0, "Class osmium::WayNodeList has wrong size to be aligned properly!");
 
     class Way : public Object {
 

@@ -5,7 +5,7 @@
 
 This file is part of Osmium (http://osmcode.org/libosmium).
 
-Copyright 2013 Jochen Topf <jochen@topf.org> and others (see README).
+Copyright 2013,2014 Jochen Topf <jochen@topf.org> and others (see README).
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -83,6 +83,8 @@ namespace osmium {
         }
 
     }; // class Node
+
+    static_assert(sizeof(Node) % osmium::memory::align_bytes == 0, "Class osmium::Node has wrong size to be aligned properly!");
 
 } // namespace osmium
 
