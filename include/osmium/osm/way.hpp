@@ -34,15 +34,13 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <cassert>
-#include <cstddef>
 
-#include <osmium/memory/collection.hpp>
 #include <osmium/memory/item.hpp>
 #include <osmium/osm/item_type.hpp>
-#include <osmium/osm/location.hpp>
 #include <osmium/osm/object.hpp>
 #include <osmium/osm/types.hpp>
 #include <osmium/osm/node_ref.hpp>
+#include <osmium/osm/node_ref_list.hpp>
 
 namespace osmium {
 
@@ -53,42 +51,12 @@ namespace osmium {
     /**
      * List of node references (id and location) in a way.
      */
-    class WayNodeList : public osmium::memory::Collection<NodeRef, osmium::item_type::way_node_list> {
+    class WayNodeList : public NodeRefList<osmium::item_type::way_node_list> {
 
     public:
 
         WayNodeList():
-            osmium::memory::Collection<NodeRef, osmium::item_type::way_node_list>() {
-        }
-
-        size_t size() const noexcept {
-            assert((byte_size() - sizeof(WayNodeList)) % sizeof(NodeRef) == 0);
-            return (byte_size() - sizeof(WayNodeList)) / sizeof(NodeRef);
-        }
-
-        const NodeRef& operator[](size_t n) const {
-            const NodeRef* node_ref = &*begin();
-            return node_ref[n];
-        }
-
-        const NodeRef& front() const {
-            return operator[](0);
-        }
-
-        const NodeRef& back() const {
-            return operator[](size()-1);
-        }
-
-        bool is_closed() const {
-            return front().ref() == back().ref();
-        }
-
-        bool ends_have_same_id() const {
-            return front().ref() == back().ref();
-        }
-
-        bool ends_have_same_location() const {
-            return front().location() == back().location();
+            NodeRefList<osmium::item_type::way_node_list>() {
         }
 
         void switch_type_to_outer_ring() {

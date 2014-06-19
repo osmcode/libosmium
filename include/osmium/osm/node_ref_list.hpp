@@ -1,5 +1,5 @@
-#ifndef OSMIUM_OSM_NODE_HPP
-#define OSMIUM_OSM_NODE_HPP
+#ifndef OSMIUM_OSM_NODE_REF_LIST_HPP
+#define OSMIUM_OSM_NODE_REF_LIST_HPP
 
 /*
 
@@ -33,60 +33,57 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <cassert>
+#include <cstddef>
+
+#include <osmium/memory/collection.hpp>
 #include <osmium/memory/item.hpp>
 #include <osmium/osm/item_type.hpp>
-#include <osmium/osm/location.hpp>
-#include <osmium/osm/object.hpp>
+#include <osmium/osm/node_ref.hpp>
 
 namespace osmium {
 
-    namespace builder {
-        template <class T> class ObjectBuilder;
-    }
-
-    class Node : public Object {
-
-        friend class osmium::builder::ObjectBuilder<osmium::Node>;
-
-        osmium::Location m_location {};
-
-        Node() :
-            Object(sizeof(Node), osmium::item_type::node) {
-        }
+    template <osmium::item_type TItemType>
+    class NodeRefList : public osmium::memory::Collection<NodeRef, TItemType> {
 
     public:
 
-        static constexpr osmium::item_type itemtype = osmium::item_type::node;
-
-        const osmium::Location location() const {
-            return m_location;
+        NodeRefList():
+            osmium::memory::Collection<NodeRef, TItemType>() {
         }
 
-        Node& location(const osmium::Location& location) {
-            m_location = location;
-            return *this;
+        size_t size() const noexcept {
+            assert((osmium::memory::Item::byte_size() - sizeof(NodeRefList)) % sizeof(NodeRef) == 0);
+            return (osmium::memory::Item::byte_size() - sizeof(NodeRefList)) / sizeof(NodeRef);
         }
 
-        void lon(double x) {
-            m_location.lon(x);
+        const NodeRef& operator[](size_t n) const {
+            const NodeRef* node_ref = &*(this->cbegin());
+            return node_ref[n];
         }
 
-        void lat(double y) {
-            m_location.lat(y);
+        const NodeRef& front() const {
+            return operator[](0);
         }
 
-        double lon() const {
-            return m_location.lon();
+        const NodeRef& back() const {
+            return operator[](size()-1);
         }
 
-        double lat() const {
-            return m_location.lat();
+        bool is_closed() const {
+            return front().ref() == back().ref();
         }
 
-    }; // class Node
+        bool ends_have_same_id() const {
+            return front().ref() == back().ref();
+        }
 
-    static_assert(sizeof(Node) % osmium::memory::align_bytes == 0, "Class osmium::Node has wrong size to be aligned properly!");
+        bool ends_have_same_location() const {
+            return front().location() == back().location();
+        }
+
+    }; // class NodeRefList
 
 } // namespace osmium
 
-#endif // OSMIUM_OSM_NODE_HPP
+#endif // OSMIUM_OSM_NODE_REF_LIST_HPP

@@ -33,8 +33,6 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <cassert>
-#include <cstddef>
 #include <utility>
 
 #include <osmium/memory/collection.hpp>
@@ -42,7 +40,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/item_type.hpp>
 #include <osmium/osm/object.hpp>
 #include <osmium/osm/types.hpp>
-#include <osmium/osm/node_ref.hpp>
+#include <osmium/osm/node_ref_list.hpp>
 
 namespace osmium {
 
@@ -53,22 +51,12 @@ namespace osmium {
     /**
      * An outer ring of an Area.
      */
-    class OuterRing : public osmium::memory::Collection<NodeRef, osmium::item_type::outer_ring> {
+    class OuterRing : public NodeRefList<osmium::item_type::outer_ring> {
 
     public:
 
         OuterRing():
-            osmium::memory::Collection<NodeRef, osmium::item_type::outer_ring>() {
-        }
-
-        size_t size() const noexcept {
-            assert((byte_size() - sizeof(OuterRing)) % sizeof(NodeRef) == 0);
-            return (byte_size() - sizeof(OuterRing)) / sizeof(NodeRef);
-        }
-
-        const NodeRef& operator[](size_t n) const {
-            const NodeRef* node_ref = &*begin();
-            return node_ref[n];
+            NodeRefList<osmium::item_type::outer_ring>() {
         }
 
     }; // class OuterRing
@@ -78,22 +66,12 @@ namespace osmium {
     /**
      * An inner ring of an Area.
      */
-    class InnerRing : public osmium::memory::Collection<NodeRef, osmium::item_type::inner_ring> {
+    class InnerRing : public NodeRefList<osmium::item_type::inner_ring> {
 
     public:
 
         InnerRing():
-            osmium::memory::Collection<NodeRef, osmium::item_type::inner_ring>() {
-        }
-
-        size_t size() const noexcept {
-            assert((byte_size() - sizeof(InnerRing)) % sizeof(NodeRef) == 0);
-            return (byte_size() - sizeof(InnerRing)) / sizeof(NodeRef);
-        }
-
-        const NodeRef& operator[](size_t n) const {
-            const NodeRef* node_ref = &*begin();
-            return node_ref[n];
+            NodeRefList<osmium::item_type::inner_ring>() {
         }
 
     }; // class InnerRing
