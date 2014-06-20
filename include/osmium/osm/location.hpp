@@ -5,7 +5,7 @@
 
 This file is part of Osmium (http://osmcode.org/libosmium).
 
-Copyright 2013 Jochen Topf <jochen@topf.org> and others (see README).
+Copyright 2013,2014 Jochen Topf <jochen@topf.org> and others (see README).
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -38,10 +38,27 @@ DEALINGS IN THE SOFTWARE.
 #include <cstdint>
 #include <cstdio>
 #include <limits>
+#include <stdexcept>
 
 #include <boost/operators.hpp>
 
 namespace osmium {
+
+    /**
+     * Exception signaling an invalid location, ie a location
+     * outside the -180 to 180 and -90 to 90 degree range.
+     */
+    struct invalid_location : public std::range_error {
+
+        invalid_location(const std::string& what) :
+            std::range_error(what) {
+        }
+
+        invalid_location(const char* what) :
+            std::range_error(what) {
+        }
+
+    }; // struct invalid_location
 
     /**
      * Locations define a place on earth.
@@ -156,11 +173,27 @@ namespace osmium {
             return *this;
         }
 
-        constexpr double lon() const noexcept {
+        /**
+         * Get longitude.
+         *
+         * @throws invalid_location if the location is invalid
+         */
+        double lon() const {
+            if (!valid()) {
+                throw osmium::invalid_location("invalid location");
+            }
             return fix_to_double(m_x);
         }
 
-        constexpr double lat() const noexcept {
+        /**
+         * Get latitude.
+         *
+         * @throws invalid_location if the location is invalid
+         */
+        double lat() const {
+            if (!valid()) {
+                throw osmium::invalid_location("invalid location");
+            }
             return fix_to_double(m_y);
         }
 
@@ -194,16 +227,9 @@ namespace osmium {
 
         template <typename T>
         T as_string(T iterator, const char separator) const {
-            if (*this) { // coordinate is defined
-                iterator = coordinate2string(iterator, lon());
-                *iterator++ = separator;
-                return coordinate2string(iterator, lat());
-            } else {
-                static const char undef[] = "undefined";
-                iterator = std::copy_n(undef, sizeof(undef)/sizeof(char) - 1, iterator);
-                *iterator++ = separator;
-                return std::copy_n(undef, sizeof(undef)/sizeof(char) - 1, iterator);
-            }
+            iterator = coordinate2string(iterator, lon());
+            *iterator++ = separator;
+            return coordinate2string(iterator, lat());
         }
 
     }; // class Location

@@ -120,6 +120,8 @@ namespace osmium {
 
         /**
          * Calculate size of the box in square degrees.
+         *
+         * @throws osmium::invalid_location unless all coordinates are valid
          */
         double size() const {
             return (m_top_right.lon() - m_bottom_left.lon()) *

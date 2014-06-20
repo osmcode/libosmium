@@ -29,7 +29,7 @@ BOOST_AUTO_TEST_CASE(empty_point) {
     osmium::geom::WKBFactory factory;
     factory.set_hex_mode();
 
-    BOOST_CHECK_THROW(factory.create_point(osmium::Location()), osmium::geom::geometry_error);
+    BOOST_CHECK_THROW(factory.create_point(osmium::Location()), osmium::invalid_location);
 }
 
 BOOST_AUTO_TEST_CASE(linestring) {
@@ -143,7 +143,7 @@ BOOST_AUTO_TEST_CASE(linestring_with_undefined_location) {
             {2, osmium::Location()},
         });
 
-    BOOST_CHECK_THROW(factory.create_linestring(way.nodes()), osmium::geom::geometry_error);
+    BOOST_CHECK_THROW(factory.create_linestring(way.nodes()), osmium::invalid_location);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

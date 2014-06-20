@@ -95,11 +95,7 @@ namespace osmium {
                 for (const osmium::NodeRef& n : nodes) {
                     if (last_location != n.location()) {
                         last_location = n.location();
-                        if (last_location) {
-                            static_cast<G*>(this)->multipolygon_add_location(last_location);
-                        } else {
-                            throw geometry_error("location is undefined");
-                        }
+                        static_cast<G*>(this)->multipolygon_add_location(last_location);
                     }
                 }
             }
@@ -120,11 +116,7 @@ namespace osmium {
             /* Point */
 
             point_type create_point(const osmium::Location location) {
-                if (location) {
-                    return static_cast<G*>(this)->make_point(location);
-                } else {
-                    throw geometry_error("location is undefined");
-                }
+                return static_cast<G*>(this)->make_point(location);
             }
 
             point_type create_point(const osmium::Node& node) {
@@ -147,11 +139,7 @@ namespace osmium {
                             for (auto& wn : wnl) {
                                 if (last_location != wn.location()) {
                                     last_location = wn.location();
-                                    if (last_location) {
-                                        static_cast<G*>(this)->linestring_add_location(last_location);
-                                    } else {
-                                        throw geometry_error("location is undefined");
-                                    }
+                                    static_cast<G*>(this)->linestring_add_location(last_location);
                                 }
                             }
                             break;
@@ -159,11 +147,7 @@ namespace osmium {
                             for (int i = wnl.size()-1; i >= 0; --i) {
                                 if (last_location != wnl[i].location()) {
                                     last_location = wnl[i].location();
-                                    if (last_location) {
-                                        static_cast<G*>(this)->linestring_add_location(last_location);
-                                    } else {
-                                        throw geometry_error("location is undefined");
-                                    }
+                                    static_cast<G*>(this)->linestring_add_location(last_location);
                                 }
                             }
                             break;
@@ -172,20 +156,12 @@ namespace osmium {
                     switch (dir) {
                         case direction::forward:
                             for (auto& wn : wnl) {
-                                if (wn.location()) {
-                                    static_cast<G*>(this)->linestring_add_location(wn.location());
-                                } else {
-                                    throw geometry_error("location is undefined");
-                                }
+                                static_cast<G*>(this)->linestring_add_location(wn.location());
                             }
                             break;
                         case direction::backward:
                             for (int i = wnl.size()-1; i >= 0; --i) {
-                                if (wnl[i].location()) {
-                                    static_cast<G*>(this)->linestring_add_location(wnl[i].location());
-                                } else {
-                                    throw geometry_error("location is undefined");
-                                }
+                                static_cast<G*>(this)->linestring_add_location(wnl[i].location());
                             }
                             break;
                     }

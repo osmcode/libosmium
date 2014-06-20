@@ -15,7 +15,7 @@ BOOST_AUTO_TEST_CASE(instantiation) {
     BOOST_CHECK(!b);
     BOOST_CHECK(!b.bottom_left());
     BOOST_CHECK(!b.top_right());
-    BOOST_CHECK_EQUAL(0, b.size());
+    BOOST_CHECK_THROW(b.size(), osmium::invalid_location);
 }
 
 BOOST_AUTO_TEST_CASE(instantiation_and_extend_with_undefined) {

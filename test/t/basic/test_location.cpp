@@ -16,6 +16,8 @@ static_assert(std::is_literal_type<osmium::Location>::value, "osmium::Location n
 BOOST_AUTO_TEST_CASE(instantiation_with_default_parameters) {
     osmium::Location loc;
     BOOST_CHECK(!loc);
+    BOOST_CHECK_THROW(loc.lon(), osmium::invalid_location);
+    BOOST_CHECK_THROW(loc.lat(), osmium::invalid_location);
 }
 
 BOOST_AUTO_TEST_CASE(instantiation_with_double_parameters) {
@@ -107,8 +109,7 @@ BOOST_AUTO_TEST_CASE(output_to_iterator_check_precision) {
 BOOST_AUTO_TEST_CASE(output_to_iterator_undefined_location) {
     char buffer[100];
     osmium::Location loc;
-    *loc.as_string(buffer, ',') = 0;
-    BOOST_CHECK(!strcmp(buffer, "undefined,undefined"));
+    BOOST_CHECK_THROW(loc.as_string(buffer, ','), osmium::invalid_location);
 }
 
 BOOST_AUTO_TEST_CASE(output_to_string_comman_separator) {
@@ -135,8 +136,7 @@ BOOST_AUTO_TEST_CASE(output_to_string_check_precision) {
 BOOST_AUTO_TEST_CASE(output_to_string_undefined_location) {
     std::string s;
     osmium::Location loc;
-    loc.as_string(std::back_inserter(s), ',');
-    BOOST_CHECK_EQUAL(s, std::string("undefined,undefined"));
+    BOOST_CHECK_THROW(loc.as_string(std::back_inserter(s), ','), osmium::invalid_location);
 }
 
 BOOST_AUTO_TEST_CASE(output_defined) {
