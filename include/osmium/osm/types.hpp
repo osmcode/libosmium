@@ -57,28 +57,24 @@ namespace osmium {
      */
     typedef uint16_t string_size_type;
 
-#ifdef _MSC_VER
-# define atoll(x) (_atoi64(x))
-#endif
-
     inline object_id_type string_to_object_id(const char* string) {
-        return atoll(string);
+        return std::atoll(string);
     }
 
     inline object_version_type string_to_object_version(const char* string) {
-        return atol(string);
+        return std::atol(string);
     }
 
     inline changeset_id_type string_to_changeset_id(const char* string) {
-        return atol(string);
+        return std::atol(string);
     }
 
     inline user_id_type string_to_user_id(const char* string) {
-        return atol(string);
+        return std::atol(string);
     }
 
     inline num_changes_type string_to_num_changes(const char* string) {
-        return atol(string);
+        return std::atol(string);
     }
 
 } // namespace osmium

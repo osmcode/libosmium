@@ -5,7 +5,7 @@
 
 This file is part of Osmium (http://osmcode.org/libosmium).
 
-Copyright 2013 Jochen Topf <jochen@topf.org> and others (see README).
+Copyright 2013,2014 Jochen Topf <jochen@topf.org> and others (see README).
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -828,7 +828,7 @@ namespace osmium {
 
                     std::string osmosis_replication_sequence_number = header.get("osmosis_replication_sequence_number");
                     if (!osmosis_replication_sequence_number.empty()) {
-                        pbf_header_block.set_osmosis_replication_sequence_number(atoll(osmosis_replication_sequence_number.c_str()));
+                        pbf_header_block.set_osmosis_replication_sequence_number(std::atoll(osmosis_replication_sequence_number.c_str()));
                     }
 
                     std::string osmosis_replication_base_url = header.get("osmosis_replication_base_url");

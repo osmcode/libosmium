@@ -118,7 +118,7 @@ namespace osmium {
                 if (m_num_threads == 0) {
                     const char* env_threads = getenv("OSMIUM_POOL_THREADS");
                     if (env_threads) {
-                        m_num_threads = atoi(env_threads);
+                        m_num_threads = std::atoi(env_threads);
                     } else {
                         m_num_threads = -2;
                     }
