@@ -37,6 +37,8 @@ DEALINGS IN THE SOFTWARE.
 #include <type_traits>
 #include <utility>
 
+#include <osmium/index/index.hpp>
+
 namespace osmium {
 
     namespace index {
@@ -64,15 +66,15 @@ namespace osmium {
 
             public:
 
+                /// The "key" type, usually osmium::unsigned_object_id_type.
                 typedef TKey key_type;
-                typedef TValue mapped_type;
+
+                /// The "value" type, usually a Location or size_t.
+                typedef TValue value_type;
 
                 Multimap() = default;
 
                 virtual ~Multimap() noexcept = default;
-
-                /// The "value" type, usually a coordinates class or similar.
-                typedef TValue value_type;
 
                 /// Set the field with id to value.
                 virtual void set(const TKey id, const TValue value) = 0;

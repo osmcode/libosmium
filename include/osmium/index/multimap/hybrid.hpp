@@ -76,7 +76,7 @@ namespace osmium {
                         ++m_begin_extra;
                     } else {
                         ++m_begin_main;
-                        while (m_begin_main != m_end_main && m_begin_main->second == TValue {}) { // ignore removed elements
+                        while (m_begin_main != m_end_main && m_begin_main->second == osmium::index::empty_value<TValue>()) { // ignore removed elements
                             ++m_begin_main;
                         }
                     }

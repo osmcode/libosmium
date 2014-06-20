@@ -133,12 +133,12 @@ namespace osmium {
                         if (!wn.location()) {
                             error = true;
                         }
-                    } catch (std::out_of_range&) {
+                    } catch (osmium::not_found&) {
                         error = true;
                     }
                 }
                 if (error && !m_ignore_errors) {
-                    throw std::out_of_range("Missing location");
+                    throw osmium::not_found("not found");
                 }
             }
 

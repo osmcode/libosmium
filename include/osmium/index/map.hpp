@@ -36,11 +36,10 @@ DEALINGS IN THE SOFTWARE.
 #include <cstddef>
 #include <type_traits>
 
+#include <osmium/index/index.hpp>
+
 namespace osmium {
 
-    /**
-     * @brief Indexing of OSM data, Locations, etc.
-     */
     namespace index {
 
         /**
@@ -69,10 +68,10 @@ namespace osmium {
              * on 64 bit systems if used in this case. 32 bit systems just
              * can't address that much memory!
              *
-             * @tparam TKey Key type, usually osmium::object_id_type, must be
-             *              an integral type.
+             * @tparam TKey Key type, usually osmium::unsigned_object_id_type,
+             *              must be an unsigned integral type.
              * @tparam TValue Value type, usually osmium::Location or size_t.
-             *                Copied by value, so must be small type.
+             *                Copied by value, so should be "small" type.
              */
             template <typename TKey, typename TValue>
             class Map {
@@ -90,8 +89,11 @@ namespace osmium {
 
             public:
 
+                /// The "key" type, usually osmium::unsigned_object_id_type.
                 typedef TKey key_type;
-                typedef TValue mapped_type;
+
+                /// The "value" type, usually a Location or size_t.
+                typedef TValue value_type;
 
                 Map() = default;
 
@@ -101,9 +103,6 @@ namespace osmium {
 #else
                 virtual ~Map() = default;
 #endif
-
-                /// The "value" type, usually a coordinates class or similar.
-                typedef TValue value_type;
 
                 virtual void reserve(const size_t) {
                     // default implementation is empty

@@ -5,7 +5,7 @@
 
 This file is part of Osmium (http://osmcode.org/libosmium).
 
-Copyright 2013 Jochen Topf <jochen@topf.org> and others (see README).
+Copyright 2013,2014 Jochen Topf <jochen@topf.org> and others (see README).
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -61,7 +61,7 @@ namespace osmium {
                 vector_type m_vector;
 
                 static bool is_removed(element_type& element) {
-                    return element.second == TValue {};
+                    return element.second == osmium::index::empty_value<TValue>();
                 }
 
             public:
@@ -76,7 +76,8 @@ namespace osmium {
 
                 std::pair<iterator, iterator> get_all(const TKey key) {
                     const element_type element {
-                        key, TValue {}
+                        key,
+                        osmium::index::empty_value<TValue>()
                     };
                     return std::equal_range(m_vector.begin(), m_vector.end(), element, [](const element_type& a, const element_type& b) {
                         return a.first < b.first;

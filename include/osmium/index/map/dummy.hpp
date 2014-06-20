@@ -5,7 +5,7 @@
 
 This file is part of Osmium (http://osmcode.org/libosmium).
 
-Copyright 2013 Jochen Topf <jochen@topf.org> and others (see README).
+Copyright 2013,2014 Jochen Topf <jochen@topf.org> and others (see README).
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -62,8 +62,8 @@ namespace osmium {
                     // intentionally left blank
                 }
 
-                const TValue get(const TKey) const override final {
-                    throw std::out_of_range("ID doesn't exist");
+                const TValue get(const TKey key) const override final {
+                    not_found_error(key);
                 }
 
                 size_t size() const override final {

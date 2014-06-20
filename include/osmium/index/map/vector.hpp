@@ -5,7 +5,7 @@
 
 This file is part of Osmium (http://osmcode.org/libosmium).
 
-Copyright 2013 Jochen Topf <jochen@topf.org> and others (see README).
+Copyright 2013,2014 Jochen Topf <jochen@topf.org> and others (see README).
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -76,11 +76,15 @@ namespace osmium {
                 }
 
                 const TValue get(const TKey key) const override final {
-                    const TValue& value = m_vector.at(key);
-                    if (value == TValue {}) {
-                        throw std::out_of_range("out of range");
+                    try {
+                        const TValue& value = m_vector.at(key);
+                        if (value == osmium::index::empty_value<TValue>()) {
+                            not_found_error(key);
+                        }
+                        return value;
+                    } catch (std::out_of_range&) {
+                        not_found_error(key);
                     }
-                    return value;
                 }
 
                 size_t size() const override final {
@@ -131,13 +135,14 @@ namespace osmium {
 
                 const TValue get(const TKey key) const override final {
                     const element_type element {
-                        key, TValue {}
+                        key,
+                        osmium::index::empty_value<TValue>()
                     };
                     const auto result = std::lower_bound(m_vector.begin(), m_vector.end(), element, [](const element_type& a, const element_type& b) {
                         return a.first < b.first;
                     });
                     if (result == m_vector.end() || result->first != key) {
-                        throw std::out_of_range("Unknown ID");
+                        not_found_error(key);
                     } else {
                         return result->second;
                     }

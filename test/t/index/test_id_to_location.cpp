@@ -30,15 +30,15 @@ void test_func_all(TIndex& index) {
     osmium::Location loc1(1.2, 4.5);
     osmium::Location loc2(3.5, -7.2);
 
-    BOOST_CHECK_THROW(index.get(id1), std::out_of_range);
+    BOOST_CHECK_THROW(index.get(id1), osmium::not_found);
 
     index.set(id1, loc1);
     index.set(id2, loc2);
 
     index.sort();
 
-    BOOST_CHECK_THROW(index.get(5), std::out_of_range);
-    BOOST_CHECK_THROW(index.get(100), std::out_of_range);
+    BOOST_CHECK_THROW(index.get(5), osmium::not_found);
+    BOOST_CHECK_THROW(index.get(100), osmium::not_found);
 }
 
 template <typename TIndex>
@@ -56,12 +56,12 @@ void test_func_real(TIndex& index) {
     BOOST_CHECK_EQUAL(loc1, index.get(id1));
     BOOST_CHECK_EQUAL(loc2, index.get(id2));
 
-    BOOST_CHECK_THROW(index.get(5), std::out_of_range);
-    BOOST_CHECK_THROW(index.get(100), std::out_of_range);
+    BOOST_CHECK_THROW(index.get(5), osmium::not_found);
+    BOOST_CHECK_THROW(index.get(100), osmium::not_found);
 
     index.clear();
 
-    BOOST_CHECK_THROW(index.get(id1), std::out_of_range);
+    BOOST_CHECK_THROW(index.get(id1), osmium::not_found);
 }
 
 BOOST_AUTO_TEST_CASE(Dummy) {
