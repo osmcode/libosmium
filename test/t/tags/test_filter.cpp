@@ -14,14 +14,10 @@
 BOOST_AUTO_TEST_SUITE(Filter)
 
 template <class TFilter>
-void check_filter(const osmium::TagList& tag_list, const TFilter filter, const std::vector<bool>& results) {
-    auto it = results.begin();
-
-    std::for_each(tag_list.begin(), tag_list.end(), [&filter, &it](const osmium::Tag& tag) {
-        BOOST_CHECK_EQUAL(*it++, filter(tag));
-    });
-
-    BOOST_CHECK(it == results.end());
+void check_filter(const osmium::TagList& tag_list, const TFilter filter, const std::vector<bool>& reference) {
+    std::vector<bool> results;
+    std::transform(tag_list.begin(), tag_list.end(), std::back_inserter(results), filter);
+    BOOST_CHECK_EQUAL_COLLECTIONS(results.begin(), results.end(), reference.begin(), reference.end());
 }
 
 BOOST_AUTO_TEST_CASE(KeyFilter_matches_some_tags) {
