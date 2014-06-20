@@ -75,6 +75,15 @@ namespace osmium {
         return (lhs.first() == rhs.first() && lhs.second() < rhs.second()) || lhs.first() < rhs.first();
     }
 
+    /**
+     * Output UndirectedSegment to a stream.
+     */
+    template <class T>
+    inline T& operator<<(T& out, const osmium::UndirectedSegment& segment) {
+        out << segment.first() << "--" << segment.second();
+        return out;
+    }
+
 } // namespace osmium
 
 #endif // OSMIUM_OSM_UNDIRECTED_SEGMENT_HPP

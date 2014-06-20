@@ -135,6 +135,26 @@ namespace osmium {
         return lhs.bottom_left() == rhs.bottom_left() && lhs.top_right() == rhs.top_right();
     }
 
+    /**
+     * Output a box to a stream.
+     */
+    template <class T>
+    inline T& operator<<(T& out, const osmium::Box& box) {
+        if (box) {
+            out << '('
+                << box.bottom_left().lon()
+                << ','
+                << box.bottom_left().lat()
+                << ','
+                << box.top_right().lon()
+                << ','
+                << box.top_right().lat()
+                << ')';
+        } else {
+            out << "(undefined)";
+        }
+        return out;
+    }
 } // namespace osmium
 
 #endif // OSMIUM_OSM_BOX_HPP

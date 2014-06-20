@@ -224,6 +224,19 @@ namespace osmium {
         return (lhs.x() == rhs.x() && lhs.y() < rhs.y()) || lhs.x() < rhs.x();
     }
 
+    /**
+     * Output a location to a stream.
+     */
+    template <class T>
+    inline T& operator<<(T& out, const Location& location) {
+        if (location) {
+            out << '(' << location.lon() << ',' << location.lat() << ')';
+        } else {
+            out << "(undefined,undefined)";
+        }
+        return out;
+    }
+
 } // namespace osmium
 
 #endif // OSMIUM_OSM_LOCATION_HPP

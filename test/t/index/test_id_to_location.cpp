@@ -13,7 +13,6 @@ using boost::test_tools::output_test_stream;
 
 #include <osmium/osm/types.hpp>
 #include <osmium/osm/location.hpp>
-#include <osmium/osm/ostream.hpp>
 
 #include <osmium/index/map/dummy.hpp>
 #include <osmium/index/map/sparse_table.hpp>

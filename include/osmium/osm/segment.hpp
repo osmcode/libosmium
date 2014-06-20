@@ -5,7 +5,7 @@
 
 This file is part of Osmium (http://osmcode.org/libosmium).
 
-Copyright 2013 Jochen Topf <jochen@topf.org> and others (see README).
+Copyright 2013,2014 Jochen Topf <jochen@topf.org> and others (see README).
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -86,6 +86,15 @@ namespace osmium {
     /// Segments are equal if both their locations are equal
     inline constexpr bool operator==(const Segment& lhs, const Segment& rhs) {
         return lhs.first() == rhs.first() && lhs.second() == rhs.second();
+    }
+
+    /**
+     * Output Segment to a stream.
+     */
+    template <class T>
+    inline T& operator<<(T& out, const osmium::Segment& segment) {
+        out << segment.first() << "->" << segment.second();
+        return out;
     }
 
 } // namespace osmium

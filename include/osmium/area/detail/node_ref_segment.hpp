@@ -41,7 +41,6 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/node_ref.hpp>
-#include <osmium/osm/ostream.hpp>
 
 namespace osmium {
 

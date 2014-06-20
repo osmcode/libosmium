@@ -4,7 +4,6 @@
 #include <boost/test/unit_test.hpp>
 
 #include <osmium/area/detail/node_ref_segment.hpp>
-#include <osmium/osm/ostream.hpp>
 
 using osmium::area::detail::NodeRefSegment;
 

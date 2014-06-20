@@ -15,7 +15,6 @@
 
 #include <osmium/index/map/mmap_vector_file.hpp>
 #include <osmium/osm/location.hpp>
-#include <osmium/osm/ostream.hpp>
 #include <osmium/osm/types.hpp>
 
 template <typename TKey, typename TValue>

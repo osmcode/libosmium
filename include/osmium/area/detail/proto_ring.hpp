@@ -35,12 +35,12 @@ DEALINGS IN THE SOFTWARE.
 
 #include <algorithm>
 #include <cassert>
+#include <iostream>
 #include <list>
 #include <set>
 #include <vector>
 
 #include <osmium/osm/node_ref.hpp>
-#include <osmium/osm/ostream.hpp>
 #include <osmium/area/detail/node_ref_segment.hpp>
 
 namespace osmium {

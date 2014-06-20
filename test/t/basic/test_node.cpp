@@ -4,7 +4,6 @@
 #include <boost/test/unit_test.hpp>
 
 #include <osmium/osm/node.hpp>
-#include <osmium/osm/ostream.hpp>
 
 #include "helper.hpp"
 

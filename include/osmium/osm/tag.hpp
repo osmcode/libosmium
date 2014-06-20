@@ -93,6 +93,15 @@ namespace osmium {
         return (!std::strcmp(a.key(), b.key()) && (std::strcmp(a.value(), b.value()) < 0)) || (std::strcmp(a.key(), b.key()) < 0);
     }
 
+    /**
+     * Output a Tag to a stream.
+     */
+    template <class T>
+    inline T& operator<<(T& out, const Tag& tag) {
+        out << tag.key() << '=' << tag.value();
+        return out;
+    }
+
     class TagList : public osmium::memory::Collection<Tag, osmium::item_type::tag_list> {
 
     public:

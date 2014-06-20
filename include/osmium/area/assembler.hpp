@@ -44,7 +44,6 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/memory/buffer.hpp>
 #include <osmium/osm/area.hpp>
 #include <osmium/osm/location.hpp>
-#include <osmium/osm/ostream.hpp>
 #include <osmium/osm/relation.hpp>
 #include <osmium/tags/filter.hpp>
 

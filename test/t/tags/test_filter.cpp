@@ -7,7 +7,6 @@
 
 #include <osmium/memory/buffer.hpp>
 #include <osmium/osm/tag.hpp>
-#include <osmium/osm/ostream.hpp>
 #include <osmium/tags/taglist.hpp>
 #include <osmium/tags/filter.hpp>
 #include <osmium/tags/regex_filter.hpp>

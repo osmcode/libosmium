@@ -7,7 +7,6 @@ using boost::test_tools::output_test_stream;
 
 #include <osmium/osm/box.hpp>
 #include <osmium/geom/relations.hpp>
-#include <osmium/osm/ostream.hpp>
 
 BOOST_AUTO_TEST_SUITE(Box)
 

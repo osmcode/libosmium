@@ -8,7 +8,6 @@
 #include <osmium/builder/osm_object_builder.hpp>
 #include <osmium/memory/buffer.hpp>
 #include <osmium/osm/tag.hpp>
-#include <osmium/osm/ostream.hpp>
 
 BOOST_AUTO_TEST_SUITE(Operators)
 

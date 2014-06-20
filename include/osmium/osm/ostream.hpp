@@ -53,52 +53,6 @@ namespace osmium {
         return out;
     }
 
-    inline std::ostream& operator<<(std::ostream& out, const Location& location) {
-        if (location) {
-            out << '(' << location.lon() << ',' << location.lat() << ')';
-        } else {
-            out << "(undefined,undefined)";
-        }
-        return out;
-    }
-
-    inline std::ostream& operator<<(std::ostream& out, const Tag& tag) {
-        out << tag.key() << '=' << tag.value();
-        return out;
-    }
-
-    inline std::ostream& operator<<(std::ostream& out, const osmium::Box& box) {
-        if (box) {
-            out << '('
-                << box.bottom_left().lon()
-                << ','
-                << box.bottom_left().lat()
-                << ','
-                << box.top_right().lon()
-                << ','
-                << box.top_right().lat()
-                << ')';
-        } else {
-            out << "(undefined)";
-        }
-        return out;
-    }
-
-    inline std::ostream& operator<<(std::ostream& out, const osmium::NodeRef& nr) {
-        out << "<" << nr.ref() << " " << nr.location() << ">";
-        return out;
-    }
-
-    inline std::ostream& operator<<(std::ostream& out, const osmium::Segment& segment) {
-        out << segment.first() << "->" << segment.second();
-        return out;
-    }
-
-    inline std::ostream& operator<<(std::ostream& out, const osmium::UndirectedSegment& segment) {
-        out << segment.first() << "--" << segment.second();
-        return out;
-    }
-
 } // namespace osmium
 
 #endif // OSMIUM_OSM_OSTREAM_HPP

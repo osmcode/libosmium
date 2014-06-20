@@ -4,9 +4,6 @@
 #include <boost/test/unit_test.hpp>
 
 #include <osmium/geom/wkt.hpp>
-#include <osmium/osm/ostream.hpp>
-//#include <osmium/osm/dump.hpp>
-//#include <osmium/visitor.hpp>
 
 #include "../basic/helper.hpp"
 

@@ -8,7 +8,6 @@ using boost::test_tools::output_test_stream;
 #include <type_traits>
 
 #include <osmium/osm/location.hpp>
-#include <osmium/osm/ostream.hpp>
 
 BOOST_AUTO_TEST_SUITE(Location)
 

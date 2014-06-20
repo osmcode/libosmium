@@ -118,6 +118,15 @@ namespace osmium {
     }
 
     /**
+     * Output a NodeRef to a stream.
+     */
+    template <class T>
+    inline T& operator<<(T& out, const osmium::NodeRef& nr) {
+        out << "<" << nr.ref() << " " << nr.location() << ">";
+        return out;
+    }
+
+    /**
      * Functor to compare NodeRefs by Location instead of id.
      */
     struct location_equal {

@@ -45,7 +45,6 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/node.hpp>
 #include <osmium/osm/node_ref.hpp>
 #include <osmium/osm/object.hpp>
-#include <osmium/osm/ostream.hpp>
 #include <osmium/osm/relation.hpp>
 #include <osmium/osm/tag.hpp>
 #include <osmium/osm/timestamp.hpp>
@@ -173,7 +172,7 @@ namespace osmium {
                 for (const auto& member : rml) {
                     m_out << m_prefix
                           << "  type="
-                          << member.type()
+                          << item_type_to_name(member.type())
                           << " ref="
                           << member.ref()
                           << " role=|"
