@@ -83,12 +83,21 @@ namespace osmium {
          */
         class Buffer {
 
+        public:
+
+            enum class auto_grow : bool {
+                yes = true,
+                no  = false
+            };
+
+        private:
+
             std::vector<unsigned char> m_memory;
             unsigned char* m_data;
             size_t m_capacity;
             size_t m_written;
             size_t m_committed;
-            bool m_auto_grow {false};
+            auto_grow m_auto_grow {auto_grow::no};
             std::function<void(Buffer&)> m_full {};
 
         public:
@@ -156,7 +165,7 @@ namespace osmium {
              * required size. The dynamic memory will be automatically
              * freed when the Buffer is destroyed.
              */
-            Buffer(size_t capacity, bool auto_grow = true) :
+            Buffer(size_t capacity, auto_grow auto_grow = auto_grow::yes) :
                 m_memory(capacity),
                 m_data(m_memory.data()),
                 m_capacity(capacity),
@@ -317,7 +326,7 @@ namespace osmium {
                 if (m_written + size > m_capacity) {
                     if (m_full) {
                         m_full(*this);
-                    } else if (!m_memory.empty() && m_auto_grow) {
+                    } else if (!m_memory.empty() && (m_auto_grow == auto_grow::yes)) {
                         // double buffer size until there is enough space
                         size_t new_capacity = m_capacity * 2;
                         while (m_written + size > new_capacity) {

@@ -95,7 +95,7 @@ namespace osmium {
             MultipolygonCollector(const assembler_config_type& assembler_config) :
                 collector_type(),
                 m_assembler_config(assembler_config),
-                m_output_buffer(1024*1024, true) {
+                m_output_buffer(1024*1024, osmium::memory::Buffer::auto_grow::yes) {
             }
 
             /**
