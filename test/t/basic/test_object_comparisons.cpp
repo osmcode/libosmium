@@ -4,9 +4,9 @@
 #include <boost/test/unit_test.hpp>
 
 #include <osmium/builder/osm_object_builder.hpp>
-#include <osmium/osm/object_comparisons.hpp>
 #include <osmium/osm.hpp>
-#include <osmium/osm/ostream.hpp>
+#include <osmium/osm/item_type_ostream.hpp>
+#include <osmium/osm/object_comparisons.hpp>
 
 BOOST_AUTO_TEST_SUITE(Object_Comparisons)
 

@@ -4,8 +4,8 @@
 #include <boost/test/unit_test.hpp>
 
 #include <osmium/builder/osm_object_builder.hpp>
+#include <osmium/osm/item_type_ostream.hpp>
 #include <osmium/osm/node.hpp>
-#include <osmium/osm/ostream.hpp>
 
 BOOST_AUTO_TEST_SUITE(Buffer_Node)
 

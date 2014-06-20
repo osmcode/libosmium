@@ -3,8 +3,8 @@
 #endif
 #include <boost/test/unit_test.hpp>
 
+#include <osmium/osm/item_type_ostream.hpp>
 #include <osmium/osm/relation.hpp>
-#include <osmium/osm/ostream.hpp>
 
 #include "helper.hpp"
 

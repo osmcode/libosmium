@@ -4,8 +4,8 @@
 #include <boost/test/unit_test.hpp>
 
 #include <osmium/memory/buffer.hpp>
+#include <osmium/osm/item_type_ostream.hpp>
 #include <osmium/osm/tag.hpp>
-#include <osmium/osm/ostream.hpp>
 #include <osmium/tags/taglist.hpp>
 
 BOOST_AUTO_TEST_SUITE(tag_list)

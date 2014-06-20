@@ -1,11 +1,11 @@
-#ifndef OSMIUM_OSM_OSTREAM_HPP
-#define OSMIUM_OSM_OSTREAM_HPP
+#ifndef OSMIUM_OSM_ITEM_TYPE_OSTREAM_HPP
+#define OSMIUM_OSM_ITEM_TYPE_OSTREAM_HPP
 
 /*
 
 This file is part of Osmium (http://osmcode.org/libosmium).
 
-Copyright 2013 Jochen Topf <jochen@topf.org> and others (see README).
+Copyright 2013,2014 Jochen Topf <jochen@topf.org> and others (see README).
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -36,13 +36,7 @@ DEALINGS IN THE SOFTWARE.
 #include <cstdint>
 #include <iostream>
 
-#include <osmium/osm/box.hpp>
 #include <osmium/osm/item_type.hpp>
-#include <osmium/osm/location.hpp>
-#include <osmium/osm/node_ref.hpp>
-#include <osmium/osm/segment.hpp>
-#include <osmium/osm/tag.hpp>
-#include <osmium/osm/undirected_segment.hpp>
 
 namespace osmium {
 
@@ -55,4 +49,4 @@ namespace osmium {
 
 } // namespace osmium
 
-#endif // OSMIUM_OSM_OSTREAM_HPP
+#endif // OSMIUM_OSM_ITEM_TYPE_OSTREAM_HPP
