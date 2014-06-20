@@ -53,17 +53,17 @@ BOOST_AUTO_TEST_CASE(linestring) {
     }
 
     {
-        std::string wkb {factory.create_linestring(way.nodes(), true, true)};
+        std::string wkb {factory.create_linestring(way.nodes(), osmium::geom::use_nodes::unique, osmium::geom::direction::backward)};
         BOOST_CHECK_EQUAL(std::string{"010200000003000000cdcccccccccc0c409a999999999913400000000000000c40cdcccccccccc12409a99999999990940cdcccccccccc1040"}, wkb);
     }
 
     {
-        std::string wkb {factory.create_linestring(way.nodes(), false)};
+        std::string wkb {factory.create_linestring(way.nodes(), osmium::geom::use_nodes::all)};
         BOOST_CHECK_EQUAL(std::string{"0102000000040000009a99999999990940cdcccccccccc10400000000000000c40cdcccccccccc12400000000000000c40cdcccccccccc1240cdcccccccccc0c409a99999999991340"}, wkb);
     }
 
     {
-        std::string wkb {factory.create_linestring(way.nodes(), false, true)};
+        std::string wkb {factory.create_linestring(way.nodes(), osmium::geom::use_nodes::all, osmium::geom::direction::backward)};
         BOOST_CHECK_EQUAL(std::string{"010200000004000000cdcccccccccc0c409a999999999913400000000000000c40cdcccccccccc12400000000000000c40cdcccccccccc12409a99999999990940cdcccccccccc1040"}, wkb);
     }
 }
@@ -98,9 +98,9 @@ BOOST_AUTO_TEST_CASE(empty_linestring) {
         std::vector<std::pair<osmium::object_id_type, osmium::Location>>({}));
 
     BOOST_CHECK_THROW(factory.create_linestring(way.nodes()), osmium::geom::geometry_error);
-    BOOST_CHECK_THROW(factory.create_linestring(way.nodes(), true, true), osmium::geom::geometry_error);
-    BOOST_CHECK_THROW(factory.create_linestring(way.nodes(), false), osmium::geom::geometry_error);
-    BOOST_CHECK_THROW(factory.create_linestring(way.nodes(), false, true), osmium::geom::geometry_error);
+    BOOST_CHECK_THROW(factory.create_linestring(way.nodes(), osmium::geom::use_nodes::unique, osmium::geom::direction::backward), osmium::geom::geometry_error);
+    BOOST_CHECK_THROW(factory.create_linestring(way.nodes(), osmium::geom::use_nodes::all), osmium::geom::geometry_error);
+    BOOST_CHECK_THROW(factory.create_linestring(way.nodes(), osmium::geom::use_nodes::all, osmium::geom::direction::backward), osmium::geom::geometry_error);
 }
 
 BOOST_AUTO_TEST_CASE(linestring_with_two_same_locations) {
@@ -117,15 +117,15 @@ BOOST_AUTO_TEST_CASE(linestring_with_two_same_locations) {
         });
 
     BOOST_CHECK_THROW(factory.create_linestring(way.nodes()), osmium::geom::geometry_error);
-    BOOST_CHECK_THROW(factory.create_linestring(way.nodes(), true, true), osmium::geom::geometry_error);
+    BOOST_CHECK_THROW(factory.create_linestring(way.nodes(), osmium::geom::use_nodes::unique, osmium::geom::direction::backward), osmium::geom::geometry_error);
 
     {
-        std::string wkb {factory.create_linestring(way.nodes(), false)};
+        std::string wkb {factory.create_linestring(way.nodes(), osmium::geom::use_nodes::all)};
         BOOST_CHECK_EQUAL(std::string{"0102000000020000000000000000000c40cdcccccccccc12400000000000000c40cdcccccccccc1240"}, wkb);
     }
 
     {
-        std::string wkb {factory.create_linestring(way.nodes(), false, true)};
+        std::string wkb {factory.create_linestring(way.nodes(), osmium::geom::use_nodes::all, osmium::geom::direction::backward)};
         BOOST_CHECK_EQUAL(std::string{"0102000000020000000000000000000c40cdcccccccccc12400000000000000c40cdcccccccccc1240"}, wkb);
     }
 }

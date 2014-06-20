@@ -42,17 +42,17 @@ BOOST_AUTO_TEST_CASE(linestring) {
     }
 
     {
-        std::string json {factory.create_linestring(way.nodes(), true, true)};
+        std::string json {factory.create_linestring(way.nodes(), osmium::geom::use_nodes::unique, osmium::geom::direction::backward)};
         BOOST_CHECK_EQUAL(std::string{"{\"type\":\"LineString\",\"coordinates\":[[3.6,4.9],[3.5,4.7],[3.2,4.2]]}"}, json);
     }
 
     {
-        std::string json {factory.create_linestring(way.nodes(), false)};
+        std::string json {factory.create_linestring(way.nodes(), osmium::geom::use_nodes::all)};
         BOOST_CHECK_EQUAL(std::string{"{\"type\":\"LineString\",\"coordinates\":[[3.2,4.2],[3.5,4.7],[3.5,4.7],[3.6,4.9]]}"}, json);
     }
 
     {
-        std::string json {factory.create_linestring(way.nodes(), false, true)};
+        std::string json {factory.create_linestring(way.nodes(), osmium::geom::use_nodes::all, osmium::geom::direction::backward)};
         BOOST_CHECK_EQUAL(std::string{"{\"type\":\"LineString\",\"coordinates\":[[3.6,4.9],[3.5,4.7],[3.5,4.7],[3.2,4.2]]}"}, json);
     }
 }
@@ -67,9 +67,9 @@ BOOST_AUTO_TEST_CASE(empty_linestring) {
         std::vector<std::pair<osmium::object_id_type, osmium::Location>>({}));
 
     BOOST_CHECK_THROW(factory.create_linestring(way.nodes()), osmium::geom::geometry_error);
-    BOOST_CHECK_THROW(factory.create_linestring(way.nodes(), true, true), osmium::geom::geometry_error);
-    BOOST_CHECK_THROW(factory.create_linestring(way.nodes(), false), osmium::geom::geometry_error);
-    BOOST_CHECK_THROW(factory.create_linestring(way.nodes(), false, true), osmium::geom::geometry_error);
+    BOOST_CHECK_THROW(factory.create_linestring(way.nodes(), osmium::geom::use_nodes::unique, osmium::geom::direction::backward), osmium::geom::geometry_error);
+    BOOST_CHECK_THROW(factory.create_linestring(way.nodes(), osmium::geom::use_nodes::all), osmium::geom::geometry_error);
+    BOOST_CHECK_THROW(factory.create_linestring(way.nodes(), osmium::geom::use_nodes::all, osmium::geom::direction::backward), osmium::geom::geometry_error);
 }
 
 BOOST_AUTO_TEST_CASE(linestring_with_two_same_locations) {
@@ -85,15 +85,15 @@ BOOST_AUTO_TEST_CASE(linestring_with_two_same_locations) {
         });
 
     BOOST_CHECK_THROW(factory.create_linestring(way.nodes()), osmium::geom::geometry_error);
-    BOOST_CHECK_THROW(factory.create_linestring(way.nodes(), true, true), osmium::geom::geometry_error);
+    BOOST_CHECK_THROW(factory.create_linestring(way.nodes(), osmium::geom::use_nodes::unique, osmium::geom::direction::backward), osmium::geom::geometry_error);
 
     {
-        std::string json {factory.create_linestring(way.nodes(), false)};
+        std::string json {factory.create_linestring(way.nodes(), osmium::geom::use_nodes::all)};
         BOOST_CHECK_EQUAL(std::string{"{\"type\":\"LineString\",\"coordinates\":[[3.5,4.7],[3.5,4.7]]}"}, json);
     }
 
     {
-        std::string json {factory.create_linestring(way.nodes(), false, true)};
+        std::string json {factory.create_linestring(way.nodes(), osmium::geom::use_nodes::all, osmium::geom::direction::backward)};
         BOOST_CHECK_EQUAL(std::string{"{\"type\":\"LineString\",\"coordinates\":[[3.5,4.7],[3.5,4.7]]}"}, json);
     }
 }

@@ -65,6 +65,23 @@ namespace osmium {
         };
 
         /**
+         * Which nodes of a way to use for a linestring.
+         */
+        enum class use_nodes : bool {
+            unique = true, ///< Remove consecutive nodes with same location.
+            all    = false ///< Use all nodes.
+        };
+
+        /**
+         * Which direction the linestring created from a way
+         * should have.
+         */
+        enum class direction : bool {
+            backward = true, ///< Linestring has reverse direction.
+            forward  = false ///< Linestring has same direction as way.
+        };
+
+        /**
          * Abstract base class for geometry factories.
          */
         template <class G, class T>
@@ -120,12 +137,12 @@ namespace osmium {
 
             /* LineString */
 
-            linestring_type create_linestring(const osmium::WayNodeList& wnl, bool unique=true, bool reverse=false) {
+            linestring_type create_linestring(const osmium::WayNodeList& wnl, use_nodes use_nodes=use_nodes::unique, direction direction=direction::forward) {
                 static_cast<G*>(this)->linestring_start();
 
-                if (unique) {
+                if (use_nodes == use_nodes::unique) {
                     osmium::Location last_location;
-                    if (reverse) {
+                    if (direction == direction::backward) {
                         for (int i = wnl.size()-1; i >= 0; --i) {
                             if (last_location != wnl[i].location()) {
                                 last_location = wnl[i].location();
@@ -149,7 +166,7 @@ namespace osmium {
                         }
                     }
                 } else {
-                    if (reverse) {
+                    if (direction == direction::backward) {
                         for (int i = wnl.size()-1; i >= 0; --i) {
                             if (wnl[i].location()) {
                                 static_cast<G*>(this)->linestring_add_location(wnl[i].location());
@@ -171,8 +188,8 @@ namespace osmium {
                 return static_cast<G*>(this)->linestring_finish();
             }
 
-            linestring_type create_linestring(const osmium::Way& way, bool unique=true, bool reverse=false) {
-                return create_linestring(way.nodes(), unique, reverse);
+            linestring_type create_linestring(const osmium::Way& way, use_nodes use_nodes=use_nodes::unique, direction direction=direction::forward) {
+                return create_linestring(way.nodes(), use_nodes, direction);
             }
 
             /* MultiPolygon */
