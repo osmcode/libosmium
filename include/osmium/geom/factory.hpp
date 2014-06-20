@@ -142,46 +142,52 @@ namespace osmium {
 
                 if (un == use_nodes::unique) {
                     osmium::Location last_location;
-                    if (dir == direction::backward) {
-                        for (int i = wnl.size()-1; i >= 0; --i) {
-                            if (last_location != wnl[i].location()) {
-                                last_location = wnl[i].location();
-                                if (last_location) {
-                                    static_cast<G*>(this)->linestring_add_location(last_location);
-                                } else {
-                                    throw geometry_error("location is undefined");
+                    switch (dir) {
+                        case direction::forward:
+                            for (auto& wn : wnl) {
+                                if (last_location != wn.location()) {
+                                    last_location = wn.location();
+                                    if (last_location) {
+                                        static_cast<G*>(this)->linestring_add_location(last_location);
+                                    } else {
+                                        throw geometry_error("location is undefined");
+                                    }
                                 }
                             }
-                        }
-                    } else {
-                        for (auto& wn : wnl) {
-                            if (last_location != wn.location()) {
-                                last_location = wn.location();
-                                if (last_location) {
-                                    static_cast<G*>(this)->linestring_add_location(last_location);
-                                } else {
-                                    throw geometry_error("location is undefined");
+                            break;
+                        case direction::backward:
+                            for (int i = wnl.size()-1; i >= 0; --i) {
+                                if (last_location != wnl[i].location()) {
+                                    last_location = wnl[i].location();
+                                    if (last_location) {
+                                        static_cast<G*>(this)->linestring_add_location(last_location);
+                                    } else {
+                                        throw geometry_error("location is undefined");
+                                    }
                                 }
                             }
-                        }
+                            break;
                     }
                 } else {
-                    if (dir == direction::backward) {
-                        for (int i = wnl.size()-1; i >= 0; --i) {
-                            if (wnl[i].location()) {
-                                static_cast<G*>(this)->linestring_add_location(wnl[i].location());
-                            } else {
-                                throw geometry_error("location is undefined");
+                    switch (dir) {
+                        case direction::forward:
+                            for (auto& wn : wnl) {
+                                if (wn.location()) {
+                                    static_cast<G*>(this)->linestring_add_location(wn.location());
+                                } else {
+                                    throw geometry_error("location is undefined");
+                                }
                             }
-                        }
-                    } else {
-                        for (auto& wn : wnl) {
-                            if (wn.location()) {
-                                static_cast<G*>(this)->linestring_add_location(wn.location());
-                            } else {
-                                throw geometry_error("location is undefined");
+                            break;
+                        case direction::backward:
+                            for (int i = wnl.size()-1; i >= 0; --i) {
+                                if (wnl[i].location()) {
+                                    static_cast<G*>(this)->linestring_add_location(wnl[i].location());
+                                } else {
+                                    throw geometry_error("location is undefined");
+                                }
                             }
-                        }
+                            break;
                     }
                 }
 
