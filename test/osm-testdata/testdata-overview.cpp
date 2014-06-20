@@ -172,7 +172,7 @@ public:
             }
 
             OGRFeature::DestroyFeature(feature);
-        } catch (osmium::geom::geometry_error&) {
+        } catch (osmium::geometry_error&) {
             std::cerr << "Ignoring illegal geometry for way " << way.id() << ".\n";
         }
     }

@@ -66,10 +66,10 @@ BOOST_AUTO_TEST_CASE(empty_linestring) {
         {},
         std::vector<std::pair<osmium::object_id_type, osmium::Location>>({}));
 
-    BOOST_CHECK_THROW(factory.create_linestring(way.nodes()), osmium::geom::geometry_error);
-    BOOST_CHECK_THROW(factory.create_linestring(way.nodes(), osmium::geom::use_nodes::unique, osmium::geom::direction::backward), osmium::geom::geometry_error);
-    BOOST_CHECK_THROW(factory.create_linestring(way.nodes(), osmium::geom::use_nodes::all), osmium::geom::geometry_error);
-    BOOST_CHECK_THROW(factory.create_linestring(way.nodes(), osmium::geom::use_nodes::all, osmium::geom::direction::backward), osmium::geom::geometry_error);
+    BOOST_CHECK_THROW(factory.create_linestring(way.nodes()), osmium::geometry_error);
+    BOOST_CHECK_THROW(factory.create_linestring(way.nodes(), osmium::geom::use_nodes::unique, osmium::geom::direction::backward), osmium::geometry_error);
+    BOOST_CHECK_THROW(factory.create_linestring(way.nodes(), osmium::geom::use_nodes::all), osmium::geometry_error);
+    BOOST_CHECK_THROW(factory.create_linestring(way.nodes(), osmium::geom::use_nodes::all, osmium::geom::direction::backward), osmium::geometry_error);
 }
 
 BOOST_AUTO_TEST_CASE(linestring_with_two_same_locations) {
@@ -84,8 +84,8 @@ BOOST_AUTO_TEST_CASE(linestring_with_two_same_locations) {
             {2, {3.5, 4.7}},
         });
 
-    BOOST_CHECK_THROW(factory.create_linestring(way.nodes()), osmium::geom::geometry_error);
-    BOOST_CHECK_THROW(factory.create_linestring(way.nodes(), osmium::geom::use_nodes::unique, osmium::geom::direction::backward), osmium::geom::geometry_error);
+    BOOST_CHECK_THROW(factory.create_linestring(way.nodes()), osmium::geometry_error);
+    BOOST_CHECK_THROW(factory.create_linestring(way.nodes(), osmium::geom::use_nodes::unique, osmium::geom::direction::backward), osmium::geometry_error);
 
     {
         std::string wkt {factory.create_linestring(way.nodes(), osmium::geom::use_nodes::all)};

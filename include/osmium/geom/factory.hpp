@@ -47,22 +47,22 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
+    struct geometry_error : public std::runtime_error {
+
+        geometry_error(const std::string& what) :
+            std::runtime_error(what) {
+        }
+
+        geometry_error(const char* what) :
+            std::runtime_error(what) {
+        }
+
+    }; // struct geometry_error
+
     /**
      * @brief Everything related to geometry handling.
      */
     namespace geom {
-
-        struct geometry_error : public std::runtime_error {
-
-            geometry_error(const std::string& what) :
-                std::runtime_error(what) {
-            }
-
-            geometry_error(const char* what) :
-                std::runtime_error(what) {
-            }
-
-        };
 
         /**
          * Which nodes of a way to use for a linestring.
