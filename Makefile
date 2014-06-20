@@ -17,7 +17,7 @@ endif
 
 INCLUDE_FILES := $(shell find include/osmium -name \*.hpp | sort)
 
-WARNINGFLAGS := -Wall -Wextra -pedantic -Wredundant-decls -Wdisabled-optimization -Wctor-dtor-privacy -Wnon-virtual-dtor -Woverloaded-virtual -Wsign-promo -Winline -Wold-style-cast
+WARNINGFLAGS := -Wall -Wextra -pedantic -Wredundant-decls -Wdisabled-optimization -Wctor-dtor-privacy -Wnon-virtual-dtor -Woverloaded-virtual -Wsign-promo -Winline -Wold-style-cast -Wdocumentation
 #WARNINGFLAGS += -Weffc++
 
 INSTALL_USER := root
