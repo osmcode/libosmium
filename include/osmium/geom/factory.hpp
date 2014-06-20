@@ -137,12 +137,12 @@ namespace osmium {
 
             /* LineString */
 
-            linestring_type create_linestring(const osmium::WayNodeList& wnl, use_nodes use_nodes=use_nodes::unique, direction direction=direction::forward) {
+            linestring_type create_linestring(const osmium::WayNodeList& wnl, use_nodes un=use_nodes::unique, direction dir=direction::forward) {
                 static_cast<G*>(this)->linestring_start();
 
-                if (use_nodes == use_nodes::unique) {
+                if (un == use_nodes::unique) {
                     osmium::Location last_location;
-                    if (direction == direction::backward) {
+                    if (dir == direction::backward) {
                         for (int i = wnl.size()-1; i >= 0; --i) {
                             if (last_location != wnl[i].location()) {
                                 last_location = wnl[i].location();
@@ -166,7 +166,7 @@ namespace osmium {
                         }
                     }
                 } else {
-                    if (direction == direction::backward) {
+                    if (dir == direction::backward) {
                         for (int i = wnl.size()-1; i >= 0; --i) {
                             if (wnl[i].location()) {
                                 static_cast<G*>(this)->linestring_add_location(wnl[i].location());
@@ -188,8 +188,8 @@ namespace osmium {
                 return static_cast<G*>(this)->linestring_finish();
             }
 
-            linestring_type create_linestring(const osmium::Way& way, use_nodes use_nodes=use_nodes::unique, direction direction=direction::forward) {
-                return create_linestring(way.nodes(), use_nodes, direction);
+            linestring_type create_linestring(const osmium::Way& way, use_nodes un=use_nodes::unique, direction dir=direction::forward) {
+                return create_linestring(way.nodes(), un, dir);
             }
 
             /* MultiPolygon */
