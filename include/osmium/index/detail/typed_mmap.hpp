@@ -64,6 +64,8 @@ namespace osmium {
          *
          * This class only contains static functions. It should never be
          * instantiated.
+         *
+         * @tparam T Type of objects we want to store.
          */
         template <typename T>
         class typed_mmap {
@@ -76,7 +78,6 @@ namespace osmium {
              *
              * Note that no constructor is called for any of the objects in this memory!
              *
-             * @tparam T Type of objects we want to store in this memory
              * @param size Number of objects of type T that should fit into this memory
              * @return Pointer to mapped memory
              * @exception std::system_error If mmap(2) failed
@@ -99,7 +100,6 @@ namespace osmium {
              *
              * Note that no constructor is called for any of the objects in this memory!
              *
-             * @tparam T Type of objects we want to store in this memory
              * @param size Number of objects of type T that should fit into this memory
              * @param fd File descriptor
              * @param write True if data should be writable
@@ -128,7 +128,6 @@ namespace osmium {
              *
              * Note that no constructor is called for any of the objects in this memory!
              *
-             * @tparam T Type of objects stored in this memory
              * @param data Pointer to current mapping (as returned by typed_mmap())
              * @param old_size Number of objects currently stored in this memory
              * @param new_size Number of objects we want to have space for
@@ -151,7 +150,6 @@ namespace osmium {
              *
              * Note that no destructor is called for the objects in this memory!
              *
-             * @tparam T Type of objects stored in this memory
              * @param data Pointer to the data
              * @param size Number of objects of type T stored
              * @exception std::system_error If munmap(2) call failed
@@ -165,7 +163,6 @@ namespace osmium {
             /**
              * Get number of objects of type T that would fit into a file.
              *
-             * @tparam T Type of objects stored in this file
              * @param fd File descriptor
              * @return Number of objects of type T in this file
              * @exception std::system_error If fstat(2) call failed
@@ -187,7 +184,6 @@ namespace osmium {
              * of type T. If the file is large enough already, nothing is done.
              * The file is never shrunk.
              *
-             * @tparam T Type of objects stored in this file
              * @param new_size Number of objects of type T that should fit into this file
              * @param fd File descriptor
              * @exception std::system_error If ftruncate(2) call failed
@@ -203,7 +199,6 @@ namespace osmium {
             /**
              * Grow file to given size (if it is smaller) and mmap it.
              *
-             * @tparam T Type of objects stored in this file
              * @param size Number of objects of type T that should fit into this file
              * @param fd File descriptor
              * @exception Errors thrown by grow_file() or map()
