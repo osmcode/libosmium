@@ -140,7 +140,7 @@ namespace osmium {
 
         public:
 
-            static const int default_num_threads = 0;
+            static constexpr int default_num_threads = 0;
 
             static Pool& instance() {
                 static Pool pool(default_num_threads);

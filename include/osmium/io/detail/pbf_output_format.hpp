@@ -228,7 +228,7 @@ namespace osmium {
                  * as well as Osmium implementation always
                  * uses at most 8k entities in a block.
                  */
-                static const uint32_t max_block_contents = 8000;
+                static constexpr uint32_t max_block_contents = 8000;
 
                 /**
                  * The output buffer (block) will be filled to about
@@ -236,7 +236,7 @@ namespace osmium {
                  * enough space for the string table (which typically
                  * needs about 0.1 to 0.3% of the block size).
                  */
-                static const int buffer_fill_percent = 95;
+                static constexpr int buffer_fill_percent = 95;
 
                 /**
                  * protobuf-struct of a HeaderBlock

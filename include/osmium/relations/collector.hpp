@@ -244,6 +244,8 @@ namespace osmium {
             typedef std::function<void(const osmium::memory::Buffer&)> callback_func_type;
             callback_func_type m_callback;
 
+            static constexpr size_t initial_buffer_size = 1024 * 1024;
+
         public:
 
             /**
@@ -251,8 +253,8 @@ namespace osmium {
              */
             Collector() :
                 m_handler_pass2(*static_cast<TCollector*>(this)),
-                m_relations_buffer(1024*1024, osmium::memory::Buffer::auto_grow::yes),
-                m_members_buffer(1024*1024, osmium::memory::Buffer::auto_grow::yes),
+                m_relations_buffer(initial_buffer_size, osmium::memory::Buffer::auto_grow::yes),
+                m_members_buffer(initial_buffer_size, osmium::memory::Buffer::auto_grow::yes),
                 m_relations(),
                 m_member_meta() {
             }

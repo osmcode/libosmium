@@ -85,7 +85,7 @@ namespace osmium {
              */
             class OPLOutputBlock : public osmium::handler::Handler {
 
-                static const size_t tmp_buffer_size = 100;
+                static constexpr size_t tmp_buffer_size = 100;
 
                 osmium::memory::Buffer m_input_buffer;
 

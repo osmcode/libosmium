@@ -60,7 +60,7 @@ namespace osmium {
                 }
             };
 
-            static const int default_buffer_size = 10 * 1024 * 1024;
+            static constexpr size_t default_buffer_size = 10 * 1024 * 1024;
 
             TDest& m_destination;
 

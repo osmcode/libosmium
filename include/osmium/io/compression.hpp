@@ -70,7 +70,7 @@ namespace osmium {
 
         public:
 
-            static const int input_buffer_size = 256*1024;
+            static constexpr size_t input_buffer_size = 256 * 1024;
 
             Decompressor() {
             }
