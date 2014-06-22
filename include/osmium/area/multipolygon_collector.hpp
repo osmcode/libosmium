@@ -77,6 +77,9 @@ namespace osmium {
 
             osmium::memory::Buffer m_output_buffer;
 
+            static constexpr size_t initial_output_buffer_size = 1024 * 1024;
+            static constexpr size_t max_buffer_size_for_flush = 100 * 1024;
+
             void flush_output_buffer() {
                 if (this->callback()) {
                     this->callback()(m_output_buffer);
@@ -85,7 +88,7 @@ namespace osmium {
             }
 
             void possibly_flush_output_buffer() {
-                if (m_output_buffer.committed() > 1024*100) {
+                if (m_output_buffer.committed() > max_buffer_size_for_flush) {
                     flush_output_buffer();
                 }
             }
@@ -95,7 +98,7 @@ namespace osmium {
             MultipolygonCollector(const assembler_config_type& assembler_config) :
                 collector_type(),
                 m_assembler_config(assembler_config),
-                m_output_buffer(1024*1024, osmium::memory::Buffer::auto_grow::yes) {
+                m_output_buffer(initial_output_buffer_size, osmium::memory::Buffer::auto_grow::yes) {
             }
 
             /**
@@ -190,7 +193,7 @@ namespace osmium {
             }
 
             osmium::memory::Buffer read() {
-                osmium::memory::Buffer buffer;
+                osmium::memory::Buffer buffer(initial_output_buffer_size, osmium::memory::Buffer::auto_grow::yes);
                 std::swap(buffer, m_output_buffer);
                 return buffer;
             }
