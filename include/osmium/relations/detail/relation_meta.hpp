@@ -108,14 +108,15 @@ namespace osmium {
 
         /**
          * Function object to check if a relation is complete.
-         *
-         * @return true if this relation is complete, false otherwise.
          */
         struct has_all_members {
 
             typedef RelationMeta& argument_type;
             typedef bool result_type;
 
+            /**
+             * @return true if this relation is complete, false otherwise.
+             */
             bool operator()(RelationMeta& relation_info) const {
                 return relation_info.has_all_members();
             }
