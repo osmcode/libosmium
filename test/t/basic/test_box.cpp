@@ -73,7 +73,7 @@ BOOST_AUTO_TEST_CASE(box_inside_box) {
     overlap.extend(osmium::Location(3, 3));
     overlap.extend(osmium::Location(5, 5));
 
-    BOOST_CHECK(osmium::geom::contains(inner, outer));
+    BOOST_CHECK( osmium::geom::contains(inner, outer));
     BOOST_CHECK(!osmium::geom::contains(outer, inner));
 
     BOOST_CHECK(!osmium::geom::contains(overlap, inner));

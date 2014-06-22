@@ -58,16 +58,16 @@ BOOST_AUTO_TEST_CASE(equality) {
     osmium::Location loc2(1.2, 4.5);
     osmium::Location loc3(1.5, 1.5);
     BOOST_CHECK_EQUAL(loc1, loc2);
-    BOOST_CHECK(loc1 != loc3);
+    BOOST_CHECK_NE(loc1, loc3);
 }
 
 BOOST_AUTO_TEST_CASE(order) {
-    BOOST_CHECK(osmium::Location(-1.2, 10.0) < osmium::Location(1.2, 10.0));
-    BOOST_CHECK(osmium::Location(1.2, 10.0) > osmium::Location(-1.2, 10.0));
+    BOOST_CHECK_LT(osmium::Location(-1.2, 10.0), osmium::Location(1.2, 10.0));
+    BOOST_CHECK_GT(osmium::Location(1.2, 10.0), osmium::Location(-1.2, 10.0));
 
-    BOOST_CHECK(osmium::Location(10.2, 20.0) < osmium::Location(11.2, 20.2));
-    BOOST_CHECK(osmium::Location(10.2, 20.2) < osmium::Location(11.2, 20.0));
-    BOOST_CHECK(osmium::Location(11.2, 20.2) > osmium::Location(10.2, 20.0));
+    BOOST_CHECK_LT(osmium::Location(10.2, 20.0), osmium::Location(11.2, 20.2));
+    BOOST_CHECK_LT(osmium::Location(10.2, 20.2), osmium::Location(11.2, 20.0));
+    BOOST_CHECK_GT(osmium::Location(11.2, 20.2), osmium::Location(10.2, 20.0));
 }
 
 BOOST_AUTO_TEST_CASE(validity) {

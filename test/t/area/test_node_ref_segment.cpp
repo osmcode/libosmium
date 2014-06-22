@@ -102,15 +102,15 @@ BOOST_AUTO_TEST_CASE(ordering) {
     osmium::NodeRef node_ref3(3, { 1.2, 3.0 });
     osmium::NodeRef node_ref4(4, { 1.2, 3.3 });
 
-    BOOST_CHECK(node_ref1 < node_ref2);
-    BOOST_CHECK(node_ref2 < node_ref3);
-    BOOST_CHECK(node_ref1 < node_ref3);
-    BOOST_CHECK(!(node_ref1 < node_ref1));
+    BOOST_CHECK_LT(node_ref1, node_ref2);
+    BOOST_CHECK_LT(node_ref2, node_ref3);
+    BOOST_CHECK_LT(node_ref1, node_ref3);
+    BOOST_CHECK_GE(node_ref1, node_ref1);
 
-    BOOST_CHECK(osmium::location_less()(node_ref1, node_ref2));
+    BOOST_CHECK( osmium::location_less()(node_ref1, node_ref2));
     BOOST_CHECK(!osmium::location_less()(node_ref2, node_ref3));
-    BOOST_CHECK(osmium::location_less()(node_ref1, node_ref3));
-    BOOST_CHECK(osmium::location_less()(node_ref3, node_ref4));
+    BOOST_CHECK( osmium::location_less()(node_ref1, node_ref3));
+    BOOST_CHECK( osmium::location_less()(node_ref3, node_ref4));
     BOOST_CHECK(!osmium::location_less()(node_ref1, node_ref1));
 }
 

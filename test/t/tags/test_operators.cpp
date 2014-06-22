@@ -55,10 +55,10 @@ BOOST_AUTO_TEST_CASE(Order) {
     const osmium::Tag& t3 = *(std::next(tl.begin(), 2));
     const osmium::Tag& t4 = *(std::next(tl.begin(), 3));
 
-    BOOST_CHECK(t2 < t1);
-    BOOST_CHECK(t1 < t3);
-    BOOST_CHECK(t2 < t3);
-    BOOST_CHECK(t4 < t1);
+    BOOST_CHECK_LT(t2, t1);
+    BOOST_CHECK_LT(t1, t3);
+    BOOST_CHECK_LT(t2, t3);
+    BOOST_CHECK_LT(t4, t1);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

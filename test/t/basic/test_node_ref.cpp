@@ -22,8 +22,8 @@ BOOST_AUTO_TEST_CASE(equality) {
     osmium::NodeRef node_ref1(7, { 1.2, 3.4 });
     osmium::NodeRef node_ref2(7, { 1.4, 3.1 });
     osmium::NodeRef node_ref3(9, { 1.2, 3.4 });
-    BOOST_CHECK(node_ref1 == node_ref2);
-    BOOST_CHECK(node_ref1 != node_ref3);
+    BOOST_CHECK_EQUAL(node_ref1, node_ref2);
+    BOOST_CHECK_NE(node_ref1, node_ref3);
     BOOST_CHECK(!osmium::location_equal()(node_ref1, node_ref2));
     BOOST_CHECK(!osmium::location_equal()(node_ref2, node_ref3));
     BOOST_CHECK(osmium::location_equal()(node_ref1, node_ref3));
@@ -43,10 +43,10 @@ BOOST_AUTO_TEST_CASE(ordering) {
     osmium::NodeRef node_ref3(3, { 1.2, 3.0 });
     osmium::NodeRef node_ref4(4, { 1.2, 3.3 });
 
-    BOOST_CHECK(node_ref1 < node_ref2);
-    BOOST_CHECK(node_ref2 < node_ref3);
-    BOOST_CHECK(node_ref1 < node_ref3);
-    BOOST_CHECK(!(node_ref1 < node_ref1));
+    BOOST_CHECK_LT(node_ref1, node_ref2);
+    BOOST_CHECK_LT(node_ref2, node_ref3);
+    BOOST_CHECK_LT(node_ref1, node_ref3);
+    BOOST_CHECK_GE(node_ref1, node_ref1);
 
     BOOST_CHECK(osmium::location_less()(node_ref1, node_ref2));
     BOOST_CHECK(!osmium::location_less()(node_ref2, node_ref3));
