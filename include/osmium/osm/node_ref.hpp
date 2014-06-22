@@ -42,6 +42,10 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
+    namespace memory {
+        template <class> class CollectionIterator;
+    }
+
     class NodeRef : public osmium::memory::detail::ItemHelper {
 
         osmium::object_id_type m_ref;

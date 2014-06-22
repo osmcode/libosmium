@@ -47,8 +47,12 @@ DEALINGS IN THE SOFTWARE.
 namespace osmium {
 
     namespace builder {
-        template <class T> class ObjectBuilder;
+        template <class> class ObjectBuilder;
         class RelationMemberListBuilder;
+    }
+
+    namespace memory {
+        template <class> class CollectionIterator;
     }
 
     class RelationMember : public osmium::memory::detail::ItemHelper {
