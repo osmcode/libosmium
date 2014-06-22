@@ -124,22 +124,6 @@ namespace osmium {
                 return true;
             }
 
-            /**
-             * Initialize area attributes and tags from the attributes and tags
-             * of the given object.
-             */
-            void initialize_area_from_object(osmium::builder::AreaBuilder& builder, const osmium::Object& object, int id_offset) const {
-                osmium::Area& area = builder.object();
-                area.id(object.id() * 2 + id_offset);
-                area.version(object.version());
-                area.changeset(object.changeset());
-                area.timestamp(object.timestamp());
-                area.visible(object.visible());
-                area.uid(object.uid());
-
-                builder.add_user(object.user());
-            }
-
             void add_tags_to_area(osmium::builder::AreaBuilder& builder, const osmium::Way& way) const {
                 osmium::builder::TagListBuilder tl_builder(builder.buffer(), &builder);
                 for (const osmium::Tag& tag : way.tags()) {
@@ -702,7 +686,7 @@ namespace osmium {
                 // from the relation.
                 {
                     osmium::builder::AreaBuilder builder(out_buffer);
-                    initialize_area_from_object(builder, way, 0);
+                    builder.initialize_from_object(way);
 
                     if (create_rings()) {
                         add_tags_to_area(builder, way);
@@ -735,7 +719,7 @@ namespace osmium {
                 // from the relation.
                 {
                     osmium::builder::AreaBuilder builder(out_buffer);
-                    initialize_area_from_object(builder, relation, 1);
+                    builder.initialize_from_object(relation);
 
                     if (create_rings()) {
                         add_tags_to_area(builder, relation);

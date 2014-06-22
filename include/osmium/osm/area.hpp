@@ -79,6 +79,31 @@ namespace osmium {
     static_assert(sizeof(InnerRing) % osmium::memory::align_bytes == 0, "Class osmium::InnerRing has wrong size to be aligned properly!");
 
     /**
+     * Convert way or (multipolygon) relation id into unique area id.
+     *
+     * @param id Id of a way or relation
+     * @param type Type of object (way or relation)
+     * @returns Area id
+     */
+    inline osmium::object_id_type object_id_to_area_id(osmium::object_id_type id, osmium::item_type type) {
+        osmium::unsigned_object_id_type area_id = std::abs(id) * 2;
+        if (type == osmium::item_type::relation) {
+            ++area_id;
+        }
+        return id < 0 ? -area_id : area_id;
+    }
+
+    /**
+     * Convert area id into id of the way or relation it was created from.
+     *
+     * @param id Area id
+     * @returns Way or Relation id.
+     */
+    inline osmium::object_id_type area_id_to_object_id(osmium::object_id_type id) {
+        return id / 2;
+    }
+
+    /**
      * An OSM area created out of a closed way or a multipolygon relation.
      */
     class Area : public Object {
@@ -105,7 +130,7 @@ namespace osmium {
          * Return the Id of the way or relation this area was created from.
          */
         osmium::object_id_type orig_id() const {
-            return id() / 2;
+            return osmium::area_id_to_object_id(id());
         }
 
         /**
