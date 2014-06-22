@@ -5,7 +5,7 @@
 
 This file is part of Osmium (http://osmcode.org/libosmium).
 
-Copyright 2013 Jochen Topf <jochen@topf.org> and others (see README).
+Copyright 2013,2014 Jochen Topf <jochen@topf.org> and others (see README).
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -46,13 +46,13 @@ namespace osmium {
 
         namespace multimap {
 
-            template <typename TKey, typename TValue>
+            template <typename TId, typename TValue>
             class HybridIterator {
 
-                typedef SparseMultimapMem<TKey, TValue> main_map_type;
-                typedef StlMultimap<TKey, TValue> extra_map_type;
+                typedef SparseMultimapMem<TId, TValue> main_map_type;
+                typedef StlMultimap<TId, TValue> extra_map_type;
 
-                typedef typename std::pair<TKey, TValue> element_type;
+                typedef typename std::pair<TId, TValue> element_type;
 
                 typename main_map_type::iterator m_begin_main;
                 typename main_map_type::iterator m_end_main;
@@ -83,7 +83,7 @@ namespace osmium {
                     return *this;
                 }
 
-                HybridIterator<TKey, TValue> operator++(int) {
+                HybridIterator<TId, TValue> operator++(int) {
                     auto tmp(*this);
                     operator++();
                     return tmp;
@@ -114,19 +114,19 @@ namespace osmium {
 
             };
 
-            template <typename TKey, typename TValue>
-            class Hybrid : public Multimap<TKey, TValue> {
+            template <typename TId, typename TValue>
+            class Hybrid : public Multimap<TId, TValue> {
 
-                typedef SparseMultimapMem<TKey, TValue> main_map_type;
-                typedef StlMultimap<TKey, TValue> extra_map_type;
+                typedef SparseMultimapMem<TId, TValue> main_map_type;
+                typedef StlMultimap<TId, TValue> extra_map_type;
 
                 main_map_type m_main;
                 extra_map_type m_extra;
 
             public:
 
-                typedef HybridIterator<TKey, TValue> iterator;
-                typedef const HybridIterator<TKey, TValue> const_iterator;
+                typedef HybridIterator<TId, TValue> iterator;
+                typedef const HybridIterator<TId, TValue> const_iterator;
 
                 Hybrid() :
                     m_main(),
@@ -145,24 +145,24 @@ namespace osmium {
                     m_main.reserve(size);
                 }
 
-                void unsorted_set(const TKey key, const TValue value) {
-                    m_main.set(key, value);
+                void unsorted_set(const TId id, const TValue value) {
+                    m_main.set(id, value);
                 }
 
-                void set(const TKey key, const TValue value) override final {
-                    m_extra.set(key, value);
+                void set(const TId id, const TValue value) override final {
+                    m_extra.set(id, value);
                 }
 
-                std::pair<iterator, iterator> get_all(const TKey key) {
-                    auto result_main = m_main.get_all(key);
-                    auto result_extra = m_extra.get_all(key);
+                std::pair<iterator, iterator> get_all(const TId id) {
+                    auto result_main = m_main.get_all(id);
+                    auto result_extra = m_extra.get_all(id);
                     return std::make_pair(iterator(result_main.first, result_main.second, result_extra.first, result_extra.second),
                                           iterator(result_main.second, result_main.second, result_extra.second, result_extra.second));
                 }
 
-                void remove(const TKey key, const TValue value) {
-                    m_main.remove(key, value);
-                    m_extra.remove(key, value);
+                void remove(const TId id, const TValue value) {
+                    m_main.remove(id, value);
+                    m_extra.remove(id, value);
                 }
 
                 void consolidate() {
