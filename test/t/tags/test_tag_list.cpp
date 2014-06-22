@@ -21,8 +21,8 @@ BOOST_AUTO_TEST_CASE(can_be_created_from_initializer_list) {
 
     BOOST_CHECK_EQUAL(osmium::item_type::tag_list, tl.type());
     BOOST_CHECK_EQUAL(3, tl.size());
-    BOOST_CHECK(!strcmp("highway", tl.begin()->key()));
-    BOOST_CHECK(!strcmp("primary", tl.begin()->value()));
+    BOOST_CHECK_EQUAL(std::string("highway"), tl.begin()->key());
+    BOOST_CHECK_EQUAL(std::string("primary"), tl.begin()->value());
 }
 
 BOOST_AUTO_TEST_CASE(can_be_created_from_map) {
@@ -35,8 +35,8 @@ BOOST_AUTO_TEST_CASE(can_be_created_from_map) {
 
     BOOST_CHECK_EQUAL(osmium::item_type::tag_list, tl.type());
     BOOST_CHECK_EQUAL(2, tl.size());
-    BOOST_CHECK(!strcmp("name", std::next(tl.begin(), 1)->key()));
-    BOOST_CHECK(!strcmp("Main Street", std::next(tl.begin(), 1)->value()));
+    BOOST_CHECK_EQUAL(std::string("name"), std::next(tl.begin(), 1)->key());
+    BOOST_CHECK_EQUAL(std::string("Main Street"), std::next(tl.begin(), 1)->value());
 }
 
 BOOST_AUTO_TEST_CASE(can_be_created_with_callback) {
@@ -49,8 +49,8 @@ BOOST_AUTO_TEST_CASE(can_be_created_with_callback) {
 
     BOOST_CHECK_EQUAL(osmium::item_type::tag_list, tl.type());
     BOOST_CHECK_EQUAL(2, tl.size());
-    BOOST_CHECK(!strcmp("bridge", std::next(tl.begin(), 1)->key()));
-    BOOST_CHECK(!strcmp("true", std::next(tl.begin(), 1)->value()));
+    BOOST_CHECK_EQUAL(std::string("bridge"), std::next(tl.begin(), 1)->key());
+    BOOST_CHECK_EQUAL(std::string("true"), std::next(tl.begin(), 1)->value());
 }
 
 BOOST_AUTO_TEST_CASE(returns_value_by_key) {
@@ -61,11 +61,11 @@ BOOST_AUTO_TEST_CASE(returns_value_by_key) {
         tlb.add_tag("bridge", "true");
     });
 
-    BOOST_CHECK(!strcmp("primary", tl.get_value_by_key("highway")));
+    BOOST_CHECK_EQUAL(std::string("primary"), tl.get_value_by_key("highway"));
     BOOST_CHECK(nullptr == tl.get_value_by_key("name"));
-    BOOST_CHECK(!strcmp("foo", tl.get_value_by_key("name", "foo")));
+    BOOST_CHECK_EQUAL(std::string("foo"), tl.get_value_by_key("name", "foo"));
 
-    BOOST_CHECK(!strcmp("true", tl["bridge"]));
+    BOOST_CHECK_EQUAL(std::string("true"), tl["bridge"]);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

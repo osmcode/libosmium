@@ -89,21 +89,21 @@ BOOST_AUTO_TEST_CASE(output_to_iterator_comma_separator) {
     char buffer[100];
     osmium::Location loc(-3.2, 47.3);
     *loc.as_string(buffer, ',') = 0;
-    BOOST_CHECK(!strcmp(buffer, "-3.2,47.3"));
+    BOOST_CHECK_EQUAL(std::string("-3.2,47.3"), buffer);
 }
 
 BOOST_AUTO_TEST_CASE(output_to_iterator_space_separator) {
     char buffer[100];
     osmium::Location loc(0.0, 7.0);
     *loc.as_string(buffer, ' ') = 0;
-    BOOST_CHECK(!strcmp(buffer, "0 7"));
+    BOOST_CHECK_EQUAL(std::string("0 7"), buffer);
 }
 
 BOOST_AUTO_TEST_CASE(output_to_iterator_check_precision) {
     char buffer[100];
     osmium::Location loc(-179.9999999, -90.0);
     *loc.as_string(buffer, ' ') = 0;
-    BOOST_CHECK(!strcmp(buffer, "-179.9999999 -90"));
+    BOOST_CHECK_EQUAL(std::string("-179.9999999 -90"), buffer);
 }
 
 BOOST_AUTO_TEST_CASE(output_to_iterator_undefined_location) {

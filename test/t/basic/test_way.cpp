@@ -29,7 +29,7 @@ BOOST_AUTO_TEST_CASE(way_builder) {
     BOOST_CHECK_EQUAL(true, way.visible());
     BOOST_CHECK_EQUAL(333, way.changeset());
     BOOST_CHECK_EQUAL(21, way.uid());
-    BOOST_CHECK(!strcmp("foo", way.user()));
+    BOOST_CHECK_EQUAL(std::string("foo"), way.user());
     BOOST_CHECK_EQUAL(123, way.timestamp());
     BOOST_CHECK_EQUAL(2, way.tags().size());
     BOOST_CHECK_EQUAL(3, way.nodes().size());

@@ -29,7 +29,7 @@ BOOST_AUTO_TEST_CASE(changeset_builder) {
     BOOST_CHECK_EQUAL(osmium::Timestamp(100), cs1.created_at());
     BOOST_CHECK_EQUAL(osmium::Timestamp(200), cs1.closed_at());
     BOOST_CHECK_EQUAL(1, cs1.tags().size());
-    BOOST_CHECK(!strcmp("user", cs1.user()));
+    BOOST_CHECK_EQUAL(std::string("user"), cs1.user());
 
     osmium::Changeset& cs2 = buffer_add_changeset(buffer,
         "user",
@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_CASE(changeset_builder) {
     BOOST_CHECK_EQUAL(osmium::Timestamp(120), cs2.created_at());
     BOOST_CHECK_EQUAL(osmium::Timestamp(), cs2.closed_at());
     BOOST_CHECK_EQUAL(2, cs2.tags().size());
-    BOOST_CHECK(!strcmp("user", cs2.user()));
+    BOOST_CHECK_EQUAL(std::string("user"), cs2.user());
 
     BOOST_CHECK_EQUAL(false, cs1 == cs2);
     BOOST_CHECK_EQUAL(true, cs1 != cs2);

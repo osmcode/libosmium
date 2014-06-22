@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_CASE(node_builder) {
     BOOST_CHECK_EQUAL(false, node.deleted());
     BOOST_CHECK_EQUAL(333, node.changeset());
     BOOST_CHECK_EQUAL(21, node.uid());
-    BOOST_CHECK(!strcmp("foo", node.user()));
+    BOOST_CHECK_EQUAL(std::string("foo"), node.user());
     BOOST_CHECK_EQUAL(123, node.timestamp());
     BOOST_CHECK_EQUAL(osmium::Location(3.5, 4.7), node.location());
     BOOST_CHECK_EQUAL(2, node.tags().size());
@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE(node_default_attributes) {
     BOOST_CHECK_EQUAL(true, node.visible());
     BOOST_CHECK_EQUAL(0, node.changeset());
     BOOST_CHECK_EQUAL(0, node.uid());
-    BOOST_CHECK(!strcmp("", node.user()));
+    BOOST_CHECK_EQUAL(std::string(""), node.user());
     BOOST_CHECK_EQUAL(0, node.timestamp());
     BOOST_CHECK_EQUAL(osmium::Location(), node.location());
     BOOST_CHECK_EQUAL(0, node.tags().size());
@@ -105,10 +105,10 @@ BOOST_AUTO_TEST_CASE(tags) {
         {3.5, 4.7});
 
     BOOST_CHECK(nullptr == node.tags().get_value_by_key("fail"));
-    BOOST_CHECK(!strcmp("pub", node.tags().get_value_by_key("amenity")));
+    BOOST_CHECK_EQUAL(std::string("pub"), node.tags().get_value_by_key("amenity"));
 
-    BOOST_CHECK(!strcmp("default", node.tags().get_value_by_key("fail", "default")));
-    BOOST_CHECK(!strcmp("pub", node.tags().get_value_by_key("amenity", "default")));
+    BOOST_CHECK_EQUAL(std::string("default"), node.tags().get_value_by_key("fail", "default"));
+    BOOST_CHECK_EQUAL(std::string("pub"), node.tags().get_value_by_key("amenity", "default"));
 }
 
 

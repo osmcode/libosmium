@@ -35,7 +35,7 @@ BOOST_AUTO_TEST_CASE(relation_builder) {
     BOOST_CHECK_EQUAL(true, relation.visible());
     BOOST_CHECK_EQUAL(333, relation.changeset());
     BOOST_CHECK_EQUAL(21, relation.uid());
-    BOOST_CHECK(!strcmp("foo", relation.user()));
+    BOOST_CHECK_EQUAL(std::string("foo"), relation.user());
     BOOST_CHECK_EQUAL(123, relation.timestamp());
     BOOST_CHECK_EQUAL(2, relation.tags().size());
     BOOST_CHECK_EQUAL(3, relation.members().size());
@@ -46,13 +46,13 @@ BOOST_AUTO_TEST_CASE(relation_builder) {
         BOOST_CHECK_EQUAL(n, member.ref());
         switch (n) {
             case 1:
-                BOOST_CHECK(!strcmp("inner", member.role()));
+                BOOST_CHECK_EQUAL(std::string("inner"), member.role());
                 break;
             case 2:
-                BOOST_CHECK(!strcmp("", member.role()));
+                BOOST_CHECK_EQUAL(std::string(""), member.role());
                 break;
             case 3:
-                BOOST_CHECK(!strcmp("outer", member.role()));
+                BOOST_CHECK_EQUAL(std::string("outer"), member.role());
                 break;
             default:
                 BOOST_CHECK(false);
