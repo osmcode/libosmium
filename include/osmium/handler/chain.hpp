@@ -37,19 +37,6 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/handler.hpp>
 
-#define OSMIUM_CHAIN_HANDLER_CALL1(_func_) \
-    template <int N, int SIZE, class THandlers> \
-    struct call_ ## _func_ { \
-        void operator()(THandlers& handlers) { \
-            std::get<N>(handlers)._func_(); \
-            call_ ## _func_<N+1, SIZE, THandlers>()(handlers); \
-        } \
-    }; \
-    template <int SIZE, class THandlers> \
-    struct call_ ## _func_<SIZE, SIZE, THandlers> { \
-        void operator()(THandlers&) {} \
-    };
-
 #define OSMIUM_CHAIN_HANDLER_CALL2(_func_, _type_) \
     template <int N, int SIZE, class THandlers> \
     struct call_ ## _func_ { \
@@ -83,7 +70,18 @@ namespace osmium {
             typedef std::tuple<THandler&...> handlers_type;
             handlers_type m_handlers;
 
-            OSMIUM_CHAIN_HANDLER_CALL1(flush)
+            template <int N, int SIZE, class THandlers>
+            struct call_flush {
+                void operator()(THandlers& handlers) {
+                    std::get<N>(handlers).flush();
+                    call_flush<N+1, SIZE, THandlers>()(handlers);
+                }
+            };
+
+            template <int SIZE, class THandlers>
+            struct call_flush<SIZE, SIZE, THandlers> {
+                void operator()(THandlers&) {}
+            };
 
             OSMIUM_CHAIN_HANDLER_CALL2(node, Node)
             OSMIUM_CHAIN_HANDLER_CALL2(way, Way)
