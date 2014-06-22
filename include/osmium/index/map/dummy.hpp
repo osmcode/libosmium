@@ -49,8 +49,8 @@ namespace osmium {
              * Use this class if you don't need a map, but you
              * need an object that behaves like one.
              */
-            template <typename TKey, typename TValue>
-            class Dummy : public osmium::index::map::Map<TKey, TValue> {
+            template <typename TId, typename TValue>
+            class Dummy : public osmium::index::map::Map<TId, TValue> {
 
             public:
 
@@ -58,12 +58,12 @@ namespace osmium {
 
                 ~Dummy() override final = default;
 
-                void set(const TKey, const TValue) override final {
+                void set(const TId, const TValue) override final {
                     // intentionally left blank
                 }
 
-                const TValue get(const TKey key) const override final {
-                    not_found_error(key);
+                const TValue get(const TId id) const override final {
+                    not_found_error(id);
                 }
 
                 size_t size() const override final {

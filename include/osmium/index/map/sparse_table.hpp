@@ -60,10 +60,10 @@ namespace osmium {
             *
             * This will only work on 64 bit machines.
             */
-            template <typename TKey, typename TValue>
-            class SparseTable : public osmium::index::map::Map<TKey, TValue> {
+            template <typename TId, typename TValue>
+            class SparseTable : public osmium::index::map::Map<TId, TValue> {
 
-                TKey m_grow_size;
+                TId m_grow_size;
 
                 google::sparsetable<TValue> m_elements;
 
@@ -79,21 +79,21 @@ namespace osmium {
                 *                  The storage will grow by at least this size
                 *                  every time it runs out of space.
                 */
-                SparseTable(const TKey grow_size=10000) :
+                SparseTable(const TId grow_size=10000) :
                     m_grow_size(grow_size),
                     m_elements(grow_size) {
                 }
 
                 ~SparseTable() override final = default;
 
-                void set(const TKey id, const TValue value) override final {
+                void set(const TId id, const TValue value) override final {
                     if (id >= m_elements.size()) {
                         m_elements.resize(id + m_grow_size);
                     }
                     m_elements[id] = value;
                 }
 
-                const TValue get(const TKey id) const override final {
+                const TValue get(const TId id) const override final {
                     if (id >= m_elements.size()) {
                         not_found_error(id);
                     }
@@ -118,7 +118,7 @@ namespace osmium {
                 }
 
                 void dump_as_list(const int fd) const {
-                    std::vector<std::pair<TKey, TValue>> v;
+                    std::vector<std::pair<TId, TValue>> v;
                     int n=0;
                     for (const TValue value : m_elements) {
                         if (value != osmium::index::empty_value<TValue>()) {
@@ -126,7 +126,7 @@ namespace osmium {
                         }
                         ++n;
                     }
-                    osmium::io::detail::reliable_write(fd, reinterpret_cast<const char*>(v.data()), sizeof(std::pair<TKey, TValue>) * v.size());
+                    osmium::io::detail::reliable_write(fd, reinterpret_cast<const char*>(v.data()), sizeof(std::pair<TId, TValue>) * v.size());
                 }
 
             }; // class SparseTable

@@ -52,16 +52,16 @@ namespace osmium {
              * This implementation uses std::map internally. It uses rather a
              * lot of memory, but might make sense for small maps.
              */
-            template <typename TKey, typename TValue>
-            class StlMap : public osmium::index::map::Map<TKey, TValue> {
+            template <typename TId, typename TValue>
+            class StlMap : public osmium::index::map::Map<TId, TValue> {
 
                 // This is a rough estimate for the memory needed for each
-                // element in the map (key + value + pointers to left, right,
+                // element in the map (id + value + pointers to left, right,
                 // and parent plus some overhead for color of red-black-tree
                 // or similar).
-                static constexpr size_t element_size = sizeof(TKey) + sizeof(TValue) + sizeof(void*) * 4;
+                static constexpr size_t element_size = sizeof(TId) + sizeof(TValue) + sizeof(void*) * 4;
 
-                std::map<TKey, TValue> m_elements;
+                std::map<TId, TValue> m_elements;
 
             public:
 
@@ -69,11 +69,11 @@ namespace osmium {
 
                 ~StlMap() override final = default;
 
-                void set(const TKey id, const TValue value) override final {
+                void set(const TId id, const TValue value) override final {
                     m_elements[id] = value;
                 }
 
-                const TValue get(const TKey id) const override final {
+                const TValue get(const TId id) const override final {
                     try {
                         return m_elements.at(id);
                     } catch (std::out_of_range&) {
@@ -94,7 +94,7 @@ namespace osmium {
                 }
 
                 void dump_as_list(const int fd) const {
-                    typedef typename std::map<TKey, TValue>::value_type t;
+                    typedef typename std::map<TId, TValue>::value_type t;
                     std::vector<t> v;
                     std::copy(m_elements.begin(), m_elements.end(), std::back_inserter(v));
                     osmium::io::detail::reliable_write(fd, reinterpret_cast<const char*>(v.data()), sizeof(t) * v.size());

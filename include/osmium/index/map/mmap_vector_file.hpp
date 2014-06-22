@@ -5,7 +5,7 @@
 
 This file is part of Osmium (http://osmcode.org/libosmium).
 
-Copyright 2013 Jochen Topf <jochen@topf.org> and others (see README).
+Copyright 2013,2014 Jochen Topf <jochen@topf.org> and others (see README).
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -42,11 +42,11 @@ namespace osmium {
 
         namespace map {
 
-            template <typename TKey, typename TValue>
-            using DenseMapFile = VectorBasedDenseMap<osmium::detail::mmap_vector_file<TValue>, TKey, TValue>;
+            template <typename TId, typename TValue>
+            using DenseMapFile = VectorBasedDenseMap<osmium::detail::mmap_vector_file<TValue>, TId, TValue>;
 
-            template <typename TKey, typename TValue>
-            using SparseMapFile = VectorBasedSparseMap<TKey, TValue, osmium::detail::mmap_vector_file>;
+            template <typename TId, typename TValue>
+            using SparseMapFile = VectorBasedSparseMap<TId, TValue, osmium::detail::mmap_vector_file>;
 
         } // namespace map
 

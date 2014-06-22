@@ -47,8 +47,8 @@ namespace osmium {
 
         namespace map {
 
-            template <class TVector, typename TKey, typename TValue>
-            class VectorBasedDenseMap : public Map<TKey, TValue> {
+            template <class TVector, typename TId, typename TValue>
+            class VectorBasedDenseMap : public Map<TId, TValue> {
 
                 TVector m_vector;
 
@@ -68,22 +68,22 @@ namespace osmium {
                     m_vector.reserve(size);
                 }
 
-                void set(const TKey key, const TValue value) override final {
-                    if (size() <= key) {
-                        m_vector.resize(key+1);
+                void set(const TId id, const TValue value) override final {
+                    if (size() <= id) {
+                        m_vector.resize(id+1);
                     }
-                    m_vector[key] = value;
+                    m_vector[id] = value;
                 }
 
-                const TValue get(const TKey key) const override final {
+                const TValue get(const TId id) const override final {
                     try {
-                        const TValue& value = m_vector.at(key);
+                        const TValue& value = m_vector.at(id);
                         if (value == osmium::index::empty_value<TValue>()) {
-                            not_found_error(key);
+                            not_found_error(id);
                         }
                         return value;
                     } catch (std::out_of_range&) {
-                        not_found_error(key);
+                        not_found_error(id);
                     }
                 }
 
@@ -103,12 +103,12 @@ namespace osmium {
             }; // class VectorBasedDenseMap
 
 
-            template <typename TKey, typename TValue, template<typename...> class TVector>
-            class VectorBasedSparseMap : public Map<TKey, TValue> {
+            template <typename TId, typename TValue, template<typename...> class TVector>
+            class VectorBasedSparseMap : public Map<TId, TValue> {
 
             public:
 
-                typedef typename std::pair<TKey, TValue> element_type;
+                typedef typename std::pair<TId, TValue> element_type;
                 typedef TVector<element_type> vector_type;
                 typedef typename vector_type::iterator iterator;
                 typedef typename vector_type::const_iterator const_iterator;
@@ -129,20 +129,20 @@ namespace osmium {
 
                 ~VectorBasedSparseMap() override final = default;
 
-                void set(const TKey key, const TValue value) override final {
-                    m_vector.push_back(element_type(key, value));
+                void set(const TId id, const TValue value) override final {
+                    m_vector.push_back(element_type(id, value));
                 }
 
-                const TValue get(const TKey key) const override final {
+                const TValue get(const TId id) const override final {
                     const element_type element {
-                        key,
+                        id,
                         osmium::index::empty_value<TValue>()
                     };
                     const auto result = std::lower_bound(m_vector.begin(), m_vector.end(), element, [](const element_type& a, const element_type& b) {
                         return a.first < b.first;
                     });
-                    if (result == m_vector.end() || result->first != key) {
-                        not_found_error(key);
+                    if (result == m_vector.end() || result->first != id) {
+                        not_found_error(id);
                     } else {
                         return result->second;
                     }
