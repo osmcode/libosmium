@@ -105,6 +105,12 @@ namespace osmium {
 
         }; // class RelationMeta
 
+        template <class T>
+        inline T& operator<<(T& out, const RelationMeta& rm) {
+            out << "RelationMeta(relation_offset=" << rm.relation_offset() << " has_all_members=" << rm.has_all_members() << ")";
+            return out;
+        }
+
         /**
          * Function object to check if a relation is complete.
          */
