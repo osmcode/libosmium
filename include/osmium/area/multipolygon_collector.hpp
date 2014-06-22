@@ -165,9 +165,9 @@ namespace osmium {
                         assert(range.first != range.second);
 
                         // if this is the last time this object was needed
-                        // the mark it as deleted
+                        // then mark it as removed
                         if (range.first + 1 == range.second) {
-                            this->get_member(range.first->buffer_offset()).deleted(true);
+                            this->get_member(range.first->buffer_offset()).removed(true);
                         }
 
                         for (auto it = range.first; it != range.second; ++it) {

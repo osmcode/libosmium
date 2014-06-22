@@ -171,7 +171,7 @@ namespace osmium {
                             size_t pos = member_meta.relation_pos();
                             m_collector.complete_relation(relation_meta);
                             m_collector.m_relations[pos] = RelationMeta();
-                            m_collector.possibly_purge_deleted_members();
+                            m_collector.possibly_purge_removed_members();
                         }
                     }
 
@@ -481,16 +481,16 @@ namespace osmium {
             }
 
             /**
-             * Decide whether to purge deleted members and then do it.
+             * Decide whether to purge removed members and then do it.
              *
              * Currently the purging is done every thousand calls.
              * This could probably be improved upon.
              */
-            void possibly_purge_deleted_members() {
+            void possibly_purge_removed_members() {
                 ++m_count_complete;
                 if (m_count_complete > 1000) { // XXX
                     std::cerr << "PURGE\n";
-                    m_members_buffer.purge_deleted(this);
+                    m_members_buffer.purge_removed(this);
                     m_count_complete = 0;
                 }
             }

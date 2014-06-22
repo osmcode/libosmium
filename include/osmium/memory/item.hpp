@@ -97,7 +97,7 @@ namespace osmium {
 
             item_size_type m_size;
             item_type m_type;
-            uint16_t m_deleted:1;
+            bool m_removed : 1;
 
             template <class TMember>
             friend class CollectionIterator;
@@ -121,7 +121,8 @@ namespace osmium {
 
             Item(item_size_type size=0, item_type type=item_type()) :
                 m_size(size),
-                m_type(type) {
+                m_type(type),
+                m_removed(false) {
             }
 
             Item(const Item&) = delete;
@@ -149,12 +150,12 @@ namespace osmium {
                 return m_type;
             }
 
-            bool deleted() const {
-                return m_deleted;
+            bool removed() const {
+                return m_removed;
             }
 
-            void deleted(bool deleted) {
-                m_deleted = deleted;
+            void removed(bool removed) {
+                m_removed = removed;
             }
 
         }; // class Item
