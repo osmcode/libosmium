@@ -314,7 +314,14 @@ int main(int argc, char* argv[]) {
     reader2.close();
     std::cerr << "Pass 2 done\n";
 
-    collector.report_missing();
+    std::vector<const osmium::Relation*> incomplete_relations = collector.get_incomplete_relations();
+    if (!incomplete_relations.empty()) {
+        std::cerr << "Warning! Some member ways missing for these multipolygon relations:";
+        for (const auto* relation : incomplete_relations) {
+            std::cerr << " " << relation->id();
+        }
+        std::cerr << "\n";
+    }
 
     google::protobuf::ShutdownProtobufLibrary();
 }

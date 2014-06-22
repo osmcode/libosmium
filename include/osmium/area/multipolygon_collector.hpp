@@ -184,17 +184,6 @@ namespace osmium {
                 flush_output_buffer();
             }
 
-            void report_missing() {
-                collector_type::clean_assembled_relations();
-                if (! collector_type::relations().empty()) {
-                    std::cerr << "Warning! Some member ways missing for these multipolygon relations:";
-                    for (const osmium::relations::RelationMeta& relation_meta : collector_type::relations()) {
-                        std::cerr << " " << this->get_relation(relation_meta).id();
-                    }
-                    std::cerr << "\n";
-                }
-            }
-
             osmium::memory::Buffer read() {
                 osmium::memory::Buffer buffer(initial_output_buffer_size, osmium::memory::Buffer::auto_grow::yes);
                 std::swap(buffer, m_output_buffer);

@@ -503,6 +503,24 @@ namespace osmium {
                 }
             }
 
+            /**
+             * Get a vector with pointers to all Relations that could not
+             * be completed, because members were missing in the input
+             * data.
+             *
+             * Note that these pointers point into memory allocated and
+             * owned by the Collector object.
+             */
+            std::vector<const osmium::Relation*> get_incomplete_relations() const {
+                std::vector<const osmium::Relation*> relations;
+                for (const auto& relation_meta : m_relations) {
+                    if (!relation_meta.has_all_members()) {
+                        relations.push_back(&get_relation(relation_meta));
+                    }
+                }
+                return relations;
+            }
+
         }; // class Collector
 
     } // namespace relations
