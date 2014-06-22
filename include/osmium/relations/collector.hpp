@@ -146,20 +146,23 @@ namespace osmium {
                     auto& mmv = m_collector.member_meta(object.type());
                     auto range = std::equal_range(mmv.begin(), mmv.end(), MemberMeta(object.id()));
 
-//                    std::cerr << "looking for " << item_type_to_char(object.type()) << object.id() << " got range: " << std::distance(range.first, range.second) << "\n";
-
                     if (range.first == range.second) {
                         // nothing found
                         return false;
                     }
 
-                    size_t pos = m_collector.members_buffer().committed();
-                    m_collector.members_buffer().add_item(object);
-                    m_collector.members_buffer().commit();
+                    {
+                        const size_t member_offset = m_collector.members_buffer().committed();
+                        m_collector.members_buffer().add_item(object);
+                        m_collector.members_buffer().commit();
+
+                        for (auto it = range.first; it != range.second; ++it) {
+                            it->buffer_offset(member_offset);
+                        }
+                    }
 
                     for (auto it = range.first; it != range.second; ++it) {
                         MemberMeta& member_meta = *it;
-                        member_meta.buffer_offset(pos);
                         assert(member_meta.member_id() == object.id());
                         assert(member_meta.relation_pos() < m_collector.m_relations.size());
                         RelationMeta& relation_meta = m_collector.m_relations[member_meta.relation_pos()];
@@ -168,9 +171,9 @@ namespace osmium {
 //                        std::cerr << "  add way " << member_meta.member_id() << " to rel " << m_collector.get_relation(relation_meta).id() << " at pos " << member_meta.member_pos() << "\n";
                         relation_meta.got_one_member();
                         if (relation_meta.has_all_members()) {
-                            size_t pos = member_meta.relation_pos();
+                            const size_t relation_offset = member_meta.relation_pos();
                             m_collector.complete_relation(relation_meta);
-                            m_collector.m_relations[pos] = RelationMeta();
+                            m_collector.m_relations[relation_offset] = RelationMeta();
                             m_collector.possibly_purge_removed_members();
                         }
                     }
@@ -488,9 +491,14 @@ namespace osmium {
              */
             void possibly_purge_removed_members() {
                 ++m_count_complete;
-                if (m_count_complete > 1000) { // XXX
-                    std::cerr << "PURGE\n";
+                if (m_count_complete > 10000) { // XXX
+                    const size_t size_before = m_members_buffer.committed();
                     m_members_buffer.purge_removed(this);
+                    const size_t size_after = m_members_buffer.committed();
+                    double percent = size_before - size_after;
+                    percent /= size_before;
+                    percent *= 100;
+                    std::cerr << "PURGE (size before=" << size_before << " after=" << size_after << " purged=" << (size_before - size_after) << " / " << static_cast<int>(percent) << "%)\n";
                     m_count_complete = 0;
                 }
             }
