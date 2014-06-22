@@ -33,7 +33,7 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <cstdint>
+#include <cstdint> // IWYU pragma: keep
 
 namespace osmium {
 

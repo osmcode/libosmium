@@ -33,8 +33,6 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <cstdint>
-
 #include <osmium/memory/item.hpp>
 
 namespace osmium {

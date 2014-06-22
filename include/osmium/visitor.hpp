@@ -36,7 +36,7 @@ DEALINGS IN THE SOFTWARE.
 #include <stdexcept>
 #include <type_traits>
 
-#include <osmium/io/reader_iterator.hpp>
+#include <osmium/io/reader_iterator.hpp> // IWYU pragma: keep
 #include <osmium/memory/buffer.hpp>
 #include <osmium/osm/item_type.hpp>
 

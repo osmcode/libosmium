@@ -38,7 +38,6 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/builder/builder.hpp>
 #include <osmium/osm.hpp>
-#include <osmium/osm/entity.hpp>
 #include <osmium/osm/item_type.hpp>
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/node_ref.hpp>

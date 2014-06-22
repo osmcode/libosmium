@@ -33,13 +33,13 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <functional>
-#include <regex>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 #include <boost/iterator/filter_iterator.hpp>
 
+#include <osmium/memory/collection.hpp>
 #include <osmium/osm/tag.hpp>
 
 namespace osmium {

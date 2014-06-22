@@ -38,7 +38,7 @@ DEALINGS IN THE SOFTWARE.
 #include <cstdlib>
 #include <iterator>
 
-#include <osmium/memory/collection.hpp>
+#include <osmium/memory/collection.hpp> // IWYU pragma: keep
 #include <osmium/memory/item.hpp>
 #include <osmium/osm/item_type.hpp>
 #include <osmium/osm/object.hpp>
@@ -49,10 +49,6 @@ namespace osmium {
     namespace builder {
         template <class> class ObjectBuilder;
         class RelationMemberListBuilder;
-    }
-
-    namespace memory {
-        template <class> class CollectionIterator;
     }
 
     class RelationMember : public osmium::memory::detail::ItemHelper {

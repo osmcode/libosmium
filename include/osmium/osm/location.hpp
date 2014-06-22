@@ -39,6 +39,7 @@ DEALINGS IN THE SOFTWARE.
 #include <cstdio>
 #include <limits>
 #include <stdexcept>
+#include <string>
 
 #include <boost/operators.hpp>
 

@@ -37,10 +37,13 @@ DEALINGS IN THE SOFTWARE.
 #include <iostream>
 #include <string>
 
+#include <osmium/handler.hpp>
 #include <osmium/memory/collection.hpp>
 #include <osmium/memory/item.hpp>
 #include <osmium/osm/area.hpp>
+#include <osmium/osm/box.hpp>
 #include <osmium/osm/changeset.hpp>
+#include <osmium/osm/item_type.hpp>
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/node.hpp>
 #include <osmium/osm/node_ref.hpp>
@@ -50,7 +53,6 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/timestamp.hpp>
 #include <osmium/osm/way.hpp>
 #include <osmium/visitor.hpp>
-#include <osmium/handler.hpp>
 
 namespace osmium {
 

@@ -35,7 +35,6 @@ DEALINGS IN THE SOFTWARE.
 
 #include <cassert>
 #include <cstddef>
-#include <functional>
 
 namespace osmium {
 

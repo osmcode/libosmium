@@ -40,12 +40,11 @@ DEALINGS IN THE SOFTWARE.
 #include <map>
 #include <utility>
 
-#include <osmium/memory/buffer.hpp>
 #include <osmium/builder/osm_object_builder.hpp>
+#include <osmium/memory/buffer.hpp>
+#include <osmium/osm/tag.hpp>
 
 namespace osmium {
-
-    class TagList;
 
     /**
      * @brief Code related to working with OSM tags

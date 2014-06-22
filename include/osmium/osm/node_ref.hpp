@@ -35,16 +35,13 @@ DEALINGS IN THE SOFTWARE.
 
 #include <cstdlib>
 
+#include <osmium/memory/collection.hpp> // IWYU pragma: keep
 #include <osmium/memory/item.hpp>
 #include <osmium/osm/item_type.hpp>
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/types.hpp>
 
 namespace osmium {
-
-    namespace memory {
-        template <class> class CollectionIterator;
-    }
 
     class NodeRef : public osmium::memory::detail::ItemHelper {
 
