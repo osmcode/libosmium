@@ -375,7 +375,7 @@ namespace osmium {
              * collector.
              */
             void add_relation(const osmium::Relation& relation) {
-                size_t offset = m_relations_buffer.committed();
+                const size_t offset = m_relations_buffer.committed();
                 m_relations_buffer.add_item(relation);
 
                 RelationMeta relation_meta(offset);
@@ -418,11 +418,11 @@ namespace osmium {
         public:
 
             uint64_t used_memory() const {
-                uint64_t nmembers = m_member_meta[0].capacity() + m_member_meta[1].capacity() + m_member_meta[2].capacity();
-                uint64_t members = nmembers * sizeof(MemberMeta);
-                uint64_t relations = m_relations.capacity() * sizeof(RelationMeta);
-                uint64_t relations_buffer_capacity = m_relations_buffer.capacity();
-                uint64_t members_buffer_capacity = m_members_buffer.capacity();
+                const uint64_t nmembers = m_member_meta[0].capacity() + m_member_meta[1].capacity() + m_member_meta[2].capacity();
+                const uint64_t members = nmembers * sizeof(MemberMeta);
+                const uint64_t relations = m_relations.capacity() * sizeof(RelationMeta);
+                const uint64_t relations_buffer_capacity = m_relations_buffer.capacity();
+                const uint64_t members_buffer_capacity = m_members_buffer.capacity();
 
                 std::cout << "  nR  = m_relations.capacity() ........... = " << std::setw(12) << m_relations.capacity() << "\n";
                 std::cout << "  nMN = m_member_meta[NODE].capacity() ... = " << std::setw(12) << m_member_meta[0].capacity() << "\n";
@@ -438,7 +438,7 @@ namespace osmium {
                 std::cout << "  relations_buffer_capacity .............. = " << std::setw(12) << relations_buffer_capacity << "\n";
                 std::cout << "  members_buffer_capacity ................ = " << std::setw(12) << members_buffer_capacity << "\n";
 
-                uint64_t total = relations + members + relations_buffer_capacity + members_buffer_capacity;
+                const uint64_t total = relations + members + relations_buffer_capacity + members_buffer_capacity;
 
                 std::cout << "  total .................................. = " << std::setw(12) << total << "\n";
                 std::cout << "  =======================================================\n";
@@ -474,8 +474,8 @@ namespace osmium {
             }
 
             void moving_in_buffer(size_t old_offset, size_t new_offset) {
-                osmium::Object& object = m_members_buffer.get<osmium::Object>(old_offset);
-                auto& mmv = m_member_meta[static_cast<uint16_t>(object.type()) - 1];
+                const osmium::Object& object = m_members_buffer.get<osmium::Object>(old_offset);
+                auto& mmv = member_meta(object.type());
                 auto range = std::equal_range(mmv.begin(), mmv.end(), osmium::relations::MemberMeta(object.id()));
                 for (auto it = range.first; it != range.second; ++it) {
                     assert(it->buffer_offset() == old_offset);
