@@ -59,10 +59,6 @@ namespace osmium {
             NodeRefList<osmium::item_type::way_node_list>() {
         }
 
-        void switch_type_to_outer_ring() {
-            type(osmium::item_type::outer_ring);
-        }
-
     }; // class WayNodeList
 
     static_assert(sizeof(WayNodeList) % osmium::memory::align_bytes == 0, "Class osmium::WayNodeList has wrong size to be aligned properly!");
@@ -110,22 +106,6 @@ namespace osmium {
 
         bool ends_have_same_location() const {
             return nodes().ends_have_same_location();
-        }
-
-        /**
-         * Switch the type of this object to Area. This should only be done when
-         * the nodes form a closed ring. This will also change the Id of the way
-         * to make sure Area Ids are unique.
-         */
-        void switch_type_to_area() {
-            assert(ends_have_same_location());
-            type(osmium::item_type::area);
-            nodes().switch_type_to_outer_ring();
-            osmium::object_id_type new_id = positive_id() * 2;
-            if (id() < 0) {
-                new_id = - new_id;
-            }
-            id(new_id);
         }
 
     }; // class Way
