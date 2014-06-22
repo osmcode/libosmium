@@ -37,7 +37,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/handler.hpp>
 
-#define OSMIUM_CHAIN_HANDLER_CALL2(_func_, _type_) \
+#define OSMIUM_CHAIN_HANDLER_CALL(_func_, _type_) \
     template <int N, int SIZE, class THandlers> \
     struct call_ ## _func_ { \
         void operator()(THandlers& handlers, osmium::_type_& object) { \
@@ -83,11 +83,11 @@ namespace osmium {
                 void operator()(THandlers&) {}
             };
 
-            OSMIUM_CHAIN_HANDLER_CALL2(node, Node)
-            OSMIUM_CHAIN_HANDLER_CALL2(way, Way)
-            OSMIUM_CHAIN_HANDLER_CALL2(relation, Relation)
-            OSMIUM_CHAIN_HANDLER_CALL2(changeset, Changeset)
-            OSMIUM_CHAIN_HANDLER_CALL2(area, Area)
+            OSMIUM_CHAIN_HANDLER_CALL(node, Node)
+            OSMIUM_CHAIN_HANDLER_CALL(way, Way)
+            OSMIUM_CHAIN_HANDLER_CALL(relation, Relation)
+            OSMIUM_CHAIN_HANDLER_CALL(changeset, Changeset)
+            OSMIUM_CHAIN_HANDLER_CALL(area, Area)
 
         public:
 

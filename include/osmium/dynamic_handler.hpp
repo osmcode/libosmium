@@ -82,7 +82,7 @@ namespace osmium {
             // http://stackoverflow.com/questions/257288/is-it-possible-to-write-a-c-template-to-check-for-a-functions-existence
             // to either call handler style functions or visitor style operator().
 
-#define HANDLER_DISPATCH1(_name_, _type_) \
+#define OSMIUM_DYNAMIC_HANDLER_DISPATCH(_name_, _type_) \
 template <class THandler> \
 auto _name_##_dispatch(THandler& handler, const osmium::_type_& object, int) -> decltype(handler._name_(object), void()) { \
     handler._name_(object); \
@@ -92,11 +92,11 @@ auto _name_##_dispatch(THandler& handler, const osmium::_type_& object, long) ->
     handler(object); \
 }
 
-            HANDLER_DISPATCH1(node, Node);
-            HANDLER_DISPATCH1(way, Way);
-            HANDLER_DISPATCH1(relation, Relation);
-            HANDLER_DISPATCH1(changeset, Changeset);
-            HANDLER_DISPATCH1(area, Area);
+            OSMIUM_DYNAMIC_HANDLER_DISPATCH(node, Node)
+            OSMIUM_DYNAMIC_HANDLER_DISPATCH(way, Way)
+            OSMIUM_DYNAMIC_HANDLER_DISPATCH(relation, Relation)
+            OSMIUM_DYNAMIC_HANDLER_DISPATCH(changeset, Changeset)
+            OSMIUM_DYNAMIC_HANDLER_DISPATCH(area, Area)
 
             template <class THandler>
             auto flush_dispatch(THandler& handler, int) -> decltype(handler.flush(), void()) {
