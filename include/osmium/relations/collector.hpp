@@ -209,15 +209,8 @@ namespace osmium {
                     }
                 }
 
-                void done() {
-                    // clear all memory used by m_member_meta of this type
-                    m_collector.member_meta(osmium::item_type::node).clear();
-                    m_collector.member_meta(osmium::item_type::node).shrink_to_fit();
-                    m_collector.member_meta(osmium::item_type::way).clear();
-                    m_collector.member_meta(osmium::item_type::way).shrink_to_fit();
-                    m_collector.member_meta(osmium::item_type::relation).clear();
-                    m_collector.member_meta(osmium::item_type::relation).shrink_to_fit();
-                    m_collector.done();
+                void flush() {
+                    m_collector.flush();
                 }
 
             }; // class HandlerPass2
@@ -341,7 +334,7 @@ namespace osmium {
              * were not in the input file! The derived class has to handle this
              * case.
              */
-            void done() {
+            void flush() {
             }
 
             /**

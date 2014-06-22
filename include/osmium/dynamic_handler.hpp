@@ -72,7 +72,7 @@ namespace osmium {
                 virtual void changeset(const osmium::Changeset&) {
                 }
 
-                virtual void done() {
+                virtual void flush() {
                 }
 
             }; // class HandlerWrapperBase
@@ -106,7 +106,7 @@ auto _name_##_dispatch(THandler& handler, const osmium::_type_& object, long) ->
             HANDLER_DISPATCH1(changeset, Changeset);
             HANDLER_DISPATCH1(area, Area);
 
-            HANDLER_DISPATCH0(done);
+            HANDLER_DISPATCH0(flush);
 
             template <class THandler>
             class HandlerWrapper : public HandlerWrapperBase {
@@ -140,8 +140,8 @@ auto _name_##_dispatch(THandler& handler, const osmium::_type_& object, long) ->
                     changeset_dispatch(m_handler, changeset, 0);
                 }
 
-                void done() override final {
-                    done_dispatch(m_handler, 0);
+                void flush() override final {
+                    flush_dispatch(m_handler, 0);
                 }
 
             }; // HandlerWrapper
@@ -184,8 +184,8 @@ auto _name_##_dispatch(THandler& handler, const osmium::_type_& object, long) ->
                 m_impl->changeset(changeset);
             }
 
-            void done() {
-                m_impl->done();
+            void flush() {
+                m_impl->flush();
             }
 
         }; // DynamicHandler

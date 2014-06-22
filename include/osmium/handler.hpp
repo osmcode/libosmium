@@ -89,7 +89,7 @@ namespace osmium {
             void inner_ring(const osmium::InnerRing&) const {
             }
 
-            void done() const {
+            void flush() const {
             }
 
         }; // class Handler

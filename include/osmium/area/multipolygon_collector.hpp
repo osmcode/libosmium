@@ -180,8 +180,11 @@ namespace osmium {
                 }
             }
 
-            void done() {
+            void flush() {
                 flush_output_buffer();
+            }
+
+            void report_missing() {
                 collector_type::clean_assembled_relations();
                 if (! collector_type::relations().empty()) {
                     std::cerr << "Warning! Some member ways missing for these multipolygon relations:";

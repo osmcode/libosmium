@@ -314,6 +314,8 @@ int main(int argc, char* argv[]) {
     reader2.close();
     std::cerr << "Pass 2 done\n";
 
+    collector.report_missing();
+
     google::protobuf::ShutdownProtobufLibrary();
 }
 

@@ -83,7 +83,7 @@ namespace osmium {
             typedef std::tuple<THandler&...> handlers_type;
             handlers_type m_handlers;
 
-            OSMIUM_CHAIN_HANDLER_CALL1(done)
+            OSMIUM_CHAIN_HANDLER_CALL1(flush)
 
             OSMIUM_CHAIN_HANDLER_CALL2(node, Node)
             OSMIUM_CHAIN_HANDLER_CALL2(way, Way)
@@ -117,8 +117,8 @@ namespace osmium {
                 call_area<0, sizeof...(THandler), handlers_type>()(m_handlers, area);
             }
 
-            void done() {
-                call_done<0, sizeof...(THandler), handlers_type>()(m_handlers);
+            void flush() {
+                call_flush<0, sizeof...(THandler), handlers_type>()(m_handlers);
             }
 
         }; // class ChainHandler

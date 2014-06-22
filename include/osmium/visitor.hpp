@@ -113,14 +113,14 @@ namespace osmium {
         }
 
         template <class THandler>
-        inline void done_recurse(THandler& handler) {
-            handler.done();
+        inline void flush_recurse(THandler& handler) {
+            handler.flush();
         }
 
         template <class THandler, class ...TRest>
-        inline void done_recurse(THandler& handler, TRest&... more) {
-            done_recurse(handler);
-            done_recurse(more...);
+        inline void flush_recurse(THandler& handler, TRest&... more) {
+            flush_recurse(handler);
+            flush_recurse(more...);
         }
 
     } // anonymous namespace
@@ -140,7 +140,7 @@ namespace osmium {
         for (; it != end; ++it) {
             apply_item_recurse(*it, handlers...);
         }
-        done_recurse(handlers...);
+        flush_recurse(handlers...);
     }
 
     template <class TContainer, class ...THandlers>
