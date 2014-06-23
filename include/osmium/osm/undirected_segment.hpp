@@ -80,8 +80,7 @@ namespace osmium {
      */
     template <class T>
     inline T& operator<<(T& out, const osmium::UndirectedSegment& segment) {
-        out << segment.first() << "--" << segment.second();
-        return out;
+        return out << segment.first() << "--" << segment.second();
     }
 
 } // namespace osmium

@@ -123,8 +123,7 @@ namespace osmium {
      */
     template <class T>
     inline T& operator<<(T& out, const osmium::NodeRef& nr) {
-        out << "<" << nr.ref() << " " << nr.location() << ">";
-        return out;
+        return out << "<" << nr.ref() << " " << nr.location() << ">";
     }
 
     /**

@@ -98,8 +98,7 @@ namespace osmium {
      */
     template <class T>
     inline T& operator<<(T& out, const Tag& tag) {
-        out << tag.key() << '=' << tag.value();
-        return out;
+        return out << tag.key() << '=' << tag.value();
     }
 
     class TagList : public osmium::memory::Collection<Tag, osmium::item_type::tag_list> {
