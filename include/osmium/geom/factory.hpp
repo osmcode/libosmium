@@ -185,12 +185,14 @@ namespace osmium {
                     const osmium::OuterRing& ring = static_cast<const osmium::OuterRing&>(*it);
                     if (it->type() == osmium::item_type::outer_ring) {
                         ++num_rings;
-                        static_cast<G*>(this)->multipolygon_add_outer_ring();
+                        static_cast<G*>(this)->multipolygon_outer_ring_start();
                         add_points(ring);
+                        static_cast<G*>(this)->multipolygon_outer_ring_finish();
                     } else if (it->type() == osmium::item_type::inner_ring) {
                         ++num_rings;
-                        static_cast<G*>(this)->multipolygon_add_inner_ring();
+                        static_cast<G*>(this)->multipolygon_inner_ring_start();
                         add_points(ring);
+                        static_cast<G*>(this)->multipolygon_inner_ring_finish();
                     }
                 }
 

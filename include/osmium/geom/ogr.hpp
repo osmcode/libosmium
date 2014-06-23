@@ -102,7 +102,7 @@ namespace osmium {
                 m_multipolygon = std::unique_ptr<OGRMultiPolygon>(new OGRMultiPolygon());
             }
 
-            void multipolygon_add_outer_ring() {
+            void multipolygon_outer_ring_start() {
                 if (m_ring) {
                     m_polygon->addRingDirectly(m_ring.release());
                 }
@@ -113,12 +113,18 @@ namespace osmium {
                 m_ring = std::unique_ptr<OGRLinearRing>(new OGRLinearRing());
             }
 
-            void multipolygon_add_inner_ring() {
+            void multipolygon_outer_ring_finish() {
+            }
+
+            void multipolygon_inner_ring_start() {
                 assert(!!m_polygon);
                 if (m_ring) {
                     m_polygon->addRingDirectly(m_ring.release());
                 }
                 m_ring = std::unique_ptr<OGRLinearRing>(new OGRLinearRing());
+            }
+
+            void multipolygon_inner_ring_finish() {
             }
 
             void multipolygon_add_location(const osmium::Location location) {

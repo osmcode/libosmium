@@ -113,7 +113,7 @@ namespace osmium {
                 m_in_polygon = false;
             }
 
-            void multipolygon_add_outer_ring() {
+            void multipolygon_outer_ring_start() {
                 if (m_in_polygon) {
                     m_str += ")),";
                 }
@@ -122,9 +122,15 @@ namespace osmium {
                 m_first = true;
             }
 
-            void multipolygon_add_inner_ring() {
+            void multipolygon_outer_ring_finish() {
+            }
+
+            void multipolygon_inner_ring_start() {
                 m_str += "),(";
                 m_first = true;
+            }
+
+            void multipolygon_inner_ring_finish() {
             }
 
             void multipolygon_add_location(const osmium::Location location) {
