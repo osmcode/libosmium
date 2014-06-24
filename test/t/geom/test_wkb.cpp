@@ -102,7 +102,7 @@ BOOST_AUTO_TEST_CASE(linestring_with_two_same_locations) {
     osmium::memory::Buffer buffer(10000);
     auto& wnl = osmium::builder::build_way_node_list(buffer, {
         {1, {3.5, 4.7}},
-        {2, {3.5, 4.7}},
+        {2, {3.5, 4.7}}
     });
 
     BOOST_CHECK_THROW(factory.create_linestring(wnl), osmium::geometry_error);
@@ -126,7 +126,7 @@ BOOST_AUTO_TEST_CASE(linestring_with_undefined_location) {
     osmium::memory::Buffer buffer(10000);
     auto& wnl = osmium::builder::build_way_node_list(buffer, {
         {1, {3.5, 4.7}},
-        {2, osmium::Location()},
+        {2, osmium::Location()}
     });
 
     BOOST_CHECK_THROW(factory.create_linestring(wnl), osmium::invalid_location);
