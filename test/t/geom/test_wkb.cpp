@@ -19,7 +19,7 @@ BOOST_AUTO_TEST_CASE(point) {
 }
 
 BOOST_AUTO_TEST_CASE(point_ewkb) {
-    osmium::geom::WKBFactory factory(true);
+    osmium::geom::WKBFactory factory(osmium::geom::wkb_type::ewkb);
     factory.set_hex_mode();
 
     std::string wkb {factory.create_point(osmium::Location(3.2, 4.2))};
@@ -67,7 +67,7 @@ BOOST_AUTO_TEST_CASE(linestring) {
 }
 
 BOOST_AUTO_TEST_CASE(linestring_ewkb) {
-    osmium::geom::WKBFactory factory(true);
+    osmium::geom::WKBFactory factory(osmium::geom::wkb_type::ewkb);
     factory.set_hex_mode();
 
     osmium::memory::Buffer buffer(10000);

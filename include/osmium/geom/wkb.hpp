@@ -53,6 +53,11 @@ namespace osmium {
             typedef std::string ring_type;
         };
 
+        enum class wkb_type : bool {
+            wkb  = false,
+            ewkb = true
+        };
+
         class WKBFactory : public GeometryFactory<WKBFactory, wkb_factory_traits> {
 
             friend class GeometryFactory;
@@ -62,9 +67,9 @@ namespace osmium {
 
         public:
 
-            explicit WKBFactory(bool ewkb=false) :
+            explicit WKBFactory(wkb_type type=wkb_type::wkb) :
                 GeometryFactory<WKBFactory, wkb_factory_traits>(),
-                m_ewkb(ewkb) {
+                m_wkb_type(type) {
             }
 
             void set_hex_mode() {
@@ -103,7 +108,7 @@ namespace osmium {
 
             std::string m_data {};
             uint32_t m_points {0};
-            bool m_ewkb;
+            wkb_type m_wkb_type;
             bool m_hex {false};
 
             template <typename T>
@@ -127,7 +132,7 @@ namespace osmium {
 
             void header(std::string& str, wkbGeometryType type) {
                 str_push(str, wkbNDR);
-                if (m_ewkb) {
+                if (m_wkb_type == wkb_type::ewkb) {
                     str_push(str, type | wkbSRID);
                     str_push(str, srid);
                 } else {
@@ -172,7 +177,7 @@ namespace osmium {
                 } else {
                     std::string data;
                     std::swap(data, m_data);
-                    memcpy(&data[5 + (m_ewkb ? 4 : 0)], &m_points, sizeof(uint32_t));
+                    memcpy(&data[5 + (m_wkb_type == wkb_type::ewkb ? 4 : 0)], &m_points, sizeof(uint32_t));
 
                     if (m_hex) {
                         return convert_to_hex(data);
