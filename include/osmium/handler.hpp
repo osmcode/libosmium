@@ -35,7 +35,7 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
-    class Object;
+    class OSMObject;
     class Node;
     class Way;
     class Relation;
@@ -56,7 +56,7 @@ namespace osmium {
 
         public:
 
-            void osm_object(const osmium::Object&) const {
+            void osm_object(const osmium::OSMObject&) const {
             }
 
             void node(const osmium::Node&) const {

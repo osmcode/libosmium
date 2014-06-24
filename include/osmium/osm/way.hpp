@@ -63,12 +63,12 @@ namespace osmium {
 
     static_assert(sizeof(WayNodeList) % osmium::memory::align_bytes == 0, "Class osmium::WayNodeList has wrong size to be aligned properly!");
 
-    class Way : public Object {
+    class Way : public OSMObject {
 
         friend class osmium::builder::ObjectBuilder<osmium::Way>;
 
         Way() :
-            Object(sizeof(Way), osmium::item_type::way) {
+            OSMObject(sizeof(Way), osmium::item_type::way) {
         }
 
     public:

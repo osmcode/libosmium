@@ -42,7 +42,7 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
-    class Object;
+    class OSMObject;
     class Node;
     class Way;
     class Relation;
@@ -67,19 +67,19 @@ namespace osmium {
         inline void apply_item_recurse(TItem& item, THandler& handler) {
             switch (item.type()) {
                 case osmium::item_type::node:
-                    handler.osm_object(static_cast<ConstIfConst<TItem, osmium::Object>&>(item));
+                    handler.osm_object(static_cast<ConstIfConst<TItem, osmium::OSMObject>&>(item));
                     handler.node(static_cast<ConstIfConst<TItem, osmium::Node>&>(item));
                     break;
                 case osmium::item_type::way:
-                    handler.osm_object(static_cast<ConstIfConst<TItem, osmium::Object>&>(item));
+                    handler.osm_object(static_cast<ConstIfConst<TItem, osmium::OSMObject>&>(item));
                     handler.way(static_cast<ConstIfConst<TItem, osmium::Way>&>(item));
                     break;
                 case osmium::item_type::relation:
-                    handler.osm_object(static_cast<ConstIfConst<TItem, osmium::Object>&>(item));
+                    handler.osm_object(static_cast<ConstIfConst<TItem, osmium::OSMObject>&>(item));
                     handler.relation(static_cast<ConstIfConst<TItem, osmium::Relation>&>(item));
                     break;
                 case osmium::item_type::area:
-                    handler.osm_object(static_cast<ConstIfConst<TItem, osmium::Object>&>(item));
+                    handler.osm_object(static_cast<ConstIfConst<TItem, osmium::OSMObject>&>(item));
                     handler.area(static_cast<ConstIfConst<TItem, osmium::Area>&>(item));
                     break;
                 case osmium::item_type::changeset:

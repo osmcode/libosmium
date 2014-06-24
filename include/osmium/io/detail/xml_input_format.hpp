@@ -200,7 +200,7 @@ namespace osmium {
                     static_cast<XMLParser*>(data)->end_element(element);
                 }
 
-                const char* init_object(osmium::Object& object, const XML_Char** attrs) {
+                const char* init_object(osmium::OSMObject& object, const XML_Char** attrs) {
                     static const char* empty = "";
                     const char* user = empty;
 

@@ -142,7 +142,7 @@ namespace osmium {
                  * @returns true if the member was added to at least one
                  *          relation and false otherwise
                  */
-                bool find_and_add_object(const osmium::Object& object) {
+                bool find_and_add_object(const osmium::OSMObject& object) {
                     auto& mmv = m_collector.member_meta(object.type());
                     auto range = std::equal_range(mmv.begin(), mmv.end(), MemberMeta(object.id()));
 
@@ -362,8 +362,8 @@ namespace osmium {
                 return get_relation(relation_meta.relation_offset());
             }
 
-            osmium::Object& get_member(size_t offset) const {
-                return m_members_buffer.get<osmium::Object>(offset);
+            osmium::OSMObject& get_member(size_t offset) const {
+                return m_members_buffer.get<osmium::OSMObject>(offset);
             }
 
             /**
@@ -474,7 +474,7 @@ namespace osmium {
             }
 
             void moving_in_buffer(size_t old_offset, size_t new_offset) {
-                const osmium::Object& object = m_members_buffer.get<osmium::Object>(old_offset);
+                const osmium::OSMObject& object = m_members_buffer.get<osmium::OSMObject>(old_offset);
                 auto& mmv = member_meta(object.type());
                 auto range = std::equal_range(mmv.begin(), mmv.end(), osmium::relations::MemberMeta(object.id()));
                 for (auto it = range.first; it != range.second; ++it) {

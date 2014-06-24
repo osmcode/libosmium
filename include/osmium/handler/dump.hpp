@@ -78,7 +78,7 @@ namespace osmium {
                 m_out << "\n";
             }
 
-            void print_meta(const osmium::Object& object) {
+            void print_meta(const osmium::OSMObject& object) {
                 m_out << m_prefix
                       << "  id="
                       << object.id()

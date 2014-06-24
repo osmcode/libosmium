@@ -460,7 +460,7 @@ namespace osmium {
                  * TPBFObject is either OSMPBF::Node, OSMPBF::Way or OSMPBF::Relation.
                  */
                 template <class TPBFObject>
-                void apply_common_info(const osmium::Object& in, TPBFObject* out) {
+                void apply_common_info(const osmium::OSMObject& in, TPBFObject* out) {
                     // set the object-id
                     out->set_id(in.id());
 

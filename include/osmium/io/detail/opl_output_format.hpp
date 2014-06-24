@@ -123,7 +123,7 @@ namespace osmium {
                     }
                 }
 
-                void write_meta(const osmium::Object& object) {
+                void write_meta(const osmium::OSMObject& object) {
                     snprintf(m_tmp_buffer, tmp_buffer_size, "%" PRId64 " v%d d", object.id(), object.version());
                     m_out += m_tmp_buffer;
                     m_out += (object.visible() ? 'V' : 'D');

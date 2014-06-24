@@ -38,7 +38,7 @@ DEALINGS IN THE SOFTWARE.
 namespace osmium {
 
     /**
-     * OSMEntity is the parent class for the OSM Object class and the Changeset class.
+     * OSMEntity is the parent class for the OSMObject class and the Changeset class.
      */
     class OSMEntity : public osmium::memory::Item {
 

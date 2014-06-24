@@ -106,12 +106,12 @@ namespace osmium {
     /**
      * An OSM area created out of a closed way or a multipolygon relation.
      */
-    class Area : public Object {
+    class Area : public OSMObject {
 
         friend class osmium::builder::ObjectBuilder<osmium::Area>;
 
         Area() :
-            Object(sizeof(Area), osmium::item_type::area) {
+            OSMObject(sizeof(Area), osmium::item_type::area) {
         }
 
     public:

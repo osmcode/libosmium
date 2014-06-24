@@ -43,7 +43,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/memory/item.hpp>
 #include <osmium/osm/object.hpp>
 
-// IWYU pragma: no_forward_declare osmium::Object
+// IWYU pragma: no_forward_declare osmium::OSMObject
 // IWYU pragma: no_forward_declare osmium::memory::Item
 
 namespace osmium {
@@ -66,18 +66,18 @@ namespace osmium {
      */
     class ObjectPointerCollection : public osmium::handler::Handler {
 
-        std::vector<osmium::Object*> m_objects;
+        std::vector<osmium::OSMObject*> m_objects;
 
     public:
 
-        typedef boost::indirect_iterator<std::vector<osmium::Object*>::iterator, osmium::Object> iterator;
-        typedef boost::indirect_iterator<std::vector<osmium::Object*>::const_iterator, const osmium::Object> const_iterator;
+        typedef boost::indirect_iterator<std::vector<osmium::OSMObject*>::iterator, osmium::OSMObject> iterator;
+        typedef boost::indirect_iterator<std::vector<osmium::OSMObject*>::const_iterator, const osmium::OSMObject> const_iterator;
 
         ObjectPointerCollection() :
             m_objects() {
         }
 
-        void osm_object(osmium::Object& object) {
+        void osm_object(osmium::OSMObject& object) {
             m_objects.push_back(&object);
         }
 

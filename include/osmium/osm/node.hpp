@@ -44,14 +44,14 @@ namespace osmium {
         template <class T> class ObjectBuilder;
     }
 
-    class Node : public Object {
+    class Node : public OSMObject {
 
         friend class osmium::builder::ObjectBuilder<osmium::Node>;
 
         osmium::Location m_location {};
 
         Node() :
-            Object(sizeof(Node), osmium::item_type::node) {
+            OSMObject(sizeof(Node), osmium::item_type::node) {
         }
 
     public:

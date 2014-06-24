@@ -82,12 +82,12 @@ namespace osmium {
         }
     }
 
-    class Object;
+    class OSMObject;
 
     template <class TSource, class ...THandlers>
     inline void apply_diff(TSource& source, THandlers&... handlers) {
-        apply_diff(osmium::io::InputIterator<TSource, osmium::Object> {source},
-                   osmium::io::InputIterator<TSource, osmium::Object> {},
+        apply_diff(osmium::io::InputIterator<TSource, osmium::OSMObject> {source},
+                   osmium::io::InputIterator<TSource, osmium::OSMObject> {},
                    handlers...);
     }
 

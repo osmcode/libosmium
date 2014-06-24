@@ -38,11 +38,11 @@ DEALINGS IN THE SOFTWARE.
 namespace osmium {
 
     /**
-     * Objects can be ordered by type, id and version.
+     * OSMObjects can be ordered by type, id and version.
      * Note that we use the absolute value of the id for a
      * better ordering of objects with negative id.
      */
-    inline bool operator<(const osmium::Object& lhs, const osmium::Object& rhs) {
+    inline bool operator<(const osmium::OSMObject& lhs, const osmium::OSMObject& rhs) {
         if (lhs.type() != rhs.type()) {
             return lhs.type() < rhs.type();
         }
@@ -51,9 +51,9 @@ namespace osmium {
     }
 
     /**
-     * Objects are equal if their type, id, and version are equal.
+     * OSMObjects are equal if their type, id, and version are equal.
      */
-    inline bool operator==(const osmium::Object& lhs, const osmium::Object& rhs) {
+    inline bool operator==(const osmium::OSMObject& lhs, const osmium::OSMObject& rhs) {
         return lhs.type() == rhs.type() &&
                lhs.id() == rhs.id() &&
                lhs.version() == rhs.version();
@@ -64,11 +64,11 @@ namespace osmium {
      */
     struct object_equal_type_id_version {
 
-        bool operator()(const osmium::Object& lhs, const osmium::Object& rhs) const {
+        bool operator()(const osmium::OSMObject& lhs, const osmium::OSMObject& rhs) const {
             return lhs == rhs;
         }
 
-        bool operator()(const osmium::Object* lhs, const osmium::Object* rhs) const {
+        bool operator()(const osmium::OSMObject* lhs, const osmium::OSMObject* rhs) const {
             return *lhs == *rhs;
         }
 
@@ -80,12 +80,12 @@ namespace osmium {
      */
     struct object_equal_type_id {
 
-        bool operator()(const osmium::Object& lhs, const osmium::Object& rhs) const {
+        bool operator()(const osmium::OSMObject& lhs, const osmium::OSMObject& rhs) const {
             return lhs.type() == rhs.type() &&
                    lhs.id() == rhs.id();
         }
 
-        bool operator()(const osmium::Object* lhs, const osmium::Object* rhs) const {
+        bool operator()(const osmium::OSMObject* lhs, const osmium::OSMObject* rhs) const {
             return operator()(*lhs, *rhs);
         }
 
@@ -96,11 +96,11 @@ namespace osmium {
      */
     struct object_order_type_id_version {
 
-        bool operator()(const osmium::Object& lhs, const osmium::Object& rhs) const {
+        bool operator()(const osmium::OSMObject& lhs, const osmium::OSMObject& rhs) const {
             return lhs < rhs;
         }
 
-        bool operator()(const osmium::Object* lhs, const osmium::Object* rhs) const {
+        bool operator()(const osmium::OSMObject* lhs, const osmium::OSMObject* rhs) const {
             return *lhs < *rhs;
         }
 
@@ -113,7 +113,7 @@ namespace osmium {
      */
     struct object_order_type_id_reverse_version {
 
-        bool operator()(const osmium::Object& lhs, const osmium::Object& rhs) const {
+        bool operator()(const osmium::OSMObject& lhs, const osmium::OSMObject& rhs) const {
             if (lhs.type() != rhs.type()) {
                 return lhs.type() < rhs.type();
             }
@@ -121,7 +121,7 @@ namespace osmium {
                    lhs.positive_id() < rhs.positive_id();
         }
 
-        bool operator()(const osmium::Object* lhs, const osmium::Object* rhs) const {
+        bool operator()(const osmium::OSMObject* lhs, const osmium::OSMObject* rhs) const {
             return operator()(*lhs, *rhs);
         }
 

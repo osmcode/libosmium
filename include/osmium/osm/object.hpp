@@ -53,9 +53,9 @@ DEALINGS IN THE SOFTWARE.
 namespace osmium {
 
     /**
-     * OSM Object (Node, Way, Relation, or Area).
+     * OSMObject (Node, Way, Relation, or Area).
      */
-    class Object : public osmium::OSMEntity, boost::totally_ordered<Object> {
+    class OSMObject : public osmium::OSMEntity, boost::totally_ordered<OSMObject> {
 
         object_id_type      m_id;
         bool                m_deleted : 1;
@@ -65,7 +65,7 @@ namespace osmium {
         changeset_id_type   m_changeset;
 
         size_t sizeof_object() const {
-            return sizeof(Object) + (type() == item_type::node ? sizeof(osmium::Location) : 0) + sizeof(string_size_type);
+            return sizeof(OSMObject) + (type() == item_type::node ? sizeof(osmium::Location) : 0) + sizeof(string_size_type);
         }
 
         unsigned char* user_position() {
@@ -90,7 +90,7 @@ namespace osmium {
 
     protected:
 
-        Object(osmium::memory::item_size_type size, osmium::item_type type) :
+        OSMObject(osmium::memory::item_size_type size, osmium::item_type type) :
             OSMEntity(size, type),
             m_id(0),
             m_deleted(false),
@@ -145,7 +145,7 @@ namespace osmium {
          *
          * @return Reference to object to make calls chainable.
          */
-        Object& id(object_id_type id) {
+        OSMObject& id(object_id_type id) {
             m_id = id;
             return *this;
         }
@@ -155,7 +155,7 @@ namespace osmium {
          *
          * @return Reference to object to make calls chainable.
          */
-        Object& id(const char* id) {
+        OSMObject& id(const char* id) {
             return this->id(osmium::string_to_object_id(id));
         }
 
@@ -174,7 +174,7 @@ namespace osmium {
          *
          * @return Reference to object to make calls chainable.
          */
-        Object& deleted(bool deleted) {
+        OSMObject& deleted(bool deleted) {
             m_deleted = deleted;
             return *this;
         }
@@ -184,7 +184,7 @@ namespace osmium {
          *
          * @return Reference to object to make calls chainable.
          */
-        Object& visible(bool visible) {
+        OSMObject& visible(bool visible) {
             m_deleted = !visible;
             return *this;
         }
@@ -195,7 +195,7 @@ namespace osmium {
          * @param visible Either "true" or "false"
          * @return Reference to object to make calls chainable.
          */
-        Object& visible(const char* visible) {
+        OSMObject& visible(const char* visible) {
             if (!strcmp("true", visible)) {
                 this->visible(true);
             } else if (!strcmp("false", visible)) {
@@ -216,7 +216,7 @@ namespace osmium {
          *
          * @return Reference to object to make calls chainable.
          */
-        Object& version(object_version_type version) {
+        OSMObject& version(object_version_type version) {
             m_version = version;
             return *this;
         }
@@ -226,7 +226,7 @@ namespace osmium {
          *
          * @return Reference to object to make calls chainable.
          */
-        Object& version(const char* version) {
+        OSMObject& version(const char* version) {
             return this->version(string_to_object_version(version));
         }
 
@@ -240,7 +240,7 @@ namespace osmium {
          *
          * @return Reference to object to make calls chainable.
          */
-        Object& changeset(changeset_id_type changeset) {
+        OSMObject& changeset(changeset_id_type changeset) {
             m_changeset = changeset;
             return *this;
         }
@@ -250,7 +250,7 @@ namespace osmium {
          *
          * @return Reference to object to make calls chainable.
          */
-        Object& changeset(const char* changeset) {
+        OSMObject& changeset(const char* changeset) {
             return this->changeset(string_to_changeset_id(changeset));
         }
 
@@ -264,7 +264,7 @@ namespace osmium {
          *
          * @return Reference to object to make calls chainable.
          */
-        Object& uid(user_id_type uid) {
+        OSMObject& uid(user_id_type uid) {
             m_uid = uid;
             return *this;
         }
@@ -275,7 +275,7 @@ namespace osmium {
          *
          * @return Reference to object to make calls chainable.
          */
-        Object& uid_from_signed(int32_t uid) {
+        OSMObject& uid_from_signed(int32_t uid) {
             m_uid = uid < 0 ? 0 : uid;
             return *this;
         }
@@ -285,7 +285,7 @@ namespace osmium {
          *
          * @return Reference to object to make calls chainable.
          */
-        Object& uid(const char* uid) {
+        OSMObject& uid(const char* uid) {
             return this->uid_from_signed(string_to_user_id(uid));
         }
 
@@ -305,7 +305,7 @@ namespace osmium {
          * @param timestamp Timestamp
          * @return Reference to object to make calls chainable.
          */
-        Object& timestamp(const osmium::Timestamp timestamp) {
+        OSMObject& timestamp(const osmium::Timestamp timestamp) {
             m_timestamp = timestamp;
             return *this;
         }
@@ -374,9 +374,9 @@ namespace osmium {
             return cend();
         }
 
-    }; // class Object
+    }; // class OSMObject
 
-    static_assert(sizeof(Object) % osmium::memory::align_bytes == 0, "Class osmium::Object has wrong size to be aligned properly!");
+    static_assert(sizeof(OSMObject) % osmium::memory::align_bytes == 0, "Class osmium::OSMObject has wrong size to be aligned properly!");
 
 } // namespace osmium
 

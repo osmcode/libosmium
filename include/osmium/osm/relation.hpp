@@ -132,12 +132,12 @@ namespace osmium {
             return reinterpret_cast<const char*>(data() + sizeof(RelationMember));
         }
 
-        Object& get_object() {
-            return *reinterpret_cast<Object*>(endpos());
+        OSMObject& get_object() {
+            return *reinterpret_cast<OSMObject*>(endpos());
         }
 
-        const Object& get_object() const {
-            return *reinterpret_cast<const Object*>(endpos());
+        const OSMObject& get_object() const {
+            return *reinterpret_cast<const OSMObject*>(endpos());
         }
 
     }; // class RelationMember
@@ -158,12 +158,12 @@ namespace osmium {
 
     static_assert(sizeof(RelationMemberList) % osmium::memory::align_bytes == 0, "Class osmium::RelationMemberList has wrong size to be aligned properly!");
 
-    class Relation : public Object {
+    class Relation : public OSMObject {
 
         friend class osmium::builder::ObjectBuilder<osmium::Relation>;
 
         Relation() :
-            Object(sizeof(Relation), osmium::item_type::relation) {
+            OSMObject(sizeof(Relation), osmium::item_type::relation) {
         }
 
     public:

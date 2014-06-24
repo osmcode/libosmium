@@ -48,9 +48,9 @@ namespace osmium {
 
     protected:
 
-        osmium::Object* m_prev;
-        osmium::Object* m_curr;
-        osmium::Object* m_next;
+        osmium::OSMObject* m_prev;
+        osmium::OSMObject* m_curr;
+        osmium::OSMObject* m_next;
 
     public:
 
@@ -60,7 +60,7 @@ namespace osmium {
             m_next(nullptr) {
         }
 
-        explicit DiffObject(osmium::Object& prev, osmium::Object& curr, osmium::Object& next) :
+        explicit DiffObject(osmium::OSMObject& prev, osmium::OSMObject& curr, osmium::OSMObject& next) :
             m_prev(&prev),
             m_curr(&curr),
             m_next(&next) {
@@ -72,15 +72,15 @@ namespace osmium {
         DiffObject(DiffObject&& other) = default;
         DiffObject& operator=(DiffObject&& other) = default;
 
-        const osmium::Object& prev() const {
+        const osmium::OSMObject& prev() const {
             return *m_prev;
         }
 
-        const osmium::Object& curr() const {
+        const osmium::OSMObject& curr() const {
             return *m_curr;
         }
 
-        const osmium::Object& next() const {
+        const osmium::OSMObject& next() const {
             return *m_next;
         }
 

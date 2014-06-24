@@ -117,7 +117,7 @@ namespace osmium {
                 add_padding();
             }
 
-            void add_member(osmium::item_type type, object_id_type ref, const char* role, const osmium::Object* full_member = nullptr) {
+            void add_member(osmium::item_type type, object_id_type ref, const char* role, const osmium::OSMObject* full_member = nullptr) {
                 osmium::RelationMember* member = reserve_space_for<osmium::RelationMember>();
                 new (member) osmium::RelationMember(ref, type, full_member != nullptr);
                 add_size(sizeof(RelationMember));
@@ -180,7 +180,7 @@ namespace osmium {
             /**
              * Initialize area attributes from the attributes of the given object.
              */
-            void initialize_from_object(const osmium::Object& source) {
+            void initialize_from_object(const osmium::OSMObject& source) {
                 osmium::Area& area = object();
                 area.id(osmium::object_id_to_area_id(source.id(), source.type()));
                 area.version(source.version());

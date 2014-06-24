@@ -125,7 +125,7 @@ namespace osmium {
                     }
                 }
 
-                void write_meta(const osmium::Object& object) {
+                void write_meta(const osmium::OSMObject& object) {
                     oprintf(m_out, " id=\"%" PRId64 "\"", object.id());
 
                     if (object.version()) {
