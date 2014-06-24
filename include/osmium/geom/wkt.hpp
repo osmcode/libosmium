@@ -70,7 +70,7 @@ namespace osmium {
 
             /* Point */
 
-            point_type make_point(const Location location) {
+            point_type make_point(const Location location) const {
                 std::string str {"POINT("};
                 location.as_string(std::back_inserter(str), ' ');
                 str += ')';

@@ -80,13 +80,13 @@ namespace osmium {
 
         private:
 
-            geos::geom::Coordinate create_geos_coordinate(const osmium::Location location) {
+            geos::geom::Coordinate create_geos_coordinate(const osmium::Location location) const {
                 return geos::geom::Coordinate(location.lon(), location.lat());
             }
 
             /* Point */
 
-            point_type make_point(const osmium::Location location) {
+            point_type make_point(const osmium::Location location) const {
                 return point_type(m_geos_factory.createPoint(create_geos_coordinate(location)));
             }
 

@@ -71,7 +71,7 @@ namespace osmium {
             /* Point */
 
             // { "type": "Point", "coordinates": [100.0, 0.0] }
-            point_type make_point(const Location location) {
+            point_type make_point(const Location location) const {
                 std::string str {"{\"type\":\"Point\",\"coordinates\":["};
                 location.as_string(std::back_inserter(str), ',');
                 str += "]}";

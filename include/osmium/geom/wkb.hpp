@@ -112,13 +112,13 @@ namespace osmium {
             bool m_hex {false};
 
             template <typename T>
-            void str_push(std::string& str, T data) {
+            void str_push(std::string& str, T data) const {
                 size_t size = str.size();
                 str.resize(size + sizeof(T));
                 std::memcpy(const_cast<char *>(&str[size]), reinterpret_cast<char*>(&data), sizeof(T));
             }
 
-            std::string convert_to_hex(std::string& str) {
+            std::string convert_to_hex(std::string& str) const {
                 static const char* lookup_hex = "0123456789abcdef";
                 std::string out;
 
@@ -130,7 +130,7 @@ namespace osmium {
                 return out;
             }
 
-            void header(std::string& str, wkbGeometryType type) {
+            void header(std::string& str, wkbGeometryType type) const {
                 str_push(str, wkb_byte_order_type::NDR);
                 if (m_wkb_type == wkb_type::ewkb) {
                     str_push(str, type | wkbSRID);
@@ -142,7 +142,7 @@ namespace osmium {
 
             /* Point */
 
-            point_type make_point(const osmium::Location location) {
+            point_type make_point(const osmium::Location location) const {
                 std::string data;
                 header(data, wkbPoint);
                 str_push(data, location.lon());

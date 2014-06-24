@@ -71,7 +71,7 @@ namespace osmium {
 
             /* Point */
 
-            point_type make_point(const osmium::Location location) {
+            point_type make_point(const osmium::Location location) const {
                 return point_type(new OGRPoint(location.lon(), location.lat()));
             }
 
