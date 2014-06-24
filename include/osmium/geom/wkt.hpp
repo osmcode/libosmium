@@ -106,7 +106,7 @@ namespace osmium {
             /* MultiPolygon */
 
             bool m_in_polygon = false;
-            bool m_first = true;
+            bool m_first_coordinate = true;
 
             void multipolygon_start() {
                 m_str = "MULTIPOLYGON(";
@@ -115,36 +115,37 @@ namespace osmium {
 
             void multipolygon_outer_ring_start() {
                 if (m_in_polygon) {
-                    m_str += ")),";
+                    m_str += "),";
                 }
                 m_str += "((";
                 m_in_polygon = true;
-                m_first = true;
+                m_first_coordinate = true;
             }
 
             void multipolygon_outer_ring_finish() {
+                m_str += ")";
             }
 
             void multipolygon_inner_ring_start() {
-                m_str += "),(";
-                m_first = true;
+                m_str += ",(";
+                m_first_coordinate = true;
             }
 
             void multipolygon_inner_ring_finish() {
+                m_str += ")";
             }
 
             void multipolygon_add_location(const osmium::Location location) {
-                if (!m_first) {
+                if (!m_first_coordinate) {
                     m_str += ",";
                 }
                 location.as_string(std::back_inserter(m_str), ' ');
-                m_first = false;
+                m_first_coordinate = false;
             }
 
             multipolygon_type multipolygon_finish() {
                 m_in_polygon = false;
-                m_first = true;
-                m_str += ")))";
+                m_str += "))";
                 return std::move(m_str);
             }
 
