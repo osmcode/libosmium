@@ -91,7 +91,7 @@ namespace osmium {
 
         public:
 
-            ChainHandler(THandler&... handlers) :
+            explicit ChainHandler(THandler&... handlers) :
                 m_handlers(handlers...) {
             }
 

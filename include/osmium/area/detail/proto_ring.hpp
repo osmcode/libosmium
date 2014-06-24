@@ -70,12 +70,12 @@ namespace osmium {
 
             public:
 
-                ProtoRing(const NodeRefSegment& segment) :
+                explicit ProtoRing(const NodeRefSegment& segment) :
                     m_segments() {
                     add_segment_back(segment);
                 }
 
-                ProtoRing(segments_type::const_iterator sbegin, segments_type::const_iterator send) :
+                explicit ProtoRing(segments_type::const_iterator sbegin, segments_type::const_iterator send) :
                     m_segments(std::distance(sbegin, send)) {
                     std::copy(sbegin, send, m_segments.begin());
                 }

@@ -80,8 +80,8 @@ namespace osmium {
 
         public:
 
-            NodeLocationsForWays(TStoragePosIDs& storage_pos,
-                                 TStorageNegIDs& storage_neg = get_dummy()) :
+            explicit NodeLocationsForWays(TStoragePosIDs& storage_pos,
+                                          TStorageNegIDs& storage_neg = get_dummy()) :
                 m_storage_pos(storage_pos),
                 m_storage_neg(storage_neg) {
             }

@@ -61,7 +61,7 @@ namespace osmium {
 
             public:
 
-                HybridIterator(typename main_map_type::iterator begin_main,
+                explicit HybridIterator(typename main_map_type::iterator begin_main,
                                typename main_map_type::iterator end_main,
                                typename extra_map_type::iterator begin_extra,
                                typename extra_map_type::iterator end_extra) :

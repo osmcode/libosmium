@@ -64,6 +64,8 @@ different.
 * All files have suffix ".hpp".
 * Closing } of all classes and namespaces should have a trailing comment
   with the name of the class/namespace.
+* All constructors with one or more arguments should be declared "explicit"
+  unless there is a reason for them not to be. Document that reason.
 
 Keep to the indentation and other styles used in the code. Use "make indent"
 in the toplevel directory to fix indentation and styling. It calls "astyle"
@@ -80,7 +82,7 @@ or distributions have which versions of these compilers installed.
 
 GCC 4.6   - too old, not supported (Ubuntu 12.04 LTS)
 GCC 4.7.2 - can probably not be supported (Debian wheezy/stable)
-GCC 4.7.3 - works (Debian jessie/testing)
+GCC 4.7.3 - works
 GCC 4.8   - works
 clang 3.0 - too old, not supported (Debian wheezy/stable, Ubuntu 12.04 LTS)
 clang 3.2 - works

@@ -64,7 +64,7 @@ namespace osmium {
 
             public:
 
-                SegmentList(bool debug) :
+                explicit SegmentList(bool debug) :
                     m_debug(debug) {
                 }
 

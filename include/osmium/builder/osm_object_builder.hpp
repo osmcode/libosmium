@@ -57,7 +57,7 @@ namespace osmium {
 
         public:
 
-            TagListBuilder(osmium::memory::Buffer& buffer, Builder* parent=nullptr) :
+            explicit TagListBuilder(osmium::memory::Buffer& buffer, Builder* parent=nullptr) :
                 ObjectBuilder<TagList>(buffer, parent) {
             }
 
@@ -76,7 +76,7 @@ namespace osmium {
 
         public:
 
-            NodeRefListBuilder(osmium::memory::Buffer& buffer, Builder* parent=nullptr) :
+            explicit NodeRefListBuilder(osmium::memory::Buffer& buffer, Builder* parent=nullptr) :
                 ObjectBuilder<T>(buffer, parent) {
             }
 
@@ -109,7 +109,7 @@ namespace osmium {
 
         public:
 
-            RelationMemberListBuilder(osmium::memory::Buffer& buffer, Builder* parent=nullptr) :
+            explicit RelationMemberListBuilder(osmium::memory::Buffer& buffer, Builder* parent=nullptr) :
                 ObjectBuilder<RelationMemberList>(buffer, parent) {
             }
 
@@ -134,7 +134,7 @@ namespace osmium {
 
         public:
 
-            OSMObjectBuilder(osmium::memory::Buffer& buffer, Builder* parent=nullptr) :
+            explicit OSMObjectBuilder(osmium::memory::Buffer& buffer, Builder* parent=nullptr) :
                 ObjectBuilder<T>(buffer, parent) {
                 static_cast<Builder*>(this)->reserve_space_for<string_size_type>();
                 static_cast<Builder*>(this)->add_size(sizeof(string_size_type));
@@ -156,7 +156,7 @@ namespace osmium {
 
         public:
 
-            WayBuilder(osmium::memory::Buffer& buffer, Builder* parent=nullptr) :
+            explicit WayBuilder(osmium::memory::Buffer& buffer, Builder* parent=nullptr) :
                 OSMObjectBuilder<osmium::Way>(buffer, parent) {
             }
 
@@ -173,7 +173,7 @@ namespace osmium {
 
         public:
 
-            AreaBuilder(osmium::memory::Buffer& buffer, Builder* parent=nullptr) :
+            explicit AreaBuilder(osmium::memory::Buffer& buffer, Builder* parent=nullptr) :
                 OSMObjectBuilder<osmium::Area>(buffer, parent) {
             }
 

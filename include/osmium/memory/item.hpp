@@ -119,7 +119,7 @@ namespace osmium {
 
         protected:
 
-            Item(item_size_type size=0, item_type type=item_type()) :
+            explicit Item(item_size_type size=0, item_type type=item_type()) :
                 m_size(size),
                 m_type(type),
                 m_removed(false) {

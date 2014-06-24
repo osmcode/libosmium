@@ -68,7 +68,7 @@ namespace osmium {
 
         public:
 
-            OutputIterator(TDest& destination, const size_t buffer_size = default_buffer_size) :
+            explicit OutputIterator(TDest& destination, const size_t buffer_size = default_buffer_size) :
                 m_destination(destination),
                 m_buffer_wrapper(std::make_shared<buffer_wrapper>(buffer_size)) {
             }

@@ -5,7 +5,7 @@
 
 This file is part of Osmium (http://osmcode.org/libosmium).
 
-Copyright 2013 Jochen Topf <jochen@topf.org> and others (see README).
+Copyright 2013,2014 Jochen Topf <jochen@topf.org> and others (see README).
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -161,7 +161,7 @@ namespace osmium {
 
             public:
 
-                OPLOutputBlock(osmium::memory::Buffer&& buffer) :
+                explicit OPLOutputBlock(osmium::memory::Buffer&& buffer) :
                     m_input_buffer(std::move(buffer)),
                     m_out(),
                     m_tmp_buffer() {

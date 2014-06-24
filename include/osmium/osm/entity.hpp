@@ -44,7 +44,7 @@ namespace osmium {
 
     public:
 
-        OSMEntity(osmium::memory::item_size_type size, osmium::item_type type) :
+        explicit OSMEntity(osmium::memory::item_size_type size, osmium::item_type type) :
             Item(size, type) {
         }
 

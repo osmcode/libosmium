@@ -49,7 +49,7 @@ namespace osmium {
 
     public:
 
-        UndirectedSegment(const osmium::Location& location1, const osmium::Location& location2) :
+        explicit UndirectedSegment(const osmium::Location& location1, const osmium::Location& location2) :
             Segment(location1, location2) {
             if (location2 < location1) {
                 swap_locations();

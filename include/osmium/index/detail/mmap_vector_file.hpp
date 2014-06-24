@@ -5,7 +5,7 @@
 
 This file is part of Osmium (http://osmcode.org/libosmium).
 
-Copyright 2013 Jochen Topf <jochen@topf.org> and others (see README).
+Copyright 2013,2014 Jochen Topf <jochen@topf.org> and others (see README).
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -51,14 +51,14 @@ namespace osmium {
 
         public:
 
-            mmap_vector_file() :
+            explicit mmap_vector_file() :
                 mmap_vector_base<T, osmium::detail::mmap_vector_file>(
                     osmium::detail::create_tmp_file(),
                     osmium::detail::mmap_vector_size_increment,
                     0) {
             }
 
-            mmap_vector_file(int fd) :
+            explicit mmap_vector_file(int fd) :
                 mmap_vector_base<T, osmium::detail::mmap_vector_file>(
                     fd,
                     osmium::detail::typed_mmap<T>::file_size(fd) == 0 ? osmium::detail::mmap_vector_size_increment : osmium::detail::typed_mmap<T>::file_size(fd),

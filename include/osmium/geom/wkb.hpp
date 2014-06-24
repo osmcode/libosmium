@@ -62,7 +62,7 @@ namespace osmium {
 
         public:
 
-            WKBFactory(bool ewkb=false) :
+            explicit WKBFactory(bool ewkb=false) :
                 GeometryFactory<WKBFactory, wkb_factory_traits>(),
                 m_ewkb(ewkb) {
             }

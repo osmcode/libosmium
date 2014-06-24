@@ -104,7 +104,7 @@ namespace osmium {
 
         public:
 
-            ProblemReporterOGR(OGRDataSource* data_source) :
+            explicit ProblemReporterOGR(OGRDataSource* data_source) :
                 m_data_source(data_source) {
 
                 OGRSpatialReference sparef;

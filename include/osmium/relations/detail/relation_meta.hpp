@@ -70,7 +70,7 @@ namespace osmium {
                 m_relation_offset(0) {
             }
 
-            RelationMeta(size_t relation_offset) :
+            explicit RelationMeta(size_t relation_offset) :
                 m_relation_offset(relation_offset) {
             }
 

@@ -50,7 +50,7 @@ namespace osmium {
 
         public:
 
-            ProblemReporterStream(std::ostream& out) :
+            explicit ProblemReporterStream(std::ostream& out) :
                 m_out(out) {
             }
 

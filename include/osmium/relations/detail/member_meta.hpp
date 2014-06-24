@@ -80,7 +80,7 @@ namespace osmium {
              * member_pos is used to create dummy MemberMeta that can be compared
              * to the MemberMeta in the vectors using the equal_range algorithm.
              */
-            MemberMeta(osmium::object_id_type member_id, size_t relation_pos=0, size_t member_pos=0) :
+            explicit MemberMeta(osmium::object_id_type member_id, size_t relation_pos=0, size_t member_pos=0) :
                 m_member_id(member_id),
                 m_relation_pos(relation_pos),
                 m_member_pos(member_pos) {

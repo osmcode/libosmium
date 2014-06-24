@@ -108,7 +108,7 @@ namespace osmium {
              *
              * In all cases the minimum number of threads in the pool is 1.
              */
-            Pool(int num_threads) :
+            explicit Pool(int num_threads) :
                 m_done(false),
                 m_work_queue(),
                 m_threads(),

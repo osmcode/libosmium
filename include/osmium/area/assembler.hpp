@@ -65,7 +65,7 @@ namespace osmium {
             // Enables debug output to stderr
             bool debug;
 
-            AssemblerConfig(osmium::area::ProblemReporter* pr = nullptr, bool d=false) :
+            explicit AssemblerConfig(osmium::area::ProblemReporter* pr = nullptr, bool d=false) :
                 problem_reporter(pr),
                 debug(d) {
             }
@@ -654,7 +654,7 @@ namespace osmium {
 
             typedef osmium::area::AssemblerConfig config_type;
 
-            Assembler(const config_type& config) :
+            explicit Assembler(const config_type& config) :
                 m_config(config),
                 m_segment_list(config.debug) {
             }

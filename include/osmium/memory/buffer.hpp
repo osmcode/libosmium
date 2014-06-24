@@ -127,7 +127,7 @@ namespace osmium {
              * @param size The size of the initialized data.
              * @exception std::invalid_argument When the size isn't a multiple of the alignment.
              */
-            Buffer(unsigned char* data, size_t size) :
+            explicit Buffer(unsigned char* data, size_t size) :
                 m_memory(),
                 m_data(data),
                 m_capacity(size),
@@ -147,7 +147,7 @@ namespace osmium {
              * @param committed The size of the initialized data. If this is 0, the buffer startes out empty.
              * @exception std::invalid_argument When the capacity or committed isn't a multiple of the alignment.
              */
-            Buffer(unsigned char* data, size_t capacity, size_t committed) :
+            explicit Buffer(unsigned char* data, size_t capacity, size_t committed) :
                 m_memory(),
                 m_data(data),
                 m_capacity(capacity),
@@ -167,7 +167,7 @@ namespace osmium {
              * required size. The dynamic memory will be automatically
              * freed when the Buffer is destroyed.
              */
-            Buffer(size_t capacity, auto_grow auto_grow = auto_grow::yes) :
+            explicit Buffer(size_t capacity, auto_grow auto_grow = auto_grow::yes) :
                 m_memory(capacity),
                 m_data(m_memory.data()),
                 m_capacity(capacity),

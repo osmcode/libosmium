@@ -5,7 +5,7 @@
 
 This file is part of Osmium (http://osmcode.org/libosmium).
 
-Copyright 2013 Jochen Topf <jochen@topf.org> and others (see README).
+Copyright 2013,2014 Jochen Topf <jochen@topf.org> and others (see README).
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -61,14 +61,14 @@ namespace osmium {
             size_t m_size;
             T* m_data;
 
-            mmap_vector_base(int fd, size_t capacity, size_t size, T* data) :
+            explicit mmap_vector_base(int fd, size_t capacity, size_t size, T* data) :
                 m_fd(fd),
                 m_capacity(capacity),
                 m_size(size),
                 m_data(data) {
             }
 
-            mmap_vector_base(int fd, size_t capacity, size_t size) :
+            explicit mmap_vector_base(int fd, size_t capacity, size_t size) :
                 m_fd(fd),
                 m_capacity(capacity),
                 m_size(size),

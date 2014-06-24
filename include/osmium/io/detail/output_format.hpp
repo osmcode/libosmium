@@ -5,7 +5,7 @@
 
 This file is part of Osmium (http://osmcode.org/libosmium).
 
-Copyright 2013 Jochen Topf <jochen@topf.org> and others (see README).
+Copyright 2013,2014 Jochen Topf <jochen@topf.org> and others (see README).
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -74,7 +74,7 @@ namespace osmium {
 
             public:
 
-                OutputFormat(const osmium::io::File& file, data_queue_type& output_queue) :
+                explicit OutputFormat(const osmium::io::File& file, data_queue_type& output_queue) :
                     m_file(file),
                     m_output_queue(output_queue) {
                 }

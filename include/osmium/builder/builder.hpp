@@ -63,7 +63,7 @@ namespace osmium {
 
         protected:
 
-            Builder(osmium::memory::Buffer& buffer, Builder* parent, size_t size) :
+            explicit Builder(osmium::memory::Buffer& buffer, Builder* parent, size_t size) :
                 m_buffer(buffer),
                 m_parent(parent),
                 m_item_offset(buffer.written()) {
@@ -155,7 +155,7 @@ namespace osmium {
 
         public:
 
-            ObjectBuilder(osmium::memory::Buffer& buffer, Builder* parent=nullptr) :
+            explicit ObjectBuilder(osmium::memory::Buffer& buffer, Builder* parent=nullptr) :
                 Builder(buffer, parent, sizeof(T)) {
                 new (&item()) T();
             }

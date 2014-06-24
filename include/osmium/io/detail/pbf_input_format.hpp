@@ -99,7 +99,7 @@ namespace osmium {
 
             public:
 
-                PBFPrimitiveBlockParser(const void* data, const size_t size, osmium::osm_entity_bits::type read_types) :
+                explicit PBFPrimitiveBlockParser(const void* data, const size_t size, osmium::osm_entity_bits::type read_types) :
                     m_data(data),
                     m_size(size),
                     m_stringtable(nullptr),

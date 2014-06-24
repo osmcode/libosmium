@@ -85,14 +85,14 @@ namespace osmium {
                 bool ignore_value;
                 bool result;
 
-                Rule(bool r, bool ignore, const key_type& k, const value_type& v) :
+                explicit Rule(bool r, bool ignore, const key_type& k, const value_type& v) :
                     key(k),
                     value(v),
                     ignore_value(ignore),
                     result(r) {
                 }
 
-                Rule(bool r, bool ignore, const key_type& k) :
+                explicit Rule(bool r, bool ignore, const key_type& k) :
                     key(k),
                     value(),
                     ignore_value(ignore),
@@ -111,7 +111,7 @@ namespace osmium {
             typedef bool result_type;
             typedef boost::filter_iterator<filter_type, osmium::TagList::const_iterator> iterator;
 
-            Filter(bool default_result = false) :
+            explicit Filter(bool default_result = false) :
                 m_default_result(default_result) {
             }
 

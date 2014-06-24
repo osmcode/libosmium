@@ -72,7 +72,7 @@ namespace osmium {
 
         public:
 
-            GEOSFactory(int srid = -1) :
+            explicit GEOSFactory(int srid = -1) :
                 GeometryFactory<GEOSFactory, geos_factory_traits>(),
                 m_precision_model(),
                 m_geos_factory(&m_precision_model, srid) {

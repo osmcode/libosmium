@@ -79,7 +79,7 @@ namespace osmium {
                 *                  The storage will grow by at least this size
                 *                  every time it runs out of space.
                 */
-                SparseTable(const TId grow_size=10000) :
+                explicit SparseTable(const TId grow_size=10000) :
                     m_grow_size(grow_size),
                     m_elements(grow_size) {
                 }

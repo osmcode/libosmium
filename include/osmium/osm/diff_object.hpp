@@ -5,7 +5,7 @@
 
 This file is part of Osmium (http://osmcode.org/libosmium).
 
-Copyright 2013 Jochen Topf <jochen@topf.org> and others (see README).
+Copyright 2013,2014 Jochen Topf <jochen@topf.org> and others (see README).
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -60,7 +60,7 @@ namespace osmium {
             m_next(nullptr) {
         }
 
-        DiffObject(osmium::Object& prev, osmium::Object& curr, osmium::Object& next) :
+        explicit DiffObject(osmium::Object& prev, osmium::Object& curr, osmium::Object& next) :
             m_prev(&prev),
             m_curr(&curr),
             m_next(&next) {

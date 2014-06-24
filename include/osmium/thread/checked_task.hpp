@@ -5,7 +5,7 @@
 
 This file is part of Osmium (http://osmcode.org/libosmium).
 
-Copyright 2013 Jochen Topf <jochen@topf.org> and others (see README).
+Copyright 2013,2014 Jochen Topf <jochen@topf.org> and others (see README).
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -50,7 +50,7 @@ namespace osmium {
 
         public:
 
-            CheckedTask(T&& task) {
+            explicit CheckedTask(T&& task) {
                 std::packaged_task<void()> pack_task(task);
                 m_future = pack_task.get_future();
                 m_thread = std::thread(std::move(pack_task));

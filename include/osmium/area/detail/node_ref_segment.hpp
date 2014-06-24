@@ -79,14 +79,14 @@ namespace osmium {
                     swap(m_first, m_second);
                 }
 
-                NodeRefSegment() :
+                explicit NodeRefSegment() :
                     m_first(),
                     m_second(),
                     m_role(nullptr),
                     m_way(nullptr) {
                 }
 
-                NodeRefSegment(const osmium::NodeRef& nr1, const osmium::NodeRef& nr2, const char* role, const osmium::Way* way) :
+                explicit NodeRefSegment(const osmium::NodeRef& nr1, const osmium::NodeRef& nr2, const char* role, const osmium::Way* way) :
                     m_first(nr1),
                     m_second(nr2),
                     m_role(role),

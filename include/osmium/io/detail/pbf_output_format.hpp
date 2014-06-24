@@ -717,7 +717,7 @@ namespace osmium {
                 /**
                  * Create PBFOutputFormat object from File.
                  */
-                PBFOutputFormat(const osmium::io::File& file, data_queue_type& output_queue) :
+                explicit PBFOutputFormat(const osmium::io::File& file, data_queue_type& output_queue) :
                     OutputFormat(file, output_queue),
                     pbf_header_block(),
                     pbf_primitive_block(),

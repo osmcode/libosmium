@@ -61,7 +61,7 @@ namespace osmium {
 
         public:
 
-            ObjectRelations(index_type& n2w, index_type& n2r, index_type& w2r, index_type& r2r) :
+            explicit ObjectRelations(index_type& n2w, index_type& n2r, index_type& w2r, index_type& r2r) :
                 m_index_n2w(n2w),
                 m_index_n2r(n2r),
                 m_index_w2r(w2r),

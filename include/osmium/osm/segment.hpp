@@ -51,7 +51,7 @@ namespace osmium {
 
     public:
 
-        constexpr Segment(const osmium::Location& location1, const osmium::Location& location2) :
+        explicit constexpr Segment(const osmium::Location& location1, const osmium::Location& location2) :
             m_first(location1),
             m_second(location2) {
         }

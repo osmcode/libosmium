@@ -60,7 +60,7 @@ namespace osmium {
 
         public:
 
-            OutputThread(data_queue_type& input_queue, osmium::io::Compressor* compressor) :
+            explicit OutputThread(data_queue_type& input_queue, osmium::io::Compressor* compressor) :
                 m_input_queue(input_queue),
                 m_compressor(compressor) {
             }

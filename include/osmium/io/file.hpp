@@ -83,7 +83,7 @@ namespace osmium {
              * @param format File format as string. See the description of the
              *               parse_format() function for details.
              */
-            File(const std::string& filename = "", const std::string& format = "") :
+            explicit File(const std::string& filename = "", const std::string& format = "") :
                 Options(),
                 m_filename(filename),
                 m_format_string(format) {

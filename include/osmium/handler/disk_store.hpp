@@ -5,7 +5,7 @@
 
 This file is part of Osmium (http://osmcode.org/libosmium).
 
-Copyright 2013 Jochen Topf <jochen@topf.org> and others (see README).
+Copyright 2013,2014 Jochen Topf <jochen@topf.org> and others (see README).
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -68,7 +68,7 @@ namespace osmium {
 
         public:
 
-            DiskStore(int data_fd, offset_index_type& node_index, offset_index_type& way_index, offset_index_type& relation_index) :
+            explicit DiskStore(int data_fd, offset_index_type& node_index, offset_index_type& way_index, offset_index_type& relation_index) :
                 m_data_fd(data_fd),
                 m_node_index(node_index),
                 m_way_index(way_index),

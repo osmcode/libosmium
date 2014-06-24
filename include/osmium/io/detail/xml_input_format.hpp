@@ -35,7 +35,6 @@ DEALINGS IN THE SOFTWARE.
 
 #define OSMIUM_LINK_WITH_LIBS_EXPAT -lexpat
 
-
 #include <atomic>
 #include <cassert>
 #include <chrono>
@@ -135,7 +134,7 @@ namespace osmium {
 
             public:
 
-                XMLParser(osmium::thread::Queue<std::string>& input_queue, osmium::thread::Queue<osmium::memory::Buffer>& queue, std::promise<osmium::io::Header>& header_promise, osmium::osm_entity_bits::type read_types, std::atomic<bool>& done) :
+                explicit XMLParser(osmium::thread::Queue<std::string>& input_queue, osmium::thread::Queue<osmium::memory::Buffer>& queue, std::promise<osmium::io::Header>& header_promise, osmium::osm_entity_bits::type read_types, std::atomic<bool>& done) :
                     m_context(context::root),
                     m_last_context(context::root),
                     m_in_delete_section(false),
@@ -558,7 +557,7 @@ namespace osmium {
                  * @param read_which_entities Which types of OSM entities (nodes, ways, relations, changesets) should be parsed?
                  * @param input_queue String queue where data is read from.
                  */
-                XMLInputFormat(const osmium::io::File& file, osmium::osm_entity_bits::type read_which_entities, osmium::thread::Queue<std::string>& input_queue) :
+                explicit XMLInputFormat(const osmium::io::File& file, osmium::osm_entity_bits::type read_which_entities, osmium::thread::Queue<std::string>& input_queue) :
                     osmium::io::detail::InputFormat(file, read_which_entities, input_queue),
                     m_queue(),
                     m_done(false),

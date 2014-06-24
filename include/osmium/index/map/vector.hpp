@@ -58,7 +58,7 @@ namespace osmium {
                     m_vector() {
                 }
 
-                VectorBasedDenseMap(int fd) :
+                explicit VectorBasedDenseMap(int fd) :
                     m_vector(fd) {
                 }
 
