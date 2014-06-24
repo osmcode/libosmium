@@ -112,13 +112,13 @@ namespace osmium {
             bool m_hex {false};
 
             template <typename T>
-            void str_push(std::string& str, T data) const {
+            static void str_push(std::string& str, T data) {
                 size_t size = str.size();
                 str.resize(size + sizeof(T));
                 std::memcpy(const_cast<char *>(&str[size]), reinterpret_cast<char*>(&data), sizeof(T));
             }
 
-            std::string convert_to_hex(std::string& str) const {
+            static std::string convert_to_hex(std::string& str) {
                 static const char* lookup_hex = "0123456789abcdef";
                 std::string out;
 
