@@ -90,25 +90,24 @@ namespace osmium {
                 m_newline(true) {
             }
 
-            ~VerboseOutput() {
-            }
+            ~VerboseOutput() = default;
 
             VerboseOutput(const VerboseOutput&) = default;
             VerboseOutput& operator=(const VerboseOutput&) = default;
             VerboseOutput(VerboseOutput&&) = default;
             VerboseOutput& operator=(VerboseOutput&&) = default;
 
-            int runtime() const {
+            int runtime() const noexcept {
                 return time(NULL) - m_start;
             }
 
             /// Get "verbose" setting.
-            bool verbose() const {
+            bool verbose() const noexcept {
                 return m_verbose;
             }
 
             /// Set "verbose" setting.
-            void verbose(bool verbose) {
+            void verbose(bool verbose) noexcept {
                 m_verbose = verbose;
             }
 
