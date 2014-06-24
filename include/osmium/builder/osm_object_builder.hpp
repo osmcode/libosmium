@@ -66,37 +66,6 @@ namespace osmium {
 
         }; // class OSMObjectBuilder
 
-        typedef OSMObjectBuilder<osmium::Node> NodeBuilder;
-        typedef OSMObjectBuilder<osmium::Way> WayBuilder;
-        typedef OSMObjectBuilder<osmium::Relation> RelationBuilder;
-
-        class AreaBuilder : public OSMObjectBuilder<osmium::Area> {
-
-        public:
-
-            AreaBuilder(osmium::memory::Buffer& buffer, Builder* parent=nullptr) :
-                OSMObjectBuilder<osmium::Area>(buffer, parent) {
-            }
-
-            /**
-             * Initialize area attributes from the attributes of the given object.
-             */
-            void initialize_from_object(const osmium::Object& source) {
-                osmium::Area& area = object();
-                area.id(osmium::object_id_to_area_id(source.id(), source.type()));
-                area.version(source.version());
-                area.changeset(source.changeset());
-                area.timestamp(source.timestamp());
-                area.visible(source.visible());
-                area.uid(source.uid());
-
-                add_user(source.user());
-            }
-
-        }; // class AreaBuilder
-
-        typedef ObjectBuilder<osmium::Changeset> ChangesetBuilder;
-
         class TagListBuilder : public ObjectBuilder<TagList> {
 
         public:
@@ -213,6 +182,37 @@ namespace osmium {
             }
 
         }; // class RelationMemberListBuilder
+
+        typedef OSMObjectBuilder<osmium::Node> NodeBuilder;
+        typedef OSMObjectBuilder<osmium::Way> WayBuilder;
+        typedef OSMObjectBuilder<osmium::Relation> RelationBuilder;
+
+        class AreaBuilder : public OSMObjectBuilder<osmium::Area> {
+
+        public:
+
+            AreaBuilder(osmium::memory::Buffer& buffer, Builder* parent=nullptr) :
+                OSMObjectBuilder<osmium::Area>(buffer, parent) {
+            }
+
+            /**
+             * Initialize area attributes from the attributes of the given object.
+             */
+            void initialize_from_object(const osmium::Object& source) {
+                osmium::Area& area = object();
+                area.id(osmium::object_id_to_area_id(source.id(), source.type()));
+                area.version(source.version());
+                area.changeset(source.changeset());
+                area.timestamp(source.timestamp());
+                area.visible(source.visible());
+                area.uid(source.uid());
+
+                add_user(source.user());
+            }
+
+        }; // class AreaBuilder
+
+        typedef ObjectBuilder<osmium::Changeset> ChangesetBuilder;
 
     } // namespace builder
 
