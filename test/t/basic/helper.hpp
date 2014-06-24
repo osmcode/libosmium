@@ -28,7 +28,7 @@ inline osmium::Way& buffer_add_way(osmium::memory::Buffer& buffer, const char* u
     add_tags(buffer, builder, tags);
     osmium::builder::WayNodeListBuilder wnl_builder(buffer, &builder);
     for (const osmium::object_id_type ref : nodes) {
-        wnl_builder.add_way_node(ref);
+        wnl_builder.add_node_ref(ref);
     }
     buffer.commit();
     return builder.object();
@@ -40,7 +40,7 @@ inline osmium::Way& buffer_add_way(osmium::memory::Buffer& buffer, const char* u
     add_tags(buffer, builder, tags);
     osmium::builder::WayNodeListBuilder wnl_builder(buffer, &builder);
     for (auto& p : nodes) {
-        wnl_builder.add_way_node(p.first, p.second);
+        wnl_builder.add_node_ref(p.first, p.second);
     }
     buffer.commit();
     return builder.object();

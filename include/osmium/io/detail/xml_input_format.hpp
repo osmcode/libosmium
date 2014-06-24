@@ -386,7 +386,7 @@ namespace osmium {
 
                                     for (int count = 0; attrs[count]; count += 2) {
                                         if (!strcmp(attrs[count], "ref")) {
-                                            m_wnl_builder->add_way_node(osmium::string_to_object_id(attrs[count+1]));
+                                            m_wnl_builder->add_node_ref(osmium::string_to_object_id(attrs[count+1]));
                                         }
                                     }
                                 } else {

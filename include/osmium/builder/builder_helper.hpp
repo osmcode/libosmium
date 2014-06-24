@@ -49,7 +49,7 @@ namespace osmium {
             {
                 osmium::builder::WayNodeListBuilder wnl_builder(buffer);
                 for (const auto& node_ref : nodes) {
-                    wnl_builder.add_way_node(node_ref);
+                    wnl_builder.add_node_ref(node_ref);
                 }
             }
             buffer.commit();

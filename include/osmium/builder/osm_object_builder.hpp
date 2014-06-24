@@ -96,13 +96,13 @@ namespace osmium {
                 add_padding();
             }
 
-            void add_way_node(const NodeRef& way_node) {
+            void add_node_ref(const NodeRef& way_node) {
                 new (reserve_space_for<osmium::NodeRef>()) osmium::NodeRef(way_node);
                 add_size(sizeof(osmium::NodeRef));
             }
 
-            void add_way_node(const object_id_type ref, const osmium::Location location=Location()) {
-                add_way_node(NodeRef(ref, location));
+            void add_node_ref(const object_id_type ref, const osmium::Location location=Location()) {
+                add_node_ref(NodeRef(ref, location));
             }
 
         }; // class WayNodeListBuilder

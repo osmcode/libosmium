@@ -201,7 +201,7 @@ namespace osmium {
                             uint64_t ref = 0;
                             for (int i=0; i < pbf_way.refs_size(); ++i) {
                                 ref += pbf_way.refs(i);
-                                wnl_builder.add_way_node(ref);
+                                wnl_builder.add_node_ref(ref);
                             }
                         }
 
