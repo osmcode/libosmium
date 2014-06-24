@@ -34,14 +34,8 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <algorithm>
-#include <cstddef>
-#include <initializer_list>
-#include <functional>
-#include <map>
 #include <utility>
 
-#include <osmium/builder/osm_object_builder.hpp>
-#include <osmium/memory/buffer.hpp>
 #include <osmium/osm/tag.hpp>
 
 namespace osmium {
@@ -50,40 +44,6 @@ namespace osmium {
      * @brief Code related to working with OSM tags
      */
     namespace tags {
-
-        inline const osmium::TagList& create_tag_list(osmium::memory::Buffer& buffer, std::initializer_list<std::pair<const char*, const char*>> tags) {
-            size_t pos = buffer.committed();
-            {
-                osmium::builder::TagListBuilder tl_builder(buffer);
-                for (auto& p : tags) {
-                    tl_builder.add_tag(p.first, p.second);
-                }
-            }
-            buffer.commit();
-            return buffer.get<const osmium::TagList>(pos);
-        }
-
-        inline const osmium::TagList& create_tag_list(osmium::memory::Buffer& buffer, std::map<const char*, const char*> tags) {
-            size_t pos = buffer.committed();
-            {
-                osmium::builder::TagListBuilder tl_builder(buffer);
-                for (auto& p : tags) {
-                    tl_builder.add_tag(p.first, p.second);
-                }
-            }
-            buffer.commit();
-            return buffer.get<const osmium::TagList>(pos);
-        }
-
-        inline const osmium::TagList& create_tag_list(osmium::memory::Buffer& buffer, std::function<void (osmium::builder::TagListBuilder&)> func) {
-            size_t pos = buffer.committed();
-            {
-                osmium::builder::TagListBuilder tl_builder(buffer);
-                func(tl_builder);
-            }
-            buffer.commit();
-            return buffer.get<const osmium::TagList>(pos);
-        }
 
         template <class TFilter>
         inline bool match_any_of(const osmium::TagList& tag_list, TFilter&& filter) {

@@ -3,17 +3,17 @@
 #endif
 #include <boost/test/unit_test.hpp>
 
+#include <osmium/builder/builder_helper.hpp>
 #include <osmium/memory/buffer.hpp>
 #include <osmium/osm/item_type_ostream.hpp>
 #include <osmium/osm/tag.hpp>
-#include <osmium/tags/taglist.hpp>
 
 BOOST_AUTO_TEST_SUITE(tag_list)
 
 BOOST_AUTO_TEST_CASE(can_be_created_from_initializer_list) {
     osmium::memory::Buffer buffer(10240);
 
-    const osmium::TagList& tl = osmium::tags::create_tag_list(buffer, {
+    const osmium::TagList& tl = osmium::builder::build_tag_list(buffer, {
         { "highway", "primary" },
         { "name", "Main Street" },
         { "source", "GPS" }
@@ -28,7 +28,7 @@ BOOST_AUTO_TEST_CASE(can_be_created_from_initializer_list) {
 BOOST_AUTO_TEST_CASE(can_be_created_from_map) {
     osmium::memory::Buffer buffer(10240);
 
-    const osmium::TagList& tl = osmium::tags::create_tag_list(buffer, std::map<const char*, const char*>({
+    const osmium::TagList& tl = osmium::builder::build_tag_list(buffer, std::map<const char*, const char*>({
         { "highway", "primary" },
         { "name", "Main Street" }
     }));
@@ -42,7 +42,7 @@ BOOST_AUTO_TEST_CASE(can_be_created_from_map) {
 BOOST_AUTO_TEST_CASE(can_be_created_with_callback) {
     osmium::memory::Buffer buffer(10240);
 
-    const osmium::TagList& tl = osmium::tags::create_tag_list(buffer, [](osmium::builder::TagListBuilder& tlb) {
+    const osmium::TagList& tl = osmium::builder::build_tag_list(buffer, [](osmium::builder::TagListBuilder& tlb) {
         tlb.add_tag("highway", "primary");
         tlb.add_tag("bridge", "true");
     });
@@ -56,7 +56,7 @@ BOOST_AUTO_TEST_CASE(can_be_created_with_callback) {
 BOOST_AUTO_TEST_CASE(returns_value_by_key) {
     osmium::memory::Buffer buffer(10240);
 
-    const osmium::TagList& tl = osmium::tags::create_tag_list(buffer, [](osmium::builder::TagListBuilder& tlb) {
+    const osmium::TagList& tl = osmium::builder::build_tag_list(buffer, [](osmium::builder::TagListBuilder& tlb) {
         tlb.add_tag("highway", "primary");
         tlb.add_tag("bridge", "true");
     });
