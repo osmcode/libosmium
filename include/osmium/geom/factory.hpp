@@ -93,9 +93,9 @@ namespace osmium {
              */
             void add_points(const osmium::OuterRing& nodes) {
                 osmium::Location last_location;
-                for (const osmium::NodeRef& n : nodes) {
-                    if (last_location != n.location()) {
-                        last_location = n.location();
+                for (const osmium::NodeRef& node_ref : nodes) {
+                    if (last_location != node_ref.location()) {
+                        last_location = node_ref.location();
                         static_cast<G*>(this)->multipolygon_add_location(last_location);
                     }
                 }
@@ -103,8 +103,7 @@ namespace osmium {
 
         protected:
 
-            GeometryFactory<G, T>() {
-            }
+            GeometryFactory<G, T>() = default;
 
         public:
 
@@ -116,8 +115,8 @@ namespace osmium {
 
             /* Point */
 
-            point_type create_point(const osmium::Location location) {
-                return static_cast<G*>(this)->make_point(location);
+            point_type create_point(const osmium::Location location) const {
+                return static_cast<const G*>(this)->make_point(location);
             }
 
             point_type create_point(const osmium::Node& node) {
@@ -137,9 +136,9 @@ namespace osmium {
                     osmium::Location last_location;
                     switch (dir) {
                         case direction::forward:
-                            for (auto& wn : wnl) {
-                                if (last_location != wn.location()) {
-                                    last_location = wn.location();
+                            for (const auto& node_ref : wnl) {
+                                if (last_location != node_ref.location()) {
+                                    last_location = node_ref.location();
                                     static_cast<G*>(this)->linestring_add_location(last_location);
                                 }
                             }
@@ -156,8 +155,8 @@ namespace osmium {
                 } else {
                     switch (dir) {
                         case direction::forward:
-                            for (auto& wn : wnl) {
-                                static_cast<G*>(this)->linestring_add_location(wn.location());
+                            for (const auto& node_ref : wnl) {
+                                static_cast<G*>(this)->linestring_add_location(node_ref.location());
                             }
                             break;
                         case direction::backward:
