@@ -119,7 +119,7 @@ namespace osmium {
             }
 
             static std::string convert_to_hex(std::string& str) {
-                static const char* lookup_hex = "0123456789abcdef";
+                static const char* lookup_hex = "0123456789ABCDEF";
                 std::string out;
 
                 for (char c : str) {

@@ -15,7 +15,7 @@ BOOST_AUTO_TEST_CASE(point) {
     factory.set_hex_mode();
 
     std::string wkb {factory.create_point(osmium::Location(3.2, 4.2))};
-    BOOST_CHECK_EQUAL(std::string{"01010000009a99999999990940cdcccccccccc1040"}, wkb);
+    BOOST_CHECK_EQUAL(std::string{"01010000009A99999999990940CDCCCCCCCCCC1040"}, wkb);
 }
 
 BOOST_AUTO_TEST_CASE(point_ewkb) {
@@ -23,7 +23,7 @@ BOOST_AUTO_TEST_CASE(point_ewkb) {
     factory.set_hex_mode();
 
     std::string wkb {factory.create_point(osmium::Location(3.2, 4.2))};
-    BOOST_CHECK_EQUAL(std::string{"0101000020e61000009a99999999990940cdcccccccccc1040"}, wkb);
+    BOOST_CHECK_EQUAL(std::string{"0101000020E61000009A99999999990940CDCCCCCCCCCC1040"}, wkb);
 }
 
 BOOST_AUTO_TEST_CASE(empty_point) {
@@ -47,22 +47,22 @@ BOOST_AUTO_TEST_CASE(linestring) {
 
     {
         std::string wkb {factory.create_linestring(wnl)};
-        BOOST_CHECK_EQUAL(std::string{"0102000000030000009a99999999990940cdcccccccccc10400000000000000c40cdcccccccccc1240cdcccccccccc0c409a99999999991340"}, wkb);
+        BOOST_CHECK_EQUAL(std::string{"0102000000030000009A99999999990940CDCCCCCCCCCC10400000000000000C40CDCCCCCCCCCC1240CDCCCCCCCCCC0C409A99999999991340"}, wkb);
     }
 
     {
         std::string wkb {factory.create_linestring(wnl, osmium::geom::use_nodes::unique, osmium::geom::direction::backward)};
-        BOOST_CHECK_EQUAL(std::string{"010200000003000000cdcccccccccc0c409a999999999913400000000000000c40cdcccccccccc12409a99999999990940cdcccccccccc1040"}, wkb);
+        BOOST_CHECK_EQUAL(std::string{"010200000003000000CDCCCCCCCCCC0C409A999999999913400000000000000C40CDCCCCCCCCCC12409A99999999990940CDCCCCCCCCCC1040"}, wkb);
     }
 
     {
         std::string wkb {factory.create_linestring(wnl, osmium::geom::use_nodes::all)};
-        BOOST_CHECK_EQUAL(std::string{"0102000000040000009a99999999990940cdcccccccccc10400000000000000c40cdcccccccccc12400000000000000c40cdcccccccccc1240cdcccccccccc0c409a99999999991340"}, wkb);
+        BOOST_CHECK_EQUAL(std::string{"0102000000040000009A99999999990940CDCCCCCCCCCC10400000000000000C40CDCCCCCCCCCC12400000000000000C40CDCCCCCCCCCC1240CDCCCCCCCCCC0C409A99999999991340"}, wkb);
     }
 
     {
         std::string wkb {factory.create_linestring(wnl, osmium::geom::use_nodes::all, osmium::geom::direction::backward)};
-        BOOST_CHECK_EQUAL(std::string{"010200000004000000cdcccccccccc0c409a999999999913400000000000000c40cdcccccccccc12400000000000000c40cdcccccccccc12409a99999999990940cdcccccccccc1040"}, wkb);
+        BOOST_CHECK_EQUAL(std::string{"010200000004000000CDCCCCCCCCCC0C409A999999999913400000000000000C40CDCCCCCCCCCC12400000000000000C40CDCCCCCCCCCC12409A99999999990940CDCCCCCCCCCC1040"}, wkb);
     }
 }
 
@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_CASE(linestring_ewkb) {
     });
 
     std::string ewkb {factory.create_linestring(wnl)};
-    BOOST_CHECK_EQUAL(std::string{"0102000020e6100000030000009a99999999990940cdcccccccccc10400000000000000c40cdcccccccccc1240cdcccccccccc0c409a99999999991340"}, ewkb);
+    BOOST_CHECK_EQUAL(std::string{"0102000020E6100000030000009A99999999990940CDCCCCCCCCCC10400000000000000C40CDCCCCCCCCCC1240CDCCCCCCCCCC0C409A99999999991340"}, ewkb);
 }
 
 BOOST_AUTO_TEST_CASE(empty_linestring) {
@@ -110,12 +110,12 @@ BOOST_AUTO_TEST_CASE(linestring_with_two_same_locations) {
 
     {
         std::string wkb {factory.create_linestring(wnl, osmium::geom::use_nodes::all)};
-        BOOST_CHECK_EQUAL(std::string{"0102000000020000000000000000000c40cdcccccccccc12400000000000000c40cdcccccccccc1240"}, wkb);
+        BOOST_CHECK_EQUAL(std::string{"0102000000020000000000000000000C40CDCCCCCCCCCC12400000000000000C40CDCCCCCCCCCC1240"}, wkb);
     }
 
     {
         std::string wkb {factory.create_linestring(wnl, osmium::geom::use_nodes::all, osmium::geom::direction::backward)};
-        BOOST_CHECK_EQUAL(std::string{"0102000000020000000000000000000c40cdcccccccccc12400000000000000c40cdcccccccccc1240"}, wkb);
+        BOOST_CHECK_EQUAL(std::string{"0102000000020000000000000000000C40CDCCCCCCCCCC12400000000000000C40CDCCCCCCCCCC1240"}, wkb);
     }
 }
 
