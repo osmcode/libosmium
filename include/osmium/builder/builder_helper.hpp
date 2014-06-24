@@ -44,6 +44,18 @@ namespace osmium {
 
     namespace builder {
 
+        inline const osmium::WayNodeList& build_way_node_list(osmium::memory::Buffer& buffer, std::initializer_list<osmium::NodeRef> nodes) {
+            size_t pos = buffer.committed();
+            {
+                osmium::builder::WayNodeListBuilder wnl_builder(buffer);
+                for (const auto& node_ref : nodes) {
+                    wnl_builder.add_way_node(node_ref);
+                }
+            }
+            buffer.commit();
+            return buffer.get<const osmium::WayNodeList>(pos);
+        }
+
         inline const osmium::TagList& build_tag_list(osmium::memory::Buffer& buffer, std::initializer_list<std::pair<const char*, const char*>> tags) {
             size_t pos = buffer.committed();
             {

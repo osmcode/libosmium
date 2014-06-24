@@ -3,6 +3,7 @@
 #endif
 #include <boost/test/unit_test.hpp>
 
+#include <osmium/builder/builder_helper.hpp>
 #include <osmium/geom/wkb.hpp>
 
 #include "../basic/helper.hpp"
@@ -37,33 +38,30 @@ BOOST_AUTO_TEST_CASE(linestring) {
     factory.set_hex_mode();
 
     osmium::memory::Buffer buffer(10000);
-    osmium::Way& way = buffer_add_way(buffer,
-        "foo",
-        {},
-        {
-            {1, {3.2, 4.2}},
-            {3, {3.5, 4.7}},
-            {4, {3.5, 4.7}},
-            {2, {3.6, 4.9}}
-        });
+    auto& wnl = osmium::builder::build_way_node_list(buffer, {
+        {1, {3.2, 4.2}},
+        {3, {3.5, 4.7}},
+        {4, {3.5, 4.7}},
+        {2, {3.6, 4.9}}
+    });
 
     {
-        std::string wkb {factory.create_linestring(way.nodes())};
+        std::string wkb {factory.create_linestring(wnl)};
         BOOST_CHECK_EQUAL(std::string{"0102000000030000009a99999999990940cdcccccccccc10400000000000000c40cdcccccccccc1240cdcccccccccc0c409a99999999991340"}, wkb);
     }
 
     {
-        std::string wkb {factory.create_linestring(way.nodes(), osmium::geom::use_nodes::unique, osmium::geom::direction::backward)};
+        std::string wkb {factory.create_linestring(wnl, osmium::geom::use_nodes::unique, osmium::geom::direction::backward)};
         BOOST_CHECK_EQUAL(std::string{"010200000003000000cdcccccccccc0c409a999999999913400000000000000c40cdcccccccccc12409a99999999990940cdcccccccccc1040"}, wkb);
     }
 
     {
-        std::string wkb {factory.create_linestring(way.nodes(), osmium::geom::use_nodes::all)};
+        std::string wkb {factory.create_linestring(wnl, osmium::geom::use_nodes::all)};
         BOOST_CHECK_EQUAL(std::string{"0102000000040000009a99999999990940cdcccccccccc10400000000000000c40cdcccccccccc12400000000000000c40cdcccccccccc1240cdcccccccccc0c409a99999999991340"}, wkb);
     }
 
     {
-        std::string wkb {factory.create_linestring(way.nodes(), osmium::geom::use_nodes::all, osmium::geom::direction::backward)};
+        std::string wkb {factory.create_linestring(wnl, osmium::geom::use_nodes::all, osmium::geom::direction::backward)};
         BOOST_CHECK_EQUAL(std::string{"010200000004000000cdcccccccccc0c409a999999999913400000000000000c40cdcccccccccc12400000000000000c40cdcccccccccc12409a99999999990940cdcccccccccc1040"}, wkb);
     }
 }
@@ -73,17 +71,14 @@ BOOST_AUTO_TEST_CASE(linestring_ewkb) {
     factory.set_hex_mode();
 
     osmium::memory::Buffer buffer(10000);
-    osmium::Way& way = buffer_add_way(buffer,
-        "foo",
-        {},
-        {
-            {1, {3.2, 4.2}},
-            {3, {3.5, 4.7}},
-            {4, {3.5, 4.7}},
-            {2, {3.6, 4.9}}
-        });
+    auto& wnl = osmium::builder::build_way_node_list(buffer, {
+        {1, {3.2, 4.2}},
+        {3, {3.5, 4.7}},
+        {4, {3.5, 4.7}},
+        {2, {3.6, 4.9}}
+    });
 
-    std::string ewkb {factory.create_linestring(way.nodes())};
+    std::string ewkb {factory.create_linestring(wnl)};
     BOOST_CHECK_EQUAL(std::string{"0102000020e6100000030000009a99999999990940cdcccccccccc10400000000000000c40cdcccccccccc1240cdcccccccccc0c409a99999999991340"}, ewkb);
 }
 
@@ -92,15 +87,12 @@ BOOST_AUTO_TEST_CASE(empty_linestring) {
     factory.set_hex_mode();
 
     osmium::memory::Buffer buffer(10000);
-    osmium::Way& way = buffer_add_way(buffer,
-        "foo",
-        {},
-        std::vector<std::pair<osmium::object_id_type, osmium::Location>>({}));
+    auto& wnl = osmium::builder::build_way_node_list(buffer, {});
 
-    BOOST_CHECK_THROW(factory.create_linestring(way.nodes()), osmium::geometry_error);
-    BOOST_CHECK_THROW(factory.create_linestring(way.nodes(), osmium::geom::use_nodes::unique, osmium::geom::direction::backward), osmium::geometry_error);
-    BOOST_CHECK_THROW(factory.create_linestring(way.nodes(), osmium::geom::use_nodes::all), osmium::geometry_error);
-    BOOST_CHECK_THROW(factory.create_linestring(way.nodes(), osmium::geom::use_nodes::all, osmium::geom::direction::backward), osmium::geometry_error);
+    BOOST_CHECK_THROW(factory.create_linestring(wnl), osmium::geometry_error);
+    BOOST_CHECK_THROW(factory.create_linestring(wnl, osmium::geom::use_nodes::unique, osmium::geom::direction::backward), osmium::geometry_error);
+    BOOST_CHECK_THROW(factory.create_linestring(wnl, osmium::geom::use_nodes::all), osmium::geometry_error);
+    BOOST_CHECK_THROW(factory.create_linestring(wnl, osmium::geom::use_nodes::all, osmium::geom::direction::backward), osmium::geometry_error);
 }
 
 BOOST_AUTO_TEST_CASE(linestring_with_two_same_locations) {
@@ -108,24 +100,21 @@ BOOST_AUTO_TEST_CASE(linestring_with_two_same_locations) {
     factory.set_hex_mode();
 
     osmium::memory::Buffer buffer(10000);
-    osmium::Way& way = buffer_add_way(buffer,
-        "foo",
-        {},
-        {
-            {1, {3.5, 4.7}},
-            {2, {3.5, 4.7}},
-        });
+    auto& wnl = osmium::builder::build_way_node_list(buffer, {
+        {1, {3.5, 4.7}},
+        {2, {3.5, 4.7}},
+    });
 
-    BOOST_CHECK_THROW(factory.create_linestring(way.nodes()), osmium::geometry_error);
-    BOOST_CHECK_THROW(factory.create_linestring(way.nodes(), osmium::geom::use_nodes::unique, osmium::geom::direction::backward), osmium::geometry_error);
+    BOOST_CHECK_THROW(factory.create_linestring(wnl), osmium::geometry_error);
+    BOOST_CHECK_THROW(factory.create_linestring(wnl, osmium::geom::use_nodes::unique, osmium::geom::direction::backward), osmium::geometry_error);
 
     {
-        std::string wkb {factory.create_linestring(way.nodes(), osmium::geom::use_nodes::all)};
+        std::string wkb {factory.create_linestring(wnl, osmium::geom::use_nodes::all)};
         BOOST_CHECK_EQUAL(std::string{"0102000000020000000000000000000c40cdcccccccccc12400000000000000c40cdcccccccccc1240"}, wkb);
     }
 
     {
-        std::string wkb {factory.create_linestring(way.nodes(), osmium::geom::use_nodes::all, osmium::geom::direction::backward)};
+        std::string wkb {factory.create_linestring(wnl, osmium::geom::use_nodes::all, osmium::geom::direction::backward)};
         BOOST_CHECK_EQUAL(std::string{"0102000000020000000000000000000c40cdcccccccccc12400000000000000c40cdcccccccccc1240"}, wkb);
     }
 }
@@ -135,15 +124,12 @@ BOOST_AUTO_TEST_CASE(linestring_with_undefined_location) {
     factory.set_hex_mode();
 
     osmium::memory::Buffer buffer(10000);
-    osmium::Way& way = buffer_add_way(buffer,
-        "foo",
-        {},
-        {
-            {1, {3.5, 4.7}},
-            {2, osmium::Location()},
-        });
+    auto& wnl = osmium::builder::build_way_node_list(buffer, {
+        {1, {3.5, 4.7}},
+        {2, osmium::Location()},
+    });
 
-    BOOST_CHECK_THROW(factory.create_linestring(way.nodes()), osmium::invalid_location);
+    BOOST_CHECK_THROW(factory.create_linestring(wnl), osmium::invalid_location);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

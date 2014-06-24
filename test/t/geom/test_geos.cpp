@@ -3,6 +3,7 @@
 #endif
 #include <boost/test/unit_test.hpp>
 
+#include <osmium/builder/builder_helper.hpp>
 #include <osmium/geom/geos.hpp>
 
 #include "../basic/helper.hpp"
@@ -27,18 +28,15 @@ BOOST_AUTO_TEST_CASE(linestring) {
     osmium::geom::GEOSFactory factory;
 
     osmium::memory::Buffer buffer(10000);
-    osmium::Way& way = buffer_add_way(buffer,
-        "foo",
-        {},
-        {
-            {1, {3.2, 4.2}},
-            {3, {3.5, 4.7}},
-            {4, {3.5, 4.7}},
-            {2, {3.6, 4.9}}
-        });
+    auto& wnl = osmium::builder::build_way_node_list(buffer, {
+        {1, {3.2, 4.2}},
+        {3, {3.5, 4.7}},
+        {4, {3.5, 4.7}},
+        {2, {3.6, 4.9}}
+    });
 
     {
-        std::unique_ptr<geos::geom::LineString> linestring {factory.create_linestring(way.nodes())};
+        std::unique_ptr<geos::geom::LineString> linestring {factory.create_linestring(wnl)};
         BOOST_CHECK_EQUAL(3, linestring->getNumPoints());
 
         std::unique_ptr<geos::geom::Point> p0 = std::unique_ptr<geos::geom::Point>(linestring->getPointN(0));
@@ -48,7 +46,7 @@ BOOST_AUTO_TEST_CASE(linestring) {
     }
 
     {
-        std::unique_ptr<geos::geom::LineString> linestring {factory.create_linestring(way.nodes(), osmium::geom::use_nodes::unique, osmium::geom::direction::backward)};
+        std::unique_ptr<geos::geom::LineString> linestring {factory.create_linestring(wnl, osmium::geom::use_nodes::unique, osmium::geom::direction::backward)};
         BOOST_CHECK_EQUAL(3, linestring->getNumPoints());
         std::unique_ptr<geos::geom::Point> p0 = std::unique_ptr<geos::geom::Point>(linestring->getPointN(0));
         BOOST_CHECK_EQUAL(3.6, p0->getX());
@@ -57,14 +55,14 @@ BOOST_AUTO_TEST_CASE(linestring) {
     }
 
     {
-        std::unique_ptr<geos::geom::LineString> linestring {factory.create_linestring(way.nodes(), osmium::geom::use_nodes::all)};
+        std::unique_ptr<geos::geom::LineString> linestring {factory.create_linestring(wnl, osmium::geom::use_nodes::all)};
         BOOST_CHECK_EQUAL(4, linestring->getNumPoints());
         std::unique_ptr<geos::geom::Point> p0 = std::unique_ptr<geos::geom::Point>(linestring->getPointN(0));
         BOOST_CHECK_EQUAL(3.2, p0->getX());
     }
 
     {
-        std::unique_ptr<geos::geom::LineString> linestring {factory.create_linestring(way.nodes(), osmium::geom::use_nodes::all, osmium::geom::direction::backward)};
+        std::unique_ptr<geos::geom::LineString> linestring {factory.create_linestring(wnl, osmium::geom::use_nodes::all, osmium::geom::direction::backward)};
         BOOST_CHECK_EQUAL(4, linestring->getNumPoints());
         std::unique_ptr<geos::geom::Point> p0 = std::unique_ptr<geos::geom::Point>(linestring->getPointN(0));
         BOOST_CHECK_EQUAL(3.6, p0->getX());
