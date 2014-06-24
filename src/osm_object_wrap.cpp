@@ -6,7 +6,7 @@ namespace node_osmium {
     Handle<Value> OSMObjectWrap::tags(const Arguments& args) {
         HandleScope scope;
 
-        osmium::Object& object = *(node::ObjectWrap::Unwrap<OSMObjectWrap>(args.This())->m_it);
+        osmium::OSMObject& object = *(node::ObjectWrap::Unwrap<OSMObjectWrap>(args.This())->m_it);
 
         if (args.Length() == 0) {
             Local<Object> tags = Object::New();

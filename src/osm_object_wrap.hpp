@@ -23,7 +23,7 @@ using namespace v8;
 
 namespace node_osmium {
 
-    typedef osmium::io::InputIterator<osmium::io::Reader, osmium::Object> input_iterator;
+    typedef osmium::io::InputIterator<osmium::io::Reader, osmium::OSMObject> input_iterator;
 
     class OSMObjectWrap : public node::ObjectWrap {
 
@@ -40,7 +40,7 @@ namespace node_osmium {
         static Handle<Value> get_uid(Local<String> property,const AccessorInfo& info);
         static Handle<Value> get_user(Local<String> property,const AccessorInfo& info);
 
-        static osmium::Object& wrapped(Local<Object> object) {
+        static osmium::OSMObject& wrapped(Local<Object> object) {
             return *(node::ObjectWrap::Unwrap<OSMObjectWrap>(object)->get());
         }
 
