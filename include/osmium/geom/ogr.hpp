@@ -99,32 +99,31 @@ namespace osmium {
             ring_type         m_ring;
 
             void multipolygon_start() {
-                m_multipolygon = std::unique_ptr<OGRMultiPolygon>(new OGRMultiPolygon());
+                m_multipolygon.reset(new OGRMultiPolygon());
             }
 
             void multipolygon_outer_ring_start() {
-                if (m_ring) {
-                    m_polygon->addRingDirectly(m_ring.release());
-                }
                 if (m_polygon) {
                     m_multipolygon->addGeometryDirectly(m_polygon.release());
                 }
-                m_polygon = std::unique_ptr<OGRPolygon>(new OGRPolygon());
-                m_ring = std::unique_ptr<OGRLinearRing>(new OGRLinearRing());
+                m_polygon.reset(new OGRPolygon());
+                m_ring.reset(new OGRLinearRing());
             }
 
             void multipolygon_outer_ring_finish() {
+                assert(!!m_polygon);
+                assert(!!m_ring);
+                m_polygon->addRingDirectly(m_ring.release());
             }
 
             void multipolygon_inner_ring_start() {
-                assert(!!m_polygon);
-                if (m_ring) {
-                    m_polygon->addRingDirectly(m_ring.release());
-                }
-                m_ring = std::unique_ptr<OGRLinearRing>(new OGRLinearRing());
+                m_ring.reset(new OGRLinearRing());
             }
 
             void multipolygon_inner_ring_finish() {
+                assert(!!m_polygon);
+                assert(!!m_ring);
+                m_polygon->addRingDirectly(m_ring.release());
             }
 
             void multipolygon_add_location(const osmium::Location location) {
@@ -134,12 +133,8 @@ namespace osmium {
             }
 
             multipolygon_type multipolygon_finish() {
-                if (m_ring) {
-                    m_polygon->addRingDirectly(m_ring.release());
-                }
-                if (m_polygon) {
-                    m_multipolygon->addGeometryDirectly(m_polygon.release());
-                }
+                assert(!!m_polygon);
+                m_multipolygon->addGeometryDirectly(m_polygon.release());
                 return std::move(m_multipolygon);
             }
 
