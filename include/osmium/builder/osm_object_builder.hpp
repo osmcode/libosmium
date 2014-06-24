@@ -140,11 +140,34 @@ namespace osmium {
                 static_cast<Builder*>(this)->add_size(sizeof(string_size_type));
             }
 
+            void add_tags(std::initializer_list<std::pair<const char*, const char*>> tags) {
+                osmium::builder::TagListBuilder tl_builder(static_cast<Builder*>(this)->buffer(), this);
+                for (const auto& p : tags) {
+                    tl_builder.add_tag(p.first, p.second);
+                }
+            }
+
         }; // class OSMObjectBuilder
 
         typedef OSMObjectBuilder<osmium::Node> NodeBuilder;
-        typedef OSMObjectBuilder<osmium::Way> WayBuilder;
         typedef OSMObjectBuilder<osmium::Relation> RelationBuilder;
+
+        class WayBuilder : public OSMObjectBuilder<osmium::Way> {
+
+        public:
+
+            WayBuilder(osmium::memory::Buffer& buffer, Builder* parent=nullptr) :
+                OSMObjectBuilder<osmium::Way>(buffer, parent) {
+            }
+
+            void add_node_refs(std::initializer_list<osmium::NodeRef> nodes) {
+                osmium::builder::WayNodeListBuilder builder(buffer(), this);
+                for (const auto& node_ref : nodes) {
+                    builder.add_node_ref(node_ref);
+                }
+            }
+
+        }; // class WayBuilder
 
         class AreaBuilder : public OSMObjectBuilder<osmium::Area> {
 
