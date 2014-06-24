@@ -80,6 +80,8 @@ namespace osmium {
                 return *reinterpret_cast<osmium::memory::Item*>(m_buffer.data() + m_item_offset);
             }
 
+        public:
+
             /**
              * Add padding to buffer (if needed) to align data properly.
              *
@@ -105,8 +107,6 @@ namespace osmium {
                     }
                 }
             }
-
-        public:
 
             void add_size(uint32_t size) {
                 item().add_size(size);

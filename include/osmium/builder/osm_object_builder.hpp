@@ -53,19 +53,6 @@ namespace osmium {
 
     namespace builder {
 
-        template <class T>
-        class OSMObjectBuilder : public ObjectBuilder<T> {
-
-        public:
-
-            OSMObjectBuilder(osmium::memory::Buffer& buffer, Builder* parent=nullptr) :
-                ObjectBuilder<T>(buffer, parent) {
-                static_cast<Builder*>(this)->reserve_space_for<string_size_type>();
-                static_cast<Builder*>(this)->add_size(sizeof(string_size_type));
-            }
-
-        }; // class OSMObjectBuilder
-
         class TagListBuilder : public ObjectBuilder<TagList> {
 
         public:
@@ -84,74 +71,33 @@ namespace osmium {
 
         }; // class TagListBuilder
 
-        class WayNodeListBuilder : public ObjectBuilder<WayNodeList> {
+        template <class T>
+        class NodeRefListBuilder : public ObjectBuilder<T> {
 
         public:
 
-            WayNodeListBuilder(osmium::memory::Buffer& buffer, Builder* parent=nullptr) :
-                ObjectBuilder<WayNodeList>(buffer, parent) {
+            NodeRefListBuilder(osmium::memory::Buffer& buffer, Builder* parent=nullptr) :
+                ObjectBuilder<T>(buffer, parent) {
             }
 
-            ~WayNodeListBuilder() {
-                add_padding();
+            ~NodeRefListBuilder() {
+                static_cast<Builder*>(this)->add_padding();
             }
 
             void add_node_ref(const NodeRef& way_node) {
-                new (reserve_space_for<osmium::NodeRef>()) osmium::NodeRef(way_node);
-                add_size(sizeof(osmium::NodeRef));
+                new (static_cast<Builder*>(this)->reserve_space_for<osmium::NodeRef>()) osmium::NodeRef(way_node);
+                static_cast<Builder*>(this)->add_size(sizeof(osmium::NodeRef));
             }
 
             void add_node_ref(const object_id_type ref, const osmium::Location location=Location()) {
                 add_node_ref(NodeRef(ref, location));
             }
 
-        }; // class WayNodeListBuilder
+        }; // class NodeRefListBuilder
 
-        class OuterRingBuilder : public ObjectBuilder<OuterRing> {
-
-        public:
-
-            OuterRingBuilder(osmium::memory::Buffer& buffer, Builder* parent=nullptr) :
-                ObjectBuilder<OuterRing>(buffer, parent) {
-            }
-
-            ~OuterRingBuilder() {
-                add_padding();
-            }
-
-            void add_node_ref(const NodeRef& node_ref) {
-                new (reserve_space_for<osmium::NodeRef>()) osmium::NodeRef(node_ref);
-                add_size(sizeof(osmium::NodeRef));
-            }
-
-            void add_node_ref(const object_id_type ref, const osmium::Location location=Location()) {
-                add_node_ref(NodeRef(ref, location));
-            }
-
-        }; // class OuterRingBuilder
-
-        class InnerRingBuilder : public ObjectBuilder<InnerRing> {
-
-        public:
-
-            InnerRingBuilder(osmium::memory::Buffer& buffer, Builder* parent=nullptr) :
-                ObjectBuilder<InnerRing>(buffer, parent) {
-            }
-
-            ~InnerRingBuilder() {
-                add_padding();
-            }
-
-            void add_node_ref(const NodeRef& node_ref) {
-                new (reserve_space_for<osmium::NodeRef>()) osmium::NodeRef(node_ref);
-                add_size(sizeof(osmium::NodeRef));
-            }
-
-            void add_node_ref(const object_id_type ref, const osmium::Location location=Location()) {
-                add_node_ref(NodeRef(ref, location));
-            }
-
-        }; // class InnerRingBuilder
+        typedef NodeRefListBuilder<WayNodeList> WayNodeListBuilder;
+        typedef NodeRefListBuilder<OuterRing> OuterRingBuilder;
+        typedef NodeRefListBuilder<InnerRing> InnerRingBuilder;
 
         class RelationMemberListBuilder : public ObjectBuilder<RelationMemberList> {
 
@@ -182,6 +128,19 @@ namespace osmium {
             }
 
         }; // class RelationMemberListBuilder
+
+        template <class T>
+        class OSMObjectBuilder : public ObjectBuilder<T> {
+
+        public:
+
+            OSMObjectBuilder(osmium::memory::Buffer& buffer, Builder* parent=nullptr) :
+                ObjectBuilder<T>(buffer, parent) {
+                static_cast<Builder*>(this)->reserve_space_for<string_size_type>();
+                static_cast<Builder*>(this)->add_size(sizeof(string_size_type));
+            }
+
+        }; // class OSMObjectBuilder
 
         typedef OSMObjectBuilder<osmium::Node> NodeBuilder;
         typedef OSMObjectBuilder<osmium::Way> WayBuilder;
