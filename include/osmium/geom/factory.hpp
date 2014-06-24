@@ -124,8 +124,8 @@ namespace osmium {
                 return create_point(node.location());
             }
 
-            point_type create_point(const osmium::NodeRef& way_node) {
-                return create_point(way_node.location());
+            point_type create_point(const osmium::NodeRef& node_ref) {
+                return create_point(node_ref.location());
             }
 
             /* LineString */

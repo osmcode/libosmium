@@ -275,9 +275,9 @@ namespace osmium {
 
                     m_out += ">\n";
 
-                    for (auto& way_node : way.nodes()) {
+                    for (const auto& node_ref : way.nodes()) {
                         write_prefix();
-                        oprintf(m_out, "  <nd ref=\"%" PRId64 "\"/>\n", way_node.ref());
+                        oprintf(m_out, "  <nd ref=\"%" PRId64 "\"/>\n", node_ref.ref());
                     }
 
                     write_tags(way.tags());

@@ -84,8 +84,8 @@ namespace osmium {
                 static_cast<Builder*>(this)->add_padding();
             }
 
-            void add_node_ref(const NodeRef& way_node) {
-                new (static_cast<Builder*>(this)->reserve_space_for<osmium::NodeRef>()) osmium::NodeRef(way_node);
+            void add_node_ref(const NodeRef& node_ref) {
+                new (static_cast<Builder*>(this)->reserve_space_for<osmium::NodeRef>()) osmium::NodeRef(node_ref);
                 static_cast<Builder*>(this)->add_size(sizeof(osmium::NodeRef));
             }
 
