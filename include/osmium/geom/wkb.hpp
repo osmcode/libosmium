@@ -101,9 +101,9 @@ namespace osmium {
             /**
              * Byte order marker in WKB geometry.
              */
-            enum wkbByteOrder : uint8_t {
-                wkbXDR = 0,         // Big Endian
-                wkbNDR = 1          // Little Endian
+            enum class wkb_byte_order_type : uint8_t {
+                XDR = 0,         // Big Endian
+                NDR = 1          // Little Endian
             };
 
             std::string m_data {};
@@ -131,7 +131,7 @@ namespace osmium {
             }
 
             void header(std::string& str, wkbGeometryType type) {
-                str_push(str, wkbNDR);
+                str_push(str, wkb_byte_order_type::NDR);
                 if (m_wkb_type == wkb_type::ewkb) {
                     str_push(str, type | wkbSRID);
                     str_push(str, srid);
