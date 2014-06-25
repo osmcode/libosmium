@@ -43,7 +43,7 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
-    namespace {
+    namespace detail {
 
         template <class THandler>
         inline void apply_diff_iterator_recurse(const osmium::DiffObject& diff, THandler& handler) {
@@ -68,7 +68,7 @@ namespace osmium {
             apply_diff_iterator_recurse(diff, more...);
         }
 
-    } // anonymous namespace
+    } // namespace detail
 
     template <class TIterator, class ...THandlers>
     inline void apply_diff(TIterator it, TIterator end, THandlers&... handlers) {
@@ -78,7 +78,7 @@ namespace osmium {
         diff_iterator dend(end, end);
 
         for (; dit != dend; ++dit) {
-            apply_diff_iterator_recurse(*dit, handlers...);
+            detail::apply_diff_iterator_recurse(*dit, handlers...);
         }
     }
 

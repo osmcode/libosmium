@@ -58,7 +58,7 @@ namespace osmium {
         class Item;
     }
 
-    namespace {
+    namespace detail {
 
         template <typename T, typename U>
         using ConstIfConst = typename std::conditional<std::is_const<T>::value, typename std::add_const<U>::type, U>::type;
@@ -123,24 +123,24 @@ namespace osmium {
             flush_recurse(more...);
         }
 
-    } // anonymous namespace
+    } // namespace detail
 
     template <class ...THandlers>
     inline void apply_item(const osmium::memory::Item& item, THandlers&... handlers) {
-        apply_item_recurse(item, handlers...);
+        detail::apply_item_recurse(item, handlers...);
     }
 
     template <class ...THandlers>
     inline void apply_item(osmium::memory::Item& item, THandlers&... handlers) {
-        apply_item_recurse(item, handlers...);
+        detail::apply_item_recurse(item, handlers...);
     }
 
     template <class TIterator, class ...THandlers>
     inline void apply(TIterator it, TIterator end, THandlers&... handlers) {
         for (; it != end; ++it) {
-            apply_item_recurse(*it, handlers...);
+            detail::apply_item_recurse(*it, handlers...);
         }
-        flush_recurse(handlers...);
+        detail::flush_recurse(handlers...);
     }
 
     template <class TContainer, class ...THandlers>
