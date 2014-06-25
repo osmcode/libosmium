@@ -87,7 +87,7 @@ check-includes: $(INCLUDE_FILES)
 
 test:
 	(cd test && ./run_tests.sh)
-	$(MAKE) -C test/osm-testdata test
+	if test -d ../osm-testdata; then $(MAKE) -C test/osm-testdata test; fi
 
 iwyu:
 	for FILE in $(INCLUDE_FILES); do \
