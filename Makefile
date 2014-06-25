@@ -46,10 +46,10 @@ CPPCHECK_OPTIONS += -USTAND_ALONE
 
 all:
 
-.PHONY: clean install check test indent
+.PHONY: clean install check test indent doc/includes.txt
 
 clean:
-	rm -fr check-includes doc/html doc/xml doc/classes.txt test/tests tests/test_*.o
+	rm -fr check-includes doc/html doc/xml doc/classes.txt doc/template-classes.txt doc/includes.txt test/tests tests/test_*.o
 	$(MAKE) -C test/osm-testdata clean
 
 check:
@@ -103,13 +103,19 @@ indent:
 	astyle --style=java --indent-namespaces --indent-switches --pad-header --lineend=linux --suffix=none --recursive include/\*.hpp examples/\*.cpp test/\*.cpp
 #	astyle --style=java --indent-namespaces --indent-switches --pad-header --unpad-paren --align-pointer=type --lineend=linux --suffix=none --recursive include/\*.hpp examples/\*.cpp test/\*.cpp
 
-doc: doc/html/files.html doc/classes.txt
+doc: doc/html/files.html doc/classes.txt doc/template-classes.txt doc/includes.txt
 
 doc/html/files.html: $(INCLUDE_FILES) doc/Doxyfile doc/doc.txt doc/osmium.css
 	doxygen doc/Doxyfile >/dev/null
 
 doc/classes.txt: doc/xml/classosmium_1_1*
-	xmlstarlet sel -t -i "/doxygen/compounddef/@prot='public'" -v "/doxygen/compounddef/compoundname/text()" -n doc/xml/classosmium_1_1* >$@
+	xmlstarlet sel -t -i "/doxygen/compounddef/@prot='public'" -i "not(/doxygen/compounddef/templateparamlist)" -v "/doxygen/compounddef/compoundname/text()" -n doc/xml/classosmium_1_1* >$@
+
+doc/template-classes.txt: doc/xml/classosmium_1_1*
+	xmlstarlet sel -t -i "/doxygen/compounddef/@prot='public'" -i "/doxygen/compounddef/templateparamlist" -v "/doxygen/compounddef/compoundname/text()" -n doc/xml/classosmium_1_1* >$@
+
+doc/includes.txt:
+	find include/osmium -type f -name \*.hpp | sort | cut -d/ -f2- >$@
 
 install-doc: doc
 	install -m 755 -g $(INSTALL_GROUP) -o $(INSTALL_USER) -d $(DESTDIR)/usr/share/doc/libosmium-dev
