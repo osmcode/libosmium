@@ -189,6 +189,76 @@ namespace osmium {
 
             /* MultiPolygon */
 
+            int m_polygons = 0;
+            int m_rings = 0;
+            size_t m_multipolygon_size_offset = 0;
+            size_t m_polygon_size_offset = 0;
+            size_t m_ring_size_offset = 0;
+
+            void multipolygon_start() {
+                m_data.clear();
+                m_polygons = 0;
+                m_rings = 0;
+                m_points = 0;
+                m_polygon_size_offset = 0;
+                m_ring_size_offset = 0;
+                header(m_data, wkbMultiPolygon);
+                m_multipolygon_size_offset = m_data.size();
+                str_push(m_data, static_cast<uint32_t>(0));
+            }
+
+            void multipolygon_outer_ring_start() {
+                if (m_polygons > 0) {
+                    memcpy(&m_data[m_polygon_size_offset], &m_rings, sizeof(uint32_t));
+                }
+                ++m_polygons;
+                m_rings=1;
+
+                // polygon header
+                header(m_data, wkbPolygon);
+                m_polygon_size_offset = m_data.size();
+                str_push(m_data, static_cast<uint32_t>(0));
+
+                // ring header
+                m_ring_size_offset = m_data.size();
+                m_points = 0;
+                str_push(m_data, static_cast<uint32_t>(0));
+            }
+
+            void multipolygon_outer_ring_finish() {
+                memcpy(&m_data[m_ring_size_offset], &m_points, sizeof(uint32_t));
+            }
+
+            void multipolygon_inner_ring_start() {
+                ++m_rings;
+                m_ring_size_offset = m_data.size();
+                m_points = 0;
+                str_push(m_data, static_cast<uint32_t>(0));
+            }
+
+            void multipolygon_inner_ring_finish() {
+                memcpy(&m_data[m_ring_size_offset], &m_points, sizeof(uint32_t));
+            }
+
+            void multipolygon_add_location(const osmium::Location location) {
+                str_push(m_data, location.lon());
+                str_push(m_data, location.lat());
+                ++m_points;
+            }
+
+            multipolygon_type multipolygon_finish() {
+                std::string data;
+                std::swap(data, m_data);
+                memcpy(&data[m_polygon_size_offset], &m_rings, sizeof(uint32_t));
+                memcpy(&data[m_multipolygon_size_offset], &m_polygons, sizeof(uint32_t));
+
+                if (m_hex) {
+                    return convert_to_hex(data);
+                } else {
+                    return data;
+                }
+            }
+
         }; // class WKBFactory
 
     } // namespace geom
