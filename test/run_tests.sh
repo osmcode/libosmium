@@ -2,8 +2,8 @@
 #
 #  Compile and run unit tests
 #
-#  ./run_tests.sh [-v] [-o]               -- compiles and runs all tests
-#  ./run_tests.sh [-v] [-o] SOME_FILE.CPP -- compiles and runs only one test
+#  ./run_tests.sh [-v] [-o]              -- compiles and runs all tests
+#  ./run_tests.sh [-v] [-o] FILE.CPP ... -- compiles and runs only given tests
 #
 #  -v  -- Run tests under valgrind
 #  -o  -- Show standard output also if tests passed
@@ -105,12 +105,14 @@ my_path=`dirname $0`
 cd $my_path
 setup
 if [ "x$1" = "x" ]; then
-    for FILE in t/*/test_*.cpp; do
-        test_file $FILE
-    done
+    FILES=t/*/test_*.cpp
 else
-    test_file $1
+    FILES=$*
 fi
+
+for FILE in $FILES; do
+    test_file $FILE
+done
 
 if [ $(($TESTS_COMPILE_ERROR + $TESTS_FAILED)) = 0 ]; then
     echo "all tests succeeded"
