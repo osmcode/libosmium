@@ -126,10 +126,10 @@ namespace osmium {
                     m_must_sort = false;
                 }
                 bool error = false;
-                for (auto& wn : way.nodes()) {
+                for (auto& node_ref : way.nodes()) {
                     try {
-                        wn.location(get_node_location(wn.ref()));
-                        if (!wn.location()) {
+                        node_ref.location(get_node_location(node_ref.ref()));
+                        if (!node_ref.location()) {
                             error = true;
                         }
                     } catch (osmium::not_found&) {

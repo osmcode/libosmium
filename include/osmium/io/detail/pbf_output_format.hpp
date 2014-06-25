@@ -669,9 +669,9 @@ namespace osmium {
                     // last way-node-id used for delta-encoding
                     Delta<int64_t> delta_id;
 
-                    for (const auto& wn : way.nodes()) {
+                    for (const auto& node_ref : way.nodes()) {
                         // copy the way-node-id, delta encoded
-                        pbf_way->add_refs(delta_id.update(wn.ref()));
+                        pbf_way->add_refs(delta_id.update(node_ref.ref()));
                     }
 
                     // count up blob size by the size of the Way

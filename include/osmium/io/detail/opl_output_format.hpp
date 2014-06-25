@@ -194,13 +194,13 @@ namespace osmium {
 
                     m_out += " N";
                     bool first = true;
-                    for (const auto& wn : way.nodes()) {
+                    for (const auto& node_ref : way.nodes()) {
                         if (first) {
                             first = false;
                         } else {
                             m_out += ',';
                         }
-                        snprintf(m_tmp_buffer, tmp_buffer_size, "n%" PRId64, wn.ref());
+                        snprintf(m_tmp_buffer, tmp_buffer_size, "n%" PRId64, node_ref.ref());
                         m_out += m_tmp_buffer;
                     }
                     m_out += '\n';
