@@ -46,9 +46,7 @@ namespace osmium {
 
     namespace handler {
 
-        namespace {
-            typedef osmium::index::map::Dummy<osmium::unsigned_object_id_type, osmium::Location> dummy_type;
-        }
+        typedef osmium::index::map::Dummy<osmium::unsigned_object_id_type, osmium::Location> dummy_type;
 
         /**
          * Handler to retrieve locations from nodes and add them to ways.

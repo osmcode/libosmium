@@ -48,7 +48,7 @@ namespace osmium {
 
     namespace handler {
 
-        namespace {
+        namespace detail {
 
             class HandlerWrapperBase {
 
@@ -144,22 +144,22 @@ auto _name_##_dispatch(THandler& handler, const osmium::_type_& object, long) ->
 
             }; // HandlerWrapper
 
-        } // anonymous namespace
+        } // namespace detail
 
         class DynamicHandler : public osmium::handler::Handler {
 
-            typedef std::unique_ptr<HandlerWrapperBase> impl_ptr;
+            typedef std::unique_ptr<osmium::handler::detail::HandlerWrapperBase> impl_ptr;
             impl_ptr m_impl;
 
         public:
 
             DynamicHandler() :
-                m_impl(impl_ptr(new HandlerWrapperBase)) {
+                m_impl(impl_ptr(new osmium::handler::detail::HandlerWrapperBase)) {
             }
 
             template <class THandler, class... TArgs>
             void set(TArgs&&... args) {
-                m_impl = impl_ptr(new osmium::handler::HandlerWrapper<THandler>(std::forward<TArgs>(args)...));
+                m_impl = impl_ptr(new osmium::handler::detail::HandlerWrapper<THandler>(std::forward<TArgs>(args)...));
             }
 
             void node(const osmium::Node& node) {
