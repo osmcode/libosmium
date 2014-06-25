@@ -13,7 +13,7 @@
 // osmium
 #include <osmium/io/any_input.hpp>
 #include <osmium/io/reader.hpp>
-#include <osmium/osm/entity_flags.hpp>
+#include <osmium/osm/entity_bits.hpp>
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/types.hpp>
 
@@ -38,7 +38,7 @@ namespace node_osmium {
             return *(node::ObjectWrap::Unwrap<ReaderWrap>(object)->get());
         }
 
-        ReaderWrap(const osmium::io::File& file, osmium::osm_entity::flags entities) :
+        ReaderWrap(const osmium::io::File& file, osmium::osm_entity_bits::type entities) :
             ObjectWrap(),
             m_this(std::make_shared<osmium::io::Reader>(file, entities)) {
         }

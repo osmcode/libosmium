@@ -45,27 +45,27 @@ namespace node_osmium {
             return ThrowException(Exception::TypeError(String::New("please provide a File object or string for the first argument and optional options Object when creating a Reader")));
         }
         try {
-            osmium::osm_entity::flags read_which_entities = osmium::osm_entity::flags::all;
+            osmium::osm_entity_bits::type read_which_entities = osmium::osm_entity_bits::all;
             if (args.Length() == 2) {
                 if (!args[1]->IsObject()) {
                     return ThrowException(Exception::TypeError(String::New("Second argument to Reader constructor must be object")));
                 }
-                read_which_entities = osmium::osm_entity::flags::nothing;
+                read_which_entities = osmium::osm_entity_bits::nothing;
                 Local<Object> options = args[1]->ToObject();
 
                 Local<Value> want_nodes = options->Get(String::New("node"));
                 if (want_nodes->IsBoolean() && want_nodes->BooleanValue()) {
-                    read_which_entities |= osmium::osm_entity::flags::node;
+                    read_which_entities |= osmium::osm_entity_bits::node;
                 }
 
                 Local<Value> want_ways = options->Get(String::New("way"));
                 if (want_ways->IsBoolean() && want_ways->BooleanValue()) {
-                    read_which_entities |= osmium::osm_entity::flags::way;
+                    read_which_entities |= osmium::osm_entity_bits::way;
                 }
 
                 Local<Value> want_relations = options->Get(String::New("relation"));
                 if (want_relations->IsBoolean() && want_relations->BooleanValue()) {
-                    read_which_entities |= osmium::osm_entity::flags::relation;
+                    read_which_entities |= osmium::osm_entity_bits::relation;
                 }
 
             }

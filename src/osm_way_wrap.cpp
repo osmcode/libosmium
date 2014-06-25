@@ -63,7 +63,7 @@ namespace node_osmium {
 #else
             return scope.Close(node::Buffer::New(const_cast<char*>(wkb.data()), wkb.size())->handle_);
 #endif
-        } catch (osmium::geom::geometry_error&) {
+        } catch (osmium::geometry_error&) {
             return scope.Close(Undefined());
         }
     }
@@ -74,7 +74,7 @@ namespace node_osmium {
         try {
             std::string wkt { wkt_factory.create_linestring(wrapped(args.This())) };
             return scope.Close(String::New(wkt.c_str()));
-        } catch (osmium::geom::geometry_error&) {
+        } catch (osmium::geometry_error&) {
             return scope.Close(Undefined());
         }
     }
