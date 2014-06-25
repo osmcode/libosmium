@@ -130,7 +130,7 @@ namespace osmium {
                 return out;
             }
 
-            void header(std::string& str, wkbGeometryType type) const {
+            size_t header(std::string& str, wkbGeometryType type, bool add_length) const {
                 str_push(str, wkb_byte_order_type::NDR);
                 if (m_wkb_type == wkb_type::ewkb) {
                     str_push(str, type | wkbSRID);
@@ -138,13 +138,22 @@ namespace osmium {
                 } else {
                     str_push(str, type);
                 }
+                size_t offset = str.size();
+                if (add_length) {
+                    str_push(str, static_cast<uint32_t>(0));
+                }
+                return offset;
+            }
+
+            void set_size(const size_t offset, const uint32_t size) {
+                memcpy(&m_data[offset], &size, sizeof(uint32_t));
             }
 
             /* Point */
 
             point_type make_point(const osmium::Location location) const {
                 std::string data;
-                header(data, wkbPoint);
+                header(data, wkbPoint, false);
                 str_push(data, location.lon());
                 str_push(data, location.lat());
 
@@ -157,11 +166,12 @@ namespace osmium {
 
             /* LineString */
 
+            size_t m_linestring_size_offset = 0;
+
             void linestring_start() {
                 m_data.clear();
                 m_points = 0;
-                header(m_data, wkbLineString);
-                str_push(m_data, static_cast<uint32_t>(0));
+                m_linestring_size_offset = header(m_data, wkbLineString, true);
             }
 
             void linestring_add_location(const osmium::Location location) {
@@ -175,9 +185,9 @@ namespace osmium {
                     m_data.clear();
                     throw geometry_error("not enough points for linestring");
                 } else {
+                    set_size(m_linestring_size_offset, m_points);
                     std::string data;
                     std::swap(data, m_data);
-                    memcpy(&data[5 + (m_wkb_type == wkb_type::ewkb ? 4 : 0)], &m_points, sizeof(uint32_t));
 
                     if (m_hex) {
                         return convert_to_hex(data);
@@ -198,46 +208,39 @@ namespace osmium {
             void multipolygon_start() {
                 m_data.clear();
                 m_polygons = 0;
+                m_multipolygon_size_offset = header(m_data, wkbMultiPolygon, true);
+            }
+
+            void multipolygon_polygon_start() {
+                ++m_polygons;
                 m_rings = 0;
-                m_points = 0;
-                m_polygon_size_offset = 0;
-                m_ring_size_offset = 0;
-                header(m_data, wkbMultiPolygon);
-                m_multipolygon_size_offset = m_data.size();
-                str_push(m_data, static_cast<uint32_t>(0));
+                m_polygon_size_offset = header(m_data, wkbPolygon, true);
+            }
+
+            void multipolygon_polygon_finish() {
+                set_size(m_polygon_size_offset, m_rings);
             }
 
             void multipolygon_outer_ring_start() {
-                if (m_polygons > 0) {
-                    memcpy(&m_data[m_polygon_size_offset], &m_rings, sizeof(uint32_t));
-                }
-                ++m_polygons;
-                m_rings=1;
-
-                // polygon header
-                header(m_data, wkbPolygon);
-                m_polygon_size_offset = m_data.size();
-                str_push(m_data, static_cast<uint32_t>(0));
-
-                // ring header
-                m_ring_size_offset = m_data.size();
+                ++m_rings;
                 m_points = 0;
+                m_ring_size_offset = m_data.size();
                 str_push(m_data, static_cast<uint32_t>(0));
             }
 
             void multipolygon_outer_ring_finish() {
-                memcpy(&m_data[m_ring_size_offset], &m_points, sizeof(uint32_t));
+                set_size(m_ring_size_offset, m_points);
             }
 
             void multipolygon_inner_ring_start() {
                 ++m_rings;
-                m_ring_size_offset = m_data.size();
                 m_points = 0;
+                m_ring_size_offset = m_data.size();
                 str_push(m_data, static_cast<uint32_t>(0));
             }
 
             void multipolygon_inner_ring_finish() {
-                memcpy(&m_data[m_ring_size_offset], &m_points, sizeof(uint32_t));
+                set_size(m_ring_size_offset, m_points);
             }
 
             void multipolygon_add_location(const osmium::Location location) {
@@ -247,10 +250,9 @@ namespace osmium {
             }
 
             multipolygon_type multipolygon_finish() {
+                set_size(m_multipolygon_size_offset, m_polygons);
                 std::string data;
                 std::swap(data, m_data);
-                memcpy(&data[m_polygon_size_offset], &m_rings, sizeof(uint32_t));
-                memcpy(&data[m_multipolygon_size_offset], &m_polygons, sizeof(uint32_t));
 
                 if (m_hex) {
                     return convert_to_hex(data);

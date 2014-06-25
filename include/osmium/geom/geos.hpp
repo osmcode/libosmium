@@ -111,18 +111,20 @@ namespace osmium {
             std::vector<std::unique_ptr<geos::geom::LinearRing>> m_rings;
             std::vector<std::unique_ptr<geos::geom::Polygon>> m_polygons;
 
-            void create_polygon() {
-                if (!m_rings.empty()) {
-                    auto inner_rings = new std::vector<geos::geom::Geometry*>;
-                    std::transform(std::next(m_rings.begin(), 1), m_rings.end(), std::back_inserter(*inner_rings), [](std::unique_ptr<geos::geom::LinearRing>& r) {
-                        return r.release();
-                    });
-                    m_polygons.emplace_back(m_geos_factory.createPolygon(m_rings[0].release(), inner_rings));
-                    m_rings.clear();
-                }
+            void multipolygon_start() {
             }
 
-            void multipolygon_start() {
+            void multipolygon_polygon_start() {
+            }
+
+            void multipolygon_polygon_finish() {
+                assert(!m_rings.empty());
+                auto inner_rings = new std::vector<geos::geom::Geometry*>;
+                std::transform(std::next(m_rings.begin(), 1), m_rings.end(), std::back_inserter(*inner_rings), [](std::unique_ptr<geos::geom::LinearRing>& r) {
+                    return r.release();
+                });
+                m_polygons.emplace_back(m_geos_factory.createPolygon(m_rings[0].release(), inner_rings));
+                m_rings.clear();
             }
 
             void multipolygon_outer_ring_start() {
@@ -130,7 +132,6 @@ namespace osmium {
             }
 
             void multipolygon_outer_ring_finish() {
-                create_polygon();
                 m_rings.emplace_back(m_geos_factory.createLinearRing(m_coordinate_sequence.release()));
             }
 
@@ -147,7 +148,6 @@ namespace osmium {
             }
 
             multipolygon_type multipolygon_finish() {
-                create_polygon();
                 auto polygons = new std::vector<geos::geom::Geometry*>;
                 std::transform(m_polygons.begin(), m_polygons.end(), std::back_inserter(*polygons), [](std::unique_ptr<geos::geom::Polygon>& p) {
                     return p.release();

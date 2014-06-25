@@ -102,11 +102,17 @@ namespace osmium {
                 m_multipolygon.reset(new OGRMultiPolygon());
             }
 
-            void multipolygon_outer_ring_start() {
-                if (m_polygon) {
-                    m_multipolygon->addGeometryDirectly(m_polygon.release());
-                }
+            void multipolygon_polygon_start() {
                 m_polygon.reset(new OGRPolygon());
+            }
+
+            void multipolygon_polygon_finish() {
+                assert(!!m_multipolygon);
+                assert(!!m_polygon);
+                m_multipolygon->addGeometryDirectly(m_polygon.release());
+            }
+
+            void multipolygon_outer_ring_start() {
                 m_ring.reset(new OGRLinearRing());
             }
 
@@ -133,8 +139,7 @@ namespace osmium {
             }
 
             multipolygon_type multipolygon_finish() {
-                assert(!!m_polygon);
-                m_multipolygon->addGeometryDirectly(m_polygon.release());
+                assert(!!m_multipolygon);
                 return std::move(m_multipolygon);
             }
 
