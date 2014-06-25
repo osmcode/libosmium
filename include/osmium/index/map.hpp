@@ -36,7 +36,7 @@ DEALINGS IN THE SOFTWARE.
 #include <cstddef>
 #include <type_traits>
 
-#include <osmium/index/index.hpp>
+#include <osmium/index/index.hpp> // IWYU pragma: export
 
 namespace osmium {
 

@@ -35,12 +35,18 @@ DEALINGS IN THE SOFTWARE.
 
 #include <cstddef>
 #include <initializer_list>
+#include <functional>
 #include <map>
+#include <utility>
 
 #include <osmium/builder/osm_object_builder.hpp>
 #include <osmium/memory/buffer.hpp>
 
 namespace osmium {
+
+    class NodeRef;
+    class TagList;
+    class WayNodeList;
 
     namespace builder {
 

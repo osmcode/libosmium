@@ -37,6 +37,7 @@ DEALINGS IN THE SOFTWARE.
 #include <limits>
 #include <sstream>
 #include <stdexcept>
+#include <string>
 
 namespace osmium {
 

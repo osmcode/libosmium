@@ -34,7 +34,6 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <cstddef>
-#include <stdexcept>
 
 #include <osmium/index/map.hpp>
 

@@ -34,7 +34,9 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <cstring>
+#include <initializer_list>
 #include <new>
+#include <utility>
 
 #include <osmium/builder/builder.hpp>
 #include <osmium/osm.hpp>
