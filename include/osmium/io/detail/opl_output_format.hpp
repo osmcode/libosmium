@@ -135,7 +135,7 @@ namespace osmium {
                     append_encoded_string(object.user());
                     m_out += " T";
                     bool first = true;
-                    for (auto& tag : object.tags()) {
+                    for (const auto& tag : object.tags()) {
                         if (first) {
                             first = false;
                         } else {
@@ -239,7 +239,7 @@ namespace osmium {
                     write_location(changeset.bounds().top_right(), 'X', 'Y');
                     m_out += " T";
                     bool first = true;
-                    for (auto& tag : changeset.tags()) {
+                    for (const auto& tag : changeset.tags()) {
                         if (first) {
                             first = false;
                         } else {

@@ -131,7 +131,7 @@ namespace osmium {
                 int64_t sum() const {
                     int64_t sum = 0;
 
-                    for (auto segment : m_segments) {
+                    for (const auto& segment : m_segments) {
                         sum += static_cast<int64_t>(segment.first().location().x()) * static_cast<int64_t>(segment.second().location().y()) -
                                static_cast<int64_t>(segment.second().location().x()) * static_cast<int64_t>(segment.first().location().y());
                     }
@@ -162,7 +162,7 @@ namespace osmium {
                 void print(std::ostream& out) const {
                     out << "[";
                     bool first = true;
-                    for (auto& segment : m_segments) {
+                    for (const auto& segment : m_segments) {
                         if (first) {
                             out << segment.first().ref();
                         }
@@ -245,13 +245,13 @@ namespace osmium {
                 }
 
                 void get_ways(std::set<const osmium::Way*>& ways) {
-                    for (auto& segment : m_segments) {
+                    for (const auto& segment : m_segments) {
                         ways.insert(segment.way());
                     }
                 }
 
                 bool contains(const NodeRefSegment& segment) const {
-                    for (auto& s : m_segments) {
+                    for (const auto& s : m_segments) {
                         if (s == segment || (s.first() == segment.second() && s.second() == segment.first())) {
                             return true;
                         }

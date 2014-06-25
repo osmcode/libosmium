@@ -92,7 +92,7 @@ namespace osmium {
 
             osmium::Box joined_boxes() const {
                 osmium::Box box;
-                for (auto& b : m_boxes) {
+                for (const auto& b : m_boxes) {
                     box.extend(b.bottom_left());
                     box.extend(b.top_right());
                 }

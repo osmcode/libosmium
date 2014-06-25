@@ -158,7 +158,7 @@ namespace osmium {
                 }
 
                 void write_tags(const osmium::TagList& tags) {
-                    for (auto& tag : tags) {
+                    for (const auto& tag : tags) {
                         write_prefix();
                         m_out += "  <tag k=\"";
                         xml_string(m_out, tag.key());
@@ -302,7 +302,7 @@ namespace osmium {
 
                     m_out += ">\n";
 
-                    for (auto& member : relation.members()) {
+                    for (const auto& member : relation.members()) {
                         write_prefix();
                         m_out += "  <member type=\"";
                         m_out += item_type_to_name(member.type());
@@ -413,7 +413,7 @@ namespace osmium {
                         out += "\">\n";
                     }
 
-                    for (auto& box : header.boxes()) {
+                    for (const auto& box : header.boxes()) {
                         out += "  <bounds";
                         oprintf(out, " minlon=\"%.7f\"", box.bottom_left().lon());
                         oprintf(out, " minlat=\"%.7f\"", box.bottom_left().lat());

@@ -134,7 +134,7 @@ namespace osmium {
             void add_common_tags(osmium::builder::TagListBuilder& tl_builder, std::set<const osmium::Way*>& ways) const {
                 std::map<std::string, size_t> counter;
                 for (const osmium::Way* way : ways) {
-                    for (auto& tag : way->tags()) {
+                    for (const auto& tag : way->tags()) {
                         std::string kv {tag.key()};
                         kv.append(1, '\0');
                         kv.append(tag.value());
@@ -143,7 +143,7 @@ namespace osmium {
                 }
 
                 size_t num_ways = ways.size();
-                for (auto& t_c : counter) {
+                for (const auto& t_c : counter) {
                     if (debug()) {
                         std::cerr << "        tag " << t_c.first << " is used " << t_c.second << " times in " << num_ways << " ways\n";
                     }
@@ -185,7 +185,7 @@ namespace osmium {
                         std::cerr << "    use tags from outer ways\n";
                     }
                     std::set<const osmium::Way*> ways;
-                    for (auto& ring : m_outer_rings) {
+                    for (const auto& ring : m_outer_rings) {
                         ring->get_ways(ways);
                     }
                     if (ways.size() == 1) {
@@ -215,7 +215,7 @@ namespace osmium {
             bool check_for_open_rings() {
                 bool open_rings = false;
 
-                for (auto& ring : m_rings) {
+                for (const auto& ring : m_rings) {
                     if (!ring.closed()) {
                         open_rings = true;
                         if (m_config.problem_reporter) {
@@ -421,14 +421,14 @@ namespace osmium {
                     {
                         osmium::builder::OuterRingBuilder ring_builder(builder.buffer(), &builder);
                         ring_builder.add_node_ref(ring->get_segment_front().first());
-                        for (auto& segment : ring->segments()) {
+                        for (const auto& segment : ring->segments()) {
                             ring_builder.add_node_ref(segment.second());
                         }
                     }
                     for (ProtoRing* inner : ring->inner_rings()) {
                         osmium::builder::InnerRingBuilder ring_builder(builder.buffer(), &builder);
                         ring_builder.add_node_ref(inner->get_segment_front().first());
-                        for (auto& segment : inner->segments()) {
+                        for (const auto& segment : inner->segments()) {
                             ring_builder.add_node_ref(segment.second());
                         }
                     }
@@ -527,8 +527,8 @@ namespace osmium {
                     std::cerr << "    check_inner_outer_roles\n";
                 }
 
-                for (auto ringptr : m_outer_rings) {
-                    for (auto segment : ringptr->segments()) {
+                for (const auto ringptr : m_outer_rings) {
+                    for (const auto segment : ringptr->segments()) {
                         if (!segment.role_outer()) {
                             ++m_inner_outer_mismatches;
                             if (debug()) {
@@ -540,8 +540,8 @@ namespace osmium {
                         }
                     }
                 }
-                for (auto ringptr : m_inner_rings) {
-                    for (auto segment : ringptr->segments()) {
+                for (const auto ringptr : m_inner_rings) {
+                    for (const auto segment : ringptr->segments()) {
                         if (!segment.role_inner()) {
                             ++m_inner_outer_mismatches;
                             if (debug()) {
@@ -587,7 +587,7 @@ namespace osmium {
 
                 if (debug()) {
                     std::cerr << "  Rings:\n";
-                    for (auto& ring : m_rings) {
+                    for (const auto& ring : m_rings) {
                         std::cerr << "    " << ring;
                         if (ring.closed()) {
                             std::cerr << " (closed)";

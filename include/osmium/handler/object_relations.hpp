@@ -80,7 +80,7 @@ namespace osmium {
             }
 
             void relation(const osmium::Relation& relation) {
-                for (auto& member : relation.members()) {
+                for (const auto& member : relation.members()) {
                     switch (member.type()) {
                         case osmium::item_type::node:
                             m_index_n2r.set(member.positive_ref(), relation.positive_id());

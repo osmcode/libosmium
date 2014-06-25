@@ -669,7 +669,7 @@ namespace osmium {
                     // last way-node-id used for delta-encoding
                     Delta<int64_t> delta_id;
 
-                    for (auto& wn : way.nodes()) {
+                    for (const auto& wn : way.nodes()) {
                         // copy the way-node-id, delta encoded
                         pbf_way->add_refs(delta_id.update(wn.ref()));
                     }
@@ -692,7 +692,7 @@ namespace osmium {
 
                     Delta<int64_t> delta_id;
 
-                    for (auto& member : relation.members()) {
+                    for (const auto& member : relation.members()) {
                         // record the relation-member role to the interim stringtable and copy the
                         // interim string-id to the pbf-object
                         pbf_relation->add_roles_sid(string_table.record_string(member.role()));
