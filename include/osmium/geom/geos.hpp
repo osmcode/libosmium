@@ -95,7 +95,7 @@ namespace osmium {
                     m_coordinate_sequence->add(geos::geom::Coordinate(xy.x, xy.y));
                 }
 
-                linestring_type linestring_finish() {
+                linestring_type linestring_finish(int /* num_points */) {
                     return linestring_type(m_geos_factory.createLineString(m_coordinate_sequence.release()));
                 }
 

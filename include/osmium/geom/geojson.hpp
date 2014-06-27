@@ -49,7 +49,6 @@ namespace osmium {
             class GeoJSONFactoryImpl {
 
                 std::string m_str {};
-                int m_points {0};
 
             public:
 
@@ -76,27 +75,20 @@ namespace osmium {
                 // { "type": "LineString", "coordinates": [ [100.0, 0.0], [101.0, 1.0] ] }
                 void linestring_start() {
                     m_str = "{\"type\":\"LineString\",\"coordinates\":[";
-                    m_points = 0;
                 }
 
                 void linestring_add_location(const osmium::geom::Coordinates& xy) {
                     xy.append_to_string(m_str, '[', ',', ']');
-                    m_str += ",";
-                    ++m_points;
+                    m_str += ',';
                 }
 
-                linestring_type linestring_finish() {
-                    if (m_points < 2) {
-                        m_str.clear();
-                        throw geometry_error("not enough points for linestring");
-                    } else {
-                        assert(!m_str.empty());
-                        std::string str;
-                        std::swap(str, m_str);
-                        str.back() = ']';
-                        str += "}";
-                        return str;
-                    }
+                linestring_type linestring_finish(int /* num_points */) {
+                    assert(!m_str.empty());
+                    std::string str;
+                    std::swap(str, m_str);
+                    str.back() = ']';
+                    str += "}";
+                    return str;
                 }
 
                 /* MultiPolygon */

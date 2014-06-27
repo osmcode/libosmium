@@ -49,7 +49,6 @@ namespace osmium {
             class WKTFactoryImpl {
 
                 std::string m_str {};
-                int m_points {0};
 
             public:
 
@@ -71,26 +70,19 @@ namespace osmium {
 
                 void linestring_start() {
                     m_str = "LINESTRING(";
-                    m_points = 0;
                 }
 
                 void linestring_add_location(const osmium::geom::Coordinates& xy) {
                     xy.append_to_string(m_str, ' ');
                     m_str += ',';
-                    ++m_points;
                 }
 
-                linestring_type linestring_finish() {
-                    if (m_points < 2) {
-                        m_str.clear();
-                        throw geometry_error("not enough points for linestring");
-                    } else {
-                        assert(!m_str.empty());
-                        std::string str;
-                        std::swap(str, m_str);
-                        str.back() = ')';
-                        return str;
-                    }
+                linestring_type linestring_finish(int /* num_points */) {
+                    assert(!m_str.empty());
+                    std::string str;
+                    std::swap(str, m_str);
+                    str.back() = ')';
+                    return str;
                 }
 
                 /* MultiPolygon */

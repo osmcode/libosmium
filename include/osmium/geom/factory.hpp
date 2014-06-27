@@ -146,48 +146,58 @@ namespace osmium {
             /* LineString */
 
             template <class TIter>
-            void fill_linestring(TIter it, TIter end) {
-                for (; it != end; ++it) {
+            int fill_linestring(TIter it, TIter end) {
+                int num_points = 0;
+                for (; it != end; ++it, ++num_points) {
                     m_impl.linestring_add_location(m_projection(it->location()));
                 }
+                return num_points;
             }
 
             template <class TIter>
-            void fill_linestring_unique(TIter it, TIter end) {
+            int fill_linestring_unique(TIter it, TIter end) {
+                int num_points = 0;
                 osmium::Location last_location;
                 for (; it != end; ++it) {
                     if (last_location != it->location()) {
                         last_location = it->location();
                         m_impl.linestring_add_location(m_projection(last_location));
+                        ++num_points;
                     }
                 }
+                return num_points;
             }
 
             linestring_type create_linestring(const osmium::WayNodeList& wnl, use_nodes un=use_nodes::unique, direction dir=direction::forward) {
                 m_impl.linestring_start();
+                int num_points = 0;
 
                 if (un == use_nodes::unique) {
                     osmium::Location last_location;
                     switch (dir) {
                         case direction::forward:
-                            fill_linestring_unique(wnl.cbegin(), wnl.cend());
+                            num_points = fill_linestring_unique(wnl.cbegin(), wnl.cend());
                             break;
                         case direction::backward:
-                            fill_linestring_unique(wnl.crbegin(), wnl.crend());
+                            num_points = fill_linestring_unique(wnl.crbegin(), wnl.crend());
                             break;
                     }
                 } else {
                     switch (dir) {
                         case direction::forward:
-                            fill_linestring(wnl.cbegin(), wnl.cend());
+                            num_points = fill_linestring(wnl.cbegin(), wnl.cend());
                             break;
                         case direction::backward:
-                            fill_linestring(wnl.crbegin(), wnl.crend());
+                            num_points = fill_linestring(wnl.crbegin(), wnl.crend());
                             break;
                     }
                 }
 
-                return m_impl.linestring_finish();
+                if (num_points < 2) {
+                    throw geometry_error("not enough points for linestring");
+                }
+
+                return m_impl.linestring_finish(num_points);
             }
 
             linestring_type create_linestring(const osmium::Way& way, use_nodes un=use_nodes::unique, direction dir=direction::forward) {

@@ -63,7 +63,7 @@ namespace osmium {
 
             private:
 
-                linestring_type m_linestring;
+                linestring_type   m_linestring;
                 multipolygon_type m_multipolygon;
                 polygon_type      m_polygon;
                 ring_type         m_ring;
@@ -89,7 +89,7 @@ namespace osmium {
                     m_linestring->addPoint(xy.x, xy.y);
                 }
 
-                linestring_type linestring_finish() {
+                linestring_type linestring_finish(int /* num_points */) {
                     return std::move(m_linestring);
                 }
 

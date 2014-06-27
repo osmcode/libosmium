@@ -172,30 +172,23 @@ namespace osmium {
 
                 void linestring_start() {
                     m_data.clear();
-                    m_points = 0;
                     m_linestring_size_offset = header(m_data, wkbLineString, true);
                 }
 
                 void linestring_add_location(const osmium::geom::Coordinates& xy) {
                     str_push(m_data, xy.x);
                     str_push(m_data, xy.y);
-                    ++m_points;
                 }
 
-                linestring_type linestring_finish() {
-                    if (m_points < 2) {
-                        m_data.clear();
-                        throw geometry_error("not enough points for linestring");
-                    } else {
-                        set_size(m_linestring_size_offset, m_points);
-                        std::string data;
-                        std::swap(data, m_data);
+                linestring_type linestring_finish(int num_points) {
+                    set_size(m_linestring_size_offset, num_points);
+                    std::string data;
+                    std::swap(data, m_data);
 
-                        if (m_out_type == out_type::hex) {
-                            return convert_to_hex(data);
-                        } else {
-                            return data;
-                        }
+                    if (m_out_type == out_type::hex) {
+                        return convert_to_hex(data);
+                    } else {
+                        return data;
                     }
                 }
 
