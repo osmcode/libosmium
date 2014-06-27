@@ -42,8 +42,8 @@ DEALINGS IN THE SOFTWARE.
 
 #include <ogr_geometry.h>
 
+#include <osmium/geom/coordinates.hpp>
 #include <osmium/geom/factory.hpp>
-#include <osmium/osm/location.hpp>
 
 namespace osmium {
 

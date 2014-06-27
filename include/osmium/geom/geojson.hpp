@@ -34,11 +34,10 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <cassert>
-#include <iterator>
 #include <string>
 #include <utility>
 
-#include <osmium/osm/location.hpp>
+#include <osmium/geom/coordinates.hpp>
 #include <osmium/geom/factory.hpp>
 
 namespace osmium {

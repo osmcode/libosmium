@@ -48,8 +48,8 @@ DEALINGS IN THE SOFTWARE.
 #include <geos/geom/Polygon.h>
 #include <geos/geom/MultiPolygon.h>
 
-#include <osmium/osm/location.hpp>
 #include <osmium/geom/factory.hpp>
+#include <osmium/geom/coordinates.hpp>
 
 namespace osmium {
 
