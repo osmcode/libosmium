@@ -51,8 +51,6 @@ namespace osmium {
 
                 std::string m_str {};
                 int m_points {0};
-                bool m_first_polygon = true;
-                bool m_first_coordinate = true;
 
             public:
 
@@ -91,7 +89,7 @@ namespace osmium {
                         assert(!m_str.empty());
                         std::string str;
                         std::swap(str, m_str);
-                        str[str.size()-1] = ')';
+                        str.back() = ')';
                         return str;
                     }
                 }
@@ -100,50 +98,42 @@ namespace osmium {
 
                 void multipolygon_start() {
                     m_str = "MULTIPOLYGON(";
-                    m_first_polygon = true;
                 }
 
                 void multipolygon_polygon_start() {
-                    if (!m_first_polygon) {
-                        m_str += ",";
-                    } else {
-                        m_first_polygon = false;
-                    }
-                    m_str += "(";
+                    m_str += '(';
                 }
 
                 void multipolygon_polygon_finish() {
-                    m_str += ")";
+                    m_str += "),";
                 }
 
                 void multipolygon_outer_ring_start() {
-                    m_str += "(";
-                    m_first_coordinate = true;
+                    m_str += '(';
                 }
 
                 void multipolygon_outer_ring_finish() {
-                    m_str += ")";
+                    assert(!m_str.empty());
+                    m_str.back() = ')';
                 }
 
                 void multipolygon_inner_ring_start() {
                     m_str += ",(";
-                    m_first_coordinate = true;
                 }
 
                 void multipolygon_inner_ring_finish() {
-                    m_str += ")";
+                    assert(!m_str.empty());
+                    m_str.back() = ')';
                 }
 
                 void multipolygon_add_location(const osmium::geom::Coordinates& xy) {
-                    if (!m_first_coordinate) {
-                        m_str += ",";
-                    }
                     xy.append_to_string(m_str, ' ');
-                    m_first_coordinate = false;
+                    m_str += ',';
                 }
 
                 multipolygon_type multipolygon_finish() {
-                    m_str += ")";
+                    assert(!m_str.empty());
+                    m_str.back() = ')';
                     return std::move(m_str);
                 }
 
