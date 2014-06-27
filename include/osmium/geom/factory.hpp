@@ -145,6 +145,24 @@ namespace osmium {
 
             /* LineString */
 
+            template <class TIter>
+            void fill_linestring(TIter it, TIter end) {
+                for (; it != end; ++it) {
+                    m_impl.linestring_add_location(m_projection(it->location()));
+                }
+            }
+
+            template <class TIter>
+            void fill_linestring_unique(TIter it, TIter end) {
+                osmium::Location last_location;
+                for (; it != end; ++it) {
+                    if (last_location != it->location()) {
+                        last_location = it->location();
+                        m_impl.linestring_add_location(m_projection(last_location));
+                    }
+                }
+            }
+
             linestring_type create_linestring(const osmium::WayNodeList& wnl, use_nodes un=use_nodes::unique, direction dir=direction::forward) {
                 m_impl.linestring_start();
 
@@ -152,33 +170,19 @@ namespace osmium {
                     osmium::Location last_location;
                     switch (dir) {
                         case direction::forward:
-                            for (const auto& node_ref : wnl) {
-                                if (last_location != node_ref.location()) {
-                                    last_location = node_ref.location();
-                                    m_impl.linestring_add_location(m_projection(last_location));
-                                }
-                            }
+                            fill_linestring_unique(wnl.cbegin(), wnl.cend());
                             break;
                         case direction::backward:
-                            for (int i = wnl.size()-1; i >= 0; --i) {
-                                if (last_location != wnl[i].location()) {
-                                    last_location = wnl[i].location();
-                                    m_impl.linestring_add_location(m_projection(last_location));
-                                }
-                            }
+                            fill_linestring_unique(wnl.crbegin(), wnl.crend());
                             break;
                     }
                 } else {
                     switch (dir) {
                         case direction::forward:
-                            for (const auto& node_ref : wnl) {
-                                m_impl.linestring_add_location(m_projection(node_ref.location()));
-                            }
+                            fill_linestring(wnl.cbegin(), wnl.cend());
                             break;
                         case direction::backward:
-                            for (int i = wnl.size()-1; i >= 0; --i) {
-                                m_impl.linestring_add_location(m_projection(wnl[i].location()));
-                            }
+                            fill_linestring(wnl.crbegin(), wnl.crend());
                             break;
                     }
                 }
