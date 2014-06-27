@@ -118,6 +118,8 @@ BOOST_AUTO_TEST_CASE(area_1outer_0inner) {
             }}
         });
 
+    BOOST_CHECK(!area.is_multipolygon());
+
     {
         std::string json {factory.create_multipolygon(area)};
         BOOST_CHECK_EQUAL(std::string{"{\"type\":\"MultiPolygon\",\"coordinates\":[[[[3.2,4.2],[3.5,4.7],[3.6,4.9],[3.2,4.2]]]]}"}, json);
@@ -147,6 +149,8 @@ BOOST_AUTO_TEST_CASE(area_1outer_1inner) {
                 {5, {1.0, 1.0}}
             }}
         });
+
+    BOOST_CHECK(!area.is_multipolygon());
 
     {
         std::string json {factory.create_multipolygon(area)};
@@ -190,6 +194,8 @@ BOOST_AUTO_TEST_CASE(area_2outer_2inner) {
                 {100, {10.0, 10.0}}
             }}
         });
+
+    BOOST_CHECK(area.is_multipolygon());
 
     {
         std::string json {factory.create_multipolygon(area)};

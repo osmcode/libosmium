@@ -155,6 +155,13 @@ namespace osmium {
             return counter;
         }
 
+        /**
+         * Is this area a multipolygon, ie. has it more than one outer ring?
+         */
+        bool is_multipolygon() const {
+            return num_rings().first > 1;
+        }
+
     }; // class Area
 
     static_assert(sizeof(Area) % osmium::memory::align_bytes == 0, "Class osmium::Area has wrong size to be aligned properly!");
