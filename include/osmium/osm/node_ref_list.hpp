@@ -35,6 +35,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <cassert>
 #include <cstddef>
+#include <iterator>
 
 #include <osmium/memory/collection.hpp>
 #include <osmium/memory/item.hpp>
@@ -80,6 +81,16 @@ namespace osmium {
 
         bool ends_have_same_location() const {
             return front().location() == back().location();
+        }
+
+        typedef std::reverse_iterator<const NodeRef*> const_reverse_iterator;
+
+        const_reverse_iterator crbegin() const {
+            return const_reverse_iterator(&*this->cend());
+        }
+
+        const_reverse_iterator crend() const {
+            return const_reverse_iterator(&*this->cbegin());
         }
 
     }; // class NodeRefList
