@@ -55,107 +55,105 @@ namespace osmium {
 
     namespace geom {
 
-        struct geos_factory_traits {
-            typedef std::unique_ptr<geos::geom::Point>        point_type;
-            typedef std::unique_ptr<geos::geom::LineString>   linestring_type;
-            typedef std::unique_ptr<geos::geom::Polygon>      polygon_type;
-            typedef std::unique_ptr<geos::geom::MultiPolygon> multipolygon_type;
-            typedef std::unique_ptr<geos::geom::LinearRing>   ring_type;
-        };
+        namespace detail {
 
-        class GEOSFactory : public GeometryFactory<GEOSFactory, geos_factory_traits> {
+            class GEOSFactoryImpl {
 
-            friend class GeometryFactory;
+                geos::geom::PrecisionModel m_precision_model;
+                geos::geom::GeometryFactory m_geos_factory;
 
-            geos::geom::PrecisionModel m_precision_model;
-            geos::geom::GeometryFactory m_geos_factory;
+                std::unique_ptr<geos::geom::CoordinateSequence> m_coordinate_sequence;
+                std::vector<std::unique_ptr<geos::geom::LinearRing>> m_rings;
+                std::vector<std::unique_ptr<geos::geom::Polygon>> m_polygons;
 
-        public:
+                geos::geom::Coordinate create_geos_coordinate(const osmium::Location location) const {
+                    return geos::geom::Coordinate(location.lon(), location.lat());
+                }
 
-            explicit GEOSFactory(int srid = -1) :
-                GeometryFactory<GEOSFactory, geos_factory_traits>(),
-                m_precision_model(),
-                m_geos_factory(&m_precision_model, srid) {
-            }
+            public:
 
-        private:
+                typedef std::unique_ptr<geos::geom::Point>        point_type;
+                typedef std::unique_ptr<geos::geom::LineString>   linestring_type;
+                typedef std::unique_ptr<geos::geom::Polygon>      polygon_type;
+                typedef std::unique_ptr<geos::geom::MultiPolygon> multipolygon_type;
+                typedef std::unique_ptr<geos::geom::LinearRing>   ring_type;
 
-            geos::geom::Coordinate create_geos_coordinate(const osmium::Location location) const {
-                return geos::geom::Coordinate(location.lon(), location.lat());
-            }
+                explicit GEOSFactoryImpl(int srid = -1) :
+                    m_precision_model(),
+                    m_geos_factory(&m_precision_model, srid) {
+                }
 
-            /* Point */
+                /* Point */
 
-            point_type make_point(const osmium::Location location) const {
-                return point_type(m_geos_factory.createPoint(create_geos_coordinate(location)));
-            }
+                point_type make_point(const osmium::Location location) const {
+                    return point_type(m_geos_factory.createPoint(create_geos_coordinate(location)));
+                }
 
-            /* LineString */
+                /* LineString */
 
-            std::unique_ptr<geos::geom::CoordinateSequence> m_coordinate_sequence;
+                void linestring_start() {
+                    m_coordinate_sequence.reset(m_geos_factory.getCoordinateSequenceFactory()->create(static_cast<size_t>(0), 2));
+                }
 
-            void linestring_start() {
-                m_coordinate_sequence.reset(m_geos_factory.getCoordinateSequenceFactory()->create(static_cast<size_t>(0), 2));
-            }
+                void linestring_add_location(const Location location) {
+                    m_coordinate_sequence->add(create_geos_coordinate(location));
+                }
 
-            void linestring_add_location(const Location location) {
-                m_coordinate_sequence->add(create_geos_coordinate(location));
-            }
+                linestring_type linestring_finish() {
+                    return linestring_type(m_geos_factory.createLineString(m_coordinate_sequence.release()));
+                }
 
-            linestring_type linestring_finish() {
-                return linestring_type(m_geos_factory.createLineString(m_coordinate_sequence.release()));
-            }
+                /* MultiPolygon */
 
-            /* MultiPolygon */
+                void multipolygon_start() {
+                }
 
-            std::vector<std::unique_ptr<geos::geom::LinearRing>> m_rings;
-            std::vector<std::unique_ptr<geos::geom::Polygon>> m_polygons;
+                void multipolygon_polygon_start() {
+                }
 
-            void multipolygon_start() {
-            }
+                void multipolygon_polygon_finish() {
+                    assert(!m_rings.empty());
+                    auto inner_rings = new std::vector<geos::geom::Geometry*>;
+                    std::transform(std::next(m_rings.begin(), 1), m_rings.end(), std::back_inserter(*inner_rings), [](std::unique_ptr<geos::geom::LinearRing>& r) {
+                        return r.release();
+                    });
+                    m_polygons.emplace_back(m_geos_factory.createPolygon(m_rings[0].release(), inner_rings));
+                    m_rings.clear();
+                }
 
-            void multipolygon_polygon_start() {
-            }
+                void multipolygon_outer_ring_start() {
+                    m_coordinate_sequence.reset(m_geos_factory.getCoordinateSequenceFactory()->create(static_cast<size_t>(0), 2));
+                }
 
-            void multipolygon_polygon_finish() {
-                assert(!m_rings.empty());
-                auto inner_rings = new std::vector<geos::geom::Geometry*>;
-                std::transform(std::next(m_rings.begin(), 1), m_rings.end(), std::back_inserter(*inner_rings), [](std::unique_ptr<geos::geom::LinearRing>& r) {
-                    return r.release();
-                });
-                m_polygons.emplace_back(m_geos_factory.createPolygon(m_rings[0].release(), inner_rings));
-                m_rings.clear();
-            }
+                void multipolygon_outer_ring_finish() {
+                    m_rings.emplace_back(m_geos_factory.createLinearRing(m_coordinate_sequence.release()));
+                }
 
-            void multipolygon_outer_ring_start() {
-                m_coordinate_sequence.reset(m_geos_factory.getCoordinateSequenceFactory()->create(static_cast<size_t>(0), 2));
-            }
+                void multipolygon_inner_ring_start() {
+                    m_coordinate_sequence.reset(m_geos_factory.getCoordinateSequenceFactory()->create(static_cast<size_t>(0), 2));
+                }
 
-            void multipolygon_outer_ring_finish() {
-                m_rings.emplace_back(m_geos_factory.createLinearRing(m_coordinate_sequence.release()));
-            }
+                void multipolygon_inner_ring_finish() {
+                    m_rings.emplace_back(m_geos_factory.createLinearRing(m_coordinate_sequence.release()));
+                }
 
-            void multipolygon_inner_ring_start() {
-                m_coordinate_sequence.reset(m_geos_factory.getCoordinateSequenceFactory()->create(static_cast<size_t>(0), 2));
-            }
+                void multipolygon_add_location(const osmium::Location location) {
+                    m_coordinate_sequence->add(create_geos_coordinate(location));
+                }
 
-            void multipolygon_inner_ring_finish() {
-                m_rings.emplace_back(m_geos_factory.createLinearRing(m_coordinate_sequence.release()));
-            }
+                multipolygon_type multipolygon_finish() {
+                    auto polygons = new std::vector<geos::geom::Geometry*>;
+                    std::transform(m_polygons.begin(), m_polygons.end(), std::back_inserter(*polygons), [](std::unique_ptr<geos::geom::Polygon>& p) {
+                        return p.release();
+                    });
+                    return multipolygon_type(m_geos_factory.createMultiPolygon(polygons));
+                }
 
-            void multipolygon_add_location(const osmium::Location location) {
-                m_coordinate_sequence->add(create_geos_coordinate(location));
-            }
+            }; // class GEOSFactoryImpl
 
-            multipolygon_type multipolygon_finish() {
-                auto polygons = new std::vector<geos::geom::Geometry*>;
-                std::transform(m_polygons.begin(), m_polygons.end(), std::back_inserter(*polygons), [](std::unique_ptr<geos::geom::Polygon>& p) {
-                    return p.release();
-                });
-                return multipolygon_type(m_geos_factory.createMultiPolygon(polygons));
-            }
+        } // namespace detail
 
-        }; // class GEOSFactory
+        typedef GeometryFactory<osmium::geom::detail::GEOSFactoryImpl> GEOSFactory;
 
     } // namespace geom
 

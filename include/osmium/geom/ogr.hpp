@@ -49,101 +49,102 @@ namespace osmium {
 
     namespace geom {
 
-        struct ogr_factory_traits {
-            typedef std::unique_ptr<OGRPoint>        point_type;
-            typedef std::unique_ptr<OGRLineString>   linestring_type;
-            typedef std::unique_ptr<OGRPolygon>      polygon_type;
-            typedef std::unique_ptr<OGRMultiPolygon> multipolygon_type;
-            typedef std::unique_ptr<OGRLinearRing>   ring_type;
-        };
+        namespace detail {
 
-        class OGRFactory : public GeometryFactory<OGRFactory, ogr_factory_traits> {
+            class OGRFactoryImpl {
 
-            friend class GeometryFactory;
+            public:
 
-        public:
+                typedef std::unique_ptr<OGRPoint>        point_type;
+                typedef std::unique_ptr<OGRLineString>   linestring_type;
+                typedef std::unique_ptr<OGRPolygon>      polygon_type;
+                typedef std::unique_ptr<OGRMultiPolygon> multipolygon_type;
+                typedef std::unique_ptr<OGRLinearRing>   ring_type;
 
-            OGRFactory() :
-                GeometryFactory<OGRFactory, ogr_factory_traits>() {
-            }
+            private:
 
-        private:
+                linestring_type m_linestring;
+                multipolygon_type m_multipolygon;
+                polygon_type      m_polygon;
+                ring_type         m_ring;
 
-            /* Point */
+            public:
 
-            point_type make_point(const osmium::Location location) const {
-                return point_type(new OGRPoint(location.lon(), location.lat()));
-            }
+                OGRFactoryImpl() = default;
 
-            /* LineString */
+                /* Point */
 
-            linestring_type m_linestring;
+                point_type make_point(const osmium::Location location) const {
+                    return point_type(new OGRPoint(location.lon(), location.lat()));
+                }
 
-            void linestring_start() {
-                m_linestring = std::unique_ptr<OGRLineString>(new OGRLineString());
-            }
+                /* LineString */
 
-            void linestring_add_location(const osmium::Location location) {
-                assert(!!m_linestring);
-                m_linestring->addPoint(location.lon(), location.lat());
-            }
+                void linestring_start() {
+                    m_linestring = std::unique_ptr<OGRLineString>(new OGRLineString());
+                }
 
-            linestring_type linestring_finish() {
-                return std::move(m_linestring);
-            }
+                void linestring_add_location(const osmium::Location location) {
+                    assert(!!m_linestring);
+                    m_linestring->addPoint(location.lon(), location.lat());
+                }
 
-            /* MultiPolygon */
+                linestring_type linestring_finish() {
+                    return std::move(m_linestring);
+                }
 
-            multipolygon_type m_multipolygon;
-            polygon_type      m_polygon;
-            ring_type         m_ring;
+                /* MultiPolygon */
 
-            void multipolygon_start() {
-                m_multipolygon.reset(new OGRMultiPolygon());
-            }
+                void multipolygon_start() {
+                    m_multipolygon.reset(new OGRMultiPolygon());
+                }
 
-            void multipolygon_polygon_start() {
-                m_polygon.reset(new OGRPolygon());
-            }
+                void multipolygon_polygon_start() {
+                    m_polygon.reset(new OGRPolygon());
+                }
 
-            void multipolygon_polygon_finish() {
-                assert(!!m_multipolygon);
-                assert(!!m_polygon);
-                m_multipolygon->addGeometryDirectly(m_polygon.release());
-            }
+                void multipolygon_polygon_finish() {
+                    assert(!!m_multipolygon);
+                    assert(!!m_polygon);
+                    m_multipolygon->addGeometryDirectly(m_polygon.release());
+                }
 
-            void multipolygon_outer_ring_start() {
-                m_ring.reset(new OGRLinearRing());
-            }
+                void multipolygon_outer_ring_start() {
+                    m_ring.reset(new OGRLinearRing());
+                }
 
-            void multipolygon_outer_ring_finish() {
-                assert(!!m_polygon);
-                assert(!!m_ring);
-                m_polygon->addRingDirectly(m_ring.release());
-            }
+                void multipolygon_outer_ring_finish() {
+                    assert(!!m_polygon);
+                    assert(!!m_ring);
+                    m_polygon->addRingDirectly(m_ring.release());
+                }
 
-            void multipolygon_inner_ring_start() {
-                m_ring.reset(new OGRLinearRing());
-            }
+                void multipolygon_inner_ring_start() {
+                    m_ring.reset(new OGRLinearRing());
+                }
 
-            void multipolygon_inner_ring_finish() {
-                assert(!!m_polygon);
-                assert(!!m_ring);
-                m_polygon->addRingDirectly(m_ring.release());
-            }
+                void multipolygon_inner_ring_finish() {
+                    assert(!!m_polygon);
+                    assert(!!m_ring);
+                    m_polygon->addRingDirectly(m_ring.release());
+                }
 
-            void multipolygon_add_location(const osmium::Location location) {
-                assert(!!m_polygon);
-                assert(!!m_ring);
-                m_ring->addPoint(location.lon(), location.lat());
-            }
+                void multipolygon_add_location(const osmium::Location location) {
+                    assert(!!m_polygon);
+                    assert(!!m_ring);
+                    m_ring->addPoint(location.lon(), location.lat());
+                }
 
-            multipolygon_type multipolygon_finish() {
-                assert(!!m_multipolygon);
-                return std::move(m_multipolygon);
-            }
+                multipolygon_type multipolygon_finish() {
+                    assert(!!m_multipolygon);
+                    return std::move(m_multipolygon);
+                }
 
-        }; // class OGRFactory
+            }; // class OGRFactoryImpl
+
+        } // namespace detail
+
+        typedef GeometryFactory<osmium::geom::detail::OGRFactoryImpl> OGRFactory;
 
     } // namespace geom
 

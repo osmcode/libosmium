@@ -35,6 +35,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <stdexcept>
 #include <string>
+#include <utility>
 
 #include <osmium/memory/collection.hpp>
 #include <osmium/memory/item.hpp>
@@ -83,9 +84,9 @@ namespace osmium {
         };
 
         /**
-         * Abstract base class for geometry factories.
+         * Geometry factory.
          */
-        template <class G, class T>
+        template <class TGeomImpl>
         class GeometryFactory {
 
             /**
@@ -96,27 +97,32 @@ namespace osmium {
                 for (const osmium::NodeRef& node_ref : nodes) {
                     if (last_location != node_ref.location()) {
                         last_location = node_ref.location();
-                        static_cast<G*>(this)->multipolygon_add_location(last_location);
+                        m_impl.multipolygon_add_location(last_location);
                     }
                 }
             }
 
-        protected:
-
-            GeometryFactory<G, T>() = default;
+            TGeomImpl m_impl;
 
         public:
 
-            typedef typename T::point_type        point_type;
-            typedef typename T::linestring_type   linestring_type;
-            typedef typename T::polygon_type      polygon_type;
-            typedef typename T::multipolygon_type multipolygon_type;
-            typedef typename T::ring_type         ring_type;
+            GeometryFactory<TGeomImpl>() = default;
+
+            template <class... TArgs>
+            GeometryFactory<TGeomImpl>(TArgs&&... args) :
+                m_impl(std::forward<TArgs>(args)...) {
+            }
+
+            typedef typename TGeomImpl::point_type        point_type;
+            typedef typename TGeomImpl::linestring_type   linestring_type;
+            typedef typename TGeomImpl::polygon_type      polygon_type;
+            typedef typename TGeomImpl::multipolygon_type multipolygon_type;
+            typedef typename TGeomImpl::ring_type         ring_type;
 
             /* Point */
 
             point_type create_point(const osmium::Location location) const {
-                return static_cast<const G*>(this)->make_point(location);
+                return m_impl.make_point(location);
             }
 
             point_type create_point(const osmium::Node& node) {
@@ -130,7 +136,7 @@ namespace osmium {
             /* LineString */
 
             linestring_type create_linestring(const osmium::WayNodeList& wnl, use_nodes un=use_nodes::unique, direction dir=direction::forward) {
-                static_cast<G*>(this)->linestring_start();
+                m_impl.linestring_start();
 
                 if (un == use_nodes::unique) {
                     osmium::Location last_location;
@@ -139,7 +145,7 @@ namespace osmium {
                             for (const auto& node_ref : wnl) {
                                 if (last_location != node_ref.location()) {
                                     last_location = node_ref.location();
-                                    static_cast<G*>(this)->linestring_add_location(last_location);
+                                    m_impl.linestring_add_location(last_location);
                                 }
                             }
                             break;
@@ -147,7 +153,7 @@ namespace osmium {
                             for (int i = wnl.size()-1; i >= 0; --i) {
                                 if (last_location != wnl[i].location()) {
                                     last_location = wnl[i].location();
-                                    static_cast<G*>(this)->linestring_add_location(last_location);
+                                    m_impl.linestring_add_location(last_location);
                                 }
                             }
                             break;
@@ -156,18 +162,18 @@ namespace osmium {
                     switch (dir) {
                         case direction::forward:
                             for (const auto& node_ref : wnl) {
-                                static_cast<G*>(this)->linestring_add_location(node_ref.location());
+                                m_impl.linestring_add_location(node_ref.location());
                             }
                             break;
                         case direction::backward:
                             for (int i = wnl.size()-1; i >= 0; --i) {
-                                static_cast<G*>(this)->linestring_add_location(wnl[i].location());
+                                m_impl.linestring_add_location(wnl[i].location());
                             }
                             break;
                     }
                 }
 
-                return static_cast<G*>(this)->linestring_finish();
+                return m_impl.linestring_finish();
             }
 
             linestring_type create_linestring(const osmium::Way& way, use_nodes un=use_nodes::unique, direction dir=direction::forward) {
@@ -179,24 +185,24 @@ namespace osmium {
             multipolygon_type create_multipolygon(const osmium::Area& area) {
                 int num_polygons = 0;
                 int num_rings = 0;
-                static_cast<G*>(this)->multipolygon_start();
+                m_impl.multipolygon_start();
 
                 for (auto it = area.cbegin(); it != area.cend(); ++it) {
                     const osmium::OuterRing& ring = static_cast<const osmium::OuterRing&>(*it);
                     if (it->type() == osmium::item_type::outer_ring) {
                         if (num_polygons > 0) {
-                            static_cast<G*>(this)->multipolygon_polygon_finish();
+                            m_impl.multipolygon_polygon_finish();
                         }
-                        static_cast<G*>(this)->multipolygon_polygon_start();
-                        static_cast<G*>(this)->multipolygon_outer_ring_start();
+                        m_impl.multipolygon_polygon_start();
+                        m_impl.multipolygon_outer_ring_start();
                         add_points(ring);
-                        static_cast<G*>(this)->multipolygon_outer_ring_finish();
+                        m_impl.multipolygon_outer_ring_finish();
                         ++num_rings;
                         ++num_polygons;
                     } else if (it->type() == osmium::item_type::inner_ring) {
-                        static_cast<G*>(this)->multipolygon_inner_ring_start();
+                        m_impl.multipolygon_inner_ring_start();
                         add_points(ring);
-                        static_cast<G*>(this)->multipolygon_inner_ring_finish();
+                        m_impl.multipolygon_inner_ring_finish();
                         ++num_rings;
                     }
                 }
@@ -206,8 +212,8 @@ namespace osmium {
                     throw geometry_error("invalid area");
                 }
 
-                static_cast<G*>(this)->multipolygon_polygon_finish();
-                return static_cast<G*>(this)->multipolygon_finish();
+                m_impl.multipolygon_polygon_finish();
+                return m_impl.multipolygon_finish();
             }
 
         }; // class GeometryFactory

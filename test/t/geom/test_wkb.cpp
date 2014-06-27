@@ -11,31 +11,27 @@
 BOOST_AUTO_TEST_SUITE(WKB_Geometry)
 
 BOOST_AUTO_TEST_CASE(point) {
-    osmium::geom::WKBFactory factory;
-    factory.set_hex_mode();
+    osmium::geom::WKBFactory factory(osmium::geom::wkb_type::wkb, osmium::geom::out_type::hex);
 
     std::string wkb {factory.create_point(osmium::Location(3.2, 4.2))};
     BOOST_CHECK_EQUAL(std::string{"01010000009A99999999990940CDCCCCCCCCCC1040"}, wkb);
 }
 
 BOOST_AUTO_TEST_CASE(point_ewkb) {
-    osmium::geom::WKBFactory factory(osmium::geom::wkb_type::ewkb);
-    factory.set_hex_mode();
+    osmium::geom::WKBFactory factory(osmium::geom::wkb_type::ewkb, osmium::geom::out_type::hex);
 
     std::string wkb {factory.create_point(osmium::Location(3.2, 4.2))};
     BOOST_CHECK_EQUAL(std::string{"0101000020E61000009A99999999990940CDCCCCCCCCCC1040"}, wkb);
 }
 
 BOOST_AUTO_TEST_CASE(empty_point) {
-    osmium::geom::WKBFactory factory;
-    factory.set_hex_mode();
+    osmium::geom::WKBFactory factory(osmium::geom::wkb_type::wkb, osmium::geom::out_type::hex);
 
     BOOST_CHECK_THROW(factory.create_point(osmium::Location()), osmium::invalid_location);
 }
 
 BOOST_AUTO_TEST_CASE(linestring) {
-    osmium::geom::WKBFactory factory;
-    factory.set_hex_mode();
+    osmium::geom::WKBFactory factory(osmium::geom::wkb_type::wkb, osmium::geom::out_type::hex);
 
     osmium::memory::Buffer buffer(10000);
     auto& wnl = osmium::builder::build_way_node_list(buffer, {
@@ -67,8 +63,7 @@ BOOST_AUTO_TEST_CASE(linestring) {
 }
 
 BOOST_AUTO_TEST_CASE(linestring_ewkb) {
-    osmium::geom::WKBFactory factory(osmium::geom::wkb_type::ewkb);
-    factory.set_hex_mode();
+    osmium::geom::WKBFactory factory(osmium::geom::wkb_type::ewkb, osmium::geom::out_type::hex);
 
     osmium::memory::Buffer buffer(10000);
     auto& wnl = osmium::builder::build_way_node_list(buffer, {
@@ -83,8 +78,7 @@ BOOST_AUTO_TEST_CASE(linestring_ewkb) {
 }
 
 BOOST_AUTO_TEST_CASE(empty_linestring) {
-    osmium::geom::WKBFactory factory;
-    factory.set_hex_mode();
+    osmium::geom::WKBFactory factory(osmium::geom::wkb_type::wkb, osmium::geom::out_type::hex);
 
     osmium::memory::Buffer buffer(10000);
     auto& wnl = osmium::builder::build_way_node_list(buffer, {});
@@ -96,8 +90,7 @@ BOOST_AUTO_TEST_CASE(empty_linestring) {
 }
 
 BOOST_AUTO_TEST_CASE(linestring_with_two_same_locations) {
-    osmium::geom::WKBFactory factory;
-    factory.set_hex_mode();
+    osmium::geom::WKBFactory factory(osmium::geom::wkb_type::wkb, osmium::geom::out_type::hex);
 
     osmium::memory::Buffer buffer(10000);
     auto& wnl = osmium::builder::build_way_node_list(buffer, {
@@ -120,8 +113,7 @@ BOOST_AUTO_TEST_CASE(linestring_with_two_same_locations) {
 }
 
 BOOST_AUTO_TEST_CASE(linestring_with_undefined_location) {
-    osmium::geom::WKBFactory factory;
-    factory.set_hex_mode();
+    osmium::geom::WKBFactory factory(osmium::geom::wkb_type::wkb, osmium::geom::out_type::hex);
 
     osmium::memory::Buffer buffer(10000);
     auto& wnl = osmium::builder::build_way_node_list(buffer, {

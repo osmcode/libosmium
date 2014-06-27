@@ -45,119 +45,114 @@ namespace osmium {
 
     namespace geom {
 
-        struct wkt_factory_traits {
-            typedef std::string point_type;
-            typedef std::string linestring_type;
-            typedef std::string polygon_type;
-            typedef std::string multipolygon_type;
-            typedef std::string ring_type;
-        };
+        namespace detail {
 
-        class WKTFactory : public GeometryFactory<WKTFactory, wkt_factory_traits> {
+            class WKTFactoryImpl {
 
-            friend class GeometryFactory;
+                std::string m_str {};
+                int m_points {0};
+                bool m_first_polygon = true;
+                bool m_first_coordinate = true;
 
-        public:
+            public:
 
-            WKTFactory() :
-                GeometryFactory<WKTFactory, wkt_factory_traits>() {
-            }
+                typedef std::string point_type;
+                typedef std::string linestring_type;
+                typedef std::string polygon_type;
+                typedef std::string multipolygon_type;
+                typedef std::string ring_type;
 
-        private:
+                /* Point */
 
-            std::string m_str {};
-            int m_points {0};
-
-            /* Point */
-
-            point_type make_point(const Location location) const {
-                std::string str {"POINT("};
-                location.as_string(std::back_inserter(str), ' ');
-                str += ')';
-                return str;
-            }
-
-            /* LineString */
-
-            void linestring_start() {
-                m_str = "LINESTRING(";
-                m_points = 0;
-            }
-
-            void linestring_add_location(const Location location) {
-                location.as_string(std::back_inserter(m_str), ' ');
-                m_str += ',';
-                ++m_points;
-            }
-
-            linestring_type linestring_finish() {
-                if (m_points < 2) {
-                    m_str.clear();
-                    throw geometry_error("not enough points for linestring");
-                } else {
-                    assert(!m_str.empty());
-                    std::string str;
-                    std::swap(str, m_str);
-                    str[str.size()-1] = ')';
+                point_type make_point(const Location location) const {
+                    std::string str {"POINT("};
+                    location.as_string(std::back_inserter(str), ' ');
+                    str += ')';
                     return str;
                 }
-            }
 
-            /* MultiPolygon */
+                /* LineString */
 
-            bool m_first_polygon = true;
-            bool m_first_coordinate = true;
-
-            void multipolygon_start() {
-                m_str = "MULTIPOLYGON(";
-                m_first_polygon = true;
-            }
-
-            void multipolygon_polygon_start() {
-                if (!m_first_polygon) {
-                    m_str += ",";
-                } else {
-                    m_first_polygon = false;
+                void linestring_start() {
+                    m_str = "LINESTRING(";
+                    m_points = 0;
                 }
-                m_str += "(";
-            }
 
-            void multipolygon_polygon_finish() {
-                m_str += ")";
-            }
-
-            void multipolygon_outer_ring_start() {
-                m_str += "(";
-                m_first_coordinate = true;
-            }
-
-            void multipolygon_outer_ring_finish() {
-                m_str += ")";
-            }
-
-            void multipolygon_inner_ring_start() {
-                m_str += ",(";
-                m_first_coordinate = true;
-            }
-
-            void multipolygon_inner_ring_finish() {
-                m_str += ")";
-            }
-
-            void multipolygon_add_location(const osmium::Location location) {
-                if (!m_first_coordinate) {
-                    m_str += ",";
+                void linestring_add_location(const Location location) {
+                    location.as_string(std::back_inserter(m_str), ' ');
+                    m_str += ',';
+                    ++m_points;
                 }
-                location.as_string(std::back_inserter(m_str), ' ');
-                m_first_coordinate = false;
-            }
 
-            multipolygon_type multipolygon_finish() {
-                m_str += ")";
-                return std::move(m_str);
-            }
+                linestring_type linestring_finish() {
+                    if (m_points < 2) {
+                        m_str.clear();
+                        throw geometry_error("not enough points for linestring");
+                    } else {
+                        assert(!m_str.empty());
+                        std::string str;
+                        std::swap(str, m_str);
+                        str[str.size()-1] = ')';
+                        return str;
+                    }
+                }
 
-        }; // class WKTFactory
+                /* MultiPolygon */
+
+                void multipolygon_start() {
+                    m_str = "MULTIPOLYGON(";
+                    m_first_polygon = true;
+                }
+
+                void multipolygon_polygon_start() {
+                    if (!m_first_polygon) {
+                        m_str += ",";
+                    } else {
+                        m_first_polygon = false;
+                    }
+                    m_str += "(";
+                }
+
+                void multipolygon_polygon_finish() {
+                    m_str += ")";
+                }
+
+                void multipolygon_outer_ring_start() {
+                    m_str += "(";
+                    m_first_coordinate = true;
+                }
+
+                void multipolygon_outer_ring_finish() {
+                    m_str += ")";
+                }
+
+                void multipolygon_inner_ring_start() {
+                    m_str += ",(";
+                    m_first_coordinate = true;
+                }
+
+                void multipolygon_inner_ring_finish() {
+                    m_str += ")";
+                }
+
+                void multipolygon_add_location(const osmium::Location location) {
+                    if (!m_first_coordinate) {
+                        m_str += ",";
+                    }
+                    location.as_string(std::back_inserter(m_str), ' ');
+                    m_first_coordinate = false;
+                }
+
+                multipolygon_type multipolygon_finish() {
+                    m_str += ")";
+                    return std::move(m_str);
+                }
+
+            }; // class WKTFactoryImpl
+
+        } // namespace detail
+
+        typedef GeometryFactory<osmium::geom::detail::WKTFactoryImpl> WKTFactory;
 
     } // namespace geom
 

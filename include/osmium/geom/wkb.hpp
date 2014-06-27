@@ -45,80 +45,26 @@ namespace osmium {
 
     namespace geom {
 
-        struct wkb_factory_traits {
-            typedef std::string point_type;
-            typedef std::string linestring_type;
-            typedef std::string polygon_type;
-            typedef std::string multipolygon_type;
-            typedef std::string ring_type;
-        };
-
         enum class wkb_type : bool {
             wkb  = false,
             ewkb = true
         };
 
-        class WKBFactory : public GeometryFactory<WKBFactory, wkb_factory_traits> {
+        enum class out_type : bool {
+            binary = false,
+            hex    = true
+        };
 
-            friend class GeometryFactory;
-
-            /// OSM data always uses SRID 4326 (WGS84).
-            static constexpr uint32_t srid = 4326;
-
-        public:
-
-            explicit WKBFactory(wkb_type type=wkb_type::wkb) :
-                GeometryFactory<WKBFactory, wkb_factory_traits>(),
-                m_wkb_type(type) {
-            }
-
-            void set_hex_mode() {
-                m_hex = true;
-            }
-
-        private:
-
-            /**
-             * Type of WKB geometry.
-             * These definitions are from
-             * 99-049_OpenGIS_Simple_Features_Specification_For_SQL_Rev_1.1.pdf (for WKB)
-             * and http://trac.osgeo.org/postgis/browser/trunk/doc/ZMSgeoms.txt (for EWKB).
-             * They are used to encode geometries into the WKB format.
-             */
-            enum wkbGeometryType : uint32_t {
-                wkbPoint               = 1,
-                wkbLineString          = 2,
-                wkbPolygon             = 3,
-                wkbMultiPoint          = 4,
-                wkbMultiLineString     = 5,
-                wkbMultiPolygon        = 6,
-                wkbGeometryCollection  = 7,
-
-                // SRID-presence flag (EWKB)
-                wkbSRID                = 0x20000000
-            };
-
-            /**
-             * Byte order marker in WKB geometry.
-             */
-            enum class wkb_byte_order_type : uint8_t {
-                XDR = 0,         // Big Endian
-                NDR = 1          // Little Endian
-            };
-
-            std::string m_data {};
-            uint32_t m_points {0};
-            wkb_type m_wkb_type;
-            bool m_hex {false};
+        namespace detail {
 
             template <typename T>
-            static void str_push(std::string& str, T data) {
+            void str_push(std::string& str, T data) {
                 size_t size = str.size();
                 str.resize(size + sizeof(T));
                 std::memcpy(const_cast<char *>(&str[size]), reinterpret_cast<char*>(&data), sizeof(T));
             }
 
-            static std::string convert_to_hex(std::string& str) {
+            std::string convert_to_hex(std::string& str) {
                 static const char* lookup_hex = "0123456789ABCDEF";
                 std::string out;
 
@@ -130,138 +76,192 @@ namespace osmium {
                 return out;
             }
 
-            size_t header(std::string& str, wkbGeometryType type, bool add_length) const {
-                str_push(str, wkb_byte_order_type::NDR);
-                if (m_wkb_type == wkb_type::ewkb) {
-                    str_push(str, type | wkbSRID);
-                    str_push(str, srid);
-                } else {
-                    str_push(str, type);
+            class WKBFactoryImpl {
+
+                /// OSM data always uses SRID 4326 (WGS84).
+                static constexpr uint32_t srid = 4326;
+
+                /**
+                * Type of WKB geometry.
+                * These definitions are from
+                * 99-049_OpenGIS_Simple_Features_Specification_For_SQL_Rev_1.1.pdf (for WKB)
+                * and http://trac.osgeo.org/postgis/browser/trunk/doc/ZMSgeoms.txt (for EWKB).
+                * They are used to encode geometries into the WKB format.
+                */
+                enum wkbGeometryType : uint32_t {
+                    wkbPoint               = 1,
+                    wkbLineString          = 2,
+                    wkbPolygon             = 3,
+                    wkbMultiPoint          = 4,
+                    wkbMultiLineString     = 5,
+                    wkbMultiPolygon        = 6,
+                    wkbGeometryCollection  = 7,
+
+                    // SRID-presence flag (EWKB)
+                    wkbSRID                = 0x20000000
+                };
+
+                /**
+                * Byte order marker in WKB geometry.
+                */
+                enum class wkb_byte_order_type : uint8_t {
+                    XDR = 0,         // Big Endian
+                    NDR = 1          // Little Endian
+                };
+
+                std::string m_data {};
+                uint32_t m_points {0};
+                wkb_type m_wkb_type;
+                out_type m_out_type;
+
+                size_t m_linestring_size_offset = 0;
+                int m_polygons = 0;
+                int m_rings = 0;
+                size_t m_multipolygon_size_offset = 0;
+                size_t m_polygon_size_offset = 0;
+                size_t m_ring_size_offset = 0;
+
+                size_t header(std::string& str, wkbGeometryType type, bool add_length) const {
+                    str_push(str, wkb_byte_order_type::NDR);
+                    if (m_wkb_type == wkb_type::ewkb) {
+                        str_push(str, type | wkbSRID);
+                        str_push(str, srid);
+                    } else {
+                        str_push(str, type);
+                    }
+                    size_t offset = str.size();
+                    if (add_length) {
+                        str_push(str, static_cast<uint32_t>(0));
+                    }
+                    return offset;
                 }
-                size_t offset = str.size();
-                if (add_length) {
-                    str_push(str, static_cast<uint32_t>(0));
+
+                void set_size(const size_t offset, const uint32_t size) {
+                    memcpy(&m_data[offset], &size, sizeof(uint32_t));
                 }
-                return offset;
-            }
 
-            void set_size(const size_t offset, const uint32_t size) {
-                memcpy(&m_data[offset], &size, sizeof(uint32_t));
-            }
+            public:
 
-            /* Point */
+                typedef std::string point_type;
+                typedef std::string linestring_type;
+                typedef std::string polygon_type;
+                typedef std::string multipolygon_type;
+                typedef std::string ring_type;
 
-            point_type make_point(const osmium::Location location) const {
-                std::string data;
-                header(data, wkbPoint, false);
-                str_push(data, location.lon());
-                str_push(data, location.lat());
-
-                if (m_hex) {
-                    return convert_to_hex(data);
-                } else {
-                    return data;
+                explicit WKBFactoryImpl(wkb_type wtype=wkb_type::wkb, out_type otype=out_type::binary) :
+                    m_wkb_type(wtype),
+                    m_out_type(otype) {
                 }
-            }
 
-            /* LineString */
+                /* Point */
 
-            size_t m_linestring_size_offset = 0;
-
-            void linestring_start() {
-                m_data.clear();
-                m_points = 0;
-                m_linestring_size_offset = header(m_data, wkbLineString, true);
-            }
-
-            void linestring_add_location(const osmium::Location location) {
-                str_push(m_data, location.lon());
-                str_push(m_data, location.lat());
-                ++m_points;
-            }
-
-            linestring_type linestring_finish() {
-                if (m_points < 2) {
-                    m_data.clear();
-                    throw geometry_error("not enough points for linestring");
-                } else {
-                    set_size(m_linestring_size_offset, m_points);
+                point_type make_point(const osmium::Location location) const {
                     std::string data;
-                    std::swap(data, m_data);
+                    header(data, wkbPoint, false);
+                    str_push(data, location.lon());
+                    str_push(data, location.lat());
 
-                    if (m_hex) {
+                    if (m_out_type == out_type::hex) {
                         return convert_to_hex(data);
                     } else {
                         return data;
                     }
                 }
-            }
 
-            /* MultiPolygon */
+                /* LineString */
 
-            int m_polygons = 0;
-            int m_rings = 0;
-            size_t m_multipolygon_size_offset = 0;
-            size_t m_polygon_size_offset = 0;
-            size_t m_ring_size_offset = 0;
-
-            void multipolygon_start() {
-                m_data.clear();
-                m_polygons = 0;
-                m_multipolygon_size_offset = header(m_data, wkbMultiPolygon, true);
-            }
-
-            void multipolygon_polygon_start() {
-                ++m_polygons;
-                m_rings = 0;
-                m_polygon_size_offset = header(m_data, wkbPolygon, true);
-            }
-
-            void multipolygon_polygon_finish() {
-                set_size(m_polygon_size_offset, m_rings);
-            }
-
-            void multipolygon_outer_ring_start() {
-                ++m_rings;
-                m_points = 0;
-                m_ring_size_offset = m_data.size();
-                str_push(m_data, static_cast<uint32_t>(0));
-            }
-
-            void multipolygon_outer_ring_finish() {
-                set_size(m_ring_size_offset, m_points);
-            }
-
-            void multipolygon_inner_ring_start() {
-                ++m_rings;
-                m_points = 0;
-                m_ring_size_offset = m_data.size();
-                str_push(m_data, static_cast<uint32_t>(0));
-            }
-
-            void multipolygon_inner_ring_finish() {
-                set_size(m_ring_size_offset, m_points);
-            }
-
-            void multipolygon_add_location(const osmium::Location location) {
-                str_push(m_data, location.lon());
-                str_push(m_data, location.lat());
-                ++m_points;
-            }
-
-            multipolygon_type multipolygon_finish() {
-                set_size(m_multipolygon_size_offset, m_polygons);
-                std::string data;
-                std::swap(data, m_data);
-
-                if (m_hex) {
-                    return convert_to_hex(data);
-                } else {
-                    return data;
+                void linestring_start() {
+                    m_data.clear();
+                    m_points = 0;
+                    m_linestring_size_offset = header(m_data, wkbLineString, true);
                 }
-            }
 
-        }; // class WKBFactory
+                void linestring_add_location(const osmium::Location location) {
+                    str_push(m_data, location.lon());
+                    str_push(m_data, location.lat());
+                    ++m_points;
+                }
+
+                linestring_type linestring_finish() {
+                    if (m_points < 2) {
+                        m_data.clear();
+                        throw geometry_error("not enough points for linestring");
+                    } else {
+                        set_size(m_linestring_size_offset, m_points);
+                        std::string data;
+                        std::swap(data, m_data);
+
+                        if (m_out_type == out_type::hex) {
+                            return convert_to_hex(data);
+                        } else {
+                            return data;
+                        }
+                    }
+                }
+
+                /* MultiPolygon */
+
+                void multipolygon_start() {
+                    m_data.clear();
+                    m_polygons = 0;
+                    m_multipolygon_size_offset = header(m_data, wkbMultiPolygon, true);
+                }
+
+                void multipolygon_polygon_start() {
+                    ++m_polygons;
+                    m_rings = 0;
+                    m_polygon_size_offset = header(m_data, wkbPolygon, true);
+                }
+
+                void multipolygon_polygon_finish() {
+                    set_size(m_polygon_size_offset, m_rings);
+                }
+
+                void multipolygon_outer_ring_start() {
+                    ++m_rings;
+                    m_points = 0;
+                    m_ring_size_offset = m_data.size();
+                    str_push(m_data, static_cast<uint32_t>(0));
+                }
+
+                void multipolygon_outer_ring_finish() {
+                    set_size(m_ring_size_offset, m_points);
+                }
+
+                void multipolygon_inner_ring_start() {
+                    ++m_rings;
+                    m_points = 0;
+                    m_ring_size_offset = m_data.size();
+                    str_push(m_data, static_cast<uint32_t>(0));
+                }
+
+                void multipolygon_inner_ring_finish() {
+                    set_size(m_ring_size_offset, m_points);
+                }
+
+                void multipolygon_add_location(const osmium::Location location) {
+                    str_push(m_data, location.lon());
+                    str_push(m_data, location.lat());
+                    ++m_points;
+                }
+
+                multipolygon_type multipolygon_finish() {
+                    set_size(m_multipolygon_size_offset, m_polygons);
+                    std::string data;
+                    std::swap(data, m_data);
+
+                    if (m_out_type == out_type::hex) {
+                        return convert_to_hex(data);
+                    } else {
+                        return data;
+                    }
+                }
+
+            }; // class WKBFactoryImpl
+
+        } // namespace detail
+
+        typedef GeometryFactory<osmium::geom::detail::WKBFactoryImpl> WKBFactory;
 
     } // namespace geom
 

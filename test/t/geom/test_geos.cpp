@@ -16,6 +16,16 @@ BOOST_AUTO_TEST_CASE(point) {
     std::unique_ptr<geos::geom::Point> point {factory.create_point(osmium::Location(3.2, 4.2))};
     BOOST_CHECK_EQUAL(3.2, point->getX());
     BOOST_CHECK_EQUAL(4.2, point->getY());
+    BOOST_CHECK_EQUAL(-1, point->getSRID());
+}
+
+BOOST_AUTO_TEST_CASE(non_default_srid) {
+    osmium::geom::GEOSFactory factory(4326);
+
+    std::unique_ptr<geos::geom::Point> point {factory.create_point(osmium::Location(3.2, 4.2))};
+    BOOST_CHECK_EQUAL(3.2, point->getX());
+    BOOST_CHECK_EQUAL(4.2, point->getY());
+    BOOST_CHECK_EQUAL(4326, point->getSRID());
 }
 
 BOOST_AUTO_TEST_CASE(empty_point) {
