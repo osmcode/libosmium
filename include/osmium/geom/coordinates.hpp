@@ -85,6 +85,11 @@ namespace osmium {
             return ! operator==(lhs, rhs);
         }
 
+        template <class T>
+        T& operator<<(T& out, const Coordinates& c) {
+            return out << '(' << c.x << ',' << c.y << ')';
+        }
+
     } // namespace geom
 
 } // namespace osmium
