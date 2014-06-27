@@ -66,10 +66,6 @@ namespace osmium {
                 std::vector<std::unique_ptr<geos::geom::LinearRing>> m_rings;
                 std::vector<std::unique_ptr<geos::geom::Polygon>> m_polygons;
 
-                geos::geom::Coordinate create_geos_coordinate(const osmium::Location location) const {
-                    return geos::geom::Coordinate(location.lon(), location.lat());
-                }
-
             public:
 
                 typedef std::unique_ptr<geos::geom::Point>        point_type;
@@ -85,8 +81,8 @@ namespace osmium {
 
                 /* Point */
 
-                point_type make_point(const osmium::Location location) const {
-                    return point_type(m_geos_factory.createPoint(create_geos_coordinate(location)));
+                point_type make_point(const osmium::geom::Coordinates& xy) const {
+                    return point_type(m_geos_factory.createPoint(geos::geom::Coordinate(xy.x, xy.y)));
                 }
 
                 /* LineString */
@@ -95,8 +91,8 @@ namespace osmium {
                     m_coordinate_sequence.reset(m_geos_factory.getCoordinateSequenceFactory()->create(static_cast<size_t>(0), 2));
                 }
 
-                void linestring_add_location(const Location location) {
-                    m_coordinate_sequence->add(create_geos_coordinate(location));
+                void linestring_add_location(const osmium::geom::Coordinates& xy) {
+                    m_coordinate_sequence->add(geos::geom::Coordinate(xy.x, xy.y));
                 }
 
                 linestring_type linestring_finish() {
@@ -137,8 +133,8 @@ namespace osmium {
                     m_rings.emplace_back(m_geos_factory.createLinearRing(m_coordinate_sequence.release()));
                 }
 
-                void multipolygon_add_location(const osmium::Location location) {
-                    m_coordinate_sequence->add(create_geos_coordinate(location));
+                void multipolygon_add_location(const osmium::geom::Coordinates& xy) {
+                    m_coordinate_sequence->add(geos::geom::Coordinate(xy.x, xy.y));
                 }
 
                 multipolygon_type multipolygon_finish() {

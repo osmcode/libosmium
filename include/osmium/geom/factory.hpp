@@ -37,6 +37,7 @@ DEALINGS IN THE SOFTWARE.
 #include <string>
 #include <utility>
 
+#include <osmium/geom/coordinates.hpp>
 #include <osmium/memory/collection.hpp>
 #include <osmium/memory/item.hpp>
 #include <osmium/osm/area.hpp>
@@ -83,10 +84,18 @@ namespace osmium {
             forward  = false ///< Linestring has same direction as way.
         };
 
+        struct IdentityProjection {
+
+            Coordinates operator()(osmium::Location location) const {
+                return Coordinates{location.lon(), location.lat()};
+            }
+
+        };
+
         /**
          * Geometry factory.
          */
-        template <class TGeomImpl>
+        template <class TGeomImpl, class TProjection = IdentityProjection>
         class GeometryFactory {
 
             /**
@@ -97,19 +106,20 @@ namespace osmium {
                 for (const osmium::NodeRef& node_ref : nodes) {
                     if (last_location != node_ref.location()) {
                         last_location = node_ref.location();
-                        m_impl.multipolygon_add_location(last_location);
+                        m_impl.multipolygon_add_location(m_projection(last_location));
                     }
                 }
             }
 
             TGeomImpl m_impl;
+            TProjection m_projection;
 
         public:
 
-            GeometryFactory<TGeomImpl>() = default;
+            GeometryFactory<TGeomImpl, TProjection>() = default;
 
             template <class... TArgs>
-            GeometryFactory<TGeomImpl>(TArgs&&... args) :
+            GeometryFactory<TGeomImpl, TProjection>(TArgs&&... args) :
                 m_impl(std::forward<TArgs>(args)...) {
             }
 
@@ -122,7 +132,7 @@ namespace osmium {
             /* Point */
 
             point_type create_point(const osmium::Location location) const {
-                return m_impl.make_point(location);
+                return m_impl.make_point(m_projection(location));
             }
 
             point_type create_point(const osmium::Node& node) {
@@ -145,7 +155,7 @@ namespace osmium {
                             for (const auto& node_ref : wnl) {
                                 if (last_location != node_ref.location()) {
                                     last_location = node_ref.location();
-                                    m_impl.linestring_add_location(last_location);
+                                    m_impl.linestring_add_location(m_projection(last_location));
                                 }
                             }
                             break;
@@ -153,7 +163,7 @@ namespace osmium {
                             for (int i = wnl.size()-1; i >= 0; --i) {
                                 if (last_location != wnl[i].location()) {
                                     last_location = wnl[i].location();
-                                    m_impl.linestring_add_location(last_location);
+                                    m_impl.linestring_add_location(m_projection(last_location));
                                 }
                             }
                             break;
@@ -162,12 +172,12 @@ namespace osmium {
                     switch (dir) {
                         case direction::forward:
                             for (const auto& node_ref : wnl) {
-                                m_impl.linestring_add_location(node_ref.location());
+                                m_impl.linestring_add_location(m_projection(node_ref.location()));
                             }
                             break;
                         case direction::backward:
                             for (int i = wnl.size()-1; i >= 0; --i) {
-                                m_impl.linestring_add_location(wnl[i].location());
+                                m_impl.linestring_add_location(m_projection(wnl[i].location()));
                             }
                             break;
                     }

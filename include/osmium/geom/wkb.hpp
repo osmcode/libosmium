@@ -155,11 +155,11 @@ namespace osmium {
 
                 /* Point */
 
-                point_type make_point(const osmium::Location location) const {
+                point_type make_point(const osmium::geom::Coordinates& xy) const {
                     std::string data;
                     header(data, wkbPoint, false);
-                    str_push(data, location.lon());
-                    str_push(data, location.lat());
+                    str_push(data, xy.x);
+                    str_push(data, xy.y);
 
                     if (m_out_type == out_type::hex) {
                         return convert_to_hex(data);
@@ -176,9 +176,9 @@ namespace osmium {
                     m_linestring_size_offset = header(m_data, wkbLineString, true);
                 }
 
-                void linestring_add_location(const osmium::Location location) {
-                    str_push(m_data, location.lon());
-                    str_push(m_data, location.lat());
+                void linestring_add_location(const osmium::geom::Coordinates& xy) {
+                    str_push(m_data, xy.x);
+                    str_push(m_data, xy.y);
                     ++m_points;
                 }
 
@@ -239,9 +239,9 @@ namespace osmium {
                     set_size(m_ring_size_offset, m_points);
                 }
 
-                void multipolygon_add_location(const osmium::Location location) {
-                    str_push(m_data, location.lon());
-                    str_push(m_data, location.lat());
+                void multipolygon_add_location(const osmium::geom::Coordinates& xy) {
+                    str_push(m_data, xy.x);
+                    str_push(m_data, xy.y);
                     ++m_points;
                 }
 

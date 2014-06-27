@@ -74,8 +74,8 @@ namespace osmium {
 
                 /* Point */
 
-                point_type make_point(const osmium::Location location) const {
-                    return point_type(new OGRPoint(location.lon(), location.lat()));
+                point_type make_point(const osmium::geom::Coordinates& xy) const {
+                    return point_type(new OGRPoint(xy.x, xy.y));
                 }
 
                 /* LineString */
@@ -84,9 +84,9 @@ namespace osmium {
                     m_linestring = std::unique_ptr<OGRLineString>(new OGRLineString());
                 }
 
-                void linestring_add_location(const osmium::Location location) {
+                void linestring_add_location(const osmium::geom::Coordinates& xy) {
                     assert(!!m_linestring);
-                    m_linestring->addPoint(location.lon(), location.lat());
+                    m_linestring->addPoint(xy.x, xy.y);
                 }
 
                 linestring_type linestring_finish() {
@@ -129,10 +129,10 @@ namespace osmium {
                     m_polygon->addRingDirectly(m_ring.release());
                 }
 
-                void multipolygon_add_location(const osmium::Location location) {
+                void multipolygon_add_location(const osmium::geom::Coordinates& xy) {
                     assert(!!m_polygon);
                     assert(!!m_ring);
-                    m_ring->addPoint(location.lon(), location.lat());
+                    m_ring->addPoint(xy.x, xy.y);
                 }
 
                 multipolygon_type multipolygon_finish() {

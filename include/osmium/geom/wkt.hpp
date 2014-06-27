@@ -64,10 +64,9 @@ namespace osmium {
 
                 /* Point */
 
-                point_type make_point(const Location location) const {
-                    std::string str {"POINT("};
-                    location.as_string(std::back_inserter(str), ' ');
-                    str += ')';
+                point_type make_point(const osmium::geom::Coordinates& xy) const {
+                    std::string str {"POINT"};
+                    xy.append_to_string(str, '(', ' ', ')');
                     return str;
                 }
 
@@ -78,8 +77,8 @@ namespace osmium {
                     m_points = 0;
                 }
 
-                void linestring_add_location(const Location location) {
-                    location.as_string(std::back_inserter(m_str), ' ');
+                void linestring_add_location(const osmium::geom::Coordinates& xy) {
+                    xy.append_to_string(m_str, ' ');
                     m_str += ',';
                     ++m_points;
                 }
@@ -135,11 +134,11 @@ namespace osmium {
                     m_str += ")";
                 }
 
-                void multipolygon_add_location(const osmium::Location location) {
+                void multipolygon_add_location(const osmium::geom::Coordinates& xy) {
                     if (!m_first_coordinate) {
                         m_str += ",";
                     }
-                    location.as_string(std::back_inserter(m_str), ' ');
+                    xy.append_to_string(m_str, ' ');
                     m_first_coordinate = false;
                 }
 
