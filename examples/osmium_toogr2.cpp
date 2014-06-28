@@ -31,6 +31,8 @@
 #include <osmium/area/multipolygon_collector.hpp>
 #include <osmium/area/assembler.hpp>
 
+#include <osmium/geom/mercator_projection.hpp>
+//#include <osmium/geom/projection.hpp>
 #include <osmium/geom/ogr.hpp>
 #include <osmium/io/any_input.hpp>
 #include <osmium/handler.hpp>
@@ -50,7 +52,19 @@ class MyOGRHandler : public osmium::handler::Handler {
     OGRLayer* m_layer_linestring;
     OGRLayer* m_layer_polygon;
 
-    osmium::geom::OGRFactory<> m_factory {};
+    // Choose one of the following:
+
+    // 1. Use WGS84, do not project coordinates.
+    //osmium::geom::OGRFactory<> m_factory {};
+
+    // 2. Project coordinates into "Web Mercator".
+    osmium::geom::OGRFactory<osmium::geom::MercatorProjection> m_factory {};
+
+    // 3. Use any projection that the proj library can handle.
+    //    (Initialize projection with EPSG code or proj string).
+    //    In addition you need to link with "-lproj" and add
+    //    #include <osmium/geom/projection.hpp>.
+    //osmium::geom::OGRFactory<osmium::geom::Projection> m_factory {osmium::geom::Projection(3857)};
 
 public:
 
@@ -73,7 +87,8 @@ public:
         }
 
         OGRSpatialReference sparef;
-        sparef.SetWellKnownGeogCS("WGS84");
+        sparef.importFromProj4(m_factory.proj_string().c_str());
+
         m_layer_point = m_data_source->CreateLayer("postboxes", &sparef, wkbPoint, nullptr);
         if (!m_layer_point) {
             std::cerr << "Layer creation failed.\n";
