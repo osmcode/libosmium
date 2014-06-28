@@ -127,9 +127,11 @@ namespace osmium {
                 /* MultiPolygon */
 
                 void multipolygon_start() {
+                    m_polygons.clear();
                 }
 
                 void multipolygon_polygon_start() {
+                    m_rings.clear();
                 }
 
                 void multipolygon_polygon_finish() {
@@ -192,6 +194,7 @@ namespace osmium {
                         std::transform(m_polygons.begin(), m_polygons.end(), std::back_inserter(*polygons), [](std::unique_ptr<geos::geom::Polygon>& p) {
                             return p.release();
                         });
+                        m_polygons.clear();
                         return multipolygon_type(m_geos_factory.createMultiPolygon(polygons));
                     } catch (geos::util::GEOSException& e) {
                         std::throw_with_nested(osmium::geos_geometry_error());
