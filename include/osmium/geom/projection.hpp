@@ -72,7 +72,7 @@ namespace osmium {
                 }
             }
 
-            CRS(unsigned int epsg) :
+            CRS(int epsg) :
                 CRS(std::string("+init=epsg:") + std::to_string(epsg)) {
             }
 
@@ -100,21 +100,35 @@ namespace osmium {
          */
         class Projection {
 
+            int m_epsg;
+            std::string m_proj_string;
             CRS m_crs_wgs84 {4326};
             CRS m_crs_user;
 
         public:
 
-            Projection(const std::string& crs) :
-                m_crs_user(crs) {
+            Projection(const std::string& proj_string) :
+                m_epsg(-1),
+                m_proj_string(proj_string),
+                m_crs_user(proj_string) {
             }
 
-            Projection(unsigned int epsg) :
+            Projection(int epsg) :
+                m_epsg(epsg),
+                m_proj_string(std::string("+init=epsg:") + std::to_string(epsg)),
                 m_crs_user(epsg) {
             }
 
             Coordinates operator()(osmium::Location location) const {
                 return transform(m_crs_wgs84, m_crs_user, {deg_to_rad(location.lon()), deg_to_rad(location.lat())});
+            }
+
+            int epsg() const {
+                return m_epsg;
+            }
+
+            std::string proj_string() const {
+                return m_proj_string;
             }
 
         }; // class Projection

@@ -90,6 +90,14 @@ namespace osmium {
                 return Coordinates{location.lon(), location.lat()};
             }
 
+            int epsg() const {
+                return 4326;
+            }
+
+            std::string proj_string() const {
+                return "+proj=longlat +datum=WGS84 +no_defs";
+            }
+
         };
 
         /**
@@ -142,6 +150,14 @@ namespace osmium {
             typedef typename TGeomImpl::polygon_type      polygon_type;
             typedef typename TGeomImpl::multipolygon_type multipolygon_type;
             typedef typename TGeomImpl::ring_type         ring_type;
+
+            int epsg() const {
+                return m_projection.epsg();
+            }
+
+            std::string proj_string() const {
+                return m_projection.proj_string();
+            }
 
             /* Point */
 
