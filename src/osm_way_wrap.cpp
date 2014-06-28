@@ -6,8 +6,8 @@
 
 namespace node_osmium {
 
-    extern osmium::geom::WKBFactory wkb_factory;
-    extern osmium::geom::WKTFactory wkt_factory;
+    extern osmium::geom::WKBFactory<> wkb_factory;
+    extern osmium::geom::WKTFactory<> wkt_factory;
 
     Persistent<FunctionTemplate> OSMWayWrap::constructor;
 

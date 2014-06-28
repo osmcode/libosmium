@@ -32,8 +32,8 @@ namespace node_osmium {
         }
     }
 
-    osmium::geom::WKBFactory wkb_factory;
-    osmium::geom::WKTFactory wkt_factory;
+    osmium::geom::WKBFactory<> wkb_factory;
+    osmium::geom::WKTFactory<> wkt_factory;
 
 } // namespace node_osmium
 
