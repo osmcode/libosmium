@@ -1,5 +1,5 @@
-#ifndef TEST_HELPER_HPP
-#define TEST_HELPER_HPP
+#ifndef TEST_BASIC_HELPER_HPP
+#define TEST_BASIC_HELPER_HPP
 
 #include <tuple>
 #include <utility>
@@ -94,4 +94,4 @@ inline osmium::Changeset& buffer_add_changeset(osmium::memory::Buffer& buffer, c
     return builder.object();
 }
 
-#endif // TEST_HELPER_HPP
+#endif // TEST_BASIC_HELPER_HPP

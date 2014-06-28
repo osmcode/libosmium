@@ -54,8 +54,8 @@ class TestHandler : public osmium::handler::Handler {
     OGRLayer* m_layer_linestring;
     OGRLayer* m_layer_polygon;
 
-    osmium::geom::OGRFactory m_ogr_factory {};
-    osmium::geom::WKTFactory m_wkt_factory {};
+    osmium::geom::OGRFactory<> m_ogr_factory {};
+    osmium::geom::WKTFactory<> m_wkt_factory {};
 
     std::ofstream m_out;
 

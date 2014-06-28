@@ -149,7 +149,8 @@ namespace osmium {
 
         } // namespace detail
 
-        typedef GeometryFactory<osmium::geom::detail::GEOSFactoryImpl> GEOSFactory;
+        template <class TProjection = IdentityProjection>
+        using GEOSFactory = GeometryFactory<osmium::geom::detail::GEOSFactoryImpl, TProjection>;
 
     } // namespace geom
 

@@ -50,7 +50,7 @@ class MyOGRHandler : public osmium::handler::Handler {
     OGRLayer* m_layer_linestring;
     OGRLayer* m_layer_polygon;
 
-    osmium::geom::OGRFactory m_factory {};
+    osmium::geom::OGRFactory<> m_factory {};
 
 public:
 

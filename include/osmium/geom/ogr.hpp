@@ -144,7 +144,8 @@ namespace osmium {
 
         } // namespace detail
 
-        typedef GeometryFactory<osmium::geom::detail::OGRFactoryImpl> OGRFactory;
+        template <class TProjection = IdentityProjection>
+        using OGRFactory = GeometryFactory<osmium::geom::detail::OGRFactoryImpl, TProjection>;
 
     } // namespace geom
 

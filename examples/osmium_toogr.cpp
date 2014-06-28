@@ -44,7 +44,7 @@ class MyOGRHandler : public osmium::handler::Handler {
     OGRLayer* m_layer_point;
     OGRLayer* m_layer_linestring;
 
-    osmium::geom::OGRFactory m_factory {};
+    osmium::geom::OGRFactory<> m_factory {};
 
 public:
 

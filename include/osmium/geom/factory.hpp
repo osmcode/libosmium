@@ -111,15 +111,29 @@ namespace osmium {
                 }
             }
 
-            TGeomImpl m_impl;
             TProjection m_projection;
+            TGeomImpl m_impl;
 
         public:
 
             GeometryFactory<TGeomImpl, TProjection>() = default;
 
+            /**
+             * Constructor for default initialized projection.
+             */
             template <class... TArgs>
             GeometryFactory<TGeomImpl, TProjection>(TArgs&&... args) :
+                m_projection(),
+                m_impl(std::forward<TArgs>(args)...) {
+            }
+
+            /**
+             * Constructor for explicitly initialized projection. Note that the
+             * projection is moved into the GeometryFactory.
+             */
+            template <class... TArgs>
+            GeometryFactory<TGeomImpl, TProjection>(TProjection&& projection, TArgs&&... args) :
+                m_projection(std::move(projection)),
                 m_impl(std::forward<TArgs>(args)...) {
             }
 

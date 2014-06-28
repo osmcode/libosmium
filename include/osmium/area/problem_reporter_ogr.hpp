@@ -61,7 +61,7 @@ namespace osmium {
          */
         class ProblemReporterOGR : public ProblemReporter {
 
-            osmium::geom::OGRFactory m_ogr_factory {};
+            osmium::geom::OGRFactory<> m_ogr_factory {};
 
             OGRDataSource* m_data_source;
 

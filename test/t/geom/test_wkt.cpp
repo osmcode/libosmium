@@ -11,20 +11,20 @@
 BOOST_AUTO_TEST_SUITE(WKT_Geometry)
 
 BOOST_AUTO_TEST_CASE(point) {
-    osmium::geom::WKTFactory factory;
+    osmium::geom::WKTFactory<> factory;
 
     std::string wkt {factory.create_point(osmium::Location(3.2, 4.2))};
     BOOST_CHECK_EQUAL(std::string{"POINT(3.2 4.2)"}, wkt);
 }
 
 BOOST_AUTO_TEST_CASE(empty_point) {
-    osmium::geom::WKTFactory factory;
+    osmium::geom::WKTFactory<> factory;
 
     BOOST_CHECK_THROW(factory.create_point(osmium::Location()), osmium::invalid_location);
 }
 
 BOOST_AUTO_TEST_CASE(linestring) {
-    osmium::geom::WKTFactory factory;
+    osmium::geom::WKTFactory<> factory;
 
     osmium::memory::Buffer buffer(10000);
     auto& wnl = osmium::builder::build_way_node_list(buffer, {
@@ -56,7 +56,7 @@ BOOST_AUTO_TEST_CASE(linestring) {
 }
 
 BOOST_AUTO_TEST_CASE(empty_linestring) {
-    osmium::geom::WKTFactory factory;
+    osmium::geom::WKTFactory<> factory;
 
     osmium::memory::Buffer buffer(10000);
     auto& wnl = osmium::builder::build_way_node_list(buffer, {});
@@ -68,7 +68,7 @@ BOOST_AUTO_TEST_CASE(empty_linestring) {
 }
 
 BOOST_AUTO_TEST_CASE(linestring_with_two_same_locations) {
-    osmium::geom::WKTFactory factory;
+    osmium::geom::WKTFactory<> factory;
 
     osmium::memory::Buffer buffer(10000);
     auto& wnl = osmium::builder::build_way_node_list(buffer, {
@@ -91,7 +91,7 @@ BOOST_AUTO_TEST_CASE(linestring_with_two_same_locations) {
 }
 
 BOOST_AUTO_TEST_CASE(linestring_with_undefined_location) {
-    osmium::geom::WKTFactory factory;
+    osmium::geom::WKTFactory<> factory;
 
     osmium::memory::Buffer buffer(10000);
     auto& wnl = osmium::builder::build_way_node_list(buffer, {
@@ -103,7 +103,7 @@ BOOST_AUTO_TEST_CASE(linestring_with_undefined_location) {
 }
 
 BOOST_AUTO_TEST_CASE(area_1outer_0inner) {
-    osmium::geom::WKTFactory factory;
+    osmium::geom::WKTFactory<> factory;
 
     osmium::memory::Buffer buffer(10000);
     osmium::Area& area = buffer_add_area(buffer,
@@ -125,7 +125,7 @@ BOOST_AUTO_TEST_CASE(area_1outer_0inner) {
 }
 
 BOOST_AUTO_TEST_CASE(area_1outer_1inner) {
-    osmium::geom::WKTFactory factory;
+    osmium::geom::WKTFactory<> factory;
 
     osmium::memory::Buffer buffer(10000);
     osmium::Area& area = buffer_add_area(buffer,
@@ -155,7 +155,7 @@ BOOST_AUTO_TEST_CASE(area_1outer_1inner) {
 }
 
 BOOST_AUTO_TEST_CASE(area_2outer_2inner) {
-    osmium::geom::WKTFactory factory;
+    osmium::geom::WKTFactory<> factory;
 
     osmium::memory::Buffer buffer(10000);
     osmium::Area& area = buffer_add_area(buffer,

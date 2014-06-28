@@ -3,26 +3,18 @@
 #endif
 #include <boost/test/unit_test.hpp>
 
-#include <geos/io/WKBWriter.h>
-
 #include <osmium/builder/builder_helper.hpp>
 #include <osmium/geom/geos.hpp>
 #include <osmium/geom/wkb.hpp>
 
 #include "../basic/helper.hpp"
-
-std::string geos_to_wkb(const geos::geom::Geometry* geometry) {
-    std::stringstream ss;
-    geos::io::WKBWriter wkb_writer;
-    wkb_writer.writeHEX(*geometry, ss);
-    return ss.str();
-}
+#include "helper.hpp"
 
 BOOST_AUTO_TEST_SUITE(WKB_Geometry_with_GEOS)
 
 BOOST_AUTO_TEST_CASE(point) {
-    osmium::geom::WKBFactory wkb_factory(osmium::geom::wkb_type::wkb, osmium::geom::out_type::hex);
-    osmium::geom::GEOSFactory geos_factory;
+    osmium::geom::WKBFactory<> wkb_factory(osmium::geom::wkb_type::wkb, osmium::geom::out_type::hex);
+    osmium::geom::GEOSFactory<> geos_factory;
 
     std::string wkb {wkb_factory.create_point(osmium::Location(3.2, 4.2))};
 
@@ -32,8 +24,8 @@ BOOST_AUTO_TEST_CASE(point) {
 
 
 BOOST_AUTO_TEST_CASE(linestring) {
-    osmium::geom::WKBFactory wkb_factory(osmium::geom::wkb_type::wkb, osmium::geom::out_type::hex);
-    osmium::geom::GEOSFactory geos_factory;
+    osmium::geom::WKBFactory<> wkb_factory(osmium::geom::wkb_type::wkb, osmium::geom::out_type::hex);
+    osmium::geom::GEOSFactory<> geos_factory;
 
     osmium::memory::Buffer buffer(10000);
     auto& wnl = osmium::builder::build_way_node_list(buffer, {
@@ -69,8 +61,8 @@ BOOST_AUTO_TEST_CASE(linestring) {
 }
 
 BOOST_AUTO_TEST_CASE(area_1outer_0inner) {
-    osmium::geom::WKBFactory wkb_factory(osmium::geom::wkb_type::wkb, osmium::geom::out_type::hex);
-    osmium::geom::GEOSFactory geos_factory;
+    osmium::geom::WKBFactory<> wkb_factory(osmium::geom::wkb_type::wkb, osmium::geom::out_type::hex);
+    osmium::geom::GEOSFactory<> geos_factory;
 
     osmium::memory::Buffer buffer(10000);
     osmium::Area& area = buffer_add_area(buffer,
@@ -91,8 +83,8 @@ BOOST_AUTO_TEST_CASE(area_1outer_0inner) {
 }
 
 BOOST_AUTO_TEST_CASE(area_1outer_1inner) {
-    osmium::geom::WKBFactory wkb_factory(osmium::geom::wkb_type::wkb, osmium::geom::out_type::hex);
-    osmium::geom::GEOSFactory geos_factory;
+    osmium::geom::WKBFactory<> wkb_factory(osmium::geom::wkb_type::wkb, osmium::geom::out_type::hex);
+    osmium::geom::GEOSFactory<> geos_factory;
 
     osmium::memory::Buffer buffer(10000);
     osmium::Area& area = buffer_add_area(buffer,
@@ -121,8 +113,8 @@ BOOST_AUTO_TEST_CASE(area_1outer_1inner) {
 }
 
 BOOST_AUTO_TEST_CASE(area_2outer_2inner) {
-    osmium::geom::WKBFactory wkb_factory(osmium::geom::wkb_type::wkb, osmium::geom::out_type::hex);
-    osmium::geom::GEOSFactory geos_factory;
+    osmium::geom::WKBFactory<> wkb_factory(osmium::geom::wkb_type::wkb, osmium::geom::out_type::hex);
+    osmium::geom::GEOSFactory<> geos_factory;
 
     osmium::memory::Buffer buffer(10000);
     osmium::Area& area = buffer_add_area(buffer,

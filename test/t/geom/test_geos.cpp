@@ -11,7 +11,7 @@
 BOOST_AUTO_TEST_SUITE(GEOS_Geometry)
 
 BOOST_AUTO_TEST_CASE(point) {
-    osmium::geom::GEOSFactory factory;
+    osmium::geom::GEOSFactory<> factory;
 
     std::unique_ptr<geos::geom::Point> point {factory.create_point(osmium::Location(3.2, 4.2))};
     BOOST_CHECK_EQUAL(3.2, point->getX());
@@ -20,7 +20,7 @@ BOOST_AUTO_TEST_CASE(point) {
 }
 
 BOOST_AUTO_TEST_CASE(non_default_srid) {
-    osmium::geom::GEOSFactory factory(4326);
+    osmium::geom::GEOSFactory<> factory(4326);
 
     std::unique_ptr<geos::geom::Point> point {factory.create_point(osmium::Location(3.2, 4.2))};
     BOOST_CHECK_EQUAL(3.2, point->getX());
@@ -29,13 +29,13 @@ BOOST_AUTO_TEST_CASE(non_default_srid) {
 }
 
 BOOST_AUTO_TEST_CASE(empty_point) {
-    osmium::geom::GEOSFactory factory;
+    osmium::geom::GEOSFactory<> factory;
 
     BOOST_CHECK_THROW(factory.create_point(osmium::Location()), osmium::invalid_location);
 }
 
 BOOST_AUTO_TEST_CASE(linestring) {
-    osmium::geom::GEOSFactory factory;
+    osmium::geom::GEOSFactory<> factory;
 
     osmium::memory::Buffer buffer(10000);
     auto& wnl = osmium::builder::build_way_node_list(buffer, {
@@ -80,7 +80,7 @@ BOOST_AUTO_TEST_CASE(linestring) {
 }
 
 BOOST_AUTO_TEST_CASE(area_1outer_0inner) {
-    osmium::geom::GEOSFactory factory;
+    osmium::geom::GEOSFactory<> factory;
 
     osmium::memory::Buffer buffer(10000);
     osmium::Area& area = buffer_add_area(buffer,
@@ -109,7 +109,7 @@ BOOST_AUTO_TEST_CASE(area_1outer_0inner) {
 }
 
 BOOST_AUTO_TEST_CASE(area_1outer_1inner) {
-    osmium::geom::GEOSFactory factory;
+    osmium::geom::GEOSFactory<> factory;
 
     osmium::memory::Buffer buffer(10000);
     osmium::Area& area = buffer_add_area(buffer,
@@ -146,7 +146,7 @@ BOOST_AUTO_TEST_CASE(area_1outer_1inner) {
 }
 
 BOOST_AUTO_TEST_CASE(area_2outer_2inner) {
-    osmium::geom::GEOSFactory factory;
+    osmium::geom::GEOSFactory<> factory;
 
     osmium::memory::Buffer buffer(10000);
     osmium::Area& area = buffer_add_area(buffer,

@@ -132,7 +132,8 @@ namespace osmium {
 
         } // namespace detail
 
-        typedef GeometryFactory<osmium::geom::detail::WKTFactoryImpl> WKTFactory;
+        template <class TProjection = IdentityProjection>
+        using WKTFactory = GeometryFactory<osmium::geom::detail::WKTFactoryImpl, TProjection>;
 
     } // namespace geom
 
