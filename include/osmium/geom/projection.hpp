@@ -57,7 +57,7 @@ namespace osmium {
                 void operator()(void* crs) { pj_free(crs); };
             };
 
-            std::unique_ptr<void, ProjCRSDeleter> m_crs {nullptr, ProjCRSDeleter()};
+            std::unique_ptr<void, ProjCRSDeleter> m_crs;
 
             projPJ get() const {
                 return m_crs.get();
@@ -66,7 +66,7 @@ namespace osmium {
         public:
 
             CRS(const std::string& crs) :
-                m_crs(pj_init_plus(crs.c_str())) {
+                m_crs(pj_init_plus(crs.c_str()), ProjCRSDeleter()) {
                 if (!m_crs) {
                     throw osmium::projection_error(std::string("creation of CRS failed: ") + pj_strerrno(*pj_get_errno_ref()));
                 }

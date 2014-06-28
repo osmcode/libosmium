@@ -36,4 +36,9 @@ BOOST_AUTO_TEST_CASE(wkb_with_parameter) {
     BOOST_CHECK_EQUAL(geos_to_wkb(geos_point.get()), wkb);
 }
 
+BOOST_AUTO_TEST_CASE(cleanup) {
+    // trying to make valgrind happy, but there is still a memory leak in proj library
+    pj_deallocate_grids();
+}
+
 BOOST_AUTO_TEST_SUITE_END()
