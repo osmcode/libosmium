@@ -51,14 +51,11 @@ TESTS_COMPILE_ERROR=0
 TESTS_FAILED=0
 TESTS_OK=0
 
-#OPTS_CFLAGS="$(gdal-config --cflags)"
-#OPTS_LIBS="$(gdal-config --libs) -lboost_regex -lboost_iostreams -lboost_filesystem -lboost_system"
-
 test_file () {
     FILES="test_main.o test_utils.o $1"
-    eval OPTS_CFLAGS=`../get_options.sh --cflags $1`
-    eval OPTS_LIBS=`../get_options.sh --libs $1`
-    msg=`echo "Checking ${BOLD}test/$1$NORM ................................................" | cut -c1-60`
+    OPTS_CFLAGS=`../get_options.sh --cflags $1`
+    OPTS_LIBS=`../get_options.sh --libs $1`
+    msg=`echo "Checking ${BOLD}test/$1$NORM ................................................" | cut -c1-70`
     echo -n "$msg "
     if ! output=$($COMPILE $FILES $OPTS_CFLAGS $OPTS_LIBS -DBOOST_TEST_DYN_LINK $LDFLAGS -lboost_unit_test_framework 2>&1 ); then
         echo "$DARKRED[COMPILE ERROR]$NORM"

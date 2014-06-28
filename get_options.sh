@@ -15,6 +15,17 @@ else
 fi
 
 (for input in $*; do
-    cpp -xc++ -dD -E -Iinclude -I../include $input 2>/dev/null | grep $macro | cut -d' ' -f3-
-done) | sort -u | xargs echo
+    cpp -xc++ -std=c++11 -dD -E -Iinclude -I../include $input 2>/dev/null | grep $macro | cut -d' ' -f3-
+done) | while read line
+do
+    case "$line" in
+    \`*)
+        eval expand=$line
+        echo $expand
+        ;;
+    *)
+        echo $line
+        ;;
+    esac
+done | sort -u | xargs echo
 
