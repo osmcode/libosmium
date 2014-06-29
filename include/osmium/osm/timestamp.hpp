@@ -35,6 +35,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <cstdint>
 #include <ctime>
+#include <limits>
 #include <stdexcept>
 #include <string>
 
@@ -127,6 +128,20 @@ namespace osmium {
         }
 
     }; // class Timestamp
+
+    inline constexpr Timestamp start_of_time() {
+        return Timestamp(1);
+    }
+
+    inline constexpr Timestamp end_of_time() {
+        return Timestamp(std::numeric_limits<time_t>::max());
+    }
+
+    template <class T>
+    inline T& operator<<(T& out, Timestamp timestamp) {
+        out << timestamp.to_iso();
+        return out;
+    }
 
 } // namespace osmium
 
