@@ -465,12 +465,17 @@ namespace osmium {
                 return range.first->buffer_offset();
             }
 
+            template <class TIter>
+            void read_relations(TIter begin, TIter end) {
+                HandlerPass1 handler(*static_cast<TCollector*>(this));
+                osmium::apply(begin, end, handler);
+                sort_member_meta();
+            }
+
             template <class TSource>
             void read_relations(TSource& source) {
-                HandlerPass1 handler(*static_cast<TCollector*>(this));
-                osmium::apply(source, handler);
+                read_relations(std::begin(source), std::end(source));
                 source.close();
-                sort_member_meta();
             }
 
             void moving_in_buffer(size_t old_offset, size_t new_offset) {
