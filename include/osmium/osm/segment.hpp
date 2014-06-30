@@ -33,6 +33,7 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <iosfwd>
 #include <utility>
 
 #include <boost/operators.hpp>
@@ -91,8 +92,8 @@ namespace osmium {
     /**
      * Output Segment to a stream.
      */
-    template <class T>
-    inline T& operator<<(T& out, const osmium::Segment& segment) {
+    template <typename TChar, typename TTraits>
+    inline std::basic_ostream<TChar, TTraits>& operator<<(std::basic_ostream<TChar, TTraits>& out, const osmium::Segment& segment) {
         return out << segment.first() << "->" << segment.second();
     }
 

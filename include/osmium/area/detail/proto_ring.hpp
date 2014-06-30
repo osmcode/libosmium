@@ -261,7 +261,8 @@ namespace osmium {
 
             }; // class ProtoRing
 
-            inline std::ostream& operator<<(std::ostream& out, const ProtoRing& ring) {
+            template <typename TChar, typename TTraits>
+            inline std::basic_ostream<TChar, TTraits>& operator<<(std::basic_ostream<TChar, TTraits>& out, const ProtoRing& ring) {
                 ring.print(out);
                 return out;
             }

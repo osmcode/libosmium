@@ -34,6 +34,7 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <cstdlib>
+#include <iosfwd>
 
 #include <osmium/memory/collection.hpp> // IWYU pragma: keep
 #include <osmium/memory/item.hpp>
@@ -121,8 +122,8 @@ namespace osmium {
     /**
      * Output a NodeRef to a stream.
      */
-    template <class T>
-    inline T& operator<<(T& out, const osmium::NodeRef& nr) {
+    template <typename TChar, typename TTraits>
+    inline std::basic_ostream<TChar, TTraits>& operator<<(std::basic_ostream<TChar, TTraits>& out, const osmium::NodeRef& nr) {
         return out << "<" << nr.ref() << " " << nr.location() << ">";
     }
 

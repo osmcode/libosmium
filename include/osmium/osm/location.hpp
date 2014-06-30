@@ -37,6 +37,7 @@ DEALINGS IN THE SOFTWARE.
 #include <cmath>
 #include <cstdint>
 #include <cstdio>
+#include <iosfwd>
 #include <limits>
 #include <stdexcept>
 #include <string>
@@ -254,8 +255,8 @@ namespace osmium {
     /**
      * Output a location to a stream.
      */
-    template <class T>
-    inline T& operator<<(T& out, const Location& location) {
+    template <typename TChar, typename TTraits>
+    inline std::basic_ostream<TChar, TTraits>& operator<<(std::basic_ostream<TChar, TTraits>& out, const osmium::Location& location) {
         if (location) {
             out << '(' << location.lon() << ',' << location.lat() << ')';
         } else {

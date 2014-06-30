@@ -34,6 +34,7 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <cstddef>
+#include <iosfwd>
 
 #include <osmium/osm/types.hpp>
 
@@ -117,8 +118,8 @@ namespace osmium {
             return a.member_id() < b.member_id();
         }
 
-        template <class T>
-        inline T& operator<<(T& out, const MemberMeta& mm) {
+        template <typename TChar, typename TTraits>
+        inline std::basic_ostream<TChar, TTraits>& operator<<(std::basic_ostream<TChar, TTraits>& out, const MemberMeta& mm) {
             out << "MemberMeta(member_id=" << mm.member_id() << " relation_pos=" << mm.relation_pos() << " member_pos=" << mm.member_pos() << " buffer_offset=" << mm.buffer_offset() << ")";
             return out;
         }

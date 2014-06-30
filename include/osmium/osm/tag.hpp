@@ -36,6 +36,7 @@ DEALINGS IN THE SOFTWARE.
 #include <algorithm>
 #include <cstddef>
 #include <cstring>
+#include <iosfwd>
 #include <iterator>
 
 #include <osmium/memory/collection.hpp>
@@ -96,8 +97,8 @@ namespace osmium {
     /**
      * Output a Tag to a stream.
      */
-    template <class T>
-    inline T& operator<<(T& out, const Tag& tag) {
+    template <typename TChar, typename TTraits>
+    inline std::basic_ostream<TChar, TTraits>& operator<<(std::basic_ostream<TChar, TTraits>& out, const Tag& tag) {
         return out << tag.key() << '=' << tag.value();
     }
 

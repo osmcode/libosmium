@@ -36,6 +36,7 @@ DEALINGS IN THE SOFTWARE.
 #include <algorithm>
 #include <cstdint>
 #include <cstring>
+#include <iosfwd>
 #include <utility>
 
 #include <boost/operators.hpp>
@@ -121,7 +122,7 @@ namespace osmium {
                         return false;
                     }
 
-                    std::pair<osmium::Location, osmium::Location> mm = std::minmax(first().location(), second().location(), [](const osmium::Location a, const osmium::Location b) {
+                    const std::pair<osmium::Location, osmium::Location> mm = std::minmax(first().location(), second().location(), [](const osmium::Location a, const osmium::Location b) {
                         return a.y() < b.y();
                     });
 
@@ -167,9 +168,9 @@ namespace osmium {
                 return (lhs.first().location() == rhs.first().location() && lhs.second().location() < rhs.second().location()) || lhs.first().location() < rhs.first().location();
             }
 
-            inline std::ostream& operator<<(std::ostream& out, const NodeRefSegment& segment) {
-                out << segment.first() << "--" << segment.second();
-                return out;
+            template <typename TChar, typename TTraits>
+            inline std::basic_ostream<TChar, TTraits>& operator<<(std::basic_ostream<TChar, TTraits>& out, const NodeRefSegment& segment) {
+                return out << segment.first() << "--" << segment.second();
             }
 
             inline bool outside_x_range(const NodeRefSegment& s1, const NodeRefSegment& s2) {

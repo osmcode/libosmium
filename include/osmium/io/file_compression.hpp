@@ -5,7 +5,7 @@
 
 This file is part of Osmium (http://osmcode.org/libosmium).
 
-Copyright 2013 Jochen Topf <jochen@topf.org> and others (see README).
+Copyright 2013,2014 Jochen Topf <jochen@topf.org> and others (see README).
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -33,7 +33,7 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <iostream>
+#include <iosfwd>
 
 namespace osmium {
 
@@ -57,9 +57,9 @@ namespace osmium {
             return "";
         }
 
-        inline std::ostream& operator<<(std::ostream& out, const file_compression compression) {
-            out << as_string(compression);
-            return out;
+        template <typename TChar, typename TTraits>
+        inline std::basic_ostream<TChar, TTraits>& operator<<(std::basic_ostream<TChar, TTraits>& out, const file_compression compression) {
+            return out << as_string(compression);
         }
 
     } // namespace io

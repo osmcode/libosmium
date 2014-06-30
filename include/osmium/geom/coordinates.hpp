@@ -34,6 +34,7 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <cstddef>
+#include <iosfwd>
 #include <string>
 
 namespace osmium {
@@ -85,8 +86,8 @@ namespace osmium {
             return ! operator==(lhs, rhs);
         }
 
-        template <class T>
-        T& operator<<(T& out, const Coordinates& c) {
+        template <typename TChar, typename TTraits>
+        inline std::basic_ostream<TChar, TTraits>& operator<<(std::basic_ostream<TChar, TTraits>& out, const Coordinates& c) {
             return out << '(' << c.x << ',' << c.y << ')';
         }
 

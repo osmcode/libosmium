@@ -34,7 +34,7 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <iterator>
-#include <ostream>
+#include <iosfwd>
 #include <type_traits>
 
 #include <osmium/memory/item.hpp>
@@ -96,9 +96,9 @@ namespace osmium {
                 return reinterpret_cast<TMember*>(m_data);
             }
 
-            friend std::ostream& operator<<(std::ostream& out, const CollectionIterator<TMember>& iter) {
-                out << static_cast<void*>(iter.m_data);
-                return out;
+            template <typename TChar, typename TTraits>
+            friend std::basic_ostream<TChar, TTraits>& operator<<(std::basic_ostream<TChar, TTraits>& out, const CollectionIterator<TMember>& iter) {
+                return out << static_cast<void*>(iter.m_data);
             }
 
         }; // class CollectionIterator

@@ -35,6 +35,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <cassert>
 #include <cstddef>
+#include <iosfwd>
 
 namespace osmium {
 
@@ -105,8 +106,8 @@ namespace osmium {
 
         }; // class RelationMeta
 
-        template <class T>
-        inline T& operator<<(T& out, const RelationMeta& rm) {
+        template <typename TChar, typename TTraits>
+        inline std::basic_ostream<TChar, TTraits>& operator<<(std::basic_ostream<TChar, TTraits>& out, const RelationMeta& rm) {
             out << "RelationMeta(relation_offset=" << rm.relation_offset() << " has_all_members=" << rm.has_all_members() << ")";
             return out;
         }

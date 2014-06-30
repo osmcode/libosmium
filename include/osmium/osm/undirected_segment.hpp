@@ -33,6 +33,8 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <iosfwd>
+
 #include <boost/operators.hpp>
 
 #include <osmium/osm/location.hpp>
@@ -78,8 +80,8 @@ namespace osmium {
     /**
      * Output UndirectedSegment to a stream.
      */
-    template <class T>
-    inline T& operator<<(T& out, const osmium::UndirectedSegment& segment) {
+    template <typename TChar, typename TTraits>
+    inline std::basic_ostream<TChar, TTraits>& operator<<(std::basic_ostream<TChar, TTraits>& out, const osmium::UndirectedSegment& segment) {
         return out << segment.first() << "--" << segment.second();
     }
 

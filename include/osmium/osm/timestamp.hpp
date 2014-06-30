@@ -35,6 +35,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <cstdint>
 #include <ctime>
+#include <iosfwd>
 #include <limits>
 #include <stdexcept>
 #include <string>
@@ -137,8 +138,8 @@ namespace osmium {
         return Timestamp(std::numeric_limits<time_t>::max());
     }
 
-    template <class T>
-    inline T& operator<<(T& out, Timestamp timestamp) {
+    template <typename TChar, typename TTraits>
+    inline std::basic_ostream<TChar, TTraits>& operator<<(std::basic_ostream<TChar, TTraits>& out, Timestamp timestamp) {
         out << timestamp.to_iso();
         return out;
     }

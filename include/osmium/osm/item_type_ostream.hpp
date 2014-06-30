@@ -34,13 +34,14 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <cstdint>
-#include <iostream>
+#include <ostream>
 
 #include <osmium/osm/item_type.hpp>
 
 namespace osmium {
 
-    inline std::ostream& operator<<(std::ostream& out, const item_type item_type) {
+    template <typename TChar, typename TTraits>
+    inline std::basic_ostream<TChar, TTraits>& operator<<(std::basic_ostream<TChar, TTraits>& out, const item_type item_type) {
         std::ios_base::fmtflags old_flags = out.flags(std::ios::hex | std::ios::showbase);
         out << static_cast<uint16_t>(item_type);
         out.flags(old_flags);
