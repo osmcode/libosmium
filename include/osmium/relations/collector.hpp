@@ -406,10 +406,10 @@ namespace osmium {
              * search on them.
              */
             void sort_member_meta() {
-                std::cerr << "relations:        " << m_relations.size() << "\n";
+/*                std::cerr << "relations:        " << m_relations.size() << "\n";
                 std::cerr << "node members:     " << m_member_meta[0].size() << "\n";
                 std::cerr << "way members:      " << m_member_meta[1].size() << "\n";
-                std::cerr << "relation members: " << m_member_meta[2].size() << "\n";
+                std::cerr << "relation members: " << m_member_meta[2].size() << "\n";*/
                 std::sort(m_member_meta[0].begin(), m_member_meta[0].end());
                 std::sort(m_member_meta[1].begin(), m_member_meta[1].end());
                 std::sort(m_member_meta[2].begin(), m_member_meta[2].end());
