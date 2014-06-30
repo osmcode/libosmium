@@ -49,7 +49,7 @@ all:
 .PHONY: clean install check test indent doc/includes.txt
 
 clean:
-	rm -fr check-includes doc/html doc/xml doc/classes.txt doc/template-classes.txt doc/includes.txt test/tests tests/test_*.o
+	rm -fr check-includes iwyu.log iwyu.tmp doc/html doc/xml doc/classes.txt doc/template-classes.txt doc/includes.txt test/tests tests/test_*.o
 	$(MAKE) -C test/osm-testdata clean
 
 check:
@@ -67,14 +67,13 @@ install: doc
 # we know we are missing something.
 .PRECIOUS: check-includes
 check-includes: $(INCLUDE_FILES)
-	echo "CHECK INCLUDES REPORT:" >check-includes; \
+	@echo "CHECK INCLUDES REPORT:" >check-includes; \
     allok=yes; \
 	for FILE in $(INCLUDE_FILES); do \
         flags=`./get_options.sh --cflags $${FILE}`; \
-        eval eflags=$${flags}; \
-        compile="$(CXX) $(CXXFLAGS) $(WARNINGFLAGS) -I include $${eflags} $${FILE}"; \
-        echo "\n======== $${FILE}\n$${compile}" >>check-includes; \
-        if `$${compile} 2>>check-includes`; then \
+        cmdline="$(CXX) $(CXXFLAGS) $(WARNINGFLAGS) -I include $${flags} $${FILE}"; \
+        echo "\n======== $${FILE}\n$${cmdline}" >>check-includes; \
+        if `$${cmdline} 2>>check-includes`; then \
             echo "[OK] $${FILE}"; \
         else \
             echo "[  ] $${FILE}"; \
@@ -89,15 +88,29 @@ test:
 	(cd test && ./run_tests.sh)
 	if test -d ../osm-testdata; then $(MAKE) -C test/osm-testdata test; fi
 
-iwyu:
+iwyu: $(INCLUDE_FILES)
+	@echo "INCLUDE WHAT YOU USE REPORT:" >iwyu.log; \
+    allok=yes; \
 	for FILE in $(INCLUDE_FILES); do \
 	    flags=`./get_options.sh --cflags $${FILE}`; \
-	    eval eflags=$${flags}; \
-	    cmdline="iwyu -Xiwyu --mapping_file=osmium.imp $(CXXFLAGS) $(WARNINGFLAGS) -I include $${eflags} $${FILE}"; \
-	    echo "\n======== $${FILE} ========================================================="; \
-	    echo "$${cmdline}"; \
-	    $${cmdline}; \
-	done;
+	    cmdline="iwyu -Xiwyu --mapping_file=osmium.imp $(CXXFLAGS) $(WARNINGFLAGS) -I include $${flags} $${FILE}"; \
+	    $${cmdline} >iwyu.tmp 2>&1; \
+        if grep -q 'has correct #includes/fwd-decls' iwyu.tmp; then \
+	        echo "\n\033[1m\033[32m========\033[0m \033[1m$${FILE}\033[0m\n$${cmdline}" >>iwyu.log; \
+            echo "[OK] $${FILE}"; \
+        elif grep -q 'Assertion failed' iwyu.tmp; then \
+	        echo "\n\033[1m======== $${FILE}\033[0m\n$${cmdline}" >>iwyu.log; \
+            echo "[--] $${FILE}"; \
+            allok=no; \
+        else \
+	        echo "\n\033[1m\033[31m========\033[0m \033[1m$${FILE}\033[0m\n$${cmdline}" >>iwyu.log; \
+            echo "[  ] $${FILE}"; \
+            allok=no; \
+        fi; \
+	    cat iwyu.tmp >>iwyu.log; \
+	done; \
+	rm iwyu.tmp; \
+	echo "\nDONE" >>iwyu.log
 
 indent:
 	astyle --style=java --indent-namespaces --indent-switches --pad-header --lineend=linux --suffix=none --recursive include/\*.hpp examples/\*.cpp test/\*.cpp
