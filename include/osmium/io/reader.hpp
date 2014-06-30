@@ -285,6 +285,27 @@ namespace osmium {
 
         }; // class Reader
 
+        /**
+         * Read contents of the given file into a buffer in one go. Takes
+         * the same arguments as any of the Reader constructors.
+         *
+         * The buffer can take up quite a lot of memory, so don't do this
+         * unless you are working with small OSM files and/or have lots of
+         * RAM.
+         */
+        template <class... TArgs>
+        osmium::memory::Buffer read_file(TArgs&&... args) {
+            osmium::memory::Buffer buffer(1024*1024, osmium::memory::Buffer::auto_grow::yes);
+
+            Reader reader(std::forward<TArgs>(args)...);
+            while (osmium::memory::Buffer read_buffer = reader.read()) {
+                buffer.add_buffer(read_buffer);
+                buffer.commit();
+            }
+
+            return buffer;
+        }
+
     } // namespace io
 
 } // namespace osmium

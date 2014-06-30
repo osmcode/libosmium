@@ -363,6 +363,17 @@ namespace osmium {
             }
 
             /**
+             * Add committed contents of the given buffer to this buffer.
+             *
+             * Note that you have to eventually call commit() to actually
+             * commit this data.
+             */
+            void add_buffer(const Buffer& buffer) {
+                unsigned char* ptr = reserve_space(buffer.committed());
+                std::memcpy(ptr, buffer.data(), buffer.committed());
+            }
+
+            /**
              * Add an item to the buffer. This function is provided so that
              * you can use std::back_inserter.
              */
