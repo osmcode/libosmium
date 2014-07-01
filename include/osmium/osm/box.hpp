@@ -65,7 +65,7 @@ namespace osmium {
         ~Box() = default;
 
         /**
-         * Extend the bounding box by the given location. If the
+         * Extend this bounding box by the given location. If the
          * location is undefined, the bounding box is unchanged.
          */
         Box& extend(const Location& location) noexcept {
@@ -88,6 +88,16 @@ namespace osmium {
                     m_top_right = location;
                 }
             }
+            return *this;
+        }
+
+        /**
+         * Extend this bounding box by the given box. If the
+         * box is undefined, the bounding box is unchanged.
+         */
+        Box& extend(const Box& box) noexcept {
+            extend(box.bottom_left());
+            extend(box.top_right());
             return *this;
         }
 
