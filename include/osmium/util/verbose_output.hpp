@@ -70,6 +70,10 @@ namespace osmium {
             /// a newline was written, start next output with runtime
             bool m_newline;
 
+            /**
+             * If we remember that a newline was written as the last thing
+             * write out the time elapsed and reset the newline flag.
+             */
             void start_line() {
                 if (m_newline) {
                     int elapsed = runtime();
@@ -112,14 +116,15 @@ namespace osmium {
             }
 
             template<typename T>
-            friend VerboseOutput& operator<<(VerboseOutput& verbose_output, T value) {
+            friend VerboseOutput& operator<<(VerboseOutput& verbose_output, const T& value) {
                 if (verbose_output.m_verbose) {
+                    verbose_output.start_line();
+                    std::cerr << value;
+
+                    // check if there was a newline a the end and remember that
                     std::ostringstream output_buffer;
                     output_buffer << value;
-                    verbose_output.start_line();
-                    std::cerr << output_buffer.str();
-
-                    if (!output_buffer.str().empty() && output_buffer.str()[output_buffer.str().size()-1] == '\n') {
+                    if (!output_buffer.str().empty() && output_buffer.str().back() == '\n') {
                         verbose_output.m_newline = true;
                     }
                 }
