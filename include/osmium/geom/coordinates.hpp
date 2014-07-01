@@ -64,6 +64,9 @@ namespace osmium {
             double x;
             double y;
 
+            Coordinates(double cx, double cy) : x(cx), y(cy) {
+            }
+
             void append_to_string(std::string& s, const char infix) const {
                 osmium::geom::detail::double2string(s, x);
                 s += infix;

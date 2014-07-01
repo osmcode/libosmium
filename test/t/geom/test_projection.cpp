@@ -21,7 +21,7 @@ BOOST_AUTO_TEST_CASE(project_location_4326) {
     BOOST_CHECK_EQUAL("+init=epsg:4326", projection.proj_string());
 
     const osmium::Location loc(1.0, 2.0);
-    const osmium::geom::Coordinates c {osmium::geom::deg_to_rad(1.0), osmium::geom::deg_to_rad(2.0)};
+    const osmium::geom::Coordinates c {1.0, 2.0};
     BOOST_CHECK_EQUAL(c, projection(loc));
 }
 
@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_CASE(project_location_4326_string) {
     BOOST_CHECK_EQUAL("+init=epsg:4326", projection.proj_string());
 
     const osmium::Location loc(1.0, 2.0);
-    const osmium::geom::Coordinates c {osmium::geom::deg_to_rad(1.0), osmium::geom::deg_to_rad(2.0)};
+    const osmium::geom::Coordinates c {1.0, 2.0};
     BOOST_CHECK_EQUAL(c, projection(loc));
 }
 

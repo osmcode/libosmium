@@ -34,6 +34,7 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <cmath>
+#include <string>
 
 #include <osmium/geom/coordinates.hpp>
 #include <osmium/geom/util.hpp>

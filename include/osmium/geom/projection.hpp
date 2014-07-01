@@ -76,6 +76,14 @@ namespace osmium {
                 CRS(std::string("+init=epsg:") + std::to_string(epsg)) {
             }
 
+            bool is_latlong() const {
+                return pj_is_latlong(m_crs.get());
+            }
+
+            bool is_geocent() const {
+                return pj_is_geocent(m_crs.get());
+            }
+
             /**
              * Transform coordinates from one CRS into another. Wraps the same function
              * of the proj library.
@@ -120,7 +128,16 @@ namespace osmium {
             }
 
             Coordinates operator()(osmium::Location location) const {
-                return transform(m_crs_wgs84, m_crs_user, {deg_to_rad(location.lon()), deg_to_rad(location.lat())});
+                if (m_epsg == 4326) {
+                    return Coordinates(location.lon(), location.lat());
+                } else {
+                    Coordinates c = transform(m_crs_wgs84, m_crs_user, {deg_to_rad(location.lon()), deg_to_rad(location.lat())});
+                    if (m_crs_user.is_latlong()) {
+                        c.x = rad_to_deg(c.x);
+                        c.y = rad_to_deg(c.y);
+                    }
+                    return c;
+                }
             }
 
             int epsg() const {
