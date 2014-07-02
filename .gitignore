@@ -1,4 +1,5 @@
 core
-check-includes
 iwyu.log
+includes.log
+check_reports
 *.swp
