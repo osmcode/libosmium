@@ -84,7 +84,13 @@ namespace osmium {
             forward  = false ///< Linestring has same direction as way.
         };
 
-        struct IdentityProjection {
+        /**
+         * This pseudo projection just returns its WGS84 input unchanged.
+         * Used as a template parameter if a real projection is not needed.
+         */
+        class IdentityProjection {
+
+        public:
 
             Coordinates operator()(osmium::Location location) const {
                 return Coordinates{location.lon(), location.lat()};
@@ -98,7 +104,7 @@ namespace osmium {
                 return "+proj=longlat +datum=WGS84 +no_defs";
             }
 
-        };
+        }; // class IdentityProjection
 
         /**
          * Geometry factory.
