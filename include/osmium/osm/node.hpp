@@ -62,25 +62,13 @@ namespace osmium {
             return m_location;
         }
 
+        osmium::Location& location() {
+            return m_location;
+        }
+
         Node& location(const osmium::Location& location) {
             m_location = location;
             return *this;
-        }
-
-        void lon(double x) {
-            m_location.lon(x);
-        }
-
-        void lat(double y) {
-            m_location.lat(y);
-        }
-
-        double lon() const {
-            return m_location.lon();
-        }
-
-        double lat() const {
-            return m_location.lat();
         }
 
     }; // class Node

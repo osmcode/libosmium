@@ -209,9 +209,9 @@ namespace osmium {
                     }
                     for (int count = 0; attrs[count]; count += 2) {
                         if (!strcmp(attrs[count], "lon")) {
-                            static_cast<osmium::Node&>(object).lon(atof(attrs[count+1])); // XXX
+                            static_cast<osmium::Node&>(object).location().lon(std::atof(attrs[count+1])); // XXX doesn't detect garbage after the number
                         } else if (!strcmp(attrs[count], "lat")) {
-                            static_cast<osmium::Node&>(object).lat(atof(attrs[count+1])); // XXX
+                            static_cast<osmium::Node&>(object).location().lat(std::atof(attrs[count+1])); // XXX doesn't detect garbage after the number
                         } else if (!strcmp(attrs[count], "user")) {
                             user = attrs[count+1];
                         } else {
