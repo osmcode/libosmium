@@ -243,6 +243,10 @@ namespace osmium {
                       << changeset.id()
                       << "\n";
                 m_out << m_prefix
+                      << "  num_changes="
+                      << changeset.num_changes()
+                      << "\n";
+                m_out << m_prefix
                       << "  uid="
                       << changeset.uid()
                       << "\n";
