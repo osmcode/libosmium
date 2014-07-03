@@ -240,9 +240,9 @@ namespace osmium {
 
                     if (node.location()) {
                         m_out += " lat=\"";
-                        osmium::Location::coordinate2string(std::back_inserter(m_out), node.location().lat());
+                        osmium::Location::coordinate2string(std::back_inserter(m_out), node.location().lat_without_check());
                         m_out += "\" lon=\"";
-                        osmium::Location::coordinate2string(std::back_inserter(m_out), node.location().lon());
+                        osmium::Location::coordinate2string(std::back_inserter(m_out), node.location().lon_without_check());
                         m_out += "\"";
                     }
 
@@ -340,10 +340,10 @@ namespace osmium {
                     }
 
                     if (changeset.bounds()) {
-                        oprintf(m_out, " min_lon=\"%.7f\"", changeset.bounds().bottom_left().lon());
-                        oprintf(m_out, " min_lat=\"%.7f\"", changeset.bounds().bottom_left().lat());
-                        oprintf(m_out, " max_lon=\"%.7f\"", changeset.bounds().top_right().lon());
-                        oprintf(m_out, " max_lat=\"%.7f\"", changeset.bounds().top_right().lat());
+                        oprintf(m_out, " min_lon=\"%.7f\"", changeset.bounds().bottom_left().lon_without_check());
+                        oprintf(m_out, " min_lat=\"%.7f\"", changeset.bounds().bottom_left().lat_without_check());
+                        oprintf(m_out, " max_lon=\"%.7f\"", changeset.bounds().top_right().lon_without_check());
+                        oprintf(m_out, " max_lat=\"%.7f\"", changeset.bounds().top_right().lat_without_check());
                     }
 
                     if (!changeset.user_is_anonymous()) {

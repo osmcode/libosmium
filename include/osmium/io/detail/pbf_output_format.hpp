@@ -595,8 +595,8 @@ namespace osmium {
 
                     // modify lat & lon to integers, respecting the block's granularity and copy
                     // the ints to the pbf-object
-                    pbf_node->set_lon(lonlat2int(node.lon()));
-                    pbf_node->set_lat(lonlat2int(node.lat()));
+                    pbf_node->set_lon(lonlat2int(node.location().lon_without_check()));
+                    pbf_node->set_lat(lonlat2int(node.location().lat_without_check()));
                 }
 
                 /**
@@ -612,10 +612,10 @@ namespace osmium {
                     dense->add_id(m_delta_id.update(node.id()));
 
                     // copy the longitude, delta encoded
-                    dense->add_lon(m_delta_lon.update(lonlat2int(node.lon())));
+                    dense->add_lon(m_delta_lon.update(lonlat2int(node.location().lon_without_check())));
 
                     // copy the latitude, delta encoded
-                    dense->add_lat(m_delta_lat.update(lonlat2int(node.lat())));
+                    dense->add_lat(m_delta_lat.update(lonlat2int(node.location().lat_without_check())));
 
                     // in the densenodes structure keys and vals are encoded in an intermixed
                     // array, individual nodes are seperated by a value of 0 (0 in the StringTable

@@ -188,6 +188,13 @@ namespace osmium {
         }
 
         /**
+         * Get longitude without checking the validity.
+         */
+        double lon_without_check() const {
+            return fix_to_double(m_x);
+        }
+
+        /**
          * Get latitude.
          *
          * @throws invalid_location if the location is invalid
@@ -196,6 +203,13 @@ namespace osmium {
             if (!valid()) {
                 throw osmium::invalid_location("invalid location");
             }
+            return fix_to_double(m_y);
+        }
+
+        /**
+         * Get latitude without checking the validity.
+         */
+        double lat_without_check() const {
             return fix_to_double(m_y);
         }
 

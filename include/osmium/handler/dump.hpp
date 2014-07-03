@@ -120,11 +120,11 @@ namespace osmium {
                           << "  lon="
                           << std::fixed
                           << std::setprecision(7)
-                          << location.lon()
+                          << location.lon_without_check()
                           << "\n";
                     m_out << m_prefix
                           << "  lat="
-                          << location.lat()
+                          << location.lat_without_check()
                           << "\n";
                 } else {
                     m_out << m_prefix
@@ -263,9 +263,23 @@ namespace osmium {
                       << changeset.closed_at().to_iso()
                       << "\n";
                 m_out << m_prefix
-                      << "  bounds="
-                      << changeset.bounds()
-                      << "\n";
+                      << "  bounds=";
+
+                if (changeset.bounds()) {
+                    m_out << '('
+                          << changeset.bounds().bottom_left().lon_without_check()
+                          << ','
+                          << changeset.bounds().bottom_left().lat_without_check()
+                          << ','
+                          << changeset.bounds().top_right().lon_without_check()
+                          << ','
+                          << changeset.bounds().top_right().lat_without_check()
+                          << ')';
+                } else {
+                    m_out << "(undefined)";
+                }
+
+                m_out << "\n";
 
                 Dump dump(m_out, m_with_size, m_prefix + "  ");
                 osmium::apply(changeset.cbegin(), changeset.cend(), dump);

@@ -149,7 +149,7 @@ namespace osmium {
 
                 void write_location(const osmium::Location location, const char x, const char y) {
                     if (location) {
-                        snprintf(m_tmp_buffer, tmp_buffer_size, " %c%.7f %c%.7f", x, location.lon(), y, location.lat());
+                        snprintf(m_tmp_buffer, tmp_buffer_size, " %c%.7f %c%.7f", x, location.lon_without_check(), y, location.lat_without_check());
                         m_out += m_tmp_buffer;
                     } else {
                         m_out += ' ';
