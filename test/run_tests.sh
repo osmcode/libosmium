@@ -55,17 +55,26 @@ test_file () {
     FILES="test_main.o test_utils.o $1"
     OPTS_CFLAGS=`../get_options.sh --cflags $1`
     OPTS_LIBS=`../get_options.sh --libs $1`
+    cmdline="$COMPILE $FILES $OPTS_CFLAGS $OPTS_LIBS -DBOOST_TEST_DYN_LINK $LDFLAGS -lboost_unit_test_framework"
     msg=`echo "Checking ${BOLD}test/$1$NORM ................................................" | cut -c1-70`
     echo -n "$msg "
-    if ! output=$($COMPILE $FILES $OPTS_CFLAGS $OPTS_LIBS -DBOOST_TEST_DYN_LINK $LDFLAGS -lboost_unit_test_framework 2>&1 ); then
+    if ! output=$($cmdline 2>&1); then
         echo "$DARKRED[COMPILE ERROR]$NORM"
         TESTS_COMPILE_ERROR=$(($TESTS_COMPILE_ERROR+1))
         echo "=========================="
-        echo $COMPILE $FILES $OPTS_CFLAGS $OPTS_LIBS -DBOOST_TEST_DYN_LINK $LDFLAGS -lboost_unit_test_framework
+        echo $cmdline
         echo "--------------------------"
         echo "$output"
         echo "=========================="
         return
+    else
+        if [ $ALWAYS_SHOW_OUTPUT = 1 ]; then
+            echo "\n=========================="
+            echo $cmdline
+            echo "--------------------------"
+            echo "$output"
+            echo "=========================="
+        fi
     fi
 
     if ! output=$($VALGRIND ./tests 2>&1 ); then
@@ -78,8 +87,7 @@ test_file () {
     else
         echo "$GREEN[SUCCESS]$NORM"
         TESTS_OK=$((TESTS_OK+1))
-        if [ $ALWAYS_SHOW_OUTPUT = 1 ]
-        then
+        if [ $ALWAYS_SHOW_OUTPUT = 1 ]; then
             echo "=========================="
             echo "$output"
             echo "=========================="
