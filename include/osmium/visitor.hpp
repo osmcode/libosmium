@@ -39,15 +39,10 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/io/reader_iterator.hpp> // IWYU pragma: keep
 #include <osmium/memory/buffer.hpp>
 #include <osmium/osm/item_type.hpp>
+#include <osmium/osm.hpp>
 
 namespace osmium {
 
-    class OSMObject;
-    class Node;
-    class Way;
-    class Relation;
-    class Area;
-    class Changeset;
     class TagList;
     class WayNodeList;
     class RelationMemberList;
@@ -100,6 +95,108 @@ namespace osmium {
                     break;
                 case osmium::item_type::inner_ring:
                     handler.inner_ring(static_cast<ConstIfConst<TItem, osmium::InnerRing>&>(item));
+                    break;
+                default:
+                    throw std::runtime_error("unknown type");
+            }
+        }
+
+        template <class THandler>
+        inline void apply_item_recurse(const osmium::OSMEntity& item, THandler& handler) {
+            switch (item.type()) {
+                case osmium::item_type::node:
+                    handler.osm_object(static_cast<const osmium::OSMObject&>(item));
+                    handler.node(static_cast<const osmium::Node&>(item));
+                    break;
+                case osmium::item_type::way:
+                    handler.osm_object(static_cast<const osmium::OSMObject&>(item));
+                    handler.way(static_cast<const osmium::Way&>(item));
+                    break;
+                case osmium::item_type::relation:
+                    handler.osm_object(static_cast<const osmium::OSMObject&>(item));
+                    handler.relation(static_cast<const osmium::Relation&>(item));
+                    break;
+                case osmium::item_type::area:
+                    handler.osm_object(static_cast<const osmium::OSMObject&>(item));
+                    handler.area(static_cast<const osmium::Area&>(item));
+                    break;
+                case osmium::item_type::changeset:
+                    handler.changeset(static_cast<const osmium::Changeset&>(item));
+                    break;
+                default:
+                    throw std::runtime_error("unknown type");
+            }
+        }
+
+        template <class THandler>
+        inline void apply_item_recurse(osmium::OSMEntity& item, THandler& handler) {
+            switch (item.type()) {
+                case osmium::item_type::node:
+                    handler.osm_object(static_cast<osmium::OSMObject&>(item));
+                    handler.node(static_cast<osmium::Node&>(item));
+                    break;
+                case osmium::item_type::way:
+                    handler.osm_object(static_cast<osmium::OSMObject&>(item));
+                    handler.way(static_cast<osmium::Way&>(item));
+                    break;
+                case osmium::item_type::relation:
+                    handler.osm_object(static_cast<osmium::OSMObject&>(item));
+                    handler.relation(static_cast<osmium::Relation&>(item));
+                    break;
+                case osmium::item_type::area:
+                    handler.osm_object(static_cast<osmium::OSMObject&>(item));
+                    handler.area(static_cast<osmium::Area&>(item));
+                    break;
+                case osmium::item_type::changeset:
+                    handler.changeset(static_cast<osmium::Changeset&>(item));
+                    break;
+                default:
+                    throw std::runtime_error("unknown type");
+            }
+        }
+
+        template <class THandler>
+        inline void apply_item_recurse(const osmium::OSMObject& item, THandler& handler) {
+            switch (item.type()) {
+                case osmium::item_type::node:
+                    handler.osm_object(item);
+                    handler.node(static_cast<const osmium::Node&>(item));
+                    break;
+                case osmium::item_type::way:
+                    handler.osm_object(item);
+                    handler.way(static_cast<const osmium::Way&>(item));
+                    break;
+                case osmium::item_type::relation:
+                    handler.osm_object(item);
+                    handler.relation(static_cast<const osmium::Relation&>(item));
+                    break;
+                case osmium::item_type::area:
+                    handler.osm_object(item);
+                    handler.area(static_cast<const osmium::Area&>(item));
+                    break;
+                default:
+                    throw std::runtime_error("unknown type");
+            }
+        }
+
+        template <class THandler>
+        inline void apply_item_recurse(osmium::OSMObject& item, THandler& handler) {
+            switch (item.type()) {
+                case osmium::item_type::node:
+                    handler.osm_object(item);
+                    handler.node(static_cast<osmium::Node&>(item));
+                    break;
+                case osmium::item_type::way:
+                    handler.osm_object(item);
+                    handler.way(static_cast<osmium::Way&>(item));
+                    break;
+                case osmium::item_type::relation:
+                    handler.osm_object(item);
+                    handler.relation(static_cast<osmium::Relation&>(item));
+                    break;
+                case osmium::item_type::area:
+                    handler.osm_object(item);
+                    handler.area(static_cast<osmium::Area&>(item));
                     break;
                 default:
                     throw std::runtime_error("unknown type");

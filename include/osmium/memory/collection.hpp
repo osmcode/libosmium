@@ -55,8 +55,6 @@ namespace osmium {
 
         public:
 
-            // XXX it is unclear whether we need this, but it came up somewhere
-            // that weed needed to default-initialize a CollectionIterator
             CollectionIterator() :
                 m_data(nullptr) {
             }

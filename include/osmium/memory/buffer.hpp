@@ -44,7 +44,7 @@ DEALINGS IN THE SOFTWARE.
 #include <vector>
 
 #include <osmium/memory/item.hpp>
-#include <osmium/memory/collection.hpp>
+#include <osmium/memory/item_iterator.hpp>
 
 namespace osmium {
 
@@ -386,27 +386,63 @@ namespace osmium {
              * These iterators can be used to iterate over all items in
              * a buffer.
              */
-            typedef osmium::memory::CollectionIterator<Item> iterator;
-            typedef osmium::memory::CollectionIterator<const Item> const_iterator;
+            template <class T>
+            using t_iterator = osmium::memory::ItemIterator<T>;
+
+            template <class T>
+            using t_const_iterator = osmium::memory::ItemIterator<const T>;
+
+            typedef t_iterator<osmium::OSMEntity> iterator;
+            typedef t_const_iterator<osmium::OSMEntity> const_iterator;
+
+            template <class T>
+            t_iterator<T> begin() {
+                return t_iterator<T>(m_data, m_data + m_committed);
+            }
 
             iterator begin() {
-                return iterator(m_data);
+                return iterator(m_data, m_data + m_committed);
+            }
+
+            template <class T>
+            t_iterator<T> end() {
+                return t_iterator<T>(m_data + m_committed, m_data + m_committed);
             }
 
             iterator end() {
-                return iterator(m_data + m_committed);
+                return iterator(m_data + m_committed, m_data + m_committed);
+            }
+
+            template <class T>
+            t_const_iterator<T> cbegin() const {
+                return t_const_iterator<T>(m_data, m_data + m_committed);
             }
 
             const_iterator cbegin() const {
-                return const_iterator(m_data);
+                return const_iterator(m_data, m_data + m_committed);
+            }
+
+            template <class T>
+            t_const_iterator<T> cend() const {
+                return t_const_iterator<T>(m_data + m_committed, m_data + m_committed);
             }
 
             const_iterator cend() const {
-                return const_iterator(m_data + m_committed);
+                return const_iterator(m_data + m_committed, m_data + m_committed);
+            }
+
+            template <class T>
+            t_const_iterator<T> begin() const {
+                return cbegin<T>();
             }
 
             const_iterator begin() const {
                 return cbegin();
+            }
+
+            template <class T>
+            t_const_iterator<T> end() const {
+                return cend<T>();
             }
 
             const_iterator end() const {

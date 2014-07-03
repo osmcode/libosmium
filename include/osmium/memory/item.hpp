@@ -102,6 +102,9 @@ namespace osmium {
             template <class TMember>
             friend class CollectionIterator;
 
+            template <class TMember>
+            friend class ItemIterator;
+
             friend class osmium::builder::Builder;
 
             unsigned char* next() {
