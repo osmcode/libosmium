@@ -223,8 +223,9 @@ namespace osmium {
                 }
 
                 void init_changeset(osmium::builder::ChangesetBuilder* builder, const XML_Char** attrs) {
+                    static const char* empty = "";
+                    const char* user = empty;
                     osmium::Changeset& new_changeset = builder->object();
-                    bool user_set = false;
 
                     osmium::Location min {};
                     osmium::Location max {};
@@ -238,8 +239,7 @@ namespace osmium {
                         } else if (!strcmp(attrs[count], "max_lat")) {
                             max.lat(atof(attrs[count+1]));
                         } else if (!strcmp(attrs[count], "user")) {
-                            builder->add_user(attrs[count+1]);
-                            user_set = true;
+                            user = attrs[count+1];
                         } else {
                             new_changeset.set_attribute(attrs[count], attrs[count+1]);
                         }
@@ -248,9 +248,7 @@ namespace osmium {
                     new_changeset.bounds().extend(min);
                     new_changeset.bounds().extend(max);
 
-                    if (!user_set) {
-                        builder->add_user("");
-                    }
+                    builder->add_user(user);
                 }
 
                 void check_tag(osmium::builder::Builder* builder, const XML_Char* element, const XML_Char** attrs) {
