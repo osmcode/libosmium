@@ -48,6 +48,14 @@ namespace osmium {
 
     namespace io {
 
+        namespace detail {
+
+            [[noreturn]] inline void throw_bzip2_error(const std::string& msg, int error) {
+                throw std::runtime_error("bzip2 error: " + msg + ": " + std::to_string(error));
+            }
+
+        } // namespace detail
+
         class Bzip2Compressor : public Compressor {
 
             FILE* m_file;
@@ -58,11 +66,11 @@ namespace osmium {
 
             explicit Bzip2Compressor(int fd) :
                 Compressor(),
-                m_file(fdopen(fd, "wb")),
+                m_file(fdopen(dup(fd), "wb")),
                 m_bzerror(BZ_OK),
                 m_bzfile(::BZ2_bzWriteOpen(&m_bzerror, m_file, 6, 0, 0)) {
                 if (!m_bzfile) {
-                    throw std::runtime_error("initialization of bzip2 compression failed");
+                    detail::throw_bzip2_error("write open failed", m_bzerror);
                 }
             }
 
@@ -73,18 +81,22 @@ namespace osmium {
             void write(const std::string& data) override final {
                 int error;
                 ::BZ2_bzWrite(&error, m_bzfile, const_cast<char*>(data.data()), data.size());
-                // XXX check for error
+                if (error != BZ_OK && error != BZ_STREAM_END) {
+                    detail::throw_bzip2_error("write failed", error);
+                }
             }
 
             void close() override final {
                 if (m_bzfile) {
                     int error;
-                    unsigned int nbytes_in_lo32;
-                    unsigned int nbytes_in_hi32;
-                    unsigned int nbytes_out_lo32;
-                    unsigned int nbytes_out_hi32;
-                    ::BZ2_bzWriteClose64(&error, m_bzfile, 0, &nbytes_in_lo32, &nbytes_in_hi32, &nbytes_out_lo32, &nbytes_out_hi32);
+                    ::BZ2_bzWriteClose(&error, m_bzfile, 0, nullptr, nullptr);
                     m_bzfile = nullptr;
+                    if (m_file) {
+                        fclose(m_file);
+                    }
+                    if (error != BZ_OK) {
+                        detail::throw_bzip2_error("write close failed", error);
+                    }
                 }
             }
 
@@ -95,16 +107,17 @@ namespace osmium {
             FILE* m_file;
             int m_bzerror;
             BZFILE* m_bzfile;
+            bool m_stream_end {false};
 
         public:
 
             Bzip2Decompressor(int fd) :
                 Decompressor(),
-                m_file(fdopen(fd, "rb")),
+                m_file(fdopen(dup(fd), "rb")),
                 m_bzerror(BZ_OK),
                 m_bzfile(::BZ2_bzReadOpen(&m_bzerror, m_file, 0, 0, nullptr, 0)) {
                 if (!m_bzfile) {
-                    throw std::runtime_error("initialization of bzip2 compression failed");
+                    detail::throw_bzip2_error("read open failed", m_bzerror);
                 }
             }
 
@@ -113,12 +126,18 @@ namespace osmium {
             }
 
             std::string read() override final {
+                if (m_stream_end) {
+                    return std::string();
+                }
                 std::string buffer(osmium::io::Decompressor::input_buffer_size, '\0');
                 int error;
                 int nread = ::BZ2_bzRead(&error, m_bzfile, const_cast<char*>(buffer.data()), buffer.size());
-//                if (error != BZ_OK && error != BZ_STREAM_END) {
-//                    throw std::runtime_error("bzip2 read failed"); // XXX better error detection and reporting
-//                }
+                if (error != BZ_OK && error != BZ_STREAM_END) {
+                    detail::throw_bzip2_error("read failed", error);
+                }
+                if (error == BZ_STREAM_END) {
+                    m_stream_end = true;
+                }
                 buffer.resize(nread);
                 return buffer;
             }
@@ -128,6 +147,12 @@ namespace osmium {
                     int error;
                     ::BZ2_bzReadClose(&error, m_bzfile);
                     m_bzfile = nullptr;
+                    if (m_file) {
+                        fclose(m_file);
+                    }
+                    if (error != BZ_OK) {
+                        detail::throw_bzip2_error("read close failed", error);
+                    }
                 }
             }
 
