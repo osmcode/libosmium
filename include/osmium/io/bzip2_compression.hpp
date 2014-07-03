@@ -58,7 +58,7 @@ namespace osmium {
 
             explicit Bzip2Compressor(int fd) :
                 Compressor(),
-                m_file(fdopen(fd, "w")),
+                m_file(fdopen(fd, "wb")),
                 m_bzerror(BZ_OK),
                 m_bzfile(::BZ2_bzWriteOpen(&m_bzerror, m_file, 6, 0, 0)) {
                 if (!m_bzfile) {
@@ -100,7 +100,7 @@ namespace osmium {
 
             Bzip2Decompressor(int fd) :
                 Decompressor(),
-                m_file(fdopen(fd, "r")),
+                m_file(fdopen(fd, "rb")),
                 m_bzerror(BZ_OK),
                 m_bzfile(::BZ2_bzReadOpen(&m_bzerror, m_file, 0, 0, nullptr, 0)) {
                 if (!m_bzfile) {
