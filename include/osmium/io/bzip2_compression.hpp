@@ -139,13 +139,10 @@ namespace osmium {
 
         namespace {
 
-            const bool registered_bzip2_compression = osmium::io::CompressionFactory::instance().register_compression({
-                osmium::io::file_compression::bzip2
-            }, [](int fd) {
-                return new osmium::io::Bzip2Compressor(fd);
-            }, [](int fd) {
-                return new osmium::io::Bzip2Decompressor(fd);
-            });
+            const bool registered_bzip2_compression = osmium::io::CompressionFactory::instance().register_compression(osmium::io::file_compression::bzip2,
+                [](int fd) { return new osmium::io::Bzip2Compressor(fd); },
+                [](int fd) { return new osmium::io::Bzip2Decompressor(fd); }
+            );
 
         } // anonymous namespace
 

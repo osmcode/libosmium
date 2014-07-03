@@ -118,13 +118,10 @@ namespace osmium {
 
         namespace {
 
-            const bool registered_gzip_compression = osmium::io::CompressionFactory::instance().register_compression({
-                osmium::io::file_compression::gzip
-            }, [](int fd) {
-                return new osmium::io::GzipCompressor(fd);
-            }, [](int fd) {
-                return new osmium::io::GzipDecompressor(fd);
-            });
+            const bool registered_gzip_compression = osmium::io::CompressionFactory::instance().register_compression(osmium::io::file_compression::gzip,
+                [](int fd) { return new osmium::io::GzipCompressor(fd); },
+                [](int fd) { return new osmium::io::GzipDecompressor(fd); }
+            );
 
         } // anonymous namespace
 
