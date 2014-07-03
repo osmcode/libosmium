@@ -136,7 +136,25 @@ namespace osmium {
                     detail::throw_bzip2_error("read failed", error);
                 }
                 if (error == BZ_STREAM_END) {
-                    m_stream_end = true;
+                    void* unused;
+                    int nunused;
+                    if (! feof(m_file)) {
+                        ::BZ2_bzReadGetUnused(&error, m_bzfile, &unused, &nunused);
+                        if (error != BZ_OK) {
+                            detail::throw_bzip2_error("get unused failed", error);
+                        }
+                        std::string unused_data(static_cast<const char*>(unused), nunused);
+                        ::BZ2_bzReadClose(&error, m_bzfile);
+                        if (error != BZ_OK) {
+                            detail::throw_bzip2_error("read close failed", error);
+                        }
+                        m_bzfile = ::BZ2_bzReadOpen(&error, m_file, 0, 0, const_cast<void*>(static_cast<const void*>(unused_data.data())), unused_data.size());
+                        if (error != BZ_OK) {
+                            detail::throw_bzip2_error("read open failed", error);
+                        }
+                    } else {
+                        m_stream_end = true;
+                    }
                 }
                 buffer.resize(nread);
                 return buffer;
