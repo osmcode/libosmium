@@ -126,11 +126,7 @@ namespace osmium {
             void close() override final {
                 if (m_bzfile) {
                     int error;
-                    unsigned int nbytes_in_lo32;
-                    unsigned int nbytes_in_hi32;
-                    unsigned int nbytes_out_lo32;
-                    unsigned int nbytes_out_hi32;
-                    ::BZ2_bzWriteClose64(&error, m_bzfile, 0, &nbytes_in_lo32, &nbytes_in_hi32, &nbytes_out_lo32, &nbytes_out_hi32);
+                    ::BZ2_bzReadClose(&error, m_bzfile);
                     m_bzfile = nullptr;
                 }
             }
