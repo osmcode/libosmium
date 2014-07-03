@@ -38,8 +38,9 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/io/reader_iterator.hpp> // IWYU pragma: keep
 #include <osmium/memory/buffer.hpp>
-#include <osmium/osm/item_type.hpp>
 #include <osmium/osm.hpp>
+#include <osmium/osm/entity.hpp>
+#include <osmium/osm/item_type.hpp>
 
 namespace osmium {
 

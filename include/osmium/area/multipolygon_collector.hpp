@@ -37,7 +37,6 @@ DEALINGS IN THE SOFTWARE.
 #include <cassert>
 #include <cstddef>
 #include <cstring>
-#include <iostream>
 #include <vector>
 
 #include <osmium/memory/buffer.hpp>
@@ -47,9 +46,14 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/way.hpp>
 #include <osmium/relations/collector.hpp>
 #include <osmium/relations/detail/member_meta.hpp>
-#include <osmium/relations/detail/relation_meta.hpp>
 
 namespace osmium {
+
+    struct invalid_location;
+
+    namespace relations {
+        class RelationMeta;
+    }
 
     /**
      * @brief Code related to the building of areas (multipolygons) from relations.

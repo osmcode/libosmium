@@ -45,6 +45,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/memory/item.hpp>
 #include <osmium/memory/item_iterator.hpp>
+#include <osmium/osm/entity.hpp>
 
 namespace osmium {
 

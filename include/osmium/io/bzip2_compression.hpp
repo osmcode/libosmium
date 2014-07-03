@@ -40,6 +40,7 @@ DEALINGS IN THE SOFTWARE.
 #include <string>
 
 #include <bzlib.h>
+#include <unistd.h>
 
 #include <osmium/io/compression.hpp>
 #include <osmium/io/file_compression.hpp>

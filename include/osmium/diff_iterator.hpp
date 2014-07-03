@@ -35,10 +35,13 @@ DEALINGS IN THE SOFTWARE.
 
 #include <cassert>
 #include <iterator>
+#include <type_traits>
 
 #include <osmium/osm/diff_object.hpp>
 
 namespace osmium {
+
+    class OSMObject;
 
     template <class TBasicIterator>
     class DiffIterator : public std::iterator<std::input_iterator_tag, const osmium::DiffObject> {

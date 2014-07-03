@@ -33,12 +33,14 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <cassert>
 #include <iterator>
 #include <iosfwd>
 #include <type_traits>
 
 #include <osmium/memory/item.hpp>
 #include <osmium/osm.hpp>
+#include <osmium/osm/item_type.hpp>
 
 namespace osmium {
 

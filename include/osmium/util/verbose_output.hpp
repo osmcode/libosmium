@@ -38,7 +38,6 @@ DEALINGS IN THE SOFTWARE.
 #include <iomanip>
 #include <iostream>
 #include <sstream>
-#include <string>
 
 namespace osmium {
 

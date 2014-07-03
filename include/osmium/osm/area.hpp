@@ -33,6 +33,7 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <cstdlib>
 #include <utility>
 
 #include <osmium/memory/collection.hpp>

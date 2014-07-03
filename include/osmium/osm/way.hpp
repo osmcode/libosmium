@@ -33,8 +33,6 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <cassert>
-
 #include <osmium/memory/item.hpp>
 #include <osmium/osm/item_type.hpp>
 #include <osmium/osm/object.hpp>

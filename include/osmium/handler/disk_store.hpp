@@ -39,7 +39,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/index/map.hpp>
 #include <osmium/io/detail/read_write.hpp>
 #include <osmium/memory/buffer.hpp>
-#include <osmium/memory/collection.hpp>
+#include <osmium/memory/item_iterator.hpp>
 #include <osmium/osm/node.hpp>
 #include <osmium/osm/relation.hpp>
 #include <osmium/osm/types.hpp>
