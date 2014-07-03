@@ -139,9 +139,13 @@ namespace osmium {
             void way_not_in_any_relation(const osmium::Way& way) {
                 if (way.ends_have_same_location() && way.nodes().size() > 3) {
                     // way is closed and has enough nodes, build simple multipolygon
-                    TAssembler assembler(m_assembler_config);
-                    assembler(way, m_output_buffer);
-                    possibly_flush_output_buffer();
+                    try {
+                        TAssembler assembler(m_assembler_config);
+                        assembler(way, m_output_buffer);
+                        possibly_flush_output_buffer();
+                    } catch (osmium::invalid_location&) {
+                        // XXX ignore
+                    }
                 }
             }
 
@@ -153,9 +157,13 @@ namespace osmium {
                         offsets.push_back(this->get_offset(member.type(), member.ref()));
                     }
                 }
-                TAssembler assembler(m_assembler_config);
-                assembler(relation, offsets, this->members_buffer(), m_output_buffer);
-                possibly_flush_output_buffer();
+                try {
+                    TAssembler assembler(m_assembler_config);
+                    assembler(relation, offsets, this->members_buffer(), m_output_buffer);
+                    possibly_flush_output_buffer();
+                } catch (osmium::invalid_location&) {
+                    // XXX ignore
+                }
 
                 // clear member metas
                 for (const auto& member : relation.members()) {
