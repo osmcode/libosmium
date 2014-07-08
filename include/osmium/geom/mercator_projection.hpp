@@ -46,25 +46,33 @@ namespace osmium {
 
         namespace detail {
 
-            constexpr double earth_radius = 6378137.0;
+            constexpr double EARTH_RADIUS_FOR_EPSG3857 = 6378137.0;
 
             double lon_to_x(double lon) {
-                return earth_radius * deg_to_rad(lon);
+                return EARTH_RADIUS_FOR_EPSG3857 * deg_to_rad(lon);
             }
 
             double lat_to_y(double lat) {
-                return earth_radius * std::log(std::tan(pi/4 + deg_to_rad(lat)/2));
+                return EARTH_RADIUS_FOR_EPSG3857 * std::log(std::tan(osmium::geom::PI/4 + deg_to_rad(lat)/2));
             }
 
             double x_to_lon(double x) {
-                return rad_to_deg(x) / earth_radius;
+                return rad_to_deg(x) / EARTH_RADIUS_FOR_EPSG3857;
             }
 
             double y_to_lat(double y) {
-                return rad_to_deg(2 * std::atan(std::exp(y / earth_radius)) - pi/2);
+                return rad_to_deg(2 * std::atan(std::exp(y / EARTH_RADIUS_FOR_EPSG3857)) - osmium::geom::PI/2);
             }
 
         } // namespace detail
+
+        Coordinates lonlat_to_mercator(const Coordinates& c) {
+            return Coordinates(detail::lon_to_x(c.x), detail::lat_to_y(c.y));
+        }
+
+        Coordinates mercator_to_lonlat(const Coordinates& c) {
+            return Coordinates(detail::x_to_lon(c.x), detail::y_to_lat(c.y));
+        }
 
         /**
          * Functor that does projection from WGS84 (EPSG:4326) to "Web

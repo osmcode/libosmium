@@ -52,14 +52,16 @@ namespace osmium {
 
     namespace geom {
 
-        constexpr double pi = 3.14159265358979323846;
+        constexpr double PI = 3.14159265358979323846;
 
+        /// Convert angle from degrees to radians.
         inline constexpr double deg_to_rad(double degree) {
-            return degree * (pi / 180.0);
+            return degree * (PI / 180.0);
         }
 
+        /// Convert angle from radians to degrees.
         inline constexpr double rad_to_deg(double radians) {
-            return radians * (180.0 / pi);
+            return radians * (180.0 / PI);
         }
 
     } // namespace geom

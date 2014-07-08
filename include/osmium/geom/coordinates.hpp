@@ -37,6 +37,8 @@ DEALINGS IN THE SOFTWARE.
 #include <iosfwd>
 #include <string>
 
+#include <osmium/osm/location.hpp>
+
 namespace osmium {
 
     namespace geom {
@@ -64,7 +66,10 @@ namespace osmium {
             double x;
             double y;
 
-            Coordinates(double cx, double cy) : x(cx), y(cy) {
+            explicit Coordinates(double cx, double cy) : x(cx), y(cy) {
+            }
+
+            Coordinates(const osmium::Location& location) : x(location.lon()), y(location.lat()) {
             }
 
             void append_to_string(std::string& s, const char infix) const {

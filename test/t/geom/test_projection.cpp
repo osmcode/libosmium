@@ -76,8 +76,6 @@ BOOST_AUTO_TEST_CASE(project_location_3857) {
 
 BOOST_AUTO_TEST_CASE(project_location_mercator) {
     osmium::geom::MercatorProjection projection;
-    BOOST_CHECK_EQUAL(3857, projection.epsg());
-    BOOST_CHECK_EQUAL("+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs", projection.proj_string());
 
     {
         const osmium::Location loc(0.0, 0.0);
@@ -131,16 +129,6 @@ BOOST_AUTO_TEST_CASE(compare_mercators) {
         BOOST_CHECK_LT(std::abs(projection_merc(loc).x - projection_3857(loc).x), 0.1);
         BOOST_CHECK_LT(std::abs(projection_merc(loc).y - projection_3857(loc).y), 0.1);
     }
-}
-
-BOOST_AUTO_TEST_CASE(low_level_mercator_functions) {
-    BOOST_CHECK_LT(17.839 - osmium::geom::detail::x_to_lon(osmium::geom::detail::lon_to_x(17.839)), 0.000000001);
-    BOOST_CHECK_LT(-3.005 - osmium::geom::detail::x_to_lon(osmium::geom::detail::lon_to_x(-3.005)), 0.000000001);
-    BOOST_CHECK_LT( 180.0 - osmium::geom::detail::x_to_lon(osmium::geom::detail::lon_to_x( 180.0)), 0.000000001);
-
-    BOOST_CHECK_LT(17.839 - osmium::geom::detail::y_to_lat(osmium::geom::detail::lat_to_y(17.839)), 0.000000001);
-    BOOST_CHECK_LT(-3.005 - osmium::geom::detail::y_to_lat(osmium::geom::detail::lat_to_y(-3.005)), 0.000000001);
-    BOOST_CHECK_LT(  85.0 - osmium::geom::detail::y_to_lat(osmium::geom::detail::lat_to_y(  85.0)), 0.000000001);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

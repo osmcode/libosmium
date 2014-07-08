@@ -131,7 +131,7 @@ namespace osmium {
                 if (m_epsg == 4326) {
                     return Coordinates(location.lon(), location.lat());
                 } else {
-                    Coordinates c = transform(m_crs_wgs84, m_crs_user, {deg_to_rad(location.lon()), deg_to_rad(location.lat())});
+                    Coordinates c = transform(m_crs_wgs84, m_crs_user, Coordinates(deg_to_rad(location.lon()), deg_to_rad(location.lat())));
                     if (m_crs_user.is_latlong()) {
                         c.x = rad_to_deg(c.x);
                         c.y = rad_to_deg(c.y);
