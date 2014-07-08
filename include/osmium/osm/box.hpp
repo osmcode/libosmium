@@ -124,9 +124,23 @@ namespace osmium {
         }
 
         /**
+         * Bottom-left location.
+         */
+        Location& bottom_left() noexcept {
+            return m_bottom_left;
+        }
+
+        /**
          * Top-right location.
          */
         constexpr Location top_right() const noexcept {
+            return m_top_right;
+        }
+
+        /**
+         * Top-right location.
+         */
+        Location& top_right() noexcept {
             return m_top_right;
         }
 
