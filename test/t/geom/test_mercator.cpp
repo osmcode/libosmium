@@ -30,4 +30,11 @@ BOOST_AUTO_TEST_CASE(low_level_mercator_functions) {
     BOOST_CHECK_LT(std::abs(c3.y - r3.y), 0.000001);
 }
 
+BOOST_AUTO_TEST_CASE(mercator_bounds) {
+    osmium::Location mmax(180.0, osmium::geom::MERCATOR_MAX_LAT);
+    osmium::geom::Coordinates c = osmium::geom::lonlat_to_mercator(mmax);
+    BOOST_CHECK_LT(c.x - c.y, 0.001);
+    BOOST_CHECK_LT(osmium::geom::MERCATOR_MAX_LAT - osmium::geom::detail::y_to_lat(osmium::geom::detail::lon_to_x(180.0)), 0.0000001);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

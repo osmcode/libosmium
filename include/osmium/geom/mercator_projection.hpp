@@ -48,23 +48,29 @@ namespace osmium {
 
             constexpr double EARTH_RADIUS_FOR_EPSG3857 = 6378137.0;
 
-            double lon_to_x(double lon) {
+            constexpr inline double lon_to_x(double lon) {
                 return EARTH_RADIUS_FOR_EPSG3857 * deg_to_rad(lon);
             }
 
-            double lat_to_y(double lat) {
+            inline double lat_to_y(double lat) { // not constexpr because math functions aren't
                 return EARTH_RADIUS_FOR_EPSG3857 * std::log(std::tan(osmium::geom::PI/4 + deg_to_rad(lat)/2));
             }
 
-            double x_to_lon(double x) {
+            constexpr inline double x_to_lon(double x) {
                 return rad_to_deg(x) / EARTH_RADIUS_FOR_EPSG3857;
             }
 
-            double y_to_lat(double y) {
+            inline double y_to_lat(double y) { // not constexpr because math functions aren't
                 return rad_to_deg(2 * std::atan(std::exp(y / EARTH_RADIUS_FOR_EPSG3857)) - osmium::geom::PI/2);
             }
 
         } // namespace detail
+
+        /**
+         * The maximum latitude that can be projected with the Web Mercator
+         * (EPSG:3857) projection.
+         */
+        constexpr double MERCATOR_MAX_LAT = 85.0511288;
 
         Coordinates lonlat_to_mercator(const Coordinates& c) {
             return Coordinates(detail::lon_to_x(c.x), detail::lat_to_y(c.y));

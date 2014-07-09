@@ -145,6 +145,14 @@ namespace osmium {
         }
 
         /**
+         * Is the location inside the box?
+         */
+        bool contains(const osmium::Location& location) const {
+            return location.x() >= bottom_left().x() && location.y() >= bottom_left().y() &&
+                   location.x() <= top_right().x() && location.y() <= top_right().y();
+        }
+
+        /**
          * Calculate size of the box in square degrees.
          *
          * @throws osmium::invalid_location unless all coordinates are valid
