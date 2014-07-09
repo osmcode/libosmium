@@ -58,6 +58,16 @@ namespace osmium {
             m_top_right() {
         }
 
+        Box(double minx, double miny, double maxx, double maxy) :
+            m_bottom_left(minx, miny),
+            m_top_right(maxx, maxy) {
+        }
+
+        Box(const osmium::Location& bottom_left, const osmium::Location& top_right) :
+            m_bottom_left(bottom_left),
+            m_top_right(top_right) {
+        }
+
         Box(const Box&) = default;
         Box(Box&&) = default;
         Box& operator=(const Box&) = default;
