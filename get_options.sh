@@ -3,6 +3,8 @@
 #  get_options.sh --cflags|--libs FILE...
 #
 
+set -e
+
 if [ "x$1" = "x--cflags" ]; then
     macro=OSMIUM_COMPILE_WITH_CFLAGS_
     shift
