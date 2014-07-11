@@ -91,7 +91,7 @@ clean-testcases:
 # --------------
 
 testdata-xml: testdata-xml.cpp
-	$(CXX) $(CXXFLAGS) $(CXXFLAGS_WARNINGS) $(CXXFLAGS_OGR) -o $@ $< $(LDFLAGS) $(LIB_IO) -DBOOST_TEST_DYN_LINK -lboost_unit_test_framework
+	$(CXX) $(CXXFLAGS) -I../include $(CXXFLAGS_WARNINGS) $(CXXFLAGS_OGR) -o $@ $< $(LDFLAGS) $(LIB_IO)
 
 xml: testdata-xml
 	TESTDIR=$(TESTDATA_DIR)/xml/data ./testdata-xml

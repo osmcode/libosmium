@@ -1,16 +1,13 @@
-#ifdef STAND_ALONE
-# define BOOST_TEST_MODULE Main
-#endif
-#include <boost/test/unit_test.hpp>
+#include "catch.hpp"
 
 #include <osmium/builder/osm_object_builder.hpp>
 #include <osmium/osm/way.hpp>
 
 #include "helper.hpp"
 
-BOOST_AUTO_TEST_SUITE(Basic_Way)
+TEST_CASE("Basic_Way") {
 
-BOOST_AUTO_TEST_CASE(way_builder) {
+SECTION("way_builder") {
     osmium::memory::Buffer buffer(10000);
 
     osmium::Way& way = buffer_add_way(buffer,
@@ -25,22 +22,22 @@ BOOST_AUTO_TEST_CASE(way_builder) {
         .uid(21)
         .timestamp(123);
 
-    BOOST_CHECK_EQUAL(17, way.id());
-    BOOST_CHECK_EQUAL(3, way.version());
-    BOOST_CHECK_EQUAL(true, way.visible());
-    BOOST_CHECK_EQUAL(333, way.changeset());
-    BOOST_CHECK_EQUAL(21, way.uid());
-    BOOST_CHECK_EQUAL(std::string("foo"), way.user());
-    BOOST_CHECK_EQUAL(123, way.timestamp());
-    BOOST_CHECK_EQUAL(2, way.tags().size());
-    BOOST_CHECK_EQUAL(3, way.nodes().size());
-    BOOST_CHECK_EQUAL(1, way.nodes()[0].ref());
-    BOOST_CHECK_EQUAL(3, way.nodes()[1].ref());
-    BOOST_CHECK_EQUAL(2, way.nodes()[2].ref());
-    BOOST_CHECK(! way.is_closed());
+    REQUIRE(17 == way.id());
+    REQUIRE(3 == way.version());
+    REQUIRE(true == way.visible());
+    REQUIRE(333 == way.changeset());
+    REQUIRE(21 == way.uid());
+    REQUIRE(std::string("foo") == way.user());
+    REQUIRE(123 == way.timestamp());
+    REQUIRE(2 == way.tags().size());
+    REQUIRE(3 == way.nodes().size());
+    REQUIRE(1 == way.nodes()[0].ref());
+    REQUIRE(3 == way.nodes()[1].ref());
+    REQUIRE(2 == way.nodes()[2].ref());
+    REQUIRE(! way.is_closed());
 }
 
-BOOST_AUTO_TEST_CASE(closed_way) {
+SECTION("closed_way") {
     osmium::memory::Buffer buffer(10000);
 
     osmium::Way& way = buffer_add_way(buffer,
@@ -48,10 +45,10 @@ BOOST_AUTO_TEST_CASE(closed_way) {
         {{"highway", "residential"}, {"name", "High Street"}},
         {1, 3, 1});
 
-    BOOST_CHECK(way.is_closed());
+    REQUIRE(way.is_closed());
 }
 
-BOOST_AUTO_TEST_CASE(way_builder_with_helpers) {
+SECTION("way_builder_with_helpers") {
     osmium::memory::Buffer buffer(10000);
     {
         osmium::builder::WayBuilder builder(buffer);
@@ -68,15 +65,15 @@ BOOST_AUTO_TEST_CASE(way_builder_with_helpers) {
     buffer.commit();
     osmium::Way& way = buffer.get<osmium::Way>(0);
 
-    BOOST_CHECK_EQUAL(std::string("username"), way.user());
+    REQUIRE(std::string("username") == way.user());
 
-    BOOST_CHECK_EQUAL(2, way.tags().size());
-    BOOST_CHECK_EQUAL(std::string("amenity"), way.tags().begin()->key());
-    BOOST_CHECK_EQUAL(std::string("Zum goldenen Schwanen"), way.tags()["name"]);
+    REQUIRE(2 == way.tags().size());
+    REQUIRE(std::string("amenity") == way.tags().begin()->key());
+    REQUIRE(std::string("Zum goldenen Schwanen") == way.tags()["name"]);
 
-    BOOST_CHECK_EQUAL(2, way.nodes().size());
-    BOOST_CHECK_EQUAL(22, way.nodes()[0].ref());
-    BOOST_CHECK_EQUAL(4.1, way.nodes()[1].location().lon());
+    REQUIRE(2 == way.nodes().size());
+    REQUIRE(22 == way.nodes()[0].ref());
+    REQUIRE(4.1 == way.nodes()[1].location().lon());
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

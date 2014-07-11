@@ -13,7 +13,7 @@ install:
  # upgrade compilers
  - sudo apt-get install -y gcc-4.8 g++-4.8
  # upgrade libosmium dependencies
- - sudo apt-get install -y make libboost-dev libboost-program-options-dev zlib1g-dev libbz2-dev libexpat1-dev libsparsehash-dev libprotobuf-dev protobuf-compiler libosmpbf-dev libboost-test-dev libgdal1-dev libgeos++-dev libproj-dev
+ - sudo apt-get install -y make libboost-dev libboost-program-options-dev zlib1g-dev libbz2-dev libexpat1-dev libsparsehash-dev libprotobuf-dev protobuf-compiler libosmpbf-dev libgdal1-dev libgeos++-dev libproj-dev
  - git clone https://github.com/scrosby/OSM-binary.git
  - cd OSM-binary/src
  - make

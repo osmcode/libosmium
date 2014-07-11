@@ -1,15 +1,12 @@
-#ifdef STAND_ALONE
-# define BOOST_TEST_MODULE Main
-#endif
-#include <boost/test/unit_test.hpp>
+#include "catch.hpp"
 
 #include <osmium/osm/changeset.hpp>
 
 #include "helper.hpp"
 
-BOOST_AUTO_TEST_SUITE(Basic_Changeset)
+TEST_CASE("Basic_Changeset") {
 
-BOOST_AUTO_TEST_CASE(changeset_builder) {
+SECTION("changeset_builder") {
     osmium::memory::Buffer buffer(10 * 1000);
 
     osmium::Changeset& cs1 = buffer_add_changeset(buffer,
@@ -22,14 +19,14 @@ BOOST_AUTO_TEST_CASE(changeset_builder) {
        .num_changes(7)
        .uid(9);
 
-    BOOST_CHECK_EQUAL(42, cs1.id());
-    BOOST_CHECK_EQUAL(9, cs1.uid());
-    BOOST_CHECK_EQUAL(7, cs1.num_changes());
-    BOOST_CHECK_EQUAL(true, cs1.closed());
-    BOOST_CHECK_EQUAL(osmium::Timestamp(100), cs1.created_at());
-    BOOST_CHECK_EQUAL(osmium::Timestamp(200), cs1.closed_at());
-    BOOST_CHECK_EQUAL(1, cs1.tags().size());
-    BOOST_CHECK_EQUAL(std::string("user"), cs1.user());
+    REQUIRE(42 == cs1.id());
+    REQUIRE(9 == cs1.uid());
+    REQUIRE(7 == cs1.num_changes());
+    REQUIRE(true == cs1.closed());
+    REQUIRE(osmium::Timestamp(100) == cs1.created_at());
+    REQUIRE(osmium::Timestamp(200) == cs1.closed_at());
+    REQUIRE(1 == cs1.tags().size());
+    REQUIRE(std::string("user") == cs1.user());
 
     osmium::Changeset& cs2 = buffer_add_changeset(buffer,
         "user",
@@ -40,23 +37,22 @@ BOOST_AUTO_TEST_CASE(changeset_builder) {
        .num_changes(21)
        .uid(9);
 
-    BOOST_CHECK_EQUAL(43, cs2.id());
-    BOOST_CHECK_EQUAL(9, cs2.uid());
-    BOOST_CHECK_EQUAL(21, cs2.num_changes());
-    BOOST_CHECK_EQUAL(false, cs2.closed());
-    BOOST_CHECK_EQUAL(osmium::Timestamp(120), cs2.created_at());
-    BOOST_CHECK_EQUAL(osmium::Timestamp(), cs2.closed_at());
-    BOOST_CHECK_EQUAL(2, cs2.tags().size());
-    BOOST_CHECK_EQUAL(std::string("user"), cs2.user());
+    REQUIRE(43 == cs2.id());
+    REQUIRE(9 == cs2.uid());
+    REQUIRE(21 == cs2.num_changes());
+    REQUIRE(false == cs2.closed());
+    REQUIRE(osmium::Timestamp(120) == cs2.created_at());
+    REQUIRE(osmium::Timestamp() == cs2.closed_at());
+    REQUIRE(2 == cs2.tags().size());
+    REQUIRE(std::string("user") == cs2.user());
 
-    BOOST_CHECK_EQUAL(false, cs1 == cs2);
-    BOOST_CHECK_EQUAL(true, cs1 != cs2);
-    BOOST_CHECK_EQUAL(true, cs1 == cs1);
+    REQUIRE(cs1 != cs2);
+    REQUIRE(cs1 == cs1);
 
-    BOOST_CHECK_EQUAL(true, cs1 < cs2);
-    BOOST_CHECK_EQUAL(true, cs1 <= cs2);
-    BOOST_CHECK_EQUAL(false, cs1 > cs2);
-    BOOST_CHECK_EQUAL(false, cs1 >= cs2);
+    REQUIRE(cs1 < cs2);
+    REQUIRE(cs1 <= cs2);
+    REQUIRE(false == (cs1 > cs2));
+    REQUIRE(false == (cs1 >= cs2));
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

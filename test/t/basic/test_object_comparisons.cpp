@@ -1,16 +1,13 @@
-#ifdef STAND_ALONE
-# define BOOST_TEST_MODULE Main
-#endif
-#include <boost/test/unit_test.hpp>
+#include "catch.hpp"
 
 #include <osmium/builder/osm_object_builder.hpp>
 #include <osmium/osm.hpp>
 #include <osmium/osm/item_type_ostream.hpp>
 #include <osmium/osm/object_comparisons.hpp>
 
-BOOST_AUTO_TEST_SUITE(Object_Comparisons)
+TEST_CASE("Object_Comparisons") {
 
-BOOST_AUTO_TEST_CASE(order) {
+SECTION("order") {
     osmium::memory::Buffer buffer(10 * 1000);
 
     {
@@ -35,30 +32,30 @@ BOOST_AUTO_TEST_CASE(order) {
     node1.version(1);
     node2.id(15);
     node2.version(2);
-    BOOST_CHECK_EQUAL(true, node1 < node2);
-    BOOST_CHECK_EQUAL(false, node1 > node2);
+    REQUIRE(true == node1 < node2);
+    REQUIRE(false == node1 > node2);
     node1.id(20);
     node1.version(1);
     node2.id(20);
     node2.version(2);
-    BOOST_CHECK_EQUAL(true, node1 < node2);
-    BOOST_CHECK_EQUAL(false, node1 > node2);
+    REQUIRE(true == node1 < node2);
+    REQUIRE(false == node1 > node2);
     node1.id(-10);
     node1.version(2);
     node2.id(-15);
     node2.version(1);
-    BOOST_CHECK_EQUAL(true, node1 < node2);
-    BOOST_CHECK_EQUAL(false, node1 > node2);
+    REQUIRE(true == node1 < node2);
+    REQUIRE(false == node1 > node2);
 }
 
-BOOST_AUTO_TEST_CASE(order_types) {
+SECTION("order_types") {
     osmium::memory::Buffer buffer(10 * 1000);
 
     {
         // add node 1
         osmium::builder::NodeBuilder node_builder(buffer);
         osmium::Node& node = node_builder.object();
-        BOOST_CHECK_EQUAL(osmium::item_type::node, node.type());
+        REQUIRE(osmium::item_type::node == node.type());
 
         node.id(3);
         node.version(3);
@@ -71,7 +68,7 @@ BOOST_AUTO_TEST_CASE(order_types) {
         // add node 2
         osmium::builder::NodeBuilder node_builder(buffer);
         osmium::Node& node = node_builder.object();
-        BOOST_CHECK_EQUAL(osmium::item_type::node, node.type());
+        REQUIRE(osmium::item_type::node == node.type());
 
         node.id(3);
         node.version(4);
@@ -84,7 +81,7 @@ BOOST_AUTO_TEST_CASE(order_types) {
         // add node 3
         osmium::builder::NodeBuilder node_builder(buffer);
         osmium::Node& node = node_builder.object();
-        BOOST_CHECK_EQUAL(osmium::item_type::node, node.type());
+        REQUIRE(osmium::item_type::node == node.type());
 
         node.id(3);
         node.version(4);
@@ -97,7 +94,7 @@ BOOST_AUTO_TEST_CASE(order_types) {
         // add way
         osmium::builder::WayBuilder way_builder(buffer);
         osmium::Way& way = way_builder.object();
-        BOOST_CHECK_EQUAL(osmium::item_type::way, way.type());
+        REQUIRE(osmium::item_type::way == way.type());
 
         way.id(2);
         way.version(2);
@@ -110,7 +107,7 @@ BOOST_AUTO_TEST_CASE(order_types) {
         // add relation
         osmium::builder::RelationBuilder relation_builder(buffer);
         osmium::Relation& relation = relation_builder.object();
-        BOOST_CHECK_EQUAL(osmium::item_type::relation, relation.type());
+        REQUIRE(osmium::item_type::relation == relation.type());
 
         relation.id(1);
         relation.version(1);
@@ -126,26 +123,26 @@ BOOST_AUTO_TEST_CASE(order_types) {
     const osmium::Way& way = static_cast<const osmium::Way&>(*(++it));
     const osmium::Relation& relation = static_cast<const osmium::Relation&>(*(++it));
 
-    BOOST_CHECK_EQUAL(true, node1 < node2);
-    BOOST_CHECK_EQUAL(true, node2 < way);
-    BOOST_CHECK_EQUAL(false, node2 > way);
-    BOOST_CHECK_EQUAL(true, way < relation);
-    BOOST_CHECK_EQUAL(true, node1 < relation);
+    REQUIRE(true == node1 < node2);
+    REQUIRE(true == node2 < way);
+    REQUIRE(false == node2 > way);
+    REQUIRE(true == way < relation);
+    REQUIRE(true == node1 < relation);
 
-    BOOST_CHECK_EQUAL(true, osmium::object_order_type_id_version()(node1, node2));
-    BOOST_CHECK_EQUAL(true, osmium::object_order_type_id_reverse_version()(node2, node1));
-    BOOST_CHECK_EQUAL(true, osmium::object_order_type_id_version()(node1, way));
-    BOOST_CHECK_EQUAL(true, osmium::object_order_type_id_reverse_version()(node1, way));
+    REQUIRE(true == osmium::object_order_type_id_version()(node1, node2));
+    REQUIRE(true == osmium::object_order_type_id_reverse_version()(node2, node1));
+    REQUIRE(true == osmium::object_order_type_id_version()(node1, way));
+    REQUIRE(true == osmium::object_order_type_id_reverse_version()(node1, way));
 
-    BOOST_CHECK_EQUAL(false, osmium::object_equal_type_id_version()(node1, node2));
-    BOOST_CHECK_EQUAL(true, osmium::object_equal_type_id_version()(node2, node3));
+    REQUIRE(false == osmium::object_equal_type_id_version()(node1, node2));
+    REQUIRE(true == osmium::object_equal_type_id_version()(node2, node3));
 
-    BOOST_CHECK_EQUAL(true, osmium::object_equal_type_id()(node1, node2));
-    BOOST_CHECK_EQUAL(true, osmium::object_equal_type_id()(node2, node3));
+    REQUIRE(true == osmium::object_equal_type_id()(node1, node2));
+    REQUIRE(true == osmium::object_equal_type_id()(node2, node3));
 
-    BOOST_CHECK_EQUAL(false, osmium::object_equal_type_id_version()(node1, way));
-    BOOST_CHECK_EQUAL(false, osmium::object_equal_type_id_version()(node1, relation));
-    BOOST_CHECK_EQUAL(false, osmium::object_equal_type_id()(node1, relation));
+    REQUIRE(false == osmium::object_equal_type_id_version()(node1, way));
+    REQUIRE(false == osmium::object_equal_type_id_version()(node1, relation));
+    REQUIRE(false == osmium::object_equal_type_id()(node1, relation));
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

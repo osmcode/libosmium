@@ -1,7 +1,4 @@
-#ifdef STAND_ALONE
-# define BOOST_TEST_MODULE Main
-#endif
-#include <boost/test/unit_test.hpp>
+#include "catch.hpp"
 
 #include <iterator>
 
@@ -9,9 +6,9 @@
 #include <osmium/memory/buffer.hpp>
 #include <osmium/osm/tag.hpp>
 
-BOOST_AUTO_TEST_SUITE(Operators)
+TEST_CASE("Operators") {
 
-BOOST_AUTO_TEST_CASE(Equal) {
+SECTION("Equal") {
     osmium::memory::Buffer buffer1(10240);
     {
         osmium::builder::TagListBuilder tl_builder(buffer1);
@@ -33,12 +30,12 @@ BOOST_AUTO_TEST_CASE(Equal) {
 
     auto tagit1 = tl1.begin();
     auto tagit2 = tl2.begin();
-    BOOST_CHECK_EQUAL(*tagit1, *tagit2);
+    REQUIRE(*tagit1 == *tagit2);
     ++tagit1;
-    BOOST_CHECK(!(*tagit1 == *tagit2));
+    REQUIRE(!(*tagit1 == *tagit2));
 }
 
-BOOST_AUTO_TEST_CASE(Order) {
+SECTION("Order") {
     osmium::memory::Buffer buffer(10240);
     {
         osmium::builder::TagListBuilder tl_builder(buffer);
@@ -55,10 +52,10 @@ BOOST_AUTO_TEST_CASE(Order) {
     const osmium::Tag& t3 = *(std::next(tl.begin(), 2));
     const osmium::Tag& t4 = *(std::next(tl.begin(), 3));
 
-    BOOST_CHECK_LT(t2, t1);
-    BOOST_CHECK_LT(t1, t3);
-    BOOST_CHECK_LT(t2, t3);
-    BOOST_CHECK_LT(t4, t1);
+    REQUIRE(t2 < t1);
+    REQUIRE(t1 < t3);
+    REQUIRE(t2 < t3);
+    REQUIRE(t4 < t1);
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}

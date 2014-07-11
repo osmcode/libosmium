@@ -81,10 +81,6 @@ you need for the programs you need.
         http://www.stack.nl/~dimitri/doxygen/
         Debian/Ubuntu: doxygen
 
-    libboost-test (for tests)
-        http://www.boost.org/doc/libs/1_54_0/libs/test/doc/html/index.html
-        Debian/Ubuntu: libboost-test-dev
-
 You need to either install the packages for your distribution or install those
 libraries from source. Most libraries should be available in all distributions.
 
@@ -121,8 +117,11 @@ on http://clang.llvm.org/ .
 
 ## Testing
 
-There are a few unit tests using the boost unit test framework in the "test"
+There are a few unit tests using the Catch unit test framework in the "test"
 directory. Many more tests are needed, any help appreciated.
+
+For [Catch](https://github.com/philsquared/Catch/) only one header file is
+needed which is included (`test/include/catch.hpp`).
 
 Run "make test" from the main directory or go to the "test" directory and type
 

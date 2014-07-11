@@ -1,10 +1,7 @@
 /* The code in this file is released into the Public Domain. */
 
-#define BOOST_TEST_MODULE Main
-
-#include <boost/test/unit_test.hpp>
-#include <boost/test/output_test_stream.hpp>
-using boost::test_tools::output_test_stream;
+#define CATCH_CONFIG_MAIN
+#include "catch.hpp"
 
 #include <cassert>
 #include <cstdlib>
@@ -30,39 +27,39 @@ std::string filename(const char* test_id) {
 }
 
 
-BOOST_AUTO_TEST_SUITE(OSM_XML_Format)
+TEST_CASE("OSM_XML_Format") {
 
-BOOST_AUTO_TEST_CASE(Test_100) {
+SECTION("Test_100") {
     osmium::io::Reader reader(filename("100"));
 
     osmium::io::Header header = reader.header();
-    BOOST_CHECK_EQUAL(header.get("generator"), "testdata");
+    REQUIRE(header.get("generator") == "testdata");
 
     osmium::memory::Buffer buffer = reader.read();
-    BOOST_CHECK_EQUAL(0, buffer.committed());
+    REQUIRE(0 == buffer.committed());
 }
 
 #if 0
-BOOST_AUTO_TEST_CASE(Test_101) {
+SECTION("Test_101") {
     osmium::io::Reader reader(filename("101"));
-    BOOST_CHECK_THROW(osmium::io::Header header = reader.header(), std::runtime_error);
+    REQUIRE_THROWS_AS(osmium::io::Header header = reader.header(), std::runtime_error);
 }
 
-BOOST_AUTO_TEST_CASE(Test_102) {
+SECTION("Test_102") {
     osmium::io::Reader reader(filename("102"));
-    BOOST_CHECK_THROW(osmium::io::Header header = reader.header(), std::runtime_error);
+    REQUIRE_THROWS_AS(osmium::io::Header header = reader.header(), std::runtime_error);
 }
 
-BOOST_AUTO_TEST_CASE(Test_103) {
+SECTION("Test_103") {
     osmium::io::Reader reader(filename("103"));
-    BOOST_CHECK_THROW(osmium::io::Header header = reader.header(), std::runtime_error);
+    REQUIRE_THROWS_AS(osmium::io::Header header = reader.header(), std::runtime_error);
 }
 
-BOOST_AUTO_TEST_CASE(Test_104) {
+SECTION("Test_104") {
     osmium::io::Reader reader(filename("104"));
-    BOOST_CHECK_THROW(osmium::io::Header header = reader.header(), std::runtime_error);
+    REQUIRE_THROWS_AS(osmium::io::Header header = reader.header(), std::runtime_error);
 }
 #endif
 
-BOOST_AUTO_TEST_SUITE_END()
+}
 

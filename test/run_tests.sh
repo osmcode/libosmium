@@ -19,7 +19,7 @@ if [ -z "$CXXFLAGS_WARNINGS" ]; then
     CXXFLAGS_WARNINGS="-Wall -Wextra -Wredundant-decls -Wdisabled-optimization -pedantic -Wctor-dtor-privacy -Wnon-virtual-dtor -Woverloaded-virtual -Wsign-promo"
 fi
 
-CXXFLAGS="$CXXFLAGS -g -std=c++11"
+CXXFLAGS="$CXXFLAGS -g -std=c++11 -Iinclude"
 
 if [ `uname -s` = 'Darwin' ]; then
     CXXFLAGS="${CXXFLAGS} -stdlib=libc++"
@@ -55,7 +55,7 @@ test_file () {
     FILES="test_main.o test_utils.o $1"
     OPTS_CFLAGS=`../get_options.sh --cflags $1`
     OPTS_LIBS=`../get_options.sh --libs $1`
-    cmdline="$COMPILE $FILES $OPTS_CFLAGS $OPTS_LIBS -DBOOST_TEST_DYN_LINK $LDFLAGS -lboost_unit_test_framework"
+    cmdline="$COMPILE $FILES $OPTS_CFLAGS $OPTS_LIBS $LDFLAGS"
     msg=`echo "Checking ${BOLD}test/$1$NORM ................................................" | cut -c1-70`
     echo -n "$msg "
     if ! output=$($cmdline 2>&1); then
@@ -98,11 +98,11 @@ test_file () {
 setup() {
     if [ \( ! -e test_main.o \) -o \( test_main.cpp -nt test_main.o \) ]; then
         echo "Compiling test runner"
-        $CXX -I../include -I. $CXXFLAGS -DBOOST_TEST_DYN_LINK -c test_main.cpp
+        $CXX -I../include -I. $CXXFLAGS -c test_main.cpp
     fi
     if [ \( ! -e test_utils.o \) -o \( test_utils.cpp -nt test_utils.o \) ]; then
         echo "Compiling test helper"
-        $CXX -I../include -I. $CXXFLAGS -DBOOST_TEST_DYN_LINK -c test_utils.cpp
+        $CXX -I../include -I. $CXXFLAGS -c test_utils.cpp
     fi
 }
 

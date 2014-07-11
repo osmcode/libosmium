@@ -1,68 +1,65 @@
-#ifdef STAND_ALONE
-# define BOOST_TEST_MODULE Main
-#endif
-#include <boost/test/unit_test.hpp>
+#include "catch.hpp"
 
 #include <osmium/builder/osm_object_builder.hpp>
 #include <osmium/osm/item_type_ostream.hpp>
 #include <osmium/osm/node.hpp>
 
-BOOST_AUTO_TEST_SUITE(Buffer_Node)
-
 void check_node_1(osmium::Node& node) {
-    BOOST_CHECK_EQUAL(1, node.id());
-    BOOST_CHECK_EQUAL(3, node.version());
-    BOOST_CHECK_EQUAL(true, node.visible());
-    BOOST_CHECK_EQUAL(333, node.changeset());
-    BOOST_CHECK_EQUAL(21, node.uid());
-    BOOST_CHECK_EQUAL(123, node.timestamp());
-    BOOST_CHECK_EQUAL(osmium::Location(3.5, 4.7), node.location());
-    BOOST_CHECK_EQUAL("testuser", node.user());
+    REQUIRE(1 == node.id());
+    REQUIRE(3 == node.version());
+    REQUIRE(true == node.visible());
+    REQUIRE(333 == node.changeset());
+    REQUIRE(21 == node.uid());
+    REQUIRE(123 == node.timestamp());
+    REQUIRE(osmium::Location(3.5, 4.7) == node.location());
+    REQUIRE(std::string("testuser") == node.user());
 
     for (osmium::memory::Item& item : node) {
-        BOOST_CHECK_EQUAL(osmium::item_type::tag_list, item.type());
+        REQUIRE(osmium::item_type::tag_list == item.type());
     }
 
-    BOOST_CHECK_EQUAL(node.tags().begin(), node.tags().end());
-    BOOST_CHECK(node.tags().empty());
-    BOOST_CHECK_EQUAL(0, std::distance(node.tags().begin(), node.tags().end()));
+    REQUIRE(node.tags().begin() == node.tags().end());
+    REQUIRE(node.tags().empty());
+    REQUIRE(0 == std::distance(node.tags().begin(), node.tags().end()));
 }
 
 void check_node_2(osmium::Node& node) {
-    BOOST_CHECK_EQUAL(2, node.id());
-    BOOST_CHECK_EQUAL(3, node.version());
-    BOOST_CHECK_EQUAL(true, node.visible());
-    BOOST_CHECK_EQUAL(333, node.changeset());
-    BOOST_CHECK_EQUAL(21, node.uid());
-    BOOST_CHECK_EQUAL(123, node.timestamp());
-    BOOST_CHECK_EQUAL(osmium::Location(3.5, 4.7), node.location());
-    BOOST_CHECK_EQUAL("testuser", node.user());
+    REQUIRE(2 == node.id());
+    REQUIRE(3 == node.version());
+    REQUIRE(true == node.visible());
+    REQUIRE(333 == node.changeset());
+    REQUIRE(21 == node.uid());
+    REQUIRE(123 == node.timestamp());
+    REQUIRE(osmium::Location(3.5, 4.7) == node.location());
+    REQUIRE(std::string("testuser") == node.user());
 
     for (osmium::memory::Item& item : node) {
-        BOOST_CHECK_EQUAL(osmium::item_type::tag_list, item.type());
+        REQUIRE(osmium::item_type::tag_list == item.type());
     }
 
-    BOOST_CHECK(!node.tags().empty());
-    BOOST_CHECK_EQUAL(2, std::distance(node.tags().begin(), node.tags().end()));
+    REQUIRE(!node.tags().empty());
+    REQUIRE(2 == std::distance(node.tags().begin(), node.tags().end()));
 
     int n = 0;
     for (osmium::Tag& tag : node.tags()) {
         switch (n) {
             case 0:
-                BOOST_CHECK_EQUAL("amenity", tag.key());
-                BOOST_CHECK_EQUAL("bank", tag.value());
+                REQUIRE(std::string("amenity") == tag.key());
+                REQUIRE(std::string("bank") == tag.value());
                 break;
             case 1:
-                BOOST_CHECK_EQUAL("name", tag.key());
-                BOOST_CHECK_EQUAL("OSM Savings", tag.value());
+                REQUIRE(std::string("name") == tag.key());
+                REQUIRE(std::string("OSM Savings") == tag.value());
                 break;
         }
         ++n;
     }
-    BOOST_CHECK_EQUAL(2, n);
+    REQUIRE(2 == n);
 }
 
-BOOST_AUTO_TEST_CASE(buffer_node) {
+TEST_CASE("Buffer_Node") {
+
+SECTION("buffer_node") {
     constexpr size_t buffer_size = 10000;
     unsigned char data[buffer_size];
 
@@ -72,7 +69,7 @@ BOOST_AUTO_TEST_CASE(buffer_node) {
         // add node 1
         osmium::builder::NodeBuilder node_builder(buffer);
         osmium::Node& node = node_builder.object();
-        BOOST_CHECK_EQUAL(osmium::item_type::node, node.type());
+        REQUIRE(osmium::item_type::node == node.type());
 
         node.id(1);
         node.version(3);
@@ -91,7 +88,7 @@ BOOST_AUTO_TEST_CASE(buffer_node) {
         // add node 2
         osmium::builder::NodeBuilder node_builder(buffer);
         osmium::Node& node = node_builder.object();
-        BOOST_CHECK_EQUAL(osmium::item_type::node, node.type());
+        REQUIRE(osmium::item_type::node == node.type());
 
         node.id(2);
         node.version(3);
@@ -112,10 +109,10 @@ BOOST_AUTO_TEST_CASE(buffer_node) {
         buffer.commit();
     }
 
-    BOOST_CHECK_EQUAL(2, std::distance(buffer.begin(), buffer.end()));
+    REQUIRE(2 == std::distance(buffer.begin(), buffer.end()));
     int item_no = 0;
     for (osmium::memory::Item& item : buffer) {
-        BOOST_CHECK_EQUAL(osmium::item_type::node, item.type());
+        REQUIRE(osmium::item_type::node == item.type());
 
         osmium::Node& node = static_cast<osmium::Node&>(item);
 
@@ -136,4 +133,4 @@ BOOST_AUTO_TEST_CASE(buffer_node) {
 
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}
