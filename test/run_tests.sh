@@ -19,13 +19,13 @@ if [ -z "$CXXFLAGS_WARNINGS" ]; then
     CXXFLAGS_WARNINGS="-Wall -Wextra -Wredundant-decls -Wdisabled-optimization -pedantic -Wctor-dtor-privacy -Wnon-virtual-dtor -Woverloaded-virtual -Wsign-promo"
 fi
 
-CXXFLAGS="$CXXFLAGS -g -std=c++11 -Iinclude"
+CXXFLAGS="$CXXFLAGS -g -std=c++11"
 
 if [ `uname -s` = 'Darwin' ]; then
     CXXFLAGS="${CXXFLAGS} -stdlib=libc++"
 fi
 
-COMPILE="$CXX -I../include -I. $CXXFLAGS $CXXFLAGS_WARNINGS -o tests $LDFLAGS"
+COMPILE="$CXX -I../include -Iinclude $CXXFLAGS $CXXFLAGS_WARNINGS -o tests $LDFLAGS"
 
 if [ "x$1" = "x-v" ]; then
     VALGRIND="valgrind --leak-check=full --show-reachable=yes --suppressions=valgrind.supp --error-exitcode=1"
@@ -52,7 +52,7 @@ TESTS_FAILED=0
 TESTS_OK=0
 
 test_file () {
-    FILES="test_main.o test_utils.o $1"
+    FILES="test_main.o $1"
     OPTS_CFLAGS=`../get_options.sh --cflags $1`
     OPTS_LIBS=`../get_options.sh --libs $1`
     cmdline="$COMPILE $FILES $OPTS_CFLAGS $OPTS_LIBS $LDFLAGS"
@@ -98,11 +98,7 @@ test_file () {
 setup() {
     if [ \( ! -e test_main.o \) -o \( test_main.cpp -nt test_main.o \) ]; then
         echo "Compiling test runner"
-        $CXX -I../include -I. $CXXFLAGS -c test_main.cpp
-    fi
-    if [ \( ! -e test_utils.o \) -o \( test_utils.cpp -nt test_utils.o \) ]; then
-        echo "Compiling test helper"
-        $CXX -I../include -I. $CXXFLAGS -c test_utils.cpp
+        $CXX -I../include -Iinclude $CXXFLAGS -c test_main.cpp
     fi
 }
 
