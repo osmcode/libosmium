@@ -35,11 +35,9 @@ DEALINGS IN THE SOFTWARE.
 
 #include <cstddef>
 #include <stdexcept>
+#include <sstream>>
 #include <string>
 #include <vector>
-
-#include <boost/algorithm/string/split.hpp>
-#include <boost/algorithm/string/classification.hpp>
 
 #include <osmium/io/file_format.hpp>
 #include <osmium/io/file_compression.hpp>
@@ -51,6 +49,20 @@ namespace osmium {
      * @brief Everything related to input and output of OSM data.
      */
     namespace io {
+
+        namespace detail {
+
+            std::vector<std::string> split(const std::string& in, const char delim) {
+                std::vector<std::string> result;
+                std::stringstream ss(in);
+                std::string item;
+                while (std::getline(ss, item, delim)) {
+                    result.push_back(item);
+                }
+                return result;
+            }
+
+        } // namespace detail
 
         /**
          * This class describes an OSM file in one of several different formats.
@@ -116,8 +128,7 @@ namespace osmium {
             ~File() = default;
 
             void parse_format(const std::string& format) {
-                std::vector<std::string> options;
-                boost::split(options, format, boost::is_any_of(","));
+                std::vector<std::string> options = detail::split(format, ',');
 
                 // if the first item in the format list doesn't contain
                 // an equals sign, it is a format
@@ -145,8 +156,7 @@ namespace osmium {
             }
 
             void detect_format_from_suffix(const std::string& name) {
-                std::vector<std::string> suffixes;
-                boost::split(suffixes, name, boost::is_any_of("."));
+                std::vector<std::string> suffixes = detail::split(name, '.');
 
                 if (suffixes.empty()) return;
 
