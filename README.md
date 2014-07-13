@@ -77,9 +77,9 @@ you need for the programs you need.
         http://trac.osgeo.org/proj/
         Debian/Ubuntu: libproj-dev
 
-    Doxygen (to build API documentation)
+    Doxygen (to build API documentation) and tools
         http://www.stack.nl/~dimitri/doxygen/
-        Debian/Ubuntu: doxygen
+        Debian/Ubuntu: doxygen graphviz xmlstarlet
 
 You need to either install the packages for your distribution or install those
 libraries from source. Most libraries should be available in all distributions.
