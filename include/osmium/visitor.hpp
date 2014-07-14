@@ -97,8 +97,6 @@ namespace osmium {
                 case osmium::item_type::inner_ring:
                     handler.inner_ring(static_cast<ConstIfConst<TItem, osmium::InnerRing>&>(item));
                     break;
-                default:
-                    throw std::runtime_error("unknown type");
             }
         }
 

@@ -423,14 +423,16 @@ namespace osmium {
                             check_tag(m_changeset_builder.get(), element, attrs);
                             break;
                         case context::ignored_node:
+                            break;
                         case context::ignored_way:
+                            break;
                         case context::ignored_relation:
+                            break;
                         case context::ignored_changeset:
                             break;
                         case context::in_object:
-                            // fallthrough
-                        default:
                             assert(false); // should never be here
+                            break;
                     }
                 }
 
@@ -508,8 +510,6 @@ namespace osmium {
                                 m_context = context::top;
                             }
                             break;
-                        default:
-                            assert(false); // should never be here
                     }
                 }
 

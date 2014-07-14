@@ -112,8 +112,6 @@ namespace osmium {
                 return 'O';
             case item_type::inner_ring:
                 return 'I';
-            default:
-                return '-';
         }
     }
 
@@ -143,8 +141,6 @@ namespace osmium {
                 return "outer_ring";
             case item_type::inner_ring:
                 return "inner_ring";
-            default:
-                return "-";
         }
     }
 
