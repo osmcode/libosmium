@@ -52,7 +52,7 @@ namespace osmium {
 
         namespace detail {
 
-            std::vector<std::string> split(const std::string& in, const char delim) {
+            inline std::vector<std::string> split(const std::string& in, const char delim) {
                 std::vector<std::string> result;
                 std::stringstream ss(in);
                 std::string item;
