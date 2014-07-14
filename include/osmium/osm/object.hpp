@@ -39,8 +39,6 @@ DEALINGS IN THE SOFTWARE.
 #include <cstring>
 #include <stdexcept>
 
-#include <boost/operators.hpp>
-
 #include <osmium/memory/collection.hpp>
 #include <osmium/memory/item.hpp>
 #include <osmium/osm/entity.hpp>
@@ -49,13 +47,14 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/tag.hpp>
 #include <osmium/osm/timestamp.hpp>
 #include <osmium/osm/types.hpp>
+#include <osmium/util/operators.hpp>
 
 namespace osmium {
 
     /**
      * OSMObject (Node, Way, Relation, or Area).
      */
-    class OSMObject : public osmium::OSMEntity, boost::totally_ordered<OSMObject> {
+    class OSMObject : public osmium::OSMEntity, osmium::totally_ordered<OSMObject> {
 
         object_id_type      m_id;
         bool                m_deleted : 1;

@@ -39,10 +39,9 @@ DEALINGS IN THE SOFTWARE.
 #include <iosfwd>
 #include <utility>
 
-#include <boost/operators.hpp>
-
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/node_ref.hpp>
+#include <osmium/util/operators.hpp>
 
 namespace osmium {
 
@@ -62,7 +61,7 @@ namespace osmium {
              * beginning of the segment. Smaller, in this case, means smaller x
              * coordinate, and if they are the same smaller y coordinate.
              */
-            class NodeRefSegment : boost::totally_ordered<NodeRefSegment> {
+            class NodeRefSegment : osmium::totally_ordered<NodeRefSegment> {
 
                 osmium::NodeRef m_first;
                 osmium::NodeRef m_second;

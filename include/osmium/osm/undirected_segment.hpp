@@ -35,10 +35,9 @@ DEALINGS IN THE SOFTWARE.
 
 #include <iosfwd>
 
-#include <boost/operators.hpp>
-
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/segment.hpp>
+#include <osmium/util/operators.hpp>
 
 namespace osmium {
 
@@ -47,7 +46,7 @@ namespace osmium {
      * always equal or "smaller" than the second Location, ie to the left
      * and down.
      */
-    class UndirectedSegment : boost::totally_ordered<UndirectedSegment>, public Segment {
+    class UndirectedSegment : osmium::totally_ordered<UndirectedSegment>, public Segment {
 
     public:
 

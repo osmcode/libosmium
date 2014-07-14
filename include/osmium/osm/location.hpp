@@ -42,7 +42,7 @@ DEALINGS IN THE SOFTWARE.
 #include <stdexcept>
 #include <string>
 
-#include <boost/operators.hpp>
+#include <osmium/util/operators.hpp>
 
 namespace osmium {
 
@@ -76,7 +76,7 @@ namespace osmium {
      * Coordinates are never checked on whether they are inside bounds.
      * Call valid() to check this.
      */
-    class Location : boost::totally_ordered<Location> {
+    class Location : osmium::totally_ordered<Location> {
 
         int32_t m_x;
         int32_t m_y;

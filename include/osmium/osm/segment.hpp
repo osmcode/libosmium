@@ -36,8 +36,6 @@ DEALINGS IN THE SOFTWARE.
 #include <iosfwd>
 #include <utility>
 
-#include <boost/operators.hpp>
-
 #include <osmium/osm/location.hpp>
 
 namespace osmium {
@@ -45,7 +43,7 @@ namespace osmium {
     /**
      * A Segment is the directed connection between two Locations.
      */
-    class Segment : boost::equality_comparable<Segment> {
+    class Segment {
 
         osmium::Location m_first;
         osmium::Location m_second;
@@ -87,6 +85,10 @@ namespace osmium {
     /// Segments are equal if both their locations are equal
     inline constexpr bool operator==(const Segment& lhs, const Segment& rhs) {
         return lhs.first() == rhs.first() && lhs.second() == rhs.second();
+    }
+
+    inline constexpr bool operator!=(const Segment& lhs, const Segment& rhs) {
+        return ! (lhs == rhs);
     }
 
     /**
