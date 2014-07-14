@@ -77,7 +77,7 @@ check_reports/%.compile: include/osmium/%.hpp
 	@flags=`./get_options.sh --cflags $<`; \
 	mkdir -p `dirname $@`; \
 	echo "$<\n===========================================" >$@; \
-    cmdline="$(CXX) $(CXXFLAGS) $(WARNINGFLAGS) -I include $${flags} $<"; \
+    cmdline="$(CXX) $(CXXFLAGS) -Werror $(WARNINGFLAGS) -I include $${flags} $<"; \
 	echo "$${cmdline}\n===========================================" >>$@; \
 	if $${cmdline} >>$@ 2>&1; then \
         echo "\n===========================================\nOK" >>$@; \
