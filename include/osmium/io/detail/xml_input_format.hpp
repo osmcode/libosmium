@@ -284,242 +284,232 @@ namespace osmium {
                 }
 
                 void start_element(const XML_Char* element, const XML_Char** attrs) {
-                    try {
-                        switch (m_context) {
-                            case context::root:
-                                if (!strcmp(element, "osm") || !strcmp(element, "osmChange")) {
-                                    if (!strcmp(element, "osmChange")) {
-                                        m_header.has_multiple_object_versions(true);
-                                    }
-                                    for (int count = 0; attrs[count]; count += 2) {
-                                        if (!strcmp(attrs[count], "version")) {
-                                            m_header.set("version", attrs[count+1]);
-                                            if (strcmp(attrs[count+1], "0.6")) {
-                                                throw std::runtime_error("can only read version 0.6 files");
-                                            }
-                                        } else if (!strcmp(attrs[count], "generator")) {
-                                            m_header.set("generator", attrs[count+1]);
+                    switch (m_context) {
+                        case context::root:
+                            if (!strcmp(element, "osm") || !strcmp(element, "osmChange")) {
+                                if (!strcmp(element, "osmChange")) {
+                                    m_header.has_multiple_object_versions(true);
+                                }
+                                for (int count = 0; attrs[count]; count += 2) {
+                                    if (!strcmp(attrs[count], "version")) {
+                                        m_header.set("version", attrs[count+1]);
+                                        if (strcmp(attrs[count+1], "0.6")) {
+                                            throw std::runtime_error("can only read version 0.6 files");
                                         }
-                                    }
-                                    if (m_header.get("version") == "") {
-                                        throw std::runtime_error("version attribute on osm element missing");
+                                    } else if (!strcmp(attrs[count], "generator")) {
+                                        m_header.set("generator", attrs[count+1]);
                                     }
                                 }
-                                m_context = context::top;
-                                break;
-                            case context::top:
-                                assert(!m_tl_builder);
-                                if (!strcmp(element, "node")) {
-                                    header_is_done();
-                                    if (m_read_types & osmium::osm_entity_bits::node) {
-                                        m_node_builder = std::unique_ptr<osmium::builder::NodeBuilder>(new osmium::builder::NodeBuilder(m_buffer));
-                                        m_node_builder->add_user(init_object(m_node_builder->object(), attrs));
-                                        m_context = context::node;
-                                    } else {
-                                        m_context = context::ignored_node;
-                                    }
-                                } else if (!strcmp(element, "way")) {
-                                    header_is_done();
-                                    if (m_read_types & osmium::osm_entity_bits::way) {
-                                        m_way_builder = std::unique_ptr<osmium::builder::WayBuilder>(new osmium::builder::WayBuilder(m_buffer));
-                                        m_way_builder->add_user(init_object(m_way_builder->object(), attrs));
-                                        m_context = context::way;
-                                    } else {
-                                        m_context = context::ignored_way;
-                                    }
-                                } else if (!strcmp(element, "relation")) {
-                                    header_is_done();
-                                    if (m_read_types & osmium::osm_entity_bits::relation) {
-                                        m_relation_builder = std::unique_ptr<osmium::builder::RelationBuilder>(new osmium::builder::RelationBuilder(m_buffer));
-                                        m_relation_builder->add_user(init_object(m_relation_builder->object(), attrs));
-                                        m_context = context::relation;
-                                    } else {
-                                        m_context = context::ignored_relation;
-                                    }
-                                } else if (!strcmp(element, "changeset")) {
-                                    header_is_done();
-                                    if (m_read_types & osmium::osm_entity_bits::changeset) {
-                                        m_changeset_builder = std::unique_ptr<osmium::builder::ChangesetBuilder>(new osmium::builder::ChangesetBuilder(m_buffer));
-                                        init_changeset(m_changeset_builder.get(), attrs);
-                                        m_context = context::changeset;
-                                    } else {
-                                        m_context = context::ignored_changeset;
-                                    }
-                                } else if (!strcmp(element, "bounds")) {
-                                    osmium::Location min;
-                                    osmium::Location max;
-                                    for (int count = 0; attrs[count]; count += 2) {
-                                        if (!strcmp(attrs[count], "minlon")) {
-                                            min.lon(atof(attrs[count+1]));
-                                        } else if (!strcmp(attrs[count], "minlat")) {
-                                            min.lat(atof(attrs[count+1]));
-                                        } else if (!strcmp(attrs[count], "maxlon")) {
-                                            max.lon(atof(attrs[count+1]));
-                                        } else if (!strcmp(attrs[count], "maxlat")) {
-                                            max.lat(atof(attrs[count+1]));
-                                        }
-                                    }
-                                    osmium::Box box;
-                                    box.extend(min).extend(max);
-                                    m_header.add_box(box);
-                                } else if (!strcmp(element, "delete")) {
-                                    m_in_delete_section = true;
+                                if (m_header.get("version") == "") {
+                                    throw std::runtime_error("version attribute on osm element missing");
                                 }
-                                break;
-                            case context::node:
-                                m_last_context = context::node;
-                                m_context = context::in_object;
-                                check_tag(m_node_builder.get(), element, attrs);
-                                break;
-                            case context::way:
-                                m_last_context = context::way;
-                                m_context = context::in_object;
-                                if (!strcmp(element, "nd")) {
-                                    m_tl_builder.reset();
-
-                                    if (!m_wnl_builder) {
-                                        m_wnl_builder = std::unique_ptr<osmium::builder::WayNodeListBuilder>(new osmium::builder::WayNodeListBuilder(m_buffer, m_way_builder.get()));
-                                    }
-
-                                    for (int count = 0; attrs[count]; count += 2) {
-                                        if (!strcmp(attrs[count], "ref")) {
-                                            m_wnl_builder->add_node_ref(osmium::string_to_object_id(attrs[count+1]));
-                                        }
-                                    }
+                            }
+                            m_context = context::top;
+                            break;
+                        case context::top:
+                            assert(!m_tl_builder);
+                            if (!strcmp(element, "node")) {
+                                header_is_done();
+                                if (m_read_types & osmium::osm_entity_bits::node) {
+                                    m_node_builder = std::unique_ptr<osmium::builder::NodeBuilder>(new osmium::builder::NodeBuilder(m_buffer));
+                                    m_node_builder->add_user(init_object(m_node_builder->object(), attrs));
+                                    m_context = context::node;
                                 } else {
-                                    check_tag(m_way_builder.get(), element, attrs);
+                                    m_context = context::ignored_node;
                                 }
-                                break;
-                            case context::relation:
-                                m_last_context = context::relation;
-                                m_context = context::in_object;
-                                if (!strcmp(element, "member")) {
-                                    m_tl_builder.reset();
-
-                                    if (!m_rml_builder) {
-                                        m_rml_builder = std::unique_ptr<osmium::builder::RelationMemberListBuilder>(new osmium::builder::RelationMemberListBuilder(m_buffer, m_relation_builder.get()));
-                                    }
-
-                                    char type = 'x';
-                                    object_id_type ref  = 0;
-                                    const char* role = "";
-                                    for (int count = 0; attrs[count]; count += 2) {
-                                        if (!strcmp(attrs[count], "type")) {
-                                            type = static_cast<char>(attrs[count+1][0]);
-                                        } else if (!strcmp(attrs[count], "ref")) {
-                                            ref = osmium::string_to_object_id(attrs[count+1]);
-                                        } else if (!strcmp(attrs[count], "role")) {
-                                            role = static_cast<const char*>(attrs[count+1]);
-                                        }
-                                    }
-                                    // XXX assert type, ref, role are set
-                                    m_rml_builder->add_member(char_to_item_type(type), ref, role);
+                            } else if (!strcmp(element, "way")) {
+                                header_is_done();
+                                if (m_read_types & osmium::osm_entity_bits::way) {
+                                    m_way_builder = std::unique_ptr<osmium::builder::WayBuilder>(new osmium::builder::WayBuilder(m_buffer));
+                                    m_way_builder->add_user(init_object(m_way_builder->object(), attrs));
+                                    m_context = context::way;
                                 } else {
-                                    check_tag(m_relation_builder.get(), element, attrs);
+                                    m_context = context::ignored_way;
                                 }
-                                break;
-                            case context::changeset:
-                                m_last_context = context::changeset;
-                                m_context = context::in_object;
-                                check_tag(m_changeset_builder.get(), element, attrs);
-                                break;
-                            case context::ignored_node:
-                            case context::ignored_way:
-                            case context::ignored_relation:
-                            case context::ignored_changeset:
-                                break;
-                            case context::in_object:
-                                // fallthrough
-                            default:
-                                assert(false); // should never be here
-                        }
-                    } catch (osmium::memory::BufferIsFull&) {
-                        std::cerr << "BUFFER FULL (start_element)" << std::endl;
-                        exit(1);
+                            } else if (!strcmp(element, "relation")) {
+                                header_is_done();
+                                if (m_read_types & osmium::osm_entity_bits::relation) {
+                                    m_relation_builder = std::unique_ptr<osmium::builder::RelationBuilder>(new osmium::builder::RelationBuilder(m_buffer));
+                                    m_relation_builder->add_user(init_object(m_relation_builder->object(), attrs));
+                                    m_context = context::relation;
+                                } else {
+                                    m_context = context::ignored_relation;
+                                }
+                            } else if (!strcmp(element, "changeset")) {
+                                header_is_done();
+                                if (m_read_types & osmium::osm_entity_bits::changeset) {
+                                    m_changeset_builder = std::unique_ptr<osmium::builder::ChangesetBuilder>(new osmium::builder::ChangesetBuilder(m_buffer));
+                                    init_changeset(m_changeset_builder.get(), attrs);
+                                    m_context = context::changeset;
+                                } else {
+                                    m_context = context::ignored_changeset;
+                                }
+                            } else if (!strcmp(element, "bounds")) {
+                                osmium::Location min;
+                                osmium::Location max;
+                                for (int count = 0; attrs[count]; count += 2) {
+                                    if (!strcmp(attrs[count], "minlon")) {
+                                        min.lon(atof(attrs[count+1]));
+                                    } else if (!strcmp(attrs[count], "minlat")) {
+                                        min.lat(atof(attrs[count+1]));
+                                    } else if (!strcmp(attrs[count], "maxlon")) {
+                                        max.lon(atof(attrs[count+1]));
+                                    } else if (!strcmp(attrs[count], "maxlat")) {
+                                        max.lat(atof(attrs[count+1]));
+                                    }
+                                }
+                                osmium::Box box;
+                                box.extend(min).extend(max);
+                                m_header.add_box(box);
+                            } else if (!strcmp(element, "delete")) {
+                                m_in_delete_section = true;
+                            }
+                            break;
+                        case context::node:
+                            m_last_context = context::node;
+                            m_context = context::in_object;
+                            check_tag(m_node_builder.get(), element, attrs);
+                            break;
+                        case context::way:
+                            m_last_context = context::way;
+                            m_context = context::in_object;
+                            if (!strcmp(element, "nd")) {
+                                m_tl_builder.reset();
+
+                                if (!m_wnl_builder) {
+                                    m_wnl_builder = std::unique_ptr<osmium::builder::WayNodeListBuilder>(new osmium::builder::WayNodeListBuilder(m_buffer, m_way_builder.get()));
+                                }
+
+                                for (int count = 0; attrs[count]; count += 2) {
+                                    if (!strcmp(attrs[count], "ref")) {
+                                        m_wnl_builder->add_node_ref(osmium::string_to_object_id(attrs[count+1]));
+                                    }
+                                }
+                            } else {
+                                check_tag(m_way_builder.get(), element, attrs);
+                            }
+                            break;
+                        case context::relation:
+                            m_last_context = context::relation;
+                            m_context = context::in_object;
+                            if (!strcmp(element, "member")) {
+                                m_tl_builder.reset();
+
+                                if (!m_rml_builder) {
+                                    m_rml_builder = std::unique_ptr<osmium::builder::RelationMemberListBuilder>(new osmium::builder::RelationMemberListBuilder(m_buffer, m_relation_builder.get()));
+                                }
+
+                                char type = 'x';
+                                object_id_type ref  = 0;
+                                const char* role = "";
+                                for (int count = 0; attrs[count]; count += 2) {
+                                    if (!strcmp(attrs[count], "type")) {
+                                        type = static_cast<char>(attrs[count+1][0]);
+                                    } else if (!strcmp(attrs[count], "ref")) {
+                                        ref = osmium::string_to_object_id(attrs[count+1]);
+                                    } else if (!strcmp(attrs[count], "role")) {
+                                        role = static_cast<const char*>(attrs[count+1]);
+                                    }
+                                }
+                                // XXX assert type, ref, role are set
+                                m_rml_builder->add_member(char_to_item_type(type), ref, role);
+                            } else {
+                                check_tag(m_relation_builder.get(), element, attrs);
+                            }
+                            break;
+                        case context::changeset:
+                            m_last_context = context::changeset;
+                            m_context = context::in_object;
+                            check_tag(m_changeset_builder.get(), element, attrs);
+                            break;
+                        case context::ignored_node:
+                        case context::ignored_way:
+                        case context::ignored_relation:
+                        case context::ignored_changeset:
+                            break;
+                        case context::in_object:
+                            // fallthrough
+                        default:
+                            assert(false); // should never be here
                     }
                 }
 
                 void end_element(const XML_Char* element) {
-                    try {
-                        switch (m_context) {
-                            case context::root:
-                                assert(false); // should never be here
-                                break;
-                            case context::top:
-                                if (!strcmp(element, "osm") || !strcmp(element, "osmChange")) {
-                                    header_is_done();
-                                    m_context = context::root;
-                                    if (m_buffer.committed() > 0) {
-                                        m_queue.push(std::move(m_buffer));
-                                    }
-                                    m_queue.push(osmium::memory::Buffer()); // empty buffer to signify eof
-                                } else if (!strcmp(element, "delete")) {
-                                    m_in_delete_section = false;
+                    switch (m_context) {
+                        case context::root:
+                            assert(false); // should never be here
+                            break;
+                        case context::top:
+                            if (!strcmp(element, "osm") || !strcmp(element, "osmChange")) {
+                                header_is_done();
+                                m_context = context::root;
+                                if (m_buffer.committed() > 0) {
+                                    m_queue.push(std::move(m_buffer));
                                 }
-                                break;
-                            case context::node:
-                                assert(!strcmp(element, "node"));
-                                m_tl_builder.reset();
-                                m_node_builder.reset();
-                                m_buffer.commit();
+                                m_queue.push(osmium::memory::Buffer()); // empty buffer to signify eof
+                            } else if (!strcmp(element, "delete")) {
+                                m_in_delete_section = false;
+                            }
+                            break;
+                        case context::node:
+                            assert(!strcmp(element, "node"));
+                            m_tl_builder.reset();
+                            m_node_builder.reset();
+                            m_buffer.commit();
+                            m_context = context::top;
+                            flush_buffer();
+                            break;
+                        case context::way:
+                            assert(!strcmp(element, "way"));
+                            m_tl_builder.reset();
+                            m_wnl_builder.reset();
+                            m_way_builder.reset();
+                            m_buffer.commit();
+                            m_context = context::top;
+                            flush_buffer();
+                            break;
+                        case context::relation:
+                            assert(!strcmp(element, "relation"));
+                            m_tl_builder.reset();
+                            m_rml_builder.reset();
+                            m_relation_builder.reset();
+                            m_buffer.commit();
+                            m_context = context::top;
+                            flush_buffer();
+                            break;
+                        case context::changeset:
+                            assert(!strcmp(element, "changeset"));
+                            m_tl_builder.reset();
+                            m_changeset_builder.reset();
+                            m_buffer.commit();
+                            m_context = context::top;
+                            flush_buffer();
+                            break;
+                        case context::in_object:
+                            m_context = m_last_context;
+                            break;
+                        case context::ignored_node:
+                            if (!strcmp(element, "node")) {
                                 m_context = context::top;
-                                flush_buffer();
-                                break;
-                            case context::way:
-                                assert(!strcmp(element, "way"));
-                                m_tl_builder.reset();
-                                m_wnl_builder.reset();
-                                m_way_builder.reset();
-                                m_buffer.commit();
+                            }
+                            break;
+                        case context::ignored_way:
+                            if (!strcmp(element, "way")) {
                                 m_context = context::top;
-                                flush_buffer();
-                                break;
-                            case context::relation:
-                                assert(!strcmp(element, "relation"));
-                                m_tl_builder.reset();
-                                m_rml_builder.reset();
-                                m_relation_builder.reset();
-                                m_buffer.commit();
+                            }
+                            break;
+                        case context::ignored_relation:
+                            if (!strcmp(element, "relation")) {
                                 m_context = context::top;
-                                flush_buffer();
-                                break;
-                            case context::changeset:
-                                assert(!strcmp(element, "changeset"));
-                                m_tl_builder.reset();
-                                m_changeset_builder.reset();
-                                m_buffer.commit();
+                            }
+                            break;
+                        case context::ignored_changeset:
+                            if (!strcmp(element, "changeset")) {
                                 m_context = context::top;
-                                flush_buffer();
-                                break;
-                            case context::in_object:
-                                m_context = m_last_context;
-                                break;
-                            case context::ignored_node:
-                                if (!strcmp(element, "node")) {
-                                    m_context = context::top;
-                                }
-                                break;
-                            case context::ignored_way:
-                                if (!strcmp(element, "way")) {
-                                    m_context = context::top;
-                                }
-                                break;
-                            case context::ignored_relation:
-                                if (!strcmp(element, "relation")) {
-                                    m_context = context::top;
-                                }
-                                break;
-                            case context::ignored_changeset:
-                                if (!strcmp(element, "changeset")) {
-                                    m_context = context::top;
-                                }
-                                break;
-                            default:
-                                assert(false); // should never be here
-                        }
-                    } catch (osmium::memory::BufferIsFull&) {
-                        std::cerr << "BUFFER FULL (end_element)" << std::endl;
-                        exit(1);
+                            }
+                            break;
+                        default:
+                            assert(false); // should never be here
                     }
                 }
 
