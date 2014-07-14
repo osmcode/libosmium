@@ -2,7 +2,6 @@
 
 #include <osmium/builder/osm_object_builder.hpp>
 #include <osmium/osm.hpp>
-#include <osmium/osm/item_type_ostream.hpp>
 #include <osmium/osm/object_comparisons.hpp>
 
 TEST_CASE("Object_Comparisons") {

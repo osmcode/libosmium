@@ -2,7 +2,6 @@
 
 #include <osmium/builder/builder_helper.hpp>
 #include <osmium/memory/buffer.hpp>
-#include <osmium/osm/item_type_ostream.hpp>
 #include <osmium/osm/tag.hpp>
 
 TEST_CASE("tag_list") {

@@ -1,7 +1,6 @@
 #include "catch.hpp"
 
 #include <osmium/builder/osm_object_builder.hpp>
-#include <osmium/osm/item_type_ostream.hpp>
 #include <osmium/osm/node.hpp>
 
 void check_node_1(osmium::Node& node) {
