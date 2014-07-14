@@ -377,6 +377,28 @@ namespace osmium {
 
     static_assert(sizeof(OSMObject) % osmium::memory::align_bytes == 0, "Class osmium::OSMObject has wrong size to be aligned properly!");
 
+    /**
+     * OSMObjects are equal if their type, id, and version are equal.
+     */
+    inline bool operator==(const osmium::OSMObject& lhs, const osmium::OSMObject& rhs) {
+        return lhs.type() == rhs.type() &&
+               lhs.id() == rhs.id() &&
+               lhs.version() == rhs.version();
+    }
+
+    /**
+     * OSMObjects can be ordered by type, id and version.
+     * Note that we use the absolute value of the id for a
+     * better ordering of objects with negative id.
+     */
+    inline bool operator<(const osmium::OSMObject& lhs, const osmium::OSMObject& rhs) {
+        if (lhs.type() != rhs.type()) {
+            return lhs.type() < rhs.type();
+        }
+        return (lhs.id() == rhs.id() && lhs.version() < rhs.version()) ||
+               lhs.positive_id() < rhs.positive_id();
+    }
+
 } // namespace osmium
 
 #endif // OSMIUM_OSM_OBJECT_HPP

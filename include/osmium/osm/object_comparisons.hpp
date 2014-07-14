@@ -38,28 +38,6 @@ DEALINGS IN THE SOFTWARE.
 namespace osmium {
 
     /**
-     * OSMObjects can be ordered by type, id and version.
-     * Note that we use the absolute value of the id for a
-     * better ordering of objects with negative id.
-     */
-    inline bool operator<(const osmium::OSMObject& lhs, const osmium::OSMObject& rhs) {
-        if (lhs.type() != rhs.type()) {
-            return lhs.type() < rhs.type();
-        }
-        return (lhs.id() == rhs.id() && lhs.version() < rhs.version()) ||
-               lhs.positive_id() < rhs.positive_id();
-    }
-
-    /**
-     * OSMObjects are equal if their type, id, and version are equal.
-     */
-    inline bool operator==(const osmium::OSMObject& lhs, const osmium::OSMObject& rhs) {
-        return lhs.type() == rhs.type() &&
-               lhs.id() == rhs.id() &&
-               lhs.version() == rhs.version();
-    }
-
-    /**
      * Function object class for comparing OSM objects for equality by type, id, and version.
      */
     struct object_equal_type_id_version {
@@ -72,7 +50,7 @@ namespace osmium {
             return *lhs == *rhs;
         }
 
-    };
+    }; // struct object_equal_type_id_version
 
     /**
      * Function object class for comparing OSM objects for equality by type and id,
@@ -89,7 +67,7 @@ namespace osmium {
             return operator()(*lhs, *rhs);
         }
 
-    };
+    }; // struct object_equal_type_id
 
     /**
      * Function object class for ordering OSM objects by type, id, and version.
@@ -104,7 +82,7 @@ namespace osmium {
             return *lhs < *rhs;
         }
 
-    };
+    }; // struct object_order_type_id_version
 
     /**
      * Function object class for ordering OSM objects by type, id, and reverse version,
@@ -125,7 +103,7 @@ namespace osmium {
             return operator()(*lhs, *rhs);
         }
 
-    };
+    }; // struct object_order_type_id_reverse_version
 
 } // namespace osmium
 
