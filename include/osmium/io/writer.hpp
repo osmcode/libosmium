@@ -44,6 +44,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/io/file.hpp>
 #include <osmium/io/header.hpp>
 #include <osmium/io/overwrite.hpp>
+#include <osmium/memory/buffer.hpp>
 #include <osmium/thread/checked_task.hpp>
 #include <osmium/thread/name.hpp>
 
@@ -145,7 +146,9 @@ namespace osmium {
              */
             void operator()(osmium::memory::Buffer&& buffer) {
                 m_output_task.check_for_exception();
-                m_output->write_buffer(std::move(buffer));
+                if (buffer.committed() > 0) {
+                    m_output->write_buffer(std::move(buffer));
+                }
             }
 
             /**
