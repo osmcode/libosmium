@@ -76,44 +76,44 @@ header_buffer_type read_xml(const char* test_id) {
 
 TEST_CASE("Reading OSM XML") {
 
-SECTION("Test_100") {
-    header_buffer_type r = read_xml("100");
+    SECTION("Test 100") {
+        header_buffer_type r = read_xml("100-correct_but_no_data");
 
-    REQUIRE(r.header.get("generator") == "testdata");
-    REQUIRE(0 == r.buffer.committed());
-    REQUIRE(! r.buffer);
-}
+        REQUIRE(r.header.get("generator") == "testdata");
+        REQUIRE(0 == r.buffer.committed());
+        REQUIRE(! r.buffer);
+    }
 
-SECTION("Test_100 with Reader") {
-    osmium::io::Reader reader(filename("100"));
+    SECTION("Test 100 with Reader") {
+        osmium::io::Reader reader(filename("100-correct_but_no_data"));
 
-    osmium::io::Header header = reader.header();
-    REQUIRE(header.get("generator") == "testdata");
+        osmium::io::Header header = reader.header();
+        REQUIRE(header.get("generator") == "testdata");
 
-    osmium::memory::Buffer buffer = reader.read();
-    REQUIRE(0 == buffer.committed());
-    REQUIRE(! buffer);
-}
+        osmium::memory::Buffer buffer = reader.read();
+        REQUIRE(0 == buffer.committed());
+        REQUIRE(! buffer);
+    }
 
-SECTION("Test_101") {
-    REQUIRE_THROWS_AS(read_xml("101"), std::runtime_error);
-}
+    SECTION("Test 101") {
+        REQUIRE_THROWS_AS(read_xml("101-missing_version"), std::runtime_error);
+    }
 
-SECTION("Test_102") {
-    REQUIRE_THROWS_AS(read_xml("102"), std::runtime_error);
-}
+    SECTION("Test 102") {
+        REQUIRE_THROWS_AS(read_xml("102-wrong_version"), std::runtime_error);
+    }
 
-SECTION("Test_103") {
-    REQUIRE_THROWS_AS(read_xml("103"), std::runtime_error);
-}
+    SECTION("Test 103") {
+        REQUIRE_THROWS_AS(read_xml("103-old_version"), std::runtime_error);
+    }
 
-SECTION("Test_104") {
-    REQUIRE_THROWS_AS(read_xml("104"), std::runtime_error);
-}
+    SECTION("Test 104") {
+        REQUIRE_THROWS_AS(read_xml("104-empty_file"), std::runtime_error);
+    }
 
-SECTION("Test_105") {
-    REQUIRE_THROWS_AS(read_xml("105"), std::runtime_error);
-}
+    SECTION("Test 105") {
+        REQUIRE_THROWS_AS(read_xml("105-incomplete_xml_file"), std::runtime_error);
+    }
 
 }
 
