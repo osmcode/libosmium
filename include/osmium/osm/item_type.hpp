@@ -84,6 +84,7 @@ namespace osmium {
             default:
                 return item_type::undefined;
         }
+        return item_type::undefined; // to silence the warning
     }
 
     inline char item_type_to_char(const item_type type) {
@@ -113,6 +114,7 @@ namespace osmium {
             case item_type::inner_ring:
                 return 'I';
         }
+        return 'X'; // to silence the warning
     }
 
     inline const char* item_type_to_name(const item_type type) {
@@ -142,6 +144,7 @@ namespace osmium {
             case item_type::inner_ring:
                 return "inner_ring";
         }
+        return "undefined"; // to silence the warning
     }
 
     template <typename TChar, typename TTraits>

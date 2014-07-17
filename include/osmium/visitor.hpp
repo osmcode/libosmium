@@ -62,6 +62,8 @@ namespace osmium {
         template <class THandler, class TItem>
         inline void apply_item_recurse(TItem& item, THandler& handler) {
             switch (item.type()) {
+                case osmium::item_type::undefined:
+                    break;
                 case osmium::item_type::node:
                     handler.osm_object(static_cast<ConstIfConst<TItem, osmium::OSMObject>&>(item));
                     handler.node(static_cast<ConstIfConst<TItem, osmium::Node>&>(item));
