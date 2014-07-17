@@ -184,6 +184,11 @@ namespace osmium {
                                 throw std::runtime_error(errorDesc.str());
                             }
                         } while (!done && !m_done);
+                        header_is_done(); // make sure we'll always fulfill the promise
+                        if (m_buffer.committed() > 0) {
+                            m_queue.push(std::move(m_buffer));
+                        }
+                        m_queue.push(osmium::memory::Buffer()); // empty buffer to signify eof
                     } catch (ParserIsDone&) {
                         // intentionally left blank
                     }
@@ -445,10 +450,6 @@ namespace osmium {
                             if (!strcmp(element, "osm") || !strcmp(element, "osmChange")) {
                                 header_is_done();
                                 m_context = context::root;
-                                if (m_buffer.committed() > 0) {
-                                    m_queue.push(std::move(m_buffer));
-                                }
-                                m_queue.push(osmium::memory::Buffer()); // empty buffer to signify eof
                             } else if (!strcmp(element, "delete")) {
                                 m_in_delete_section = false;
                             }
