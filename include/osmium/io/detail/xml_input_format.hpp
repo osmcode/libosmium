@@ -115,6 +115,11 @@ namespace osmium {
 
         namespace detail {
 
+            /**
+             * Once the header is fully parsed this exception will be thrown if
+             * the caller is not interested in anything else except the header.
+             * It will break off the parsing at this point.
+             */
             class ParserIsDone : std::exception {
             };
 
