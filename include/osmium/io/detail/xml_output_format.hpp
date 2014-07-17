@@ -102,11 +102,19 @@ namespace osmium {
 
             class XMLOutputBlock : public osmium::handler::Handler {
 
+                // operation (create, modify, delete) for osc files
+                enum class operation {
+                    op_none   = 0,
+                    op_create = 1,
+                    op_modify = 2,
+                    op_delete = 3
+                };
+
                 osmium::memory::Buffer m_input_buffer;
 
                 std::string m_out {};
 
-                char m_last_op {'\0'};
+                operation m_last_op {operation::op_none};
 
                 const bool m_write_visible_flag;
                 const bool m_write_change_ops;
@@ -168,33 +176,35 @@ namespace osmium {
                     }
                 }
 
-                void open_close_op_tag(const char op) {
+                void open_close_op_tag(const operation op = operation::op_none) {
                     if (op == m_last_op) {
                         return;
                     }
 
                     switch (m_last_op) {
-                        case 'c':
+                        case operation::op_none:
+                            break;
+                        case operation::op_create:
                             m_out += "  </create>\n";
                             break;
-                        case 'm':
+                        case operation::op_modify:
                             m_out += "  </modify>\n";
                             break;
-                        case 'd':
+                        case operation::op_delete:
                             m_out += "  </delete>\n";
-                            break;
-                        default:
                             break;
                     }
 
                     switch (op) {
-                        case 'c':
+                        case operation::op_none:
+                            break;
+                        case operation::op_create:
                             m_out += "  <create>\n";
                             break;
-                        case 'm':
+                        case operation::op_modify:
                             m_out += "  <modify>\n";
                             break;
-                        case 'd':
+                        case operation::op_delete:
                             m_out += "  <delete>\n";
                             break;
                     }
@@ -220,7 +230,7 @@ namespace osmium {
                     osmium::apply(m_input_buffer.cbegin(), m_input_buffer.cend(), *this);
 
                     if (m_write_change_ops) {
-                        open_close_op_tag('\0');
+                        open_close_op_tag();
                     }
 
                     std::string out;
@@ -230,7 +240,7 @@ namespace osmium {
 
                 void node(const osmium::Node& node) {
                     if (m_write_change_ops) {
-                        open_close_op_tag(node.visible() ? (node.version() == 1 ? 'c' : 'm') : 'd');
+                        open_close_op_tag(node.visible() ? (node.version() == 1 ? operation::op_create : operation::op_modify) : operation::op_delete);
                     }
 
                     write_prefix();
@@ -261,7 +271,7 @@ namespace osmium {
 
                 void way(const osmium::Way& way) {
                     if (m_write_change_ops) {
-                        open_close_op_tag(way.visible() ? (way.version() == 1 ? 'c' : 'm') : 'd');
+                        open_close_op_tag(way.visible() ? (way.version() == 1 ? operation::op_create : operation::op_modify) : operation::op_delete);
                     }
 
                     write_prefix();
@@ -288,7 +298,7 @@ namespace osmium {
 
                 void relation(const osmium::Relation& relation) {
                     if (m_write_change_ops) {
-                        open_close_op_tag(relation.visible() ? (relation.version() == 1 ? 'c' : 'm') : 'd');
+                        open_close_op_tag(relation.visible() ? (relation.version() == 1 ? operation::op_create : operation::op_modify) : operation::op_delete);
                     }
 
                     write_prefix();
