@@ -37,20 +37,29 @@ DEALINGS IN THE SOFTWARE.
 #include <cstddef>
 #include <iterator>
 
-#include <osmium/memory/collection.hpp>
 #include <osmium/memory/item.hpp>
 #include <osmium/osm/item_type.hpp>
 #include <osmium/osm/node_ref.hpp>
 
 namespace osmium {
 
+    /**
+     * A vector of NodeRef objects. Usually this is not instatiated directly,
+     * but one of its subclasses are used.
+     */
     template <osmium::item_type TItemType>
-    class NodeRefList : public osmium::memory::Collection<NodeRef, TItemType> {
+    class NodeRefList : public osmium::memory::Item {
 
     public:
 
+        static constexpr osmium::item_type itemtype = TItemType;
+
         NodeRefList():
-            osmium::memory::Collection<NodeRef, TItemType>() {
+            osmium::memory::Item(sizeof(NodeRefList), TItemType) {
+        }
+
+        bool empty() const {
+            return sizeof(NodeRefList) == byte_size();
         }
 
         size_t size() const noexcept {
@@ -83,14 +92,40 @@ namespace osmium {
             return front().location() == back().location();
         }
 
+        typedef NodeRef* iterator;
+        typedef const NodeRef* const_iterator;
         typedef std::reverse_iterator<const NodeRef*> const_reverse_iterator;
 
+        iterator begin() {
+            return iterator(data() + sizeof(NodeRefList));
+        }
+
+        iterator end() {
+            return iterator(data() + byte_size());
+        }
+
+        const_iterator cbegin() const {
+            return const_iterator(data() + sizeof(NodeRefList));
+        }
+
+        const_iterator cend() const {
+            return const_iterator(data() + byte_size());
+        }
+
+        const_iterator begin() const {
+            return cbegin();
+        }
+
+        const_iterator end() const {
+            return cend();
+        }
+
         const_reverse_iterator crbegin() const {
-            return const_reverse_iterator(&*this->cend());
+            return const_reverse_iterator(this->cend());
         }
 
         const_reverse_iterator crend() const {
-            return const_reverse_iterator(&*this->cbegin());
+            return const_reverse_iterator(this->cbegin());
         }
 
     }; // class NodeRefList

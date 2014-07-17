@@ -36,33 +36,24 @@ DEALINGS IN THE SOFTWARE.
 #include <cstdlib>
 #include <iosfwd>
 
-#include <osmium/memory/collection.hpp> // IWYU pragma: keep
 #include <osmium/memory/item.hpp>
 #include <osmium/osm/item_type.hpp>
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/types.hpp>
+#include <osmium/util/operators.hpp>
 
 namespace osmium {
 
-    class NodeRef : public osmium::memory::detail::ItemHelper {
+    /**
+     * This reference to a node contains a node ID and a (possibly empty)
+     * location.
+     */
+    class NodeRef : public osmium::memory::detail::ItemHelper, public osmium::totally_ordered<NodeRef> {
 
         osmium::object_id_type m_ref;
         osmium::Location m_location;
 
-        template <class TMember>
-        friend class osmium::memory::CollectionIterator;
-
-        unsigned char* next() {
-            return data() + sizeof(NodeRef);
-        }
-
-        const unsigned char* next() const {
-            return data() + sizeof(NodeRef);
-        }
-
     public:
-
-        static constexpr osmium::item_type collection_type = osmium::item_type::way_node_list;
 
         NodeRef(const osmium::object_id_type ref=0, const osmium::Location& location=Location()) :
             m_ref(ref),
@@ -99,24 +90,8 @@ namespace osmium {
         return lhs.ref() < rhs.ref();
     }
 
-    inline bool operator>(const NodeRef& lhs, const NodeRef& rhs) {
-        return lhs.ref() > rhs.ref();
-    }
-
-    inline bool operator<=(const NodeRef& lhs, const NodeRef& rhs) {
-        return lhs.ref() <= rhs.ref();
-    }
-
-    inline bool operator>=(const NodeRef& lhs, const NodeRef& rhs) {
-        return lhs.ref() >= rhs.ref();
-    }
-
     inline bool operator==(const NodeRef& lhs, const NodeRef& rhs) {
         return lhs.ref() == rhs.ref();
-    }
-
-    inline bool operator!=(const NodeRef& lhs, const NodeRef& rhs) {
-        return !(lhs == rhs);
     }
 
     /**
