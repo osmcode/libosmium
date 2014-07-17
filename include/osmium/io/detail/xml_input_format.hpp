@@ -71,6 +71,44 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
+    struct xml_error : public io_error {
+
+        long line;
+        long column;
+        XML_Error error_code;
+        std::string error_string;
+
+        xml_error(XML_Parser parser) :
+            io_error(std::string("XML parsing error at line ")
+                    + std::to_string(XML_GetCurrentLineNumber(parser))
+                    + ", column "
+                    + std::to_string(XML_GetCurrentColumnNumber(parser))
+                    + ": "
+                    + XML_ErrorString(XML_GetErrorCode(parser))),
+            line(XML_GetCurrentLineNumber(parser)),
+            column(XML_GetCurrentColumnNumber(parser)),
+            error_code(XML_GetErrorCode(parser)),
+            error_string(XML_ErrorString(error_code)) {
+        }
+
+    }; // struct xml_error
+
+    struct format_version_error : public io_error {
+
+        std::string version;
+
+        explicit format_version_error() :
+            io_error("Can not read file without version (missing version attribute on osm element)."),
+            version() {
+        }
+
+        explicit format_version_error(const char* version) :
+            io_error(std::string("Can not read file with version ") + version),
+            version(version) {
+        }
+
+    }; // struct format_version_error
+
     namespace io {
 
         class File;
@@ -157,9 +195,9 @@ namespace osmium {
                 }
 
                 void operator()() {
-                    XML_Parser parser = XML_ParserCreate(0);
+                    XML_Parser parser = XML_ParserCreate(nullptr);
                     if (!parser) {
-                        throw std::runtime_error("Error creating parser");
+                        throw osmium::io_error("Internal error: Can not create parser");
                     }
 
                     XML_SetUserData(parser, this);
@@ -173,15 +211,7 @@ namespace osmium {
                             m_input_queue.wait_and_pop(data);
                             done = data.empty();
                             if (XML_Parse(parser, data.data(), data.size(), done) == XML_STATUS_ERROR) {
-                                XML_Error errorCode = XML_GetErrorCode(parser);
-                                long errorLine = XML_GetCurrentLineNumber(parser);
-                                long errorCol = XML_GetCurrentColumnNumber(parser);
-                                const XML_LChar* errorString = XML_ErrorString(errorCode);
-
-                                std::stringstream errorDesc;
-                                errorDesc << "XML parsing error at line " << errorLine << ":" << errorCol;
-                                errorDesc << ": " << errorString;
-                                throw std::runtime_error(errorDesc.str());
+                                throw osmium::xml_error(parser);
                             }
                         } while (!done && !m_done);
                         header_is_done(); // make sure we'll always fulfill the promise
@@ -299,14 +329,14 @@ namespace osmium {
                                     if (!strcmp(attrs[count], "version")) {
                                         m_header.set("version", attrs[count+1]);
                                         if (strcmp(attrs[count+1], "0.6")) {
-                                            throw std::runtime_error("can only read version 0.6 files");
+                                            throw osmium::format_version_error(attrs[count+1]);
                                         }
                                     } else if (!strcmp(attrs[count], "generator")) {
                                         m_header.set("generator", attrs[count+1]);
                                     }
                                 }
                                 if (m_header.get("version") == "") {
-                                    throw std::runtime_error("version attribute on osm element missing");
+                                    throw osmium::format_version_error();
                                 }
                             }
                             m_context = context::top;

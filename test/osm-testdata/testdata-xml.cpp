@@ -96,23 +96,44 @@ TEST_CASE("Reading OSM XML") {
     }
 
     SECTION("Test 101") {
-        REQUIRE_THROWS_AS(read_xml("101-missing_version"), std::runtime_error);
+        REQUIRE_THROWS_AS(read_xml("101-missing_version"), osmium::format_version_error);
+        try {
+            read_xml("101-missing_version");
+        } catch (osmium::format_version_error& e) {
+            REQUIRE(e.version.empty());
+        }
     }
 
     SECTION("Test 102") {
-        REQUIRE_THROWS_AS(read_xml("102-wrong_version"), std::runtime_error);
+        REQUIRE_THROWS_AS(read_xml("102-wrong_version"), osmium::format_version_error);
+        try {
+            read_xml("102-wrong_version");
+        } catch (osmium::format_version_error& e) {
+            REQUIRE(e.version == "0.1");
+        }
     }
 
     SECTION("Test 103") {
-        REQUIRE_THROWS_AS(read_xml("103-old_version"), std::runtime_error);
+        REQUIRE_THROWS_AS(read_xml("103-old_version"), osmium::format_version_error);
+        try {
+            read_xml("103-old_version");
+        } catch (osmium::format_version_error& e) {
+            REQUIRE(e.version == "0.5");
+        }
     }
 
     SECTION("Test 104") {
-        REQUIRE_THROWS_AS(read_xml("104-empty_file"), std::runtime_error);
+        REQUIRE_THROWS_AS(read_xml("104-empty_file"), osmium::xml_error);
+        try {
+            read_xml("104-empty_file");
+        } catch (osmium::xml_error& e) {
+            REQUIRE(e.line == 1);
+            REQUIRE(e.column == 0);
+        }
     }
 
     SECTION("Test 105") {
-        REQUIRE_THROWS_AS(read_xml("105-incomplete_xml_file"), std::runtime_error);
+        REQUIRE_THROWS_AS(read_xml("105-incomplete_xml_file"), osmium::xml_error);
     }
 
 }
