@@ -33,7 +33,6 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <stdexcept>
 #include <type_traits>
 
 #include <osmium/io/reader_iterator.hpp> // IWYU pragma: keep
@@ -125,7 +124,7 @@ namespace osmium {
                     handler.changeset(static_cast<const osmium::Changeset&>(item));
                     break;
                 default:
-                    throw std::runtime_error("unknown type");
+                    throw osmium::unknown_type();
             }
         }
 
@@ -152,7 +151,7 @@ namespace osmium {
                     handler.changeset(static_cast<osmium::Changeset&>(item));
                     break;
                 default:
-                    throw std::runtime_error("unknown type");
+                    throw osmium::unknown_type();
             }
         }
 
@@ -176,7 +175,7 @@ namespace osmium {
                     handler.area(static_cast<const osmium::Area&>(item));
                     break;
                 default:
-                    throw std::runtime_error("unknown type");
+                    throw osmium::unknown_type();
             }
         }
 
@@ -200,7 +199,7 @@ namespace osmium {
                     handler.area(static_cast<osmium::Area&>(item));
                     break;
                 default:
-                    throw std::runtime_error("unknown type");
+                    throw osmium::unknown_type();
             }
         }
 

@@ -35,6 +35,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <cstdint> // IWYU pragma: keep
 #include <iosfwd>
+#include <stdexcept>
 
 namespace osmium {
 
@@ -151,6 +152,14 @@ namespace osmium {
     inline std::basic_ostream<TChar, TTraits>& operator<<(std::basic_ostream<TChar, TTraits>& out, const item_type item_type) {
         return out << item_type_to_char(item_type);
     }
+
+    struct unknown_type : public std::runtime_error {
+
+        unknown_type() :
+            std::runtime_error("unknown item type") {
+        }
+
+    }; // struct unknown_type
 
 } // namespace osmium
 

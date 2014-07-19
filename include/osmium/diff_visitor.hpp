@@ -33,8 +33,6 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <stdexcept>
-
 #include <osmium/diff_iterator.hpp>
 #include <osmium/io/input_iterator.hpp>
 #include <osmium/memory/buffer.hpp>
@@ -58,7 +56,7 @@ namespace osmium {
                     handler.relation(static_cast<const osmium::DiffRelation&>(diff));
                     break;
                 default:
-                    throw std::runtime_error("unknown type");
+                    throw osmium::unknown_type();
             }
         }
 
