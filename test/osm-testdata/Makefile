@@ -23,6 +23,9 @@ endif
 CXXFLAGS_OGR      := $(shell gdal-config --cflags)
 CXXFLAGS_WARNINGS := -Wall -Wextra -pedantic -Wredundant-decls -Wdisabled-optimization -Wctor-dtor-privacy -Wnon-virtual-dtor -Woverloaded-virtual -Wsign-promo -Wold-style-cast
 
+# suppress warnings from Catch unit test macros
+CXXFLAGS_WARNINGS += -Wno-unused-variable
+
 LIB_EXPAT  := -lexpat
 LIB_PBF    := -pthread -lz -lprotobuf-lite -losmpbf
 LIB_GZIP   := -lz
