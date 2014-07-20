@@ -200,7 +200,7 @@ namespace osmium {
             } else if (!strcmp("false", visible)) {
                 this->visible(false);
             } else {
-                throw std::runtime_error("Unknown value for visible attribute (allowed is 'true' or 'false')");
+                throw std::invalid_argument("Unknown value for visible attribute (allowed is 'true' or 'false')");
             }
             return *this;
         }
