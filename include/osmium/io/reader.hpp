@@ -118,8 +118,8 @@ namespace osmium {
             osmium::io::File m_file;
             osmium::osm_entity_bits::type m_read_which_entities;
 
+            osmium::thread::Queue<std::string> m_input_queue;
             std::unique_ptr<osmium::io::detail::InputFormat> m_input;
-            osmium::thread::Queue<std::string> m_input_queue {};
 
             std::unique_ptr<osmium::io::Decompressor> m_decompressor;
 
@@ -206,6 +206,7 @@ namespace osmium {
             explicit Reader(const osmium::io::File& file, osmium::osm_entity_bits::type read_which_entities = osmium::osm_entity_bits::all) :
                 m_file(file),
                 m_read_which_entities(read_which_entities),
+                m_input_queue(),
                 m_input(osmium::io::detail::InputFormatFactory::instance().create_input(m_file, m_read_which_entities, m_input_queue)),
                 m_decompressor(osmium::io::CompressionFactory::instance().create_decompressor(file.compression(), open_input_file_or_url(m_file.filename()))),
                 m_input_task(InputThread {m_input_queue, m_decompressor.get(), m_input_done}) {
@@ -231,7 +232,7 @@ namespace osmium {
              * Close down the Reader. A call to this is optional, because the
              * destructor of Reader will also call this. But if you don't call
              * this function first, the destructor might throw an exception
-             * which is bot good.
+             * which is not good.
              *
              * @throws Some form of std::runtime_error when there is a problem.
              */
