@@ -117,16 +117,15 @@ namespace osmium {
 
             osmium::io::File m_file;
             osmium::osm_entity_bits::type m_read_which_entities;
+            std::atomic<bool> m_input_done;
+            int m_childpid;
 
             osmium::thread::Queue<std::string> m_input_queue;
             std::unique_ptr<osmium::io::detail::InputFormat> m_input;
 
             std::unique_ptr<osmium::io::Decompressor> m_decompressor;
 
-            std::atomic<bool> m_input_done;
             osmium::thread::CheckedTask<InputThread> m_input_task;
-
-            int m_childpid {0};
 
             /**
              * Fork and execute the given command in the child.
@@ -139,7 +138,7 @@ namespace osmium {
              * @return File descriptor of pipe in the parent.
              * @throws std::system_error if a system call fails.
              */
-            int execute(const std::string& command, const std::string& filename) {
+            static int execute(const std::string& command, const std::string& filename, int* childpid) {
                 int pipefd[2];
                 if (pipe(pipefd) < 0) {
                     throw std::system_error(errno, std::system_category(), "opening pipe failed");
@@ -170,7 +169,7 @@ namespace osmium {
                     }
                 }
                 // parent
-                m_childpid = pid;
+                *childpid = pid;
                 ::close(pipefd[1]);
                 return pipefd[0];
             }
@@ -183,10 +182,10 @@ namespace osmium {
              * @return File descriptor of open file or pipe.
              * @throws std::system_error if a system call fails.
              */
-            int open_input_file_or_url(const std::string& filename) {
+            static int open_input_file_or_url(const std::string& filename, int* childpid) {
                 std::string protocol = filename.substr(0, filename.find_first_of(':'));
                 if (protocol == "http" || protocol == "https" || protocol == "ftp" || protocol == "file") {
-                    return execute("curl", filename);
+                    return execute("curl", filename, childpid);
                 } else {
                     return osmium::io::detail::open_for_reading(filename);
                 }
@@ -206,10 +205,11 @@ namespace osmium {
             explicit Reader(const osmium::io::File& file, osmium::osm_entity_bits::type read_which_entities = osmium::osm_entity_bits::all) :
                 m_file(file),
                 m_read_which_entities(read_which_entities),
+                m_input_done(false),
+                m_childpid(0),
                 m_input_queue(),
                 m_input(osmium::io::detail::InputFormatFactory::instance().create_input(m_file, m_read_which_entities, m_input_queue)),
-                m_decompressor(osmium::io::CompressionFactory::instance().create_decompressor(m_file.compression(), open_input_file_or_url(m_file.filename()))),
-                m_input_done(false),
+                m_decompressor(osmium::io::CompressionFactory::instance().create_decompressor(file.compression(), open_input_file_or_url(m_file.filename(), &m_childpid))),
                 m_input_task(InputThread {m_input_queue, m_decompressor.get(), m_input_done}) {
                 m_input->open();
             }
