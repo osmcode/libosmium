@@ -35,11 +35,9 @@ DEALINGS IN THE SOFTWARE.
 
 #include <atomic>
 #include <cerrno>
-#include <chrono>
 #include <cstdlib>
 #include <fcntl.h>
 #include <memory>
-#include <ratio>
 #include <string>
 #include <sys/wait.h>
 #include <system_error>
@@ -49,6 +47,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/io/compression.hpp>
 #include <osmium/io/detail/input_format.hpp>
+#include <osmium/io/detail/read_thread.hpp>
 #include <osmium/io/detail/read_write.hpp>
 #include <osmium/io/file.hpp>
 #include <osmium/io/header.hpp>
@@ -61,51 +60,6 @@ DEALINGS IN THE SOFTWARE.
 namespace osmium {
 
     namespace io {
-
-        class InputThread {
-
-            osmium::thread::Queue<std::string>& m_queue;
-            osmium::io::Decompressor* m_decompressor;
-
-            // If this is set in the main thread, we have to wrap up at the
-            // next possible moment.
-            std::atomic<bool>& m_done;
-
-        public:
-
-            explicit InputThread(osmium::thread::Queue<std::string>& queue, osmium::io::Decompressor* decompressor, std::atomic<bool>& done) :
-                m_queue(queue),
-                m_decompressor(decompressor),
-                m_done(done) {
-            }
-
-            void operator()() {
-                osmium::thread::set_thread_name("_osmium_input");
-
-                try {
-                    while (!m_done) {
-                        std::string data {m_decompressor->read()};
-                        if (data.empty()) {
-                            m_done = true;
-                        }
-                        m_queue.push(std::move(data));
-                        while (m_queue.size() > 10) {
-                            std::this_thread::sleep_for(std::chrono::milliseconds(10));
-                        }
-                    }
-
-                    m_decompressor->close();
-                } catch (...) {
-                    // If there is an exception in this thread, we make sure
-                    // to push an empty string onto the queue to signal the
-                    // end-of-data to the reading thread so that it will not
-                    // hang. Then we re-throw the exception.
-                    m_queue.push(std::string());
-                    throw;
-                }
-            }
-
-        }; // class InputThread
 
         /**
          * This is the user-facing interface for reading OSM files. Instantiate
@@ -125,7 +79,7 @@ namespace osmium {
 
             std::unique_ptr<osmium::io::Decompressor> m_decompressor;
 
-            osmium::thread::CheckedTask<InputThread> m_input_task;
+            osmium::thread::CheckedTask<detail::ReadThread> m_read_task;
 
             /**
              * Fork and execute the given command in the child.
@@ -210,7 +164,7 @@ namespace osmium {
                 m_input_queue(),
                 m_input(osmium::io::detail::InputFormatFactory::instance().create_input(m_file, m_read_which_entities, m_input_queue)),
                 m_decompressor(osmium::io::CompressionFactory::instance().create_decompressor(file.compression(), open_input_file_or_url(m_file.filename(), &m_childpid))),
-                m_input_task(InputThread {m_input_queue, m_decompressor.get(), m_input_done}) {
+                m_read_task(detail::ReadThread {m_input_queue, m_decompressor.get(), m_input_done}) {
                 m_input->open();
             }
 
@@ -255,7 +209,7 @@ namespace osmium {
                     m_childpid = 0;
                 }
 
-                m_input_task.close();
+                m_read_task.close();
             }
 
             /**
@@ -275,7 +229,7 @@ namespace osmium {
             osmium::memory::Buffer read() {
                 // If an exception happened in the input thread, re-throw
                 // it in this (the main) thread.
-                m_input_task.check_for_exception();
+                m_read_task.check_for_exception();
 
                 if (m_read_which_entities == osmium::osm_entity_bits::nothing) {
                     // If the caller didn't want anything but the header, it will
