@@ -97,7 +97,7 @@ namespace osmium {
                 virtual void close() {
                 }
 
-                osmium::io::Header header() const {
+                virtual osmium::io::Header header() {
                     return m_header;
                 }
 

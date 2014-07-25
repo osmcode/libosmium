@@ -55,23 +55,18 @@ header_buffer_type read_xml(const char* test_id) {
     input_queue.push(input);
     input_queue.push(std::string());
 
-//    std::cerr << "call parser for " << test_id << ":\n";
     parser();
 
     header_buffer_type result;
-//    std::cerr << "  get header...\n";
     result.header = header_promise.get_future().get();
-//    std::cerr << "  get buffer...\n";
     output_queue.wait_and_pop(result.buffer);
 
-//    std::cerr << "  check is done...\n";
     if (result.buffer) {
         osmium::memory::Buffer buffer;
         output_queue.wait_and_pop(buffer);
         assert(!buffer);
     }
 
-//    std::cerr << "  DONE\n";
     close(fd);
 
     return result;
@@ -114,20 +109,13 @@ TEST_CASE("Reading OSM XML 101") {
         }
     }
 
-#if 0
     SECTION("Using Reader") {
-        try {
+        REQUIRE_THROWS_AS({
             osmium::io::Reader reader(filename("101-missing_version"));
-
             osmium::io::Header header = reader.header();
-            REQUIRE(header.get("generator") == "testdata");
-
             osmium::memory::Buffer buffer = reader.read();
-        } catch (osmium::format_version_error& e) {
-            REQUIRE(e.version.empty());
-        }
+        }, osmium::format_version_error);
     }
-#endif
 
 }
 
@@ -144,20 +132,14 @@ TEST_CASE("Reading OSM XML 102") {
         }
     }
 
-#if 0
     SECTION("Using Reader") {
-        try {
+        REQUIRE_THROWS_AS({
             osmium::io::Reader reader(filename("102-wrong_version"));
 
             osmium::io::Header header = reader.header();
-            REQUIRE(header.get("generator") == "testdata");
-
             osmium::memory::Buffer buffer = reader.read();
-        } catch (osmium::format_version_error& e) {
-            REQUIRE(e.version == "0.1");
-        }
+        }, osmium::format_version_error);
     }
-#endif
 
 }
 
@@ -174,16 +156,13 @@ TEST_CASE("Reading OSM XML 103") {
         }
     }
 
-#if 0
     SECTION("Using Reader") {
-        osmium::io::Reader reader(filename("103-old_version"));
-
-        osmium::io::Header header = reader.header();
-        REQUIRE(header.get("generator") == "testdata");
-
-        osmium::memory::Buffer buffer = reader.read();
+        REQUIRE_THROWS_AS({
+            osmium::io::Reader reader(filename("103-old_version"));
+            osmium::io::Header header = reader.header();
+            osmium::memory::Buffer buffer = reader.read();
+        }, osmium::format_version_error);
     }
-#endif
 
 }
 
@@ -201,17 +180,13 @@ TEST_CASE("Reading OSM XML 104") {
         }
     }
 
-#if 0
     SECTION("Using Reader") {
-        osmium::io::Reader reader(filename("104-empty_file"));
-
-        osmium::io::Header header = reader.header();
-        REQUIRE(header.get("generator") == "testdata");
-
-        osmium::memory::Buffer buffer = reader.read();
+        REQUIRE_THROWS_AS({
+            osmium::io::Reader reader(filename("104-empty_file"));
+            osmium::io::Header header = reader.header();
+            osmium::memory::Buffer buffer = reader.read();
+        }, osmium::xml_error);
     }
-#endif
-
 }
 
 // =============================================
@@ -222,16 +197,13 @@ TEST_CASE("Reading OSM XML 105") {
         REQUIRE_THROWS_AS(read_xml("105-incomplete_xml_file"), osmium::xml_error);
     }
 
-#if 0
     SECTION("Using Reader") {
-        osmium::io::Reader reader(filename("105-incomplete_xml_file"));
-
-        osmium::io::Header header = reader.header();
-        REQUIRE(header.get("generator") == "testdata");
-
-        osmium::memory::Buffer buffer = reader.read();
+        REQUIRE_THROWS_AS({
+            osmium::io::Reader reader(filename("105-incomplete_xml_file"));
+            osmium::io::Header header = reader.header();
+            osmium::memory::Buffer buffer = reader.read();
+        }, osmium::xml_error);
     }
-#endif
 
 }
 

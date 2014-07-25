@@ -123,9 +123,9 @@ namespace osmium {
 
             std::unique_ptr<osmium::io::Decompressor> m_decompressor;
 
+            std::atomic<bool> m_input_done;
             osmium::thread::CheckedTask<InputThread> m_input_task;
 
-            std::atomic<bool> m_input_done {false};
             int m_childpid {0};
 
             /**
@@ -208,7 +208,8 @@ namespace osmium {
                 m_read_which_entities(read_which_entities),
                 m_input_queue(),
                 m_input(osmium::io::detail::InputFormatFactory::instance().create_input(m_file, m_read_which_entities, m_input_queue)),
-                m_decompressor(osmium::io::CompressionFactory::instance().create_decompressor(file.compression(), open_input_file_or_url(m_file.filename()))),
+                m_decompressor(osmium::io::CompressionFactory::instance().create_decompressor(m_file.compression(), open_input_file_or_url(m_file.filename()))),
+                m_input_done(false),
                 m_input_task(InputThread {m_input_queue, m_decompressor.get(), m_input_done}) {
                 m_input->open();
             }

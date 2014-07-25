@@ -68,6 +68,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/object.hpp>
 #include <osmium/osm/types.hpp>
 #include <osmium/thread/queue.hpp>
+#include <osmium/thread/checked_task.hpp>
 
 namespace osmium {
 
@@ -215,8 +216,19 @@ namespace osmium {
                             std::string data;
                             m_input_queue.wait_and_pop(data);
                             done = data.empty();
-                            if (XML_Parse(parser, data.data(), data.size(), done) == XML_STATUS_ERROR) {
-                                throw osmium::xml_error(parser);
+                            try {
+                                if (XML_Parse(parser, data.data(), data.size(), done) == XML_STATUS_ERROR) {
+                                    throw osmium::xml_error(parser);
+                                }
+                            } catch (ParserIsDone&) {
+                                throw;
+                            } catch (...) {
+                                m_queue.push(osmium::memory::Buffer()); // empty buffer to signify eof
+                                if (!m_promise_fulfilled) {
+                                    m_promise_fulfilled = true;
+                                    m_header_promise.set_value(m_header);
+                                }
+                                throw;
                             }
                         } while (!done && !m_done);
                         header_is_done(); // make sure we'll always fulfill the promise
@@ -316,10 +328,10 @@ namespace osmium {
                 void header_is_done() {
                     if (!m_promise_fulfilled) {
                         m_header_promise.set_value(m_header);
+                        m_promise_fulfilled = true;
                         if (m_read_types == osmium::osm_entity_bits::nothing) {
                             throw ParserIsDone();
                         }
-                        m_promise_fulfilled = true;
                     }
                 }
 
@@ -569,8 +581,8 @@ namespace osmium {
 
                 osmium::thread::Queue<osmium::memory::Buffer> m_queue;
                 std::atomic<bool> m_done;
-                std::thread m_reader;
                 std::promise<osmium::io::Header> m_header_promise;
+                osmium::thread::CheckedTask<XMLParser> m_parser_task;
 
             public:
 
@@ -585,32 +597,29 @@ namespace osmium {
                     osmium::io::detail::InputFormat(file, read_which_entities, input_queue),
                     m_queue(),
                     m_done(false),
-                    m_reader() {
+                    m_header_promise(),
+                    m_parser_task(XMLParser {input_queue, m_queue, m_header_promise, read_which_entities, m_done}) {
                 }
 
                 ~XMLInputFormat() {
                     m_done = true;
-                    if (m_reader.joinable()) {
-                        m_reader.join();
-                    }
                 }
 
                 void open() override {
-                    XMLParser parser(m_input_queue, m_queue, m_header_promise, m_read_which_entities, m_done);
+                }
 
-                    m_reader = std::thread(std::move(parser));
-
-                    // wait for header
-                    m_header = m_header_promise.get_future().get();
+                virtual osmium::io::Header header() override final {
+                    m_parser_task.check_for_exception();
+                    return m_header_promise.get_future().get();
                 }
 
                 osmium::memory::Buffer read() override {
                     osmium::memory::Buffer buffer;
-
                     if (!m_done || !m_queue.empty()) {
                         m_queue.wait_and_pop(buffer);
                     }
 
+                    m_parser_task.check_for_exception();
                     return buffer;
                 }
 

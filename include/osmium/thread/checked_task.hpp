@@ -51,13 +51,16 @@ namespace osmium {
         public:
 
             explicit CheckedTask(T&& task) {
-                std::packaged_task<void()> pack_task(task);
+                std::packaged_task<void()> pack_task(std::move(task));
                 m_future = pack_task.get_future();
                 m_thread = std::thread(std::move(pack_task));
             }
 
             ~CheckedTask() {
-                close();
+                // Make sure task is done.
+                if (m_thread.joinable()) {
+                    m_thread.join();
+                }
             }
 
             CheckedTask(const CheckedTask&) = delete;
@@ -77,10 +80,7 @@ namespace osmium {
 
             /**
              * Close the task. This will raise in this thread any exception the
-             * task generated in the other thread. Calling this function is
-             * optional, because the destructor will also call this function.
-             * But because it can throw an exception, it is better to call it
-             * explicitly.
+             * task generated in the other thread.
              */
             void close() {
                 // If an exception happened in the task, re-throw
