@@ -605,9 +605,6 @@ namespace osmium {
                     m_done = true;
                 }
 
-                void open() override {
-                }
-
                 virtual osmium::io::Header header() override final {
                     m_parser_task.check_for_exception();
                     return m_header_promise.get_future().get();

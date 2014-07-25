@@ -90,8 +90,6 @@ namespace osmium {
                 virtual ~InputFormat() {
                 }
 
-                virtual void open() = 0;
-
                 virtual osmium::memory::Buffer read() = 0;
 
                 virtual void close() {

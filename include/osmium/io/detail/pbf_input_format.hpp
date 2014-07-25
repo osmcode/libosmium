@@ -621,19 +621,6 @@ namespace osmium {
                     m_done(false),
                     m_input_queue_reader(input_queue) {
                     GOOGLE_PROTOBUF_VERIFY_VERSION;
-                }
-
-                ~PBFInputFormat() {
-                    m_done = true;
-                    if (m_reader.joinable()) {
-                        m_reader.join();
-                    }
-                }
-
-                /**
-                 * Read PBF file.
-                 */
-                void open() override {
 
                     // handle OSMHeader
                     size_t size = read_blob_header("OSMHeader");
@@ -645,6 +632,13 @@ namespace osmium {
 
                     if (m_read_which_entities != osmium::osm_entity_bits::nothing) {
                         m_reader = std::thread(&PBFInputFormat::parse_osm_data, this, m_read_which_entities);
+                    }
+                }
+
+                ~PBFInputFormat() {
+                    m_done = true;
+                    if (m_reader.joinable()) {
+                        m_reader.join();
                     }
                 }
 
