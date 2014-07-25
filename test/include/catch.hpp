@@ -5063,10 +5063,10 @@ namespace Catch {
         }
 
         virtual void sectionEnded( SectionInfo const& info, Counts const& prevAssertions, double _durationInSeconds ) {
-            if( std::uncaught_exception() ) {
+            /*if( std::uncaught_exception() ) { // XXX Hack that makes Catch not run in loop in certain situations
                 m_unfinishedSections.push_back( UnfinishedSections( info, prevAssertions, _durationInSeconds ) );
                 return;
-            }
+            }*/
 
             Counts assertions = m_totals.assertions - prevAssertions;
             bool missingAssertions = testForMissingAssertions( assertions );
