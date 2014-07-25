@@ -33,7 +33,6 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <future>
 #include <memory>
 #include <string>
 #include <utility>
@@ -41,46 +40,16 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/io/compression.hpp>
 #include <osmium/io/detail/output_format.hpp>
 #include <osmium/io/detail/read_write.hpp>
+#include <osmium/io/detail/write_thread.hpp>
 #include <osmium/io/file.hpp>
 #include <osmium/io/header.hpp>
 #include <osmium/io/overwrite.hpp>
 #include <osmium/memory/buffer.hpp>
 #include <osmium/thread/checked_task.hpp>
-#include <osmium/thread/name.hpp>
 
 namespace osmium {
 
     namespace io {
-
-        class OutputThread {
-
-            typedef osmium::io::detail::data_queue_type data_queue_type;
-
-            data_queue_type& m_input_queue;
-            osmium::io::Compressor* m_compressor;
-
-        public:
-
-            explicit OutputThread(data_queue_type& input_queue, osmium::io::Compressor* compressor) :
-                m_input_queue(input_queue),
-                m_compressor(compressor) {
-            }
-
-            void operator()() {
-                osmium::thread::set_thread_name("_osmium_output");
-
-                std::future<std::string> data_future;
-                std::string data;
-                do {
-                    m_input_queue.wait_and_pop(data_future);
-                    data = data_future.get();
-                    m_compressor->write(data);
-                } while (!data.empty());
-
-                m_compressor->close();
-            }
-
-        }; // class OutputThread
 
         /**
          * This is the user-facing interface for writing OSM files. Instantiate
@@ -97,7 +66,7 @@ namespace osmium {
 
             std::unique_ptr<osmium::io::Compressor> m_compressor;
 
-            osmium::thread::CheckedTask<OutputThread> m_output_task;
+            osmium::thread::CheckedTask<detail::WriteThread> m_write_task;
 
         public:
 
@@ -120,7 +89,7 @@ namespace osmium {
                 m_file(file),
                 m_output(osmium::io::detail::OutputFormatFactory::instance().create_output(m_file, m_output_queue)),
                 m_compressor(osmium::io::CompressionFactory::instance().create_compressor(file.compression(), osmium::io::detail::open_for_writing(m_file.filename(), allow_overwrite))),
-                m_output_task(OutputThread {m_output_queue, m_compressor.get()}) {
+                m_write_task(detail::WriteThread {m_output_queue, m_compressor.get()}) {
                 m_output->write_header(header);
             }
 
@@ -145,7 +114,7 @@ namespace osmium {
              * @throws Some form of std::runtime_error when there is a problem.
              */
             void operator()(osmium::memory::Buffer&& buffer) {
-                m_output_task.check_for_exception();
+                m_write_task.check_for_exception();
                 if (buffer.committed() > 0) {
                     m_output->write_buffer(std::move(buffer));
                 }
@@ -161,7 +130,7 @@ namespace osmium {
              */
             void close() {
                 m_output->close();
-                m_output_task.close();
+                m_write_task.close();
             }
 
         }; // class Writer
