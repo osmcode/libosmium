@@ -50,8 +50,9 @@ namespace osmium {
 
         public:
 
-            explicit CheckedTask(T&& task) {
-                std::packaged_task<void()> pack_task(std::move(task));
+            template <class... TArgs>
+            explicit CheckedTask(TArgs&&... args) {
+                std::packaged_task<void()> pack_task(T(std::forward<TArgs>(args)...));
                 m_future = pack_task.get_future();
                 m_thread = std::thread(std::move(pack_task));
             }

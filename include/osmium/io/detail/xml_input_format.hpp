@@ -598,7 +598,7 @@ namespace osmium {
                     m_queue(),
                     m_done(false),
                     m_header_promise(),
-                    m_parser_task(XMLParser {input_queue, m_queue, m_header_promise, read_which_entities, m_done}) {
+                    m_parser_task(input_queue, m_queue, m_header_promise, read_which_entities, m_done) {
                 }
 
                 ~XMLInputFormat() {
