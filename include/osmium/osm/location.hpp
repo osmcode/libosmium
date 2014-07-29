@@ -89,7 +89,7 @@ namespace osmium {
         static constexpr int coordinate_precision = 10000000;
 
         static int32_t double_to_fix(const double c) noexcept {
-            return std::round(c * coordinate_precision);
+            return static_cast<int32_t>(std::round(c * coordinate_precision));
         }
 
         static constexpr double fix_to_double(const int32_t c) noexcept {
@@ -120,8 +120,8 @@ namespace osmium {
          * times larger than the real coordinates.
          */
         constexpr Location(const int64_t x, const int64_t y) :
-            m_x(x),
-            m_y(y) {
+            m_x(static_cast<int32_t>(x)),
+            m_y(static_cast<int32_t>(y)) {
         }
 
         /**

@@ -42,6 +42,10 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
+    /**
+     * A timestamp. Internal representation is an unsigned 32bit integer
+     * holding seconds since epoch, so this will overflow in 2038.
+     */
     class Timestamp {
 
         // length of ISO timestamp string yyyy-mm-ddThh:mm:ssZ\0
@@ -67,7 +71,7 @@ namespace osmium {
         // Not "explicit" so that conversions from time_t work
         // like in node.timestamp(123);
         constexpr Timestamp(time_t timestamp) :
-            m_timestamp(timestamp) {
+            m_timestamp(static_cast<uint32_t>(timestamp)) {
         }
 
         /**
@@ -82,7 +86,7 @@ namespace osmium {
             if (strptime(timestamp, timestamp_format(), &tm) == nullptr) {
                 throw std::invalid_argument("can't parse timestamp");
             }
-            m_timestamp = timegm(&tm);
+            m_timestamp = static_cast<uint32_t>(timegm(&tm));
 #else
             struct tm tm;
             int n = sscanf(timestamp, "%4d-%2d-%2dT%2d:%2d:%2dZ", &tm.tm_year, &tm.tm_mon, &tm.tm_mday, &tm.tm_hour, &tm.tm_min, &tm.tm_sec);

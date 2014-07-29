@@ -54,7 +54,9 @@ namespace osmium {
         class CRS {
 
             struct ProjCRSDeleter {
-                void operator()(void* crs) { pj_free(crs); };
+                void operator()(void* crs) {
+                    pj_free(crs);
+                }
             };
 
             std::unique_ptr<void, ProjCRSDeleter> m_crs;

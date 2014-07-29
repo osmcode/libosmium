@@ -65,7 +65,7 @@ namespace osmium {
         }
 
         osmium::unsigned_object_id_type positive_ref() const {
-            return std::abs(m_ref);
+            return static_cast<osmium::unsigned_object_id_type>(std::abs(m_ref));
         }
 
         osmium::Location location() const {

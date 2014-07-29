@@ -106,12 +106,14 @@ namespace osmium {
 
     public:
 
+        typedef size_t size_type;
+
         TagList() :
             osmium::memory::Collection<Tag, osmium::item_type::tag_list>() {
         }
 
-        size_t size() const noexcept {
-            return std::distance(begin(), end());
+        size_type size() const noexcept {
+            return static_cast<size_type>(std::distance(begin(), end()));
         }
 
         const char* get_value_by_key(const char* key, const char* default_value = nullptr) const noexcept {

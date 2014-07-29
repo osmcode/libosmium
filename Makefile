@@ -20,6 +20,7 @@ IWYU_REPORT_FILES := $(subst include/osmium,check_reports,$(INCLUDE_FILES:.hpp=.
 INCLUDES_REPORT_FILES := $(subst include/osmium,check_reports,$(INCLUDE_FILES:.hpp=.compile))
 
 WARNINGFLAGS := -Wall -Wextra -pedantic -Wredundant-decls -Wdisabled-optimization -Wctor-dtor-privacy -Wnon-virtual-dtor -Woverloaded-virtual -Wsign-promo -Winline -Wold-style-cast
+#WARNINGFLAGS += -Weverything -Wno-c++98-compat -Wno-unused-macros -Wno-exit-time-destructors
 #WARNINGFLAGS += -Weffc++
 
 ifeq ($(CXX),clang++)

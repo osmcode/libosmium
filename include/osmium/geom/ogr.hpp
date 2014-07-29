@@ -40,7 +40,10 @@ DEALINGS IN THE SOFTWARE.
 #include <memory>
 #include <utility>
 
-#include <ogr_geometry.h>
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdocumentation-unknown-command"
+# include <ogr_geometry.h>
+#pragma GCC diagnostic pop
 
 #include <osmium/geom/coordinates.hpp>
 #include <osmium/geom/factory.hpp>
@@ -89,7 +92,7 @@ namespace osmium {
                     m_linestring->addPoint(xy.x, xy.y);
                 }
 
-                linestring_type linestring_finish(int /* num_points */) {
+                linestring_type linestring_finish(size_t /* num_points */) {
                     return std::move(m_linestring);
                 }
 

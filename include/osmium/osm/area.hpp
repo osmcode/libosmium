@@ -87,7 +87,7 @@ namespace osmium {
      * @returns Area id
      */
     inline osmium::object_id_type object_id_to_area_id(osmium::object_id_type id, osmium::item_type type) {
-        osmium::unsigned_object_id_type area_id = std::abs(id) * 2;
+        osmium::object_id_type area_id = std::abs(id) * 2;
         if (type == osmium::item_type::relation) {
             ++area_id;
         }

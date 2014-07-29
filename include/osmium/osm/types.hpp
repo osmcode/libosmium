@@ -48,6 +48,7 @@ namespace osmium {
     typedef uint32_t object_version_type;     ///< Type for OSM object version number.
     typedef uint32_t changeset_id_type;       ///< Type for OSM changeset IDs.
     typedef uint32_t user_id_type;            ///< Type for OSM user IDs.
+    typedef int32_t  signed_user_id_type;     ///< Type for signed OSM user IDs.
     typedef uint32_t num_changes_type;        ///< Type for changeset num_changes.
 
     /**
@@ -62,19 +63,19 @@ namespace osmium {
     }
 
     inline object_version_type string_to_object_version(const char* string) {
-        return std::atol(string);
+        return static_cast<object_version_type>(std::atol(string));
     }
 
     inline changeset_id_type string_to_changeset_id(const char* string) {
-        return std::atol(string);
+        return static_cast<changeset_id_type>(std::atol(string));
     }
 
-    inline user_id_type string_to_user_id(const char* string) {
-        return std::atol(string);
+    inline signed_user_id_type string_to_user_id(const char* string) {
+        return static_cast<signed_user_id_type>(std::atol(string));
     }
 
     inline num_changes_type string_to_num_changes(const char* string) {
-        return std::atol(string);
+        return static_cast<num_changes_type>(std::atol(string));
     }
 
 } // namespace osmium

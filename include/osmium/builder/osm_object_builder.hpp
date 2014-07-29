@@ -104,7 +104,9 @@ namespace osmium {
         class RelationMemberListBuilder : public ObjectBuilder<RelationMemberList> {
 
             void add_role(osmium::RelationMember* member, const char* role) {
-                member->set_role_size(std::strlen(role) + 1);
+                size_t length = std::strlen(role) + 1;
+                assert(length < std::numeric_limits<string_size_type>::max());
+                member->set_role_size(static_cast<string_size_type>(length));
                 add_size(append(role));
                 add_padding(true);
             }

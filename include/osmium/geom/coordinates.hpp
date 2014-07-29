@@ -84,13 +84,13 @@ namespace osmium {
                 s += suffix;
             }
 
-        };
+        }; // struct coordinates
 
-        bool operator==(const Coordinates& lhs, const Coordinates& rhs) {
+        inline bool operator==(const Coordinates& lhs, const Coordinates& rhs) {
             return lhs.x == rhs.x && lhs.y == rhs.y;
         }
 
-        bool operator!=(const Coordinates& lhs, const Coordinates& rhs) {
+        inline bool operator!=(const Coordinates& lhs, const Coordinates& rhs) {
             return ! operator==(lhs, rhs);
         }
 

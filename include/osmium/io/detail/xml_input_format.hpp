@@ -74,8 +74,8 @@ namespace osmium {
 
     struct xml_error : public io_error {
 
-        long line;
-        long column;
+        unsigned long line;
+        unsigned long column;
         XML_Error error_code;
         std::string error_string;
 
@@ -103,9 +103,9 @@ namespace osmium {
             version() {
         }
 
-        explicit format_version_error(const char* version) :
-            io_error(std::string("Can not read file with version ") + version),
-            version(version) {
+        explicit format_version_error(const char* v) :
+            io_error(std::string("Can not read file with version ") + v),
+            version(v) {
         }
 
     }; // struct format_version_error

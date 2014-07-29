@@ -144,7 +144,7 @@ namespace osmium {
                         if (error != BZ_OK) {
                             detail::throw_bzip2_error("get unused failed", error);
                         }
-                        std::string unused_data(static_cast<const char*>(unused), nunused);
+                        std::string unused_data(static_cast<const char*>(unused), static_cast<std::string::size_type>(nunused));
                         ::BZ2_bzReadClose(&error, m_bzfile);
                         if (error != BZ_OK) {
                             detail::throw_bzip2_error("read close failed", error);
@@ -157,7 +157,7 @@ namespace osmium {
                         m_stream_end = true;
                     }
                 }
-                buffer.resize(nread);
+                buffer.resize(static_cast<std::string::size_type>(nread));
                 return buffer;
             }
 

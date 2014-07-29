@@ -103,7 +103,7 @@ namespace osmium {
                     throw std::runtime_error("gzip read failed"); // XXX better error detection and reporting
 //                    throw std::system_error(errno, std::system_category(), "Read failed");
                 }
-                buffer.resize(nread);
+                buffer.resize(static_cast<std::string::size_type>(nread));
                 return buffer;
             }
 

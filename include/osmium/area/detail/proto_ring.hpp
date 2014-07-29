@@ -76,7 +76,7 @@ namespace osmium {
                 }
 
                 explicit ProtoRing(segments_type::const_iterator sbegin, segments_type::const_iterator send) :
-                    m_segments(std::distance(sbegin, send)) {
+                    m_segments(static_cast<size_t>(std::distance(sbegin, send))) {
                     std::copy(sbegin, send, m_segments.begin());
                 }
 
@@ -190,9 +190,7 @@ namespace osmium {
                         other.print(std::cerr);
                         std::cerr << "\n";
                     }
-                    size_t n = m_segments.size();
-                    m_segments.resize(n + other.m_segments.size());
-                    std::copy(other.m_segments.begin(), other.m_segments.end(), m_segments.begin() + n);
+                    m_segments.insert(m_segments.end(), other.m_segments.begin(), other.m_segments.end());
                     if (debug) {
                         std::cerr << "          result ring: ";
                         print(std::cerr);
@@ -210,7 +208,7 @@ namespace osmium {
                     }
                     size_t n = m_segments.size();
                     m_segments.resize(n + other.m_segments.size());
-                    std::transform(other.m_segments.rbegin(), other.m_segments.rend(), m_segments.begin() + n, [](NodeRefSegment segment) {
+                    std::transform(other.m_segments.rbegin(), other.m_segments.rend(), m_segments.begin() + static_cast<segments_type::difference_type>(n), [](NodeRefSegment segment) {
                         segment.swap_locations();
                         return segment;
                     });

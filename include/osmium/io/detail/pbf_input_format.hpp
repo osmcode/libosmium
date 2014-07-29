@@ -199,8 +199,8 @@ namespace osmium {
                         if (pbf_way.refs_size() > 0) {
                             osmium::builder::WayNodeListBuilder wnl_builder(m_buffer, &builder);
                             uint64_t ref = 0;
-                            for (int i=0; i < pbf_way.refs_size(); ++i) {
-                                ref += pbf_way.refs(i);
+                            for (int n=0; n < pbf_way.refs_size(); ++n) {
+                                ref += pbf_way.refs(n);
                                 wnl_builder.add_node_ref(ref);
                             }
                         }
@@ -226,9 +226,9 @@ namespace osmium {
                         if (pbf_relation.types_size() > 0) {
                             osmium::builder::RelationMemberListBuilder rml_builder(m_buffer, &builder);
                             uint64_t ref = 0;
-                            for (int i=0; i < pbf_relation.types_size(); ++i) {
-                                ref += pbf_relation.memids(i);
-                                rml_builder.add_member(osmpbf_membertype_to_item_type(pbf_relation.types(i)), ref, m_stringtable->s(pbf_relation.roles_sid(i)).data());
+                            for (int n=0; n < pbf_relation.types_size(); ++n) {
+                                ref += pbf_relation.memids(n);
+                                rml_builder.add_member(osmpbf_membertype_to_item_type(pbf_relation.types(n)), ref, m_stringtable->s(pbf_relation.roles_sid(n)).data());
                             }
                         }
 

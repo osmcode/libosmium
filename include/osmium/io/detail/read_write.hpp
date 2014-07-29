@@ -120,14 +120,14 @@ namespace osmium {
             inline bool reliable_read(const int fd, unsigned char* input_buffer, const size_t size) {
                 size_t offset = 0;
                 while (offset < size) {
-                    ssize_t nread = ::read(fd, input_buffer + offset, size - offset);
-                    if (nread < 0) {
+                    ssize_t length = ::read(fd, input_buffer + offset, size - offset);
+                    if (length < 0) {
                         throw std::system_error(errno, std::system_category(), "Read failed");
                     }
-                    if (nread == 0) {
+                    if (length == 0) {
                         return false;
                     }
-                    offset += nread;
+                    offset += static_cast<size_t>(length);
                 }
                 return true;
             }
@@ -148,7 +148,7 @@ namespace osmium {
                     if (length < 0) {
                         throw std::system_error(errno, std::system_category(), "Write failed");
                     }
-                    offset += length;
+                    offset += static_cast<size_t>(length);
                 } while (offset < size);
             }
 

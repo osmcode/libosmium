@@ -72,11 +72,11 @@ namespace osmium {
          */
         constexpr double MERCATOR_MAX_LAT = 85.0511288;
 
-        Coordinates lonlat_to_mercator(const Coordinates& c) {
+        inline Coordinates lonlat_to_mercator(const Coordinates& c) {
             return Coordinates(detail::lon_to_x(c.x), detail::lat_to_y(c.y));
         }
 
-        Coordinates mercator_to_lonlat(const Coordinates& c) {
+        inline Coordinates mercator_to_lonlat(const Coordinates& c) {
             return Coordinates(detail::x_to_lon(c.x), detail::y_to_lat(c.y));
         }
 

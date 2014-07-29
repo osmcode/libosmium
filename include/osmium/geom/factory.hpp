@@ -181,8 +181,8 @@ namespace osmium {
             /* LineString */
 
             template <class TIter>
-            int fill_linestring(TIter it, TIter end) {
-                int num_points = 0;
+            size_t fill_linestring(TIter it, TIter end) {
+                size_t num_points = 0;
                 for (; it != end; ++it, ++num_points) {
                     m_impl.linestring_add_location(m_projection(it->location()));
                 }
@@ -190,8 +190,8 @@ namespace osmium {
             }
 
             template <class TIter>
-            int fill_linestring_unique(TIter it, TIter end) {
-                int num_points = 0;
+            size_t fill_linestring_unique(TIter it, TIter end) {
+                size_t num_points = 0;
                 osmium::Location last_location;
                 for (; it != end; ++it) {
                     if (last_location != it->location()) {
@@ -205,7 +205,7 @@ namespace osmium {
 
             linestring_type create_linestring(const osmium::WayNodeList& wnl, use_nodes un=use_nodes::unique, direction dir=direction::forward) {
                 m_impl.linestring_start();
-                int num_points = 0;
+                size_t num_points = 0;
 
                 if (un == use_nodes::unique) {
                     osmium::Location last_location;
@@ -242,8 +242,8 @@ namespace osmium {
             /* MultiPolygon */
 
             multipolygon_type create_multipolygon(const osmium::Area& area) {
-                int num_polygons = 0;
-                int num_rings = 0;
+                size_t num_polygons = 0;
+                size_t num_rings = 0;
                 m_impl.multipolygon_start();
 
                 for (auto it = area.cbegin(); it != area.cend(); ++it) {

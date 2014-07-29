@@ -136,7 +136,7 @@ namespace osmium {
 
         /// Get absolute value of the ID of this object.
         unsigned_object_id_type positive_id() const {
-            return std::abs(m_id);
+            return static_cast<unsigned_object_id_type>(std::abs(m_id));
         }
 
         /**
@@ -274,8 +274,8 @@ namespace osmium {
          *
          * @return Reference to object to make calls chainable.
          */
-        OSMObject& uid_from_signed(int32_t uid) {
-            m_uid = uid < 0 ? 0 : uid;
+        OSMObject& uid_from_signed(signed_user_id_type uid) {
+            m_uid = uid < 0 ? 0 : static_cast<user_id_type>(uid);
             return *this;
         }
 

@@ -52,7 +52,7 @@ namespace osmium {
         relation_member_list                   = 0x13,
         relation_member_list_with_full_members = 0x23,
         outer_ring                             = 0x40,
-        inner_ring                             = 0x41,
+        inner_ring                             = 0x41
 
     }; // enum class item_type
 
@@ -85,7 +85,6 @@ namespace osmium {
             default:
                 return item_type::undefined;
         }
-        return item_type::undefined; // to silence the warning
     }
 
     inline char item_type_to_char(const item_type type) {
@@ -115,7 +114,6 @@ namespace osmium {
             case item_type::inner_ring:
                 return 'I';
         }
-        return 'X'; // to silence the warning
     }
 
     inline const char* item_type_to_name(const item_type type) {
@@ -145,7 +143,6 @@ namespace osmium {
             case item_type::inner_ring:
                 return "inner_ring";
         }
-        return "undefined"; // to silence the warning
     }
 
     template <typename TChar, typename TTraits>

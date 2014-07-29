@@ -47,10 +47,16 @@ namespace osmium {
 
     namespace memory {
 
+        typedef uint32_t item_size_type;
+
         // align datastructures to this many bytes
-        constexpr size_t align_bytes = 8;
+        constexpr item_size_type align_bytes = 8;
 
         inline size_t padded_length(size_t length) {
+            return (length + align_bytes - 1) & ~(align_bytes - 1);
+        }
+
+        inline item_size_type padded_length(item_size_type length) {
             return (length + align_bytes - 1) & ~(align_bytes - 1);
         }
 
@@ -91,13 +97,12 @@ namespace osmium {
 
         } // namespace detail
 
-        typedef uint32_t item_size_type;
-
         class Item : public osmium::memory::detail::ItemHelper {
 
             item_size_type m_size;
             item_type m_type;
             bool m_removed : 1;
+            int m_padding : 15;
 
             template <class TMember>
             friend class CollectionIterator;

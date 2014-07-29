@@ -58,13 +58,13 @@ namespace osmium {
         namespace detail {
 
             template <typename T>
-            void str_push(std::string& str, T data) {
+            inline void str_push(std::string& str, T data) {
                 size_t size = str.size();
                 str.resize(size + sizeof(T));
                 std::memcpy(const_cast<char *>(&str[size]), reinterpret_cast<char*>(&data), sizeof(T));
             }
 
-            std::string convert_to_hex(std::string& str) {
+            inline std::string convert_to_hex(std::string& str) {
                 static const char* lookup_hex = "0123456789ABCDEF";
                 std::string out;
 
@@ -115,8 +115,8 @@ namespace osmium {
                 out_type m_out_type;
 
                 size_t m_linestring_size_offset = 0;
-                int m_polygons = 0;
-                int m_rings = 0;
+                size_t m_polygons = 0;
+                size_t m_rings = 0;
                 size_t m_multipolygon_size_offset = 0;
                 size_t m_polygon_size_offset = 0;
                 size_t m_ring_size_offset = 0;
@@ -180,7 +180,7 @@ namespace osmium {
                     str_push(m_data, xy.y);
                 }
 
-                linestring_type linestring_finish(int num_points) {
+                linestring_type linestring_finish(size_t num_points) {
                     set_size(m_linestring_size_offset, num_points);
                     std::string data;
                     std::swap(data, m_data);

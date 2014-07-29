@@ -82,7 +82,7 @@ namespace osmium {
                     m_str += ',';
                 }
 
-                linestring_type linestring_finish(int /* num_points */) {
+                linestring_type linestring_finish(size_t /* num_points */) {
                     assert(!m_str.empty());
                     std::string str;
                     std::swap(str, m_str);

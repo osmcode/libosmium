@@ -60,7 +60,6 @@ namespace osmium {
                 case file_format::json:
                     return "JSON";
             }
-            return "";
         }
 
         template <typename TChar, typename TTraits>

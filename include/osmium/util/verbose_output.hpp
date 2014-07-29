@@ -75,7 +75,7 @@ namespace osmium {
              */
             void start_line() {
                 if (m_newline) {
-                    int elapsed = runtime();
+                    time_t elapsed = runtime();
 
                     char old_fill = std::cerr.fill();
                     std::cerr << '[' << std::setw(2) << (elapsed / 60) << ':' << std::setw(2) << std::setfill('0') << (elapsed % 60) << "] ";
@@ -100,7 +100,7 @@ namespace osmium {
             VerboseOutput(VerboseOutput&&) = default;
             VerboseOutput& operator=(VerboseOutput&&) = default;
 
-            int runtime() const noexcept {
+            time_t runtime() const noexcept {
                 return time(NULL) - m_start;
             }
 

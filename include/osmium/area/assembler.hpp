@@ -70,8 +70,6 @@ namespace osmium {
                 debug(d) {
             }
 
-            ~AssemblerConfig() = default;
-
             /**
              * Enable or disable debug output to stderr. This is for Osmium
              * developers only.
@@ -162,7 +160,7 @@ namespace osmium {
                 osmium::tags::KeyFilter::iterator fi_begin(filter, relation.tags().begin(), relation.tags().end());
                 osmium::tags::KeyFilter::iterator fi_end(filter, relation.tags().end(), relation.tags().end());
 
-                size_t count = std::distance(fi_begin, fi_end);
+                auto count = std::distance(fi_begin, fi_end);
 
                 if (debug()) {
                     std::cerr << "  found " << count << " tags on relation (without ignored ones)\n";

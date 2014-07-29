@@ -117,7 +117,7 @@ namespace osmium {
         }
 
         unsigned_object_id_type positive_ref() const {
-            return std::abs(m_ref);
+            return static_cast<unsigned_object_id_type>(std::abs(m_ref));
         }
 
         item_type type() const {
@@ -146,12 +146,14 @@ namespace osmium {
 
     public:
 
+        typedef size_t size_type;
+
         RelationMemberList() :
             osmium::memory::Collection<RelationMember, osmium::item_type::relation_member_list>() {
         }
 
-        size_t size() const noexcept {
-            return std::distance(begin(), end());
+        size_type size() const noexcept {
+            return static_cast<size_type>(std::distance(begin(), end()));
         }
 
     }; // class RelationMemberList

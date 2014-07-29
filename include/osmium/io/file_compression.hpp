@@ -54,7 +54,6 @@ namespace osmium {
                 case file_compression::bzip2:
                     return "bzip2";
             }
-            return "";
         }
 
         template <typename TChar, typename TTraits>

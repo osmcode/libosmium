@@ -155,8 +155,8 @@ namespace osmium {
          *
          * @return Reference to changeset to make calls chainable.
          */
-        Changeset& uid_from_signed(int32_t uid) noexcept {
-            m_uid = uid < 0 ? 0 : uid;
+        Changeset& uid_from_signed(signed_user_id_type uid) noexcept {
+            m_uid = uid < 0 ? 0 : static_cast<user_id_type>(uid);
             return *this;
         }
 
