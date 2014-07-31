@@ -19,9 +19,9 @@ INCLUDE_FILES := $(shell find include/osmium -name \*.hpp | sort)
 IWYU_REPORT_FILES := $(subst include/osmium,check_reports,$(INCLUDE_FILES:.hpp=.iwyu))
 INCLUDES_REPORT_FILES := $(subst include/osmium,check_reports,$(INCLUDE_FILES:.hpp=.compile))
 
-WARNINGFLAGS := -Wall -Wextra -pedantic -Wredundant-decls -Wdisabled-optimization -Wctor-dtor-privacy -Wnon-virtual-dtor -Woverloaded-virtual -Wsign-promo -Winline -Wold-style-cast
-#WARNINGFLAGS += -Weverything -Wno-c++98-compat -Wno-unused-macros -Wno-exit-time-destructors
-#WARNINGFLAGS += -Weffc++
+WARNINGFLAGS := -Wall -Wextra -pedantic -Wredundant-decls -Wdisabled-optimization -Wctor-dtor-privacy -Wnon-virtual-dtor -Woverloaded-virtual -Wsign-promo -Winline -Wold-style-cast -Wmissing-prototypes -Wunused-exception-parameter
+#WARNINGFLAGS += -Weverything -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-unused-macros -Wno-exit-time-destructors -Wno-global-constructors
+#WARNINGFLAGS += -Wno-shorten-64-to-32 -Wno-float-equal -Wno-padded -Wno-switch-enum
 
 ifeq ($(CXX),clang++)
     WARNINGFLAGS += -Wdocumentation
