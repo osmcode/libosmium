@@ -16,6 +16,11 @@ void check_filter(const osmium::TagList& tag_list, const TFilter filter, const s
     for (auto it = reference.begin(); it != reference.end(); ++t_it, ++it) {
         REQUIRE(filter(*t_it) == *it);
     }
+
+    typename TFilter::iterator fi_begin(filter, tag_list.begin(), tag_list.end());
+    typename TFilter::iterator fi_end(filter, tag_list.end(), tag_list.end());
+
+    REQUIRE(std::distance(fi_begin, fi_end) == std::count(reference.begin(), reference.end(), true));
 }
 
 TEST_CASE("Filter") {
