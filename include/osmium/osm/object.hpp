@@ -325,6 +325,16 @@ namespace osmium {
         }
 
         /**
+         * Get tag value by key.
+         *
+         * Convenience function that will forward to same function on TagList
+         * object.
+         */
+        const char* get_value_by_key(const char* key, const char* default_value = nullptr) const noexcept {
+            return tags().get_value_by_key(key, default_value);
+        }
+
+        /**
          * Set named attribute.
          *
          * @param attr Name of the attribute (must be one of "id", "version", "changeset", "timestamp", "uid", "visible")

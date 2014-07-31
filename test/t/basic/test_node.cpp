@@ -103,9 +103,11 @@ SECTION("tags") {
 
     REQUIRE(nullptr == node.tags().get_value_by_key("fail"));
     REQUIRE(std::string("pub") == node.tags().get_value_by_key("amenity"));
+    REQUIRE(std::string("pub") == node.get_value_by_key("amenity"));
 
     REQUIRE(std::string("default") == node.tags().get_value_by_key("fail", "default"));
     REQUIRE(std::string("pub") == node.tags().get_value_by_key("amenity", "default"));
+    REQUIRE(std::string("pub") == node.get_value_by_key("amenity", "default"));
 }
 
 
