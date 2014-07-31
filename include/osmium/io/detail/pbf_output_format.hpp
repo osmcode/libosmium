@@ -350,7 +350,7 @@ namespace osmium {
                     // test, if the node-block has been allocated
                     if (pbf_nodes) {
                         // iterate over all nodes, passing them to the map_common_string_ids function
-                        for (int i=0, l=pbf_nodes->nodes_size(); i<l; i++) {
+                        for (int i=0, l=pbf_nodes->nodes_size(); i<l; ++i) {
                             map_common_string_ids(pbf_nodes->mutable_nodes(i));
                         }
 
@@ -362,11 +362,13 @@ namespace osmium {
                             // in the densenodes structure keys and vals are encoded in an intermixed
                             // array, individual nodes are seperated by a value of 0 (0 in the StringTable
                             // is always unused). String-ids of 0 are thus kept alone.
-                            for (int i=0, l=dense->keys_vals_size(); i<l; i++) {
+                            for (int i=0, l=dense->keys_vals_size(); i<l; ++i) {
                                 // map interim string-ids > 0 to real string ids
-                                uint16_t sid = dense->keys_vals(i);
+                                auto sid = dense->keys_vals(i);
+                                assert(sid >= 0);
+                                assert(sid < std::numeric_limits<osmium::io::detail::StringTable::string_id_type>::max());
                                 if (sid > 0) {
-                                    dense->set_keys_vals(i, string_table.map_string_id(sid));
+                                    dense->set_keys_vals(i, string_table.map_string_id(static_cast<osmium::io::detail::StringTable::string_id_type>(sid)));
                                 }
                             }
 
@@ -376,9 +378,11 @@ namespace osmium {
                                 OSMPBF::DenseInfo* denseinfo = dense->mutable_denseinfo();
 
                                 // iterate over all username string-ids
-                                for (int i=0, l= denseinfo->user_sid_size(); i<l; i++) {
+                                for (int i=0, l=denseinfo->user_sid_size(); i<l; ++i) {
                                     // map interim string-ids > 0 to real string ids
-                                    uint16_t user_sid = string_table.map_string_id(denseinfo->user_sid(i));
+                                    auto usid = denseinfo->user_sid(i);
+                                    assert(usid < std::numeric_limits<osmium::io::detail::StringTable::string_id_type>::max());
+                                    auto user_sid = string_table.map_string_id(static_cast<osmium::io::detail::StringTable::string_id_type>(usid));
 
                                     // delta encode the string-id
                                     denseinfo->set_user_sid(i, m_delta_user_sid.update(user_sid));
@@ -390,7 +394,7 @@ namespace osmium {
                     // test, if the ways-block has been allocated
                     if (pbf_ways) {
                         // iterate over all ways, passing them to the map_common_string_ids function
-                        for (int i=0, l=pbf_ways->ways_size(); i<l; i++) {
+                        for (int i=0, l=pbf_ways->ways_size(); i<l; ++i) {
                             map_common_string_ids(pbf_ways->mutable_ways(i));
                         }
                     }
@@ -398,7 +402,7 @@ namespace osmium {
                     // test, if the relations-block has been allocated
                     if (pbf_relations) {
                         // iterate over all relations
-                        for (int i=0, l=pbf_relations->relations_size(); i<l; i++) {
+                        for (int i=0, l=pbf_relations->relations_size(); i<l; ++i) {
                             // get a pointer to the relation
                             OSMPBF::Relation* relation = pbf_relations->mutable_relations(i);
 
@@ -407,7 +411,7 @@ namespace osmium {
 
                             // iterate over all relation members, mapping the interim string-ids
                             // of the role to real string ids
-                            for (int mi=0, ml=relation->roles_sid_size(); mi<ml; mi++) {
+                            for (int mi=0, ml=relation->roles_sid_size(); mi<ml; ++mi) {
                                 relation->set_roles_sid(mi, string_table.map_string_id(relation->roles_sid(mi)));
                             }
                         }
@@ -430,7 +434,7 @@ namespace osmium {
                     }
 
                     // iterate over all tags and map the interim-ids of the key and the value to real ids
-                    for (int i=0, l=in->keys_size(); i<l; i++) {
+                    for (int i=0, l=in->keys_size(); i<l; ++i) {
                         in->set_keys(i, string_table.map_string_id(in->keys(i)));
                         in->set_vals(i, string_table.map_string_id(in->vals(i)));
                     }
@@ -477,10 +481,10 @@ namespace osmium {
                         if (m_add_visible) {
                             out_info->set_visible(in.visible());
                         }
-                        out_info->set_version(in.version());
+                        out_info->set_version(static_cast<::google::protobuf::int32>(in.version()));
                         out_info->set_timestamp(timestamp2int(in.timestamp()));
                         out_info->set_changeset(in.changeset());
-                        out_info->set_uid(in.uid());
+                        out_info->set_uid(static_cast<::google::protobuf::int32>(in.uid()));
                         out_info->set_user_sid(string_table.record_string(in.user()));
                     }
                 }
@@ -575,7 +579,7 @@ namespace osmium {
                         store_primitive_block();
                     }
 
-                    primitive_block_contents++;
+                    ++primitive_block_contents;
                 }
 
 
@@ -633,7 +637,7 @@ namespace osmium {
                         // add a DenseInfo-Section to the PrimitiveGroup
                         OSMPBF::DenseInfo* denseinfo = dense->mutable_denseinfo();
 
-                        denseinfo->add_version(node.version());
+                        denseinfo->add_version(static_cast<::google::protobuf::int32>(node.version()));
 
                         if (m_add_visible) {
                             denseinfo->add_visible(node.visible());
@@ -814,10 +818,10 @@ namespace osmium {
                     if (!header.boxes().empty()) {
                         OSMPBF::HeaderBBox* pbf_bbox = pbf_header_block.mutable_bbox();
                         osmium::Box box = header.joined_boxes();
-                        pbf_bbox->set_left(box.bottom_left().lon() * OSMPBF::lonlat_resolution);
-                        pbf_bbox->set_bottom(box.bottom_left().lat() * OSMPBF::lonlat_resolution);
-                        pbf_bbox->set_right(box.top_right().lon() * OSMPBF::lonlat_resolution);
-                        pbf_bbox->set_top(box.top_right().lat() * OSMPBF::lonlat_resolution);
+                        pbf_bbox->set_left(static_cast<::google::protobuf::int64>(box.bottom_left().lon() * OSMPBF::lonlat_resolution));
+                        pbf_bbox->set_bottom(static_cast<::google::protobuf::int64>(box.bottom_left().lat() * OSMPBF::lonlat_resolution));
+                        pbf_bbox->set_right(static_cast<::google::protobuf::int64>(box.top_right().lon() * OSMPBF::lonlat_resolution));
+                        pbf_bbox->set_top(static_cast<::google::protobuf::int64>(box.top_right().lat() * OSMPBF::lonlat_resolution));
                     }
 
                     std::string osmosis_replication_timestamp = header.get("osmosis_replication_timestamp");
