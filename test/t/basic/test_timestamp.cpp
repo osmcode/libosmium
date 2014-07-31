@@ -6,31 +6,36 @@
 
 TEST_CASE("Timestamp") {
 
-SECTION("can_be_default_initialized") {
+SECTION("can be default initialized to invalid value") {
     osmium::Timestamp t;
     REQUIRE(0 == t);
     REQUIRE("" == t.to_iso());
 }
 
-SECTION("invalid_value") {
+SECTION("invalid value is zero") {
     osmium::Timestamp t(static_cast<time_t>(0));
     REQUIRE(0 == t);
     REQUIRE("" == t.to_iso());
 }
 
-SECTION("can_be_initialized_from_time_t") {
+SECTION("can be initialized from time_t") {
     osmium::Timestamp t(static_cast<time_t>(1));
     REQUIRE(1 == t);
     REQUIRE("1970-01-01T00:00:01Z" == t.to_iso());
 }
 
-SECTION("can_be_compared") {
+SECTION("can be initialized from string") {
+    osmium::Timestamp t("2000-01-01T00:00:00Z");
+    REQUIRE("2000-01-01T00:00:00Z" == t.to_iso());
+}
+
+SECTION("can be compared") {
     osmium::Timestamp t1(10);
     osmium::Timestamp t2(50);
     REQUIRE(t1 < t2);
 }
 
-SECTION("can_be_written_to_stream") {
+SECTION("can be written to stream") {
     std::stringstream ss;
     osmium::Timestamp t(1);
     ss << t;
