@@ -84,7 +84,10 @@ namespace osmium {
     public:
 
         /// this value is used for a coordinate to mark it as undefined
-        static constexpr int32_t undefined_coordinate = std::numeric_limits<int32_t>::max();
+        // MSVC doesn't declare std::numeric_limits<int32_t>::max() as
+        // constexpr, so we hard code this for the time being.
+        // static constexpr int32_t undefined_coordinate = std::numeric_limits<int32_t>::max();
+        static constexpr int32_t undefined_coordinate = 2147483647;
 
         static constexpr int coordinate_precision = 10000000;
 
