@@ -110,7 +110,7 @@ namespace osmium {
 
             typedef std::map<const osmium::io::file_compression, std::pair<create_compressor_type, create_decompressor_type>> compression_map_type;
 
-            compression_map_type m_callbacks {};
+            compression_map_type m_callbacks;
 
             CompressionFactory() = default;
 
@@ -120,7 +120,10 @@ namespace osmium {
             CompressionFactory(CompressionFactory&&) = delete;
             CompressionFactory& operator=(CompressionFactory&&) = delete;
 
-            [[noreturn]] void error(osmium::io::file_compression compression) {
+#ifndef _MSC_VER
+            [[noreturn]]
+#endif
+            void error(osmium::io::file_compression compression) {
                 std::string error_message {"Support for compression '"};
                 error_message += as_string(compression);
                 error_message += "' not compiled into this binary.";

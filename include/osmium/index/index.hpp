@@ -63,7 +63,10 @@ namespace osmium {
     namespace index {
 
         template <typename TKey>
-        [[noreturn]] void not_found_error(TKey key) {
+#ifndef _MSC_VER
+        [[noreturn]]
+#endif
+        void not_found_error(TKey key) {
             std::stringstream s;
             s << "id " << key << " no found";
             throw not_found(s.str());

@@ -53,7 +53,10 @@ namespace osmium {
 
         namespace detail {
 
-            [[noreturn]] inline void throw_bzip2_error(const std::string& msg, int error) {
+#ifndef _MSC_VER
+            [[noreturn]]
+#endif
+            inline void throw_bzip2_error(const std::string& msg, int error) {
                 throw std::runtime_error("bzip2 error: " + msg + ": " + std::to_string(error));
             }
 
