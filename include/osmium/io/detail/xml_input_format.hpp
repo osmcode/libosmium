@@ -200,7 +200,7 @@ namespace osmium {
                     m_done(done) {
                 }
 
-                void operator()() {
+                bool operator()() {
                     XML_Parser parser = XML_ParserCreate(nullptr);
                     if (!parser) {
                         throw osmium::io_error("Internal error: Can not create parser");
@@ -240,6 +240,7 @@ namespace osmium {
                         // intentionally left blank
                     }
                     XML_ParserFree(parser);
+                    return true;
                 }
 
             private:

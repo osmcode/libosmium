@@ -67,7 +67,7 @@ namespace osmium {
                     m_done(done) {
                 }
 
-                void operator()() {
+                bool operator()() {
                     osmium::thread::set_thread_name("_osmium_input");
 
                     try {
@@ -91,6 +91,7 @@ namespace osmium {
                         m_queue.push(std::string());
                         throw;
                     }
+                    return true;
                 }
 
             }; // class ReadThread

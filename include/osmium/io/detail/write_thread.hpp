@@ -60,7 +60,7 @@ namespace osmium {
                     m_compressor(compressor) {
                 }
 
-                void operator()() {
+                bool operator()() {
                     osmium::thread::set_thread_name("_osmium_output");
 
                     std::future<std::string> data_future;
@@ -72,6 +72,7 @@ namespace osmium {
                     } while (!data.empty());
 
                     m_compressor->close();
+                    return true;
                 }
 
             }; // class WriteThread
