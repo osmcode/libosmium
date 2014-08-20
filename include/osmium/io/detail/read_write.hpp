@@ -40,7 +40,12 @@ DEALINGS IN THE SOFTWARE.
 //#include <sys/stat.h>
 //#include <sys/types.h>
 #include <system_error>
+#ifndef _MSC_VER
 #include <unistd.h>
+#else
+#include <io.h>
+typedef int ssize_t;
+#endif
 
 #include <osmium/io/overwrite.hpp>
 

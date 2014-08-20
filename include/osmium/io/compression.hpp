@@ -40,7 +40,11 @@ DEALINGS IN THE SOFTWARE.
 #include <stdexcept>
 #include <string>
 #include <system_error>
+#ifndef _MSC_VER
 #include <unistd.h>
+#else
+#include <io.h>
+#endif
 #include <utility>
 
 #include <osmium/io/detail/read_write.hpp>

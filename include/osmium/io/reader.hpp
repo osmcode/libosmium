@@ -39,10 +39,15 @@ DEALINGS IN THE SOFTWARE.
 #include <fcntl.h>
 #include <memory>
 #include <string>
-#include <sys/wait.h>
 #include <system_error>
 #include <thread>
+#ifndef _WIN32
+#include <sys/wait.h>
+#endif
+#ifndef _MSC_VER
 #include <unistd.h>
+#else
+#endif
 #include <utility>
 
 #include <osmium/io/compression.hpp>
