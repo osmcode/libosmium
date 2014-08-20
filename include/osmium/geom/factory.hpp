@@ -129,8 +129,6 @@ namespace osmium {
 
         public:
 
-            GeometryFactory<TGeomImpl, TProjection>() = default;
-
             /**
              * Constructor for default initialized projection.
              */
