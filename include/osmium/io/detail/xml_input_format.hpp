@@ -279,8 +279,8 @@ namespace osmium {
                     const char* user = empty;
                     osmium::Changeset& new_changeset = builder->object();
 
-                    osmium::Location min {};
-                    osmium::Location max {};
+                    osmium::Location min;
+                    osmium::Location max;
                     for (int count = 0; attrs[count]; count += 2) {
                         if (!strcmp(attrs[count], "min_lon")) {
                             min.lon(atof(attrs[count+1]));

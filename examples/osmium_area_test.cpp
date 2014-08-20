@@ -28,7 +28,7 @@ typedef osmium::handler::NodeLocationsForWays<index_pos_type, index_neg_type> lo
 
 class WKTDump : public osmium::handler::Handler {
 
-    osmium::geom::WKTFactory<> m_factory {};
+    osmium::geom::WKTFactory<> m_factory ;
 
     std::ostream& m_out;
 

@@ -45,8 +45,8 @@ namespace osmium {
         template <class T>
         class CheckedTask {
 
-            std::thread m_thread {};
-            std::future<void> m_future {};
+            std::thread m_thread;
+            std::future<void> m_future;
 
         public:
 

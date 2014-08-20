@@ -66,7 +66,7 @@ namespace osmium {
                 bool m_outer {true};
 
                 // if this is an outer ring, these point to it's inner rings (if any)
-                std::vector<ProtoRing*> m_inner {};
+                std::vector<ProtoRing*> m_inner;
 
             public:
 

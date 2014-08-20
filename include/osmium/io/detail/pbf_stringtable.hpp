@@ -95,14 +95,14 @@ namespace osmium {
                  * the StringTable once the block is written to disk.
                  */
                 typedef std::map<std::string, string_info> string2string_info_type;
-                string2string_info_type m_strings {};
+                string2string_info_type m_strings;
 
                 /**
                  * This vector is used to map the interim IDs to real StringTable IDs after
                  * writing all strings to the StringTable.
                  */
                 typedef std::vector<string_id_type> interim_id2id_type;
-                interim_id2id_type m_id2id_map {};
+                interim_id2id_type m_id2id_map;
 
                 size_t m_size = 0;
 

@@ -59,7 +59,7 @@ namespace osmium {
             typedef typename osmium::memory::Buffer::t_iterator<TItem> item_iterator;
 
             TSource* m_source;
-            std::shared_ptr<osmium::memory::Buffer> m_buffer {};
+            std::shared_ptr<osmium::memory::Buffer> m_buffer;
             item_iterator m_iter {};
 
             void update_buffer() {

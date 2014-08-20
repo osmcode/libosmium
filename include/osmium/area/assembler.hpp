@@ -93,10 +93,10 @@ namespace osmium {
             osmium::area::detail::SegmentList m_segment_list;
 
             // The rings we are building from the way segments
-            std::list<ProtoRing> m_rings {};
+            std::list<ProtoRing> m_rings;
 
-            std::vector<ProtoRing*> m_outer_rings {};
-            std::vector<ProtoRing*> m_inner_rings {};
+            std::vector<ProtoRing*> m_outer_rings;
+            std::vector<ProtoRing*> m_inner_rings;
 
             int m_inner_outer_mismatches { 0 };
 

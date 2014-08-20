@@ -48,7 +48,7 @@ namespace osmium {
 
             class GeoJSONFactoryImpl {
 
-                std::string m_str {};
+                std::string m_str;
 
             public:
 

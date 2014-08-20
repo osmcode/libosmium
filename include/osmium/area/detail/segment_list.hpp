@@ -58,7 +58,7 @@ namespace osmium {
 
                 typedef std::vector<NodeRefSegment> slist_type;
 
-                slist_type m_segments {};
+                slist_type m_segments;
 
                 bool m_debug;
 

@@ -340,7 +340,7 @@ namespace osmium {
             class InputQueueReader {
 
                 osmium::thread::Queue<std::string>& m_queue;
-                std::string m_buffer {};
+                std::string m_buffer;
 
             public:
 

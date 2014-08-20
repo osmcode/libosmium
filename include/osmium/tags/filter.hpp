@@ -101,7 +101,7 @@ namespace osmium {
 
             };
 
-            std::vector<Rule> m_rules {};
+            std::vector<Rule> m_rules;
             bool m_default_result;
 
         public:

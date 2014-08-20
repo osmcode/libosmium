@@ -54,7 +54,7 @@ namespace osmium {
 
         const TBasicIterator m_end;
 
-        mutable osmium::DiffObject m_diff {};
+        mutable osmium::DiffObject m_diff;
 
         void set_diff() const {
             assert(m_curr != m_end);

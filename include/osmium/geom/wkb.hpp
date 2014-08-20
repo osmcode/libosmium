@@ -109,7 +109,7 @@ namespace osmium {
                     NDR = 1          // Little Endian
                 };
 
-                std::string m_data {};
+                std::string m_data;
                 uint32_t m_points {0};
                 wkb_type m_wkb_type;
                 out_type m_out_type;

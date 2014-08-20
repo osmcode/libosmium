@@ -101,7 +101,7 @@ namespace osmium {
             size_t m_written;
             size_t m_committed;
             auto_grow m_auto_grow {auto_grow::no};
-            std::function<void(Buffer&)> m_full {};
+            std::function<void(Buffer&)> m_full;
 
         public:
 

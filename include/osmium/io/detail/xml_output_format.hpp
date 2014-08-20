@@ -112,7 +112,7 @@ namespace osmium {
 
                 osmium::memory::Buffer m_input_buffer;
 
-                std::string m_out {};
+                std::string m_out;
 
                 operation m_last_op {operation::op_none};
 

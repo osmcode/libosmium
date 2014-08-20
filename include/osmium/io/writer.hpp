@@ -62,7 +62,7 @@ namespace osmium {
             osmium::io::File m_file;
 
             std::unique_ptr<osmium::io::detail::OutputFormat> m_output;
-            osmium::io::detail::data_queue_type m_output_queue {};
+            osmium::io::detail::data_queue_type m_output_queue;
 
             std::unique_ptr<osmium::io::Compressor> m_compressor;
 
