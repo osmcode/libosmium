@@ -46,8 +46,11 @@ namespace osmium {
             template <typename TId, typename TValue>
             using DenseMapMem = VectorBasedDenseMap<std::vector<TValue>, TId, TValue>;
 
+            template <typename T>
+            using StdVectorWrap = std::vector<T>;
+
             template <typename TId, typename TValue>
-            using SparseMapMem = VectorBasedSparseMap<TId, TValue, std::vector>;
+            using SparseMapMem = VectorBasedSparseMap<TId, TValue, StdVectorWrap>;
 
         } // namespace map
 

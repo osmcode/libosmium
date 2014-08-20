@@ -43,8 +43,11 @@ namespace osmium {
 
         namespace multimap {
 
+            template <typename T>
+            using StdVectorWrap = std::vector<T>;
+
             template <typename TId, typename TValue>
-            using SparseMultimapMem = VectorBasedSparseMultimap<TId, TValue, std::vector>;
+            using SparseMultimapMem = VectorBasedSparseMultimap<TId, TValue, StdVectorWrap>;
 
         } // namespace multimap
 
