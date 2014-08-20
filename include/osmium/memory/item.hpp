@@ -101,8 +101,8 @@ namespace osmium {
 
             item_size_type m_size;
             item_type m_type;
-            bool m_removed : 1;
-            int m_padding : 15;
+            uint16_t m_removed : 1;
+            uint16_t m_padding : 15;
 
             template <class TMember>
             friend class CollectionIterator;
