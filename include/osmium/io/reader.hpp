@@ -86,6 +86,7 @@ namespace osmium {
 
             std::unique_ptr<osmium::io::detail::InputFormat> m_input;
 
+#ifndef _WIN32
             /**
              * Fork and execute the given command in the child.
              * A pipe is created between the child and the parent.
@@ -132,6 +133,7 @@ namespace osmium {
                 ::close(pipefd[1]);
                 return pipefd[0];
             }
+#endif
 
             /**
              * Open File for reading. Handles URLs or normal files. URLs
@@ -144,7 +146,11 @@ namespace osmium {
             static int open_input_file_or_url(const std::string& filename, int* childpid) {
                 std::string protocol = filename.substr(0, filename.find_first_of(':'));
                 if (protocol == "http" || protocol == "https" || protocol == "ftp" || protocol == "file") {
+#ifndef _WIN32
                     return execute("curl", filename, childpid);
+#else
+                    throw std::runtime_error("Reading OSM files from the network currently not supported on Windows.");
+#endif
                 } else {
                     return osmium::io::detail::open_for_reading(filename);
                 }
@@ -201,6 +207,7 @@ namespace osmium {
 
                 m_input->close();
 
+#ifndef _WIN32
                 if (m_childpid) {
                     int status;
                     pid_t pid = ::waitpid(m_childpid, &status, 0);
@@ -212,6 +219,7 @@ namespace osmium {
 #pragma GCC diagnostic pop
                     m_childpid = 0;
                 }
+#endif
 
                 m_read_task.close();
             }
