@@ -72,6 +72,10 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/thread/pool.hpp>
 #include <osmium/visitor.hpp>
 
+#ifdef _MSC_VER
+#define snprintf _snprintf
+#endif
+
 namespace osmium {
 
     namespace io {
