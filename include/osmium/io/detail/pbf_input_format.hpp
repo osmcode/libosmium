@@ -496,7 +496,7 @@ namespace osmium {
 
             public:
 
-                friend class BlobParser;
+                friend class BlobParser<HeaderBlobParser>;
 
                 HeaderBlobParser(const int size, InputQueueReader& input_queue_reader, osmium::io::Header& header) :
                     BlobParser(size, 0, input_queue_reader),
@@ -516,7 +516,7 @@ namespace osmium {
 
             public:
 
-                friend class BlobParser;
+                friend class BlobParser<DataBlobParser>;
 
                 DataBlobParser(const int size, const int blob_num, InputQueueReader& input_queue_reader, osmium::osm_entity_bits::type read_types) :
                     BlobParser(size, blob_num, input_queue_reader),
