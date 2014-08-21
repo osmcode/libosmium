@@ -62,7 +62,7 @@ namespace osmium {
 
         osmium::Timestamp m_created_at;
         osmium::Timestamp m_closed_at;
-        osmium::Box       m_bounds ;
+        osmium::Box       m_bounds;
         changeset_id_type m_id {0};
         num_changes_type  m_num_changes {0};
         user_id_type      m_uid {0};
