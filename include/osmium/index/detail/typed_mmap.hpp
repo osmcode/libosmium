@@ -38,9 +38,19 @@ DEALINGS IN THE SOFTWARE.
 #include <stdexcept>
 #include <system_error>
 
-#include <sys/mman.h>
+#ifndef WIN32
+# include <sys/mman.h>
+#else
+# include <mmap_for_windows.hpp>
+#endif
+
 #include <sys/stat.h>
-#include <unistd.h>
+
+#ifdef _MSC_VER
+# define ftruncate _chsize
+#else
+# include <unistd.h>
+#endif
 
 // for bsd systems
 #ifndef MAP_ANONYMOUS
