@@ -41,6 +41,8 @@ DEALINGS IN THE SOFTWARE.
 #include <string>
 #include <time.h>
 
+#include <osmium/config/constexpr.hpp>
+
 namespace osmium {
 
     /**
@@ -138,11 +140,11 @@ namespace osmium {
 
     }; // class Timestamp
 
-    inline constexpr Timestamp start_of_time() {
+    inline OSMIUM_CONSTEXPR Timestamp start_of_time() {
         return Timestamp(1);
     }
 
-    inline constexpr Timestamp end_of_time() {
+    inline OSMIUM_CONSTEXPR Timestamp end_of_time() {
         return Timestamp(std::numeric_limits<time_t>::max());
     }
 

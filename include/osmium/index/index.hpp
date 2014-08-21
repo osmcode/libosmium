@@ -39,6 +39,8 @@ DEALINGS IN THE SOFTWARE.
 #include <stdexcept>
 #include <string>
 
+#include <osmium/config/constexpr.hpp>
+
 namespace osmium {
 
     /**
@@ -90,7 +92,7 @@ namespace osmium {
          * the full range, so the max value is a good "empty" value.
          */
         template <>
-        inline constexpr size_t empty_value<size_t>() {
+        inline OSMIUM_CONSTEXPR size_t empty_value<size_t>() {
             return std::numeric_limits<size_t>::max();
         }
 

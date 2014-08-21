@@ -42,6 +42,7 @@ DEALINGS IN THE SOFTWARE.
 #include <stdexcept>
 #include <string>
 
+#include <osmium/config/constexpr.hpp>
 #include <osmium/util/operators.hpp>
 
 namespace osmium {
@@ -95,7 +96,7 @@ namespace osmium {
             return static_cast<int32_t>(std::round(c * coordinate_precision));
         }
 
-        static constexpr double fix_to_double(const int32_t c) noexcept {
+        static OSMIUM_CONSTEXPR double fix_to_double(const int32_t c) noexcept {
             return static_cast<double>(c) / coordinate_precision;
         }
 
@@ -256,7 +257,7 @@ namespace osmium {
     /**
      * Locations are equal if both coordinates are equal.
      */
-    inline constexpr bool operator==(const Location& lhs, const Location& rhs) noexcept {
+    inline OSMIUM_CONSTEXPR bool operator==(const Location& lhs, const Location& rhs) noexcept {
         return lhs.x() == rhs.x() && lhs.y() == rhs.y();
     }
 
@@ -265,7 +266,7 @@ namespace osmium {
      * the y coordinate. If either of the locations is
      * undefined the result is undefined.
      */
-    inline constexpr bool operator<(const Location& lhs, const Location& rhs) noexcept {
+    inline OSMIUM_CONSTEXPR bool operator<(const Location& lhs, const Location& rhs) noexcept {
         return (lhs.x() == rhs.x() && lhs.y() < rhs.y()) || lhs.x() < rhs.x();
     }
 

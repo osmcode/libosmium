@@ -35,6 +35,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <iosfwd>
 
+#include <osmium/config/constexpr.hpp>
 #include <osmium/osm/location.hpp>
 
 namespace osmium {
@@ -129,7 +130,7 @@ namespace osmium {
         /**
          * Bottom-left location.
          */
-        constexpr Location bottom_left() const noexcept {
+        OSMIUM_CONSTEXPR Location bottom_left() const noexcept {
             return m_bottom_left;
         }
 
@@ -143,7 +144,7 @@ namespace osmium {
         /**
          * Top-right location.
          */
-        constexpr Location top_right() const noexcept {
+        OSMIUM_CONSTEXPR Location top_right() const noexcept {
             return m_top_right;
         }
 
@@ -177,7 +178,7 @@ namespace osmium {
     /**
      * Boxes are equal if both locations are equal.
      */
-    inline constexpr bool operator==(const Box& lhs, const Box& rhs) noexcept {
+    inline OSMIUM_CONSTEXPR bool operator==(const Box& lhs, const Box& rhs) noexcept {
         return lhs.bottom_left() == rhs.bottom_left() && lhs.top_right() == rhs.top_right();
     }
 
