@@ -200,6 +200,34 @@ namespace osmium {
                     m_done(done) {
                 }
 
+                /**
+                 * The copy constructor is needed for storing XMLParser in a std::function.
+                 * The copy will look the same as if it has been initialized with the
+                 * same parameters as the original. Any state changes in the original will
+                 * not be reflected in the copy.
+                 */
+                explicit XMLParser(const XMLParser& other) :
+                    m_context(context::root),
+                    m_last_context(context::root),
+                    m_in_delete_section(false),
+                    m_header(),
+                    m_buffer(buffer_size),
+                    m_node_builder(),
+                    m_way_builder(),
+                    m_relation_builder(),
+                    m_changeset_builder(),
+                    m_tl_builder(),
+                    m_wnl_builder(),
+                    m_rml_builder(),
+                    m_input_queue(other.m_input_queue),
+                    m_queue(other.m_queue),
+                    m_header_promise(other.m_header_promise),
+                    m_promise_fulfilled(false),
+                    m_read_types(other.m_read_types),
+                    m_max_queue_size(100),
+                    m_done(other.m_done) {
+                }
+
                 bool operator()() {
                     XML_Parser parser = XML_ParserCreate(nullptr);
                     if (!parser) {
