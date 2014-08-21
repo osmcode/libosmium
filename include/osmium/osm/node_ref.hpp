@@ -40,7 +40,6 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/item_type.hpp>
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/types.hpp>
-#include <osmium/util/operators.hpp>
 
 namespace osmium {
 
@@ -48,7 +47,7 @@ namespace osmium {
      * This reference to a node contains a node ID and a (possibly empty)
      * location.
      */
-    class NodeRef : public osmium::memory::detail::ItemHelper, public osmium::totally_ordered<NodeRef> {
+    class NodeRef : public osmium::memory::detail::ItemHelper {
 
         osmium::object_id_type m_ref;
         osmium::Location m_location;
@@ -86,12 +85,28 @@ namespace osmium {
 
     }; // class NodeRef
 
+    inline bool operator==(const NodeRef& lhs, const NodeRef& rhs) {
+        return lhs.ref() == rhs.ref();
+    }
+
+    inline bool operator!=(const NodeRef& lhs, const NodeRef& rhs) {
+        return ! (lhs == rhs);
+    }
+
     inline bool operator<(const NodeRef& lhs, const NodeRef& rhs) {
         return lhs.ref() < rhs.ref();
     }
 
-    inline bool operator==(const NodeRef& lhs, const NodeRef& rhs) {
-        return lhs.ref() == rhs.ref();
+    inline bool operator>(const NodeRef& lhs, const NodeRef& rhs) {
+        return rhs < lhs;
+    }
+
+    inline bool operator<=(const NodeRef& lhs, const NodeRef& rhs) {
+        return ! (rhs < lhs);
+    }
+
+    inline bool operator>=(const NodeRef& lhs, const NodeRef& rhs) {
+        return ! (lhs < rhs);
     }
 
     /**

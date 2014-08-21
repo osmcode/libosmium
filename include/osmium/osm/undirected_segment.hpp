@@ -37,7 +37,6 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/segment.hpp>
-#include <osmium/util/operators.hpp>
 
 namespace osmium {
 
@@ -46,7 +45,7 @@ namespace osmium {
      * always equal or "smaller" than the second Location, ie to the left
      * and down.
      */
-    class UndirectedSegment : osmium::totally_ordered<UndirectedSegment>, public Segment {
+    class UndirectedSegment : public Segment {
 
     public:
 
@@ -74,6 +73,18 @@ namespace osmium {
      */
     inline bool operator<(const UndirectedSegment& lhs, const UndirectedSegment& rhs) {
         return (lhs.first() == rhs.first() && lhs.second() < rhs.second()) || lhs.first() < rhs.first();
+    }
+
+    inline bool operator>(const UndirectedSegment& lhs, const UndirectedSegment& rhs) {
+        return rhs < lhs;
+    }
+
+    inline bool operator<=(const UndirectedSegment& lhs, const UndirectedSegment& rhs) {
+        return ! (rhs < lhs);
+    }
+
+    inline bool operator>=(const UndirectedSegment& lhs, const UndirectedSegment& rhs) {
+        return ! (lhs < rhs);
     }
 
     /**

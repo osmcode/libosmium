@@ -44,7 +44,6 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/tag.hpp>
 #include <osmium/osm/timestamp.hpp>
 #include <osmium/osm/types.hpp>
-#include <osmium/util/operators.hpp>
 
 namespace osmium {
 
@@ -56,7 +55,7 @@ namespace osmium {
      * An OSM Changeset is of a group of changes made by a single user over a
      * short period of time.
      */
-    class Changeset : public osmium::OSMEntity, osmium::totally_ordered<Changeset> {
+    class Changeset : public osmium::OSMEntity {
 
         friend class osmium::builder::ObjectBuilder<osmium::Changeset>;
 
@@ -313,11 +312,27 @@ namespace osmium {
         return lhs.id() == rhs.id();
     }
 
+    inline bool operator!=(const Changeset& lhs, const Changeset& rhs) {
+        return ! (lhs == rhs);
+    }
+
     /**
      * Changesets can be ordered by id.
      */
     inline bool operator<(const Changeset& lhs, const Changeset& rhs) {
         return lhs.id() < rhs.id();
+    }
+
+    inline bool operator>(const Changeset& lhs, const Changeset& rhs) {
+        return rhs < lhs;
+    }
+
+    inline bool operator<=(const Changeset& lhs, const Changeset& rhs) {
+        return ! (rhs < lhs);
+    }
+
+    inline bool operator>=(const Changeset& lhs, const Changeset& rhs) {
+        return ! (lhs < rhs);
     }
 
 } // namespace osmium

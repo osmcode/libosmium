@@ -43,7 +43,6 @@ DEALINGS IN THE SOFTWARE.
 #include <string>
 
 #include <osmium/config/constexpr.hpp>
-#include <osmium/util/operators.hpp>
 
 namespace osmium {
 
@@ -77,7 +76,7 @@ namespace osmium {
      * Coordinates are never checked on whether they are inside bounds.
      * Call valid() to check this.
      */
-    class Location : osmium::totally_ordered<Location> {
+    class Location {
 
         int32_t m_x;
         int32_t m_y;
@@ -261,6 +260,10 @@ namespace osmium {
         return lhs.x() == rhs.x() && lhs.y() == rhs.y();
     }
 
+    inline OSMIUM_CONSTEXPR bool operator!=(const Location& lhs, const Location& rhs) {
+        return ! (lhs == rhs);
+    }
+
     /**
      * Compare two locations by comparing first the x and then
      * the y coordinate. If either of the locations is
@@ -268,6 +271,18 @@ namespace osmium {
      */
     inline OSMIUM_CONSTEXPR bool operator<(const Location& lhs, const Location& rhs) noexcept {
         return (lhs.x() == rhs.x() && lhs.y() < rhs.y()) || lhs.x() < rhs.x();
+    }
+
+    inline OSMIUM_CONSTEXPR bool operator>(const Location& lhs, const Location& rhs) {
+        return rhs < lhs;
+    }
+
+    inline OSMIUM_CONSTEXPR bool operator<=(const Location& lhs, const Location& rhs) {
+        return ! (rhs < lhs);
+    }
+
+    inline OSMIUM_CONSTEXPR bool operator>=(const Location& lhs, const Location& rhs) {
+        return ! (lhs < rhs);
     }
 
     /**

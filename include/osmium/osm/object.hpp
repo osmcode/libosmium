@@ -47,14 +47,13 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/tag.hpp>
 #include <osmium/osm/timestamp.hpp>
 #include <osmium/osm/types.hpp>
-#include <osmium/util/operators.hpp>
 
 namespace osmium {
 
     /**
      * OSMObject (Node, Way, Relation, or Area).
      */
-    class OSMObject : public osmium::OSMEntity, osmium::totally_ordered<OSMObject> {
+    class OSMObject : public osmium::OSMEntity {
 
         object_id_type      m_id;
         bool                m_deleted : 1;
@@ -390,10 +389,14 @@ namespace osmium {
     /**
      * OSMObjects are equal if their type, id, and version are equal.
      */
-    inline bool operator==(const osmium::OSMObject& lhs, const osmium::OSMObject& rhs) {
+    inline bool operator==(const OSMObject& lhs, const OSMObject& rhs) {
         return lhs.type() == rhs.type() &&
                lhs.id() == rhs.id() &&
                lhs.version() == rhs.version();
+    }
+
+    inline bool operator!=(const OSMObject& lhs, const OSMObject& rhs) {
+        return ! (lhs == rhs);
     }
 
     /**
@@ -401,12 +404,24 @@ namespace osmium {
      * Note that we use the absolute value of the id for a
      * better ordering of objects with negative id.
      */
-    inline bool operator<(const osmium::OSMObject& lhs, const osmium::OSMObject& rhs) {
+    inline bool operator<(const OSMObject& lhs, const OSMObject& rhs) {
         if (lhs.type() != rhs.type()) {
             return lhs.type() < rhs.type();
         }
         return (lhs.id() == rhs.id() && lhs.version() < rhs.version()) ||
                lhs.positive_id() < rhs.positive_id();
+    }
+
+    inline bool operator>(const OSMObject& lhs, const OSMObject& rhs) {
+        return rhs < lhs;
+    }
+
+    inline bool operator<=(const OSMObject& lhs, const OSMObject& rhs) {
+        return ! (rhs < lhs);
+    }
+
+    inline bool operator>=(const OSMObject& lhs, const OSMObject& rhs) {
+        return ! (lhs < rhs);
     }
 
 } // namespace osmium

@@ -41,7 +41,6 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/node_ref.hpp>
-#include <osmium/util/operators.hpp>
 
 namespace osmium {
 
@@ -61,7 +60,7 @@ namespace osmium {
              * beginning of the segment. Smaller, in this case, means smaller x
              * coordinate, and if they are the same smaller y coordinate.
              */
-            class NodeRefSegment : osmium::totally_ordered<NodeRefSegment> {
+            class NodeRefSegment {
 
                 osmium::NodeRef m_first;
                 osmium::NodeRef m_second;
@@ -158,6 +157,10 @@ namespace osmium {
                 return lhs.first().location() == rhs.first().location() && lhs.second().location() == rhs.second().location();
             }
 
+            inline bool operator!=(const NodeRefSegment& lhs, const NodeRefSegment& rhs) {
+                return ! (lhs == rhs);
+            }
+
             /**
              * NodeRefSegments are "smaller" if they are to the left and down of another
              * segment. The first() location is checked first() and only if they have the
@@ -165,6 +168,18 @@ namespace osmium {
              */
             inline bool operator<(const NodeRefSegment& lhs, const NodeRefSegment& rhs) {
                 return (lhs.first().location() == rhs.first().location() && lhs.second().location() < rhs.second().location()) || lhs.first().location() < rhs.first().location();
+            }
+
+            inline bool operator>(const NodeRefSegment& lhs, const NodeRefSegment& rhs) {
+                return rhs < lhs;
+            }
+
+            inline bool operator<=(const NodeRefSegment& lhs, const NodeRefSegment& rhs) {
+                return ! (rhs < lhs);
+            }
+
+            inline bool operator>=(const NodeRefSegment& lhs, const NodeRefSegment& rhs) {
+                return ! (lhs < rhs);
             }
 
             template <typename TChar, typename TTraits>
