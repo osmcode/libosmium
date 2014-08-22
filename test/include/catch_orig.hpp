@@ -1,7 +1,3 @@
-
-// This is needed for Windows
-#define CATCH_CONFIG_CPP11_NULLPTR
-
 /*
  *  CATCH v1.0 build 52 (master branch)
  *  Generated: 2014-07-10 09:17:43.994453
@@ -5067,10 +5063,10 @@ namespace Catch {
         }
 
         virtual void sectionEnded( SectionInfo const& info, Counts const& prevAssertions, double _durationInSeconds ) {
-            /*if( std::uncaught_exception() ) { // XXX Hack that makes Catch not run in loop in certain situations
+            if( std::uncaught_exception() ) {
                 m_unfinishedSections.push_back( UnfinishedSections( info, prevAssertions, _durationInSeconds ) );
                 return;
-            }*/
+            }
 
             Counts assertions = m_totals.assertions - prevAssertions;
             bool missingAssertions = testForMissingAssertions( assertions );
