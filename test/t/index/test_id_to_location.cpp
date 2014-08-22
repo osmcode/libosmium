@@ -2,12 +2,6 @@
 #include <boost/test/output_test_stream.hpp>
 using boost::test_tools::output_test_stream;
 
-#include <type_traits>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
-
 #include <osmium/osm/types.hpp>
 #include <osmium/osm/location.hpp>
 
