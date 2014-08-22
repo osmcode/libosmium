@@ -1,97 +1,97 @@
 
-SET(DART_TESTING_TIMEOUT 5)
-INCLUDE(Dart)
+set(DART_TESTING_TIMEOUT 5)
+include(Dart)
 
 include_directories("include")
 
-IF(CMAKE_COMPILER_IS_GNUCC)
-  set(CXX_FLAGS_WARNINGS "-Wall -Wextra -Wredundant-decls -Wdisabled-optimization -pedantic -Wctor-dtor-privacy -Wnon-virtual-dtor -Woverloaded-virtual -Wsign-promo -Wno-long-long")
-  set(CXXFLAGS "-g")
-  SET(CMAKE_CXX_FLAGS "${CXXFLAGS} ${CXX_FLAGS_WARNINGS}")
-ENDIF(CMAKE_COMPILER_IS_GNUCC)
+if(CMAKE_COMPILER_IS_GNUCC)
+    set(CXX_FLAGS_WARNINGS "-Wall -Wextra -Wredundant-decls -Wdisabled-optimization -pedantic -Wctor-dtor-privacy -Wnon-virtual-dtor -Woverloaded-virtual -Wsign-promo -Wno-long-long")
+    set(CXXFLAGS "-g")
+    set(CMAKE_CXX_FLAGS "${CXXFLAGS} ${CXX_FLAGS_WARNINGS}")
+endif(CMAKE_COMPILER_IS_GNUCC)
 
-MESSAGE(STATUS ${CMAKE_CXX_FLAGS})
+message(STATUS ${CMAKE_CXX_FLAGS})
 
 add_library(testlib STATIC test_main.cpp)
 
 
-
 macro(MORE_TESTS) 
-FOREACH(test_name ${TESTS})
-  MESSAGE(${test_name})
-  add_executable(${test_name} ${FOLDER}/${test_name}.cpp)
-  target_link_libraries (${test_name} testlib ${LIBS})
-  ADD_TEST(${test_name} ${test_name} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-ENDFOREACH(test_name)
+    foreach(test_name ${TESTS})
+        message(${test_name})
+        add_executable(${test_name} ${FOLDER}/${test_name}.cpp)
+        target_link_libraries(${test_name} testlib ${LIBS})
+        add_test(${test_name} ${test_name} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+    endforeach(test_name)
 endmacro()
 
 
-SET(FOLDER t/area)
-SET(TESTS test_area_id test_node_ref_segment)
-SET(LIBS "")
+set(FOLDER t/area)
+set(TESTS test_area_id test_node_ref_segment)
+set(LIBS "")
 MORE_TESTS()
 
-SET(FOLDER t/basic)
-SET(TESTS test_entity_bits test_box test_changeset 
+set(FOLDER t/basic)
+set(TESTS test_entity_bits test_box test_changeset 
    test_location test_node test_way test_relation 
    test_node_ref test_timestamp
    test_object_comparisons)
-SET(LIBS "")
+set(LIBS "")
 MORE_TESTS()
 
 
-SET(FOLDER t/buffer)
-SET(TESTS test_buffer_node)
-SET(LIBS "")
+set(FOLDER t/buffer)
+set(TESTS test_buffer_node)
+set(LIBS "")
 MORE_TESTS()
 
-if (GEOS_FOUND AND PROJ_FOUND)
-SET(FOLDER t/geom)
-SET(TESTS
-   test_factory_with_projection
-   test_geojson
-   test_geos
-   test_geos_wkb
-   test_mercator
+if(GEOS_FOUND AND PROJ_FOUND)
+    set(FOLDER t/geom)
+    set(TESTS
+        test_factory_with_projection
+        test_geojson
+        test_geos
+        test_geos_wkb
+        test_mercator
 #   test_ogr
-   test_projection
-   test_wkb
-   test_wkt
-)
-SET(LIBS ${GEOS_LIBRARY} ${PROJ_LIBRARY} ${BZIP2_LIBRARY})
-MORE_TESTS()
+        test_projection
+        test_wkb
+        test_wkt
+    )
+    set(LIBS ${GEOS_LIBRARY} ${PROJ_LIBRARY} ${BZIP2_LIBRARY})
+    MORE_TESTS()
 else()
-MESSAGE("Skipped geom tests - needed GEOS and PROJ libraries")
+    message("Skipped geom tests - needed GEOS and PROJ libraries")
 endif()
 
-SET(FOLDER t/index)
-SET(TESTS
+set(FOLDER t/index)
+set(TESTS
    test_id_to_location
    test_typed_mmap
 )
-SET(LIBS "")
+set(LIBS "")
 MORE_TESTS()
 
-SET(FOLDER t/io)
-SET(TESTS
+set(FOLDER t/io)
+set(TESTS
    test_bzip2
    test_file_formats
 )
-SET(LIBS ${BZIP2_LIBRARIES})
+set(LIBS ${BZIP2_LIBRARIES})
 MORE_TESTS()
 
-SET(FOLDER t/tags)
-SET(TESTS
+set(FOLDER t/tags)
+set(TESTS
    test_filter
    test_operators
    test_tag_list
 )
-SET(LIBS "")
+set(LIBS "")
 MORE_TESTS()
 
-SET(FOLDER t/util)
-SET(TESTS
+set(FOLDER t/util)
+set(TESTS
    test_options
 )
-SET(LIBS "")
+set(LIBS "")
 MORE_TESTS()
+
