@@ -45,8 +45,8 @@ else()
 endif()
 
 SET(OGR_EXAMPLES
-  osmium_toogr.cpp
-  osmium_toogr2.cpp
+  osmium_toogr
+  osmium_toogr2
 )
 
 

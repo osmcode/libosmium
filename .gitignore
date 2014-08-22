@@ -4,3 +4,4 @@ includes.log
 check_reports
 *.swp
 build-cmake
+build
