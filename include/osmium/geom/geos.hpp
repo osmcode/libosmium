@@ -52,10 +52,11 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/geom/factory.hpp>
 #include <osmium/geom/coordinates.hpp>
 
+// MSVC doesn't support throw_with_nested yet
 #ifdef _MSC_VER
-#define THROW throw
+# define THROW throw
 #else
-#define THROW std::throw_with_nested
+# define THROW std::throw_with_nested
 #endif
 
 namespace osmium {
@@ -217,5 +218,7 @@ namespace osmium {
     } // namespace geom
 
 } // namespace osmium
+
+#undef THROW
 
 #endif // OSMIUM_GEOM_GEOS_HPP
