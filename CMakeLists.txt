@@ -151,11 +151,6 @@ include_directories(BEFORE include)
 
 enable_testing()
 
-option(OSMIUM_WITH_DEBUG 0)
-if(OSMIUM_WITH_DEBUG)
-    add_definitions(-DOSMIUM_WITH_DEBUG)
-endif()
-
 if(BUILD_EXAMPLES)
     add_subdirectory(examples)
 endif()
