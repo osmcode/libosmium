@@ -19,7 +19,7 @@ add_library(testlib STATIC test_main.cpp)
 macro(compile_tests)
     foreach(test_name ${TESTS})
         message(${test_name})
-        add_executable(${test_name} ${FOLDER}/${test_name}.cpp)
+        add_executable(${test_name} t/${TEST_GROUP}/${test_name}.cpp)
         target_link_libraries(${test_name} testlib ${LIBS})
         add_test(${test_name} ${test_name} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
     endforeach(test_name)
@@ -27,7 +27,7 @@ endmacro()
 
 
 #----------------------------------------------------------------------
-set(FOLDER t/area)
+set(TEST_GROUP area)
 set(TESTS
     test_area_id
     test_node_ref_segment
@@ -35,7 +35,7 @@ set(TESTS
 set(LIBS "")
 compile_tests()
 
-set(FOLDER t/basic)
+set(TEST_GROUP basic)
 set(TESTS
     test_box
     test_changeset
@@ -52,7 +52,7 @@ set(LIBS "")
 compile_tests()
 
 
-set(FOLDER t/buffer)
+set(TEST_GROUP buffer)
 set(TESTS
     test_buffer_node
 )
@@ -60,7 +60,7 @@ set(LIBS "")
 compile_tests()
 
 if(GEOS_FOUND AND PROJ_FOUND)
-    set(FOLDER t/geom)
+    set(TEST_GROUP geom)
     set(TESTS
         test_factory_with_projection
         test_geojson
@@ -78,7 +78,7 @@ else()
     message("Skipped geom tests - needed GEOS and PROJ libraries")
 endif()
 
-set(FOLDER t/index)
+set(TEST_GROUP index)
 set(TESTS
     test_id_to_location
     test_typed_mmap
@@ -86,7 +86,7 @@ set(TESTS
 set(LIBS "")
 compile_tests()
 
-set(FOLDER t/io)
+set(TEST_GROUP io)
 set(TESTS
     test_bzip2
     test_file_formats
@@ -94,7 +94,7 @@ set(TESTS
 set(LIBS ${BZIP2_LIBRARIES})
 compile_tests()
 
-set(FOLDER t/tags)
+set(TEST_GROUP tags)
 set(TESTS
     test_filter
     test_operators
@@ -103,7 +103,7 @@ set(TESTS
 set(LIBS "")
 compile_tests()
 
-set(FOLDER t/util)
+set(TEST_GROUP util)
 set(TESTS
     test_options
 )
