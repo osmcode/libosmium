@@ -228,6 +228,14 @@ namespace osmium {
                     m_done(other.m_done) {
                 }
 
+                explicit XMLParser(XMLParser&& other) = default;
+
+                XMLParser& operator=(const XMLParser&) = delete;
+
+                XMLParser& operator=(XMLParser&& other) = default;
+
+                ~XMLParser() = default;
+
                 bool operator()() {
                     XML_Parser parser = XML_ParserCreate(nullptr);
                     if (!parser) {
