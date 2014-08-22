@@ -1,3 +1,6 @@
+#ifndef MMAP_FOR_WINDOWS_HPP
+#define MMAP_FOR_WINDOWS_HPP
+
 /* mmap() replacement for Windows
  *
  * Author: Mike Frysinger <vapier@gentoo.org>
@@ -99,3 +102,5 @@ static int munmap(void *addr, size_t length)
 
 #undef DWORD_HI
 #undef DWORD_LO
+
+#endif
