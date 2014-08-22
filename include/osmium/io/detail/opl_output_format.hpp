@@ -72,10 +72,6 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/thread/pool.hpp>
 #include <osmium/visitor.hpp>
 
-#ifdef _MSC_VER
-#define snprintf _snprintf
-#endif
-
 namespace osmium {
 
     namespace io {
@@ -96,6 +92,17 @@ namespace osmium {
                 std::string m_out;
 
                 char m_tmp_buffer[tmp_buffer_size+1];
+
+                template <typename... TArgs>
+                void output_formatted(const char* format, TArgs&&... args) {
+#ifndef _MSC_VER
+                    int len = snprintf(m_tmp_buffer, tmp_buffer_size, format, std::forward<TArgs>(args)...);
+#else
+                    int len = _snprintf(m_tmp_buffer, tmp_buffer_size, format, std::forward<TArgs>(args)...);
+#endif
+                    assert(len > 0 && static_cast<size_t>(len) < tmp_buffer_size);
+                    m_out += m_tmp_buffer;
+                }
 
                 void append_encoded_string(const std::string& data) {
                     boost::u8_to_u32_iterator<std::string::const_iterator> it(data.cbegin(), data.cbegin(), data.cend());
@@ -121,21 +128,17 @@ namespace osmium {
                             *oit = c;
                         } else {
                             m_out += '%';
-                            snprintf(m_tmp_buffer, tmp_buffer_size, "%04x", c);
-                            m_out += m_tmp_buffer;
+                            output_formatted("%04x", c);
                         }
                     }
                 }
 
                 void write_meta(const osmium::OSMObject& object) {
-                    snprintf(m_tmp_buffer, tmp_buffer_size, "%" PRId64 " v%d d", object.id(), object.version());
-                    m_out += m_tmp_buffer;
+                    output_formatted("%" PRId64 " v%d d", object.id(), object.version());
                     m_out += (object.visible() ? 'V' : 'D');
-                    snprintf(m_tmp_buffer, tmp_buffer_size, " c%d t", object.changeset());
-                    m_out += m_tmp_buffer;
+                    output_formatted(" c%d t", object.changeset());
                     m_out += object.timestamp().to_iso();
-                    snprintf(m_tmp_buffer, tmp_buffer_size, " i%d u", object.uid());
-                    m_out += m_tmp_buffer;
+                    output_formatted(" i%d u", object.uid());
                     append_encoded_string(object.user());
                     m_out += " T";
                     bool first = true;
@@ -153,8 +156,7 @@ namespace osmium {
 
                 void write_location(const osmium::Location location, const char x, const char y) {
                     if (location) {
-                        snprintf(m_tmp_buffer, tmp_buffer_size, " %c%.7f %c%.7f", x, location.lon_without_check(), y, location.lat_without_check());
-                        m_out += m_tmp_buffer;
+                        output_formatted(" %c%.7f %c%.7f", x, location.lon_without_check(), y, location.lat_without_check());
                     } else {
                         m_out += ' ';
                         m_out += x;
@@ -204,8 +206,7 @@ namespace osmium {
                         } else {
                             m_out += ',';
                         }
-                        snprintf(m_tmp_buffer, tmp_buffer_size, "n%" PRId64, node_ref.ref());
-                        m_out += m_tmp_buffer;
+                        output_formatted("n%" PRId64, node_ref.ref());
                     }
                     m_out += '\n';
                 }
@@ -223,21 +224,18 @@ namespace osmium {
                             m_out += ',';
                         }
                         m_out += item_type_to_char(member.type());
-                        snprintf(m_tmp_buffer, tmp_buffer_size, "%" PRId64 "@", member.ref());
-                        m_out += m_tmp_buffer;
+                        output_formatted("%" PRId64 "@", member.ref());
                         m_out += member.role();
                     }
                     m_out += '\n';
                 }
 
                 void changeset(const osmium::Changeset& changeset) {
-                    snprintf(m_tmp_buffer, tmp_buffer_size, "c%d k%d s", changeset.id(), changeset.num_changes());
-                    m_out += m_tmp_buffer;
+                    output_formatted("c%d k%d s", changeset.id(), changeset.num_changes());
                     m_out += changeset.created_at().to_iso();
                     m_out += " e";
                     m_out += changeset.closed_at().to_iso();
-                    snprintf(m_tmp_buffer, tmp_buffer_size, " i%d u", changeset.uid());
-                    m_out += m_tmp_buffer;
+                    output_formatted(" i%d u", changeset.uid());
                     append_encoded_string(changeset.user());
                     write_location(changeset.bounds().bottom_left(), 'x', 'y');
                     write_location(changeset.bounds().top_right(), 'X', 'Y');

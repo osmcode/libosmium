@@ -33,6 +33,7 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <cassert>
 #include <chrono>
 #include <cinttypes>
 #include <cstddef>
@@ -94,7 +95,13 @@ namespace osmium {
                 template <typename T>
                 void oprintf(std::string& out, const char* format, T value) {
                     char buffer[tmp_buffer_size+1];
-                    snprintf(buffer, sizeof(buffer)/sizeof(char), format, value);
+                    size_t max_size = sizeof(buffer)/sizeof(char);
+#ifndef _MSC_VER
+                    int len = snprintf(buffer, max_size, format, value);
+#else
+                    int len = _snprintf(buffer, max_size, format, value);
+#endif
+                    assert(len > 0 && static_cast<size_t>(len) < max_size);
                     out += buffer;
                 }
 

@@ -34,6 +34,7 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <algorithm>
+#include <cassert>
 #include <cmath>
 #include <cstdint>
 #include <cstdio>
@@ -41,6 +42,8 @@ DEALINGS IN THE SOFTWARE.
 #include <limits>
 #include <stdexcept>
 #include <string>
+
+#include <iostream>
 
 #include <osmium/config/constexpr.hpp>
 
@@ -237,7 +240,12 @@ namespace osmium {
         static T coordinate2string(T iterator, double value) {
             char buffer[coordinate_length];
 
+#ifndef _MSC_VER
             int len = snprintf(buffer, coordinate_length, "%.7f", value);
+#else
+            int len = _snprintf(buffer, coordinate_length, "%.7f", value);
+#endif
+            assert(len > 0 && len < coordinate_length);
             while (buffer[len-1] == '0') --len;
             if (buffer[len-1] == '.') --len;
 
