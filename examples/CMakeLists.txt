@@ -1,26 +1,37 @@
 
-
 if(CMAKE_COMPILER_IS_GNUCC)
-    set(WARNING_FLAGS "-Wall -Wextra -Wdisabled-optimization -pedantic -Wctor-dtor-privacy -Wnon-virtual-dtor -Woverloaded-virtual -Wsign-promo -Wno-long-long")
+    add_compile_options(
+        -Wall
+        -Wextra
+        -pedantic
+        -Wredundant-decls
+        -Wdisabled-optimization
+        -Wctor-dtor-privacy
+        -Wnon-virtual-dtor
+        -Woverloaded-virtual
+        -Wsign-promo
+        -Wold-style-cast
+    )
+
     set(CXX_FLAGS "-O3 -g")
-    set(CMAKE_CXX_FLAGS ${CXX_FLAGS} ${WARNINGS_FLAGS})
-endif(CMAKE_COMPILER_IS_GNUCC)
+    set(CMAKE_CXX_FLAGS ${CXX_FLAGS})
+endif()
 
 add_definitions(-D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64)
 
 
 if(SPARSEHASH_FOUND)
-   include_directories(${SPARSEHASH_INCLUDE_DIR})
+    include_directories(${SPARSEHASH_INCLUDE_DIR})
 endif()
 
-set(BASIC_LIBS ${EXPAT_LIBRARY} ${OSMPBF_LIBRARIES} ${BZIP2_LIBRARIES} ${WIN_LIBS} ${CMAKE_THREAD_LIBS_INIT})
+set(BASIC_LIBS ${EXPAT_LIBRARY} ${OSMPBF_LIBRARIES} ${PROTOBUF_LITE_LIBRARY} ${ZLIB_LIBRARY} ${BZIP2_LIBRARIES} ${WIN_LIBS} ${CMAKE_THREAD_LIBS_INIT})
 
 set(SIMPLE_EXAMPLES
-  osmium_read
-  osmium_debug
-  osmium_convert
-  osmium_area_test
-  osmium_serdump
+    osmium_read
+    osmium_debug
+    osmium_convert
+    osmium_area_test
+    osmium_serdump
 )
 
 foreach(example ${SIMPLE_EXAMPLES})
@@ -45,8 +56,8 @@ else()
 endif()
 
 set(OGR_EXAMPLES
-  osmium_toogr
-  osmium_toogr2
+    osmium_toogr
+    osmium_toogr2
 )
 
 if(GDAL_FOUND AND GEOS_FOUND AND SPARSEHASH_FOUND)

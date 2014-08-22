@@ -1,15 +1,40 @@
-set(PACKAGE OSMIUM)
-set(PACKAGE_NAME OSMIUM)
+#----------------------------------------------------------------------
+#
+#  Libosmium CMakeLists.txt
+#
+#----------------------------------------------------------------------
 
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
-project(OSMIUM)
+
+#----------------------------------------------------------------------
+#
+#  Project version
+#
+#----------------------------------------------------------------------
+
+project(libosmium)
+
+set(LIBOSMIUM_VERSION_MAJOR 0)
+set(LIBOSMIUM_VERSION_MINOR 0)
+set(LIBOSMIUM_VERSION_PATCH 1)
+
+set(LIBOSMIUM_VERSION ${OSMIUM_VERSION_MAJOR}.${OSMIUM_VERSION_MINOR}.${OSMIUM_VERSION_PATCH})
+
+
+#----------------------------------------------------------------------
 
 option(BUILD_EXAMPLES "compile example programs" ON)
 option(BUILD_TESTING "compile tests, please run them with ctest" ON)
 option(BUILD_TRY_HPPS "compile every hpp" ON)
 
 
+#----------------------------------------------------------------------
+#
+#  Find external dependencies
+#
+#----------------------------------------------------------------------
 find_package(Boost 1.38)
 mark_as_advanced(CLEAR BOOST_ROOT)
 
@@ -43,14 +68,16 @@ find_package(EXPAT)
 find_package(Protobuf)
 find_package(Threads)
 
-##### Find OSMPBF Library
-find_path(OSMPBF_INCLUDE_DIR osmpbf/osmpbf.h)
-find_library(OSMPBF_LIBRARY NAMES osmpbf)
-#####
+find_package(OSMPBF)
+include_directories(${OSMPBF_INCLUDE_DIRS})
+#list(APPEND LIBRARIES ${OSMPBF_LIBRARIES})
+if(NOT OSMPBF_FOUND)
+    message(WARNING "OSMPBF library not found!\n")
+endif()
 
 
 # check that the essential libraries were found
-if(BUILD_EXAMPLES OR BUILD_TESTING OR BUILD_TESTING OR BUILD_OSMJS)
+if(BUILD_EXAMPLES OR BUILD_TESTING OR BUILD_TRY_HPPS)
 
     if(Boost_FOUND)
         include_directories(${Boost_INCLUDE_DIRS})
@@ -84,15 +111,6 @@ if(BUILD_EXAMPLES OR BUILD_TESTING OR BUILD_TESTING OR BUILD_OSMJS)
     else()
         mark_as_advanced(CLEAR PROTOBUF_INCLUDE_DIR PROTOBUF_LITE_LIBRARY)
         message(FATAL_ERROR "Please, specify the Google PROTOBUF library dir")
-    endif()
-
-    if(OSMPBF_LIBRARY AND OSMPBF_INCLUDE_DIR)
-        include_directories(${OSMPBF_INCLUDE_DIR})
-        set(OSMPBF_FOUND 1)
-        set(OSMPBF_LIBRARIES ${OSMPBF_LIBRARY} ${PROTOBUF_LITE_LIBRARY} ${ZLIB_LIBRARY})
-        message(STATUS "OSMPBF library found")
-    else()
-        message(FATAL_ERROR "OSMPBF library not found, please specify its location manually")
     endif()
 
 endif()
@@ -154,7 +172,6 @@ enable_testing()
 if(BUILD_EXAMPLES)
     add_subdirectory(examples)
 endif()
-
 
 if(BUILD_TESTING)
     add_subdirectory(test)

@@ -15,7 +15,8 @@ message(STATUS ${CMAKE_CXX_FLAGS})
 add_library(testlib STATIC test_main.cpp)
 
 
-macro(MORE_TESTS) 
+#----------------------------------------------------------------------
+macro(compile_tests)
     foreach(test_name ${TESTS})
         message(${test_name})
         add_executable(${test_name} ${FOLDER}/${test_name}.cpp)
@@ -25,24 +26,38 @@ macro(MORE_TESTS)
 endmacro()
 
 
+#----------------------------------------------------------------------
 set(FOLDER t/area)
-set(TESTS test_area_id test_node_ref_segment)
+set(TESTS
+    test_area_id
+    test_node_ref_segment
+)
 set(LIBS "")
-MORE_TESTS()
+compile_tests()
 
 set(FOLDER t/basic)
-set(TESTS test_entity_bits test_box test_changeset 
-   test_location test_node test_way test_relation 
-   test_node_ref test_timestamp
-   test_object_comparisons)
+set(TESTS
+    test_box
+    test_changeset
+    test_entity_bits
+    test_location
+    test_node
+    test_node_ref
+    test_object_comparisons
+    test_relation
+    test_timestamp
+    test_way
+)
 set(LIBS "")
-MORE_TESTS()
+compile_tests()
 
 
 set(FOLDER t/buffer)
-set(TESTS test_buffer_node)
+set(TESTS
+    test_buffer_node
+)
 set(LIBS "")
-MORE_TESTS()
+compile_tests()
 
 if(GEOS_FOUND AND PROJ_FOUND)
     set(FOLDER t/geom)
@@ -58,40 +73,40 @@ if(GEOS_FOUND AND PROJ_FOUND)
         test_wkt
     )
     set(LIBS ${GEOS_LIBRARY} ${PROJ_LIBRARY} ${BZIP2_LIBRARY})
-    MORE_TESTS()
+    compile_tests()
 else()
     message("Skipped geom tests - needed GEOS and PROJ libraries")
 endif()
 
 set(FOLDER t/index)
 set(TESTS
-   test_id_to_location
-   test_typed_mmap
+    test_id_to_location
+    test_typed_mmap
 )
 set(LIBS "")
-MORE_TESTS()
+compile_tests()
 
 set(FOLDER t/io)
 set(TESTS
-   test_bzip2
-   test_file_formats
+    test_bzip2
+    test_file_formats
 )
 set(LIBS ${BZIP2_LIBRARIES})
-MORE_TESTS()
+compile_tests()
 
 set(FOLDER t/tags)
 set(TESTS
-   test_filter
-   test_operators
-   test_tag_list
+    test_filter
+    test_operators
+    test_tag_list
 )
 set(LIBS "")
-MORE_TESTS()
+compile_tests()
 
 set(FOLDER t/util)
 set(TESTS
-   test_options
+    test_options
 )
 set(LIBS "")
-MORE_TESTS()
+compile_tests()
 
