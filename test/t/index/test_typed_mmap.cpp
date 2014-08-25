@@ -4,6 +4,10 @@ using boost::test_tools::output_test_stream;
 
 #include <osmium/index/detail/typed_mmap.hpp>
 
+#ifdef _MSC_VER
+  #include "win_mkstemp.hpp"
+#endif
+
 TEST_CASE("TypedMmap") {
 
 SECTION("Mmap") {
