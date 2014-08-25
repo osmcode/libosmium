@@ -206,7 +206,7 @@ namespace osmium {
                  * same parameters as the original. Any state changes in the original will
                  * not be reflected in the copy.
                  */
-                explicit XMLParser(const XMLParser& other) :
+                XMLParser(const XMLParser& other) :
                     m_context(context::root),
                     m_last_context(context::root),
                     m_in_delete_section(false),
@@ -228,7 +228,7 @@ namespace osmium {
                     m_done(other.m_done) {
                 }
 
-                explicit XMLParser(XMLParser&& other) = default;
+                XMLParser(XMLParser&& other) = default;
 
                 XMLParser& operator=(const XMLParser&) = delete;
 
