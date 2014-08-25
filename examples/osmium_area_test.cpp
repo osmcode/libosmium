@@ -41,8 +41,8 @@ public:
     void area(const osmium::Area& area) {
         try {
             m_out << m_factory.create_multipolygon(area) << "\n";
-        } catch (osmium::geometry_error) {
-            m_out << "GEOMETRY ERROR\n";
+        } catch (osmium::geometry_error& e) {
+            m_out << "GEOMETRY ERROR: " << e.what() << "\n";
         }
     }
 
