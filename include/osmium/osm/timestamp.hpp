@@ -41,7 +41,7 @@ DEALINGS IN THE SOFTWARE.
 #include <string>
 #include <time.h>
 
-#include <osmium/config/constexpr.hpp>
+#include <osmium/util/compatibility.hpp>
 
 namespace osmium {
 

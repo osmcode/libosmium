@@ -39,7 +39,7 @@ DEALINGS IN THE SOFTWARE.
 #include <stdexcept>
 #include <string>
 
-#include <osmium/config/constexpr.hpp>
+#include <osmium/util/compatibility.hpp>
 
 namespace osmium {
 

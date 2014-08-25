@@ -36,8 +36,8 @@ DEALINGS IN THE SOFTWARE.
 #include <iosfwd>
 #include <utility>
 
-#include <osmium/config/constexpr.hpp>
 #include <osmium/osm/location.hpp>
+#include <osmium/util/compatibility.hpp>
 
 namespace osmium {
 
