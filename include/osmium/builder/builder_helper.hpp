@@ -50,7 +50,7 @@ namespace osmium {
 
     namespace builder {
 
-        inline const osmium::WayNodeList& build_way_node_list(osmium::memory::Buffer& buffer, std::initializer_list<osmium::NodeRef> nodes) {
+        inline const osmium::WayNodeList& build_way_node_list(osmium::memory::Buffer& buffer, const std::initializer_list<osmium::NodeRef>& nodes) {
             size_t pos = buffer.committed();
             {
                 osmium::builder::WayNodeListBuilder wnl_builder(buffer);
@@ -62,7 +62,7 @@ namespace osmium {
             return buffer.get<const osmium::WayNodeList>(pos);
         }
 
-        inline const osmium::TagList& build_tag_list(osmium::memory::Buffer& buffer, std::initializer_list<std::pair<const char*, const char*>> tags) {
+        inline const osmium::TagList& build_tag_list(osmium::memory::Buffer& buffer, const std::initializer_list<std::pair<const char*, const char*>>& tags) {
             size_t pos = buffer.committed();
             {
                 osmium::builder::TagListBuilder tl_builder(buffer);
@@ -74,7 +74,7 @@ namespace osmium {
             return buffer.get<const osmium::TagList>(pos);
         }
 
-        inline const osmium::TagList& build_tag_list(osmium::memory::Buffer& buffer, const std::map<const char*, const char*>& tags) {
+        inline const osmium::TagList& build_tag_list_from_map(osmium::memory::Buffer& buffer, const std::map<const char*, const char*>& tags) {
             size_t pos = buffer.committed();
             {
                 osmium::builder::TagListBuilder tl_builder(buffer);
@@ -86,7 +86,7 @@ namespace osmium {
             return buffer.get<const osmium::TagList>(pos);
         }
 
-        inline const osmium::TagList& build_tag_list(osmium::memory::Buffer& buffer, std::function<void(osmium::builder::TagListBuilder&)> func) {
+        inline const osmium::TagList& build_tag_list_from_func(osmium::memory::Buffer& buffer, std::function<void(osmium::builder::TagListBuilder&)> func) {
             size_t pos = buffer.committed();
             {
                 osmium::builder::TagListBuilder tl_builder(buffer);

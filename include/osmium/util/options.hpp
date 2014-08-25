@@ -63,7 +63,7 @@ namespace osmium {
 
             Options() = default;
 
-            explicit Options(std::initializer_list<value_type> values) :
+            explicit Options(const std::initializer_list<value_type>& values) :
                 m_options(values) {
             }
 

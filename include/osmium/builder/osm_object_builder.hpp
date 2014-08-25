@@ -144,7 +144,7 @@ namespace osmium {
                 static_cast<Builder*>(this)->add_size(sizeof(string_size_type));
             }
 
-            void add_tags(std::initializer_list<std::pair<const char*, const char*>> tags) {
+            void add_tags(const std::initializer_list<std::pair<const char*, const char*>>& tags) {
                 osmium::builder::TagListBuilder tl_builder(static_cast<Builder*>(this)->buffer(), this);
                 for (const auto& p : tags) {
                     tl_builder.add_tag(p.first, p.second);
@@ -164,7 +164,7 @@ namespace osmium {
                 OSMObjectBuilder<osmium::Way>(buffer, parent) {
             }
 
-            void add_node_refs(std::initializer_list<osmium::NodeRef> nodes) {
+            void add_node_refs(const std::initializer_list<osmium::NodeRef>& nodes) {
                 osmium::builder::WayNodeListBuilder builder(buffer(), this);
                 for (const auto& node_ref : nodes) {
                     builder.add_node_ref(node_ref);

@@ -61,7 +61,7 @@ namespace osmium {
 
             Header() = default;
 
-            explicit Header(std::initializer_list<osmium::util::Options::value_type> values) :
+            explicit Header(const std::initializer_list<osmium::util::Options::value_type>& values) :
                 Options(values) {
             }
 

@@ -24,7 +24,7 @@ SECTION("can_be_created_from_initializer_list") {
 SECTION("can_be_created_from_map") {
     osmium::memory::Buffer buffer(10240);
 
-    const osmium::TagList& tl = osmium::builder::build_tag_list(buffer, std::map<const char*, const char*>({
+    const osmium::TagList& tl = osmium::builder::build_tag_list_from_map(buffer, std::map<const char*, const char*>({
         { "highway", "primary" },
         { "name", "Main Street" }
     }));
@@ -47,7 +47,7 @@ SECTION("can_be_created_from_map") {
 SECTION("can_be_created_with_callback") {
     osmium::memory::Buffer buffer(10240);
 
-    const osmium::TagList& tl = osmium::builder::build_tag_list(buffer, [](osmium::builder::TagListBuilder& tlb) {
+    const osmium::TagList& tl = osmium::builder::build_tag_list_from_func(buffer, [](osmium::builder::TagListBuilder& tlb) {
         tlb.add_tag("highway", "primary");
         tlb.add_tag("bridge", "true");
     });
@@ -61,7 +61,7 @@ SECTION("can_be_created_with_callback") {
 SECTION("returns_value_by_key") {
     osmium::memory::Buffer buffer(10240);
 
-    const osmium::TagList& tl = osmium::builder::build_tag_list(buffer, [](osmium::builder::TagListBuilder& tlb) {
+    const osmium::TagList& tl = osmium::builder::build_tag_list_from_func(buffer, [](osmium::builder::TagListBuilder& tlb) {
         tlb.add_tag("highway", "primary");
         tlb.add_tag("bridge", "true");
     });
