@@ -38,6 +38,10 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
+    /**
+     * Exception thrown when a projection object can not be initialized or the
+     * projection of some coordinates can not be calculated.
+     */
     struct projection_error : public std::runtime_error {
 
         projection_error(const std::string& what) :

@@ -49,6 +49,10 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
+    /**
+     * Exception thrown when an invalid geometry is encountered. An example
+     * would be a linestring with less than two points.
+     */
     struct geometry_error : public std::runtime_error {
 
         geometry_error(const std::string& what) :
@@ -227,7 +231,7 @@ namespace osmium {
                 }
 
                 if (num_points < 2) {
-                    throw geometry_error("not enough points for linestring");
+                    throw osmium::geometry_error("not enough points for linestring");
                 }
 
                 return m_impl.linestring_finish(num_points);
@@ -266,7 +270,7 @@ namespace osmium {
 
                 // if there are no rings, this area is invalid
                 if (num_rings == 0) {
-                    throw geometry_error("invalid area");
+                    throw osmium::geometry_error("invalid area");
                 }
 
                 m_impl.multipolygon_polygon_finish();

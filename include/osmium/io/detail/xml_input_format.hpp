@@ -72,6 +72,11 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
+    /**
+     * Exception thrown when the XML parser failed. The exception contains
+     * information about the place where the error happened and the type of
+     * error.
+     */
     struct xml_error : public io_error {
 
         unsigned long line;
@@ -120,6 +125,8 @@ namespace osmium {
              * Once the header is fully parsed this exception will be thrown if
              * the caller is not interested in anything else except the header.
              * It will break off the parsing at this point.
+             *
+             * This exception is never seen by user code, it is caught internally.
              */
             class ParserIsDone : std::exception {
             };

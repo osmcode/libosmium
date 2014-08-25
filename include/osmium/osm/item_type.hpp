@@ -150,6 +150,12 @@ namespace osmium {
         return out << item_type_to_char(item_type);
     }
 
+    /**
+     * This exception is thrown when a visitor encounters an unknown item type.
+     * Under usual circumstance this should not happen. If it does happen, it
+     * probably means the buffer contains different kinds of objects than were
+     * expected or that there is some kind of data corruption.
+     */
     struct unknown_type : public std::runtime_error {
 
         unknown_type() :

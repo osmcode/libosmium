@@ -45,6 +45,9 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
+    /**
+     * Exception thrown when some kind of input/output operation failed.
+     */
     struct io_error : public std::runtime_error {
 
         io_error(const std::string& what) :

@@ -50,15 +50,22 @@ DEALINGS IN THE SOFTWARE.
 namespace osmium {
 
     /**
+     * Exception thrown by the osmium::memory::Buffer class when somebody tries
+     * to write data into a buffer and it doesn't fit. Buffers with internal
+     * memory management will not throw this exception, but increase their size.
+     */
+    struct buffer_is_full : public std::runtime_error {
+
+        buffer_is_full() :
+            std::runtime_error("Osmium buffer is full") {
+        }
+
+    }; // struct buffer_is_full
+
+    /**
      * @brief Memory management of items in buffers and iterators over this data.
      */
     namespace memory {
-
-        /**
-         * Exception thrown by the Buffer class when somebody tries to write data
-         * into the buffer and it doesn't fit.
-         */
-        class BufferIsFull : public std::exception {};
 
         /**
          * A memory area for storing OSM objects and other items. Each item stored
@@ -80,7 +87,7 @@ namespace osmium {
          * create a Buffer object and have it manage the memory internally. It will
          * dynamically allocate memory and free it again after use.
          *
-         * By default, if a buffer gets full it will throw a BufferIsFull exception.
+         * By default, if a buffer gets full it will throw a buffer_is_full exception.
          * You can use the set_full_callback() method to set a callback functor
          * which will be called instead of throwing an exception.
          */
@@ -229,7 +236,7 @@ namespace osmium {
 
             /**
              * Set functor to be called whenever the buffer is full
-             * instead of throwing BufferIsFull.
+             * instead of throwing buffer_is_full.
              */
             void set_full_callback(std::function<void(Buffer&)> full) {
                 m_full = full;
@@ -317,13 +324,13 @@ namespace osmium {
              * * If no callback is defined and this buffer uses internal
              *   memory management, the buffers capacity is grown, so that
              *   the new data will fit.
-             * * Else the BufferIsFull exception is thrown.
+             * * Else the buffer_is_full exception is thrown.
              *
              * @param size Number of bytes to reserve.
              * @return Pointer to reserved space. Note that this pointer is
              *         only guaranteed to be valid until the next call to
              *         reserve_space().
-             * @throw BufferIsFull Might be thrown if the buffer is full.
+             * @throw osmium::buffer_is_full Might be thrown if the buffer is full.
              */
             unsigned char* reserve_space(const size_t size) {
                 if (m_written + size > m_capacity) {
@@ -337,7 +344,7 @@ namespace osmium {
                         }
                         grow(new_capacity);
                     } else {
-                        throw BufferIsFull();
+                        throw osmium::buffer_is_full();
                     }
                 }
                 unsigned char* data = &m_data[m_written];

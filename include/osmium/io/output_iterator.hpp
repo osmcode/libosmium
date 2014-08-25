@@ -82,7 +82,7 @@ namespace osmium {
             OutputIterator& operator=(const osmium::memory::Item& item) {
                 try {
                     m_buffer_wrapper->buffer.push_back(item);
-                } catch (osmium::memory::BufferIsFull&) {
+                } catch (osmium::buffer_is_full&) {
                     flush();
                     m_buffer_wrapper->buffer.push_back(item);
                 }
