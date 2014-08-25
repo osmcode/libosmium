@@ -49,6 +49,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/io/detail/read_write.hpp>
 #include <osmium/io/file_compression.hpp>
+#include <osmium/util/compatibility.hpp>
 
 namespace osmium {
 
@@ -120,10 +121,7 @@ namespace osmium {
             CompressionFactory(CompressionFactory&&) = delete;
             CompressionFactory& operator=(CompressionFactory&&) = delete;
 
-#ifndef _MSC_VER
-            [[noreturn]]
-#endif
-            void error(osmium::io::file_compression compression) {
+            OSMIUM_NORETURN void error(osmium::io::file_compression compression) {
                 std::string error_message {"Support for compression '"};
                 error_message += as_string(compression);
                 error_message += "' not compiled into this binary.";

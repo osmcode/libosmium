@@ -33,11 +33,15 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-// Workaround for MSVC which doesn't support constexpr in all cases yet
+// Workarounds for MSVC which doesn't support
+// * constexpr in all cases yet
+// * [[noreturn]]
 #ifdef _MSC_VER
 # define OSMIUM_CONSTEXPR
+# define OSMIUM_NORETURN __declspec(noreturn)
 #else
 # define OSMIUM_CONSTEXPR constexpr
+# define OSMIUM_NORETURN [[noreturn]]
 #endif
 
 #endif // OSMIUM_CONFIG_CONSTEXPR_HPP

@@ -41,11 +41,12 @@ DEALINGS IN THE SOFTWARE.
 
 #include <bzlib.h>
 #ifndef _MSC_VER
-#include <unistd.h>
+# include <unistd.h>
 #endif
 
 #include <osmium/io/compression.hpp>
 #include <osmium/io/file_compression.hpp>
+#include <osmium/util/compatibility.hpp>
 
 namespace osmium {
 
@@ -53,10 +54,7 @@ namespace osmium {
 
         namespace detail {
 
-#ifndef _MSC_VER
-            [[noreturn]]
-#endif
-            inline void throw_bzip2_error(const std::string& msg, int error) {
+            OSMIUM_NORETURN inline void throw_bzip2_error(const std::string& msg, int error) {
                 throw std::runtime_error("bzip2 error: " + msg + ": " + std::to_string(error));
             }
 
