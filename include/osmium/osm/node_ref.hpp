@@ -79,6 +79,14 @@ namespace osmium {
             return m_location.lat();
         }
 
+        int32_t x() const {
+            return m_location.x();
+        }
+
+        int32_t y() const{
+            return m_location.y();
+        }
+
         void location(const osmium::Location& location) {
             m_location = location;
         }

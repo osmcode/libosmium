@@ -226,10 +226,15 @@ namespace osmium {
                     return osmium::Location();
                 }
 
-                double denom = ((s2.second().lat() - s2.first().lat())*(s1.second().lon() - s1.first().lon())) -
-                               ((s2.second().lon() - s2.first().lon())*(s1.second().lat() - s1.first().lat()));
+                auto d = (static_cast<int64_t>(s2.second().y()) - static_cast<int64_t>(s2.first().y())) *
+                         (static_cast<int64_t>(s1.second().x()) - static_cast<int64_t>(s1.first().x())) -
+                         (static_cast<int64_t>(s2.second().x()) - static_cast<int64_t>(s2.first().x())) *
+                         (static_cast<int64_t>(s1.second().y()) - static_cast<int64_t>(s1.first().y()));
 
-                if (denom != 0) {
+                if (d != 0) {
+                    double denom  = ((s2.second().lat() - s2.first().lat())*(s1.second().lon() - s1.first().lon())) -
+                                    ((s2.second().lon() - s2.first().lon())*(s1.second().lat() - s1.first().lat()));
+
                     double nume_a = ((s2.second().lon() - s2.first().lon())*(s1.first().lat() - s2.first().lat())) -
                                     ((s2.second().lat() - s2.first().lat())*(s1.first().lon() - s2.first().lon()));
 
