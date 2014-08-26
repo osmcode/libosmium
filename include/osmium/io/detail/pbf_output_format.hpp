@@ -236,7 +236,7 @@ namespace osmium {
                  * enough space for the string table (which typically
                  * needs about 0.1 to 0.3% of the block size).
                  */
-                static constexpr int buffer_fill_percent = 95;
+                static constexpr int64_t buffer_fill_percent = 95;
 
                 /**
                  * protobuf-struct of a HeaderBlock
@@ -313,7 +313,7 @@ namespace osmium {
                  * called once for each object.
                  */
                 uint16_t primitive_block_contents;
-                uint32_t primitive_block_size;
+                int primitive_block_size;
 
                 // StringTable management
                 StringTable string_table;
@@ -329,7 +329,7 @@ namespace osmium {
                 Delta<int64_t> m_delta_timestamp;
                 Delta<int64_t> m_delta_changeset;
                 Delta<int64_t> m_delta_uid;
-                Delta<uint32_t> m_delta_user_sid;
+                Delta<::google::protobuf::int32> m_delta_user_sid;
 
                 bool debug;
 
@@ -411,8 +411,11 @@ namespace osmium {
 
                             // iterate over all relation members, mapping the interim string-ids
                             // of the role to real string ids
-                            for (int mi=0, ml=relation->roles_sid_size(); mi<ml; ++mi) {
-                                relation->set_roles_sid(mi, string_table.map_string_id(relation->roles_sid(mi)));
+                            for (int mi=0; mi < relation->roles_sid_size(); ++mi) {
+                                auto roles_sid = relation->roles_sid(mi);
+                                assert(roles_sid >= 0);
+                                assert(roles_sid < std::numeric_limits<osmium::io::detail::StringTable::string_id_type>::max());
+                                relation->set_roles_sid(mi, string_table.map_string_id(static_cast<osmium::io::detail::StringTable::string_id_type>(roles_sid)));
                             }
                         }
                     }
@@ -430,7 +433,10 @@ namespace osmium {
                     if (in->has_info()) {
                         // map the interim-id of the user name to a real id
                         OSMPBF::Info* info = in->mutable_info();
-                        info->set_user_sid(string_table.map_string_id(info->user_sid()));
+                        auto user_sid = info->user_sid();
+                        assert(user_sid >= 0);
+                        assert(user_sid < std::numeric_limits<osmium::io::detail::StringTable::string_id_type>::max());
+                        info->set_user_sid(string_table.map_string_id(static_cast<osmium::io::detail::StringTable::string_id_type>(user_sid)));
                     }
 
                     // iterate over all tags and map the interim-ids of the key and the value to real ids
@@ -447,14 +453,14 @@ namespace osmium {
                  * convert a double lat or lon value to an int, respecting the current blocks granularity
                  */
                 int64_t lonlat2int(double lonlat) {
-                    return round(lonlat * OSMPBF::lonlat_resolution / location_granularity());
+                    return static_cast<int64_t>(std::round(lonlat * OSMPBF::lonlat_resolution / location_granularity()));
                 }
 
                 /**
                  * convert a timestamp to an int, respecting the current blocks granularity
                  */
                 int64_t timestamp2int(time_t timestamp) {
-                    return round(timestamp * (static_cast<double>(1000) / date_granularity()));
+                    return static_cast<int64_t>(std::round(timestamp * (1000.0 / date_granularity())));
                 }
 
                 /**
@@ -570,7 +576,7 @@ namespace osmium {
                 void check_block_contents_counter() {
                     if (primitive_block_contents >= max_block_contents) {
                         store_primitive_block();
-                    } else if (primitive_block_size > (static_cast<uint32_t>(OSMPBF::max_uncompressed_blob_size) * buffer_fill_percent / 100)) {
+                    } else if (primitive_block_size > OSMPBF::max_uncompressed_blob_size * buffer_fill_percent / 100) {
                         if (debug && has_debug_level(1)) {
                             std::cerr << "storing primitive_block with only " << primitive_block_contents << " items, because its ByteSize (" << primitive_block_size << ") reached " <<
                                       (static_cast<float>(primitive_block_size) / static_cast<float>(OSMPBF::max_uncompressed_blob_size) * 100.0) << "% of the maximum blob-size" << std::endl;
