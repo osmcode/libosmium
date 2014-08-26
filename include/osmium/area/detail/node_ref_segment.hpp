@@ -204,20 +204,20 @@ namespace osmium {
             }
 
             /**
-            * Calculate the intersection between to NodeRefSegments. The result is returned
-            * as a Location. Note that because the Location uses integers with limited
-            * precision internally, the result might be slightly different than the
-            * numerically correct location.
-            *
-            * If the segments touch in one of their endpoints, it doesn't count as an
-            * intersection.
-            *
-            * If the segments intersect not in a single point but in multiple points, ie
-            * if they overlap, this is NOT detected.
-            *
-            * @returns Undefined osmium::Location if there is no intersection or a defined
-            *          Location if the segments intersect.
-            */
+             * Calculate the intersection between to NodeRefSegments. The result is returned
+             * as a Location. Note that because the Location uses integers with limited
+             * precision internally, the result might be slightly different than the
+             * numerically correct location.
+             *
+             * If the segments touch in one of their endpoints, it doesn't count as an
+             * intersection.
+             *
+             * If the segments intersect not in a single point but in multiple points, ie
+             * if they overlap, this is NOT detected.
+             *
+             * @returns Undefined osmium::Location if there is no intersection or a defined
+             *          Location if the segments intersect.
+             */
             inline osmium::Location calculate_intersection(const NodeRefSegment& s1, const NodeRefSegment& s2) {
                 if (s1.first().location()  == s2.first().location()  ||
                     s1.first().location()  == s2.second().location() ||
@@ -227,7 +227,7 @@ namespace osmium {
                 }
 
                 double denom = ((s2.second().lat() - s2.first().lat())*(s1.second().lon() - s1.first().lon())) -
-                            ((s2.second().lon() - s2.first().lon())*(s1.second().lat() - s1.first().lat()));
+                               ((s2.second().lon() - s2.first().lon())*(s1.second().lat() - s1.first().lat()));
 
                 if (denom != 0) {
                     double nume_a = ((s2.second().lon() - s2.first().lon())*(s1.first().lat() - s2.first().lat())) -
