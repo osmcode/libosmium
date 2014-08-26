@@ -69,6 +69,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/types.hpp>
 #include <osmium/thread/queue.hpp>
 #include <osmium/thread/checked_task.hpp>
+#include <osmium/util/cast.hpp>
 
 namespace osmium {
 
@@ -260,7 +261,7 @@ namespace osmium {
                             m_input_queue.wait_and_pop(data);
                             done = data.empty();
                             try {
-                                if (XML_Parse(parser, data.data(), data.size(), done) == XML_STATUS_ERROR) {
+                                if (XML_Parse(parser, data.data(), static_cast_with_assert<int>(data.size()), done) == XML_STATUS_ERROR) {
                                     throw osmium::xml_error(parser);
                                 }
                             } catch (ParserIsDone&) {

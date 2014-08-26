@@ -128,6 +128,7 @@ More complete outlines of real .osm.pbf files can be created using the osmpbf-ou
 #include <osmium/osm/tag.hpp>
 #include <osmium/osm/timestamp.hpp>
 #include <osmium/osm/way.hpp>
+#include <osmium/util/cast.hpp>
 #include <osmium/visitor.hpp>
 
 namespace osmium {
@@ -153,7 +154,7 @@ namespace osmium {
                         std::string content;
                         msg.SerializeToString(&content);
 
-                        pbf_blob.set_raw_size(content.size());
+                        pbf_blob.set_raw_size(static_cast_with_assert<::google::protobuf::int32>(content.size()));
 
                         if (use_compression) {
                             pbf_blob.set_zlib_data(osmium::io::detail::zlib_compress(content));
@@ -167,12 +168,12 @@ namespace osmium {
 
                     OSMPBF::BlobHeader pbf_blob_header;
                     pbf_blob_header.set_type(type);
-                    pbf_blob_header.set_datasize(blob_data.size());
+                    pbf_blob_header.set_datasize(static_cast_with_assert<::google::protobuf::int32>(blob_data.size()));
 
                     std::string blob_header_data;
                     pbf_blob_header.SerializeToString(&blob_header_data);
 
-                    uint32_t sz = htonl(blob_header_data.size());
+                    uint32_t sz = htonl(static_cast_with_assert<uint32_t>(blob_header_data.size()));
 
                     // write to output: the 4-byte BlobHeader-Size followed by the BlobHeader followed by the Blob
                     std::string output;
@@ -365,10 +366,8 @@ namespace osmium {
                             for (int i=0, l=dense->keys_vals_size(); i<l; ++i) {
                                 // map interim string-ids > 0 to real string ids
                                 auto sid = dense->keys_vals(i);
-                                assert(sid >= 0);
-                                assert(sid < std::numeric_limits<osmium::io::detail::StringTable::string_id_type>::max());
                                 if (sid > 0) {
-                                    dense->set_keys_vals(i, string_table.map_string_id(static_cast<osmium::io::detail::StringTable::string_id_type>(sid)));
+                                    dense->set_keys_vals(i, string_table.map_string_id(static_cast_with_assert<osmium::io::detail::StringTable::string_id_type>(sid)));
                                 }
                             }
 
@@ -380,9 +379,7 @@ namespace osmium {
                                 // iterate over all username string-ids
                                 for (int i=0, l=denseinfo->user_sid_size(); i<l; ++i) {
                                     // map interim string-ids > 0 to real string ids
-                                    auto usid = denseinfo->user_sid(i);
-                                    assert(usid < std::numeric_limits<osmium::io::detail::StringTable::string_id_type>::max());
-                                    auto user_sid = string_table.map_string_id(static_cast<osmium::io::detail::StringTable::string_id_type>(usid));
+                                    auto user_sid = string_table.map_string_id(static_cast_with_assert<osmium::io::detail::StringTable::string_id_type>(denseinfo->user_sid(i)));
 
                                     // delta encode the string-id
                                     denseinfo->set_user_sid(i, m_delta_user_sid.update(user_sid));
@@ -412,10 +409,7 @@ namespace osmium {
                             // iterate over all relation members, mapping the interim string-ids
                             // of the role to real string ids
                             for (int mi=0; mi < relation->roles_sid_size(); ++mi) {
-                                auto roles_sid = relation->roles_sid(mi);
-                                assert(roles_sid >= 0);
-                                assert(roles_sid < std::numeric_limits<osmium::io::detail::StringTable::string_id_type>::max());
-                                relation->set_roles_sid(mi, string_table.map_string_id(static_cast<osmium::io::detail::StringTable::string_id_type>(roles_sid)));
+                                relation->set_roles_sid(mi, string_table.map_string_id(static_cast_with_assert<osmium::io::detail::StringTable::string_id_type>(relation->roles_sid(mi))));
                             }
                         }
                     }
@@ -433,10 +427,7 @@ namespace osmium {
                     if (in->has_info()) {
                         // map the interim-id of the user name to a real id
                         OSMPBF::Info* info = in->mutable_info();
-                        auto user_sid = info->user_sid();
-                        assert(user_sid >= 0);
-                        assert(user_sid < std::numeric_limits<osmium::io::detail::StringTable::string_id_type>::max());
-                        info->set_user_sid(string_table.map_string_id(static_cast<osmium::io::detail::StringTable::string_id_type>(user_sid)));
+                        info->set_user_sid(string_table.map_string_id(static_cast_with_assert<osmium::io::detail::StringTable::string_id_type>(info->user_sid())));
                     }
 
                     // iterate over all tags and map the interim-ids of the key and the value to real ids
@@ -656,7 +647,7 @@ namespace osmium {
                         denseinfo->add_changeset(m_delta_changeset.update(node.changeset()));
 
                         // copy the user id, delta encoded
-                        denseinfo->add_uid(m_delta_uid.update(node.uid()));
+                        denseinfo->add_uid(static_cast<::google::protobuf::int32>(m_delta_uid.update(node.uid())));
 
                         // record the user-name to the interim stringtable and copy the
                         // interim string-id to the pbf-object

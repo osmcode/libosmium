@@ -42,6 +42,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/io/compression.hpp>
 #include <osmium/io/file_compression.hpp>
+#include <osmium/util/cast.hpp>
 
 namespace osmium {
 
@@ -66,7 +67,7 @@ namespace osmium {
             }
 
             void write(const std::string& data) override final {
-                ::gzwrite(m_gzfile, data.data(), data.size());
+                ::gzwrite(m_gzfile, data.data(), static_cast_with_assert<unsigned int>(data.size()));
             }
 
             void close() override final {
@@ -98,7 +99,7 @@ namespace osmium {
 
             std::string read() override final {
                 std::string buffer(osmium::io::Decompressor::input_buffer_size, '\0');
-                int nread = ::gzread(m_gzfile, const_cast<char*>(buffer.data()), buffer.size());
+                int nread = ::gzread(m_gzfile, const_cast<char*>(buffer.data()), static_cast_with_assert<unsigned int>(buffer.size()));
                 if (nread < 0) {
                     throw std::runtime_error("gzip read failed"); // XXX better error detection and reporting
 //                    throw std::system_error(errno, std::system_category(), "Read failed");

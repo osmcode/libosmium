@@ -46,6 +46,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/object.hpp>
 #include <osmium/osm/tag.hpp>
 #include <osmium/osm/types.hpp>
+#include <osmium/util/cast.hpp>
 
 namespace osmium {
 
@@ -104,9 +105,7 @@ namespace osmium {
         class RelationMemberListBuilder : public ObjectBuilder<RelationMemberList> {
 
             void add_role(osmium::RelationMember* member, const char* role) {
-                size_t length = std::strlen(role) + 1;
-                assert(length < std::numeric_limits<string_size_type>::max());
-                member->set_role_size(static_cast<string_size_type>(length));
+                member->set_role_size(static_cast_with_assert<string_size_type>(std::strlen(role) + 1));
                 add_size(append(role));
                 add_padding(true);
             }

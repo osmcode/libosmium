@@ -65,6 +65,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/thread/name.hpp>
 #include <osmium/thread/pool.hpp>
 #include <osmium/thread/queue.hpp>
+#include <osmium/util/cast.hpp>
 
 namespace osmium {
 
@@ -95,7 +96,7 @@ namespace osmium {
                 static constexpr size_t initial_buffer_size = 10 * 1024;
 
                 const void* m_data;
-                const size_t m_size;
+                const int m_size;
 
                 const OSMPBF::StringTable* m_stringtable;
                 int64_t m_lon_offset;
@@ -115,7 +116,7 @@ namespace osmium {
 
             public:
 
-                explicit PBFPrimitiveBlockParser(const void* data, const size_t size, osmium::osm_entity_bits::type read_types) :
+                explicit PBFPrimitiveBlockParser(const void* data, const int size, osmium::osm_entity_bits::type read_types) :
                     m_data(data),
                     m_size(size),
                     m_stringtable(nullptr),
@@ -329,11 +330,11 @@ namespace osmium {
                             auto v = dense.denseinfo().version(i);
                             assert(v > 0);
                             node.version(static_cast<osmium::object_version_type>(v));
-                            node.changeset(last_dense_changeset);
+                            node.changeset(static_cast<osmium::changeset_id_type>(last_dense_changeset));
                             node.timestamp(last_dense_timestamp * m_date_factor);
-                            node.uid_from_signed(last_dense_uid);
+                            node.uid_from_signed(static_cast<osmium::signed_user_id_type>(last_dense_uid));
                             node.visible(visible);
-                            builder.add_user(m_stringtable->s(last_dense_user_sid).data());
+                            builder.add_user(m_stringtable->s(static_cast<int>(last_dense_user_sid)).data());
                         } else {
                             builder.add_user("");
                         }
@@ -459,7 +460,7 @@ namespace osmium {
 
                 void handle_blob(const std::string& data) {
                     OSMPBF::HeaderBlock pbf_header_block;
-                    if (!pbf_header_block.ParseFromArray(data.data(), data.size())) {
+                    if (!pbf_header_block.ParseFromArray(data.data(), static_cast_with_assert<int>(data.size()))) {
                         throw osmium::pbf_error("failed to parse HeaderBlock");
                     }
 
@@ -521,7 +522,7 @@ namespace osmium {
                 osmium::osm_entity_bits::type m_read_types;
 
                 osmium::memory::Buffer handle_blob(const std::string& data) {
-                    PBFPrimitiveBlockParser parser(data.data(), data.size(), m_read_types);
+                    PBFPrimitiveBlockParser parser(data.data(), static_cast_with_assert<int>(data.size()), m_read_types);
                     return std::move(parser());
                 }
 
@@ -558,7 +559,7 @@ namespace osmium {
                  * @param expected_type Expected type of data ("OSMHeader" or "OSMData").
                  * @return Size of the data read from BlobHeader (0 on EOF).
                  */
-                size_t read_blob_header(const char* expected_type) {
+                int read_blob_header(const char* expected_type) {
                     uint32_t size_in_network_byte_order;
 
                     if (! m_input_queue_reader(reinterpret_cast<unsigned char*>(&size_in_network_byte_order), sizeof(size_in_network_byte_order))) {
@@ -583,13 +584,13 @@ namespace osmium {
                         throw osmium::pbf_error("blob does not have expected type (OSMHeader in first blob, OSMData in following blobs)");
                     }
 
-                    return static_cast<size_t>(m_blob_header.datasize());
+                    return m_blob_header.datasize();
                 }
 
                 void parse_osm_data(osmium::osm_entity_bits::type read_types) {
                     osmium::thread::set_thread_name("_osmium_pbf_in");
                     int n=0;
-                    while (size_t size = read_blob_header("OSMData")) {
+                    while (int size = read_blob_header("OSMData")) {
                         DataBlobParser data_blob_parser(size, n, m_input_queue_reader, read_types);
 
                         if (m_use_thread_pool) {
@@ -638,7 +639,7 @@ namespace osmium {
                     GOOGLE_PROTOBUF_VERIFY_VERSION;
 
                     // handle OSMHeader
-                    size_t size = read_blob_header("OSMHeader");
+                    int size = read_blob_header("OSMHeader");
 
                     {
                         HeaderBlobParser header_blob_parser(size, m_input_queue_reader, m_header);

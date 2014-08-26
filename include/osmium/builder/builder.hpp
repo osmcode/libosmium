@@ -63,7 +63,7 @@ namespace osmium {
 
         protected:
 
-            explicit Builder(osmium::memory::Buffer& buffer, Builder* parent, size_t size) :
+            explicit Builder(osmium::memory::Buffer& buffer, Builder* parent, osmium::memory::item_size_type size) :
                 m_buffer(buffer),
                 m_parent(parent),
                 m_item_offset(buffer.written()) {
@@ -96,7 +96,7 @@ namespace osmium {
              *
              */
             void add_padding(bool self=false) {
-                size_t padding = osmium::memory::align_bytes - (size() % osmium::memory::align_bytes);
+                auto padding = osmium::memory::align_bytes - (size() % osmium::memory::align_bytes);
                 if (padding != osmium::memory::align_bytes) {
                     std::memset(m_buffer.reserve_space(padding), 0, padding);
                     if (self) {
@@ -137,8 +137,8 @@ namespace osmium {
             /**
              * Append \0-terminated string to buffer.
              */
-            size_t append(const char* str) {
-                size_t length = std::strlen(str) + 1;
+            osmium::memory::item_size_type append(const char* str) {
+                osmium::memory::item_size_type length = static_cast<osmium::memory::item_size_type>(std::strlen(str) + 1);
                 std::memcpy(m_buffer.reserve_space(length), str, length);
                 return length;
             }

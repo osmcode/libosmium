@@ -40,6 +40,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/geom/coordinates.hpp>
 #include <osmium/geom/factory.hpp>
+#include <osmium/util/cast.hpp>
 
 namespace osmium {
 
@@ -136,8 +137,9 @@ namespace osmium {
                     return offset;
                 }
 
-                void set_size(const size_t offset, const uint32_t size) {
-                    memcpy(&m_data[offset], &size, sizeof(uint32_t));
+                void set_size(const size_t offset, const size_t size) {
+                    const uint32_t s = static_cast_with_assert<uint32_t>(size);
+                    memcpy(&m_data[offset], &s, sizeof(uint32_t));
                 }
 
             public:
