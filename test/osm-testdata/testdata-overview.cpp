@@ -1,7 +1,6 @@
 /* The code in this file is released into the Public Domain. */
 
 #include <iostream>
-#include <getopt.h>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wold-style-cast"
@@ -181,56 +180,15 @@ public:
 
 /* ================================================== */
 
-void print_help() {
-    std::cout << "testdata-overview [OPTIONS] [INFILE [OUTFILE]]\n\n" \
-              << "If INFILE is not given stdin is assumed.\n" \
-              << "If OUTFILE is not given 'testdata-overview.db' is used.\n" \
-              << "\nOptions:\n" \
-              << "  -h, --help           This help message\n" \
-              << "  -f, --format=FORMAT  Output OGR format (Default: 'SQLite')\n";
-}
-
 int main(int argc, char* argv[]) {
-    static struct option long_options[] = {
-        {"help",   no_argument, 0, 'h'},
-        {"format", required_argument, 0, 'f'},
-        {0, 0, 0, 0}
-    };
+    if (argc != 2) {
+        std::cerr << "Usage: " << argv[0] << " INFILE\n";
+        exit(1);
+    }
 
     std::string output_format("SQLite");
-
-    while (true) {
-        int c = getopt_long(argc, argv, "hf:", long_options, 0);
-        if (c == -1) {
-            break;
-        }
-
-        switch (c) {
-            case 'h':
-                print_help();
-                exit(0);
-            case 'f':
-                output_format = optarg;
-                break;
-            default:
-                exit(1);
-        }
-    }
-
-    std::string input_filename;
+    std::string input_filename(argv[1]);
     std::string output_filename("testdata-overview.db");
-    int remaining_args = argc - optind;
-    if (remaining_args > 2) {
-        std::cerr << "Usage: " << argv[0] << " [OPTIONS] [INFILE [OUTFILE]]" << std::endl;
-        exit(1);
-    } else if (remaining_args == 2) {
-        input_filename =  argv[optind];
-        output_filename = argv[optind+1];
-    } else if (remaining_args == 1) {
-        input_filename =  argv[optind];
-    } else {
-        input_filename = "-";
-    }
 
     osmium::io::Reader reader(input_filename);
 
