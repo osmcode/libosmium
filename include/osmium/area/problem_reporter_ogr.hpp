@@ -37,10 +37,11 @@ DEALINGS IN THE SOFTWARE.
 #define OSMIUM_LINK_WITH_LIBS_OGR `gdal-config --libs`
 
 #pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdocumentation-unknown-command"
+#pragma GCC diagnostic ignored "-Wfloat-equal"
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 #pragma GCC diagnostic ignored "-Wredundant-decls"
 #pragma GCC diagnostic ignored "-Wshadow"
-#pragma GCC diagnostic ignored "-Wdocumentation-unknown-command"
 # include <ogr_api.h>
 # include <ogrsf_frmts.h>
 #pragma GCC diagnostic pop

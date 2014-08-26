@@ -42,6 +42,7 @@ DEALINGS IN THE SOFTWARE.
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdocumentation-unknown-command"
+#pragma GCC diagnostic ignored "-Wfloat-equal"
 # include <ogr_geometry.h>
 #pragma GCC diagnostic pop
 

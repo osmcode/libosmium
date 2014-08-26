@@ -86,8 +86,16 @@ namespace osmium {
 
         }; // struct coordinates
 
+        /**
+         * Compare whether two Coordinates are identical. Might not give the
+         * right result if the coordinates have been the result of some
+         * calculation that introduced rounding errors.
+         */
         inline bool operator==(const Coordinates& lhs, const Coordinates& rhs) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wfloat-equal"
             return lhs.x == rhs.x && lhs.y == rhs.y;
+#pragma GCC diagnostic pop
         }
 
         inline bool operator!=(const Coordinates& lhs, const Coordinates& rhs) {
