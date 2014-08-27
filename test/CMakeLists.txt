@@ -1,4 +1,3 @@
-
 set(DART_TESTING_TIMEOUT 5)
 include(Dart)
 
@@ -14,11 +13,9 @@ message(STATUS ${CMAKE_CXX_FLAGS})
 
 add_library(testlib STATIC test_main.cpp)
 
-
 #----------------------------------------------------------------------
 macro(compile_tests)
     foreach(test_name ${TESTS})
-        message(${test_name})
         add_executable(${test_name} t/${TEST_GROUP}/${test_name}.cpp)
         target_link_libraries(${test_name} testlib ${LIBS})
         add_test(${test_name} ${test_name} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
@@ -67,12 +64,15 @@ if(GEOS_FOUND AND PROJ_FOUND)
         test_geos
         test_geos_wkb
         test_mercator
-#   test_ogr
         test_projection
         test_wkb
         test_wkt
     )
     set(LIBS ${GEOS_LIBRARY} ${PROJ_LIBRARY} ${BZIP2_LIBRARY})
+    if (GDAL_FOUND)
+      list(APPEND TESTS test_ogr)
+      list(APPEND LIBS ${GDAL_LIBRARY})
+    endif()
     compile_tests()
 else()
     message("Skipped geom tests - needed GEOS and PROJ libraries")
@@ -80,9 +80,13 @@ endif()
 
 set(TEST_GROUP index)
 set(TESTS
-    test_id_to_location
     test_typed_mmap
 )
+if (SPARSEHASH_FOUND)
+    list(APPEND TESTS test_id_to_location)
+else()
+    message("Skipped index/test_id_to_localtion test - needed Google SparseHash")
+endif()
 set(LIBS "")
 compile_tests()
 

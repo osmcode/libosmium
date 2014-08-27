@@ -64,7 +64,7 @@ class MyOGRHandler : public osmium::handler::Handler {
     //osmium::geom::OGRFactory<> m_factory {};
 
     // 2. Project coordinates into "Web Mercator".
-    osmium::geom::OGRFactory<osmium::geom::MercatorProjection> m_factory {};
+    osmium::geom::OGRFactory<osmium::geom::MercatorProjection> m_factory;
 
     // 3. Use any projection that the proj library can handle.
     //    (Initialize projection with EPSG code or proj string).

@@ -1,6 +1,7 @@
 
 if(NOT (PROJ_FOUND AND GEOS_FOUND AND SPARSEHASH_FOUND))
-    message(FATAL_ERROR "Proj+Geos+Sparsehash are needed to check all includes")
+    message(WARNING "Proj+Geos+Sparsehash are needed to check all includes")
+    return()
 endif()
 
 file(GLOB_RECURSE ALL_HPPS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.hpp)

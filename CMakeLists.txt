@@ -35,8 +35,6 @@ option(BUILD_TRY_HPPS "compile every hpp" ON)
 #  Find external dependencies
 #
 #----------------------------------------------------------------------
-find_package(Boost 1.38)
-mark_as_advanced(CLEAR BOOST_ROOT)
 
 
 include(CheckIncludeFiles)
@@ -50,34 +48,17 @@ if(CMAKE_COMPILER_IS_GNUCC AND WIN32)
     list(APPEND WIN_LIBS iconv)
 endif()
 
-if(NOT CMAKE_COMPILER_IS_GNUCC AND WIN32)
-    find_path(GETOPT_INCLUDE_DIR getopt.h)
-    find_library(GETOPT_LIBRARY NAMES wingetopt)
+if(MSVC)
     add_definitions(-wd4996 -DNOMINMAX -DWIN32_LEAN_AND_MEAN -D_CRT_SECURE_NO_WARNINGS)
-    if(GETOPT_INCLUDE_DIR AND GETOPT_LIBRARY)
-        include_directories(${GETOPT_INCLUDE_DIR})
-        list(APPEND WIN_LIBS ${GETOPT_LIBRARY})
-    endif()
 else()
     add_definitions(-std=c++11)
 endif()
 
-find_package(ZLIB)
-find_package(BZip2)
-find_package(EXPAT)
-find_package(Protobuf)
-find_package(Threads)
-
-find_package(OSMPBF)
-include_directories(${OSMPBF_INCLUDE_DIRS})
-#list(APPEND LIBRARIES ${OSMPBF_LIBRARIES})
-if(NOT OSMPBF_FOUND)
-    message(WARNING "OSMPBF library not found!\n")
-endif()
-
-
 # check that the essential libraries were found
 if(BUILD_EXAMPLES OR BUILD_TESTING OR BUILD_TRY_HPPS)
+
+    find_package(Boost 1.38)
+    mark_as_advanced(CLEAR BOOST_ROOT)
 
     if(Boost_FOUND)
         include_directories(${Boost_INCLUDE_DIRS})
@@ -86,6 +67,7 @@ if(BUILD_EXAMPLES OR BUILD_TESTING OR BUILD_TRY_HPPS)
         message(FATAL_ERROR "PLEASE, specify the directory where the Boost library is installed in BOOST_ROOT")
     endif()
 
+    find_package(ZLIB)
     if(ZLIB_FOUND)
         include_directories(${ZLIB_INCLUDE_DIR})
     else()
@@ -93,12 +75,14 @@ if(BUILD_EXAMPLES OR BUILD_TESTING OR BUILD_TRY_HPPS)
         message(FATAL_ERROR "Please, specify the ZLIB includes directory and the library file")
     endif()
 
+    find_package(BZip2)
     if(BZIP2_FOUND)
         include_directories(${BZIP2_INCLUDE_DIR})
     else()
         message(FATAL_ERROR "Please, specify the BZip2 includes directory and the library file")
     endif()
 
+    find_package(EXPAT)
     if(EXPAT_FOUND)
         include_directories(${EXPAT_INCLUDE_DIR})
     else()
@@ -106,6 +90,7 @@ if(BUILD_EXAMPLES OR BUILD_TESTING OR BUILD_TRY_HPPS)
         message(FATAL_ERROR "Please, specify the EXPAT includes directory and the library file")
     endif()
 
+    find_package(Protobuf)
     if(PROTOBUF_INCLUDE_DIR AND PROTOBUF_LITE_LIBRARY)
         include_directories(${PROTOBUF_INCLUDE_DIR})
     else()
@@ -113,49 +98,59 @@ if(BUILD_EXAMPLES OR BUILD_TESTING OR BUILD_TRY_HPPS)
         message(FATAL_ERROR "Please, specify the Google PROTOBUF library dir")
     endif()
 
-endif()
+    find_package(OSMPBF)
+    if(OSMPBF_FOUND)
+       include_directories(${OSMPBF_INCLUDE_DIRS})
+    else()
+       message(WARNING "OSMPBF library not found!\n")
+    endif()
 
-find_package(LibXml2)
+    ##### Find Google SparseHash
+    find_path(SPARSEHASH_INCLUDE_DIR google/sparsetable)
+    if(SPARSEHASH_INCLUDE_DIR)
+       message(STATUS "SparseHash library found")
+       set(SPARSEHASH_FOUND 1)
+       include_directories(${SPARSEHASH_INCLUDE_DIR})
+    else()
+       message(STATUS "SparseHash library not found")
+    endif()
 
-##### Find Google SparseHash
-find_path(SPARSEHASH_INCLUDE_DIR google/sparsetable)
-if(SPARSEHASH_INCLUDE_DIR)
-    message(STATUS "SparseHash library found")
-    set(SPARSEHASH_FOUND 1)
-else()
-    message(STATUS "SparseHash library not found")
-endif()
-#####
+    ##### Find GEOS Library
+    find_path(GEOS_INCLUDE_DIR geos/geom.h)
+    find_library(GEOS_LIBRARY NAMES geos)
+    if(GEOS_INCLUDE_DIR AND GEOS_LIBRARY)
+       message(STATUS "GEOS library found")
+       SET(GEOS_FOUND 1)
+       include_directories(${GEOS_INCLUDE_DIR})
+    else()
+       message(STATUS "GEOS library not found")
+    endif()
 
+    ##### Find Proj.4 Library
+    find_path(PROJ_INCLUDE_DIR proj_api.h)
+    find_library(PROJ_LIBRARY NAMES proj)
+    if(PROJ_INCLUDE_DIR AND PROJ_LIBRARY)
+       message(STATUS "PROJ library found")
+       set(PROJ_FOUND 1)
+       include_directories(${PROJ_INCLUDE_DIR})
+    else()
+       message(STATUS "PROJ library not found")
+    endif()
 
-##### Find GEOS Library
-find_path(GEOS_INCLUDE_DIR geos/geom.h)
-find_library(GEOS_LIBRARY NAMES geos)
-if(GEOS_INCLUDE_DIR AND GEOS_LIBRARY)
-    message(STATUS "GEOS library found")
-    SET(GEOS_FOUND 1)
-else()
-    message(STATUS "GEOS library not found")
-endif()
-#####
+    find_package(GDAL)
+    if(GDAL_FOUND)
+       include_directories(${GDAL_INCLUDE_DIR})
+       set(GDAL_LIBRARIES ${GDAL_LIBRARY} ${ZLIB_LIBRARY} ${WIN_LIBS})
+    endif()
 
-##### Find Proj.4 Library
-find_path(PROJ_INCLUDE_DIR proj_api.h)
-find_library(PROJ_LIBRARY NAMES proj)
-if(PROJ_INCLUDE_DIR AND PROJ_LIBRARY)
-    message(STATUS "PROJ library found")
-    set(PROJ_FOUND 1)
-    include_directories(${PROJ_INCLUDE_DIR})
-else()
-    message(STATUS "PROJ library not found")
-endif()
-#####
-
-
-
-find_package(GDAL)
-if(GDAL_FOUND)
-    set(GDAL_LIBRARIES ${GDAL_LIBRARY} ${ZLIB_LIBRARY} ${WIN_LIBS})
+    if(MSVC)
+      find_path(GETOPT_INCLUDE_DIR getopt.h)
+      find_library(GETOPT_LIBRARY NAMES wingetopt)
+      if(GETOPT_INCLUDE_DIR AND GETOPT_LIBRARY)
+        include_directories(${GETOPT_INCLUDE_DIR})
+        list(APPEND WIN_LIBS ${GETOPT_LIBRARY})
+      endif()
+    endif()
 endif()
 
 if(WIN32)

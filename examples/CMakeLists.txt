@@ -1,4 +1,3 @@
-
 if(CMAKE_COMPILER_IS_GNUCC)
     add_compile_options(
         -Wall
@@ -19,20 +18,21 @@ endif()
 
 add_definitions(-D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64)
 
-
-if(SPARSEHASH_FOUND)
-    include_directories(${SPARSEHASH_INCLUDE_DIR})
-endif()
-
 set(BASIC_LIBS ${EXPAT_LIBRARY} ${OSMPBF_LIBRARIES} ${PROTOBUF_LITE_LIBRARY} ${ZLIB_LIBRARY} ${BZIP2_LIBRARIES} ${WIN_LIBS} ${CMAKE_THREAD_LIBS_INIT})
 
 set(SIMPLE_EXAMPLES
     osmium_read
     osmium_debug
     osmium_convert
-    osmium_area_test
     osmium_serdump
 )
+
+if (SPARSEHASH_FOUND)
+    list(APPEND SIMPLE_EXAMPLES osmium_area_test)
+else()
+    message("Skipped osmium_area_test example - needed Google SparseHash")
+endif()
+
 
 foreach(example ${SIMPLE_EXAMPLES})
     message(${example})
@@ -61,9 +61,6 @@ set(OGR_EXAMPLES
 )
 
 if(GDAL_FOUND AND GEOS_FOUND AND SPARSEHASH_FOUND)
-    include_directories(${GDAL_INCLUDE_DIR})
-    include_directories(${GEOS_INCLUDE_DIR})
-
     foreach(example ${OGR_EXAMPLES})
         message(${example})
         add_executable(${example} "${example}.cpp")
