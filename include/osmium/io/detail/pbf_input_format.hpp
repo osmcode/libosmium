@@ -170,14 +170,14 @@ namespace osmium {
                     object.id(pbf_object.id());
 
                     if (pbf_object.has_info()) {
-                        object.version(pbf_object.info().version())
-                            .changeset(pbf_object.info().changeset())
+                        object.version(static_cast_with_assert<object_version_type>(pbf_object.info().version()))
+                            .changeset(static_cast_with_assert<changeset_id_type>(pbf_object.info().changeset()))
                             .timestamp(pbf_object.info().timestamp() * m_date_factor)
                             .uid_from_signed(pbf_object.info().uid());
                         if (pbf_object.info().has_visible()) {
                             object.visible(pbf_object.info().visible());
                         }
-                        builder.add_user(m_stringtable->s(pbf_object.info().user_sid()).data());
+                        builder.add_user(m_stringtable->s(static_cast_with_assert<int>(pbf_object.info().user_sid())).data());
                     } else {
                         builder.add_user("");
                     }
@@ -399,7 +399,7 @@ namespace osmium {
                     if (size < 0 || size > OSMPBF::max_uncompressed_blob_size) {
                         throw osmium::pbf_error(std::string("invalid blob size: " + std::to_string(size)));
                     }
-                    if (! input_queue_reader(m_input_buffer.get(), size)) {
+                    if (! input_queue_reader(m_input_buffer.get(), static_cast<size_t>(size))) {
                         throw osmium::pbf_error("truncated data (EOF encountered)");
                     }
                 }

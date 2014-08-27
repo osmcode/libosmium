@@ -57,6 +57,8 @@ DEALINGS IN THE SOFTWARE.
 # define MAP_ANONYMOUS MAP_ANON
 #endif
 
+#include <osmium/util/cast.hpp>
+
 namespace osmium {
 
     /**
@@ -183,10 +185,10 @@ namespace osmium {
                 if (fstat(fd, &s) < 0) {
                     throw std::system_error(errno, std::system_category(), "fstat failed");
                 }
-                if (s.st_size % sizeof(T) != 0) {
+                if (static_cast<size_t>(s.st_size) % sizeof(T) != 0) {
                     throw std::length_error("file size has to be multiple of object size");
                 }
-                return s.st_size / sizeof(T);
+                return static_cast<size_t>(s.st_size) / sizeof(T);
             }
 
             /**
@@ -200,7 +202,7 @@ namespace osmium {
              */
             static void grow_file(size_t new_size, int fd) {
                 if (file_size(fd) < new_size) {
-                    if (::ftruncate(fd, sizeof(T) * new_size) < 0) {
+                    if (::ftruncate(fd, static_cast_with_assert<off_t>(sizeof(T) * new_size)) < 0) {
                         throw std::system_error(errno, std::system_category(), "ftruncate failed");
                     }
                 }

@@ -41,6 +41,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/memory/buffer.hpp>
 #include <osmium/memory/item.hpp>
+#include <osmium/util/cast.hpp>
 
 namespace osmium {
 
@@ -165,7 +166,7 @@ namespace osmium {
             }
 
             void add_user(const char* user) {
-                object().user_size(std::strlen(user) + 1);
+                object().user_size(static_cast_with_assert<string_size_type>(std::strlen(user) + 1));
                 add_size(append(user));
                 add_padding(true);
             }

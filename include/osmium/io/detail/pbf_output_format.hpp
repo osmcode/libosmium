@@ -367,7 +367,7 @@ namespace osmium {
                                 // map interim string-ids > 0 to real string ids
                                 auto sid = dense->keys_vals(i);
                                 if (sid > 0) {
-                                    dense->set_keys_vals(i, string_table.map_string_id(static_cast_with_assert<osmium::io::detail::StringTable::string_id_type>(sid)));
+                                    dense->set_keys_vals(i, string_table.map_string_id(sid));
                                 }
                             }
 
@@ -379,7 +379,7 @@ namespace osmium {
                                 // iterate over all username string-ids
                                 for (int i=0, l=denseinfo->user_sid_size(); i<l; ++i) {
                                     // map interim string-ids > 0 to real string ids
-                                    auto user_sid = string_table.map_string_id(static_cast_with_assert<osmium::io::detail::StringTable::string_id_type>(denseinfo->user_sid(i)));
+                                    auto user_sid = string_table.map_string_id(denseinfo->user_sid(i));
 
                                     // delta encode the string-id
                                     denseinfo->set_user_sid(i, m_delta_user_sid.update(user_sid));
@@ -409,7 +409,7 @@ namespace osmium {
                             // iterate over all relation members, mapping the interim string-ids
                             // of the role to real string ids
                             for (int mi=0; mi < relation->roles_sid_size(); ++mi) {
-                                relation->set_roles_sid(mi, string_table.map_string_id(static_cast_with_assert<osmium::io::detail::StringTable::string_id_type>(relation->roles_sid(mi))));
+                                relation->set_roles_sid(mi, string_table.map_string_id(relation->roles_sid(mi)));
                             }
                         }
                     }
@@ -427,7 +427,7 @@ namespace osmium {
                     if (in->has_info()) {
                         // map the interim-id of the user name to a real id
                         OSMPBF::Info* info = in->mutable_info();
-                        info->set_user_sid(string_table.map_string_id(static_cast_with_assert<osmium::io::detail::StringTable::string_id_type>(info->user_sid())));
+                        info->set_user_sid(string_table.map_string_id(info->user_sid()));
                     }
 
                     // iterate over all tags and map the interim-ids of the key and the value to real ids

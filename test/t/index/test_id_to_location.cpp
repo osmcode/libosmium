@@ -12,8 +12,8 @@
 
 template <typename TIndex>
 void test_func_all(TIndex& index) {
-    osmium::object_id_type id1 = 12;
-    osmium::object_id_type id2 = 3;
+    osmium::unsigned_object_id_type id1 = 12;
+    osmium::unsigned_object_id_type id2 = 3;
     osmium::Location loc1(1.2, 4.5);
     osmium::Location loc2(3.5, -7.2);
 
@@ -30,8 +30,8 @@ void test_func_all(TIndex& index) {
 
 template <typename TIndex>
 void test_func_real(TIndex& index) {
-    osmium::object_id_type id1 = 12;
-    osmium::object_id_type id2 = 3;
+    osmium::unsigned_object_id_type id1 = 12;
+    osmium::unsigned_object_id_type id2 = 3;
     osmium::Location loc1(1.2, 4.5);
     osmium::Location loc2(3.5, -7.2);
 
