@@ -16,7 +16,18 @@ if [ -z "$CXX" ]; then
 fi
 
 if [ -z "$CXXFLAGS_WARNINGS" ]; then
-    CXXFLAGS_WARNINGS="-Wall -Wextra -Wredundant-decls -Wdisabled-optimization -pedantic -Wctor-dtor-privacy -Wnon-virtual-dtor -Woverloaded-virtual -Wsign-promo"
+    CXXFLAGS_WARNINGS="-Wall -Wextra -pedantic -Wredundant-decls -Wdisabled-optimization -Wctor-dtor-privacy -Wnon-virtual-dtor -Woverloaded-virtual -Wsign-promo -Wold-style-cast"
+fi
+
+if [ "$CXX" = "g++" ]; then
+    # remove warnings that create false positives on g++
+    CXXFLAGS_WARNINGS="$CXXFLAGS_WARNINGS -Wno-return-type -Wno-array-bounds"
+fi
+
+if [ "$CXX" = "clang++" ]; then
+    CXXFLAGS_WARNINGS="$CXXFLAGS_WARNINGS -Wdocumentation -Wunused-exception-parameter -Wmissing-declarations"
+    CXXFLAGS_WARNINGS="$CXXFLAGS_WARNINGS -Weverything -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-unused-macros -Wno-exit-time-destructors -Wno-global-constructors -Wno-padded -Wno-switch-enum -Wno-missing-prototypes -Wno-weak-vtables"
+    CXXFLAGS_WARNINGS="$CXXFLAGS_WARNINGS -Wno-cast-align"
 fi
 
 CXXFLAGS="$CXXFLAGS -g -std=c++11"
@@ -25,7 +36,7 @@ if [ `uname -s` = 'Darwin' ]; then
     CXXFLAGS="${CXXFLAGS} -stdlib=libc++"
 fi
 
-COMPILE="$CXX -I../include -Iinclude $CXXFLAGS $CXXFLAGS_WARNINGS -o tests $LDFLAGS"
+COMPILE="$CXX -I../include -Iinclude $CXXFLAGS -Werror $CXXFLAGS_WARNINGS -o tests $LDFLAGS"
 
 if [ "x$1" = "x-v" ]; then
     VALGRIND="valgrind --leak-check=full --show-reachable=yes --suppressions=valgrind.supp --error-exitcode=1"

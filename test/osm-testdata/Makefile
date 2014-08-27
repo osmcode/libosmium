@@ -22,6 +22,18 @@ endif
 
 CXXFLAGS_OGR      := $(shell gdal-config --cflags)
 CXXFLAGS_WARNINGS := -Wall -Wextra -pedantic -Wredundant-decls -Wdisabled-optimization -Wctor-dtor-privacy -Wnon-virtual-dtor -Woverloaded-virtual -Wsign-promo -Wold-style-cast
+CXXFLAGS_WARNINGS += -Werror
+
+ifeq ($(CXX),g++)
+    # remove warnings that create false positives on g++
+    CXXFLAGS_WARNINGS += -Wno-return-type -Wno-array-bounds
+endif
+
+ifeq ($(CXX),clang++)
+    CXXFLAGS_WARNINGS += -Wdocumentation -Wunused-exception-parameter -Wmissing-declarations
+    CXXFLAGS_WARNINGS += -Weverything -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-unused-macros -Wno-exit-time-destructors -Wno-global-constructors -Wno-padded -Wno-switch-enum -Wno-missing-prototypes -Wno-weak-vtables
+    CXXFLAGS_WARNINGS += -Wno-cast-align
+endif
 
 # suppress warnings from Catch unit test macros
 CXXFLAGS_WARNINGS += -Wno-unused-variable

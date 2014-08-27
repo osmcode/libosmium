@@ -14,6 +14,11 @@
 #  
 #------------------------------------------------------------------------------
 
+# first inherit from env
+CXX := $(CXX)
+CXXFLAGS := $(CXXFLAGS)
+LDFLAGS := $(LDFLAGS)
+
 CXXFLAGS += -O3
 CXXFLAGS += -g
 CXXFLAGS += -std=c++11 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64
@@ -28,6 +33,21 @@ endif
 CXXFLAGS_GEOS     := $(shell geos-config --cflags)
 CXXFLAGS_OGR      := $(shell gdal-config --cflags)
 CXXFLAGS_WARNINGS := -Wall -Wextra -pedantic -Wredundant-decls -Wdisabled-optimization -Wctor-dtor-privacy -Wnon-virtual-dtor -Woverloaded-virtual -Wsign-promo -Wold-style-cast
+CXXFLAGS_WARNINGS += -Werror
+
+# remove optional version from compiler name in CXX
+COMPILER := $(shell echo $(CXX) | sed -e's/-.*//')
+
+ifeq ($(COMPILER),g++)
+    # remove warnings that create false positives on g++
+    CXXFLAGS_WARNINGS += -Wno-return-type -Wno-array-bounds
+endif
+
+ifeq ($(COMPILER),clang++)
+    CXXFLAGS_WARNINGS += -Wdocumentation -Wunused-exception-parameter -Wmissing-declarations
+    CXXFLAGS_WARNINGS += -Weverything -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-unused-macros -Wno-exit-time-destructors -Wno-global-constructors -Wno-padded -Wno-switch-enum -Wno-missing-prototypes -Wno-weak-vtables
+    CXXFLAGS_WARNINGS += -Wno-cast-align -Wno-format-nonliteral
+endif
 
 LIB_EXPAT  := -lexpat
 LIB_PBF    := -pthread -lz -lprotobuf-lite -losmpbf

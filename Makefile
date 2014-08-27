@@ -19,12 +19,19 @@ INCLUDE_FILES := $(shell find include/osmium -name \*.hpp | sort)
 IWYU_REPORT_FILES := $(subst include/osmium,check_reports,$(INCLUDE_FILES:.hpp=.iwyu))
 INCLUDES_REPORT_FILES := $(subst include/osmium,check_reports,$(INCLUDE_FILES:.hpp=.compile))
 
-WARNINGFLAGS := -Wall -Wextra -pedantic -Wredundant-decls -Wdisabled-optimization -Wctor-dtor-privacy -Wnon-virtual-dtor -Woverloaded-virtual -Wsign-promo -Winline -Wold-style-cast -Wmissing-prototypes -Wunused-exception-parameter
-#WARNINGFLAGS += -Weverything -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-unused-macros -Wno-exit-time-destructors -Wno-global-constructors
-#WARNINGFLAGS += -Wno-shorten-64-to-32 -Wno-float-equal -Wno-padded -Wno-switch-enum
+CXXFLAGS_WARNINGS := -Wall -Wextra -pedantic -Wredundant-decls -Wdisabled-optimization -Wctor-dtor-privacy -Wnon-virtual-dtor -Woverloaded-virtual -Wsign-promo -Wold-style-cast
 
-ifeq ($(CXX),clang++)
-    WARNINGFLAGS += -Wdocumentation
+# remove optional version from compiler name in CXX
+COMPILER := $(shell echo $(CXX) | sed -e's/-.*//')
+
+ifeq ($(COMPILER),g++)
+    # remove warnings that create false positives on g++
+    CXXFLAGS_WARNINGS += -Wno-return-type -Wno-array-bounds
+endif
+
+ifeq ($(COMPILER),clang++)
+    CXXFLAGS_WARNINGS += -Wdocumentation -Wunused-exception-parameter -Wmissing-declarations
+    CXXFLAGS_WARNINGS += -Weverything -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-unused-macros -Wno-exit-time-destructors -Wno-global-constructors -Wno-padded -Wno-switch-enum -Wno-missing-prototypes -Wno-weak-vtables
 endif
 
 INSTALL_USER := root
@@ -78,7 +85,7 @@ check_reports/%.compile: include/osmium/%.hpp
 	@flags=`./get_options.sh --cflags $<`; \
 	mkdir -p `dirname $@`; \
 	echo "$<\n===========================================" >$@; \
-    cmdline="$(CXX) $(CXXFLAGS) -Werror $(WARNINGFLAGS) -I include $${flags} $<"; \
+    cmdline="$(CXX) $(CXXFLAGS) -Werror $(CXXFLAGS_WARNINGS) -I include $${flags} $<"; \
 	echo "$${cmdline}\n===========================================" >>$@; \
 	if $${cmdline} >>$@ 2>&1; then \
         echo "\n===========================================\nOK" >>$@; \
@@ -93,7 +100,7 @@ check_reports/%.iwyu: include/osmium/%.hpp
 	@flags=`./get_options.sh --cflags $<`; \
 	mkdir -p `dirname $@`; \
 	echo "$<\n===========================================" >$@; \
-    cmdline="iwyu -Xiwyu --mapping_file=osmium.imp $(CXXFLAGS) $(WARNINGFLAGS) -I include $${flags} $<"; \
+    cmdline="iwyu -Xiwyu --mapping_file=osmium.imp $(CXXFLAGS) $(CXXFLAGS_WARNINGS) -I include $${flags} $<"; \
 	echo "$${cmdline}\n===========================================" >>$@; \
 	$${cmdline} >>$@ 2>&1; \
 	true
