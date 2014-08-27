@@ -32,7 +32,7 @@ endif
 ifeq ($(CXX),clang++)
     CXXFLAGS_WARNINGS += -Wdocumentation -Wunused-exception-parameter -Wmissing-declarations
     CXXFLAGS_WARNINGS += -Weverything -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-unused-macros -Wno-exit-time-destructors -Wno-global-constructors -Wno-padded -Wno-switch-enum -Wno-missing-prototypes -Wno-weak-vtables
-    CXXFLAGS_WARNINGS += -Wno-cast-align
+    CXXFLAGS_WARNINGS += -Wno-cast-align -Wno-float-equal
 endif
 
 # suppress warnings from Catch unit test macros
