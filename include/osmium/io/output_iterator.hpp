@@ -62,21 +62,21 @@ namespace osmium {
 
             static constexpr size_t default_buffer_size = 10 * 1024 * 1024;
 
-            TDest& m_destination;
+            TDest* m_destination;
 
             std::shared_ptr<buffer_wrapper> m_buffer_wrapper;
 
         public:
 
             explicit OutputIterator(TDest& destination, const size_t buffer_size = default_buffer_size) :
-                m_destination(destination),
+                m_destination(&destination),
                 m_buffer_wrapper(std::make_shared<buffer_wrapper>(buffer_size)) {
             }
 
             void flush() {
                 osmium::memory::Buffer buffer(m_buffer_wrapper->buffer.capacity(), osmium::memory::Buffer::auto_grow::no);
                 std::swap(m_buffer_wrapper->buffer, buffer);
-                m_destination(std::move(buffer));
+                (*m_destination)(std::move(buffer));
             }
 
             OutputIterator& operator=(const osmium::memory::Item& item) {
