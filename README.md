@@ -19,7 +19,7 @@ limitations).
 ## Prerequisites
 
 Because Osmium uses many C++11 features you need a modern compiler and standard
-C++ library. Osmium needs at least GCC 4.7.3 or clang (LLVM) 3.2. (Some parts may
+C++ library. Osmium needs at least GCC 4.8 or clang (LLVM) 3.2. (Some parts may
 work with older versions.)
 
 Different parts of Osmium (and the applications built on top of it) need
