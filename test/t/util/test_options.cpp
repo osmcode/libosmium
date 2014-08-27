@@ -1,6 +1,4 @@
 #include "catch.hpp"
-#include <boost/test/output_test_stream.hpp>
-using boost::test_tools::output_test_stream;
 
 #include <iterator>
 
