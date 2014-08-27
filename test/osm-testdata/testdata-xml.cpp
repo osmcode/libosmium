@@ -49,9 +49,9 @@ header_buffer_type read_xml(const char* test_id) {
     int fd = osmium::io::detail::open_for_reading(filename(test_id));
     assert(fd >= 0);
     std::string input(10000, '\0');
-    int n = ::read(fd, reinterpret_cast<unsigned char*>(const_cast<char*>(input.data())), 10000);
+    ssize_t n = ::read(fd, reinterpret_cast<unsigned char*>(const_cast<char*>(input.data())), 10000);
     assert(n >= 0);
-    input.resize(n);
+    input.resize(static_cast<std::string::size_type>(n));
     input_queue.push(input);
     input_queue.push(std::string());
 
