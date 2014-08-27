@@ -13,6 +13,9 @@ repository for more example code.
 
 [![Build Status](https://secure.travis-ci.org/osmcode/libosmium.png)](http://travis-ci.org/osmcode/libosmium)
 
+Libosmium is developed on Linux, but also works on OSX and Windows (with some
+limitations).
+
 ## Prerequisites
 
 Because Osmium uses many C++11 features you need a modern compiler and standard
@@ -23,7 +26,7 @@ Different parts of Osmium (and the applications built on top of it) need
 different libraries. You DO NOT NEED to install all of them, just install those
 you need for the programs you need.
 
-    boost (several libraries)
+    boost-iterator, boost-regex
         http://www.boost.org/
         Debian/Ubuntu: libboost-dev
         openSUSE: boost-devel
