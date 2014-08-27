@@ -3,8 +3,14 @@
 #include <iostream>
 
 #pragma GCC diagnostic push
+#ifdef __clang__
+# pragma GCC diagnostic ignored "-Wdocumentation-unknown-command"
+#endif
+#pragma GCC diagnostic ignored "-Wfloat-equal"
 #pragma GCC diagnostic ignored "-Wold-style-cast"
+#pragma GCC diagnostic ignored "-Wpadded"
 #pragma GCC diagnostic ignored "-Wredundant-decls"
+#pragma GCC diagnostic ignored "-Wshadow"
 # include <ogr_api.h>
 # include <ogrsf_frmts.h>
 #pragma GCC diagnostic pop
