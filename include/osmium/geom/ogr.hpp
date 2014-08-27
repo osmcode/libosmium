@@ -41,7 +41,9 @@ DEALINGS IN THE SOFTWARE.
 #include <utility>
 
 #pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdocumentation-unknown-command"
+#ifdef __clang__
+# pragma GCC diagnostic ignored "-Wdocumentation-unknown-command"
+#endif
 #pragma GCC diagnostic ignored "-Wfloat-equal"
 #pragma GCC diagnostic ignored "-Wpadded"
 # include <ogr_geometry.h>
