@@ -24,6 +24,12 @@ set(LIBOSMIUM_VERSION ${OSMIUM_VERSION_MAJOR}.${OSMIUM_VERSION_MINOR}.${OSMIUM_V
 
 
 #----------------------------------------------------------------------
+#
+#  Build options
+#
+#  (Change with -DOPTION=VALUE on cmake command line.)
+#
+#----------------------------------------------------------------------
 
 option(BUILD_EXAMPLES "compile example programs" ON)
 option(BUILD_TESTING "compile tests, please run them with ctest" ON)
@@ -35,7 +41,6 @@ option(BUILD_TRY_HPPS "compile every hpp" ON)
 #  Find external dependencies
 #
 #----------------------------------------------------------------------
-
 
 include(CheckIncludeFiles)
 check_include_files(winsock2.h HAVE_WINSOCK)
@@ -100,61 +105,61 @@ if(BUILD_EXAMPLES OR BUILD_TESTING OR BUILD_TRY_HPPS)
 
     find_package(OSMPBF)
     if(OSMPBF_FOUND)
-       include_directories(${OSMPBF_INCLUDE_DIRS})
+        include_directories(${OSMPBF_INCLUDE_DIRS})
     else()
-       message(WARNING "OSMPBF library not found!\n")
+        message(WARNING "OSMPBF library not found!\n")
     endif()
 
     ##### Find Google SparseHash
     find_path(SPARSEHASH_INCLUDE_DIR google/sparsetable)
     if(SPARSEHASH_INCLUDE_DIR)
-       message(STATUS "SparseHash library found")
-       set(SPARSEHASH_FOUND 1)
-       include_directories(${SPARSEHASH_INCLUDE_DIR})
+        message(STATUS "SparseHash library found")
+        set(SPARSEHASH_FOUND 1)
+        include_directories(${SPARSEHASH_INCLUDE_DIR})
     else()
-       message(STATUS "SparseHash library not found")
+        message(STATUS "SparseHash library not found")
     endif()
 
     ##### Find GEOS Library
     find_path(GEOS_INCLUDE_DIR geos/geom.h)
     find_library(GEOS_LIBRARY NAMES geos)
     if(GEOS_INCLUDE_DIR AND GEOS_LIBRARY)
-       message(STATUS "GEOS library found")
-       SET(GEOS_FOUND 1)
-       include_directories(${GEOS_INCLUDE_DIR})
+        message(STATUS "GEOS library found")
+        SET(GEOS_FOUND 1)
+        include_directories(${GEOS_INCLUDE_DIR})
     else()
-       message(STATUS "GEOS library not found")
+        message(STATUS "GEOS library not found")
     endif()
 
     ##### Find Proj.4 Library
     find_path(PROJ_INCLUDE_DIR proj_api.h)
     find_library(PROJ_LIBRARY NAMES proj)
     if(PROJ_INCLUDE_DIR AND PROJ_LIBRARY)
-       message(STATUS "PROJ library found")
-       set(PROJ_FOUND 1)
-       include_directories(${PROJ_INCLUDE_DIR})
+        message(STATUS "PROJ library found")
+        set(PROJ_FOUND 1)
+        include_directories(${PROJ_INCLUDE_DIR})
     else()
-       message(STATUS "PROJ library not found")
+        message(STATUS "PROJ library not found")
     endif()
 
     find_package(GDAL)
     if(GDAL_FOUND)
-       include_directories(${GDAL_INCLUDE_DIR})
-       set(GDAL_LIBRARIES ${GDAL_LIBRARY} ${ZLIB_LIBRARY} ${WIN_LIBS})
+        include_directories(${GDAL_INCLUDE_DIR})
+        set(GDAL_LIBRARIES ${GDAL_LIBRARY} ${ZLIB_LIBRARY} ${WIN_LIBS})
     endif()
 
     if(MSVC)
-      find_path(GETOPT_INCLUDE_DIR getopt.h)
-      find_library(GETOPT_LIBRARY NAMES wingetopt)
-      if(GETOPT_INCLUDE_DIR AND GETOPT_LIBRARY)
-        include_directories(${GETOPT_INCLUDE_DIR})
-        list(APPEND WIN_LIBS ${GETOPT_LIBRARY})
-      endif()
+        find_path(GETOPT_INCLUDE_DIR getopt.h)
+        find_library(GETOPT_LIBRARY NAMES wingetopt)
+        if(GETOPT_INCLUDE_DIR AND GETOPT_LIBRARY)
+            include_directories(${GETOPT_INCLUDE_DIR})
+            list(APPEND WIN_LIBS ${GETOPT_LIBRARY})
+        endif()
     endif()
 endif()
 
 if(WIN32)
-    add_definitions(-DWIN32 -D_WIN32 -DMSWIN32 -DBGDWIN32 -DWINVER=0x0500  -D_WIN32_WINNT=0x0500 -D_WIN32_IE=0x0600)
+    add_definitions(-DWIN32 -D_WIN32 -DMSWIN32 -DBGDWIN32 -DWINVER=0x0500 -D_WIN32_WINNT=0x0500 -D_WIN32_IE=0x0600)
     set(CPACK_GENERATOR ZIP)
 else(WIN32)
     set(CPACK_GENERATOR TGZ)
