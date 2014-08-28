@@ -22,8 +22,8 @@ install:
  - make
  - sudo make install
  - cd ../..
- - /usr/bin/cpp --version
- - dpkg -S /usr/bin/cpp
+ - sudo rm /usr/bin/cpp
+ - sudo ln -s /usr/bin/cpp-4.8 /usr/bin/cpp
 
 #env:
 
