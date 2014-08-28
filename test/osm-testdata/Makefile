@@ -24,12 +24,15 @@ CXXFLAGS_OGR      := $(shell gdal-config --cflags)
 CXXFLAGS_WARNINGS := -Wall -Wextra -pedantic -Wredundant-decls -Wdisabled-optimization -Wctor-dtor-privacy -Wnon-virtual-dtor -Woverloaded-virtual -Wsign-promo -Wold-style-cast
 CXXFLAGS_WARNINGS += -Werror
 
-ifeq ($(CXX),g++)
+# remove optional version from compiler name in CXX
+COMPILER := $(shell echo $(CXX) | sed -e's/-.*//')
+
+ifeq ($(COMPILER),g++)
     # remove warnings that create false positives on g++
     CXXFLAGS_WARNINGS += -Wno-return-type -Wno-array-bounds
 endif
 
-ifeq ($(CXX),clang++)
+ifeq ($(COMPILER),clang++)
     CXXFLAGS_WARNINGS += -Wdocumentation -Wunused-exception-parameter -Wmissing-declarations
     CXXFLAGS_WARNINGS += -Weverything -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-unused-macros -Wno-exit-time-destructors -Wno-global-constructors -Wno-padded -Wno-switch-enum -Wno-missing-prototypes -Wno-weak-vtables
     CXXFLAGS_WARNINGS += -Wno-cast-align -Wno-float-equal
@@ -45,7 +48,8 @@ LIB_BZIP2  := -lbz2
 
 LIB_IO     := $(LIB_EXPAT) $(LIB_PBF) $(LIB_GZIP) $(LIB_BZIP2)
 
-LIB_OGR    := $(shell gdal-config --libs)
+# -pthread is needed for g++-4.8
+LIB_OGR    := $(shell gdal-config --libs) -pthread
 
 # place where the test data directory has been cloned
 # https://github.com/osmcode/osm-testdata

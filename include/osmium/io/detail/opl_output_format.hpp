@@ -48,11 +48,15 @@ DEALINGS IN THE SOFTWARE.
 
 #include <boost/version.hpp>
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-noreturn"
+#pragma clang diagnostic ignored "-Wsign-conversion"
 #if BOOST_VERSION >= 104800
 # include <boost/regex/pending/unicode_iterator.hpp>
 #else
 # include <boost_unicode_iterator.hpp>
 #endif
+#pragma clang diagnostic pop
 
 #include <osmium/handler.hpp>
 #include <osmium/io/detail/output_format.hpp>

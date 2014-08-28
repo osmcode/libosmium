@@ -33,6 +33,14 @@
 #pragma clang diagnostic ignored "-Wfloat-equal"
 #endif
 
+#ifndef __clang__
+# pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
+# pragma GCC diagnostic ignored "-Wunused-variable"
+# pragma GCC diagnostic ignored "-Wreturn-type"
+# pragma GCC diagnostic ignored "-Wsign-promo"
+# pragma GCC diagnostic ignored "-Wparentheses"
+#endif
+
 #ifdef CATCH_CONFIG_MAIN
 #  define CATCH_CONFIG_RUNNER
 #endif
