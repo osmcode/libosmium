@@ -114,6 +114,7 @@ TEST_CASE("Reading OSM XML 101") {
             osmium::io::Reader reader(filename("101-missing_version"));
             osmium::io::Header header = reader.header();
             osmium::memory::Buffer buffer = reader.read();
+            reader.close();
         }, osmium::format_version_error);
     }
 
@@ -138,6 +139,7 @@ TEST_CASE("Reading OSM XML 102") {
 
             osmium::io::Header header = reader.header();
             osmium::memory::Buffer buffer = reader.read();
+            reader.close();
         }, osmium::format_version_error);
     }
 
@@ -161,6 +163,7 @@ TEST_CASE("Reading OSM XML 103") {
             osmium::io::Reader reader(filename("103-old_version"));
             osmium::io::Header header = reader.header();
             osmium::memory::Buffer buffer = reader.read();
+            reader.close();
         }, osmium::format_version_error);
     }
 
@@ -185,6 +188,7 @@ TEST_CASE("Reading OSM XML 104") {
             osmium::io::Reader reader(filename("104-empty_file"));
             osmium::io::Header header = reader.header();
             osmium::memory::Buffer buffer = reader.read();
+            reader.close();
         }, osmium::xml_error);
     }
 }
@@ -202,6 +206,7 @@ TEST_CASE("Reading OSM XML 105") {
             osmium::io::Reader reader(filename("105-incomplete_xml_file"));
             osmium::io::Header header = reader.header();
             osmium::memory::Buffer buffer = reader.read();
+            reader.close();
         }, osmium::xml_error);
     }
 

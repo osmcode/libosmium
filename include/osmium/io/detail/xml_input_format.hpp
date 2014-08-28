@@ -647,7 +647,11 @@ namespace osmium {
                 }
 
                 ~XMLInputFormat() {
-                    m_done = true;
+                    try {
+                        close();
+                    } catch (...) {
+                        // ignore any exceptions at this point because destructor should not throw
+                    }
                 }
 
                 virtual osmium::io::Header header() override final {
@@ -663,6 +667,11 @@ namespace osmium {
 
                     m_parser_task.check_for_exception();
                     return buffer;
+                }
+
+                void close() {
+                    m_done = true;
+                    m_parser_task.close();
                 }
 
             }; // class XMLInputFormat
