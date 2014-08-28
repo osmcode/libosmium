@@ -48,15 +48,21 @@ DEALINGS IN THE SOFTWARE.
 
 #include <boost/version.hpp>
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wmissing-noreturn"
-#pragma clang diagnostic ignored "-Wsign-conversion"
+#ifdef __clang__
+# pragma clang diagnostic push
+# pragma clang diagnostic ignored "-Wmissing-noreturn"
+# pragma clang diagnostic ignored "-Wsign-conversion"
+#endif
+
 #if BOOST_VERSION >= 104800
 # include <boost/regex/pending/unicode_iterator.hpp>
 #else
 # include <boost_unicode_iterator.hpp>
 #endif
-#pragma clang diagnostic pop
+
+#ifdef __clang__
+# pragma clang diagnostic pop
+#endif
 
 #include <osmium/handler.hpp>
 #include <osmium/io/detail/output_format.hpp>
@@ -291,10 +297,13 @@ namespace osmium {
 
             namespace {
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-variable"
                 const bool registered_opl_output = osmium::io::detail::OutputFormatFactory::instance().register_output_format(osmium::io::file_format::opl,
                     [](const osmium::io::File& file, data_queue_type& output_queue) {
                         return new osmium::io::detail::OPLOutputFormat(file, output_queue);
                 });
+#pragma GCC diagnostic pop
 
             } // anonymous namespace
 
