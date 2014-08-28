@@ -6,14 +6,14 @@ compiler:
 
 before_install:
  # we need at least g++-4.8 for c++11 features
- - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
- - sudo apt-get update -y
+ - sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test
+ - sudo apt-get update --yes --quiet
 
 install:
  # upgrade compilers
- - sudo apt-get install -y gcc-4.8 g++-4.8
+ - sudo apt-get install --yes gcc-4.8 g++-4.8
  # upgrade libosmium dependencies
- - sudo apt-get install -y make libboost-dev libboost-program-options-dev zlib1g-dev libbz2-dev libexpat1-dev libsparsehash-dev libprotobuf-dev protobuf-compiler libosmpbf-dev libgdal1-dev libgeos++-dev libproj-dev
+ - sudo apt-get install --yes make libboost-dev libboost-program-options-dev libsparsehash-dev libprotobuf-dev protobuf-compiler libosmpbf-dev libgdal-dev libgeos++-dev libproj-dev
  - git clone https://github.com/scrosby/OSM-binary.git
  - cd OSM-binary/src
  - make
