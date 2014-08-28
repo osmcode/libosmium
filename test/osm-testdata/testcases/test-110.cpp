@@ -1,4 +1,6 @@
 
+#include "common.hpp"
+
 class TestHandler110 : public osmium::handler::Handler {
 
 public:

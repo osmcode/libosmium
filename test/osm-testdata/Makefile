@@ -92,17 +92,23 @@ clean-multipolygon:
 
 # --------------
 
-tests-include.hpp: testcases/*.hpp
-	(for file in testcases/*.hpp; do echo "#include \"$${file}\""; done) >tests-include.hpp
+TESTCASES := $(wildcard testcases/test-*.cpp)
+TESTCASES_O := $(patsubst %.cpp,%.o,$(TESTCASES))
 
-testdata-testcases: testdata-testcases.cpp testcases/*.hpp check_basics_handler.hpp check_wkt_handler.hpp tests-include.hpp
-	$(CXX) -I../include $(CXXFLAGS) $(CXXFLAGS_WARNINGS) $(CXXFLAGS_OGR) -o $@ $< $(LDFLAGS) $(LIB_IO) $(LIB_OGR)
+testcases/%.o: testcases/%.cpp
+	$(CXX) -Iinclude -I../include $(CXXFLAGS) $(CXXFLAGS_WARNINGS) $(CXXFLAGS_OGR) -o $@ -c $<
+
+testdata-testcases.o: testdata-testcases.cpp
+	$(CXX) -Iinclude -I../include $(CXXFLAGS) $(CXXFLAGS_WARNINGS) $(CXXFLAGS_OGR) -o $@ -c $<
+
+testdata-testcases: testdata-testcases.o $(TESTCASES_O)
+	$(CXX) -o $@ $< $(TESTCASES_O) $(LDFLAGS) $(LIB_IO) $(LIB_OGR)
 
 testcases: testdata-testcases
 	TESTCASES_DIR=$(TESTDATA_DIR)/grid/data ./testdata-testcases
 
 clean-testcases:
-	rm -f testdata-testcases tests-include.hpp
+	rm -f testdata-testcases testcases/*.o
 
 # --------------
 
