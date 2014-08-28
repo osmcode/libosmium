@@ -1,45 +1,39 @@
 
-namespace testcase_100 {
+class TestHandler100 : public osmium::handler::Handler {
 
-    class TestHandler : public osmium::handler::Handler {
+public:
 
-    public:
+    TestHandler100() :
+        osmium::handler::Handler() {
+    }
 
-        TestHandler() :
-            osmium::handler::Handler() {
+    void node(osmium::Node& node) {
+        if (node.id() == 100000) {
+            REQUIRE(node.version() == 1);
+            REQUIRE(node.timestamp() == osmium::Timestamp("2014-01-01T00:00:00Z"));
+            REQUIRE(node.uid() == 1);
+            REQUIRE(!strcmp(node.user(), "test"));
+            REQUIRE(node.changeset() == 1);
+            REQUIRE(node.location().lon() == 1.02);
+            REQUIRE(node.location().lat() == 1.02);
+        } else {
+            throw std::runtime_error("Unknown ID");
         }
+    }
 
-        void node(osmium::Node& node) {
-            if (node.id() == 100000) {
-                assert(node.version() == 1);
-                assert(node.timestamp() == osmium::Timestamp("2014-01-01T00:00:00Z"));
-                assert(node.uid() == 1);
-                assert(!strcmp(node.user(), "test"));
-                assert(node.changeset() == 1);
-                assert(node.location().lon() == 1.02);
-                assert(node.location().lat() == 1.02);
-            } else {
-                throw std::runtime_error("Unknown ID");
-            }
-        }
+}; // class TestHandler100
 
-    }; // class TestHandler
+TEST_CASE("100") {
 
-    struct RunTest {
+    SECTION("test 100") {
+        osmium::io::Reader reader(dirname + "/1/100/data.osm");
 
-        bool operator()(const std::string& dirname) {
-            osmium::io::Reader reader(dirname + "/1/100/data.osm");
+        CheckBasicsHandler check_basics_handler(100, 1, 0, 0);
+        CheckWKTHandler check_wkt_handler(dirname, 100);
+        TestHandler100 test_handler;
 
-            CheckBasicsHandler check_basics_handler(100, 1, 0, 0);
-            CheckWKTHandler check_wkt_handler(dirname, 100);
-            TestHandler test_handler;
+        osmium::apply(reader, check_basics_handler, check_wkt_handler, test_handler);
+    }
 
-            osmium::apply(reader, check_basics_handler, check_wkt_handler, test_handler);
-
-            return true;
-        }
-
-    }; // RunTest
-
-} // namespace testcase_100
+}
 

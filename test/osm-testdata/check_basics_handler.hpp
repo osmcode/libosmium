@@ -1,7 +1,6 @@
 #ifndef CHECK_BASICS_HANDLER_HPP
 #define CHECK_BASICS_HANDLER_HPP
 
-#include <cassert>
 #include <iostream>
 #include <unordered_set>
 

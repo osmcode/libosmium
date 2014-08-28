@@ -4,6 +4,9 @@
 #include <iostream>
 #include <string>
 
+#define CATCH_CONFIG_RUNNER
+#include <catch.hpp>
+
 #include <osmium/geom/wkt.hpp>
 #include <osmium/handler.hpp>
 #include <osmium/handler/node_locations_for_ways.hpp>
@@ -21,22 +24,26 @@ typedef osmium::handler::NodeLocationsForWays<index_pos_type, index_neg_type> lo
 
 /* ================================================== */
 
+static std::string dirname;
+
 #include "tests-include.hpp"
 
 /* ================================================== */
 
 int main(int argc, char* argv[]) {
-
-    if (argc != 2) {
-        std::cerr << "Usage: testdata-testcases TEST-DIRECTORY\n";
-        exit(3);
+    const char* testcases_dir = getenv("TESTCASES_DIR");
+    if (testcases_dir) {
+        dirname = testcases_dir;
+        std::cerr << "Running tests from '" << dirname << "' (from TESTCASES_DIR environment variable)\n";
+    } else {
+        std::cerr << "Please set TESTCASES_DIR environment variable.\n";
+        exit(1);
     }
 
-    std::string directory = argv[1];
-    std::cout << "Running tests from '" << directory << "'\n";
-
-#include "tests-run.hpp"
+    int result = Catch::Session().run(argc, argv);
 
     google::protobuf::ShutdownProtobufLibrary();
+
+    return result;
 }
 

@@ -95,17 +95,14 @@ clean-multipolygon:
 tests-include.hpp: testcases/*.hpp
 	(for file in testcases/*.hpp; do echo "#include \"$${file}\""; done) >tests-include.hpp
 
-tests-run.hpp: testcases/*.hpp
-	(for id in $(patsubst testcases/test-%.hpp,%,$(wildcard testcases/*.hpp)); do echo "std::cerr << \"Running test $${id}...\\\n\"; testcase_$${id}::RunTest t$${id}; t$${id}(directory);"; done) >tests-run.hpp
-
-testdata-testcases: testdata-testcases.cpp testcases/*.hpp check_basics_handler.hpp check_wkt_handler.hpp tests-include.hpp tests-run.hpp
-	$(CXX) $(CXXFLAGS) $(CXXFLAGS_WARNINGS) $(CXXFLAGS_OGR) -o $@ $< $(LDFLAGS) $(LIB_IO) $(LIB_OGR)
+testdata-testcases: testdata-testcases.cpp testcases/*.hpp check_basics_handler.hpp check_wkt_handler.hpp tests-include.hpp
+	$(CXX) -I../include $(CXXFLAGS) $(CXXFLAGS_WARNINGS) $(CXXFLAGS_OGR) -o $@ $< $(LDFLAGS) $(LIB_IO) $(LIB_OGR)
 
 testcases: testdata-testcases
-	./testdata-testcases $(TESTDATA_DIR)/grid/data
+	TESTCASES_DIR=$(TESTDATA_DIR)/grid/data ./testdata-testcases
 
 clean-testcases:
-	rm -f testdata-testcases tests-include.hpp tests-run.hpp
+	rm -f testdata-testcases tests-include.hpp
 
 # --------------
 
