@@ -13,9 +13,10 @@ install:
  # upgrade compilers
  - sudo apt-get install --yes gcc-4.8 g++-4.8
  # upgrade libosmium dependencies
- - sudo apt-get install --yes make libboost-dev libboost-program-options-dev libsparsehash-dev libprotobuf-dev protobuf-compiler libosmpbf-dev libgeos++-dev libproj-dev
- - dpkg -l libosmpbf-dev
+ - sudo apt-get install --yes make libboost-dev libboost-program-options-dev libsparsehash-dev libprotobuf-dev protobuf-compiler libgeos++-dev libproj-dev
  - sudo apt-get install --yes make libgdal1h libgdal-dev
+ # OSMPBF is too old, install from git
+ #- sudo apt-get install --yes libosmpbf-dev
  - git clone https://github.com/scrosby/OSM-binary.git
  - cd OSM-binary/src
  - make
@@ -29,6 +30,9 @@ before_script:
 
 script:
  - if [ "${CXX}" = 'g++' ]; then export CXX=g++-4.8; fi;
+ - cd test
+ - /bin/sh -x ./run_tests.sh -o t/geom/test_factory_with_projection.cpp
+ - cd ..
  - make test
  - cd examples
  - make
