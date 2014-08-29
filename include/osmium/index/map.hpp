@@ -97,12 +97,7 @@ namespace osmium {
 
                 Map() = default;
 
-// workaround for a bug in GCC 4.7
-#if __GNUC__ == 4 && __GNUC_MINOR__ < 8
-                virtual ~Map() {}
-#else
                 virtual ~Map() = default;
-#endif
 
                 virtual void reserve(const size_t) {
                     // default implementation is empty
