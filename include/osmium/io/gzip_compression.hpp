@@ -38,13 +38,32 @@ DEALINGS IN THE SOFTWARE.
 #include <stdexcept>
 #include <string>
 
+#include <errno.h>
 #include <zlib.h>
 
 #include <osmium/io/compression.hpp>
 #include <osmium/io/file_compression.hpp>
 #include <osmium/util/cast.hpp>
+#include <osmium/util/compatibility.hpp>
 
 namespace osmium {
+
+    /**
+     * Exception thrown when there are problems gzip compressing or
+     * uncompressing files.
+     */
+    struct gzip_error : public std::runtime_error {
+
+        int gzip_error_code;
+        int system_errno;
+
+        gzip_error(const std::string& what, int error_code) :
+            std::runtime_error(what),
+            gzip_error_code(error_code),
+            system_errno(error_code == Z_ERRNO ? errno : 0) {
+        }
+
+    }; // struct gzip_error
 
     namespace io {
 
@@ -52,28 +71,49 @@ namespace osmium {
 
             gzFile m_gzfile;
 
+            OSMIUM_NORETURN inline void throw_gzip_error(const char* msg, int zlib_error=0) {
+                std::string error("gzip compress error: ");
+                error += msg;
+                error += ": ";
+                int errnum = zlib_error;
+                if (zlib_error) {
+                    error += std::to_string(zlib_error);
+                } else {
+                    error += ::gzerror(m_gzfile, &errnum);
+                }
+                throw osmium::gzip_error(error, errnum);
+            }
+
         public:
 
             explicit GzipCompressor(int fd) :
                 Compressor(),
                 m_gzfile(::gzdopen(fd, "w")) {
                 if (!m_gzfile) {
-                    throw std::runtime_error("initialization of gzip compression failed");
+                    throw_gzip_error("initialization failed");
                 }
             }
 
             ~GzipCompressor() override final {
-                this->close();
+                close();
             }
 
             void write(const std::string& data) override final {
-                ::gzwrite(m_gzfile, data.data(), static_cast_with_assert<unsigned int>(data.size()));
+                if (!data.empty()) {
+                    int nwrite = ::gzwrite(m_gzfile, data.data(), static_cast_with_assert<unsigned int>(data.size()));
+                    if (nwrite == 0) {
+                        throw_gzip_error("write failed");
+                    }
+                }
             }
 
             void close() override final {
                 if (m_gzfile) {
-                    ::gzclose(m_gzfile);
+                    int result = ::gzclose(m_gzfile);
                     m_gzfile = nullptr;
+                    if (result != Z_OK) {
+                        throw_gzip_error("close failed", result);
+                    }
                 }
             }
 
@@ -83,26 +123,38 @@ namespace osmium {
 
             gzFile m_gzfile;
 
+            OSMIUM_NORETURN inline void throw_gzip_error(const char* msg, int zlib_error=0) {
+                std::string error("gzip decompress error: ");
+                error += msg;
+                error += ": ";
+                int errnum = zlib_error;
+                if (zlib_error) {
+                    error += std::to_string(zlib_error);
+                } else {
+                    error += ::gzerror(m_gzfile, &errnum);
+                }
+                throw osmium::gzip_error(error, errnum);
+            }
+
         public:
 
             explicit GzipDecompressor(int fd) :
                 Decompressor(),
                 m_gzfile(::gzdopen(fd, "r")) {
                 if (!m_gzfile) {
-                    throw std::runtime_error("initialization of gzip compression failed");
+                    throw_gzip_error("initialization failed");
                 }
             }
 
             ~GzipDecompressor() override final {
-                this->close();
+                close();
             }
 
             std::string read() override final {
                 std::string buffer(osmium::io::Decompressor::input_buffer_size, '\0');
                 int nread = ::gzread(m_gzfile, const_cast<char*>(buffer.data()), static_cast_with_assert<unsigned int>(buffer.size()));
                 if (nread < 0) {
-                    throw std::runtime_error("gzip read failed"); // XXX better error detection and reporting
-//                    throw std::system_error(errno, std::system_category(), "Read failed");
+                    throw_gzip_error("read failed");
                 }
                 buffer.resize(static_cast<std::string::size_type>(nread));
                 return buffer;
@@ -110,8 +162,11 @@ namespace osmium {
 
             void close() override final {
                 if (m_gzfile) {
-                    ::gzclose(m_gzfile);
+                    int result = ::gzclose(m_gzfile);
                     m_gzfile = nullptr;
+                    if (result != Z_OK) {
+                        throw_gzip_error("close failed", result);
+                    }
                 }
             }
 
