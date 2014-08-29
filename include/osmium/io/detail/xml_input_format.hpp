@@ -176,8 +176,6 @@ namespace osmium {
                 osmium::thread::Queue<osmium::memory::Buffer>& m_queue;
                 std::promise<osmium::io::Header>& m_header_promise;
 
-                bool m_promise_fulfilled;
-
                 osmium::osm_entity_bits::type m_read_types;
 
                 size_t m_max_queue_size;
@@ -229,6 +227,30 @@ namespace osmium {
 
                 }; // class ExpatXMLParser
 
+                /**
+                 * A helper class that makes sure a promise is kept. It stores
+                 * a reference to some piece of data and to a promise and, on
+                 * destruction, sets the value of the promise from the data.
+                 */
+                template <class T>
+                class PromiseKeeper {
+
+                    T& m_data;
+                    std::promise<T>& m_promise;
+
+                public:
+
+                    PromiseKeeper(T& data, std::promise<T>& promise) :
+                        m_data(data),
+                        m_promise(promise) {
+                    }
+
+                    ~PromiseKeeper() {
+                        m_promise.set_value(m_data);
+                    }
+
+                }; // class PromiseKeeper
+
             public:
 
                 explicit XMLParser(osmium::thread::Queue<std::string>& input_queue, osmium::thread::Queue<osmium::memory::Buffer>& queue, std::promise<osmium::io::Header>& header_promise, osmium::osm_entity_bits::type read_types, std::atomic<bool>& done) :
@@ -247,7 +269,6 @@ namespace osmium {
                     m_input_queue(input_queue),
                     m_queue(queue),
                     m_header_promise(header_promise),
-                    m_promise_fulfilled(false),
                     m_read_types(read_types),
                     m_max_queue_size(100),
                     m_done(done) {
@@ -275,7 +296,6 @@ namespace osmium {
                     m_input_queue(other.m_input_queue),
                     m_queue(other.m_queue),
                     m_header_promise(other.m_header_promise),
-                    m_promise_fulfilled(false),
                     m_read_types(other.m_read_types),
                     m_max_queue_size(100),
                     m_done(other.m_done) {
@@ -291,34 +311,25 @@ namespace osmium {
 
                 bool operator()() {
                     ExpatXMLParser<XMLParser> parser(this);
-
-                    try {
-                        bool last;
-                        do {
-                            std::string data;
-                            m_input_queue.wait_and_pop(data);
-                            last = data.empty();
-                            try {
-                                parser(data, last);
-                            } catch (ParserIsDone&) {
-                                throw;
-                            } catch (...) {
-                                m_queue.push(osmium::memory::Buffer()); // empty buffer to signify eof
-                                if (!m_promise_fulfilled) {
-                                    m_promise_fulfilled = true;
-                                    m_header_promise.set_value(m_header);
-                                }
-                                throw;
-                            }
-                        } while (!last && !m_done);
-                        header_is_done(); // make sure we'll always fulfill the promise
-                        if (m_buffer.committed() > 0) {
-                            m_queue.push(std::move(m_buffer));
+                    PromiseKeeper<osmium::io::Header> promise_keeper(m_header, m_header_promise);
+                    bool last;
+                    do {
+                        std::string data;
+                        m_input_queue.wait_and_pop(data);
+                        last = data.empty();
+                        try {
+                            parser(data, last);
+                        } catch (ParserIsDone&) {
+                            return true;
+                        } catch (...) {
+                            m_queue.push(osmium::memory::Buffer()); // empty buffer to signify eof
+                            throw;
                         }
-                        m_queue.push(osmium::memory::Buffer()); // empty buffer to signify eof
-                    } catch (ParserIsDone&) {
-                        // intentionally left blank
+                    } while (!last && !m_done);
+                    if (m_buffer.committed() > 0) {
+                        m_queue.push(std::move(m_buffer));
                     }
+                    m_queue.push(osmium::memory::Buffer()); // empty buffer to signify eof
                     return true;
                 }
 
@@ -398,12 +409,8 @@ namespace osmium {
                 }
 
                 void header_is_done() {
-                    if (!m_promise_fulfilled) {
-                        m_header_promise.set_value(m_header);
-                        m_promise_fulfilled = true;
-                        if (m_read_types == osmium::osm_entity_bits::nothing) {
-                            throw ParserIsDone();
-                        }
+                    if (m_read_types == osmium::osm_entity_bits::nothing) {
+                        throw ParserIsDone();
                     }
                 }
 
