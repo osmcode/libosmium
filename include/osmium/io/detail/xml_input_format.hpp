@@ -184,6 +184,51 @@ namespace osmium {
 
                 std::atomic<bool>& m_done;
 
+                /**
+                 * A C++ wrapper for the Expat parser that makes sure no memory is leaked.
+                 */
+                template <class T>
+                class ExpatXMLParser {
+
+                    XML_Parser m_parser;
+
+                    static void XMLCALL start_element_wrapper(void* data, const XML_Char* element, const XML_Char** attrs) {
+                        static_cast<XMLParser*>(data)->start_element(element, attrs);
+                    }
+
+                    static void XMLCALL end_element_wrapper(void* data, const XML_Char* element) {
+                        static_cast<XMLParser*>(data)->end_element(element);
+                    }
+
+                public:
+
+                    ExpatXMLParser(T* callback_object) :
+                        m_parser(XML_ParserCreate(nullptr)) {
+                        if (!m_parser) {
+                            throw osmium::io_error("Internal error: Can not create parser");
+                        }
+                        XML_SetUserData(m_parser, callback_object);
+                        XML_SetElementHandler(m_parser, start_element_wrapper, end_element_wrapper);
+                    }
+
+                    ExpatXMLParser(const ExpatXMLParser&) = delete;
+                    ExpatXMLParser(ExpatXMLParser&&) = delete;
+
+                    ExpatXMLParser& operator=(const ExpatXMLParser&) = delete;
+                    ExpatXMLParser& operator=(ExpatXMLParser&&) = delete;
+
+                    ~ExpatXMLParser() {
+                        XML_ParserFree(m_parser);
+                    }
+
+                    void operator()(const std::string& data, bool last) {
+                        if (XML_Parse(m_parser, data.data(), static_cast_with_assert<int>(data.size()), last) == XML_STATUS_ERROR) {
+                            throw osmium::xml_error(m_parser);
+                        }
+                    }
+
+                }; // class ExpatXMLParser
+
             public:
 
                 explicit XMLParser(osmium::thread::Queue<std::string>& input_queue, osmium::thread::Queue<osmium::memory::Buffer>& queue, std::promise<osmium::io::Header>& header_promise, osmium::osm_entity_bits::type read_types, std::atomic<bool>& done) :
@@ -245,25 +290,16 @@ namespace osmium {
                 ~XMLParser() = default;
 
                 bool operator()() {
-                    XML_Parser parser = XML_ParserCreate(nullptr);
-                    if (!parser) {
-                        throw osmium::io_error("Internal error: Can not create parser");
-                    }
-
-                    XML_SetUserData(parser, this);
-
-                    XML_SetElementHandler(parser, start_element_wrapper, end_element_wrapper);
+                    ExpatXMLParser<XMLParser> parser(this);
 
                     try {
-                        int done;
+                        bool last;
                         do {
                             std::string data;
                             m_input_queue.wait_and_pop(data);
-                            done = data.empty();
+                            last = data.empty();
                             try {
-                                if (XML_Parse(parser, data.data(), static_cast_with_assert<int>(data.size()), done) == XML_STATUS_ERROR) {
-                                    throw osmium::xml_error(parser);
-                                }
+                                parser(data, last);
                             } catch (ParserIsDone&) {
                                 throw;
                             } catch (...) {
@@ -274,7 +310,7 @@ namespace osmium {
                                 }
                                 throw;
                             }
-                        } while (!done && !m_done);
+                        } while (!last && !m_done);
                         header_is_done(); // make sure we'll always fulfill the promise
                         if (m_buffer.committed() > 0) {
                             m_queue.push(std::move(m_buffer));
@@ -282,23 +318,11 @@ namespace osmium {
                         m_queue.push(osmium::memory::Buffer()); // empty buffer to signify eof
                     } catch (ParserIsDone&) {
                         // intentionally left blank
-                    } catch (...) {
-                        XML_ParserFree(parser);
-                        throw;
                     }
-                    XML_ParserFree(parser);
                     return true;
                 }
 
             private:
-
-                static void XMLCALL start_element_wrapper(void* data, const XML_Char* element, const XML_Char** attrs) {
-                    static_cast<XMLParser*>(data)->start_element(element, attrs);
-                }
-
-                static void XMLCALL end_element_wrapper(void* data, const XML_Char* element) {
-                    static_cast<XMLParser*>(data)->end_element(element);
-                }
 
                 const char* init_object(osmium::OSMObject& object, const XML_Char** attrs) {
                     static const char* empty = "";
