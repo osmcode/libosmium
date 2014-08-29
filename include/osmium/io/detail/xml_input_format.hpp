@@ -282,6 +282,9 @@ namespace osmium {
                         m_queue.push(osmium::memory::Buffer()); // empty buffer to signify eof
                     } catch (ParserIsDone&) {
                         // intentionally left blank
+                    } catch (...) {
+                        XML_ParserFree(parser);
+                        throw;
                     }
                     XML_ParserFree(parser);
                     return true;
