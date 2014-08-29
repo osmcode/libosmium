@@ -36,6 +36,7 @@ DEALINGS IN THE SOFTWARE.
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
+#include <endian.h>
 #include <string>
 
 #include <osmium/geom/coordinates.hpp>
@@ -123,7 +124,11 @@ namespace osmium {
                 size_t m_ring_size_offset = 0;
 
                 size_t header(std::string& str, wkbGeometryType type, bool add_length) const {
+#if __BYTE_ORDER == __LITTLE_ENDIAN
                     str_push(str, wkb_byte_order_type::NDR);
+#else
+                    str_push(str, wkb_byte_order_type::XDR);
+#endif
                     if (m_wkb_type == wkb_type::ewkb) {
                         str_push(str, type | wkbSRID);
                         str_push(str, srid);
