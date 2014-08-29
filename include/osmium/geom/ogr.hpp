@@ -37,6 +37,7 @@ DEALINGS IN THE SOFTWARE.
 #define OSMIUM_LINK_WITH_LIBS_OGR `gdal-config --libs`
 
 #include <cassert>
+#include <cstddef>
 #include <memory>
 #include <utility>
 

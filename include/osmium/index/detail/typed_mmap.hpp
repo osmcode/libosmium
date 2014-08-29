@@ -38,18 +38,18 @@ DEALINGS IN THE SOFTWARE.
 #include <stdexcept>
 #include <system_error>
 
+#include <sys/stat.h>
+
 #ifndef WIN32
 # include <sys/mman.h>
 #else
 # include <mmap_for_windows.hpp>
 #endif
 
-#include <sys/stat.h>
-
-#ifdef _MSC_VER
-# define ftruncate _chsize
-#else
+#ifndef _MSC_VER
 # include <unistd.h>
+#else
+# define ftruncate _chsize
 #endif
 
 // for bsd systems

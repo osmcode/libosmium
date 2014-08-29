@@ -14,8 +14,9 @@
 #include <string>
 #include <sys/stat.h>
 #include <sys/types.h>
+
 #ifdef _MSC_VER
-#include <direct.h>
+# include <direct.h>
 #endif
 
 #include <osmium/io/pbf_input.hpp>

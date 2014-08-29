@@ -37,13 +37,12 @@ DEALINGS IN THE SOFTWARE.
 #include <cstddef>
 #include <fcntl.h>
 #include <string>
-//#include <sys/stat.h>
-//#include <sys/types.h>
 #include <system_error>
+
 #ifndef _MSC_VER
-#include <unistd.h>
+# include <unistd.h>
 #else
-#include <io.h>
+# include <io.h>
 typedef int ssize_t;
 #endif
 

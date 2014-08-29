@@ -40,6 +40,7 @@ DEALINGS IN THE SOFTWARE.
 #include <string>
 
 #include <bzlib.h>
+
 #ifndef _MSC_VER
 # include <unistd.h>
 #endif

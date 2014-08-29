@@ -41,14 +41,15 @@ DEALINGS IN THE SOFTWARE.
 #include <string>
 #include <system_error>
 #include <thread>
-#ifndef _WIN32
-#include <sys/wait.h>
-#endif
-#ifndef _MSC_VER
-#include <unistd.h>
-#else
-#endif
 #include <utility>
+
+#ifndef _WIN32
+# include <sys/wait.h>
+#endif
+
+#ifndef _MSC_VER
+# include <unistd.h>
+#endif
 
 #include <osmium/io/compression.hpp>
 #include <osmium/io/detail/input_format.hpp>
