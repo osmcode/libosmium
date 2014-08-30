@@ -35,7 +35,7 @@ class TestOverviewHandler : public osmium::handler::Handler {
     OGRLayer* m_layer_labels;
     OGRLayer* m_layer_ways;
 
-    osmium::geom::OGRFactory<> m_factory {};
+    osmium::geom::OGRFactory<> m_factory;
 
 public:
 

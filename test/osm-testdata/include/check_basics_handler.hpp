@@ -28,7 +28,7 @@ class CheckBasicsHandler : public osmium::handler::Handler {
 
     // All IDs encountered in the data.osm file will be stored in this set and
     // checked for duplicates.
-    std::unordered_set<osmium::object_id_type> m_ids {};
+    std::unordered_set<osmium::object_id_type> m_ids;
 
     // Check id is in range [min, max] and that it isn't more than once in input.
     void id_check(osmium::object_id_type id, osmium::object_id_type min, osmium::object_id_type max) {
