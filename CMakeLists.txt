@@ -175,6 +175,7 @@ endif()
 
 if(BUILD_TESTING)
     add_subdirectory(test)
+    add_subdirectory(test/osm-testdata)
 endif()
 
 if(BUILD_TRY_HPPS)

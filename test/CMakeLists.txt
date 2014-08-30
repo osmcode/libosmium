@@ -1,4 +1,4 @@
-set(DART_TESTING_TIMEOUT 5)
+set(DART_TESTING_TIMEOUT 60)
 include(Dart)
 
 include_directories("include")
