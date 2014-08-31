@@ -1,7 +1,5 @@
 #include "catch.hpp"
 
-#include <endian.h>
-
 #include <osmium/builder/builder_helper.hpp>
 #include <osmium/geom/wkb.hpp>
 
