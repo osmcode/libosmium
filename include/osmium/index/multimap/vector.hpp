@@ -84,6 +84,16 @@ namespace osmium {
                     });
                 }
 
+                std::pair<const_iterator, const_iterator> get_all(const TId id) const {
+                    const element_type element {
+                        id,
+                        osmium::index::empty_value<TValue>()
+                    };
+                    return std::equal_range(m_vector.cbegin(), m_vector.cend(), element, [](const element_type& a, const element_type& b) {
+                        return a.first < b.first;
+                    });
+                }
+
                 size_t size() const override final {
                     return m_vector.size();
                 }
