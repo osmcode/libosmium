@@ -105,10 +105,13 @@ namespace osmium {
 
                 template <typename... TArgs>
                 void output_formatted(const char* format, TArgs&&... args) {
+#ifndef NDEBUG
+                    int len =
+#endif
 #ifndef _MSC_VER
-                    int len = snprintf(m_tmp_buffer, tmp_buffer_size, format, std::forward<TArgs>(args)...);
+                    snprintf(m_tmp_buffer, tmp_buffer_size, format, std::forward<TArgs>(args)...);
 #else
-                    int len = _snprintf(m_tmp_buffer, tmp_buffer_size, format, std::forward<TArgs>(args)...);
+                    _snprintf(m_tmp_buffer, tmp_buffer_size, format, std::forward<TArgs>(args)...);
 #endif
                     assert(len > 0 && static_cast<size_t>(len) < tmp_buffer_size);
                     m_out += m_tmp_buffer;

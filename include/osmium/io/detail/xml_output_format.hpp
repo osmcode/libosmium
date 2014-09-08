@@ -96,10 +96,13 @@ namespace osmium {
                 void oprintf(std::string& out, const char* format, T value) {
                     char buffer[tmp_buffer_size+1];
                     size_t max_size = sizeof(buffer)/sizeof(char);
+#ifndef NDEBUG
+                    int len =
+#endif
 #ifndef _MSC_VER
-                    int len = snprintf(buffer, max_size, format, value);
+                    snprintf(buffer, max_size, format, value);
 #else
-                    int len = _snprintf(buffer, max_size, format, value);
+                    _snprintf(buffer, max_size, format, value);
 #endif
                     assert(len > 0 && static_cast<size_t>(len) < max_size);
                     out += buffer;
