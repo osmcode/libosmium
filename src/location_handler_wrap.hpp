@@ -35,6 +35,7 @@ namespace node_osmium {
         static void Initialize(Handle<Object> target);
         static Handle<Value> New(const Arguments& args);
         static Handle<Value> clear(const Arguments& args);
+        static Handle<Value> ignoreErrors(const Arguments& args);
 
         static location_handler_type& wrapped(Local<Object> object) {
             return *(node::ObjectWrap::Unwrap<LocationHandlerWrap>(object)->get());

@@ -11,6 +11,7 @@ namespace node_osmium {
         constructor->InstanceTemplate()->SetInternalFieldCount(1);
         constructor->SetClassName(String::NewSymbol("LocationHandler"));
         NODE_SET_PROTOTYPE_METHOD(constructor, "clear", clear);
+        NODE_SET_PROTOTYPE_METHOD(constructor, "ignoreErrors", ignoreErrors);
         target->Set(String::NewSymbol("LocationHandler"), constructor->GetFunction());
     }
 
@@ -26,6 +27,13 @@ namespace node_osmium {
         } catch (const std::exception& ex) {
             return ThrowException(Exception::TypeError(String::New(ex.what())));
         }
+    }
+
+    Handle<Value> LocationHandlerWrap::ignoreErrors(const Arguments& args) {
+        HandleScope scope;
+        LocationHandlerWrap* handler = node::ObjectWrap::Unwrap<LocationHandlerWrap>(args.This());
+        handler->get()->ignore_errors();
+        return scope.Close(Undefined());
     }
 
     Handle<Value> LocationHandlerWrap::clear(const Arguments& args) {
