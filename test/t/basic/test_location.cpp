@@ -150,31 +150,5 @@ SECTION("output_undefined") {
     REQUIRE(out.str() == "(undefined,undefined)");
 }
 
-SECTION("coordinate2string") {
-    std::string s1;
-    osmium::Location::coordinate2string(std::back_inserter(s1), 1.123);
-    REQUIRE(s1 == "1.123");
-
-    std::string s2;
-    osmium::Location::coordinate2string(std::back_inserter(s2), 1.000);
-    REQUIRE(s2 == "1");
-
-    std::string s3;
-    osmium::Location::coordinate2string(std::back_inserter(s3), 0.0);
-    REQUIRE(s3 == "0");
-
-    std::string s4;
-    osmium::Location::coordinate2string(std::back_inserter(s4), 0.020);
-    REQUIRE(s4 == "0.02");
-
-    std::string s5;
-    osmium::Location::coordinate2string(std::back_inserter(s5), -0.020);
-    REQUIRE(s5 == "-0.02");
-
-    std::string s6;
-    osmium::Location::coordinate2string(std::back_inserter(s6), -0.0);
-    REQUIRE(s6 == "-0");
-}
-
 }
 

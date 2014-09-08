@@ -33,19 +33,16 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <algorithm>
-#include <cassert>
 #include <cmath>
 #include <cstdint>
-#include <cstdio>
 #include <iosfwd>
-#include <limits>
 #include <stdexcept>
 #include <string>
 
 #include <iostream>
 
 #include <osmium/util/compatibility.hpp>
+#include <osmium/util/double.hpp>
 
 namespace osmium {
 
@@ -86,7 +83,7 @@ namespace osmium {
 
     public:
 
-        /// this value is used for a coordinate to mark it as undefined
+        // this value is used for a coordinate to mark it as undefined
         // MSVC doesn't declare std::numeric_limits<int32_t>::max() as
         // constexpr, so we hard code this for the time being.
         // static constexpr int32_t undefined_coordinate = std::numeric_limits<int32_t>::max();
@@ -229,34 +226,11 @@ namespace osmium {
             return *this;
         }
 
-        static constexpr int coordinate_length =
-            1 + /* sign */
-            3 + /* before . */
-            1 + /* . */
-            7 + /* after . */
-            1; /*  null byte */
-
-        template <typename T>
-        static T coordinate2string(T iterator, double value) {
-            char buffer[coordinate_length];
-
-#ifndef _MSC_VER
-            int len = snprintf(buffer, coordinate_length, "%.7f", value);
-#else
-            int len = _snprintf(buffer, coordinate_length, "%.7f", value);
-#endif
-            assert(len > 0 && len < coordinate_length);
-            while (buffer[len-1] == '0') --len;
-            if (buffer[len-1] == '.') --len;
-
-            return std::copy_n(buffer, len, iterator);
-        }
-
         template <typename T>
         T as_string(T iterator, const char separator) const {
-            iterator = coordinate2string(iterator, lon());
+            iterator = osmium::util::double2string(iterator, lon(), 7);
             *iterator++ = separator;
-            return coordinate2string(iterator, lat());
+            return osmium::util::double2string(iterator, lat(), 7);
         }
 
     }; // class Location

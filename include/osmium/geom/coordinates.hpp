@@ -38,28 +38,11 @@ DEALINGS IN THE SOFTWARE.
 #include <string>
 
 #include <osmium/osm/location.hpp>
+#include <osmium/util/double.hpp>
 
 namespace osmium {
 
     namespace geom {
-
-        namespace detail {
-
-            /**
-             * Append double to string, removing superfluous '0' characters at
-             * the end. The decimal dot will also be removed if necessary.
-             */
-            inline void double2string(std::string& s, double value) {
-                s += std::to_string(value);
-
-                size_t len = s.size()-1;
-                while (s[len] == '0') --len;
-                if (s[len] == '.') --len;
-
-                s.resize(len+1);
-            }
-
-        } // namespace detail
 
         struct Coordinates {
 
@@ -73,9 +56,9 @@ namespace osmium {
             }
 
             void append_to_string(std::string& s, const char infix) const {
-                osmium::geom::detail::double2string(s, x);
+                osmium::util::double2string(s, x, 6);
                 s += infix;
-                osmium::geom::detail::double2string(s, y);
+                osmium::util::double2string(s, y, 6);
             }
 
             void append_to_string(std::string& s, const char prefix, const char infix, const char suffix) const {
