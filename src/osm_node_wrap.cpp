@@ -56,12 +56,12 @@ namespace node_osmium {
 
     Handle<Value> OSMNodeWrap::get_lon(Local<String> property,const AccessorInfo& info) {
         HandleScope scope;
-        return scope.Close(Number::New(wrapped(info.This()).lon()));
+        return scope.Close(Number::New(wrapped(info.This()).location().lon()));
     }
 
     Handle<Value> OSMNodeWrap::get_lat(Local<String> property,const AccessorInfo& info) {
         HandleScope scope;
-        return scope.Close(Number::New(wrapped(info.This()).lat()));
+        return scope.Close(Number::New(wrapped(info.This()).location().lat()));
     }
 
     Handle<Value> OSMNodeWrap::wkb(const Arguments& args) {
