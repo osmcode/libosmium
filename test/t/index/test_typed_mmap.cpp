@@ -11,13 +11,13 @@ TEST_CASE("TypedMmap") {
 SECTION("Mmap") {
     uint64_t* data = osmium::detail::typed_mmap<uint64_t>::map(10);
 
-    data[0] = 4;
-    data[3] = 9;
-    data[9] = 25;
+    data[0] = 4ul;
+    data[3] = 9ul;
+    data[9] = 25ul;
 
-    REQUIRE(4 == data[0]);
-    REQUIRE(9 == data[3]);
-    REQUIRE(25 == data[9]);
+    REQUIRE(4ul == data[0]);
+    REQUIRE(9ul == data[3]);
+    REQUIRE(25ul == data[9]);
 
     osmium::detail::typed_mmap<uint64_t>::unmap(data, 10);
 }
@@ -34,15 +34,15 @@ SECTION("MmapHugeSize") {
 SECTION("Remap") {
     uint64_t* data = osmium::detail::typed_mmap<uint64_t>::map(10);
 
-    data[0] = 4;
-    data[3] = 9;
-    data[9] = 25;
+    data[0] = 4ul;
+    data[3] = 9ul;
+    data[9] = 25ul;
 
     uint64_t* new_data = osmium::detail::typed_mmap<uint64_t>::remap(data, 10, 1000);
 
-    REQUIRE(4 == new_data[0]);
-    REQUIRE(9 == new_data[3]);
-    REQUIRE(25 == new_data[9]);
+    REQUIRE(4ul == new_data[0]);
+    REQUIRE(9ul == new_data[3]);
+    REQUIRE(25ul == new_data[9]);
 }
 #else
 # pragma message "not running 'Remap' test case on this machine"
@@ -78,13 +78,13 @@ SECTION("GrowAndMap") {
     uint64_t* data = osmium::detail::typed_mmap<uint64_t>::grow_and_map(size, fd);
     REQUIRE(size == osmium::detail::typed_mmap<uint64_t>::file_size(fd));
 
-    data[0] = 1;
-    data[1] = 8;
-    data[99] = 27;
+    data[0] = 1ul;
+    data[1] = 8ul;
+    data[99] = 27ul;
 
-    REQUIRE(1 == data[0]);
-    REQUIRE(8 == data[1]);
-    REQUIRE(27 == data[99]);
+    REQUIRE(1ul == data[0]);
+    REQUIRE(8ul == data[1]);
+    REQUIRE(27ul == data[99]);
 
     osmium::detail::typed_mmap<uint64_t>::unmap(data, size);
 }

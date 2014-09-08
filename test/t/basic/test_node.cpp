@@ -21,8 +21,8 @@ SECTION("node_builder") {
         .uid(21)
         .timestamp(123);
 
-    REQUIRE(17 == node.id());
-    REQUIRE(17 == node.positive_id());
+    REQUIRE(17l == node.id());
+    REQUIRE(17ul == node.positive_id());
     REQUIRE(3 == node.version());
     REQUIRE(true == node.visible());
     REQUIRE(false == node.deleted());
@@ -43,8 +43,8 @@ SECTION("node_default_attributes") {
 
     osmium::Node& node = buffer_add_node(buffer, "", {}, osmium::Location{});
 
-    REQUIRE(0 == node.id());
-    REQUIRE(0 == node.positive_id());
+    REQUIRE(0l == node.id());
+    REQUIRE(0ul == node.positive_id());
     REQUIRE(0 == node.version());
     REQUIRE(true == node.visible());
     REQUIRE(0 == node.changeset());
@@ -69,8 +69,8 @@ SECTION("set_node_attributes_from_string") {
         .changeset("333")
         .uid("21");
 
-    REQUIRE(-17 == node.id());
-    REQUIRE(17 == node.positive_id());
+    REQUIRE(-17l == node.id());
+    REQUIRE(17ul == node.positive_id());
     REQUIRE(3 == node.version());
     REQUIRE(true == node.visible());
     REQUIRE(333 == node.changeset());
@@ -86,11 +86,11 @@ SECTION("large_id") {
     node.id(id);
 
     REQUIRE(id == node.id());
-    REQUIRE(id == node.positive_id());
+    REQUIRE(static_cast<osmium::unsigned_object_id_type>(id) == node.positive_id());
 
     node.id(-id);
     REQUIRE(-id == node.id());
-    REQUIRE(id == node.positive_id());
+    REQUIRE(static_cast<osmium::unsigned_object_id_type>(id) == node.positive_id());
 }
 
 SECTION("tags") {
