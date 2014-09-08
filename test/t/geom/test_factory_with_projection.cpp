@@ -11,17 +11,17 @@
 TEST_CASE("Projection") {
 
 SECTION("point_mercator") {
-    osmium::geom::WKTFactory<osmium::geom::MercatorProjection> factory;
+    osmium::geom::WKTFactory<osmium::geom::MercatorProjection> factory(2);
 
     std::string wkt {factory.create_point(osmium::Location(3.2, 4.2))};
-    REQUIRE(std::string{"POINT(356222.370538 467961.143605)"} == wkt);
+    REQUIRE(std::string{"POINT(356222.37 467961.14)"} == wkt);
 }
 
 SECTION("point_epsg_3857") {
-    osmium::geom::WKTFactory<osmium::geom::Projection> factory(osmium::geom::Projection(3857));
+    osmium::geom::WKTFactory<osmium::geom::Projection> factory(osmium::geom::Projection(3857), 2);
 
     std::string wkt {factory.create_point(osmium::Location(3.2, 4.2))};
-    REQUIRE(std::string{"POINT(356222.370538 467961.143605)"} == wkt);
+    REQUIRE(std::string{"POINT(356222.37 467961.14)"} == wkt);
 }
 
 SECTION("wkb_with_parameter") {

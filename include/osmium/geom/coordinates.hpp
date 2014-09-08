@@ -55,15 +55,15 @@ namespace osmium {
             Coordinates(const osmium::Location& location) : x(location.lon()), y(location.lat()) {
             }
 
-            void append_to_string(std::string& s, const char infix) const {
-                osmium::util::double2string(s, x, 6);
+            void append_to_string(std::string& s, const char infix, int precision) const {
+                osmium::util::double2string(s, x, precision);
                 s += infix;
-                osmium::util::double2string(s, y, 6);
+                osmium::util::double2string(s, y, precision);
             }
 
-            void append_to_string(std::string& s, const char prefix, const char infix, const char suffix) const {
+            void append_to_string(std::string& s, const char prefix, const char infix, const char suffix, int precision) const {
                 s += prefix;
-                append_to_string(s, infix);
+                append_to_string(s, infix, precision);
                 s += suffix;
             }
 
