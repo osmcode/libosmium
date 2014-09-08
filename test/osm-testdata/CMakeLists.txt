@@ -1,6 +1,6 @@
-if (NOT GDAL_FOUND OR NOT GEOS_FOUND  OR NOT OSMPBF_FOUND OR NOT PROTOBUF_FOUND OR NOT EXPAT_FOUND)
-  message("Sorry, building osm-testdata tests needs GEOS, GDAL, Expat, Protobuf and OSMPBF")
-  return()
+if (NOT GDAL_FOUND OR NOT GEOS_FOUND OR NOT OSMPBF_FOUND OR NOT PROTOBUF_FOUND OR NOT EXPAT_FOUND)
+    message("Sorry, building osm-testdata tests needs GEOS, GDAL, Expat, Protobuf and OSMPBF")
+    return()
 endif()
 
 set(DART_TESTING_TIMEOUT 60)
@@ -11,9 +11,9 @@ include_directories("../include")
 
 
 get_filename_component(TESTDATA_DIR ../../../osm-testdata ABSOLUTE)
-if (NOT EXISTS ${TESTDATA_DIR})
+if(NOT EXISTS ${TESTDATA_DIR})
     execute_process(COMMAND git clone https://github.com/osmcode/osm-testdata.git ${TESTDATA_DIR})
-endif ()
+endif()
 
 
 if(CMAKE_COMPILER_IS_GNUCC)
@@ -24,7 +24,7 @@ endif(CMAKE_COMPILER_IS_GNUCC)
 
 message(STATUS ${CMAKE_CXX_FLAGS})
 
-set(LIBS ${EXPAT_LIBRARY} ${OSMPBF_LIBRARIES} ${PROTOBUF_LITE_LIBRARY} 
+set(LIBS ${EXPAT_LIBRARY} ${OSMPBF_LIBRARIES} ${PROTOBUF_LITE_LIBRARY}
     ${ZLIB_LIBRARY} ${BZIP2_LIBRARIES} ${GEOS_LIBRARY} ${GDAL_LIBRARY}
     ${WIN_LIBS} ${CMAKE_THREAD_LIBS_INIT})
 
