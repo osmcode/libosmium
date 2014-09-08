@@ -98,7 +98,7 @@ namespace osmium {
             enum class auto_grow : bool {
                 yes = true,
                 no  = false
-            };
+            }; // enum class auto_grow
 
         private:
 

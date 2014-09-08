@@ -148,7 +148,7 @@ namespace osmium {
                     ignored_relation,
                     ignored_changeset,
                     in_object
-                };
+                }; // enum class context
 
                 context m_context;
                 context m_last_context;
@@ -652,7 +652,7 @@ namespace osmium {
                     }
                 }
 
-            }; // XMLParser
+            }; // class XMLParser
 
             class XMLInputFormat : public osmium::io::detail::InputFormat {
 

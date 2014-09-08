@@ -58,12 +58,12 @@ namespace osmium {
         enum class wkb_type : bool {
             wkb  = false,
             ewkb = true
-        };
+        }; // enum class wkb_type
 
         enum class out_type : bool {
             binary = false,
             hex    = true
-        };
+        }; // enum class out_type
 
         namespace detail {
 
@@ -109,7 +109,7 @@ namespace osmium {
 
                     // SRID-presence flag (EWKB)
                     wkbSRID                = 0x20000000
-                };
+                }; // enum wkbGeometryType
 
                 /**
                 * Byte order marker in WKB geometry.
@@ -117,7 +117,7 @@ namespace osmium {
                 enum class wkb_byte_order_type : uint8_t {
                     XDR = 0,         // Big Endian
                     NDR = 1          // Little Endian
-                };
+                }; // enum class wkb_byte_order_type
 
                 std::string m_data;
                 uint32_t m_points {0};

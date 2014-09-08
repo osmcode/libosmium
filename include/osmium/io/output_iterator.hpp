@@ -53,12 +53,14 @@ namespace osmium {
         class OutputIterator : public std::iterator<std::output_iterator_tag, osmium::memory::Item> {
 
             struct buffer_wrapper {
+
                 osmium::memory::Buffer buffer;
 
                 buffer_wrapper(size_t buffer_size) :
                     buffer(buffer_size, osmium::memory::Buffer::auto_grow::no) {
                 }
-            };
+
+            }; // struct buffer_wrapper
 
             static constexpr size_t default_buffer_size = 10 * 1024 * 1024;
 

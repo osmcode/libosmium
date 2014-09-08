@@ -93,7 +93,7 @@ namespace osmium {
                     return reinterpret_cast<const unsigned char*>(this);
                 }
 
-            };
+            }; // class ItemHelper
 
         } // namespace detail
 

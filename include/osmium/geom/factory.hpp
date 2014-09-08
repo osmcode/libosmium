@@ -77,7 +77,7 @@ namespace osmium {
         enum class use_nodes : bool {
             unique = true, ///< Remove consecutive nodes with same location.
             all    = false ///< Use all nodes.
-        };
+        }; // enum class use_nodes
 
         /**
          * Which direction the linestring created from a way
@@ -86,7 +86,7 @@ namespace osmium {
         enum class direction : bool {
             backward = true, ///< Linestring has reverse direction.
             forward  = false ///< Linestring has same direction as way.
-        };
+        }; // enum class direction
 
         /**
          * This pseudo projection just returns its WGS84 input unchanged.

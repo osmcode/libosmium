@@ -85,12 +85,14 @@ namespace osmium {
                  * IDs means less used space in the resulting file.
                  */
                 struct string_info {
+
                     /// number of occurrences of this string
                     uint16_t count;
 
                     /// an intermediate-id
                     string_id_type interim_id;
-                };
+
+                }; // struct string_info
 
                 /**
                  * Interim StringTable, storing all strings that should be written to

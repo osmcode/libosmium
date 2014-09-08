@@ -379,7 +379,7 @@ namespace osmium {
                     return true;
                 }
 
-            };
+            }; // class InputQueueReader
 
             template <class TDerived>
             class BlobParser {

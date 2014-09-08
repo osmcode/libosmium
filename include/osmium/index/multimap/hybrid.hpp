@@ -112,7 +112,7 @@ namespace osmium {
                     return &operator*();
                 }
 
-            };
+            }; // class HybridIterator
 
             template <typename TId, typename TValue>
             class Hybrid : public Multimap<TId, TValue> {
@@ -188,7 +188,7 @@ namespace osmium {
                     m_main.sort();
                 }
 
-            }; // Hybrid
+            }; // class Hybrid
 
         } // namespace multimap
 

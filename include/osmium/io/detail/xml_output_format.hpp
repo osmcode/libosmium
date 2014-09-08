@@ -118,7 +118,7 @@ namespace osmium {
                     op_create = 1,
                     op_modify = 2,
                     op_delete = 3
-                };
+                }; // enum class operation
 
                 osmium::memory::Buffer m_input_buffer;
 
