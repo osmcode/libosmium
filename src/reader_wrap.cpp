@@ -187,51 +187,57 @@ namespace node_osmium {
     Handle<Value> ReaderWrap::apply(const Arguments& args) {
         HandleScope scope;
 
-        typedef boost::variant<location_handler_type&, JSHandler&> some_handler_type;
-        std::vector<some_handler_type> handlers;
+        try {
+            typedef boost::variant<location_handler_type&, JSHandler&> some_handler_type;
+            std::vector<some_handler_type> handlers;
 
-        for (int i=0; i != args.Length(); ++i) {
-            if (args[i]->IsObject()) {
-                Local<Object> obj = args[i]->ToObject();
-                if (JSHandler::constructor->HasInstance(obj)) {
-                    handlers.push_back(*node::ObjectWrap::Unwrap<JSHandler>(obj));
-                } else if (LocationHandlerWrap::constructor->HasInstance(obj)) {
-                    location_handler_type* lh = node::ObjectWrap::Unwrap<LocationHandlerWrap>(obj)->get().get();
-                    handlers.push_back(*lh);
+            for (int i=0; i != args.Length(); ++i) {
+                if (args[i]->IsObject()) {
+                    Local<Object> obj = args[i]->ToObject();
+                    if (JSHandler::constructor->HasInstance(obj)) {
+                        handlers.push_back(*node::ObjectWrap::Unwrap<JSHandler>(obj));
+                    } else if (LocationHandlerWrap::constructor->HasInstance(obj)) {
+                        location_handler_type* lh = node::ObjectWrap::Unwrap<LocationHandlerWrap>(obj)->get().get();
+                        handlers.push_back(*lh);
+                    }
+                } else {
+                    return ThrowException(Exception::TypeError(String::New("please provide a handler object")));
                 }
-            } else {
-                return ThrowException(Exception::TypeError(String::New("please provide a handler object")));
             }
-        }
 
-        osmium::io::Reader& reader = wrapped(args.This());
+            osmium::io::Reader& reader = wrapped(args.This());
 
-        input_iterator it(reader);
-        input_iterator end;
+            input_iterator it(reader);
+            input_iterator end;
 
-        osmium::item_type last_type = osmium::item_type::undefined;
+            osmium::item_type last_type = osmium::item_type::undefined;
 
-        for (; it != end; ++it) {
-            visitor_before_after_type visitor_before_after(last_type, it->type());
-            visitor_type visitor(it);
+            for (; it != end; ++it) {
+                visitor_before_after_type visitor_before_after(last_type, it->type());
+                visitor_type visitor(it);
 
-            for (some_handler_type& handler : handlers) {
+                for (some_handler_type& handler : handlers) {
+                    if (last_type != it->type()) {
+                        boost::apply_visitor(visitor_before_after, handler);
+                    }
+                    boost::apply_visitor(visitor, handler);
+                }
+
                 if (last_type != it->type()) {
-                    boost::apply_visitor(visitor_before_after, handler);
+                    last_type = it->type();
                 }
-                boost::apply_visitor(visitor, handler);
             }
 
-            if (last_type != it->type()) {
-                last_type = it->type();
+            visitor_before_after_type visitor_before_after(last_type, osmium::item_type::undefined);
+            for (auto handler : handlers) {
+                boost::apply_visitor(visitor_before_after, handler);
             }
+        } catch (std::exception const& ex) {
+            std::string msg("during io: osmium says '");
+            msg += ex.what();
+            msg += "'";
+            return ThrowException(Exception::Error(String::New(msg.c_str())));
         }
-
-        visitor_before_after_type visitor_before_after(last_type, osmium::item_type::undefined);
-        for (auto handler : handlers) {
-            boost::apply_visitor(visitor_before_after, handler);
-        }
-
         return Undefined();
     }
 
