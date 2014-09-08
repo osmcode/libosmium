@@ -68,6 +68,11 @@ namespace node_osmium {
                     read_which_entities |= osmium::osm_entity_bits::relation;
                 }
 
+                Local<Value> want_changesets = options->Get(String::New("changeset"));
+                if (want_changesets->IsBoolean() && want_changesets->BooleanValue()) {
+                    read_which_entities |= osmium::osm_entity_bits::changeset;
+                }
+
             }
             if (args[0]->IsString()) {
                 osmium::io::File file(*String::Utf8Value(args[0]));
