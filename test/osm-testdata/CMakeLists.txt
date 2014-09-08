@@ -28,8 +28,6 @@ set(LIBS ${EXPAT_LIBRARY} ${OSMPBF_LIBRARIES} ${PROTOBUF_LITE_LIBRARY}
     ${ZLIB_LIBRARY} ${BZIP2_LIBRARIES} ${GEOS_LIBRARY} ${GDAL_LIBRARY}
     ${WIN_LIBS} ${CMAKE_THREAD_LIBS_INIT})
 
-file(REMOVE *.db)
-
 add_executable(testdata-overview testdata-overview.cpp)
 target_link_libraries(testdata-overview ${LIBS})
 add_test(testdata-overview testdata-overview ${TESTDATA_DIR}/grid/data/all.osm)

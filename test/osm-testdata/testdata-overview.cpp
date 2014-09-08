@@ -195,6 +195,7 @@ int main(int argc, char* argv[]) {
     std::string output_format("SQLite");
     std::string input_filename(argv[1]);
     std::string output_filename("testdata-overview.db");
+    ::unlink(output_filename.c_str());
 
     osmium::io::Reader reader(input_filename);
 
