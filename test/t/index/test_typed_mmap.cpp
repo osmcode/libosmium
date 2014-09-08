@@ -15,9 +15,9 @@ SECTION("Mmap") {
     data[3] = 9;
     data[9] = 25;
 
-    REQUIRE(4 == data[0]);
-    REQUIRE(9 == data[3]);
-    REQUIRE(25 == data[9]);
+    REQUIRE(uint64_t(4) == data[0]);
+    REQUIRE(uint64_t(9) == data[3]);
+    REQUIRE(uint64_t(25) == data[9]);
 
     osmium::detail::typed_mmap<uint64_t>::unmap(data, 10);
 }
@@ -40,9 +40,9 @@ SECTION("Remap") {
 
     uint64_t* new_data = osmium::detail::typed_mmap<uint64_t>::remap(data, 10, 1000);
 
-    REQUIRE(4 == new_data[0]);
-    REQUIRE(9 == new_data[3]);
-    REQUIRE(25 == new_data[9]);
+    REQUIRE(uint64_t(4) == new_data[0]);
+    REQUIRE(uint64_t(9) == new_data[3]);
+    REQUIRE(uint64_t(25) == new_data[9]);
 }
 #else
 # pragma message "not running 'Remap' test case on this machine"
@@ -82,9 +82,9 @@ SECTION("GrowAndMap") {
     data[1] = 8;
     data[99] = 27;
 
-    REQUIRE(1 == data[0]);
-    REQUIRE(8 == data[1]);
-    REQUIRE(27 == data[99]);
+    REQUIRE(uint64_t(1) == data[0]);
+    REQUIRE(uint64_t(8) == data[1]);
+    REQUIRE(uint64_t(27) == data[99]);
 
     osmium::detail::typed_mmap<uint64_t>::unmap(data, size);
 }
