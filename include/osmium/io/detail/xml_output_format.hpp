@@ -260,9 +260,9 @@ namespace osmium {
 
                     if (node.location()) {
                         m_out += " lat=\"";
-                        osmium::Location::coordinate2string(std::back_inserter(m_out), node.location().lat_without_check());
+                        osmium::util::double2string(std::back_inserter(m_out), node.location().lat_without_check(), 7);
                         m_out += "\" lon=\"";
-                        osmium::Location::coordinate2string(std::back_inserter(m_out), node.location().lon_without_check());
+                        osmium::util::double2string(std::back_inserter(m_out), node.location().lon_without_check(), 7);
                         m_out += "\"";
                     }
 
