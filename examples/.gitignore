@@ -1,4 +1,6 @@
 osmium_area_test
+osmium_create_node_cache
+osmium_use_node_cache
 osmium_convert
 osmium_debug
 osmium_index
