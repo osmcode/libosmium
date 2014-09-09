@@ -44,7 +44,7 @@ namespace node_osmium {
 
         file_ptr m_this;
 
-    };
+    }; // class FileWrap
 
 } // namespace node_osmium
 

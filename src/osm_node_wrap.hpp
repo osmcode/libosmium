@@ -1,5 +1,5 @@
-#ifndef NODE_WRAP_HPP
-#define NODE_WRAP_HPP
+#ifndef OSM_NODE_WRAP_HPP
+#define OSM_NODE_WRAP_HPP
 
 // v8
 #include <v8.h>
@@ -47,8 +47,8 @@ namespace node_osmium {
 
         ~OSMNodeWrap();
 
-    };
+    }; // class OSMNodeWrap
 
 } // namespace node_osmium
 
-#endif // NODE_WRAP_HPP
+#endif // OSM_NODE_WRAP_HPP

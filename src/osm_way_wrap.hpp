@@ -1,5 +1,5 @@
-#ifndef WAY_WRAP_HPP
-#define WAY_WRAP_HPP
+#ifndef OSM_WAY_WRAP_HPP
+#define OSM_WAY_WRAP_HPP
 
 // v8
 #include <v8.h>
@@ -45,8 +45,8 @@ namespace node_osmium {
 
         ~OSMWayWrap();
 
-    };
+    }; // class OSMWayWrap
 
 } // namespace node_osmium
 
-#endif // WAY_WRAP_HPP
+#endif // OSM_WAY_WRAP_HPP

@@ -53,7 +53,8 @@ namespace node_osmium {
         }
 
         reader_ptr m_this;
-    };
+
+    }; // class ReaderWrap
 
 } // namespace node_osmium
 

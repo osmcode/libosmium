@@ -1,5 +1,5 @@
-#ifndef RELATION_WRAP_HPP
-#define RELATION_WRAP_HPP
+#ifndef OSM_RELATION_WRAP_HPP
+#define OSM_RELATION_WRAP_HPP
 
 // c++
 #include <iterator>
@@ -46,8 +46,8 @@ namespace node_osmium {
 
         ~OSMRelationWrap();
 
-    };
+    }; // class OSMRelationWrap
 
 } // namespace node_osmium
 
-#endif // RELATION_WRAP_HPP
+#endif // OSM_RELATION_WRAP_HPP

@@ -1,3 +1,5 @@
+#ifndef HANDLER_HPP
+#define HANDLER_HPP
 
 // v8
 #include <v8.h>
@@ -64,7 +66,8 @@ namespace node_osmium {
 
         ~JSHandler();
 
-    };
+    }; // class JSHandler
 
 } // namespace node_osmium
 
+#endif // HANDLER_HPP

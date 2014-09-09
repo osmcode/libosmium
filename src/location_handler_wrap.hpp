@@ -69,7 +69,7 @@ namespace node_osmium {
         index_neg_type m_index_neg;
         location_handler_ptr m_this;
 
-    };
+    }; // class LocationHandlerWrap
 
 } // namespace node_osmium
 
