@@ -21,7 +21,18 @@ namespace node_osmium {
             if (!args.IsConstructCall()) {
                 return ThrowException(Exception::Error(String::New("Cannot call constructor as function, you need to use 'new' keyword")));
             }
-            LocationHandlerWrap* q = new LocationHandlerWrap();
+            LocationHandlerWrap* q;
+            if (args.Length() == 0) {
+                q = new LocationHandlerWrap("sparsetable");
+            } else {
+                if (args.Length() != 1) {
+                    return ThrowException(Exception::TypeError(String::New("please provide a node cache type as string when creating a LocationHandler")));
+                }
+                if (!args[0]->IsString()) {
+                    return ThrowException(Exception::TypeError(String::New("please provide a node cache type as string when creating a LocationHandler")));
+                }
+                q = new LocationHandlerWrap(*String::Utf8Value(args[0]));
+            }
             q->Wrap(args.This());
             return args.This();
         } catch (const std::exception& ex) {
