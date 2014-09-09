@@ -35,7 +35,7 @@
         "MACOSX_DEPLOYMENT_TARGET":"10.9"
       },
       "cflags_cc!": ["-fno-rtti", "-fno-exceptions"],
-      "cflags_cc" : ["-std=c++11"],
+      "cflags_cc" : ["-std=c++11", "-Wno-return-type"],
       "libraries": [
           "-losmpbf",
           "-lprotobuf-lite",
