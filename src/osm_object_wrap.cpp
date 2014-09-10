@@ -38,21 +38,23 @@ namespace node_osmium {
 
         const osmium::OSMObject& object = static_cast<const osmium::OSMObject&>(*(node::ObjectWrap::Unwrap<OSMObjectWrap>(args.This())->m_entity));
 
-        if (args.Length() == 0) {
-            v8::Local<v8::Object> tags = v8::Object::New();
-            for (auto& tag : object.tags()) {
-                tags->Set(v8::String::New(tag.key()), v8::String::New(tag.value()));
-            }
-            return scope.Close(tags);
-        } else if (args.Length() == 1) {
-            const char* value = object.tags().get_value_by_key(*v8::String::Utf8Value(args[0]));
-            if (value) {
-                return scope.Close(v8::String::New(value));
-            } else {
-                return v8::Undefined();
-            }
+        switch (args.Length()) {
+            case 0:
+                {
+                    v8::Local<v8::Object> tags = v8::Object::New();
+                    for (const auto& tag : object.tags()) {
+                        tags->Set(v8::String::New(tag.key()), v8::String::New(tag.value()));
+                    }
+                    return scope.Close(tags);
+                }
+            case 1:
+                {
+                    const char* value = object.tags().get_value_by_key(*v8::String::Utf8Value(args[0]));
+                    return scope.Close(value ? v8::String::New(value) : v8::Undefined());
+                }
         }
-        return scope.Close(v8::Undefined());
+
+        return ThrowException(v8::Exception::TypeError(v8::String::New("call tags() with zero or one parameter")));
     }
 
     v8::Handle<v8::Value> OSMObjectWrap::get_id(v8::Local<v8::String> property, const v8::AccessorInfo& info) {

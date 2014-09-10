@@ -71,4 +71,41 @@ describe('basic', function() {
         reader.apply(handler);
     });
 
+   it('should be able to handle object without tags', function(done) {
+        var handler = new osmium.Handler();
+        var count = 0;
+        handler.on('node',function(node) {
+            if (count == 0) {
+                assert.deepEqual(node.tags(), {});
+                assert.equal(node.tags("foobar"), undefined);
+                done();
+            }
+            count++;
+        });
+        var file = new osmium.File(__dirname + "/data/winthrop.osm");
+        var reader = new osmium.Reader(file, {node: true});
+        reader.apply(handler);
+    });
+
+   it('should be able access tags on object', function(done) {
+        var handler = new osmium.Handler();
+        var count = 0;
+        handler.on('way',function(way) {
+            if (count == 0) {
+                assert.equal(way.tags().name, "National Fish Hatchery Entranc");
+                assert.equal(way.tags().foobar, undefined);
+                assert.equal(way.tags("highway"), "residential");
+                assert.equal(way.tags("foobar"), undefined);
+                assert.throws(function() {
+                    way.tags("foo", "bar");
+                }, TypeError);
+                done();
+            }
+            count++;
+        });
+        var file = new osmium.File(__dirname + "/data/winthrop.osm");
+        var reader = new osmium.Reader(file, {way: true});
+        reader.apply(handler);
+    });
+
 });
