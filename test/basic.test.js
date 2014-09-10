@@ -111,4 +111,33 @@ describe('basic', function() {
         reader.apply(handler);
     });
 
+   it('should be able access nodes on ways', function(done) {
+        var handler = new osmium.Handler();
+        var count = 0;
+        handler.on('way',function(way) {
+            if (count == 0) {
+                assert.equal(way.nodes_count, 6);
+                assert.equal(way.nodes().length, 6);
+                assert.equal(way.nodes()[0], 50253600);
+                assert.equal(way.nodes()[5], 50253608);
+                assert.equal(way.nodes(0), 50253600);
+                assert.equal(way.nodes(5), 50253608);
+                assert.throws(function() {
+                    way.nodes(6);
+                }, RangeError);
+                assert.throws(function() {
+                    way.nodes("foo");
+                }, TypeError);
+                assert.throws(function() {
+                    way.nodes(1, "bar");
+                }, TypeError);
+                done();
+            }
+            count++;
+        });
+        var file = new osmium.File(__dirname + "/data/winthrop.osm");
+        var reader = new osmium.Reader(file, {way: true});
+        reader.apply(handler);
+    });
+
 });

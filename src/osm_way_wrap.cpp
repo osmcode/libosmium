@@ -23,9 +23,11 @@ namespace node_osmium {
         constructor->Inherit(OSMObjectWrap::constructor);
         constructor->InstanceTemplate()->SetInternalFieldCount(1);
         constructor->SetClassName(v8::String::NewSymbol("Way"));
+        auto attributes = static_cast<v8::PropertyAttribute>(v8::ReadOnly | v8::DontDelete);
+        set_accessor(constructor, "nodes_count", get_nodes_count, attributes);
+        node::SetPrototypeMethod(constructor, "nodes", nodes);
         node::SetPrototypeMethod(constructor, "wkb", wkb);
         node::SetPrototypeMethod(constructor, "wkt", wkt);
-        node::SetPrototypeMethod(constructor, "nodes", nodes);
         target->Set(v8::String::NewSymbol("Way"), constructor->GetFunction());
     }
 
@@ -65,27 +67,42 @@ namespace node_osmium {
         }
     }
 
+    v8::Handle<v8::Value> OSMWayWrap::get_nodes_count(v8::Local<v8::String> /* property */, const v8::AccessorInfo& info) {
+        v8::HandleScope scope;
+        return scope.Close(v8::Number::New(wrapped(info.This()).nodes().size()));
+    }
+
     v8::Handle<v8::Value> OSMWayWrap::nodes(const v8::Arguments& args) {
         v8::HandleScope scope;
+
         const osmium::Way& way = static_cast<const osmium::Way&>(*(node::ObjectWrap::Unwrap<OSMWayWrap>(args.This())->get()));
 
-        if (args.Length() == 0) {
-            v8::Local<v8::Array> nodes = v8::Array::New(way.nodes().size());
-            int i = 0;
-            for (auto& wn : way.nodes()) {
-                nodes->Set(i, v8::Number::New(wn.ref()));
-                ++i;
-            }
-            return scope.Close(nodes);
-        } else if (args.Length() == 1) {
-            if (args[0]->IsNumber()) {
-                int n = static_cast<int>(args[0]->ToNumber()->Value());
-                if (n > 0 && n < static_cast<int>(way.nodes().size())) {
-                    return scope.Close(v8::Number::New(way.nodes()[n].ref()));
+        switch (args.Length()) {
+            case 0:
+                {
+                    v8::Local<v8::Array> nodes = v8::Array::New(way.nodes().size());
+                    int i = 0;
+                    for (const auto& node_ref : way.nodes()) {
+                        nodes->Set(i, v8::Number::New(node_ref.ref()));
+                        ++i;
+                    }
+                    return scope.Close(nodes);
                 }
-            }
+            case 1:
+                {
+                    if (!args[0]->IsNumber()) {
+                        return ThrowException(v8::Exception::TypeError(v8::String::New("call nodes() without parameters or the index of the node you want")));
+                    }
+                    int n = static_cast<int>(args[0]->ToNumber()->Value());
+                    if (n >= 0 && n < static_cast<int>(way.nodes().size())) {
+                        return scope.Close(v8::Number::New(way.nodes()[n].ref()));
+                    } else {
+                        return ThrowException(v8::Exception::RangeError(v8::String::New("argument to nodes() out of range")));
+                    }
+                }
         }
-        return scope.Close(v8::Undefined());
+
+        return ThrowException(v8::Exception::TypeError(v8::String::New("call nodes() without parameters or the index of the node you want")));
     }
 
 } // namespace node_osmium

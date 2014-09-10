@@ -21,6 +21,8 @@ namespace node_osmium {
 
         static v8::Persistent<v8::FunctionTemplate> constructor;
 
+        static v8::Handle<v8::Value> get_nodes_count(v8::Local<v8::String> /* property */, const v8::AccessorInfo& info);
+
         static v8::Handle<v8::Value> nodes(const v8::Arguments& args);
         static v8::Handle<v8::Value> wkb(const v8::Arguments& args);
         static v8::Handle<v8::Value> wkt(const v8::Arguments& args);
