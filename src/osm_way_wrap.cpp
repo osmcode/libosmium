@@ -50,7 +50,7 @@ namespace node_osmium {
         } else {
             return ThrowException(v8::Exception::TypeError(v8::String::New("osmium.Way cannot be created in Javascript")));
         }
-        return v8::Undefined();
+        return scope.Close(v8::Undefined());
     }
 
     v8::Handle<v8::Value> OSMWayWrap::wkb(const v8::Arguments& args) {
@@ -99,7 +99,7 @@ namespace node_osmium {
                 }
             }
         }
-        return v8::Undefined();
+        return scope.Close(v8::Undefined());
     }
 
 } // namespace node_osmium

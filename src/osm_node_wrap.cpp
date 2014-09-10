@@ -82,4 +82,5 @@ namespace node_osmium {
 
         return scope.Close(v8::String::New(wkt.c_str()));
     }
+
 } // namespace node_osmium

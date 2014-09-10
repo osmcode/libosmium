@@ -67,10 +67,11 @@ namespace node_osmium {
             h->Wrap(args.This());
             return args.This();
         }
-        return v8::Undefined();
+        return scope.Close(v8::Undefined());
     }
 
     void JSHandler::print_error_message(v8::TryCatch& trycatch) {
+        v8::HandleScope scope;
         v8::Handle<v8::Value> exception = trycatch.Exception();
         v8::String::AsciiValue exception_str(exception);
         v8::Handle<v8::Message> message = trycatch.Message();
@@ -96,6 +97,7 @@ namespace node_osmium {
     }
 
     v8::Handle<v8::Value> JSHandler::options(const v8::Arguments& args) {
+        v8::HandleScope scope;
         if (args.Length() == 1) {
             if (args[0]->IsObject()) {
                 v8::Local<v8::Value> tagged_nodes_only = args[0]->ToObject()->Get(v8::String::New("tagged_nodes_only"));
@@ -105,7 +107,7 @@ namespace node_osmium {
                 }
             }
         }
-        return v8::Undefined();
+        return scope.Close(v8::Undefined());
     }
 
     v8::Handle<v8::Value> JSHandler::on(const v8::Arguments& args) {
@@ -236,6 +238,7 @@ namespace node_osmium {
 
     void JSHandler::init() {
         if (!init_cb.IsEmpty()) {
+            v8::HandleScope scope;
             v8::Local<v8::Value> argv[0] = { };
             v8::TryCatch trycatch;
             v8::Handle<v8::Value> v = init_cb->Call(v8::Context::GetCurrent()->Global(), 0, argv);
@@ -248,6 +251,7 @@ namespace node_osmium {
 
     void JSHandler::before_nodes() {
         if (!before_nodes_cb.IsEmpty()) {
+            v8::HandleScope scope;
             v8::Local<v8::Value> argv[0] = { };
             v8::TryCatch trycatch;
             v8::Handle<v8::Value> v = before_nodes_cb->Call(v8::Context::GetCurrent()->Global(), 0, argv);
@@ -260,6 +264,7 @@ namespace node_osmium {
 
     void JSHandler::after_nodes() {
         if (!after_nodes_cb.IsEmpty()) {
+            v8::HandleScope scope;
             v8::Local<v8::Value> argv[0] = { };
             v8::TryCatch trycatch;
             v8::Handle<v8::Value> v = after_nodes_cb->Call(v8::Context::GetCurrent()->Global(), 0, argv);
@@ -272,6 +277,7 @@ namespace node_osmium {
 
     void JSHandler::before_ways() {
         if (!before_ways_cb.IsEmpty()) {
+            v8::HandleScope scope;
             v8::Local<v8::Value> argv[0] = { };
             v8::TryCatch trycatch;
             v8::Handle<v8::Value> v = before_ways_cb->Call(v8::Context::GetCurrent()->Global(), 0, argv);
@@ -284,6 +290,7 @@ namespace node_osmium {
 
     void JSHandler::after_ways() {
         if (!after_ways_cb.IsEmpty()) {
+            v8::HandleScope scope;
             v8::Local<v8::Value> argv[0] = { };
             v8::TryCatch trycatch;
             v8::Handle<v8::Value> v = after_ways_cb->Call(v8::Context::GetCurrent()->Global(), 0, argv);
@@ -296,6 +303,7 @@ namespace node_osmium {
 
     void JSHandler::before_relations() {
         if (!before_relations_cb.IsEmpty()) {
+            v8::HandleScope scope;
             v8::Local<v8::Value> argv[0] = { };
             v8::TryCatch trycatch;
             v8::Handle<v8::Value> v = before_relations_cb->Call(v8::Context::GetCurrent()->Global(), 0, argv);
@@ -308,6 +316,7 @@ namespace node_osmium {
 
     void JSHandler::after_relations() {
         if (!after_relations_cb.IsEmpty()) {
+            v8::HandleScope scope;
             v8::Local<v8::Value> argv[0] = { };
             v8::TryCatch trycatch;
             v8::Handle<v8::Value> v = after_relations_cb->Call(v8::Context::GetCurrent()->Global(), 0, argv);
@@ -320,6 +329,7 @@ namespace node_osmium {
 
     void JSHandler::before_changesets() {
         if (!before_changesets_cb.IsEmpty()) {
+            v8::HandleScope scope;
             v8::Local<v8::Value> argv[0] = { };
             v8::TryCatch trycatch;
             v8::Handle<v8::Value> v = before_changesets_cb->Call(v8::Context::GetCurrent()->Global(), 0, argv);
@@ -332,6 +342,7 @@ namespace node_osmium {
 
     void JSHandler::after_changesets() {
         if (!after_changesets_cb.IsEmpty()) {
+            v8::HandleScope scope;
             v8::Local<v8::Value> argv[0] = { };
             v8::TryCatch trycatch;
             v8::Handle<v8::Value> v = after_changesets_cb->Call(v8::Context::GetCurrent()->Global(), 0, argv);
@@ -344,6 +355,7 @@ namespace node_osmium {
 
     void JSHandler::done() {
         if (!done_cb.IsEmpty()) {
+            v8::HandleScope scope;
             v8::Local<v8::Value> argv[0] = { };
             v8::TryCatch trycatch;
             v8::Handle<v8::Value> v = done_cb->Call(v8::Context::GetCurrent()->Global(), 0, argv);

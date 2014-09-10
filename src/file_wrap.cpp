@@ -49,7 +49,7 @@ namespace node_osmium {
         } catch (const std::exception& ex) {
             return ThrowException(v8::Exception::TypeError(v8::String::New(ex.what())));
         }
-        return v8::Undefined();
+        return scope.Close(v8::Undefined());
     }
 
 } // namespace node_osmium

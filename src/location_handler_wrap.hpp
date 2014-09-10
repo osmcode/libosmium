@@ -18,7 +18,6 @@
 #include <osmium/index/map/mmap_vector_anon.hpp>
 #include <osmium/index/map/mmap_vector_file.hpp>
 
-
 namespace node_osmium {
 
     typedef osmium::index::map::Dummy<osmium::unsigned_object_id_type, osmium::Location> index_neg_type;

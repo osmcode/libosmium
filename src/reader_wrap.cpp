@@ -91,7 +91,7 @@ namespace node_osmium {
         } catch (const std::exception& ex) {
             return ThrowException(v8::Exception::TypeError(v8::String::New(ex.what())));
         }
-        return v8::Undefined();
+        return scope.Close(v8::Undefined());
     }
 
     v8::Handle<v8::Value> ReaderWrap::header(const v8::Arguments& args) {
@@ -243,12 +243,13 @@ namespace node_osmium {
             msg += "'";
             return ThrowException(v8::Exception::Error(v8::String::New(msg.c_str())));
         }
-        return v8::Undefined();
+        return scope.Close(v8::Undefined());
     }
 
     v8::Handle<v8::Value> ReaderWrap::close(const v8::Arguments& args) {
+        v8::HandleScope scope;
         wrapped(args.This()).close();
-        return v8::Undefined();
+        return scope.Close(v8::Undefined());
     }
 
 } // namespace node_osmium

@@ -22,7 +22,7 @@ namespace node_osmium {
                 return v8::Undefined();
             }
         }
-        return v8::Undefined();
+        return scope.Close(v8::Undefined());
     }
 
     v8::Handle<v8::Value> OSMObjectWrap::get_id(v8::Local<v8::String> property, const v8::AccessorInfo& info) {
