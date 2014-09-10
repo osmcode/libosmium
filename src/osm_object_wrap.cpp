@@ -24,17 +24,13 @@ namespace node_osmium {
     }
 
     v8::Handle<v8::Value> OSMObjectWrap::New(const v8::Arguments& args) {
-        v8::HandleScope scope;
-        if (args[0]->IsExternal()) {
+        if (args.Length() == 1 && args[0]->IsExternal()) {
             v8::Local<v8::External> ext = v8::Local<v8::External>::Cast(args[0]);
-            void* ptr = ext->Value();
-            OSMObjectWrap* node = static_cast<OSMObjectWrap*>(ptr);
-            node->Wrap(args.This());
+            static_cast<OSMObjectWrap*>(ext->Value())->Wrap(args.This());
             return args.This();
         } else {
             return ThrowException(v8::Exception::TypeError(v8::String::New("osmium.OSMObject cannot be created in Javascript")));
         }
-        return scope.Close(v8::Undefined());
     }
 
     v8::Handle<v8::Value> OSMObjectWrap::tags(const v8::Arguments& args) {
