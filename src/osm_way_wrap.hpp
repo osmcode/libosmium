@@ -41,10 +41,6 @@ namespace node_osmium {
             OSMObjectWrap(entity) {
         }
 
-        const osmium::Way& object() {
-            return static_cast<const osmium::Way&>(*get());
-        }
-
     private:
 
         ~OSMWayWrap() {

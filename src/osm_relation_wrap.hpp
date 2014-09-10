@@ -42,10 +42,6 @@ namespace node_osmium {
             OSMObjectWrap(entity) {
         }
 
-        const osmium::Relation& object() {
-            return static_cast<const osmium::Relation&>(*get());
-        }
-
     private:
 
         ~OSMRelationWrap() {
