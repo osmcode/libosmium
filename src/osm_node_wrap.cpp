@@ -25,8 +25,7 @@ namespace node_osmium {
         constructor->SetClassName(v8::String::NewSymbol("Node"));
         node::SetPrototypeMethod(constructor, "wkb", wkb);
         node::SetPrototypeMethod(constructor, "wkt", wkt);
-        enum v8::PropertyAttribute attributes =
-            static_cast<v8::PropertyAttribute>(v8::ReadOnly | v8::DontDelete);
+        auto attributes = static_cast<v8::PropertyAttribute>(v8::ReadOnly | v8::DontDelete);
         set_accessor(constructor, "lon", get_lon, attributes);
         set_accessor(constructor, "lat", get_lat, attributes);
         target->Set(v8::String::NewSymbol("Node"), constructor->GetFunction());

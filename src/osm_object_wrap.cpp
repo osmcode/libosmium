@@ -10,8 +10,7 @@ namespace node_osmium {
         constructor = v8::Persistent<v8::FunctionTemplate>::New(v8::FunctionTemplate::New(OSMObjectWrap::New));
         constructor->InstanceTemplate()->SetInternalFieldCount(1);
         constructor->SetClassName(v8::String::NewSymbol("OSMObject"));
-        enum v8::PropertyAttribute attributes =
-            static_cast<v8::PropertyAttribute>(v8::ReadOnly | v8::DontDelete);
+        auto attributes = static_cast<v8::PropertyAttribute>(v8::ReadOnly | v8::DontDelete);
         set_accessor(constructor, "id", get_id, attributes);
         set_accessor(constructor, "version", get_version, attributes);
         set_accessor(constructor, "changeset", get_changeset, attributes);
