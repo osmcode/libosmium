@@ -42,12 +42,12 @@ namespace node_osmium {
         }
     }
 
-    v8::Handle<v8::Value> OSMNodeWrap::get_lon(v8::Local<v8::String> property, const v8::AccessorInfo& info) {
+    v8::Handle<v8::Value> OSMNodeWrap::get_lon(v8::Local<v8::String> /* property */, const v8::AccessorInfo& info) {
         v8::HandleScope scope;
         return scope.Close(v8::Number::New(wrapped(info.This()).location().lon()));
     }
 
-    v8::Handle<v8::Value> OSMNodeWrap::get_lat(v8::Local<v8::String> property, const v8::AccessorInfo& info) {
+    v8::Handle<v8::Value> OSMNodeWrap::get_lat(v8::Local<v8::String> /* property */, const v8::AccessorInfo& info) {
         v8::HandleScope scope;
         return scope.Close(v8::Number::New(wrapped(info.This()).location().lat()));
     }

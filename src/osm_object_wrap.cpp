@@ -57,37 +57,37 @@ namespace node_osmium {
         return ThrowException(v8::Exception::TypeError(v8::String::New("call tags() with zero or one parameter")));
     }
 
-    v8::Handle<v8::Value> OSMObjectWrap::get_id(v8::Local<v8::String> property, const v8::AccessorInfo& info) {
+    v8::Handle<v8::Value> OSMObjectWrap::get_id(v8::Local<v8::String> /* property */, const v8::AccessorInfo& info) {
         v8::HandleScope scope;
         return scope.Close(v8::Number::New(wrapped(info.This()).id()));
     }
 
-    v8::Handle<v8::Value> OSMObjectWrap::get_version(v8::Local<v8::String> property, const v8::AccessorInfo& info) {
+    v8::Handle<v8::Value> OSMObjectWrap::get_version(v8::Local<v8::String> /* property */, const v8::AccessorInfo& info) {
         v8::HandleScope scope;
         return scope.Close(v8::Number::New(wrapped(info.This()).version()));
     }
 
-    v8::Handle<v8::Value> OSMObjectWrap::get_changeset(v8::Local<v8::String> property, const v8::AccessorInfo& info) {
+    v8::Handle<v8::Value> OSMObjectWrap::get_changeset(v8::Local<v8::String> /* property */, const v8::AccessorInfo& info) {
         v8::HandleScope scope;
         return scope.Close(v8::Number::New(wrapped(info.This()).changeset()));
     }
 
-    v8::Handle<v8::Value> OSMObjectWrap::get_visible(v8::Local<v8::String> property, const v8::AccessorInfo& info) {
+    v8::Handle<v8::Value> OSMObjectWrap::get_visible(v8::Local<v8::String> /* property */, const v8::AccessorInfo& info) {
         v8::HandleScope scope;
         return scope.Close(v8::Boolean::New(wrapped(info.This()).visible()));
     }
 
-    v8::Handle<v8::Value> OSMObjectWrap::get_timestamp(v8::Local<v8::String> property, const v8::AccessorInfo& info) {
+    v8::Handle<v8::Value> OSMObjectWrap::get_timestamp(v8::Local<v8::String> /* property */, const v8::AccessorInfo& info) {
         v8::HandleScope scope;
         return scope.Close(v8::Number::New(wrapped(info.This()).timestamp()));
     }
 
-    v8::Handle<v8::Value> OSMObjectWrap::get_uid(v8::Local<v8::String> property, const v8::AccessorInfo& info) {
+    v8::Handle<v8::Value> OSMObjectWrap::get_uid(v8::Local<v8::String> /* property */, const v8::AccessorInfo& info) {
         v8::HandleScope scope;
         return scope.Close(v8::Number::New(wrapped(info.This()).uid()));
     }
 
-    v8::Handle<v8::Value> OSMObjectWrap::get_user(v8::Local<v8::String> property, const v8::AccessorInfo& info) {
+    v8::Handle<v8::Value> OSMObjectWrap::get_user(v8::Local<v8::String> /* property */, const v8::AccessorInfo& info) {
         v8::HandleScope scope;
         return scope.Close(v8::String::New(wrapped(info.This()).user()));
     }
