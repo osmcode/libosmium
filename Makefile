@@ -17,7 +17,7 @@ rebuild:
 	@make clean
 	@make
 
-test:
+test: osmium.node
 	@PATH="./node_modules/mocha/bin:${PATH}" && NODE_PATH="./lib:$(NODE_PATH)" mocha -R spec --timeout 10000
 
 indent:
