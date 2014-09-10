@@ -17,6 +17,8 @@ namespace node_osmium {
         constructor->Inherit(OSMObjectWrap::constructor);
         constructor->InstanceTemplate()->SetInternalFieldCount(1);
         constructor->SetClassName(v8::String::NewSymbol("Relation"));
+        auto attributes = static_cast<v8::PropertyAttribute>(v8::ReadOnly | v8::DontDelete);
+        set_accessor(constructor, "members_count", get_members_count, attributes);
         node::SetPrototypeMethod(constructor, "members", members);
         target->Set(v8::String::NewSymbol("Relation"), constructor->GetFunction());
     }
@@ -31,43 +33,57 @@ namespace node_osmium {
         }
     }
 
+    v8::Handle<v8::Value> OSMRelationWrap::get_members_count(v8::Local<v8::String> /* property */, const v8::AccessorInfo& info) {
+        v8::HandleScope scope;
+        return scope.Close(v8::Number::New(wrapped(info.This()).members().size()));
+    }
+
     v8::Handle<v8::Value> OSMRelationWrap::members(const v8::Arguments& args) {
         v8::HandleScope scope;
+
         const osmium::Relation& relation = wrapped(args.This());
 
-        if (args.Length() == 0) {
-            v8::Local<v8::Array> members = v8::Array::New();
-            int i = 0;
-            char typec[2] = " ";
-            for (auto& member : relation.members()) {
-                v8::Local<v8::Object> jsmember = v8::Object::New();
-                typec[0] = osmium::item_type_to_char(member.type());
-                jsmember->Set(v8::String::NewSymbol("type"), v8::String::New(typec));
-                jsmember->Set(v8::String::NewSymbol("ref"), v8::Number::New(member.ref()));
-                jsmember->Set(v8::String::NewSymbol("role"), v8::String::New(member.role()));
-                members->Set(i, jsmember);
-                ++i;
-            }
-            return scope.Close(members);
-        } else if (args.Length() == 1) {
-            if (args[0]->IsNumber()) {
-                int n = static_cast<int>(args[0]->ToNumber()->Value());
-                if (n > 0 && n < static_cast<int>(relation.members().size())) {
-                    auto it = relation.members().begin();
-                    std::advance(it, n);
-                    const osmium::RelationMember& member = *it;
-                    v8::Local<v8::Object> jsmember = v8::Object::New();
+        switch (args.Length()) {
+            case 0:
+                {
+                    v8::Local<v8::Array> members = v8::Array::New();
+                    int i = 0;
                     char typec[2] = " ";
-                    typec[0] = osmium::item_type_to_char(member.type());
-                    jsmember->Set(v8::String::NewSymbol("type"), v8::String::New(typec));
-                    jsmember->Set(v8::String::NewSymbol("ref"), v8::Number::New(member.ref()));
-                    jsmember->Set(v8::String::NewSymbol("role"), v8::String::New(member.role()));
-                    return scope.Close(jsmember);
+                    for (const auto& member : relation.members()) {
+                        v8::Local<v8::Object> jsmember = v8::Object::New();
+                        typec[0] = osmium::item_type_to_char(member.type());
+                        jsmember->Set(v8::String::NewSymbol("type"), v8::String::New(typec));
+                        jsmember->Set(v8::String::NewSymbol("ref"), v8::Number::New(member.ref()));
+                        jsmember->Set(v8::String::NewSymbol("role"), v8::String::New(member.role()));
+                        members->Set(i, jsmember);
+                        ++i;
+                    }
+                    return scope.Close(members);
                 }
-            }
+            case 1:
+                {
+                    if (!args[0]->IsNumber()) {
+                        return ThrowException(v8::Exception::TypeError(v8::String::New("call members() without parameters or the index of the member you want")));
+                    }
+                    int n = static_cast<int>(args[0]->ToNumber()->Value());
+                    if (n >= 0 && n < static_cast<int>(relation.members().size())) {
+                        auto it = relation.members().begin();
+                        std::advance(it, n);
+                        const osmium::RelationMember& member = *it;
+                        v8::Local<v8::Object> jsmember = v8::Object::New();
+                        char typec[2] = " ";
+                        typec[0] = osmium::item_type_to_char(member.type());
+                        jsmember->Set(v8::String::NewSymbol("type"), v8::String::New(typec));
+                        jsmember->Set(v8::String::NewSymbol("ref"), v8::Number::New(member.ref()));
+                        jsmember->Set(v8::String::NewSymbol("role"), v8::String::New(member.role()));
+                        return scope.Close(jsmember);
+                    } else {
+                        return ThrowException(v8::Exception::RangeError(v8::String::New("argument to members() out of range")));
+                    }
+                }
         }
 
-        return scope.Close(v8::Undefined());
+        return ThrowException(v8::Exception::TypeError(v8::String::New("call members() without parameters or the index of the member you want")));
     }
 
 } // namespace node_osmium

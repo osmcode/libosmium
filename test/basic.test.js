@@ -140,4 +140,40 @@ describe('basic', function() {
         reader.apply(handler);
     });
 
+   it('should be able access members on relations', function(done) {
+        var handler = new osmium.Handler();
+        var count = 0;
+        handler.on('relation',function(relation) {
+            if (count == 0) {
+                assert.equal(relation.members_count, 5);
+                assert.equal(relation.members().length, 5);
+                assert.deepEqual(relation.members()[0], {
+                    type: 'w',
+                    ref: 40512249,
+                    role: 'outer'
+                });
+                assert.deepEqual(relation.members()[4], {
+                    type: 'w',
+                    ref: 40512263,
+                    role: 'inner'
+                });
+                assert.deepEqual(relation.members(1), relation.members()[1]);
+                assert.throws(function() {
+                    relation.members(5);
+                }, RangeError);
+                assert.throws(function() {
+                    relation.members("foo");
+                }, TypeError);
+                assert.throws(function() {
+                    relation.members(1, "bar");
+                }, TypeError);
+                done();
+            }
+            count++;
+        });
+        var file = new osmium.File(__dirname + "/data/winthrop.osm");
+        var reader = new osmium.Reader(file, {relation: true});
+        reader.apply(handler);
+    });
+
 });
