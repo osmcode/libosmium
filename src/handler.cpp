@@ -17,6 +17,7 @@
 #include "osm_node_wrap.hpp"
 #include "osm_way_wrap.hpp"
 #include "osm_relation_wrap.hpp"
+#include "osm_changeset_wrap.hpp"
 
 namespace node_osmium {
 
@@ -51,6 +52,9 @@ namespace node_osmium {
         }
         if (!relation_cb.IsEmpty()) {
             relation_cb.Dispose();
+        }
+        if (!changeset_cb.IsEmpty()) {
+            changeset_cb.Dispose();
         }
     }
 
@@ -136,6 +140,11 @@ namespace node_osmium {
                 handler->relation_cb.Dispose();
             }
             handler->relation_cb = v8::Persistent<v8::Function>::New(callback);
+        } else if (callback_name == "changeset") {
+            if (!handler->changeset_cb.IsEmpty()) {
+                handler->changeset_cb.Dispose();
+            }
+            handler->changeset_cb = v8::Persistent<v8::Function>::New(callback);
         } else if (callback_name == "init") {
             if (!handler->init_cb.IsEmpty()) {
                 handler->init_cb.Dispose();
@@ -171,6 +180,16 @@ namespace node_osmium {
                 handler->after_relations_cb.Dispose();
             }
             handler->after_relations_cb = v8::Persistent<v8::Function>::New(callback);
+        } else if (callback_name == "before_changesets") {
+            if (!handler->before_changesets_cb.IsEmpty()) {
+                handler->before_changesets_cb.Dispose();
+            }
+            handler->before_changesets_cb = v8::Persistent<v8::Function>::New(callback);
+        } else if (callback_name == "after_changesets") {
+            if (!handler->after_changesets_cb.IsEmpty()) {
+                handler->after_changesets_cb.Dispose();
+            }
+            handler->after_changesets_cb = v8::Persistent<v8::Function>::New(callback);
         } else if (callback_name == "done") {
             if (!handler->done_cb.IsEmpty()) {
                 handler->done_cb.Dispose();
@@ -219,6 +238,20 @@ namespace node_osmium {
 
                     v8::TryCatch trycatch;
                     v8::Handle<v8::Value> v = relation_cb->Call(v8::Context::GetCurrent()->Global(), argc, argv);
+                    if (v.IsEmpty()) {
+                        print_error_message(trycatch);
+                        exit(1);
+                    }
+                }
+                break;
+            case osmium::item_type::changeset:
+                if (!changeset_cb.IsEmpty()) {
+                    const int argc = 1;
+                    v8::Local<v8::Object> obj = OSMChangesetWrap::create(entity);
+                    v8::Local<v8::Value> argv[argc] = { obj };
+
+                    v8::TryCatch trycatch;
+                    v8::Handle<v8::Value> v = changeset_cb->Call(v8::Context::GetCurrent()->Global(), argc, argv);
                     if (v.IsEmpty()) {
                         print_error_message(trycatch);
                         exit(1);

@@ -4,11 +4,8 @@
 // v8
 #include <v8.h>
 
-// node.js
+// node
 #include <node_object_wrap.h>
-
-// node-osmium
-#include "osm_object_wrap.hpp"
 
 namespace node_osmium {
 

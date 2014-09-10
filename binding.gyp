@@ -13,10 +13,12 @@
         "src/location_handler_wrap.cpp",
         "src/file_wrap.cpp",
         "src/reader_wrap.cpp",
+        "src/osm_entity_wrap.cpp",
         "src/osm_object_wrap.cpp",
         "src/osm_node_wrap.cpp",
         "src/osm_way_wrap.cpp",
-        "src/osm_relation_wrap.cpp"
+        "src/osm_relation_wrap.cpp",
+        "src/osm_changeset_wrap.cpp"
       ],
       "include_dirs": [
           "../libosmium/include/",

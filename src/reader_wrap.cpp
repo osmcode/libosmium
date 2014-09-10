@@ -7,9 +7,8 @@
 // boost
 #include <boost/variant.hpp>
 
-// node.js
+// node
 #include <node.h>
-#include <node_object_wrap.h>
 
 // osmium
 #include <osmium/io/input_iterator.hpp>
@@ -213,7 +212,7 @@ namespace node_osmium {
 
             osmium::io::Reader& reader = wrapped(args.This());
 
-            typedef osmium::io::InputIterator<osmium::io::Reader, osmium::OSMObject> input_iterator;
+            typedef osmium::io::InputIterator<osmium::io::Reader, osmium::OSMEntity> input_iterator;
             input_iterator it(reader);
             input_iterator end;
 
@@ -223,7 +222,7 @@ namespace node_osmium {
                 visitor_before_after_type visitor_before_after(last_type, it->type());
                 visitor_type visitor(*it);
 
-                for (some_handler_type& handler : handlers) {
+                for (auto& handler : handlers) {
                     if (last_type != it->type()) {
                         boost::apply_visitor(visitor_before_after, handler);
                     }
@@ -236,7 +235,7 @@ namespace node_osmium {
             }
 
             visitor_before_after_type visitor_before_after(last_type, osmium::item_type::undefined);
-            for (auto handler : handlers) {
+            for (auto& handler : handlers) {
                 boost::apply_visitor(visitor_before_after, handler);
             }
         } catch (std::exception const& ex) {

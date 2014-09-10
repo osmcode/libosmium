@@ -1,7 +1,7 @@
 // v8
 #include <v8.h>
 
-// node.js
+// node
 #include <node.h>
 
 // osmium
@@ -12,6 +12,7 @@
 #include "osm_node_wrap.hpp"
 #include "osm_way_wrap.hpp"
 #include "osm_relation_wrap.hpp"
+#include "osm_changeset_wrap.hpp"
 #include "handler.hpp"
 #include "location_handler_wrap.hpp"
 #include "file_wrap.hpp"
@@ -22,10 +23,12 @@ namespace node_osmium {
     extern "C" {
         static void start(v8::Handle<v8::Object> target) {
             v8::HandleScope scope;
+            node_osmium::OSMEntityWrap::Initialize(target);
             node_osmium::OSMObjectWrap::Initialize(target);
             node_osmium::OSMNodeWrap::Initialize(target);
             node_osmium::OSMWayWrap::Initialize(target);
             node_osmium::OSMRelationWrap::Initialize(target);
+            node_osmium::OSMChangesetWrap::Initialize(target);
             node_osmium::LocationHandlerWrap::Initialize(target);
             node_osmium::JSHandler::Initialize(target);
             node_osmium::FileWrap::Initialize(target);

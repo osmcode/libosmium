@@ -8,7 +8,7 @@
 // v8
 #include <v8.h>
 
-// node.js
+// node
 #include <node_object_wrap.h>
 
 // osmium
