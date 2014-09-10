@@ -62,8 +62,8 @@ TESTS_COMPILE_ERROR=0
 TESTS_FAILED=0
 TESTS_OK=0
 
-// Without this we have test failures on FreeBSD
-// see https://github.com/joto/osmium/issues/94
+# Without this we have test failures on FreeBSD
+# see https://github.com/joto/osmium/issues/94
 export BOOST_TEST_CATCH_SYSTEM_ERRORS=no
 
 test_file () {
