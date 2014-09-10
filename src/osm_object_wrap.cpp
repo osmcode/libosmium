@@ -19,7 +19,7 @@ namespace node_osmium {
         set_accessor(constructor, "timestamp_seconds_since_epoch", get_timestamp, attributes);
         set_accessor(constructor, "uid", get_uid, attributes);
         set_accessor(constructor, "user", get_user, attributes);
-        NODE_SET_PROTOTYPE_METHOD(constructor, "tags", tags);
+        node::SetPrototypeMethod(constructor, "tags", tags);
         target->Set(v8::String::NewSymbol("OSMObject"), constructor->GetFunction());
     }
 

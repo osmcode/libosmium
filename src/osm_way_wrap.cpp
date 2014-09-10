@@ -17,9 +17,9 @@ namespace node_osmium {
         constructor->Inherit(OSMObjectWrap::constructor);
         constructor->InstanceTemplate()->SetInternalFieldCount(1);
         constructor->SetClassName(v8::String::NewSymbol("Way"));
-        NODE_SET_PROTOTYPE_METHOD(constructor, "wkb", wkb);
-        NODE_SET_PROTOTYPE_METHOD(constructor, "wkt", wkt);
-        NODE_SET_PROTOTYPE_METHOD(constructor, "nodes", nodes);
+        node::SetPrototypeMethod(constructor, "wkb", wkb);
+        node::SetPrototypeMethod(constructor, "wkt", wkt);
+        node::SetPrototypeMethod(constructor, "nodes", nodes);
         target->Set(v8::String::NewSymbol("Way"), constructor->GetFunction());
     }
 

@@ -30,9 +30,9 @@ namespace node_osmium {
         constructor = v8::Persistent<v8::FunctionTemplate>::New(v8::FunctionTemplate::New(ReaderWrap::New));
         constructor->InstanceTemplate()->SetInternalFieldCount(1);
         constructor->SetClassName(v8::String::NewSymbol("Reader"));
-        NODE_SET_PROTOTYPE_METHOD(constructor, "header", header);
-        NODE_SET_PROTOTYPE_METHOD(constructor, "apply", apply);
-        NODE_SET_PROTOTYPE_METHOD(constructor, "close", close);
+        node::SetPrototypeMethod(constructor, "header", header);
+        node::SetPrototypeMethod(constructor, "apply", apply);
+        node::SetPrototypeMethod(constructor, "close", close);
         target->Set(v8::String::NewSymbol("Reader"), constructor->GetFunction());
     }
 

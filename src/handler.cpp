@@ -27,8 +27,8 @@ namespace node_osmium {
         constructor = v8::Persistent<v8::FunctionTemplate>::New(v8::FunctionTemplate::New(JSHandler::New));
         constructor->InstanceTemplate()->SetInternalFieldCount(1);
         constructor->SetClassName(v8::String::NewSymbol("Handler"));
-        NODE_SET_PROTOTYPE_METHOD(constructor, "on", on);
-        NODE_SET_PROTOTYPE_METHOD(constructor, "options", options);
+        node::SetPrototypeMethod(constructor, "on", on);
+        node::SetPrototypeMethod(constructor, "options", options);
         target->Set(v8::String::NewSymbol("Handler"), constructor->GetFunction());
     }
 

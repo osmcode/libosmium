@@ -10,8 +10,8 @@ namespace node_osmium {
         constructor = v8::Persistent<v8::FunctionTemplate>::New(v8::FunctionTemplate::New(LocationHandlerWrap::New));
         constructor->InstanceTemplate()->SetInternalFieldCount(1);
         constructor->SetClassName(v8::String::NewSymbol("LocationHandler"));
-        NODE_SET_PROTOTYPE_METHOD(constructor, "clear", clear);
-        NODE_SET_PROTOTYPE_METHOD(constructor, "ignoreErrors", ignoreErrors);
+        node::SetPrototypeMethod(constructor, "clear", clear);
+        node::SetPrototypeMethod(constructor, "ignoreErrors", ignoreErrors);
         target->Set(v8::String::NewSymbol("LocationHandler"), constructor->GetFunction());
     }
 

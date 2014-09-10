@@ -17,8 +17,8 @@ namespace node_osmium {
         constructor->Inherit(OSMObjectWrap::constructor);
         constructor->InstanceTemplate()->SetInternalFieldCount(1);
         constructor->SetClassName(v8::String::NewSymbol("Node"));
-        NODE_SET_PROTOTYPE_METHOD(constructor, "wkb", wkb);
-        NODE_SET_PROTOTYPE_METHOD(constructor, "wkt", wkt);
+        node::SetPrototypeMethod(constructor, "wkb", wkb);
+        node::SetPrototypeMethod(constructor, "wkt", wkt);
         enum v8::PropertyAttribute attributes =
             static_cast<v8::PropertyAttribute>(v8::ReadOnly | v8::DontDelete);
         set_accessor(constructor, "lon", get_lon, attributes);

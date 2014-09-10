@@ -11,7 +11,7 @@ namespace node_osmium {
         constructor->Inherit(OSMObjectWrap::constructor);
         constructor->InstanceTemplate()->SetInternalFieldCount(1);
         constructor->SetClassName(v8::String::NewSymbol("Relation"));
-        NODE_SET_PROTOTYPE_METHOD(constructor, "members", members);
+        node::SetPrototypeMethod(constructor, "members", members);
         target->Set(v8::String::NewSymbol("Relation"), constructor->GetFunction());
     }
 
