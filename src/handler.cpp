@@ -186,9 +186,7 @@ namespace node_osmium {
             case osmium::item_type::node:
                 if (!node_cb.IsEmpty() && (!node_callback_for_tagged_only || !it->tags().empty())) {
                     const int argc = 1;
-
-                    v8::Handle<v8::Value> ext = v8::External::New(new OSMNodeWrap(it));
-                    v8::Local<v8::Object> obj = OSMNodeWrap::constructor->GetFunction()->NewInstance(1, &ext);
+                    v8::Local<v8::Object> obj = OSMNodeWrap::create(it);
                     v8::Local<v8::Value> argv[argc] = { obj };
 
                     v8::TryCatch trycatch;
@@ -202,9 +200,7 @@ namespace node_osmium {
             case osmium::item_type::way:
                 if (!way_cb.IsEmpty()) {
                     const int argc = 1;
-
-                    v8::Handle<v8::Value> ext = v8::External::New(new OSMWayWrap(it));
-                    v8::Local<v8::Object> obj = OSMWayWrap::constructor->GetFunction()->NewInstance(1, &ext);
+                    v8::Local<v8::Object> obj = OSMWayWrap::create(it);
                     v8::Local<v8::Value> argv[argc] = { obj };
 
                     v8::TryCatch trycatch;
@@ -218,9 +214,7 @@ namespace node_osmium {
             case osmium::item_type::relation:
                 if (!relation_cb.IsEmpty()) {
                     const int argc = 1;
-
-                    v8::Handle<v8::Value> ext = v8::External::New(new OSMRelationWrap(it));
-                    v8::Local<v8::Object> obj = OSMRelationWrap::constructor->GetFunction()->NewInstance(1, &ext);
+                    v8::Local<v8::Object> obj = OSMRelationWrap::create(it);
                     v8::Local<v8::Value> argv[argc] = { obj };
 
                     v8::TryCatch trycatch;

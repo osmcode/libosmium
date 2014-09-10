@@ -24,9 +24,10 @@ namespace node_osmium {
         static v8::Handle<v8::Value> wkt(const v8::Arguments& args);
         static v8::Handle<v8::Value> nodes(const v8::Arguments& args);
 
+        static v8::Persistent<v8::FunctionTemplate> constructor;
+
     public:
 
-        static v8::Persistent<v8::FunctionTemplate> constructor;
         static void Initialize(v8::Handle<v8::Object> target);
         static v8::Handle<v8::Value> New(const v8::Arguments& args);
 
@@ -35,6 +36,12 @@ namespace node_osmium {
         }
 
         OSMWayWrap(const input_iterator&);
+
+        static v8::Local<v8::Object> create(const input_iterator& it) {
+            v8::HandleScope scope;
+            v8::Handle<v8::Value> ext = v8::External::New(new OSMWayWrap(it));
+            return scope.Close(OSMWayWrap::constructor->GetFunction()->NewInstance(1, &ext));
+        }
 
         osmium::Way& object() {
             return static_cast<osmium::Way&>(*get());

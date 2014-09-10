@@ -25,9 +25,10 @@ namespace node_osmium {
 
         static v8::Handle<v8::Value> members(const v8::Arguments& args);
 
+        static v8::Persistent<v8::FunctionTemplate> constructor;
+
     public:
 
-        static v8::Persistent<v8::FunctionTemplate> constructor;
         static void Initialize(v8::Handle<v8::Object> target);
         static v8::Handle<v8::Value> New(const v8::Arguments& args);
 
@@ -36,6 +37,12 @@ namespace node_osmium {
         }
 
         OSMRelationWrap(const input_iterator&);
+
+        static v8::Local<v8::Object> create(const input_iterator& it) {
+            v8::HandleScope scope;
+            v8::Handle<v8::Value> ext = v8::External::New(new OSMRelationWrap(it));
+            return scope.Close(OSMRelationWrap::constructor->GetFunction()->NewInstance(1, &ext));
+        }
 
         osmium::Relation& object() {
             return static_cast<osmium::Relation&>(*get());

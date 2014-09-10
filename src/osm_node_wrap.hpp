@@ -26,9 +26,10 @@ namespace node_osmium {
         static v8::Handle<v8::Value> get_lon(v8::Local<v8::String> property, const v8::AccessorInfo& info);
         static v8::Handle<v8::Value> get_lat(v8::Local<v8::String> property, const v8::AccessorInfo& info);
 
+        static v8::Persistent<v8::FunctionTemplate> constructor;
+
     public:
 
-        static v8::Persistent<v8::FunctionTemplate> constructor;
         static void Initialize(v8::Handle<v8::Object> target);
         static v8::Handle<v8::Value> New(const v8::Arguments& args);
 
@@ -37,6 +38,12 @@ namespace node_osmium {
         }
 
         OSMNodeWrap(const input_iterator&);
+
+        static v8::Local<v8::Object> create(const input_iterator& it) {
+            v8::HandleScope scope;
+            v8::Handle<v8::Value> ext = v8::External::New(new OSMNodeWrap(it));
+            return scope.Close(OSMNodeWrap::constructor->GetFunction()->NewInstance(1, &ext));
+        }
 
         osmium::Node& object() {
             return static_cast<osmium::Node&>(*get());
