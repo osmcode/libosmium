@@ -75,7 +75,7 @@ namespace node_osmium {
     v8::Handle<v8::Value> OSMWayWrap::nodes(const v8::Arguments& args) {
         v8::HandleScope scope;
 
-        const osmium::Way& way = static_cast<const osmium::Way&>(*(node::ObjectWrap::Unwrap<OSMWayWrap>(args.This())->get()));
+        const osmium::Way& way = wrapped(args.This());
 
         switch (args.Length()) {
             case 0:
