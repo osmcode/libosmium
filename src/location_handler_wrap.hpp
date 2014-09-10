@@ -18,7 +18,6 @@
 #include <osmium/index/map/mmap_vector_anon.hpp>
 #include <osmium/index/map/mmap_vector_file.hpp>
 
-using namespace v8;
 
 namespace node_osmium {
 
@@ -66,14 +65,14 @@ namespace node_osmium {
 
     public:
 
-        static Persistent<FunctionTemplate> constructor;
+        static v8::Persistent<v8::FunctionTemplate> constructor;
 
-        static void Initialize(Handle<Object> target);
-        static Handle<Value> New(const Arguments& args);
-        static Handle<Value> clear(const Arguments& args);
-        static Handle<Value> ignoreErrors(const Arguments& args);
+        static void Initialize(v8::Handle<v8::Object> target);
+        static v8::Handle<v8::Value> New(const v8::Arguments& args);
+        static v8::Handle<v8::Value> clear(const v8::Arguments& args);
+        static v8::Handle<v8::Value> ignoreErrors(const v8::Arguments& args);
 
-        static location_handler_type& wrapped(Local<Object> object) {
+        static location_handler_type& wrapped(v8::Local<v8::Object> object) {
             return *(node::ObjectWrap::Unwrap<LocationHandlerWrap>(object)->get());
         }
 

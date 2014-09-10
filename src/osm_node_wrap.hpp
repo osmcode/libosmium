@@ -17,23 +17,21 @@
 
 #include "osm_object_wrap.hpp"
 
-using namespace v8;
-
 namespace node_osmium {
 
     class OSMNodeWrap : public OSMObjectWrap {
 
     public:
 
-        static Persistent<FunctionTemplate> constructor;
-        static void Initialize(Handle<Object> target);
-        static Handle<Value> New(const Arguments& args);
-        static Handle<Value> wkb(const Arguments& args);
-        static Handle<Value> wkt(const Arguments& args);
-        static Handle<Value> get_lon(Local<String> property,const AccessorInfo& info);
-        static Handle<Value> get_lat(Local<String> property,const AccessorInfo& info);
+        static v8::Persistent<v8::FunctionTemplate> constructor;
+        static void Initialize(v8::Handle<v8::Object> target);
+        static v8::Handle<v8::Value> New(const v8::Arguments& args);
+        static v8::Handle<v8::Value> wkb(const v8::Arguments& args);
+        static v8::Handle<v8::Value> wkt(const v8::Arguments& args);
+        static v8::Handle<v8::Value> get_lon(v8::Local<v8::String> property, const v8::AccessorInfo& info);
+        static v8::Handle<v8::Value> get_lat(v8::Local<v8::String> property, const v8::AccessorInfo& info);
 
-        static osmium::Node& wrapped(Local<Object> object) {
+        static osmium::Node& wrapped(v8::Local<v8::Object> object) {
             return static_cast<osmium::Node&>(OSMObjectWrap::wrapped(object));
         }
 

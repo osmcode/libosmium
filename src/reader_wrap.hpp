@@ -17,8 +17,6 @@
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/types.hpp>
 
-using namespace v8;
-
 namespace node_osmium {
 
     typedef std::shared_ptr<osmium::io::Reader> reader_ptr;
@@ -27,14 +25,14 @@ namespace node_osmium {
 
     public:
 
-        static Persistent<FunctionTemplate> constructor;
-        static void Initialize(Handle<Object> target);
-        static Handle<Value> New(const Arguments& args);
-        static Handle<Value> header(const Arguments& args);
-        static Handle<Value> apply(const Arguments& args);
-        static Handle<Value> close(const Arguments& args);
+        static v8::Persistent<v8::FunctionTemplate> constructor;
+        static void Initialize(v8::Handle<v8::Object> target);
+        static v8::Handle<v8::Value> New(const v8::Arguments& args);
+        static v8::Handle<v8::Value> header(const v8::Arguments& args);
+        static v8::Handle<v8::Value> apply(const v8::Arguments& args);
+        static v8::Handle<v8::Value> close(const v8::Arguments& args);
 
-        static osmium::io::Reader& wrapped(Local<Object> object) {
+        static osmium::io::Reader& wrapped(v8::Local<v8::Object> object) {
             return *(node::ObjectWrap::Unwrap<ReaderWrap>(object)->get());
         }
 

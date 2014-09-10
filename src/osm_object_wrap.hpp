@@ -15,11 +15,8 @@
 #include <osmium/io/input_iterator.hpp>
 #include <osmium/osm/object.hpp>
 
-using namespace v8;
-
 #define SET_ACCESSOR(t, name, getter,attributes)                                         \
-    t->InstanceTemplate()->SetAccessor(String::NewSymbol(name),getter,NULL,Handle<Value>(),v8::DEFAULT,attributes); \
- 
+    t->InstanceTemplate()->SetAccessor(v8::String::NewSymbol(name),getter,NULL,v8::Handle<v8::Value>(),v8::DEFAULT,attributes); \
 
 namespace node_osmium {
 
@@ -31,16 +28,16 @@ namespace node_osmium {
 
     public:
 
-        static Handle<Value> tags(const Arguments& args);
-        static Handle<Value> get_id(Local<String> property,const AccessorInfo& info);
-        static Handle<Value> get_version(Local<String> property,const AccessorInfo& info);
-        static Handle<Value> get_changeset(Local<String> property,const AccessorInfo& info);
-        static Handle<Value> get_visible(Local<String> property,const AccessorInfo& info);
-        static Handle<Value> get_timestamp(Local<String> property,const AccessorInfo& info);
-        static Handle<Value> get_uid(Local<String> property,const AccessorInfo& info);
-        static Handle<Value> get_user(Local<String> property,const AccessorInfo& info);
+        static v8::Handle<v8::Value> tags(const v8::Arguments& args);
+        static v8::Handle<v8::Value> get_id(v8::Local<v8::String> property, const v8::AccessorInfo& info);
+        static v8::Handle<v8::Value> get_version(v8::Local<v8::String> property, const v8::AccessorInfo& info);
+        static v8::Handle<v8::Value> get_changeset(v8::Local<v8::String> property, const v8::AccessorInfo& info);
+        static v8::Handle<v8::Value> get_visible(v8::Local<v8::String> property, const v8::AccessorInfo& info);
+        static v8::Handle<v8::Value> get_timestamp(v8::Local<v8::String> property, const v8::AccessorInfo& info);
+        static v8::Handle<v8::Value> get_uid(v8::Local<v8::String> property, const v8::AccessorInfo& info);
+        static v8::Handle<v8::Value> get_user(v8::Local<v8::String> property, const v8::AccessorInfo& info);
 
-        static osmium::OSMObject& wrapped(Local<Object> object) {
+        static osmium::OSMObject& wrapped(v8::Local<v8::Object> object) {
             return *(node::ObjectWrap::Unwrap<OSMObjectWrap>(object)->get());
         }
 

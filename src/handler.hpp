@@ -12,19 +12,17 @@
 
 namespace node_osmium {
 
-    using namespace v8;
-
     class JSHandler : public node::ObjectWrap {
 
-        void print_error_message(TryCatch& trycatch);
+        void print_error_message(v8::TryCatch& trycatch);
 
     public:
 
-        static Persistent<FunctionTemplate> constructor;
-        static void Initialize(Handle<Object> target);
-        static Handle<Value> New(const Arguments& args);
-        static Handle<Value> on(const Arguments& args);
-        static Handle<Value> options(const Arguments& args);
+        static v8::Persistent<v8::FunctionTemplate> constructor;
+        static void Initialize(v8::Handle<v8::Object> target);
+        static v8::Handle<v8::Value> New(const v8::Arguments& args);
+        static v8::Handle<v8::Value> on(const v8::Arguments& args);
+        static v8::Handle<v8::Value> options(const v8::Arguments& args);
         JSHandler();
 
         void dispatch_object(const input_iterator& it);
@@ -42,25 +40,25 @@ namespace node_osmium {
 
         bool node_callback_for_tagged_only;
 
-        Persistent<Function> init_cb;
+        v8::Persistent<v8::Function> init_cb;
 
-        Persistent<Function> before_nodes_cb;
-        Persistent<Function> node_cb;
-        Persistent<Function> after_nodes_cb;
+        v8::Persistent<v8::Function> before_nodes_cb;
+        v8::Persistent<v8::Function> node_cb;
+        v8::Persistent<v8::Function> after_nodes_cb;
 
-        Persistent<Function> before_ways_cb;
-        Persistent<Function> way_cb;
-        Persistent<Function> after_ways_cb;
+        v8::Persistent<v8::Function> before_ways_cb;
+        v8::Persistent<v8::Function> way_cb;
+        v8::Persistent<v8::Function> after_ways_cb;
 
-        Persistent<Function> before_relations_cb;
-        Persistent<Function> relation_cb;
-        Persistent<Function> after_relations_cb;
+        v8::Persistent<v8::Function> before_relations_cb;
+        v8::Persistent<v8::Function> relation_cb;
+        v8::Persistent<v8::Function> after_relations_cb;
 
-        Persistent<Function> before_changesets_cb;
-        Persistent<Function> changeset_cb;
-        Persistent<Function> after_changesets_cb;
+        v8::Persistent<v8::Function> before_changesets_cb;
+        v8::Persistent<v8::Function> changeset_cb;
+        v8::Persistent<v8::Function> after_changesets_cb;
 
-        Persistent<Function> done_cb;
+        v8::Persistent<v8::Function> done_cb;
 
     private:
 

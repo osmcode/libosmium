@@ -23,90 +23,90 @@
 
 namespace node_osmium {
 
-    Persistent<FunctionTemplate> ReaderWrap::constructor;
+    v8::Persistent<v8::FunctionTemplate> ReaderWrap::constructor;
 
-    void ReaderWrap::Initialize(Handle<Object> target) {
-        HandleScope scope;
-        constructor = Persistent<FunctionTemplate>::New(FunctionTemplate::New(ReaderWrap::New));
+    void ReaderWrap::Initialize(v8::Handle<v8::Object> target) {
+        v8::HandleScope scope;
+        constructor = v8::Persistent<v8::FunctionTemplate>::New(v8::FunctionTemplate::New(ReaderWrap::New));
         constructor->InstanceTemplate()->SetInternalFieldCount(1);
-        constructor->SetClassName(String::NewSymbol("Reader"));
+        constructor->SetClassName(v8::String::NewSymbol("Reader"));
         NODE_SET_PROTOTYPE_METHOD(constructor, "header", header);
         NODE_SET_PROTOTYPE_METHOD(constructor, "apply", apply);
         NODE_SET_PROTOTYPE_METHOD(constructor, "close", close);
-        target->Set(String::NewSymbol("Reader"), constructor->GetFunction());
+        target->Set(v8::String::NewSymbol("Reader"), constructor->GetFunction());
     }
 
-    Handle<Value> ReaderWrap::New(const Arguments& args) {
-        HandleScope scope;
+    v8::Handle<v8::Value> ReaderWrap::New(const v8::Arguments& args) {
+        v8::HandleScope scope;
         if (!args.IsConstructCall()) {
-            return ThrowException(Exception::Error(String::New("Cannot call constructor as function, you need to use 'new' keyword")));
+            return ThrowException(v8::Exception::Error(v8::String::New("Cannot call constructor as function, you need to use 'new' keyword")));
         }
         if (args.Length() < 1 || args.Length() > 2) {
-            return ThrowException(Exception::TypeError(String::New("please provide a File object or string for the first argument and optional options Object when creating a Reader")));
+            return ThrowException(v8::Exception::TypeError(v8::String::New("please provide a File object or string for the first argument and optional options v8::Object when creating a Reader")));
         }
         try {
             osmium::osm_entity_bits::type read_which_entities = osmium::osm_entity_bits::all;
             if (args.Length() == 2) {
                 if (!args[1]->IsObject()) {
-                    return ThrowException(Exception::TypeError(String::New("Second argument to Reader constructor must be object")));
+                    return ThrowException(v8::Exception::TypeError(v8::String::New("Second argument to Reader constructor must be object")));
                 }
                 read_which_entities = osmium::osm_entity_bits::nothing;
-                Local<Object> options = args[1]->ToObject();
+                v8::Local<v8::Object> options = args[1]->ToObject();
 
-                Local<Value> want_nodes = options->Get(String::New("node"));
+                v8::Local<v8::Value> want_nodes = options->Get(v8::String::New("node"));
                 if (want_nodes->IsBoolean() && want_nodes->BooleanValue()) {
                     read_which_entities |= osmium::osm_entity_bits::node;
                 }
 
-                Local<Value> want_ways = options->Get(String::New("way"));
+                v8::Local<v8::Value> want_ways = options->Get(v8::String::New("way"));
                 if (want_ways->IsBoolean() && want_ways->BooleanValue()) {
                     read_which_entities |= osmium::osm_entity_bits::way;
                 }
 
-                Local<Value> want_relations = options->Get(String::New("relation"));
+                v8::Local<v8::Value> want_relations = options->Get(v8::String::New("relation"));
                 if (want_relations->IsBoolean() && want_relations->BooleanValue()) {
                     read_which_entities |= osmium::osm_entity_bits::relation;
                 }
 
-                Local<Value> want_changesets = options->Get(String::New("changeset"));
+                v8::Local<v8::Value> want_changesets = options->Get(v8::String::New("changeset"));
                 if (want_changesets->IsBoolean() && want_changesets->BooleanValue()) {
                     read_which_entities |= osmium::osm_entity_bits::changeset;
                 }
 
             }
             if (args[0]->IsString()) {
-                osmium::io::File file(*String::Utf8Value(args[0]));
+                osmium::io::File file(*v8::String::Utf8Value(args[0]));
                 ReaderWrap* q = new ReaderWrap(file, read_which_entities);
                 q->Wrap(args.This());
                 return args.This();
             } else if (args[0]->IsObject() && FileWrap::constructor->HasInstance(args[0]->ToObject())) {
-                Local<Object> file_obj = args[0]->ToObject();
+                v8::Local<v8::Object> file_obj = args[0]->ToObject();
                 FileWrap* file_wrap = node::ObjectWrap::Unwrap<FileWrap>(file_obj);
                 ReaderWrap* q = new ReaderWrap(*(file_wrap->get()), read_which_entities);
                 q->Wrap(args.This());
                 return args.This();
             } else {
-                return ThrowException(Exception::TypeError(String::New("please provide a File object or string for the first argument when creating a Reader")));
+                return ThrowException(v8::Exception::TypeError(v8::String::New("please provide a File object or string for the first argument when creating a Reader")));
             }
         } catch (const std::exception& ex) {
-            return ThrowException(Exception::TypeError(String::New(ex.what())));
+            return ThrowException(v8::Exception::TypeError(v8::String::New(ex.what())));
         }
-        return Undefined();
+        return v8::Undefined();
     }
 
-    Handle<Value> ReaderWrap::header(const Arguments& args) {
-        HandleScope scope;
-        Local<Object> obj = Object::New();
+    v8::Handle<v8::Value> ReaderWrap::header(const v8::Arguments& args) {
+        v8::HandleScope scope;
+        v8::Local<v8::Object> obj = v8::Object::New();
         ReaderWrap* reader = node::ObjectWrap::Unwrap<ReaderWrap>(args.This());
         const osmium::io::Header& header = reader->m_this->header();
-        obj->Set(String::New("generator"), String::New(header.get("generator").c_str()));
+        obj->Set(v8::String::New("generator"), v8::String::New(header.get("generator").c_str()));
         const osmium::Box& bounds = header.box();
-        Local<Array> arr = Array::New(4);
-        arr->Set(0, Number::New(bounds.bottom_left().lon()));
-        arr->Set(1, Number::New(bounds.bottom_left().lat()));
-        arr->Set(2, Number::New(bounds.top_right().lon()));
-        arr->Set(3, Number::New(bounds.top_right().lat()));
-        obj->Set(String::New("bounds"), arr);
+        v8::Local<v8::Array> arr = v8::Array::New(4);
+        arr->Set(0, v8::Number::New(bounds.bottom_left().lon()));
+        arr->Set(1, v8::Number::New(bounds.bottom_left().lat()));
+        arr->Set(2, v8::Number::New(bounds.top_right().lon()));
+        arr->Set(3, v8::Number::New(bounds.top_right().lat()));
+        obj->Set(v8::String::New("bounds"), arr);
         return scope.Close(obj);
     }
 
@@ -189,8 +189,8 @@ namespace node_osmium {
 
     }; // visitor_before_after
 
-    Handle<Value> ReaderWrap::apply(const Arguments& args) {
-        HandleScope scope;
+    v8::Handle<v8::Value> ReaderWrap::apply(const v8::Arguments& args) {
+        v8::HandleScope scope;
 
         try {
             typedef boost::variant<location_handler_type&, JSHandler&> some_handler_type;
@@ -198,7 +198,7 @@ namespace node_osmium {
 
             for (int i=0; i != args.Length(); ++i) {
                 if (args[i]->IsObject()) {
-                    Local<Object> obj = args[i]->ToObject();
+                    v8::Local<v8::Object> obj = args[i]->ToObject();
                     if (JSHandler::constructor->HasInstance(obj)) {
                         handlers.push_back(*node::ObjectWrap::Unwrap<JSHandler>(obj));
                     } else if (LocationHandlerWrap::constructor->HasInstance(obj)) {
@@ -206,7 +206,7 @@ namespace node_osmium {
                         handlers.push_back(*lh);
                     }
                 } else {
-                    return ThrowException(Exception::TypeError(String::New("please provide a handler object")));
+                    return ThrowException(v8::Exception::TypeError(v8::String::New("please provide a handler object")));
                 }
             }
 
@@ -241,14 +241,14 @@ namespace node_osmium {
             std::string msg("during io: osmium says '");
             msg += ex.what();
             msg += "'";
-            return ThrowException(Exception::Error(String::New(msg.c_str())));
+            return ThrowException(v8::Exception::Error(v8::String::New(msg.c_str())));
         }
-        return Undefined();
+        return v8::Undefined();
     }
 
-    Handle<Value> ReaderWrap::close(const Arguments& args) {
+    v8::Handle<v8::Value> ReaderWrap::close(const v8::Arguments& args) {
         wrapped(args.This()).close();
-        return Undefined();
+        return v8::Undefined();
     }
 
 } // namespace node_osmium

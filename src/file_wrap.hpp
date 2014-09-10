@@ -14,7 +14,6 @@
 // osmium
 #include <osmium/io/file.hpp>
 
-using namespace v8;
 
 namespace node_osmium {
 
@@ -24,9 +23,9 @@ namespace node_osmium {
 
     public:
 
-        static Persistent<FunctionTemplate> constructor;
-        static void Initialize(Handle<Object> target);
-        static Handle<Value> New(const Arguments& args);
+        static v8::Persistent<v8::FunctionTemplate> constructor;
+        static void Initialize(v8::Handle<v8::Object> target);
+        static v8::Handle<v8::Value> New(const v8::Arguments& args);
 
         FileWrap(const std::string& filename, const std::string& format) :
             ObjectWrap(),

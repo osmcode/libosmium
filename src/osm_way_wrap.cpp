@@ -9,19 +9,19 @@ namespace node_osmium {
     extern osmium::geom::WKBFactory<> wkb_factory;
     extern osmium::geom::WKTFactory<> wkt_factory;
 
-    Persistent<FunctionTemplate> OSMWayWrap::constructor;
+    v8::Persistent<v8::FunctionTemplate> OSMWayWrap::constructor;
 
-    void OSMWayWrap::Initialize(Handle<Object> target) {
-        HandleScope scope;
-        constructor = Persistent<FunctionTemplate>::New(FunctionTemplate::New(OSMWayWrap::New));
+    void OSMWayWrap::Initialize(v8::Handle<v8::Object> target) {
+        v8::HandleScope scope;
+        constructor = v8::Persistent<v8::FunctionTemplate>::New(v8::FunctionTemplate::New(OSMWayWrap::New));
         constructor->InstanceTemplate()->SetInternalFieldCount(1);
-        constructor->SetClassName(String::NewSymbol("Way"));
+        constructor->SetClassName(v8::String::NewSymbol("Way"));
         NODE_SET_PROTOTYPE_METHOD(constructor, "tags", tags);
         NODE_SET_PROTOTYPE_METHOD(constructor, "wkb", wkb);
         NODE_SET_PROTOTYPE_METHOD(constructor, "wkt", wkt);
         NODE_SET_PROTOTYPE_METHOD(constructor, "nodes", nodes);
-        enum PropertyAttribute attributes =
-            static_cast<PropertyAttribute>(v8::ReadOnly | v8::DontDelete);
+        enum v8::PropertyAttribute attributes =
+            static_cast<v8::PropertyAttribute>(v8::ReadOnly | v8::DontDelete);
         SET_ACCESSOR(constructor, "id", get_id, attributes);
         SET_ACCESSOR(constructor, "version", get_version, attributes);
         SET_ACCESSOR(constructor, "changeset", get_changeset, attributes);
@@ -29,7 +29,7 @@ namespace node_osmium {
         SET_ACCESSOR(constructor, "timestamp", get_timestamp, attributes);
         SET_ACCESSOR(constructor, "uid", get_uid, attributes);
         SET_ACCESSOR(constructor, "user", get_user, attributes);
-        target->Set(String::NewSymbol("Way"), constructor->GetFunction());
+        target->Set(v8::String::NewSymbol("Way"), constructor->GetFunction());
     }
 
     OSMWayWrap::OSMWayWrap(const input_iterator& it) :
@@ -39,22 +39,22 @@ namespace node_osmium {
     OSMWayWrap::~OSMWayWrap() {
     }
 
-    Handle<Value> OSMWayWrap::New(const Arguments& args) {
-        HandleScope scope;
+    v8::Handle<v8::Value> OSMWayWrap::New(const v8::Arguments& args) {
+        v8::HandleScope scope;
         if (args[0]->IsExternal()) {
-            Local<External> ext = Local<External>::Cast(args[0]);
+            v8::Local<v8::External> ext = v8::Local<v8::External>::Cast(args[0]);
             void* ptr = ext->Value();
             OSMWayWrap* way = static_cast<OSMWayWrap*>(ptr);
             way->Wrap(args.This());
             return args.This();
         } else {
-            return ThrowException(Exception::TypeError(String::New("osmium.Way cannot be created in Javascript")));
+            return ThrowException(v8::Exception::TypeError(v8::String::New("osmium.Way cannot be created in Javascript")));
         }
-        return Undefined();
+        return v8::Undefined();
     }
 
-    Handle<Value> OSMWayWrap::wkb(const Arguments& args) {
-        HandleScope scope;
+    v8::Handle<v8::Value> OSMWayWrap::wkb(const v8::Arguments& args) {
+        v8::HandleScope scope;
 
         try {
             std::string wkb { wkb_factory.create_linestring(wrapped(args.This())) };
@@ -64,30 +64,30 @@ namespace node_osmium {
             return scope.Close(node::Buffer::New(const_cast<char*>(wkb.data()), wkb.size())->handle_);
 #endif
         } catch (osmium::geometry_error&) {
-            return scope.Close(Undefined());
+            return scope.Close(v8::Undefined());
         }
     }
 
-    Handle<Value> OSMWayWrap::wkt(const Arguments& args) {
-        HandleScope scope;
+    v8::Handle<v8::Value> OSMWayWrap::wkt(const v8::Arguments& args) {
+        v8::HandleScope scope;
 
         try {
             std::string wkt { wkt_factory.create_linestring(wrapped(args.This())) };
-            return scope.Close(String::New(wkt.c_str()));
+            return scope.Close(v8::String::New(wkt.c_str()));
         } catch (osmium::geometry_error&) {
-            return scope.Close(Undefined());
+            return scope.Close(v8::Undefined());
         }
     }
 
-    Handle<Value> OSMWayWrap::nodes(const Arguments& args) {
-        HandleScope scope;
+    v8::Handle<v8::Value> OSMWayWrap::nodes(const v8::Arguments& args) {
+        v8::HandleScope scope;
         osmium::Way& way = static_cast<osmium::Way&>(*(node::ObjectWrap::Unwrap<OSMWayWrap>(args.This())->get()));
 
         if (args.Length() == 0) {
-            Local<Array> nodes = Array::New(way.nodes().size());
+            v8::Local<v8::Array> nodes = v8::Array::New(way.nodes().size());
             int i = 0;
             for (auto& wn : way.nodes()) {
-                nodes->Set(i, Number::New(wn.ref()));
+                nodes->Set(i, v8::Number::New(wn.ref()));
                 ++i;
             }
             return scope.Close(nodes);
@@ -95,11 +95,11 @@ namespace node_osmium {
             if (args[0]->IsNumber()) {
                 int n = static_cast<int>(args[0]->ToNumber()->Value());
                 if (n > 0 && n < static_cast<int>(way.nodes().size())) {
-                    return scope.Close(Number::New(way.nodes()[n].ref()));
+                    return scope.Close(v8::Number::New(way.nodes()[n].ref()));
                 }
             }
         }
-        return Undefined();
+        return v8::Undefined();
     }
 
 } // namespace node_osmium
