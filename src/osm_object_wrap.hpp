@@ -8,17 +8,16 @@
 #include <node.h>
 #include <node_version.h>
 #include <node_object_wrap.h>
-#include <node_buffer.h>
 
 // osmium
-#include <osmium/io/reader.hpp>
 #include <osmium/osm/object.hpp>
+
+// node-osmium
+#include "osm_entity_wrap.hpp"
 
 namespace node_osmium {
 
-    class OSMObjectWrap : public node::ObjectWrap {
-
-        const osmium::OSMEntity* m_entity;
+    class OSMObjectWrap : public OSMEntityWrap {
 
         static v8::Handle<v8::Value> tags(const v8::Arguments& args);
         static v8::Handle<v8::Value> get_id(v8::Local<v8::String> property, const v8::AccessorInfo& info);
@@ -29,14 +28,6 @@ namespace node_osmium {
         static v8::Handle<v8::Value> get_uid(v8::Local<v8::String> property, const v8::AccessorInfo& info);
         static v8::Handle<v8::Value> get_user(v8::Local<v8::String> property, const v8::AccessorInfo& info);
 
-    protected:
-
-        typedef v8::Handle<v8::Value> accessor_type(v8::Local<v8::String> property, const v8::AccessorInfo& info);
-
-        static void set_accessor(v8::Persistent<v8::FunctionTemplate> t, const char* name, accessor_type getter, v8::PropertyAttribute attributes) {
-            t->InstanceTemplate()->SetAccessor(v8::String::NewSymbol(name), getter, nullptr, v8::Handle<v8::Value>(), v8::DEFAULT, attributes);
-        }
-
     public:
 
         static v8::Persistent<v8::FunctionTemplate> constructor;
@@ -44,15 +35,11 @@ namespace node_osmium {
         static v8::Handle<v8::Value> New(const v8::Arguments& args);
 
         static const osmium::OSMObject& wrapped(v8::Local<v8::Object> object) {
-            return static_cast<const osmium::OSMObject&>(*(node::ObjectWrap::Unwrap<OSMObjectWrap>(object)->get()));
+            return static_cast<const osmium::OSMObject&>(OSMEntityWrap::wrapped(object));
         }
 
         OSMObjectWrap(const osmium::OSMEntity& entity) :
-            m_entity(&entity) {
-        }
-
-        const osmium::OSMEntity* get() {
-            return m_entity;
+            OSMEntityWrap(entity) {
         }
 
     }; // class OSMObjectWrap

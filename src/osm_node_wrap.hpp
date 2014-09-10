@@ -8,12 +8,11 @@
 #include <node.h>
 #include <node_version.h>
 #include <node_object_wrap.h>
-#include <node_buffer.h>
 
 // osmium
 #include <osmium/osm/node.hpp>
-#include <osmium/io/reader.hpp>
 
+// node-osmium
 #include "osm_object_wrap.hpp"
 
 namespace node_osmium {
@@ -34,7 +33,7 @@ namespace node_osmium {
         static v8::Local<v8::Object> create(const osmium::OSMEntity& entity);
 
         static const osmium::Node& wrapped(v8::Local<v8::Object> object) {
-            return static_cast<const osmium::Node&>(OSMObjectWrap::wrapped(object));
+            return static_cast<const osmium::Node&>(OSMEntityWrap::wrapped(object));
         }
 
         OSMNodeWrap(const osmium::OSMEntity& entity) :

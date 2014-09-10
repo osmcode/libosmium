@@ -1,7 +1,12 @@
 
+// node
+#include <node_buffer.h>
+
+// osmium
 #include <osmium/geom/wkb.hpp>
 #include <osmium/geom/wkt.hpp>
 
+// node-osmium
 #include "osm_way_wrap.hpp"
 
 namespace node_osmium {

@@ -1,9 +1,6 @@
 #ifndef OSM_RELATION_WRAP_HPP
 #define OSM_RELATION_WRAP_HPP
 
-// c++
-#include <iterator>
-
 // v8
 #include <v8.h>
 
@@ -14,8 +11,8 @@
 
 // osmium
 #include <osmium/osm/relation.hpp>
-#include <osmium/io/reader.hpp>
 
+// node-osmium
 #include "osm_object_wrap.hpp"
 
 namespace node_osmium {
@@ -35,7 +32,7 @@ namespace node_osmium {
         static v8::Local<v8::Object> create(const osmium::OSMEntity& entity);
 
         static const osmium::Relation& wrapped(v8::Local<v8::Object> object) {
-            return static_cast<const osmium::Relation&>(OSMObjectWrap::wrapped(object));
+            return static_cast<const osmium::Relation&>(OSMEntityWrap::wrapped(object));
         }
 
         OSMRelationWrap(const osmium::OSMEntity& entity) :
