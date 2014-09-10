@@ -15,9 +15,6 @@
 #include <osmium/io/input_iterator.hpp>
 #include <osmium/osm/object.hpp>
 
-#define SET_ACCESSOR(t, name, getter,attributes)                                         \
-    t->InstanceTemplate()->SetAccessor(v8::String::NewSymbol(name),getter,NULL,v8::Handle<v8::Value>(),v8::DEFAULT,attributes); \
-
 namespace node_osmium {
 
     typedef osmium::io::InputIterator<osmium::io::Reader, osmium::OSMObject> input_iterator;
@@ -25,6 +22,14 @@ namespace node_osmium {
     class OSMObjectWrap : public node::ObjectWrap {
 
         input_iterator m_it;
+
+    protected:
+
+        typedef v8::Handle<v8::Value> accessor_type(v8::Local<v8::String> property, const v8::AccessorInfo& info);
+
+        static void set_accessor(v8::Persistent<v8::FunctionTemplate> t, const char* name, accessor_type getter, v8::PropertyAttribute attributes) {
+            t->InstanceTemplate()->SetAccessor(v8::String::NewSymbol(name), getter, nullptr, v8::Handle<v8::Value>(), v8::DEFAULT, attributes);
+        }
 
     public:
 

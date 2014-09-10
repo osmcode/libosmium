@@ -22,13 +22,13 @@ namespace node_osmium {
         NODE_SET_PROTOTYPE_METHOD(constructor, "nodes", nodes);
         enum v8::PropertyAttribute attributes =
             static_cast<v8::PropertyAttribute>(v8::ReadOnly | v8::DontDelete);
-        SET_ACCESSOR(constructor, "id", get_id, attributes);
-        SET_ACCESSOR(constructor, "version", get_version, attributes);
-        SET_ACCESSOR(constructor, "changeset", get_changeset, attributes);
-        SET_ACCESSOR(constructor, "visible", get_visible, attributes);
-        SET_ACCESSOR(constructor, "timestamp", get_timestamp, attributes);
-        SET_ACCESSOR(constructor, "uid", get_uid, attributes);
-        SET_ACCESSOR(constructor, "user", get_user, attributes);
+        set_accessor(constructor, "id", get_id, attributes);
+        set_accessor(constructor, "version", get_version, attributes);
+        set_accessor(constructor, "changeset", get_changeset, attributes);
+        set_accessor(constructor, "visible", get_visible, attributes);
+        set_accessor(constructor, "timestamp", get_timestamp, attributes);
+        set_accessor(constructor, "uid", get_uid, attributes);
+        set_accessor(constructor, "user", get_user, attributes);
         target->Set(v8::String::NewSymbol("Way"), constructor->GetFunction());
     }
 
