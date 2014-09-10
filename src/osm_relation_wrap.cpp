@@ -56,9 +56,9 @@ namespace node_osmium {
             for (auto& member : relation.members()) {
                 v8::Local<v8::Object> jsmember = v8::Object::New();
                 typec[0] = osmium::item_type_to_char(member.type());
-                jsmember->Set(v8::String::New("type"), v8::String::New(typec));
-                jsmember->Set(v8::String::New("ref"), v8::Number::New(member.ref()));
-                jsmember->Set(v8::String::New("role"), v8::String::New(member.role()));
+                jsmember->Set(v8::String::NewSymbol("type"), v8::String::New(typec));
+                jsmember->Set(v8::String::NewSymbol("ref"), v8::Number::New(member.ref()));
+                jsmember->Set(v8::String::NewSymbol("role"), v8::String::New(member.role()));
                 members->Set(i, jsmember);
                 ++i;
             }
@@ -73,9 +73,9 @@ namespace node_osmium {
                     v8::Local<v8::Object> jsmember = v8::Object::New();
                     char typec[2] = " ";
                     typec[0] = osmium::item_type_to_char(member.type());
-                    jsmember->Set(v8::String::New("type"), v8::String::New(typec));
-                    jsmember->Set(v8::String::New("ref"), v8::Number::New(member.ref()));
-                    jsmember->Set(v8::String::New("role"), v8::String::New(member.role()));
+                    jsmember->Set(v8::String::NewSymbol("type"), v8::String::New(typec));
+                    jsmember->Set(v8::String::NewSymbol("ref"), v8::Number::New(member.ref()));
+                    jsmember->Set(v8::String::NewSymbol("role"), v8::String::New(member.role()));
                     return scope.Close(jsmember);
                 }
             }

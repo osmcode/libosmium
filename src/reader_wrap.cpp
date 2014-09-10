@@ -53,22 +53,22 @@ namespace node_osmium {
                 read_which_entities = osmium::osm_entity_bits::nothing;
                 v8::Local<v8::Object> options = args[1]->ToObject();
 
-                v8::Local<v8::Value> want_nodes = options->Get(v8::String::New("node"));
+                v8::Local<v8::Value> want_nodes = options->Get(v8::String::NewSymbol("node"));
                 if (want_nodes->IsBoolean() && want_nodes->BooleanValue()) {
                     read_which_entities |= osmium::osm_entity_bits::node;
                 }
 
-                v8::Local<v8::Value> want_ways = options->Get(v8::String::New("way"));
+                v8::Local<v8::Value> want_ways = options->Get(v8::String::NewSymbol("way"));
                 if (want_ways->IsBoolean() && want_ways->BooleanValue()) {
                     read_which_entities |= osmium::osm_entity_bits::way;
                 }
 
-                v8::Local<v8::Value> want_relations = options->Get(v8::String::New("relation"));
+                v8::Local<v8::Value> want_relations = options->Get(v8::String::NewSymbol("relation"));
                 if (want_relations->IsBoolean() && want_relations->BooleanValue()) {
                     read_which_entities |= osmium::osm_entity_bits::relation;
                 }
 
-                v8::Local<v8::Value> want_changesets = options->Get(v8::String::New("changeset"));
+                v8::Local<v8::Value> want_changesets = options->Get(v8::String::NewSymbol("changeset"));
                 if (want_changesets->IsBoolean() && want_changesets->BooleanValue()) {
                     read_which_entities |= osmium::osm_entity_bits::changeset;
                 }
@@ -99,14 +99,14 @@ namespace node_osmium {
         v8::Local<v8::Object> obj = v8::Object::New();
         ReaderWrap* reader = node::ObjectWrap::Unwrap<ReaderWrap>(args.This());
         const osmium::io::Header& header = reader->m_this->header();
-        obj->Set(v8::String::New("generator"), v8::String::New(header.get("generator").c_str()));
+        obj->Set(v8::String::NewSymbol("generator"), v8::String::New(header.get("generator").c_str()));
         const osmium::Box& bounds = header.box();
         v8::Local<v8::Array> arr = v8::Array::New(4);
         arr->Set(0, v8::Number::New(bounds.bottom_left().lon()));
         arr->Set(1, v8::Number::New(bounds.bottom_left().lat()));
         arr->Set(2, v8::Number::New(bounds.top_right().lon()));
         arr->Set(3, v8::Number::New(bounds.top_right().lat()));
-        obj->Set(v8::String::New("bounds"), arr);
+        obj->Set(v8::String::NewSymbol("bounds"), arr);
         return scope.Close(obj);
     }
 
