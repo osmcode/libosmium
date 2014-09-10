@@ -90,14 +90,14 @@ describe('osmium', function() {
             assert.equal(nodes, 0);
             before_nodes++;
         });
-        handler.on('node',function(node) {
+        handler.on('node', function(node) {
             ++nodes;
         });
         handler.on('after_nodes', function() {
             assert.equal(nodes >= 1500, true);
             after_nodes++;
         });
-        handler.on('done',function() {
+        handler.on('done', function() {
             assert.equal(nodes >= 1500, true);
             done();
         });

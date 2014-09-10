@@ -6,7 +6,7 @@ describe('basic', function() {
    it('should be able to access basic attributes from node', function(done) {
         var handler = new osmium.Handler();
         var count = 0;
-        handler.on('node',function(node) {
+        handler.on('node', function(node) {
             if (count == 0) {
                 assert.equal(node.id, 50031066);
                 assert.equal(node.visible, true);
@@ -30,7 +30,7 @@ describe('basic', function() {
    it('should be able to access basic attributes from way', function(done) {
         var handler = new osmium.Handler();
         var count = 0;
-        handler.on('way',function(way) {
+        handler.on('way', function(way) {
             if (count == 0) {
                 assert.equal(way.id, 6091729);
                 assert.equal(way.visible, true);
@@ -52,7 +52,7 @@ describe('basic', function() {
    it('should be able to access basic attributes from relation', function(done) {
         var handler = new osmium.Handler();
         var count = 0;
-        handler.on('relation',function(relation) {
+        handler.on('relation', function(relation) {
             if (count == 0) {
                 assert.equal(relation.id, 237891);
                 assert.equal(relation.visible, true);
@@ -74,7 +74,7 @@ describe('basic', function() {
    it('should be able to handle object without tags', function(done) {
         var handler = new osmium.Handler();
         var count = 0;
-        handler.on('node',function(node) {
+        handler.on('node', function(node) {
             if (count == 0) {
                 assert.deepEqual(node.tags(), {});
                 assert.equal(node.tags("foobar"), undefined);
@@ -90,7 +90,7 @@ describe('basic', function() {
    it('should be able access tags on object', function(done) {
         var handler = new osmium.Handler();
         var count = 0;
-        handler.on('way',function(way) {
+        handler.on('way', function(way) {
             if (count == 0) {
                 assert.equal(way.tags().name, "National Fish Hatchery Entranc");
                 assert.equal(way.tags().foobar, undefined);
@@ -114,7 +114,7 @@ describe('basic', function() {
    it('should be able access nodes on ways', function(done) {
         var handler = new osmium.Handler();
         var count = 0;
-        handler.on('way',function(way) {
+        handler.on('way', function(way) {
             if (count == 0) {
                 assert.equal(way.nodes_count, 6);
                 assert.equal(way.nodes().length, 6);
@@ -143,7 +143,7 @@ describe('basic', function() {
    it('should be able access members on relations', function(done) {
         var handler = new osmium.Handler();
         var count = 0;
-        handler.on('relation',function(relation) {
+        handler.on('relation', function(relation) {
             if (count == 0) {
                 assert.equal(relation.members_count, 5);
                 assert.equal(relation.members().length, 5);
