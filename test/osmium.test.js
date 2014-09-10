@@ -18,21 +18,6 @@ describe('osmium', function() {
         done();
     });
 
-   it('should be able to read ISO time from node', function(done) {
-        var handler = new osmium.Handler();
-        var count = 0;
-        handler.on('node',function(node) {
-            if (count == 0) {
-                assert.equal(node.date().toISOString(),'2009-11-17T00:10:56.000Z');
-                done();
-            }
-            count++;
-        });
-        var file = new osmium.File(__dirname+"/data/winthrop.osm");
-        var reader = new osmium.Reader(file, {node:true});
-        reader.apply(handler);
-    });
-
     it('should be able to get node data from handler parameter', function(done) {
         var handler = new osmium.Handler();
         var nodes = 0, ways = 0, relations = 0;

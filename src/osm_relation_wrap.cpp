@@ -18,7 +18,7 @@ namespace node_osmium {
         set_accessor(constructor, "version", get_version, attributes);
         set_accessor(constructor, "changeset", get_changeset, attributes);
         set_accessor(constructor, "visible", get_visible, attributes);
-        set_accessor(constructor, "timestamp", get_timestamp, attributes);
+        set_accessor(constructor, "timestamp_seconds_since_epoch", get_timestamp, attributes);
         set_accessor(constructor, "uid", get_uid, attributes);
         set_accessor(constructor, "user", get_user, attributes);
         target->Set(v8::String::NewSymbol("Relation"), constructor->GetFunction());
