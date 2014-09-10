@@ -36,7 +36,7 @@ namespace node_osmium {
     v8::Handle<v8::Value> OSMObjectWrap::tags(const v8::Arguments& args) {
         v8::HandleScope scope;
 
-        osmium::OSMObject& object = *(node::ObjectWrap::Unwrap<OSMObjectWrap>(args.This())->m_it);
+        const osmium::OSMObject& object = static_cast<const osmium::OSMObject&>(*(node::ObjectWrap::Unwrap<OSMObjectWrap>(args.This())->m_entity));
 
         if (args.Length() == 0) {
             v8::Local<v8::Object> tags = v8::Object::New();

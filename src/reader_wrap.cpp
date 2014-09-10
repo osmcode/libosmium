@@ -12,6 +12,7 @@
 #include <node_object_wrap.h>
 
 // osmium
+#include <osmium/io/input_iterator.hpp>
 #include <osmium/visitor.hpp>
 
 // node-osmium
@@ -112,18 +113,18 @@ namespace node_osmium {
 
     struct visitor_type : public boost::static_visitor<> {
 
-        input_iterator& m_it;
+        osmium::OSMEntity& m_entity;
 
-        visitor_type(input_iterator& it) :
-            m_it(it) {
+        visitor_type(osmium::OSMEntity& entity) :
+            m_entity(entity) {
         }
 
         void operator()(JSHandler& handler) const {
-            handler.dispatch_object(m_it);
+            handler.dispatch_object(m_entity);
         }
 
         void operator()(location_handler_type& handler) const {
-            osmium::apply_item(*m_it, handler);
+            osmium::apply_item(m_entity, handler);
         }
 
     }; // visitor_type
@@ -212,6 +213,7 @@ namespace node_osmium {
 
             osmium::io::Reader& reader = wrapped(args.This());
 
+            typedef osmium::io::InputIterator<osmium::io::Reader, osmium::OSMObject> input_iterator;
             input_iterator it(reader);
             input_iterator end;
 
@@ -219,7 +221,7 @@ namespace node_osmium {
 
             for (; it != end; ++it) {
                 visitor_before_after_type visitor_before_after(last_type, it->type());
-                visitor_type visitor(it);
+                visitor_type visitor(*it);
 
                 for (some_handler_type& handler : handlers) {
                     if (last_type != it->type()) {

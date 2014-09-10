@@ -5,9 +5,9 @@ namespace node_osmium {
 
     v8::Persistent<v8::FunctionTemplate> OSMRelationWrap::constructor;
 
-    v8::Local<v8::Object> OSMRelationWrap::create(const input_iterator& it) {
+    v8::Local<v8::Object> OSMRelationWrap::create(const osmium::OSMEntity& entity) {
         v8::HandleScope scope;
-        v8::Handle<v8::Value> ext = v8::External::New(new OSMRelationWrap(it));
+        v8::Handle<v8::Value> ext = v8::External::New(new OSMRelationWrap(entity));
         return scope.Close(OSMRelationWrap::constructor->GetFunction()->NewInstance(1, &ext));
     }
 
@@ -33,7 +33,7 @@ namespace node_osmium {
 
     v8::Handle<v8::Value> OSMRelationWrap::members(const v8::Arguments& args) {
         v8::HandleScope scope;
-        osmium::Relation& relation = wrapped(args.This());
+        const osmium::Relation& relation = wrapped(args.This());
 
         if (args.Length() == 0) {
             v8::Local<v8::Array> members = v8::Array::New();
@@ -55,7 +55,7 @@ namespace node_osmium {
                 if (n > 0 && n < static_cast<int>(relation.members().size())) {
                     auto it = relation.members().begin();
                     std::advance(it, n);
-                    osmium::RelationMember& member = *it;
+                    const osmium::RelationMember& member = *it;
                     v8::Local<v8::Object> jsmember = v8::Object::New();
                     char typec[2] = " ";
                     typec[0] = osmium::item_type_to_char(member.type());

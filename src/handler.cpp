@@ -180,13 +180,13 @@ namespace node_osmium {
         return scope.Close(v8::Undefined());
     }
 
-    void JSHandler::dispatch_object(const input_iterator& it) {
+    void JSHandler::dispatch_object(const osmium::OSMEntity& entity) {
         v8::HandleScope scope;
-        switch (it->type()) {
+        switch (entity.type()) {
             case osmium::item_type::node:
-                if (!node_cb.IsEmpty() && (!node_callback_for_tagged_only || !it->tags().empty())) {
+                if (!node_cb.IsEmpty() && (!node_callback_for_tagged_only || !static_cast<const osmium::Node&>(entity).tags().empty())) {
                     const int argc = 1;
-                    v8::Local<v8::Object> obj = OSMNodeWrap::create(it);
+                    v8::Local<v8::Object> obj = OSMNodeWrap::create(entity);
                     v8::Local<v8::Value> argv[argc] = { obj };
 
                     v8::TryCatch trycatch;
@@ -200,7 +200,7 @@ namespace node_osmium {
             case osmium::item_type::way:
                 if (!way_cb.IsEmpty()) {
                     const int argc = 1;
-                    v8::Local<v8::Object> obj = OSMWayWrap::create(it);
+                    v8::Local<v8::Object> obj = OSMWayWrap::create(entity);
                     v8::Local<v8::Value> argv[argc] = { obj };
 
                     v8::TryCatch trycatch;
@@ -214,7 +214,7 @@ namespace node_osmium {
             case osmium::item_type::relation:
                 if (!relation_cb.IsEmpty()) {
                     const int argc = 1;
-                    v8::Local<v8::Object> obj = OSMRelationWrap::create(it);
+                    v8::Local<v8::Object> obj = OSMRelationWrap::create(entity);
                     v8::Local<v8::Value> argv[argc] = { obj };
 
                     v8::TryCatch trycatch;

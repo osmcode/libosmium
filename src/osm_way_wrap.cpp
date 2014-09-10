@@ -11,9 +11,9 @@ namespace node_osmium {
 
     v8::Persistent<v8::FunctionTemplate> OSMWayWrap::constructor;
 
-    v8::Local<v8::Object> OSMWayWrap::create(const input_iterator& it) {
+    v8::Local<v8::Object> OSMWayWrap::create(const osmium::OSMEntity& entity) {
         v8::HandleScope scope;
-        v8::Handle<v8::Value> ext = v8::External::New(new OSMWayWrap(it));
+        v8::Handle<v8::Value> ext = v8::External::New(new OSMWayWrap(entity));
         return scope.Close(OSMWayWrap::constructor->GetFunction()->NewInstance(1, &ext));
     }
 
@@ -67,7 +67,7 @@ namespace node_osmium {
 
     v8::Handle<v8::Value> OSMWayWrap::nodes(const v8::Arguments& args) {
         v8::HandleScope scope;
-        osmium::Way& way = static_cast<osmium::Way&>(*(node::ObjectWrap::Unwrap<OSMWayWrap>(args.This())->get()));
+        const osmium::Way& way = static_cast<const osmium::Way&>(*(node::ObjectWrap::Unwrap<OSMWayWrap>(args.This())->get()));
 
         if (args.Length() == 0) {
             v8::Local<v8::Array> nodes = v8::Array::New(way.nodes().size());

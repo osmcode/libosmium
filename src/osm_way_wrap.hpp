@@ -11,7 +11,6 @@
 
 // osmium
 #include <osmium/osm/way.hpp>
-#include <osmium/io/input_iterator.hpp>
 #include <osmium/io/reader.hpp>
 
 #include "osm_object_wrap.hpp"
@@ -30,18 +29,18 @@ namespace node_osmium {
 
         static void Initialize(v8::Handle<v8::Object> target);
         static v8::Handle<v8::Value> New(const v8::Arguments& args);
-        static v8::Local<v8::Object> create(const input_iterator& it);
+        static v8::Local<v8::Object> create(const osmium::OSMEntity& entity);
 
-        static osmium::Way& wrapped(v8::Local<v8::Object> object) {
-            return static_cast<osmium::Way&>(OSMObjectWrap::wrapped(object));
+        static const osmium::Way& wrapped(v8::Local<v8::Object> object) {
+            return static_cast<const osmium::Way&>(OSMObjectWrap::wrapped(object));
         }
 
-        OSMWayWrap(const input_iterator& it) :
-            OSMObjectWrap(it) {
+        OSMWayWrap(const osmium::OSMEntity& entity) :
+            OSMObjectWrap(entity) {
         }
 
-        osmium::Way& object() {
-            return static_cast<osmium::Way&>(*get());
+        const osmium::Way& object() {
+            return static_cast<const osmium::Way&>(*get());
         }
 
     private:

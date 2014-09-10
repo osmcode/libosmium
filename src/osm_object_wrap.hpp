@@ -12,16 +12,13 @@
 
 // osmium
 #include <osmium/io/reader.hpp>
-#include <osmium/io/input_iterator.hpp>
 #include <osmium/osm/object.hpp>
 
 namespace node_osmium {
 
-    typedef osmium::io::InputIterator<osmium::io::Reader, osmium::OSMObject> input_iterator;
-
     class OSMObjectWrap : public node::ObjectWrap {
 
-        input_iterator m_it;
+        const osmium::OSMEntity* m_entity;
 
         static v8::Handle<v8::Value> tags(const v8::Arguments& args);
         static v8::Handle<v8::Value> get_id(v8::Local<v8::String> property, const v8::AccessorInfo& info);
@@ -46,16 +43,16 @@ namespace node_osmium {
         static void Initialize(v8::Handle<v8::Object> target);
         static v8::Handle<v8::Value> New(const v8::Arguments& args);
 
-        static osmium::OSMObject& wrapped(v8::Local<v8::Object> object) {
-            return *(node::ObjectWrap::Unwrap<OSMObjectWrap>(object)->get());
+        static const osmium::OSMObject& wrapped(v8::Local<v8::Object> object) {
+            return static_cast<const osmium::OSMObject&>(*(node::ObjectWrap::Unwrap<OSMObjectWrap>(object)->get()));
         }
 
-        OSMObjectWrap(const input_iterator& it) :
-            m_it(it) {
+        OSMObjectWrap(const osmium::OSMEntity& entity) :
+            m_entity(&entity) {
         }
 
-        input_iterator& get() {
-            return m_it;
+        const osmium::OSMEntity* get() {
+            return m_entity;
         }
 
     }; // class OSMObjectWrap

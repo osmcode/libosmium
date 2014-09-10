@@ -12,7 +12,6 @@
 
 // osmium
 #include <osmium/osm/node.hpp>
-#include <osmium/io/input_iterator.hpp>
 #include <osmium/io/reader.hpp>
 
 #include "osm_object_wrap.hpp"
@@ -32,18 +31,18 @@ namespace node_osmium {
 
         static void Initialize(v8::Handle<v8::Object> target);
         static v8::Handle<v8::Value> New(const v8::Arguments& args);
-        static v8::Local<v8::Object> create(const input_iterator& it);
+        static v8::Local<v8::Object> create(const osmium::OSMEntity& entity);
 
-        static osmium::Node& wrapped(v8::Local<v8::Object> object) {
-            return static_cast<osmium::Node&>(OSMObjectWrap::wrapped(object));
+        static const osmium::Node& wrapped(v8::Local<v8::Object> object) {
+            return static_cast<const osmium::Node&>(OSMObjectWrap::wrapped(object));
         }
 
-        OSMNodeWrap(const input_iterator& it) :
-            OSMObjectWrap(it) {
+        OSMNodeWrap(const osmium::OSMEntity& entity) :
+            OSMObjectWrap(entity) {
         }
 
-        osmium::Node& object() {
-            return static_cast<osmium::Node&>(*get());
+        const osmium::Node& object() {
+            return static_cast<const osmium::Node&>(*get());
         }
 
     private:
