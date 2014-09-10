@@ -5,6 +5,12 @@ namespace node_osmium {
 
     v8::Persistent<v8::FunctionTemplate> OSMRelationWrap::constructor;
 
+    v8::Local<v8::Object> OSMRelationWrap::create(const input_iterator& it) {
+        v8::HandleScope scope;
+        v8::Handle<v8::Value> ext = v8::External::New(new OSMRelationWrap(it));
+        return scope.Close(OSMRelationWrap::constructor->GetFunction()->NewInstance(1, &ext));
+    }
+
     void OSMRelationWrap::Initialize(v8::Handle<v8::Object> target) {
         v8::HandleScope scope;
         constructor = v8::Persistent<v8::FunctionTemplate>::New(v8::FunctionTemplate::New(OSMRelationWrap::New));
@@ -13,13 +19,6 @@ namespace node_osmium {
         constructor->SetClassName(v8::String::NewSymbol("Relation"));
         node::SetPrototypeMethod(constructor, "members", members);
         target->Set(v8::String::NewSymbol("Relation"), constructor->GetFunction());
-    }
-
-    OSMRelationWrap::OSMRelationWrap(const input_iterator& it) :
-        OSMObjectWrap(it) {
-    }
-
-    OSMRelationWrap::~OSMRelationWrap() {
     }
 
     v8::Handle<v8::Value> OSMRelationWrap::New(const v8::Arguments& args) {

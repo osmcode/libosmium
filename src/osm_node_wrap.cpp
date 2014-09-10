@@ -11,6 +11,12 @@ namespace node_osmium {
 
     v8::Persistent<v8::FunctionTemplate> OSMNodeWrap::constructor;
 
+    v8::Local<v8::Object> OSMNodeWrap::create(const input_iterator& it) {
+        v8::HandleScope scope;
+        v8::Handle<v8::Value> ext = v8::External::New(new OSMNodeWrap(it));
+        return scope.Close(OSMNodeWrap::constructor->GetFunction()->NewInstance(1, &ext));
+    }
+
     void OSMNodeWrap::Initialize(v8::Handle<v8::Object> target) {
         v8::HandleScope scope;
         constructor = v8::Persistent<v8::FunctionTemplate>::New(v8::FunctionTemplate::New(OSMNodeWrap::New));
@@ -24,13 +30,6 @@ namespace node_osmium {
         set_accessor(constructor, "lon", get_lon, attributes);
         set_accessor(constructor, "lat", get_lat, attributes);
         target->Set(v8::String::NewSymbol("Node"), constructor->GetFunction());
-    }
-
-    OSMNodeWrap::OSMNodeWrap(const input_iterator& it) :
-        OSMObjectWrap(it) {
-    }
-
-    OSMNodeWrap::~OSMNodeWrap() {
     }
 
     v8::Handle<v8::Value> OSMNodeWrap::New(const v8::Arguments& args) {
