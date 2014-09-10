@@ -191,7 +191,11 @@ namespace osmium {
             Reader& operator=(const Reader&) = delete;
 
             ~Reader() {
-                close();
+                try {
+                    close();
+                }
+                catch (...) {
+                }
             }
 
             /**
