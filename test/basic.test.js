@@ -97,6 +97,9 @@ describe('basic', function() {
                 assert.equal(way.tags("highway"), "residential");
                 assert.equal(way.tags("foobar"), undefined);
                 assert.throws(function() {
+                    way.tags({});
+                }, TypeError);
+                assert.throws(function() {
                     way.tags("foo", "bar");
                 }, TypeError);
                 done();

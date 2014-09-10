@@ -48,12 +48,15 @@ namespace node_osmium {
                 }
             case 1:
                 {
+                    if (!args[0]->IsString()) {
+                        return ThrowException(v8::Exception::TypeError(v8::String::New("call tags() without parameters or with a string (key)")));
+                    }
                     const char* value = object.tags().get_value_by_key(*v8::String::Utf8Value(args[0]));
                     return scope.Close(value ? v8::String::New(value) : v8::Undefined());
                 }
         }
 
-        return ThrowException(v8::Exception::TypeError(v8::String::New("call tags() with zero or one parameter")));
+        return ThrowException(v8::Exception::TypeError(v8::String::New("call tags() without parameters or with a string (key)")));
     }
 
     v8::Handle<v8::Value> OSMObjectWrap::get_id(v8::Local<v8::String> /* property */, const v8::AccessorInfo& info) {
