@@ -33,6 +33,10 @@ namespace node_osmium {
 
     public:
 
+        static v8::Persistent<v8::FunctionTemplate> constructor;
+        static void Initialize(v8::Handle<v8::Object> target);
+        static v8::Handle<v8::Value> New(const v8::Arguments& args);
+
         static v8::Handle<v8::Value> tags(const v8::Arguments& args);
         static v8::Handle<v8::Value> get_id(v8::Local<v8::String> property, const v8::AccessorInfo& info);
         static v8::Handle<v8::Value> get_version(v8::Local<v8::String> property, const v8::AccessorInfo& info);

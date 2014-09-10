@@ -14,20 +14,13 @@ namespace node_osmium {
     void OSMNodeWrap::Initialize(v8::Handle<v8::Object> target) {
         v8::HandleScope scope;
         constructor = v8::Persistent<v8::FunctionTemplate>::New(v8::FunctionTemplate::New(OSMNodeWrap::New));
+        constructor->Inherit(OSMObjectWrap::constructor);
         constructor->InstanceTemplate()->SetInternalFieldCount(1);
         constructor->SetClassName(v8::String::NewSymbol("Node"));
-        NODE_SET_PROTOTYPE_METHOD(constructor, "tags", tags);
         NODE_SET_PROTOTYPE_METHOD(constructor, "wkb", wkb);
         NODE_SET_PROTOTYPE_METHOD(constructor, "wkt", wkt);
         enum v8::PropertyAttribute attributes =
             static_cast<v8::PropertyAttribute>(v8::ReadOnly | v8::DontDelete);
-        set_accessor(constructor, "id", get_id, attributes);
-        set_accessor(constructor, "version", get_version, attributes);
-        set_accessor(constructor, "changeset", get_changeset, attributes);
-        set_accessor(constructor, "visible", get_visible, attributes);
-        set_accessor(constructor, "timestamp_seconds_since_epoch", get_timestamp, attributes);
-        set_accessor(constructor, "uid", get_uid, attributes);
-        set_accessor(constructor, "user", get_user, attributes);
         set_accessor(constructor, "lon", get_lon, attributes);
         set_accessor(constructor, "lat", get_lat, attributes);
         target->Set(v8::String::NewSymbol("Node"), constructor->GetFunction());

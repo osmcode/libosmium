@@ -22,6 +22,7 @@ namespace node_osmium {
     extern "C" {
         static void start(v8::Handle<v8::Object> target) {
             v8::HandleScope scope;
+            node_osmium::OSMObjectWrap::Initialize(target);
             node_osmium::OSMNodeWrap::Initialize(target);
             node_osmium::OSMWayWrap::Initialize(target);
             node_osmium::OSMRelationWrap::Initialize(target);
