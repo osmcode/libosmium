@@ -199,13 +199,20 @@ namespace node_osmium {
         return scope.Close(v8::Undefined());
     }
 
+    template <class TWrapped>
+    v8::Local<v8::Object> create_wrapper(const osmium::OSMEntity& entity) {
+        v8::HandleScope scope;
+        v8::Handle<v8::Value> ext = v8::External::New(new TWrapped(entity));
+        return scope.Close(TWrapped::constructor->GetFunction()->NewInstance(1, &ext));
+    }
+
     void JSHandler::dispatch_object(const osmium::OSMEntity& entity) {
         v8::HandleScope scope;
         switch (entity.type()) {
             case osmium::item_type::node:
                 if (!node_cb.IsEmpty() && (!node_callback_for_tagged_only || !static_cast<const osmium::Node&>(entity).tags().empty())) {
                     const int argc = 1;
-                    v8::Local<v8::Object> obj = OSMNodeWrap::create(entity);
+                    v8::Local<v8::Object> obj = create_wrapper<OSMNodeWrap>(entity);
                     v8::Local<v8::Value> argv[argc] = { obj };
 
                     v8::TryCatch trycatch;
@@ -219,7 +226,7 @@ namespace node_osmium {
             case osmium::item_type::way:
                 if (!way_cb.IsEmpty()) {
                     const int argc = 1;
-                    v8::Local<v8::Object> obj = OSMWayWrap::create(entity);
+                    v8::Local<v8::Object> obj = create_wrapper<OSMWayWrap>(entity);
                     v8::Local<v8::Value> argv[argc] = { obj };
 
                     v8::TryCatch trycatch;
@@ -233,7 +240,7 @@ namespace node_osmium {
             case osmium::item_type::relation:
                 if (!relation_cb.IsEmpty()) {
                     const int argc = 1;
-                    v8::Local<v8::Object> obj = OSMRelationWrap::create(entity);
+                    v8::Local<v8::Object> obj = create_wrapper<OSMRelationWrap>(entity);
                     v8::Local<v8::Value> argv[argc] = { obj };
 
                     v8::TryCatch trycatch;
@@ -247,7 +254,7 @@ namespace node_osmium {
             case osmium::item_type::changeset:
                 if (!changeset_cb.IsEmpty()) {
                     const int argc = 1;
-                    v8::Local<v8::Object> obj = OSMChangesetWrap::create(entity);
+                    v8::Local<v8::Object> obj = create_wrapper<OSMChangesetWrap>(entity);
                     v8::Local<v8::Value> argv[argc] = { obj };
 
                     v8::TryCatch trycatch;

@@ -5,12 +5,6 @@ namespace node_osmium {
 
     v8::Persistent<v8::FunctionTemplate> OSMChangesetWrap::constructor;
 
-    v8::Local<v8::Object> OSMChangesetWrap::create(const osmium::OSMEntity& entity) {
-        v8::HandleScope scope;
-        v8::Handle<v8::Value> ext = v8::External::New(new OSMChangesetWrap(entity));
-        return scope.Close(OSMChangesetWrap::constructor->GetFunction()->NewInstance(1, &ext));
-    }
-
     void OSMChangesetWrap::Initialize(v8::Handle<v8::Object> target) {
         v8::HandleScope scope;
         constructor = v8::Persistent<v8::FunctionTemplate>::New(v8::FunctionTemplate::New(OSMChangesetWrap::New));

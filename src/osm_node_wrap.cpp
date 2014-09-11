@@ -17,12 +17,6 @@ namespace node_osmium {
 
     v8::Persistent<v8::FunctionTemplate> OSMNodeWrap::constructor;
 
-    v8::Local<v8::Object> OSMNodeWrap::create(const osmium::OSMEntity& entity) {
-        v8::HandleScope scope;
-        v8::Handle<v8::Value> ext = v8::External::New(new OSMNodeWrap(entity));
-        return scope.Close(OSMNodeWrap::constructor->GetFunction()->NewInstance(1, &ext));
-    }
-
     void OSMNodeWrap::Initialize(v8::Handle<v8::Object> target) {
         v8::HandleScope scope;
         constructor = v8::Persistent<v8::FunctionTemplate>::New(v8::FunctionTemplate::New(OSMNodeWrap::New));
