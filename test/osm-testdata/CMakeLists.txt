@@ -34,7 +34,11 @@ add_test(testdata-overview testdata-overview ${TESTDATA_DIR}/grid/data/all.osm)
 
 add_executable(testdata-multipolygon testdata-multipolygon.cpp)
 target_link_libraries(testdata-multipolygon ${LIBS})
-add_test(testdata-multipolygon ${CMAKE_SOURCE_DIR}/test/osm-testdata/run-testdata-multipolygon.sh ${TESTDATA_DIR})
+if (WIN32)
+  add_test(testdata-multipolygon ${CMAKE_SOURCE_DIR}/test/osm-testdata/run-testdata-multipolygon.bat ${TESTDATA_DIR} ${CMAKE_BUILD_TYPE})
+else()
+  add_test(testdata-multipolygon ${CMAKE_SOURCE_DIR}/test/osm-testdata/run-testdata-multipolygon.sh ${TESTDATA_DIR})
+endif()
 
 file(GLOB TESTCASE_CPPS testcases/*.cpp)
 add_executable(testdata-testcases testdata-testcases.cpp ${TESTCASE_CPPS})
