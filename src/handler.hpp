@@ -18,9 +18,9 @@ namespace node_osmium {
 
     class JSHandler : public node::ObjectWrap {
 
-        void print_error_message(v8::TryCatch& trycatch);
-
     public:
+
+        static void print_error_message(v8::TryCatch& trycatch);
 
         static v8::Persistent<v8::FunctionTemplate> constructor;
         static void Initialize(v8::Handle<v8::Object> target);

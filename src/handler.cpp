@@ -200,69 +200,41 @@ namespace node_osmium {
     }
 
     template <class TWrapped>
-    v8::Local<v8::Object> create_wrapper(const osmium::OSMEntity& entity) {
+    void call_callback(v8::Persistent<v8::Function>& function, const osmium::OSMEntity& entity) {
         v8::HandleScope scope;
+
         v8::Handle<v8::Value> ext = v8::External::New(new TWrapped(entity));
-        return scope.Close(TWrapped::constructor->GetFunction()->NewInstance(1, &ext));
+        v8::Local<v8::Object> obj = TWrapped::constructor->GetFunction()->NewInstance(1, &ext);
+        v8::Local<v8::Value> argv[1] = { obj };
+
+        v8::TryCatch trycatch;
+        v8::Handle<v8::Value> v = function->Call(v8::Context::GetCurrent()->Global(), 1, argv);
+        if (v.IsEmpty()) {
+            JSHandler::print_error_message(trycatch);
+            exit(1);
+        }
     }
 
     void JSHandler::dispatch_object(const osmium::OSMEntity& entity) {
-        v8::HandleScope scope;
         switch (entity.type()) {
             case osmium::item_type::node:
                 if (!node_cb.IsEmpty() && (!node_callback_for_tagged_only || !static_cast<const osmium::Node&>(entity).tags().empty())) {
-                    const int argc = 1;
-                    v8::Local<v8::Object> obj = create_wrapper<OSMNodeWrap>(entity);
-                    v8::Local<v8::Value> argv[argc] = { obj };
-
-                    v8::TryCatch trycatch;
-                    v8::Handle<v8::Value> v = node_cb->Call(v8::Context::GetCurrent()->Global(), argc, argv);
-                    if (v.IsEmpty()) {
-                        print_error_message(trycatch);
-                        exit(1);
-                    }
+                    call_callback<OSMNodeWrap>(node_cb, entity);
                 }
                 break;
             case osmium::item_type::way:
                 if (!way_cb.IsEmpty()) {
-                    const int argc = 1;
-                    v8::Local<v8::Object> obj = create_wrapper<OSMWayWrap>(entity);
-                    v8::Local<v8::Value> argv[argc] = { obj };
-
-                    v8::TryCatch trycatch;
-                    v8::Handle<v8::Value> v = way_cb->Call(v8::Context::GetCurrent()->Global(), argc, argv);
-                    if (v.IsEmpty()) {
-                        print_error_message(trycatch);
-                        exit(1);
-                    }
+                    call_callback<OSMWayWrap>(way_cb, entity);
                 }
                 break;
             case osmium::item_type::relation:
                 if (!relation_cb.IsEmpty()) {
-                    const int argc = 1;
-                    v8::Local<v8::Object> obj = create_wrapper<OSMRelationWrap>(entity);
-                    v8::Local<v8::Value> argv[argc] = { obj };
-
-                    v8::TryCatch trycatch;
-                    v8::Handle<v8::Value> v = relation_cb->Call(v8::Context::GetCurrent()->Global(), argc, argv);
-                    if (v.IsEmpty()) {
-                        print_error_message(trycatch);
-                        exit(1);
-                    }
+                    call_callback<OSMRelationWrap>(relation_cb, entity);
                 }
                 break;
             case osmium::item_type::changeset:
                 if (!changeset_cb.IsEmpty()) {
-                    const int argc = 1;
-                    v8::Local<v8::Object> obj = create_wrapper<OSMChangesetWrap>(entity);
-                    v8::Local<v8::Value> argv[argc] = { obj };
-
-                    v8::TryCatch trycatch;
-                    v8::Handle<v8::Value> v = changeset_cb->Call(v8::Context::GetCurrent()->Global(), argc, argv);
-                    if (v.IsEmpty()) {
-                        print_error_message(trycatch);
-                        exit(1);
-                    }
+                    call_callback<OSMChangesetWrap>(changeset_cb, entity);
                 }
                 break;
             default:
