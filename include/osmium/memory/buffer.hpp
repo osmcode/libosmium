@@ -490,6 +490,10 @@ namespace osmium {
              */
             template <class TCallbackClass>
             void purge_removed(TCallbackClass* callback) {
+                if (begin() == end()) {
+                    return;
+                }
+
                 iterator it_write = begin();
 
                 iterator next;
@@ -497,19 +501,19 @@ namespace osmium {
                     next = std::next(it_read);
                     if (!it_read->removed()) {
                         if (it_read != it_write) {
-                            assert(it_read->data() >= data());
-                            assert(it_write->data() >= data());
-                            size_t old_offset = static_cast<size_t>(it_read->data() - data());
-                            size_t new_offset = static_cast<size_t>(it_write->data() - data());
+                            assert(it_read.data() >= data());
+                            assert(it_write.data() >= data());
+                            size_t old_offset = static_cast<size_t>(it_read.data() - data());
+                            size_t new_offset = static_cast<size_t>(it_write.data() - data());
                             callback->moving_in_buffer(old_offset, new_offset);
-                            std::memmove(it_write->data(), it_read->data(), it_read->padded_size());
+                            std::memmove(it_write.data(), it_read.data(), it_read->padded_size());
                         }
-                        ++it_write;
+                        it_write.advance_once();
                     }
                 }
 
-                assert(it_write->data() >= data());
-                m_written = static_cast<size_t>(it_write->data() - data());
+                assert(it_write.data() >= data());
+                m_written = static_cast<size_t>(it_write.data() - data());
                 m_committed = m_written;
             }
 

@@ -131,6 +131,18 @@ namespace osmium {
                 return *static_cast<ItemIterator<TMember>*>(this);
             }
 
+            /**
+             * Like operator++() but will NOT skip items of unwanted
+             * types. Do not use this unless you know what you are
+             * doing.
+             */
+            ItemIterator<TMember>& advance_once() {
+                assert(m_data);
+                assert(m_data != m_end);
+                m_data = reinterpret_cast<TMember*>(m_data)->next();
+                return *static_cast<ItemIterator<TMember>*>(this);
+            }
+
             ItemIterator<TMember> operator++(int) {
                 ItemIterator<TMember> tmp(*this);
                 operator++();
@@ -147,7 +159,6 @@ namespace osmium {
 
             unsigned char* data() const {
                 assert(m_data);
-                assert(m_data != m_end);
                 return m_data;
             }
 
