@@ -102,15 +102,16 @@ namespace node_osmium {
 
     v8::Handle<v8::Value> JSHandler::options(const v8::Arguments& args) {
         v8::HandleScope scope;
-        if (args.Length() == 1) {
-            if (args[0]->IsObject()) {
-                v8::Local<v8::Value> tagged_nodes_only = args[0]->ToObject()->Get(v8::String::New("tagged_nodes_only"));
-                if (tagged_nodes_only->IsBoolean()) {
-                    JSHandler* handler = node::ObjectWrap::Unwrap<JSHandler>(args.This());
-                    handler->node_callback_for_tagged_only = tagged_nodes_only->BooleanValue();
-                }
-            }
+        if (args.Length() != 1 || !args[0]->IsObject()) {
+            return ThrowException(v8::Exception::TypeError(v8::String::New("please provide a single object as parameter")));
         }
+
+        v8::Local<v8::Value> tagged_nodes_only = args[0]->ToObject()->Get(v8::String::NewSymbol("tagged_nodes_only"));
+        if (tagged_nodes_only->IsBoolean()) {
+            JSHandler* handler = node::ObjectWrap::Unwrap<JSHandler>(args.This());
+            handler->node_callback_for_tagged_only = tagged_nodes_only->BooleanValue();
+        }
+
         return scope.Close(v8::Undefined());
     }
 
@@ -124,6 +125,7 @@ namespace node_osmium {
         if (callback->IsNull() || callback->IsUndefined()) {
             return ThrowException(v8::Exception::TypeError(v8::String::New("please provide a valid callback function for second arg")));
         }
+
         JSHandler* handler = node::ObjectWrap::Unwrap<JSHandler>(args.This());
         if (callback_name == "node") {
             if (!handler->node_cb.IsEmpty()) {
@@ -195,7 +197,10 @@ namespace node_osmium {
                 handler->done_cb.Dispose();
             }
             handler->done_cb = v8::Persistent<v8::Function>::New(callback);
+        } else {
+            return ThrowException(v8::Exception::RangeError(v8::String::New("unknown callback name as first argument")));
         }
+
         return scope.Close(v8::Undefined());
     }
 
