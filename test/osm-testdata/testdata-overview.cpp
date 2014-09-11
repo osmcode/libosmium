@@ -207,6 +207,7 @@ int main(int argc, char* argv[]) {
     TestOverviewHandler handler(output_format, output_filename);
 
     osmium::apply(reader, location_handler, handler);
+    reader.close();
 
     google::protobuf::ShutdownProtobufLibrary();
 }

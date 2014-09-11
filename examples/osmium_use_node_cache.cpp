@@ -62,6 +62,7 @@ int main(int argc, char* argv[]) {
 
     MyHandler handler;
     osmium::apply(reader, location_handler, handler);
+    reader.close();
 
     google::protobuf::ShutdownProtobufLibrary();
 

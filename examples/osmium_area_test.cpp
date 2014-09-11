@@ -102,6 +102,7 @@ int main(int argc, char* argv[]) {
     std::cout << "Pass 1...\n";
     osmium::io::Reader reader1(infile, osmium::osm_entity_bits::relation);
     collector.read_relations(reader1);
+    reader1.close();
     std::cout << "Pass 1 done\n";
 
     std::cout << "Memory:\n";
@@ -117,6 +118,7 @@ int main(int argc, char* argv[]) {
     osmium::apply(reader2, location_handler, collector.handler([&handler](const osmium::memory::Buffer& buffer) {
         osmium::apply(buffer, handler);
     }));
+    reader2.close();
     std::cout << "Pass 2 done\n";
 
     std::cout << "Memory:\n";

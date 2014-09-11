@@ -122,6 +122,8 @@ int main(int argc, char* argv[]) {
         osmium::apply(buffer, object_relations_handler);
     }
 
+    reader.close();
+
     {
         std::string index_file(dir + "/nodes.idx");
         int fd = ::open(index_file.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0666);

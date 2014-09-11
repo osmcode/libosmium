@@ -281,6 +281,7 @@ int main(int argc, char* argv[]) {
     std::cerr << "Pass 1...\n";
     osmium::io::Reader reader1(input_filename);
     collector.read_relations(reader1);
+    reader1.close();
     std::cerr << "Pass 1 done\n";
 
     index_type index_pos;

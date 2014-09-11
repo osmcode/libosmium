@@ -45,6 +45,8 @@ int main(int argc, char* argv[]) {
         osmium::apply(buffer, dump);
     }
 
+    reader.close();
+
     google::protobuf::ShutdownProtobufLibrary();
 }
 

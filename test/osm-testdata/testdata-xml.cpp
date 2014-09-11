@@ -121,6 +121,7 @@ TEST_CASE("Reading OSM XML 100") {
         osmium::memory::Buffer buffer = reader.read();
         REQUIRE(0 == buffer.committed());
         REQUIRE(! buffer);
+        reader.close();
     }
 
     SECTION("Using Reader asking for header only") {
@@ -128,6 +129,7 @@ TEST_CASE("Reading OSM XML 100") {
 
         osmium::io::Header header = reader.header();
         REQUIRE(header.get("generator") == "testdata");
+        reader.close();
     }
 
 }
@@ -272,6 +274,7 @@ TEST_CASE("Reading OSM XML 120") {
         osmium::memory::Buffer buffer = reader.read();
         REQUIRE(0 == buffer.committed());
         REQUIRE(! buffer);
+        reader.close();
     }
 
 }
@@ -324,6 +327,7 @@ TEST_CASE("Reading OSM XML 200") {
         REQUIRE(buffer.get<osmium::memory::Item>(0).type() == osmium::item_type::node);
         REQUIRE(buffer.get<osmium::Node>(0).id() == 36966060);
         REQUIRE(std::distance(buffer.begin(), buffer.end()) == 3);
+        reader.close();
     }
 
     SECTION("Using Reader asking for nodes") {
@@ -337,6 +341,7 @@ TEST_CASE("Reading OSM XML 200") {
         REQUIRE(buffer.get<osmium::memory::Item>(0).type() == osmium::item_type::node);
         REQUIRE(buffer.get<osmium::Node>(0).id() == 36966060);
         REQUIRE(std::distance(buffer.begin(), buffer.end()) == 3);
+        reader.close();
     }
 
     SECTION("Using Reader asking for header only") {
@@ -348,6 +353,7 @@ TEST_CASE("Reading OSM XML 200") {
         osmium::memory::Buffer buffer = reader.read();
         REQUIRE(0 == buffer.committed());
         REQUIRE(! buffer);
+        reader.close();
     }
 
     SECTION("Using Reader asking for ways") {
@@ -359,6 +365,7 @@ TEST_CASE("Reading OSM XML 200") {
         osmium::memory::Buffer buffer = reader.read();
         REQUIRE(0 == buffer.committed());
         REQUIRE(! buffer);
+        reader.close();
     }
 
 }

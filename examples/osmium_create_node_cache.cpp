@@ -49,6 +49,7 @@ int main(int argc, char* argv[]) {
     location_handler.ignore_errors();
 
     osmium::apply(reader, location_handler);
+    reader.close();
 
     google::protobuf::ShutdownProtobufLibrary();
 
