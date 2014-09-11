@@ -29,7 +29,7 @@ namespace node_osmium {
         static v8::Handle<v8::Value> options(const v8::Arguments& args);
         JSHandler();
 
-        void dispatch_object(const osmium::OSMEntity& entity);
+        void dispatch_entity(const osmium::OSMEntity& entity);
 
         void init();
         void before_nodes();

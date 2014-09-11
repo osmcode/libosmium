@@ -205,7 +205,7 @@ namespace node_osmium {
     }
 
     template <class TWrapped>
-    void call_callback(v8::Persistent<v8::Function>& function, const osmium::OSMEntity& entity) {
+    void call_callback_with_entity(v8::Persistent<v8::Function>& function, const osmium::OSMEntity& entity) {
         v8::HandleScope scope;
 
         v8::Handle<v8::Value> ext = v8::External::New(new TWrapped(entity));
@@ -220,26 +220,41 @@ namespace node_osmium {
         }
     }
 
-    void JSHandler::dispatch_object(const osmium::OSMEntity& entity) {
+    void call_callback(v8::Persistent<v8::Function>& function) {
+        if (function.IsEmpty()) {
+            return;
+        }
+
+        v8::HandleScope scope;
+        v8::Local<v8::Value> argv[0] = { };
+        v8::TryCatch trycatch;
+        v8::Handle<v8::Value> v = function->Call(v8::Context::GetCurrent()->Global(), 0, argv);
+        if (v.IsEmpty()) {
+            JSHandler::print_error_message(trycatch);
+            exit(1);
+        }
+    }
+
+    void JSHandler::dispatch_entity(const osmium::OSMEntity& entity) {
         switch (entity.type()) {
             case osmium::item_type::node:
                 if (!node_cb.IsEmpty() && (!node_callback_for_tagged_only || !static_cast<const osmium::Node&>(entity).tags().empty())) {
-                    call_callback<OSMNodeWrap>(node_cb, entity);
+                    call_callback_with_entity<OSMNodeWrap>(node_cb, entity);
                 }
                 break;
             case osmium::item_type::way:
                 if (!way_cb.IsEmpty()) {
-                    call_callback<OSMWayWrap>(way_cb, entity);
+                    call_callback_with_entity<OSMWayWrap>(way_cb, entity);
                 }
                 break;
             case osmium::item_type::relation:
                 if (!relation_cb.IsEmpty()) {
-                    call_callback<OSMRelationWrap>(relation_cb, entity);
+                    call_callback_with_entity<OSMRelationWrap>(relation_cb, entity);
                 }
                 break;
             case osmium::item_type::changeset:
                 if (!changeset_cb.IsEmpty()) {
-                    call_callback<OSMChangesetWrap>(changeset_cb, entity);
+                    call_callback_with_entity<OSMChangesetWrap>(changeset_cb, entity);
                 }
                 break;
             default:
@@ -248,133 +263,43 @@ namespace node_osmium {
     }
 
     void JSHandler::init() {
-        if (!init_cb.IsEmpty()) {
-            v8::HandleScope scope;
-            v8::Local<v8::Value> argv[0] = { };
-            v8::TryCatch trycatch;
-            v8::Handle<v8::Value> v = init_cb->Call(v8::Context::GetCurrent()->Global(), 0, argv);
-            if (v.IsEmpty()) {
-                print_error_message(trycatch);
-                exit(1);
-            }
-        }
+        call_callback(init_cb);
     }
 
     void JSHandler::before_nodes() {
-        if (!before_nodes_cb.IsEmpty()) {
-            v8::HandleScope scope;
-            v8::Local<v8::Value> argv[0] = { };
-            v8::TryCatch trycatch;
-            v8::Handle<v8::Value> v = before_nodes_cb->Call(v8::Context::GetCurrent()->Global(), 0, argv);
-            if (v.IsEmpty()) {
-                print_error_message(trycatch);
-                exit(1);
-            }
-        }
+        call_callback(before_nodes_cb);
     }
 
     void JSHandler::after_nodes() {
-        if (!after_nodes_cb.IsEmpty()) {
-            v8::HandleScope scope;
-            v8::Local<v8::Value> argv[0] = { };
-            v8::TryCatch trycatch;
-            v8::Handle<v8::Value> v = after_nodes_cb->Call(v8::Context::GetCurrent()->Global(), 0, argv);
-            if (v.IsEmpty()) {
-                print_error_message(trycatch);
-                exit(1);
-            }
-        }
+        call_callback(after_nodes_cb);
     }
 
     void JSHandler::before_ways() {
-        if (!before_ways_cb.IsEmpty()) {
-            v8::HandleScope scope;
-            v8::Local<v8::Value> argv[0] = { };
-            v8::TryCatch trycatch;
-            v8::Handle<v8::Value> v = before_ways_cb->Call(v8::Context::GetCurrent()->Global(), 0, argv);
-            if (v.IsEmpty()) {
-                print_error_message(trycatch);
-                exit(1);
-            }
-        }
+        call_callback(before_ways_cb);
     }
 
     void JSHandler::after_ways() {
-        if (!after_ways_cb.IsEmpty()) {
-            v8::HandleScope scope;
-            v8::Local<v8::Value> argv[0] = { };
-            v8::TryCatch trycatch;
-            v8::Handle<v8::Value> v = after_ways_cb->Call(v8::Context::GetCurrent()->Global(), 0, argv);
-            if (v.IsEmpty()) {
-                print_error_message(trycatch);
-                exit(1);
-            }
-        }
+        call_callback(after_ways_cb);
     }
 
     void JSHandler::before_relations() {
-        if (!before_relations_cb.IsEmpty()) {
-            v8::HandleScope scope;
-            v8::Local<v8::Value> argv[0] = { };
-            v8::TryCatch trycatch;
-            v8::Handle<v8::Value> v = before_relations_cb->Call(v8::Context::GetCurrent()->Global(), 0, argv);
-            if (v.IsEmpty()) {
-                print_error_message(trycatch);
-                exit(1);
-            }
-        }
+        call_callback(before_relations_cb);
     }
 
     void JSHandler::after_relations() {
-        if (!after_relations_cb.IsEmpty()) {
-            v8::HandleScope scope;
-            v8::Local<v8::Value> argv[0] = { };
-            v8::TryCatch trycatch;
-            v8::Handle<v8::Value> v = after_relations_cb->Call(v8::Context::GetCurrent()->Global(), 0, argv);
-            if (v.IsEmpty()) {
-                print_error_message(trycatch);
-                exit(1);
-            }
-        }
+        call_callback(after_relations_cb);
     }
 
     void JSHandler::before_changesets() {
-        if (!before_changesets_cb.IsEmpty()) {
-            v8::HandleScope scope;
-            v8::Local<v8::Value> argv[0] = { };
-            v8::TryCatch trycatch;
-            v8::Handle<v8::Value> v = before_changesets_cb->Call(v8::Context::GetCurrent()->Global(), 0, argv);
-            if (v.IsEmpty()) {
-                print_error_message(trycatch);
-                exit(1);
-            }
-        }
+        call_callback(before_changesets_cb);
     }
 
     void JSHandler::after_changesets() {
-        if (!after_changesets_cb.IsEmpty()) {
-            v8::HandleScope scope;
-            v8::Local<v8::Value> argv[0] = { };
-            v8::TryCatch trycatch;
-            v8::Handle<v8::Value> v = after_changesets_cb->Call(v8::Context::GetCurrent()->Global(), 0, argv);
-            if (v.IsEmpty()) {
-                print_error_message(trycatch);
-                exit(1);
-            }
-        }
+        call_callback(after_changesets_cb);
     }
 
     void JSHandler::done() {
-        if (!done_cb.IsEmpty()) {
-            v8::HandleScope scope;
-            v8::Local<v8::Value> argv[0] = { };
-            v8::TryCatch trycatch;
-            v8::Handle<v8::Value> v = done_cb->Call(v8::Context::GetCurrent()->Global(), 0, argv);
-            if (v.IsEmpty()) {
-                print_error_message(trycatch);
-                exit(1);
-            }
-        }
+        call_callback(done_cb);
     }
 
 } // namespace node_osmium

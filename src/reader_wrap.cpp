@@ -119,7 +119,7 @@ namespace node_osmium {
         }
 
         void operator()(JSHandler& handler) const {
-            handler.dispatch_object(m_entity);
+            handler.dispatch_entity(m_entity);
         }
 
         void operator()(location_handler_type& handler) const {
