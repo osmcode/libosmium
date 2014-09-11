@@ -1,6 +1,9 @@
-node_modules
-lib/binding
-.DS_Store
-build
-berlin-latest.osm.pbf
 .*.swp
+.DS_Store
+berlin-latest.osm.pbf
+build
+check_reports
+includes.log
+iwyu.log
+lib/binding
+node_modules

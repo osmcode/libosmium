@@ -2,15 +2,15 @@
 #define OSM_CHANGESET_WRAP_HPP
 
 // v8
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 #include <v8.h>
-
-// node
-#include <node.h>
-#include <node_version.h>
-#include <node_object_wrap.h>
+#pragma GCC diagnostic pop
 
 // osmium
 #include <osmium/osm/changeset.hpp>
+namespace osmium { class OSMEntity; }
 
 // node-osmium
 #include "osm_entity_wrap.hpp"

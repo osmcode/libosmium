@@ -5,9 +5,15 @@
 #include <memory>
 
 // v8
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 #include <v8.h>
+#pragma GCC diagnostic pop
 
 // node
+#include <node.h>
+#include <node_version.h>
 #include <node_object_wrap.h>
 
 // osmium
