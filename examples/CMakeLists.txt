@@ -25,6 +25,8 @@ set(SIMPLE_EXAMPLES
     osmium_debug
     osmium_convert
     osmium_serdump
+    osmium_create_node_cache
+    osmium_use_node_cache
 )
 
 if (SPARSEHASH_FOUND)
