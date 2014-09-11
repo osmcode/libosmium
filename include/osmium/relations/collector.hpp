@@ -152,9 +152,8 @@ namespace osmium {
                     }
 
                     {
-                        const size_t member_offset = m_collector.members_buffer().committed();
                         m_collector.members_buffer().add_item(object);
-                        m_collector.members_buffer().commit();
+                        const size_t member_offset = m_collector.members_buffer().commit();
 
                         for (auto it = range.first; it != range.second; ++it) {
                             it->buffer_offset(member_offset);
