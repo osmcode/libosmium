@@ -154,5 +154,31 @@ describe('handler', function() {
         done();
    });
 
+   it('should allow a callback to be redefined', function(done) {
+        var handler = new osmium.Handler();
+
+        var count = 0;
+        handler.on('node', function(node) {
+            count++;
+        });
+
+        var file = new osmium.File(__dirname + "/data/winthrop.osm");
+        var reader = new osmium.Reader(file);
+        reader.apply(handler);
+
+        assert.equal(count, 1525);
+
+        count = 0;
+        handler.on('node', function(node) { });
+
+        file = new osmium.File(__dirname + "/data/winthrop.osm");
+        reader = new osmium.Reader(file);
+        reader.apply(handler);
+
+        assert.equal(count, 0);
+
+        done();
+   });
+
 });
 
