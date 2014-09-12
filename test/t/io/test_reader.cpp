@@ -26,8 +26,12 @@ TEST_CASE("Reader") {
         osmium::io::File file("t/io/data.osm");
         osmium::io::Reader reader(file);
 
+        REQUIRE(!reader.eof());
+
         while (osmium::memory::Buffer buffer = reader.read()) {
         }
+
+        REQUIRE(reader.eof());
 
         // extra read always returns invalid buffer
         osmium::memory::Buffer buffer = reader.read();

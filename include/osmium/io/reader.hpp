@@ -238,7 +238,10 @@ namespace osmium {
 
             /**
              * Reads the next buffer from the input. An invalid buffer signals
-             * end-of-file. Do not call read() after the end-of-file.
+             * end-of-file. After end-of-file all read() calls will return an
+             * invalid buffer. An invalid buffer is also always returned if
+             * osmium::osm_entity_bits::nothing was set when the Reader was
+             * constructed.
              *
              * @returns Buffer.
              * @throws Some form of std::runtime_error if there is an error.
@@ -259,6 +262,14 @@ namespace osmium {
                     m_input_done = true;
                 }
                 return buffer;
+            }
+
+            /**
+             * Has the end of file been reached? This is set after the last
+             * data has been read. It is also set by calling close().
+             */
+            bool eof() {
+                return m_input_done;
             }
 
         }; // class Reader
