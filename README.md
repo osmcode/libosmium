@@ -2,15 +2,15 @@
 
 Fast and flexible Javascript library for working with OpenStreetMap data.
 
-Provides a bindings to the [libosmium](https://github.com/osmcode/libosmium) C++ library.
+Provides bindings to the [libosmium](https://github.com/osmcode/libosmium) C++ library.
 
 [![Build Status](https://secure.travis-ci.org/osmcode/node-osmium.png)](http://travis-ci.org/osmcode/node-osmium)
 
-# Depends
+## Depends
 
  - Node.js v0.10.x
 
-# Installing
+## Installing
 
 By default, binaries are provided and no external dependencies or compile is needed.
 
@@ -21,24 +21,24 @@ Just do:
 We currently provide binaries for 64 bit OS X and 64 bit Linux. Running `npm install` on other
 platforms will fall back to a source compile (see `Developing` below for build details).
 
-# Usage
+## Usage
 
-## Get the bounds of an `.osm` file
+### Get the bounds of an `.osm` file
 
 ```js
 var osmium = require('osmium');
 var file = new osmium.File("test/data/winthrop.osm");
 var reader = new osmium.Reader(file);
-console.log(reader.header())
+var bounds = reader.header().bounds[0];
+console.log(bounds.left(), bounds.bottom(), bounds.right(), bounds.top());
 ```
 
 Result:
 ```
-{ generator: 'CGImap 0.2.0',
-  bounds: [ -120.2024, 48.4636, -120.1569, 48.4869 ] }
+-120.2024 48.4636 -120.1569 48.4869
 ```
 
-## Parse an OSM file and create a node handler callback to count total nodes
+### Parse an OSM file and create a node handler callback to count total nodes
 
 ```js
 var osmium = require('osmium');
@@ -58,7 +58,7 @@ Result:
 1525
 ```
 
-# Developing
+## Developing
 
 If you wish to develop on `node-osmium` you can check out the code and then build like:
 
@@ -67,7 +67,7 @@ If you wish to develop on `node-osmium` you can check out the code and then buil
     make
     make test
 
-## Source build dependencies
+### Source build dependencies
 
  - Compiler that supports `-std=c++11` (>= clang++ 3.2 || >= g++ 4.8)
  - Boost >= 1.49 with development headers
@@ -104,3 +104,4 @@ Set dependencies up on OS X like:
     ./scripts/build_osm-pbf.sh
     # NOTE: in the same terminal then run the build commands
     # Or from a different terminal re-run `source MacOSX.sh`
+
