@@ -248,7 +248,7 @@ namespace osmium {
                 // it in this (the main) thread.
                 m_read_task.check_for_exception();
 
-                if (m_read_which_entities == osmium::osm_entity_bits::nothing) {
+                if (m_read_which_entities == osmium::osm_entity_bits::nothing || m_input_done) {
                     // If the caller didn't want anything but the header, it will
                     // always get an empty buffer here.
                     return osmium::memory::Buffer();
