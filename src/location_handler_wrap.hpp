@@ -36,8 +36,6 @@ namespace node_osmium {
 
     typedef osmium::handler::NodeLocationsForWays<index_pos_type, index_neg_type> location_handler_type;
 
-    typedef std::shared_ptr<location_handler_type> location_handler_ptr;
-
     inline index_pos_type* node_cache_factory(const std::string& cache_options) {
         size_t comma = cache_options.find_first_of(',');
         std::string cache_type = comma == std::string::npos ? cache_options : cache_options.substr(0, comma);
@@ -68,6 +66,11 @@ namespace node_osmium {
 
         static v8::Handle<v8::Value> ignoreErrors(const v8::Arguments& args);
 
+        std::unique_ptr<index_pos_type> m_index_pos;
+        std::unique_ptr<index_neg_type> m_index_neg;
+
+        std::shared_ptr<location_handler_type> m_this;
+
     public:
 
         static v8::Persistent<v8::FunctionTemplate> constructor;
@@ -77,7 +80,7 @@ namespace node_osmium {
         static v8::Handle<v8::Value> clear(const v8::Arguments& args);
 
         static location_handler_type& wrapped(v8::Local<v8::Object> object) {
-            return *(node::ObjectWrap::Unwrap<LocationHandlerWrap>(object)->get());
+            return node::ObjectWrap::Unwrap<LocationHandlerWrap>(object)->get();
         }
 
         LocationHandlerWrap(const std::string& cache_type) :
@@ -98,18 +101,14 @@ namespace node_osmium {
             Unref();
         }
 
-        location_handler_ptr get() {
-            return m_this;
+        location_handler_type& get() {
+            return *m_this;
         }
 
     private:
 
         ~LocationHandlerWrap() {
         }
-
-        std::unique_ptr<index_pos_type> m_index_pos;
-        std::unique_ptr<index_neg_type> m_index_neg;
-        location_handler_ptr m_this;
 
     }; // class LocationHandlerWrap
 

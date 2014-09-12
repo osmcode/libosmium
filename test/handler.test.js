@@ -11,6 +11,13 @@ var get_size = function(obj) {
 
 describe('handler', function() {
 
+    it('should throw when Handler called as function', function(done) {
+        assert.throws(function() {
+            var handler = osmium.Handler();
+        }, Error);
+        done();
+    });
+
     it('should be able to initialize handler', function(done) {
         var handler = new osmium.Handler();
         handler.on('node', function(node) {

@@ -65,6 +65,9 @@ namespace node_osmium {
 
     v8::Handle<v8::Value> JSHandler::New(const v8::Arguments& args) {
         v8::HandleScope scope;
+        if (!args.IsConstructCall()) {
+            return ThrowException(v8::Exception::Error(v8::String::New("Cannot call constructor as function, you need to use 'new' keyword")));
+        }
         if (args[0]->IsExternal()) {
             v8::Local<v8::External> ext = v8::Local<v8::External>::Cast(args[0]);
             void* ptr = ext->Value();

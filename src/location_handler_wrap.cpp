@@ -17,13 +17,14 @@ namespace node_osmium {
 
     v8::Handle<v8::Value> LocationHandlerWrap::New(const v8::Arguments& args) {
         v8::HandleScope scope;
+        if (!args.IsConstructCall()) {
+            return ThrowException(v8::Exception::Error(v8::String::New("Cannot call constructor as function, you need to use 'new' keyword")));
+        }
+
         try {
-            if (!args.IsConstructCall()) {
-                return ThrowException(v8::Exception::Error(v8::String::New("Cannot call constructor as function, you need to use 'new' keyword")));
-            }
-            LocationHandlerWrap* q;
+            LocationHandlerWrap* location_handler_wrap;
             if (args.Length() == 0) {
-                q = new LocationHandlerWrap("sparsetable");
+                location_handler_wrap = new LocationHandlerWrap("sparsetable");
             } else {
                 if (args.Length() != 1) {
                     return ThrowException(v8::Exception::TypeError(v8::String::New("please provide a node cache type as string when creating a LocationHandler")));
@@ -31,9 +32,9 @@ namespace node_osmium {
                 if (!args[0]->IsString()) {
                     return ThrowException(v8::Exception::TypeError(v8::String::New("please provide a node cache type as string when creating a LocationHandler")));
                 }
-                q = new LocationHandlerWrap(*v8::String::Utf8Value(args[0]));
+                location_handler_wrap = new LocationHandlerWrap(*v8::String::Utf8Value(args[0]));
             }
-            q->Wrap(args.This());
+            location_handler_wrap->Wrap(args.This());
             return args.This();
         } catch (const std::exception& ex) {
             return ThrowException(v8::Exception::TypeError(v8::String::New(ex.what())));
@@ -43,7 +44,7 @@ namespace node_osmium {
     v8::Handle<v8::Value> LocationHandlerWrap::ignoreErrors(const v8::Arguments& args) {
         v8::HandleScope scope;
         LocationHandlerWrap* handler = node::ObjectWrap::Unwrap<LocationHandlerWrap>(args.This());
-        handler->get()->ignore_errors();
+        handler->get().ignore_errors();
         return scope.Close(v8::Undefined());
     }
 

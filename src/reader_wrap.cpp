@@ -85,7 +85,7 @@ namespace node_osmium {
             } else if (args[0]->IsObject() && FileWrap::constructor->HasInstance(args[0]->ToObject())) {
                 v8::Local<v8::Object> file_obj = args[0]->ToObject();
                 FileWrap* file_wrap = node::ObjectWrap::Unwrap<FileWrap>(file_obj);
-                ReaderWrap* q = new ReaderWrap(*(file_wrap->get()), read_which_entities);
+                ReaderWrap* q = new ReaderWrap(file_wrap->get(), read_which_entities);
                 q->Wrap(args.This());
                 return args.This();
             } else {
@@ -197,29 +197,29 @@ namespace node_osmium {
     v8::Handle<v8::Value> ReaderWrap::apply(const v8::Arguments& args) {
         v8::HandleScope scope;
 
-        try {
-            typedef boost::variant<location_handler_type&, JSHandler&> some_handler_type;
-            std::vector<some_handler_type> handlers;
+        typedef boost::variant<location_handler_type&, JSHandler&> some_handler_type;
+        std::vector<some_handler_type> handlers;
 
-            for (int i=0; i != args.Length(); ++i) {
-                if (args[i]->IsObject()) {
-                    v8::Local<v8::Object> obj = args[i]->ToObject();
-                    if (JSHandler::constructor->HasInstance(obj)) {
-                        handlers.push_back(*node::ObjectWrap::Unwrap<JSHandler>(obj));
-                    } else if (LocationHandlerWrap::constructor->HasInstance(obj)) {
-                        location_handler_type* lh = node::ObjectWrap::Unwrap<LocationHandlerWrap>(obj)->get().get();
-                        handlers.push_back(*lh);
-                    }
-                } else {
-                    return ThrowException(v8::Exception::TypeError(v8::String::New("please provide a handler object")));
+        for (int i=0; i != args.Length(); ++i) {
+            if (args[i]->IsObject()) {
+                auto obj = args[i]->ToObject();
+                if (JSHandler::constructor->HasInstance(obj)) {
+                    handlers.push_back(*node::ObjectWrap::Unwrap<JSHandler>(obj));
+                } else if (LocationHandlerWrap::constructor->HasInstance(obj)) {
+                    location_handler_type& lh = node::ObjectWrap::Unwrap<LocationHandlerWrap>(obj)->get();
+                    handlers.push_back(lh);
                 }
+            } else {
+                return ThrowException(v8::Exception::TypeError(v8::String::New("please provide a handler object")));
             }
+        }
 
-            osmium::io::Reader& reader = wrapped(args.This());
-            if (reader.eof()) {
-                return ThrowException(v8::Exception::Error(v8::String::New("apply() called on a reader that has reached EOF")));
-            }
+        osmium::io::Reader& reader = wrapped(args.This());
+        if (reader.eof()) {
+            return ThrowException(v8::Exception::Error(v8::String::New("apply() called on a reader that has reached EOF")));
+        }
 
+        try {
             typedef osmium::io::InputIterator<osmium::io::Reader, osmium::OSMEntity> input_iterator;
             input_iterator it(reader);
             input_iterator end;
@@ -246,10 +246,9 @@ namespace node_osmium {
             for (auto& handler : handlers) {
                 boost::apply_visitor(visitor_before_after, handler);
             }
-        } catch (std::exception const& ex) {
-            std::string msg("during io: osmium says '");
-            msg += ex.what();
-            msg += "'";
+        } catch (const std::exception& e) {
+            std::string msg("osmium io error: ");
+            msg += e.what();
             return ThrowException(v8::Exception::Error(v8::String::New(msg.c_str())));
         }
         return scope.Close(v8::Undefined());
@@ -257,7 +256,13 @@ namespace node_osmium {
 
     v8::Handle<v8::Value> ReaderWrap::close(const v8::Arguments& args) {
         v8::HandleScope scope;
-        wrapped(args.This()).close();
+        try {
+            wrapped(args.This()).close();
+        } catch (const std::exception& e) {
+            std::string msg("osmium io error: ");
+            msg += e.what();
+            return ThrowException(v8::Exception::Error(v8::String::New(msg.c_str())));
+        }
         return scope.Close(v8::Undefined());
     }
 
