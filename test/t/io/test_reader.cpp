@@ -8,7 +8,7 @@
 TEST_CASE("Reader") {
 
     SECTION("reader can be initialized with file") {
-        osmium::io::File file("t/io/data.osm"); 
+        osmium::io::File file("t/io/data.osm");
         osmium::io::Reader reader(file);
         osmium::handler::Handler handler;
 
@@ -23,7 +23,7 @@ TEST_CASE("Reader") {
     }
 
     SECTION("should return invalid buffer after eof") {
-        osmium::io::File file("t/io/data.osm"); 
+        osmium::io::File file("t/io/data.osm");
         osmium::io::Reader reader(file);
 
         while (osmium::memory::Buffer buffer = reader.read()) {
@@ -35,7 +35,7 @@ TEST_CASE("Reader") {
     }
 
     SECTION("should not hang when apply() is called twice on reader") {
-        osmium::io::File file("t/io/data.osm"); 
+        osmium::io::File file("t/io/data.osm");
         osmium::io::Reader reader(file);
         osmium::handler::Handler handler;
 

@@ -74,7 +74,8 @@ namespace osmium {
                         while (!m_done) {
                             std::string data {m_decompressor->read()};
                             if (data.empty()) {
-                                m_done = true;
+                                m_queue.push(std::move(data));
+                                break;
                             }
                             m_queue.push(std::move(data));
                             while (m_queue.size() > 10) {

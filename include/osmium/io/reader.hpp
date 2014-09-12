@@ -253,7 +253,12 @@ namespace osmium {
                     // always get an empty buffer here.
                     return osmium::memory::Buffer();
                 }
-                return m_input->read();
+
+                osmium::memory::Buffer buffer = m_input->read();
+                if (!buffer) {
+                    m_input_done = true;
+                }
+                return buffer;
             }
 
         }; // class Reader
