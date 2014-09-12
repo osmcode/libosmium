@@ -1,8 +1,10 @@
-# Install
+# geojson-stream
+
+## Install
 
     npm install
 
-# Usage
+## Usage
 
 Convert osm data to geojson file:
 
@@ -12,3 +14,4 @@ You can also pipe geojson to stdout and push to http://geojson.io:
 
     npm install -g geojsonio-cli
     ./index.js --output stdout --input ../../test/data/winthrop.osm | geojsonio
+
