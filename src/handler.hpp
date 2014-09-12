@@ -18,6 +18,8 @@ namespace node_osmium {
 
     class JSHandler : public node::ObjectWrap {
 
+        static v8::Persistent<v8::String> symbol_tagged_nodes_only;
+
     public:
 
         static void print_error_message(v8::TryCatch& trycatch);
@@ -27,6 +29,7 @@ namespace node_osmium {
         static v8::Handle<v8::Value> New(const v8::Arguments& args);
         static v8::Handle<v8::Value> on(const v8::Arguments& args);
         static v8::Handle<v8::Value> options(const v8::Arguments& args);
+
         JSHandler();
 
         void dispatch_entity(const osmium::OSMEntity& entity);

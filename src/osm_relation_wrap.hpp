@@ -24,6 +24,10 @@ namespace node_osmium {
 
         static v8::Handle<v8::Value> members(const v8::Arguments& args);
 
+        static v8::Persistent<v8::String> symbol_type;
+        static v8::Persistent<v8::String> symbol_ref;
+        static v8::Persistent<v8::String> symbol_role;
+
     public:
 
         static v8::Persistent<v8::FunctionTemplate> constructor;

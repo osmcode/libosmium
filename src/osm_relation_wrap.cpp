@@ -1,9 +1,14 @@
 
+#include <node.h>
+
 #include <osm_relation_wrap.hpp>
 
 namespace node_osmium {
 
     v8::Persistent<v8::FunctionTemplate> OSMRelationWrap::constructor;
+    v8::Persistent<v8::String> OSMRelationWrap::symbol_type;
+    v8::Persistent<v8::String> OSMRelationWrap::symbol_ref;
+    v8::Persistent<v8::String> OSMRelationWrap::symbol_role;
 
     void OSMRelationWrap::Initialize(v8::Handle<v8::Object> target) {
         v8::HandleScope scope;
@@ -15,6 +20,10 @@ namespace node_osmium {
         set_accessor(constructor, "members_count", get_members_count, attributes);
         node::SetPrototypeMethod(constructor, "members", members);
         target->Set(v8::String::NewSymbol("Relation"), constructor->GetFunction());
+
+        symbol_type = NODE_PSYMBOL("type");
+        symbol_ref  = NODE_PSYMBOL("ref");
+        symbol_role = NODE_PSYMBOL("role");
     }
 
     v8::Handle<v8::Value> OSMRelationWrap::New(const v8::Arguments& args) {
@@ -46,9 +55,9 @@ namespace node_osmium {
                     for (const auto& member : relation.members()) {
                         v8::Local<v8::Object> jsmember = v8::Object::New();
                         typec[0] = osmium::item_type_to_char(member.type());
-                        jsmember->Set(v8::String::NewSymbol("type"), v8::String::New(typec));
-                        jsmember->Set(v8::String::NewSymbol("ref"), v8::Number::New(member.ref()));
-                        jsmember->Set(v8::String::NewSymbol("role"), v8::String::New(member.role()));
+                        jsmember->Set(symbol_type, v8::String::New(typec));
+                        jsmember->Set(symbol_ref, v8::Number::New(member.ref()));
+                        jsmember->Set(symbol_role, v8::String::New(member.role()));
                         members->Set(i, jsmember);
                         ++i;
                     }
@@ -67,9 +76,9 @@ namespace node_osmium {
                         v8::Local<v8::Object> jsmember = v8::Object::New();
                         char typec[2] = " ";
                         typec[0] = osmium::item_type_to_char(member.type());
-                        jsmember->Set(v8::String::NewSymbol("type"), v8::String::New(typec));
-                        jsmember->Set(v8::String::NewSymbol("ref"), v8::Number::New(member.ref()));
-                        jsmember->Set(v8::String::NewSymbol("role"), v8::String::New(member.role()));
+                        jsmember->Set(symbol_type, v8::String::New(typec));
+                        jsmember->Set(symbol_ref, v8::Number::New(member.ref()));
+                        jsmember->Set(symbol_role, v8::String::New(member.role()));
                         return scope.Close(jsmember);
                     } else {
                         return ThrowException(v8::Exception::RangeError(v8::String::New("argument to members() out of range")));

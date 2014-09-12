@@ -22,6 +22,7 @@
 namespace node_osmium {
 
     v8::Persistent<v8::FunctionTemplate> JSHandler::constructor;
+    v8::Persistent<v8::String> JSHandler::symbol_tagged_nodes_only;
 
     void JSHandler::Initialize(v8::Handle<v8::Object> target) {
         v8::HandleScope scope;
@@ -31,6 +32,8 @@ namespace node_osmium {
         node::SetPrototypeMethod(constructor, "on", on);
         node::SetPrototypeMethod(constructor, "options", options);
         target->Set(v8::String::NewSymbol("Handler"), constructor->GetFunction());
+
+        symbol_tagged_nodes_only = NODE_PSYMBOL("tagged_nodes_only");
     }
 
     JSHandler::JSHandler() :
@@ -108,7 +111,7 @@ namespace node_osmium {
             return ThrowException(v8::Exception::TypeError(v8::String::New("please provide a single object as parameter")));
         }
 
-        v8::Local<v8::Value> tagged_nodes_only = args[0]->ToObject()->Get(v8::String::NewSymbol("tagged_nodes_only"));
+        v8::Local<v8::Value> tagged_nodes_only = args[0]->ToObject()->Get(symbol_tagged_nodes_only);
         if (tagged_nodes_only->IsBoolean()) {
             JSHandler* handler = node::ObjectWrap::Unwrap<JSHandler>(args.This());
             handler->node_callback_for_tagged_only = tagged_nodes_only->BooleanValue();
