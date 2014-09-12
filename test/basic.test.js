@@ -16,6 +16,8 @@ describe('basic', function() {
                 assert.equal(node.uid, 147510);
                 assert.equal(node.timestamp_seconds_since_epoch, 1258416656);
                 assert.equal(node.timestamp().toISOString(), '2009-11-17T00:10:56.000Z');
+                assert.equal(node.coordinates.lon, -120.1891610);
+                assert.equal(node.coordinates.lat, 48.4655800);
                 assert.equal(node.lon, -120.1891610);
                 assert.equal(node.lat, 48.4655800);
                 done();

@@ -12,6 +12,7 @@
 
 namespace node_osmium {
 
+    extern v8::Persistent<v8::Object> module;
     extern osmium::geom::WKBFactory<> wkb_factory;
     extern osmium::geom::WKTFactory<> wkt_factory;
 
@@ -26,6 +27,8 @@ namespace node_osmium {
         node::SetPrototypeMethod(constructor, "wkb", wkb);
         node::SetPrototypeMethod(constructor, "wkt", wkt);
         auto attributes = static_cast<v8::PropertyAttribute>(v8::ReadOnly | v8::DontDelete);
+        set_accessor(constructor, "location", get_coordinates, attributes);
+        set_accessor(constructor, "coordinates", get_coordinates, attributes);
         set_accessor(constructor, "lon", get_lon, attributes);
         set_accessor(constructor, "lat", get_lat, attributes);
         target->Set(v8::String::NewSymbol("Node"), constructor->GetFunction());
@@ -39,6 +42,19 @@ namespace node_osmium {
         } else {
             return ThrowException(v8::Exception::TypeError(v8::String::New("osmium.Node cannot be created in Javascript")));
         }
+    }
+
+    v8::Handle<v8::Value> OSMNodeWrap::get_coordinates(v8::Local<v8::String> /* property */, const v8::AccessorInfo& info) {
+        v8::HandleScope scope;
+
+        auto lon = v8::Number::New(wrapped(info.This()).location().lon());
+        auto lat = v8::Number::New(wrapped(info.This()).location().lat());
+
+        auto cf = module->Get(v8::String::NewSymbol("Coordinates"));
+        assert(cf->IsFunction());
+
+        v8::Local<v8::Value> argv[2] = { lon, lat };
+        return scope.Close(v8::Local<v8::Function>::Cast(cf)->NewInstance(2, argv));
     }
 
     v8::Handle<v8::Value> OSMNodeWrap::get_lon(v8::Local<v8::String> /* property */, const v8::AccessorInfo& info) {

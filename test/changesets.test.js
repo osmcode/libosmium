@@ -16,6 +16,10 @@ describe('changesets', function() {
                 assert.equal(changeset.created_at().toISOString(), '2013-03-22T02:08:55.000Z');
                 assert.equal(changeset.closed_at_seconds_since_epoch, 1363918138);
                 assert.equal(changeset.closed_at().toISOString(), '2013-03-22T02:08:58.000Z');
+                assert.equal(changeset.bounds.left(), 120.2988730);
+                assert.equal(changeset.bounds.bottom(), -10.0004425);
+                assert.equal(changeset.bounds.right(), 120.2991740);
+                assert.equal(changeset.bounds.top(), -10.0002384);
                 assert.ok(changeset.closed);
                 done();
             }
@@ -39,6 +43,7 @@ describe('changesets', function() {
                 assert.equal(changeset.created_at().toISOString(), '2013-03-22T04:20:25.000Z');
                 assert.equal(changeset.closed_at_seconds_since_epoch, 0);
                 assert.equal(changeset.closed_at(), undefined);
+                assert.equal(changeset.bounds, undefined);
                 assert.ok(changeset.open);
                 done();
             }

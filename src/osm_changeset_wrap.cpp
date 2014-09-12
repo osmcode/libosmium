@@ -3,6 +3,8 @@
 
 namespace node_osmium {
 
+    extern v8::Persistent<v8::Object> module;
+
     v8::Persistent<v8::FunctionTemplate> OSMChangesetWrap::constructor;
 
     void OSMChangesetWrap::Initialize(v8::Handle<v8::Object> target) {
@@ -20,6 +22,7 @@ namespace node_osmium {
         set_accessor(constructor, "closed_at_seconds_since_epoch", get_closed_at, attributes);
         set_accessor(constructor, "open", get_open, attributes);
         set_accessor(constructor, "closed", get_closed, attributes);
+        set_accessor(constructor, "bounds", get_bounds, attributes);
         node::SetPrototypeMethod(constructor, "tags", tags);
         target->Set(v8::String::NewSymbol("Changeset"), constructor->GetFunction());
     }
@@ -99,6 +102,30 @@ namespace node_osmium {
     v8::Handle<v8::Value> OSMChangesetWrap::get_closed(v8::Local<v8::String> /* property */, const v8::AccessorInfo& info) {
         v8::HandleScope scope;
         return scope.Close(v8::Boolean::New(wrapped(info.This()).closed()));
+    }
+
+    v8::Handle<v8::Value> OSMChangesetWrap::get_bounds(v8::Local<v8::String> /* property */, const v8::AccessorInfo& info) {
+        v8::HandleScope scope;
+
+        const osmium::Box& box = wrapped(info.This()).bounds();
+
+        if (!box.valid()) {
+            return scope.Close(v8::Undefined());
+        }
+
+        auto cf = module->Get(v8::String::NewSymbol("Coordinates"));
+        assert(cf->IsFunction());
+        auto bf = module->Get(v8::String::NewSymbol("Box"));
+        assert(bf->IsFunction());
+
+        v8::Local<v8::Value> argv_bl[2] = { v8::Number::New(box.bottom_left().lon()), v8::Number::New(box.bottom_left().lat()) };
+        auto bottom_left = v8::Local<v8::Function>::Cast(cf)->NewInstance(2, argv_bl);
+
+        v8::Local<v8::Value> argv_tr[2] = { v8::Number::New(box.top_right().lon()), v8::Number::New(box.top_right().lat()) };
+        auto top_right = v8::Local<v8::Function>::Cast(cf)->NewInstance(2, argv_tr);
+
+        v8::Local<v8::Value> argv_box[2] = { bottom_left, top_right };
+        return scope.Close(v8::Local<v8::Function>::Cast(bf)->NewInstance(2, argv_box));
     }
 
 } // namespace node_osmium

@@ -27,6 +27,7 @@ namespace node_osmium {
         static v8::Handle<v8::Value> get_closed_at(v8::Local<v8::String> property, const v8::AccessorInfo& info);
         static v8::Handle<v8::Value> get_open(v8::Local<v8::String> property, const v8::AccessorInfo& info);
         static v8::Handle<v8::Value> get_closed(v8::Local<v8::String> property, const v8::AccessorInfo& info);
+        static v8::Handle<v8::Value> get_bounds(v8::Local<v8::String> property, const v8::AccessorInfo& info);
         static v8::Handle<v8::Value> tags(const v8::Arguments& args);
 
     public:

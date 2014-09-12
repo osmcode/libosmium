@@ -20,9 +20,15 @@
 
 namespace node_osmium {
 
+    v8::Persistent<v8::Object> module;
+    osmium::geom::WKBFactory<> wkb_factory;
+    osmium::geom::WKTFactory<> wkt_factory;
+
     extern "C" {
         static void start(v8::Handle<v8::Object> target) {
             v8::HandleScope scope;
+            module = v8::Persistent<v8::Object>::New(target);
+
             node_osmium::OSMEntityWrap::Initialize(target);
             node_osmium::OSMObjectWrap::Initialize(target);
             node_osmium::OSMNodeWrap::Initialize(target);
@@ -35,9 +41,6 @@ namespace node_osmium {
             node_osmium::ReaderWrap::Initialize(target);
         }
     }
-
-    osmium::geom::WKBFactory<> wkb_factory;
-    osmium::geom::WKTFactory<> wkt_factory;
 
 } // namespace node_osmium
 

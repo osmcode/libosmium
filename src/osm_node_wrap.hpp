@@ -20,6 +20,7 @@ namespace node_osmium {
 
     class OSMNodeWrap : public OSMObjectWrap {
 
+        static v8::Handle<v8::Value> get_coordinates(v8::Local<v8::String> property, const v8::AccessorInfo& info);
         static v8::Handle<v8::Value> get_lon(v8::Local<v8::String> property, const v8::AccessorInfo& info);
         static v8::Handle<v8::Value> get_lat(v8::Local<v8::String> property, const v8::AccessorInfo& info);
         static v8::Handle<v8::Value> wkb(const v8::Arguments& args);
