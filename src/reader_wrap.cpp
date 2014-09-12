@@ -211,6 +211,9 @@ namespace node_osmium {
             }
 
             osmium::io::Reader& reader = wrapped(args.This());
+            if (reader.eof()) {
+                return ThrowException(v8::Exception::Error(v8::String::New("apply() called on a reader that has reached EOF")));
+            }
 
             typedef osmium::io::InputIterator<osmium::io::Reader, osmium::OSMEntity> input_iterator;
             input_iterator it(reader);
