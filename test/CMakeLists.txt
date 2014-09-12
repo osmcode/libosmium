@@ -52,6 +52,7 @@ compile_tests()
 set(TEST_GROUP buffer)
 set(TESTS
     test_buffer_node
+    test_buffer_purge
 )
 set(LIBS "")
 compile_tests()
@@ -96,6 +97,11 @@ set(TESTS
     test_file_formats
 )
 set(LIBS ${BZIP2_LIBRARIES})
+compile_tests()
+set(TESTS
+    test_reader
+)
+set(LIBS ${EXPAT_LIBRARY} ${OSMPBF_LIBRARIES} ${PROTOBUF_LITE_LIBRARY} ${ZLIB_LIBRARY} ${BZIP2_LIBRARIES} ${WIN_LIBS} ${CMAKE_THREAD_LIBS_INIT})
 compile_tests()
 
 set(TEST_GROUP tags)
