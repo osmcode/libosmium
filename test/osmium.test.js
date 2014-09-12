@@ -3,21 +3,6 @@ var assert = require('assert');
 
 describe('osmium', function() {
 
-    it('should be able to create an osmium.Reader', function(done) {
-        var file = new osmium.File(__dirname+"/data/winthrop.osm");
-        var reader = new osmium.Reader(file, {});
-        var header = reader.header();
-        assert.equal(header.generator, 'CGImap 0.2.0');
-        var bounds = header.bounds;
-        var expected = [ -120.2024, 48.4636, -120.1569, 48.4869 ];
-        assert.ok(Math.abs(bounds[0] - expected[0]) < .000000001);
-        assert.ok(Math.abs(bounds[1] - expected[1]) < .000000001);
-        assert.ok(Math.abs(bounds[2] - expected[2]) < .000000001);
-        assert.ok(Math.abs(bounds[3] - expected[3]) < .000000001);
-        reader.close();
-        done();
-    });
-
     it('should be able to get node data from handler parameter', function(done) {
         var handler = new osmium.Handler();
         var nodes = 0, ways = 0, relations = 0;

@@ -1,5 +1,6 @@
 
 #include "osm_changeset_wrap.hpp"
+#include "utils.hpp"
 
 namespace node_osmium {
 
@@ -105,27 +106,7 @@ namespace node_osmium {
     }
 
     v8::Handle<v8::Value> OSMChangesetWrap::get_bounds(v8::Local<v8::String> /* property */, const v8::AccessorInfo& info) {
-        v8::HandleScope scope;
-
-        const osmium::Box& box = wrapped(info.This()).bounds();
-
-        if (!box.valid()) {
-            return scope.Close(v8::Undefined());
-        }
-
-        auto cf = module->Get(v8::String::NewSymbol("Coordinates"));
-        assert(cf->IsFunction());
-        auto bf = module->Get(v8::String::NewSymbol("Box"));
-        assert(bf->IsFunction());
-
-        v8::Local<v8::Value> argv_bl[2] = { v8::Number::New(box.bottom_left().lon()), v8::Number::New(box.bottom_left().lat()) };
-        auto bottom_left = v8::Local<v8::Function>::Cast(cf)->NewInstance(2, argv_bl);
-
-        v8::Local<v8::Value> argv_tr[2] = { v8::Number::New(box.top_right().lon()), v8::Number::New(box.top_right().lat()) };
-        auto top_right = v8::Local<v8::Function>::Cast(cf)->NewInstance(2, argv_tr);
-
-        v8::Local<v8::Value> argv_box[2] = { bottom_left, top_right };
-        return scope.Close(v8::Local<v8::Function>::Cast(bf)->NewInstance(2, argv_box));
+        return create_js_box(wrapped(info.This()).bounds());
     }
 
 } // namespace node_osmium

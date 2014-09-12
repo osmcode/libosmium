@@ -8,17 +8,18 @@
     {
       "target_name": "<(module_name)",
       "sources": [
-        "src/node_osmium.cpp",
+        "src/file_wrap.cpp",
         "src/handler.cpp",
         "src/location_handler_wrap.cpp",
-        "src/file_wrap.cpp",
-        "src/reader_wrap.cpp",
+        "src/node_osmium.cpp",
+        "src/osm_changeset_wrap.cpp",
         "src/osm_entity_wrap.cpp",
-        "src/osm_object_wrap.cpp",
         "src/osm_node_wrap.cpp",
-        "src/osm_way_wrap.cpp",
+        "src/osm_object_wrap.cpp",
         "src/osm_relation_wrap.cpp",
-        "src/osm_changeset_wrap.cpp"
+        "src/osm_way_wrap.cpp",
+        "src/reader_wrap.cpp",
+        "src/utils.cpp"
       ],
       "include_dirs": [
           "../libosmium/include/",

@@ -20,8 +20,11 @@
 #include "handler.hpp"
 #include "location_handler_wrap.hpp"
 #include "osm_object_wrap.hpp"
+#include "utils.hpp"
 
 namespace node_osmium {
+
+    extern v8::Persistent<v8::Object> module;
 
     v8::Persistent<v8::FunctionTemplate> ReaderWrap::constructor;
 
@@ -100,13 +103,15 @@ namespace node_osmium {
         ReaderWrap* reader = node::ObjectWrap::Unwrap<ReaderWrap>(args.This());
         const osmium::io::Header& header = reader->m_this->header();
         obj->Set(v8::String::NewSymbol("generator"), v8::String::New(header.get("generator").c_str()));
-        const osmium::Box& bounds = header.box();
-        v8::Local<v8::Array> arr = v8::Array::New(4);
-        arr->Set(0, v8::Number::New(bounds.bottom_left().lon()));
-        arr->Set(1, v8::Number::New(bounds.bottom_left().lat()));
-        arr->Set(2, v8::Number::New(bounds.top_right().lon()));
-        arr->Set(3, v8::Number::New(bounds.top_right().lat()));
-        obj->Set(v8::String::NewSymbol("bounds"), arr);
+
+        auto bounds_array = v8::Array::New(header.boxes().size());
+
+        int i=0;
+        for (const osmium::Box& box : header.boxes()) {
+            bounds_array->Set(i++, create_js_box(box));
+        }
+
+        obj->Set(v8::String::NewSymbol("bounds"), bounds_array);
         return scope.Close(obj);
     }
 
