@@ -38,10 +38,7 @@ var handler = new osmium.Handler();
 handler.on('node',function(node) {
     geojsonOut.write({
         type: 'Feature',
-        geometry: {
-            type: 'Point',
-            coordinates: [node.lon, node.lat]
-        },
+        geometry: node.geojson(),
         properties: {}
     });
 });
