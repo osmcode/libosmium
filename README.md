@@ -9,6 +9,7 @@ Provides bindings to the [libosmium](https://github.com/osmcode/libosmium) C++ l
 ## Depends
 
  - Node.js v0.10.x
+ - libosmium (https://github.com/osmcode/libosmium)
 
 ## Installing
 
@@ -27,8 +28,7 @@ platforms will fall back to a source compile (see `Developing` below for build d
 
 ```js
 var osmium = require('osmium');
-var file = new osmium.File("test/data/winthrop.osm");
-var reader = new osmium.Reader(file);
+var reader = new osmium.Reader("test/data/winthrop.osm");
 var bounds = reader.header().bounds[0];
 console.log(bounds.left(), bounds.bottom(), bounds.right(), bounds.top());
 ```
@@ -42,11 +42,10 @@ Result:
 
 ```js
 var osmium = require('osmium');
-var file = new osmium.File("test/data/winthrop.osm");
-var reader = new osmium.Reader(file);
+var reader = new osmium.Reader("test/data/winthrop.osm");
 var handler = new osmium.Handler();
 var nodes = 0;
-handler.on('node',function(node) {
+handler.on('node', function(node) {
     ++nodes;
 });
 reader.apply(handler);
@@ -57,6 +56,11 @@ Result:
 ```
 1525
 ```
+
+## Demos
+
+There are some demo applications in the 'demo' directory. See the README.md
+there.
 
 ## Developing
 
@@ -104,4 +108,21 @@ Set dependencies up on OS X like:
     ./scripts/build_osm-pbf.sh
     # NOTE: in the same terminal then run the build commands
     # Or from a different terminal re-run `source MacOSX.sh`
+
+## License
+
+node-osmium is available under the Boost Software License. See LICENSE.txt for
+details.
+
+## Contact
+
+Please open bug reports on https://github.com/osmcode/node-osmium/issues. You
+can ask questions on the
+[OSM developer mailing list](https://lists.openstreetmap.org/listinfo/dev)
+or on [OFTC net IRC channel #osm-dev](https://wiki.openstreetmap.org/wiki/Irc).
+
+## Authors
+
+ - Dane Springmeyer (dane@mapbox.com)
+ - Jochen Topf (jochen@topf.org)
 
