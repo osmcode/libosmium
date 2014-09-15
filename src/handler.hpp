@@ -20,33 +20,6 @@ namespace node_osmium {
 
         static v8::Persistent<v8::String> symbol_tagged_nodes_only;
 
-    public:
-
-        static v8::Persistent<v8::FunctionTemplate> constructor;
-        static void Initialize(v8::Handle<v8::Object> target);
-        static v8::Handle<v8::Value> New(const v8::Arguments& args);
-        static v8::Handle<v8::Value> on(const v8::Arguments& args);
-        static v8::Handle<v8::Value> options(const v8::Arguments& args);
-
-        JSHandler();
-
-        JSHandler& get() {
-            return *this;
-        }
-
-        void dispatch_entity(v8::TryCatch& trycatch, const osmium::OSMEntity& entity) const;
-
-        void init(v8::TryCatch& trycatch) const;
-        void before_nodes(v8::TryCatch& trycatch) const;
-        void after_nodes(v8::TryCatch& trycatch) const;
-        void before_ways(v8::TryCatch& trycatch) const;
-        void after_ways(v8::TryCatch& trycatch) const;
-        void before_relations(v8::TryCatch& trycatch) const;
-        void after_relations(v8::TryCatch& trycatch) const;
-        void before_changesets(v8::TryCatch& trycatch) const;
-        void after_changesets(v8::TryCatch& trycatch) const;
-        void done(v8::TryCatch& trycatch) const;
-
         bool node_callback_for_tagged_only;
 
         v8::Persistent<v8::Function> init_cb;
@@ -68,6 +41,34 @@ namespace node_osmium {
         v8::Persistent<v8::Function> after_changesets_cb;
 
         v8::Persistent<v8::Function> done_cb;
+
+        static v8::Handle<v8::Value> on(const v8::Arguments& args);
+        static v8::Handle<v8::Value> options(const v8::Arguments& args);
+
+    public:
+
+        static v8::Persistent<v8::FunctionTemplate> constructor;
+        static void Initialize(v8::Handle<v8::Object> target);
+        static v8::Handle<v8::Value> New(const v8::Arguments& args);
+
+        JSHandler();
+
+        JSHandler& get() {
+            return *this;
+        }
+
+        void dispatch_entity(v8::TryCatch& trycatch, const osmium::OSMEntity& entity) const;
+
+        void init(v8::TryCatch& trycatch) const;
+        void before_nodes(v8::TryCatch& trycatch) const;
+        void after_nodes(v8::TryCatch& trycatch) const;
+        void before_ways(v8::TryCatch& trycatch) const;
+        void after_ways(v8::TryCatch& trycatch) const;
+        void before_relations(v8::TryCatch& trycatch) const;
+        void after_relations(v8::TryCatch& trycatch) const;
+        void before_changesets(v8::TryCatch& trycatch) const;
+        void after_changesets(v8::TryCatch& trycatch) const;
+        void done(v8::TryCatch& trycatch) const;
 
     private:
 

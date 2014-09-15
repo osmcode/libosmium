@@ -64,20 +64,19 @@ namespace node_osmium {
 
     class LocationHandlerWrap : public node::ObjectWrap {
 
-        static v8::Handle<v8::Value> ignoreErrors(const v8::Arguments& args);
-
         std::unique_ptr<index_pos_type> m_index_pos;
         std::unique_ptr<index_neg_type> m_index_neg;
 
         std::shared_ptr<location_handler_type> m_this;
 
+        static v8::Handle<v8::Value> clear(const v8::Arguments& args);
+        static v8::Handle<v8::Value> ignoreErrors(const v8::Arguments& args);
+
     public:
 
         static v8::Persistent<v8::FunctionTemplate> constructor;
-
         static void Initialize(v8::Handle<v8::Object> target);
         static v8::Handle<v8::Value> New(const v8::Arguments& args);
-        static v8::Handle<v8::Value> clear(const v8::Arguments& args);
 
         LocationHandlerWrap(const std::string& cache_type) :
             ObjectWrap(),

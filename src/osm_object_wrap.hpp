@@ -19,7 +19,6 @@ namespace node_osmium {
 
     class OSMObjectWrap : public OSMEntityWrap {
 
-        static v8::Handle<v8::Value> tags(const v8::Arguments& args);
         static v8::Handle<v8::Value> get_id(v8::Local<v8::String> property, const v8::AccessorInfo& info);
         static v8::Handle<v8::Value> get_version(v8::Local<v8::String> property, const v8::AccessorInfo& info);
         static v8::Handle<v8::Value> get_changeset(v8::Local<v8::String> property, const v8::AccessorInfo& info);
@@ -27,6 +26,7 @@ namespace node_osmium {
         static v8::Handle<v8::Value> get_timestamp(v8::Local<v8::String> property, const v8::AccessorInfo& info);
         static v8::Handle<v8::Value> get_uid(v8::Local<v8::String> property, const v8::AccessorInfo& info);
         static v8::Handle<v8::Value> get_user(v8::Local<v8::String> property, const v8::AccessorInfo& info);
+        static v8::Handle<v8::Value> tags(const v8::Arguments& args);
 
     public:
 

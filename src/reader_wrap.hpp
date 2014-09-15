@@ -25,13 +25,13 @@
 
 namespace node_osmium {
 
-    typedef std::shared_ptr<osmium::io::Reader> reader_ptr;
-
     class ReaderWrap : public node::ObjectWrap {
 
         static v8::Handle<v8::Value> header(const v8::Arguments& args);
         static v8::Handle<v8::Value> apply(const v8::Arguments& args);
         static v8::Handle<v8::Value> close(const v8::Arguments& args);
+
+        std::shared_ptr<osmium::io::Reader> m_this;
 
     public:
 
@@ -52,8 +52,6 @@ namespace node_osmium {
 
         ~ReaderWrap() {
         }
-
-        reader_ptr m_this;
 
     }; // class ReaderWrap
 
