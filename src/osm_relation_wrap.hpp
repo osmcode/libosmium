@@ -36,7 +36,7 @@ namespace node_osmium {
         static v8::Handle<v8::Value> New(const v8::Arguments& args);
 
         static const osmium::Relation& wrapped(const v8::Local<v8::Object>& object) {
-            return static_cast<const osmium::Relation&>(OSMEntityWrap::wrapped(object));
+            return static_cast<const osmium::Relation&>(unwrap<OSMEntityWrap>(object));
         }
 
         OSMRelationWrap(const osmium::OSMEntity& entity) :

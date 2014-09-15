@@ -35,13 +35,11 @@ namespace node_osmium {
     v8::Handle<v8::Value> OSMObjectWrap::tags(const v8::Arguments& args) {
         v8::HandleScope scope;
 
-        const osmium::OSMObject& object = wrapped(args.This());
-
         switch (args.Length()) {
             case 0:
                 {
                     v8::Local<v8::Object> tags = v8::Object::New();
-                    for (const auto& tag : object.tags()) {
+                    for (const auto& tag : wrapped(args.This()).tags()) {
                         tags->Set(v8::String::New(tag.key()), v8::String::New(tag.value()));
                     }
                     return scope.Close(tags);
@@ -51,7 +49,7 @@ namespace node_osmium {
                     if (!args[0]->IsString()) {
                         return ThrowException(v8::Exception::TypeError(v8::String::New("call tags() without parameters or with a string (key)")));
                     }
-                    const char* value = object.tags().get_value_by_key(*v8::String::Utf8Value(args[0]));
+                    const char* value = wrapped(args.This()).tags().get_value_by_key(*v8::String::Utf8Value(args[0]));
                     return scope.Close(value ? v8::String::New(value) : v8::Undefined());
                 }
         }

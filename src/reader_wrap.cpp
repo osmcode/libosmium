@@ -84,8 +84,7 @@ namespace node_osmium {
                 return args.This();
             } else if (args[0]->IsObject() && FileWrap::constructor->HasInstance(args[0]->ToObject())) {
                 v8::Local<v8::Object> file_obj = args[0]->ToObject();
-                FileWrap* file_wrap = node::ObjectWrap::Unwrap<FileWrap>(file_obj);
-                ReaderWrap* q = new ReaderWrap(file_wrap->get(), read_which_entities);
+                ReaderWrap* q = new ReaderWrap(unwrap<FileWrap>(file_obj), read_which_entities);
                 q->Wrap(args.This());
                 return args.This();
             } else {
@@ -100,8 +99,7 @@ namespace node_osmium {
     v8::Handle<v8::Value> ReaderWrap::header(const v8::Arguments& args) {
         v8::HandleScope scope;
         v8::Local<v8::Object> obj = v8::Object::New();
-        ReaderWrap* reader = node::ObjectWrap::Unwrap<ReaderWrap>(args.This());
-        const osmium::io::Header& header = reader->m_this->header();
+        const osmium::io::Header& header = unwrap<ReaderWrap>(args.This()).header();
         obj->Set(v8::String::NewSymbol("generator"), v8::String::New(header.get("generator").c_str()));
 
         auto bounds_array = v8::Array::New(header.boxes().size());
@@ -208,17 +206,16 @@ namespace node_osmium {
             if (args[i]->IsObject()) {
                 auto obj = args[i]->ToObject();
                 if (JSHandler::constructor->HasInstance(obj)) {
-                    handlers.push_back(*node::ObjectWrap::Unwrap<JSHandler>(obj));
+                    handlers.push_back(unwrap<JSHandler>(obj));
                 } else if (LocationHandlerWrap::constructor->HasInstance(obj)) {
-                    location_handler_type& lh = node::ObjectWrap::Unwrap<LocationHandlerWrap>(obj)->get();
-                    handlers.push_back(lh);
+                    handlers.push_back(unwrap<LocationHandlerWrap>(obj));
                 }
             } else {
                 return ThrowException(v8::Exception::TypeError(v8::String::New("please provide a handler object")));
             }
         }
 
-        osmium::io::Reader& reader = wrapped(args.This());
+        osmium::io::Reader& reader = unwrap<ReaderWrap>(args.This());
         if (reader.eof()) {
             return ThrowException(v8::Exception::Error(v8::String::New("apply() called on a reader that has reached EOF")));
         }
@@ -271,7 +268,7 @@ namespace node_osmium {
     v8::Handle<v8::Value> ReaderWrap::close(const v8::Arguments& args) {
         v8::HandleScope scope;
         try {
-            wrapped(args.This()).close();
+            unwrap<ReaderWrap>(args.This()).close();
         } catch (const std::exception& e) {
             std::string msg("osmium io error: ");
             msg += e.what();

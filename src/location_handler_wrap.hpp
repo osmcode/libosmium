@@ -79,10 +79,6 @@ namespace node_osmium {
         static v8::Handle<v8::Value> New(const v8::Arguments& args);
         static v8::Handle<v8::Value> clear(const v8::Arguments& args);
 
-        static location_handler_type& wrapped(const v8::Local<v8::Object>& object) {
-            return node::ObjectWrap::Unwrap<LocationHandlerWrap>(object)->get();
-        }
-
         LocationHandlerWrap(const std::string& cache_type) :
             ObjectWrap(),
             m_index_pos(node_cache_factory(cache_type)),

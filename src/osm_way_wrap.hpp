@@ -34,7 +34,7 @@ namespace node_osmium {
         static v8::Handle<v8::Value> New(const v8::Arguments& args);
 
         static const osmium::Way& wrapped(const v8::Local<v8::Object>& object) {
-            return static_cast<const osmium::Way&>(OSMEntityWrap::wrapped(object));
+            return static_cast<const osmium::Way&>(unwrap<OSMEntityWrap>(object));
         }
 
         OSMWayWrap(const osmium::OSMEntity& entity) :

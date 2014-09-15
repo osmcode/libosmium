@@ -30,6 +30,10 @@ namespace node_osmium {
 
         JSHandler();
 
+        JSHandler& get() {
+            return *this;
+        }
+
         void dispatch_entity(v8::TryCatch& trycatch, const osmium::OSMEntity& entity) const;
 
         void init(v8::TryCatch& trycatch) const;

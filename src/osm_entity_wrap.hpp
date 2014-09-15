@@ -14,6 +14,8 @@
 // osmium
 namespace osmium { class OSMEntity; }
 
+#include "utils.hpp"
+
 namespace node_osmium {
 
     class OSMEntityWrap : public node::ObjectWrap {
@@ -34,19 +36,15 @@ namespace node_osmium {
         static void Initialize(v8::Handle<v8::Object> target);
         static v8::Handle<v8::Value> New(const v8::Arguments& args);
 
-        static const osmium::OSMEntity& wrapped(const v8::Local<v8::Object>& object) {
-            return static_cast<const osmium::OSMEntity&>(*(node::ObjectWrap::Unwrap<OSMEntityWrap>(object)->get()));
-        }
-
         OSMEntityWrap(const osmium::OSMEntity& entity) :
             m_entity(&entity) {
         }
 
-        const osmium::OSMEntity* get() {
-            return m_entity;
+        const osmium::OSMEntity& get() {
+            return *m_entity;
         }
 
-    }; // class OSMObjectWrap
+    }; // class OSMEntityWrap
 
 } // namespace node_osmium
 

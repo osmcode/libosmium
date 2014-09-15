@@ -18,6 +18,7 @@
 #include "osm_way_wrap.hpp"
 #include "osm_relation_wrap.hpp"
 #include "osm_changeset_wrap.hpp"
+#include "utils.hpp"
 
 namespace node_osmium {
 
@@ -90,8 +91,7 @@ namespace node_osmium {
 
         v8::Local<v8::Value> tagged_nodes_only = args[0]->ToObject()->Get(symbol_tagged_nodes_only);
         if (tagged_nodes_only->IsBoolean()) {
-            JSHandler* handler = node::ObjectWrap::Unwrap<JSHandler>(args.This());
-            handler->node_callback_for_tagged_only = tagged_nodes_only->BooleanValue();
+            unwrap<JSHandler>(args.This()).node_callback_for_tagged_only = tagged_nodes_only->BooleanValue();
         }
 
         return scope.Close(v8::Undefined());
@@ -108,49 +108,49 @@ namespace node_osmium {
             return ThrowException(v8::Exception::TypeError(v8::String::New("please provide a valid callback function for second arg")));
         }
 
-        JSHandler* handler = node::ObjectWrap::Unwrap<JSHandler>(args.This());
+        JSHandler& handler = unwrap<JSHandler>(args.This());
         if (callback_name == "node") {
-            handler->node_cb.Dispose();
-            handler->node_cb = v8::Persistent<v8::Function>::New(callback);
+            handler.node_cb.Dispose();
+            handler.node_cb = v8::Persistent<v8::Function>::New(callback);
         } else if (callback_name == "way") {
-            handler->way_cb.Dispose();
-            handler->way_cb = v8::Persistent<v8::Function>::New(callback);
+            handler.way_cb.Dispose();
+            handler.way_cb = v8::Persistent<v8::Function>::New(callback);
         } else if (callback_name == "relation") {
-            handler->relation_cb.Dispose();
-            handler->relation_cb = v8::Persistent<v8::Function>::New(callback);
+            handler.relation_cb.Dispose();
+            handler.relation_cb = v8::Persistent<v8::Function>::New(callback);
         } else if (callback_name == "changeset") {
-            handler->changeset_cb.Dispose();
-            handler->changeset_cb = v8::Persistent<v8::Function>::New(callback);
+            handler.changeset_cb.Dispose();
+            handler.changeset_cb = v8::Persistent<v8::Function>::New(callback);
         } else if (callback_name == "init") {
-            handler->init_cb.Dispose();
-            handler->init_cb = v8::Persistent<v8::Function>::New(callback);
+            handler.init_cb.Dispose();
+            handler.init_cb = v8::Persistent<v8::Function>::New(callback);
         } else if (callback_name == "before_nodes") {
-            handler->before_nodes_cb.Dispose();
-            handler->before_nodes_cb = v8::Persistent<v8::Function>::New(callback);
+            handler.before_nodes_cb.Dispose();
+            handler.before_nodes_cb = v8::Persistent<v8::Function>::New(callback);
         } else if (callback_name == "after_nodes") {
-            handler->after_nodes_cb.Dispose();
-            handler->after_nodes_cb = v8::Persistent<v8::Function>::New(callback);
+            handler.after_nodes_cb.Dispose();
+            handler.after_nodes_cb = v8::Persistent<v8::Function>::New(callback);
         } else if (callback_name == "before_ways") {
-            handler->before_ways_cb.Dispose();
-            handler->before_ways_cb = v8::Persistent<v8::Function>::New(callback);
+            handler.before_ways_cb.Dispose();
+            handler.before_ways_cb = v8::Persistent<v8::Function>::New(callback);
         } else if (callback_name == "after_ways") {
-            handler->after_ways_cb.Dispose();
-            handler->after_ways_cb = v8::Persistent<v8::Function>::New(callback);
+            handler.after_ways_cb.Dispose();
+            handler.after_ways_cb = v8::Persistent<v8::Function>::New(callback);
         } else if (callback_name == "before_relations") {
-            handler->before_relations_cb.Dispose();
-            handler->before_relations_cb = v8::Persistent<v8::Function>::New(callback);
+            handler.before_relations_cb.Dispose();
+            handler.before_relations_cb = v8::Persistent<v8::Function>::New(callback);
         } else if (callback_name == "after_relations") {
-            handler->after_relations_cb.Dispose();
-            handler->after_relations_cb = v8::Persistent<v8::Function>::New(callback);
+            handler.after_relations_cb.Dispose();
+            handler.after_relations_cb = v8::Persistent<v8::Function>::New(callback);
         } else if (callback_name == "before_changesets") {
-            handler->before_changesets_cb.Dispose();
-            handler->before_changesets_cb = v8::Persistent<v8::Function>::New(callback);
+            handler.before_changesets_cb.Dispose();
+            handler.before_changesets_cb = v8::Persistent<v8::Function>::New(callback);
         } else if (callback_name == "after_changesets") {
-            handler->after_changesets_cb.Dispose();
-            handler->after_changesets_cb = v8::Persistent<v8::Function>::New(callback);
+            handler.after_changesets_cb.Dispose();
+            handler.after_changesets_cb = v8::Persistent<v8::Function>::New(callback);
         } else if (callback_name == "done") {
-            handler->done_cb.Dispose();
-            handler->done_cb = v8::Persistent<v8::Function>::New(callback);
+            handler.done_cb.Dispose();
+            handler.done_cb = v8::Persistent<v8::Function>::New(callback);
         } else {
             return ThrowException(v8::Exception::RangeError(v8::String::New("unknown callback name as first argument")));
         }

@@ -1,5 +1,6 @@
 
 #include "location_handler_wrap.hpp"
+#include "utils.hpp"
 
 namespace node_osmium {
 
@@ -43,8 +44,7 @@ namespace node_osmium {
 
     v8::Handle<v8::Value> LocationHandlerWrap::ignoreErrors(const v8::Arguments& args) {
         v8::HandleScope scope;
-        LocationHandlerWrap* handler = node::ObjectWrap::Unwrap<LocationHandlerWrap>(args.This());
-        handler->get().ignore_errors();
+        unwrap<LocationHandlerWrap>(args.This()).ignore_errors();
         return scope.Close(v8::Undefined());
     }
 

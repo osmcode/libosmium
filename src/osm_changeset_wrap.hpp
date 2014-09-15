@@ -38,7 +38,7 @@ namespace node_osmium {
         static v8::Handle<v8::Value> New(const v8::Arguments& args);
 
         static const osmium::Changeset& wrapped(const v8::Local<v8::Object>& object) {
-            return static_cast<const osmium::Changeset&>(OSMEntityWrap::wrapped(object));
+            return static_cast<const osmium::Changeset&>(unwrap<OSMEntityWrap>(object));
         }
 
         OSMChangesetWrap(const osmium::OSMEntity& entity) :
