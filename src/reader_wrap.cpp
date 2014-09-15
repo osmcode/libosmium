@@ -258,7 +258,7 @@ namespace node_osmium {
                 }
             }
         } catch (const std::exception& e) {
-            std::string msg("osmium io error: ");
+            std::string msg("osmium error: ");
             msg += e.what();
             return ThrowException(v8::Exception::Error(v8::String::New(msg.c_str())));
         }
@@ -270,7 +270,7 @@ namespace node_osmium {
         try {
             unwrap<ReaderWrap>(args.This()).close();
         } catch (const std::exception& e) {
-            std::string msg("osmium io error: ");
+            std::string msg("osmium error: ");
             msg += e.what();
             return ThrowException(v8::Exception::Error(v8::String::New(msg.c_str())));
         }
