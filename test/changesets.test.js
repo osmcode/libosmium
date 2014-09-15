@@ -27,7 +27,7 @@ describe('changesets', function() {
         });
         var file = new osmium.File(__dirname + "/data/changesets.osm");
         var reader = new osmium.Reader(file, {changeset: true});
-        reader.apply(handler);
+        osmium.apply(reader, handler);
     });
 
    it('should be able to access basic attributes from open changeset', function(done) {
@@ -51,7 +51,7 @@ describe('changesets', function() {
         });
         var file = new osmium.File(__dirname + "/data/changesets.osm");
         var reader = new osmium.Reader(file, {changeset: true});
-        reader.apply(handler);
+        osmium.apply(reader, handler);
     });
 
    it('should be able to access tags from changeset', function(done) {
@@ -67,7 +67,7 @@ describe('changesets', function() {
         });
         var file = new osmium.File(__dirname + "/data/changesets.osm");
         var reader = new osmium.Reader(file, {changeset: true});
-        reader.apply(handler);
+        osmium.apply(reader, handler);
     });
 
 });

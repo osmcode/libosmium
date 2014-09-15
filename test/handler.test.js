@@ -58,7 +58,7 @@ describe('handler', function() {
 
         var file = new osmium.File(__dirname + "/data/winthrop.osm");
         var reader = new osmium.Reader(file);
-        reader.apply(handler);
+        osmium.apply(reader, handler);
 
         assert.equal(count_nodes, 1525);
         assert.equal(count_ways, 98);
@@ -67,7 +67,7 @@ describe('handler', function() {
 
         file = new osmium.File(__dirname + "/data/changesets.osm");
         reader = new osmium.Reader(file);
-        reader.apply(handler);
+        osmium.apply(reader, handler);
 
         assert.equal(count_nodes, 1525);
         assert.equal(count_ways, 98);
@@ -90,7 +90,7 @@ describe('handler', function() {
 
         var file = new osmium.File(__dirname + "/data/winthrop.osm");
         var reader = new osmium.Reader(file);
-        reader.apply(handler);
+        osmium.apply(reader, handler);
 
         assert.equal(count, 8);
         done();
@@ -109,7 +109,7 @@ describe('handler', function() {
 
         var file = new osmium.File(__dirname + "/data/changesets.osm");
         var reader = new osmium.Reader(file);
-        reader.apply(handler);
+        osmium.apply(reader, handler);
 
         assert.equal(count, 4);
         done();
@@ -127,7 +127,7 @@ describe('handler', function() {
 
         var file = new osmium.File(__dirname + "/data/winthrop.osm");
         var reader = new osmium.Reader(file);
-        reader.apply(handler);
+        osmium.apply(reader, handler);
 
         assert.equal(count, 15);
 
@@ -136,7 +136,7 @@ describe('handler', function() {
 
         file = new osmium.File(__dirname + "/data/winthrop.osm");
         reader = new osmium.Reader(file);
-        reader.apply(handler);
+        osmium.apply(reader, handler);
 
         assert.equal(count, 0);
 
@@ -171,7 +171,7 @@ describe('handler', function() {
 
         var file = new osmium.File(__dirname + "/data/winthrop.osm");
         var reader = new osmium.Reader(file);
-        reader.apply(handler);
+        osmium.apply(reader, handler);
 
         assert.equal(count, 1525);
 
@@ -180,7 +180,7 @@ describe('handler', function() {
 
         file = new osmium.File(__dirname + "/data/winthrop.osm");
         reader = new osmium.Reader(file);
-        reader.apply(handler);
+        osmium.apply(reader, handler);
 
         assert.equal(count, 0);
 
@@ -227,7 +227,7 @@ describe('handler', function() {
         });
 
         var reader = new osmium.Reader(__dirname + "/data/winthrop.osm", { 'node': true, 'way': true });
-        reader.apply(handler);
+        osmium.apply(reader, handler);
         done();
     });
 
@@ -247,7 +247,7 @@ describe('handler', function() {
 
         var file = new osmium.File(__dirname + "/data/winthrop.osm");
         var reader = new osmium.Reader(file);
-        reader.apply(handler1, handler2);
+        osmium.apply(reader, handler1, handler2);
 
         assert.equal(count, 2);
         done();
@@ -263,7 +263,7 @@ describe('handler', function() {
         var reader = new osmium.Reader(file);
 
         assert.throws(function() {
-            reader.apply(handler);
+            osmium.apply(reader, handler);
         }, Error);
 
         done();

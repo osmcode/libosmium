@@ -19,19 +19,19 @@ describe('location handler', function() {
 
     it('should be able to use the default location handler', function(done) {
         var reader = new osmium.Reader(__dirname + "/data/winthrop.osm", { 'node': true, 'way': true });
-        reader.apply(new osmium.LocationHandler(), get_handler());
+        osmium.apply(reader, new osmium.LocationHandler(), get_handler());
         done();
     });
 
     it('should be able to use the sparsetable location handler', function(done) {
         var reader = new osmium.Reader(__dirname + "/data/winthrop.osm", { 'node': true, 'way': true });
-        reader.apply(new osmium.LocationHandler("sparsetable"), get_handler());
+        osmium.apply(reader, new osmium.LocationHandler("sparsetable"), get_handler());
         done();
     });
 
     it('should be able to use the stlmap location handler', function(done) {
         var reader = new osmium.Reader(__dirname + "/data/winthrop.osm", { 'node': true, 'way': true });
-        reader.apply(new osmium.LocationHandler("stlmap"), get_handler());
+        osmium.apply(reader, new osmium.LocationHandler("stlmap"), get_handler());
         done();
     });
 

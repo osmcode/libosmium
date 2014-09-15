@@ -14,10 +14,10 @@ describe('reader', function() {
         var file = new osmium.File(__dirname + "/data/winthrop.osm");
         var reader = new osmium.Reader(file);
         var handler = new osmium.Handler(); 
-        reader.apply(handler);
+        osmium.apply(reader, handler);
 
         assert.throws(function() {
-            reader.apply(handler);
+            osmium.apply(reader, handler);
         }, Error);
         done();
     });
@@ -35,6 +35,14 @@ describe('reader', function() {
         assert.ok(Math.abs(bounds.top()    - (  48.4869)) < .000000001);
         reader.close();
 
+        done();
+    });
+
+    it('should be able to call apply() with an osmium.Reader and a handler', function(done) {
+        var reader = new osmium.Reader(__dirname + "/data/winthrop.osm");
+        var handler = new osmium.Handler();
+
+        osmium.apply(reader, handler);
         done();
     });
 

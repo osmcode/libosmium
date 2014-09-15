@@ -18,7 +18,7 @@ describe('geojson', function() {
         });
         var file = new osmium.File(__dirname + "/data/winthrop.osm");
         var reader = new osmium.Reader(file, {node: true});
-        reader.apply(handler);
+        osmium.apply(reader, handler);
     });
 
    it('should be able to create geojson from a way', function(done) {
@@ -37,7 +37,7 @@ describe('geojson', function() {
         });
         var file = new osmium.File(__dirname + "/data/winthrop.osm");
         var reader = new osmium.Reader(file);
-        reader.apply(new osmium.LocationHandler(), handler);
+        osmium.apply(reader, new osmium.LocationHandler(), handler);
     });
 
 });

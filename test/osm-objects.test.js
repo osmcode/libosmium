@@ -26,7 +26,7 @@ describe('basic', function() {
         });
         var file = new osmium.File(__dirname + "/data/winthrop.osm");
         var reader = new osmium.Reader(file, {node: true});
-        reader.apply(handler);
+        osmium.apply(reader, handler);
     });
 
    it('should be able to access basic attributes from way', function(done) {
@@ -48,7 +48,7 @@ describe('basic', function() {
         });
         var file = new osmium.File(__dirname + "/data/winthrop.osm");
         var reader = new osmium.Reader(file, {way: true});
-        reader.apply(handler);
+        osmium.apply(reader, handler);
     });
 
    it('should be able to access basic attributes from relation', function(done) {
@@ -70,7 +70,7 @@ describe('basic', function() {
         });
         var file = new osmium.File(__dirname + "/data/winthrop.osm");
         var reader = new osmium.Reader(file, {relation: true});
-        reader.apply(handler);
+        osmium.apply(reader, handler);
     });
 
    it('should be able to handle object without tags', function(done) {
@@ -86,7 +86,7 @@ describe('basic', function() {
         });
         var file = new osmium.File(__dirname + "/data/winthrop.osm");
         var reader = new osmium.Reader(file, {node: true});
-        reader.apply(handler);
+        osmium.apply(reader, handler);
     });
 
    it('should be able access tags on object', function(done) {
@@ -110,7 +110,7 @@ describe('basic', function() {
         });
         var file = new osmium.File(__dirname + "/data/winthrop.osm");
         var reader = new osmium.Reader(file, {way: true});
-        reader.apply(handler);
+        osmium.apply(reader, handler);
     });
 
    it('should be able access nodes on ways', function(done) {
@@ -139,7 +139,7 @@ describe('basic', function() {
         });
         var file = new osmium.File(__dirname + "/data/winthrop.osm");
         var reader = new osmium.Reader(file, {way: true});
-        reader.apply(handler);
+        osmium.apply(reader, handler);
     });
 
    it('should be able access members on relations', function(done) {
@@ -175,7 +175,7 @@ describe('basic', function() {
         });
         var file = new osmium.File(__dirname + "/data/winthrop.osm");
         var reader = new osmium.Reader(file, {relation: true});
-        reader.apply(handler);
+        osmium.apply(reader, handler);
     });
 
 });
