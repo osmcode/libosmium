@@ -88,14 +88,6 @@ namespace node_osmium {
             }
         }
 
-        void _ref() {
-            Ref();
-        }
-
-        void _unref() {
-            Unref();
-        }
-
         location_handler_type& get() {
             return *m_this;
         }
