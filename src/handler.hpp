@@ -22,8 +22,6 @@ namespace node_osmium {
 
     public:
 
-        static void print_error_message(v8::TryCatch& trycatch);
-
         static v8::Persistent<v8::FunctionTemplate> constructor;
         static void Initialize(v8::Handle<v8::Object> target);
         static v8::Handle<v8::Value> New(const v8::Arguments& args);
@@ -32,18 +30,18 @@ namespace node_osmium {
 
         JSHandler();
 
-        void dispatch_entity(const osmium::OSMEntity& entity);
+        void dispatch_entity(v8::TryCatch& trycatch, const osmium::OSMEntity& entity);
 
-        void init();
-        void before_nodes();
-        void after_nodes();
-        void before_ways();
-        void after_ways();
-        void before_relations();
-        void after_relations();
-        void before_changesets();
-        void after_changesets();
-        void done();
+        void init(v8::TryCatch& trycatch);
+        void before_nodes(v8::TryCatch& trycatch);
+        void after_nodes(v8::TryCatch& trycatch);
+        void before_ways(v8::TryCatch& trycatch);
+        void after_ways(v8::TryCatch& trycatch);
+        void before_relations(v8::TryCatch& trycatch);
+        void after_relations(v8::TryCatch& trycatch);
+        void before_changesets(v8::TryCatch& trycatch);
+        void after_changesets(v8::TryCatch& trycatch);
+        void done(v8::TryCatch& trycatch);
 
         bool node_callback_for_tagged_only;
 

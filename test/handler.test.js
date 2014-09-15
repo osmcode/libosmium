@@ -253,5 +253,21 @@ describe('handler', function() {
         done();
     });
 
+    it('should catch errors in handler callbacks and rethrow from apply function', function(done) {
+        var handler = new osmium.Handler();
+        handler.on('node', function(node) {
+            throw new Error("test error");
+        });
+
+        var file = new osmium.File(__dirname + "/data/winthrop.osm");
+        var reader = new osmium.Reader(file);
+
+        assert.throws(function() {
+            reader.apply(handler);
+        }, Error);
+
+        done();
+    });
+
 });
 
