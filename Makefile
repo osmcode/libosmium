@@ -18,8 +18,8 @@ osmium.node: Makefile ./build
 	./node_modules/.bin/node-gyp build
 
 clean:
-	rm -rf ./build
-	rm -f lib/osmium.node
+	rm -rf ./build ./check_reports lib/binding
+	rm -f lib/osmium.node includes.log iwyu.log
 
 rebuild:
 	@make clean
