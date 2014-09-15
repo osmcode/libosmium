@@ -10,7 +10,9 @@
 
 // osmium
 #include <osmium/osm/way.hpp>
-namespace osmium { class OSMEntity; }
+namespace osmium {
+    class OSMEntity;
+}
 
 // node-osmium
 #include "osm_entity_wrap.hpp"

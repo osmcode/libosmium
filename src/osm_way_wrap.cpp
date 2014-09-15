@@ -78,28 +78,26 @@ namespace node_osmium {
         const osmium::Way& way = wrapped(args.This());
 
         switch (args.Length()) {
-            case 0:
-                {
-                    v8::Local<v8::Array> nodes = v8::Array::New(way.nodes().size());
-                    int i = 0;
-                    for (const auto& node_ref : way.nodes()) {
-                        nodes->Set(i, v8::Number::New(node_ref.ref()));
-                        ++i;
-                    }
-                    return scope.Close(nodes);
+            case 0: {
+                v8::Local<v8::Array> nodes = v8::Array::New(way.nodes().size());
+                int i = 0;
+                for (const auto& node_ref : way.nodes()) {
+                    nodes->Set(i, v8::Number::New(node_ref.ref()));
+                    ++i;
                 }
-            case 1:
-                {
-                    if (!args[0]->IsNumber()) {
-                        return ThrowException(v8::Exception::TypeError(v8::String::New("call nodes() without parameters or the index of the node you want")));
-                    }
-                    int n = static_cast<int>(args[0]->ToNumber()->Value());
-                    if (n >= 0 && n < static_cast<int>(way.nodes().size())) {
-                        return scope.Close(v8::Number::New(way.nodes()[n].ref()));
-                    } else {
-                        return ThrowException(v8::Exception::RangeError(v8::String::New("argument to nodes() out of range")));
-                    }
+                return scope.Close(nodes);
+            }
+            case 1: {
+                if (!args[0]->IsNumber()) {
+                    return ThrowException(v8::Exception::TypeError(v8::String::New("call nodes() without parameters or the index of the node you want")));
                 }
+                int n = static_cast<int>(args[0]->ToNumber()->Value());
+                if (n >= 0 && n < static_cast<int>(way.nodes().size())) {
+                    return scope.Close(v8::Number::New(way.nodes()[n].ref()));
+                } else {
+                    return ThrowException(v8::Exception::RangeError(v8::String::New("argument to nodes() out of range")));
+                }
+            }
         }
 
         return ThrowException(v8::Exception::TypeError(v8::String::New("call nodes() without parameters or the index of the node you want")));

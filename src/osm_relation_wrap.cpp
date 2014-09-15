@@ -47,43 +47,41 @@ namespace node_osmium {
         const osmium::Relation& relation = wrapped(args.This());
 
         switch (args.Length()) {
-            case 0:
-                {
-                    v8::Local<v8::Array> members = v8::Array::New();
-                    int i = 0;
+            case 0: {
+                v8::Local<v8::Array> members = v8::Array::New();
+                int i = 0;
+                char typec[2] = " ";
+                for (const auto& member : relation.members()) {
+                    v8::Local<v8::Object> jsmember = v8::Object::New();
+                    typec[0] = osmium::item_type_to_char(member.type());
+                    jsmember->Set(symbol_type, v8::String::New(typec));
+                    jsmember->Set(symbol_ref, v8::Number::New(member.ref()));
+                    jsmember->Set(symbol_role, v8::String::New(member.role()));
+                    members->Set(i, jsmember);
+                    ++i;
+                }
+                return scope.Close(members);
+            }
+            case 1: {
+                if (!args[0]->IsNumber()) {
+                    return ThrowException(v8::Exception::TypeError(v8::String::New("call members() without parameters or the index of the member you want")));
+                }
+                int n = static_cast<int>(args[0]->ToNumber()->Value());
+                if (n >= 0 && n < static_cast<int>(relation.members().size())) {
+                    auto it = relation.members().begin();
+                    std::advance(it, n);
+                    const osmium::RelationMember& member = *it;
+                    v8::Local<v8::Object> jsmember = v8::Object::New();
                     char typec[2] = " ";
-                    for (const auto& member : relation.members()) {
-                        v8::Local<v8::Object> jsmember = v8::Object::New();
-                        typec[0] = osmium::item_type_to_char(member.type());
-                        jsmember->Set(symbol_type, v8::String::New(typec));
-                        jsmember->Set(symbol_ref, v8::Number::New(member.ref()));
-                        jsmember->Set(symbol_role, v8::String::New(member.role()));
-                        members->Set(i, jsmember);
-                        ++i;
-                    }
-                    return scope.Close(members);
+                    typec[0] = osmium::item_type_to_char(member.type());
+                    jsmember->Set(symbol_type, v8::String::New(typec));
+                    jsmember->Set(symbol_ref, v8::Number::New(member.ref()));
+                    jsmember->Set(symbol_role, v8::String::New(member.role()));
+                    return scope.Close(jsmember);
+                } else {
+                    return ThrowException(v8::Exception::RangeError(v8::String::New("argument to members() out of range")));
                 }
-            case 1:
-                {
-                    if (!args[0]->IsNumber()) {
-                        return ThrowException(v8::Exception::TypeError(v8::String::New("call members() without parameters or the index of the member you want")));
-                    }
-                    int n = static_cast<int>(args[0]->ToNumber()->Value());
-                    if (n >= 0 && n < static_cast<int>(relation.members().size())) {
-                        auto it = relation.members().begin();
-                        std::advance(it, n);
-                        const osmium::RelationMember& member = *it;
-                        v8::Local<v8::Object> jsmember = v8::Object::New();
-                        char typec[2] = " ";
-                        typec[0] = osmium::item_type_to_char(member.type());
-                        jsmember->Set(symbol_type, v8::String::New(typec));
-                        jsmember->Set(symbol_ref, v8::Number::New(member.ref()));
-                        jsmember->Set(symbol_role, v8::String::New(member.role()));
-                        return scope.Close(jsmember);
-                    } else {
-                        return ThrowException(v8::Exception::RangeError(v8::String::New("argument to members() out of range")));
-                    }
-                }
+            }
         }
 
         return ThrowException(v8::Exception::TypeError(v8::String::New("call members() without parameters or the index of the member you want")));

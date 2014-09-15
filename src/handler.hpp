@@ -12,7 +12,9 @@
 #include <node_object_wrap.h>
 
 // osmium
-namespace osmium { class OSMEntity; }
+namespace osmium {
+    class OSMEntity;
+}
 
 namespace node_osmium {
 
