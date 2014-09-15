@@ -1,9 +1,8 @@
 
-// v8
-#include <v8.h>
-
 // osmium
 #include <osmium/osm/box.hpp>
+
+#include "utils.hpp"
 
 namespace node_osmium {
 

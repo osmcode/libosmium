@@ -17,6 +17,7 @@ namespace osmium {
 // node-osmium
 #include "osm_entity_wrap.hpp"
 #include "osm_object_wrap.hpp"
+#include "utils.hpp"
 
 namespace node_osmium {
 
