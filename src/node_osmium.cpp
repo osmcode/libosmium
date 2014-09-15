@@ -6,11 +6,13 @@
 
 // node
 #include <node.h>
+#include <node_buffer.h>
 
 // osmium
 #include <osmium/geom/wkb.hpp>
 #include <osmium/geom/wkt.hpp>
 #include <osmium/io/input_iterator.hpp>
+#include <osmium/memory/buffer.hpp>
 #include <osmium/visitor.hpp>
 
 // node-osmium
@@ -112,35 +114,12 @@ namespace node_osmium {
 
     }; // visitor_before_after
 
-    v8::Handle<v8::Value> apply(const v8::Arguments& args) {
+    typedef boost::variant<location_handler_type&, JSHandler&> some_handler_type;
+
+    template <class TIter>
+    v8::Handle<v8::Value> apply_iterator(TIter it, TIter end, std::vector<some_handler_type>& handlers) {
         v8::HandleScope scope;
-
-        typedef boost::variant<location_handler_type&, JSHandler&> some_handler_type;
-        std::vector<some_handler_type> handlers;
-
-        for (int i=1; i != args.Length(); ++i) {
-            if (args[i]->IsObject()) {
-                auto obj = args[i]->ToObject();
-                if (JSHandler::constructor->HasInstance(obj)) {
-                    handlers.push_back(unwrap<JSHandler>(obj));
-                } else if (LocationHandlerWrap::constructor->HasInstance(obj)) {
-                    handlers.push_back(unwrap<LocationHandlerWrap>(obj));
-                }
-            } else {
-                return ThrowException(v8::Exception::TypeError(v8::String::New("please provide a handler object")));
-            }
-        }
-
-        osmium::io::Reader& reader = unwrap<ReaderWrap>(args[0]->ToObject());
-        if (reader.eof()) {
-            return ThrowException(v8::Exception::Error(v8::String::New("apply() called on a reader that has reached EOF")));
-        }
-
         try {
-            typedef osmium::io::InputIterator<osmium::io::Reader, osmium::OSMEntity> input_iterator;
-            input_iterator it(reader);
-            input_iterator end;
-
             osmium::item_type last_type = osmium::item_type::undefined;
 
             v8::TryCatch trycatch;
@@ -179,6 +158,45 @@ namespace node_osmium {
             return ThrowException(v8::Exception::Error(v8::String::New(msg.c_str())));
         }
         return scope.Close(v8::Undefined());
+    }
+
+    v8::Handle<v8::Value> apply(const v8::Arguments& args) {
+        v8::HandleScope scope;
+
+        if (args.Length() > 0 && args[0]->IsObject()) {
+            std::vector<some_handler_type> handlers;
+
+            for (int i=1; i != args.Length(); ++i) {
+                if (!args[i]->IsObject()) {
+                    return ThrowException(v8::Exception::TypeError(v8::String::New("please provide handler objects as second and further parameters to apply()")));
+                }
+                auto obj = args[i]->ToObject();
+                if (JSHandler::constructor->HasInstance(obj)) {
+                    handlers.push_back(unwrap<JSHandler>(obj));
+                } else if (LocationHandlerWrap::constructor->HasInstance(obj)) {
+                    handlers.push_back(unwrap<LocationHandlerWrap>(obj));
+                }
+            }
+
+            auto source = args[0]->ToObject();
+            if (ReaderWrap::constructor->HasInstance(source)) {
+                osmium::io::Reader& reader = unwrap<ReaderWrap>(source);
+
+                if (reader.eof()) {
+                    return ThrowException(v8::Exception::Error(v8::String::New("apply() called on a reader that has reached EOF")));
+                }
+
+                typedef osmium::io::InputIterator<osmium::io::Reader, osmium::OSMEntity> input_iterator;
+
+                return scope.Close(apply_iterator(input_iterator{reader}, input_iterator{}, handlers));
+            } else if (node::Buffer::HasInstance(source)) {
+                osmium::memory::Buffer buffer(reinterpret_cast<unsigned char*>(node::Buffer::Data(source)), node::Buffer::Length(source));
+
+                return scope.Close(apply_iterator(buffer.begin<osmium::OSMEntity>(), buffer.end<osmium::OSMEntity>(), handlers));
+            }
+        }
+
+        return ThrowException(v8::Exception::TypeError(v8::String::New("please provide a Reader or Buffer object as first parameter")));
     }
 
     extern "C" {
