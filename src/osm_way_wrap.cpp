@@ -14,6 +14,7 @@ namespace node_osmium {
 
     extern osmium::geom::WKBFactory<> wkb_factory;
     extern osmium::geom::WKTFactory<> wkt_factory;
+    extern v8::Persistent<v8::Object> module;
 
     v8::Persistent<v8::FunctionTemplate> OSMWayWrap::constructor;
 
@@ -25,7 +26,8 @@ namespace node_osmium {
         constructor->SetClassName(v8::String::NewSymbol("Way"));
         auto attributes = static_cast<v8::PropertyAttribute>(v8::ReadOnly | v8::DontDelete);
         set_accessor(constructor, "nodes_count", get_nodes_count, attributes);
-        node::SetPrototypeMethod(constructor, "nodes", nodes);
+        node::SetPrototypeMethod(constructor, "node_refs", node_refs);
+        node::SetPrototypeMethod(constructor, "node_coordinates", node_coordinates);
         node::SetPrototypeMethod(constructor, "wkb", wkb);
         node::SetPrototypeMethod(constructor, "wkt", wkt);
         target->Set(v8::String::NewSymbol("Way"), constructor->GetFunction());
@@ -72,7 +74,7 @@ namespace node_osmium {
         return scope.Close(v8::Number::New(wrapped(info.This()).nodes().size()));
     }
 
-    v8::Handle<v8::Value> OSMWayWrap::nodes(const v8::Arguments& args) {
+    v8::Handle<v8::Value> OSMWayWrap::node_refs(const v8::Arguments& args) {
         v8::HandleScope scope;
 
         const osmium::Way& way = wrapped(args.This());
@@ -89,18 +91,56 @@ namespace node_osmium {
             }
             case 1: {
                 if (!args[0]->IsNumber()) {
-                    return ThrowException(v8::Exception::TypeError(v8::String::New("call nodes() without parameters or the index of the node you want")));
+                    return ThrowException(v8::Exception::TypeError(v8::String::New("call node_refs() without parameters or the index of the node you want")));
                 }
                 int n = static_cast<int>(args[0]->ToNumber()->Value());
                 if (n >= 0 && n < static_cast<int>(way.nodes().size())) {
                     return scope.Close(v8::Number::New(way.nodes()[n].ref()));
                 } else {
-                    return ThrowException(v8::Exception::RangeError(v8::String::New("argument to nodes() out of range")));
+                    return ThrowException(v8::Exception::RangeError(v8::String::New("argument to node_refs() out of range")));
                 }
             }
         }
 
-        return ThrowException(v8::Exception::TypeError(v8::String::New("call nodes() without parameters or the index of the node you want")));
+        return ThrowException(v8::Exception::TypeError(v8::String::New("call node_refs() without parameters or the index of the node you want")));
+    }
+
+    v8::Handle<v8::Value> OSMWayWrap::node_coordinates(const v8::Arguments& args) {
+        v8::HandleScope scope;
+
+        auto cf = module->Get(v8::String::NewSymbol("Coordinates"));
+        assert(cf->IsFunction());
+
+        const osmium::Way& way = wrapped(args.This());
+
+        switch (args.Length()) {
+            case 0: {
+                v8::Local<v8::Array> nodes = v8::Array::New(way.nodes().size());
+                int i = 0;
+                for (const auto& node_ref : way.nodes()) {
+                    const osmium::Location location = node_ref.location();
+                    v8::Local<v8::Value> argv[2] = { v8::Number::New(location.lon()), v8::Number::New(location.lat()) };
+                    nodes->Set(i, v8::Local<v8::Function>::Cast(cf)->NewInstance(2, argv));
+                    ++i;
+                }
+                return scope.Close(nodes);
+            }
+            case 1: {
+                if (!args[0]->IsNumber()) {
+                    return ThrowException(v8::Exception::TypeError(v8::String::New("call node_coordinates() without parameters or the index of the node you want")));
+                }
+                int n = static_cast<int>(args[0]->ToNumber()->Value());
+                if (n >= 0 && n < static_cast<int>(way.nodes().size())) {
+                    const osmium::Location location = way.nodes()[n].location();
+                    v8::Local<v8::Value> argv[2] = { v8::Number::New(location.lon()), v8::Number::New(location.lat()) };
+                    return scope.Close(v8::Local<v8::Function>::Cast(cf)->NewInstance(2, argv));
+                } else {
+                    return ThrowException(v8::Exception::RangeError(v8::String::New("argument to node_coordinates() out of range")));
+                }
+            }
+        }
+
+        return ThrowException(v8::Exception::TypeError(v8::String::New("call node_coordinates() without parameters or the index of the node you want")));
     }
 
 } // namespace node_osmium

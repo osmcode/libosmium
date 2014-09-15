@@ -1,9 +1,9 @@
 # public-transport
 
-Reads OSM file and outputs public transport route into a spatialite database.
+Reads OSM file and outputs public transport route into a GeoJSON file.
 
 Public transport is often tagged differently in different places, this one
-works in Berlin, Germany.
+works well in Berlin, Germany.
 
 ## Install
 
@@ -12,7 +12,5 @@ works in Berlin, Germany.
 ## Usage
 
     wget http://download.geofabrik.de/europe/germany/berlin-latest.osm.pbf
-    ./index.js berlin-latest.osm.pbf berlin.db
-
-You will get a spatialite database with table `routes`.
+    ./index.js berlin-latest.osm.pbf berlin.geojson
 

@@ -119,19 +119,19 @@ describe('basic', function() {
         handler.on('way', function(way) {
             if (count == 0) {
                 assert.equal(way.nodes_count, 6);
-                assert.equal(way.nodes().length, 6);
-                assert.equal(way.nodes()[0], 50253600);
-                assert.equal(way.nodes()[5], 50253608);
-                assert.equal(way.nodes(0), 50253600);
-                assert.equal(way.nodes(5), 50253608);
+                assert.equal(way.node_refs().length, 6);
+                assert.equal(way.node_refs()[0], 50253600);
+                assert.equal(way.node_refs()[5], 50253608);
+                assert.equal(way.node_refs(0), 50253600);
+                assert.equal(way.node_refs(5), 50253608);
                 assert.throws(function() {
-                    way.nodes(6);
+                    way.node_refs(6);
                 }, RangeError);
                 assert.throws(function() {
-                    way.nodes("foo");
+                    way.node_refs("foo");
                 }, TypeError);
                 assert.throws(function() {
-                    way.nodes(1, "bar");
+                    way.node_refs(1, "bar");
                 }, TypeError);
                 done();
             }

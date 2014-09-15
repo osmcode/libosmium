@@ -209,8 +209,8 @@ describe('handler', function() {
         handler.on('way', function(way) {
             if (ways == 0) {
                 assert.equal(way.id, 6091729);
-                assert.equal(way.nodes(1), 50253602);
-                assert.deepEqual(way.nodes(), [50253600, 50253602, 50137292, 50137371, 50253605, 50253608]);
+                assert.equal(way.node_refs(1), 50253602);
+                assert.deepEqual(way.node_refs(), [50253600, 50253602, 50137292, 50137371, 50253605, 50253608]);
             }
             ++ways;
         });
