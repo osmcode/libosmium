@@ -143,6 +143,15 @@ namespace osmium {
                 }
             }
 
+            /**
+             * Call clear on the location indexes. Makes the NodeLocationsForWays
+             * handler unusable. Used to explicitly free memory if thats needed.
+             */
+            void clear() {
+                m_storage_pos.clear();
+                m_storage_neg.clear();
+            }
+
         }; // class NodeLocationsForWays
 
     } // namespace handler
