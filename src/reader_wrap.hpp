@@ -39,7 +39,7 @@ namespace node_osmium {
         static void Initialize(v8::Handle<v8::Object> target);
         static v8::Handle<v8::Value> New(const v8::Arguments& args);
 
-        static osmium::io::Reader& wrapped(v8::Local<v8::Object> object) {
+        static osmium::io::Reader& wrapped(const v8::Local<v8::Object>& object) {
             return *(node::ObjectWrap::Unwrap<ReaderWrap>(object)->get());
         }
 

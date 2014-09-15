@@ -30,18 +30,18 @@ namespace node_osmium {
 
         JSHandler();
 
-        void dispatch_entity(v8::TryCatch& trycatch, const osmium::OSMEntity& entity);
+        void dispatch_entity(v8::TryCatch& trycatch, const osmium::OSMEntity& entity) const;
 
-        void init(v8::TryCatch& trycatch);
-        void before_nodes(v8::TryCatch& trycatch);
-        void after_nodes(v8::TryCatch& trycatch);
-        void before_ways(v8::TryCatch& trycatch);
-        void after_ways(v8::TryCatch& trycatch);
-        void before_relations(v8::TryCatch& trycatch);
-        void after_relations(v8::TryCatch& trycatch);
-        void before_changesets(v8::TryCatch& trycatch);
-        void after_changesets(v8::TryCatch& trycatch);
-        void done(v8::TryCatch& trycatch);
+        void init(v8::TryCatch& trycatch) const;
+        void before_nodes(v8::TryCatch& trycatch) const;
+        void after_nodes(v8::TryCatch& trycatch) const;
+        void before_ways(v8::TryCatch& trycatch) const;
+        void after_ways(v8::TryCatch& trycatch) const;
+        void before_relations(v8::TryCatch& trycatch) const;
+        void after_relations(v8::TryCatch& trycatch) const;
+        void before_changesets(v8::TryCatch& trycatch) const;
+        void after_changesets(v8::TryCatch& trycatch) const;
+        void done(v8::TryCatch& trycatch) const;
 
         bool node_callback_for_tagged_only;
 

@@ -159,7 +159,7 @@ namespace node_osmium {
     }
 
     template <class TWrapped>
-    void call_callback_with_entity(v8::TryCatch& trycatch, v8::Persistent<v8::Function>& function, const osmium::OSMEntity& entity) {
+    void call_callback_with_entity(v8::TryCatch& trycatch, const v8::Persistent<v8::Function>& function, const osmium::OSMEntity& entity) {
         if (function.IsEmpty()) {
             return;
         }
@@ -171,7 +171,7 @@ namespace node_osmium {
         function->Call(v8::Context::GetCurrent()->Global(), 1, argv);
     }
 
-    void call_callback(v8::TryCatch& trycatch, v8::Persistent<v8::Function>& function) {
+    void call_callback(v8::TryCatch& trycatch, const v8::Persistent<v8::Function>& function) {
         if (function.IsEmpty()) {
             return;
         }
@@ -181,7 +181,7 @@ namespace node_osmium {
         function->Call(v8::Context::GetCurrent()->Global(), 0, argv);
     }
 
-    void JSHandler::dispatch_entity(v8::TryCatch& trycatch, const osmium::OSMEntity& entity) {
+    void JSHandler::dispatch_entity(v8::TryCatch& trycatch, const osmium::OSMEntity& entity) const {
         switch (entity.type()) {
             case osmium::item_type::node:
                 if (!node_cb.IsEmpty() && (!node_callback_for_tagged_only || !static_cast<const osmium::Node&>(entity).tags().empty())) {
@@ -208,43 +208,43 @@ namespace node_osmium {
         }
     }
 
-    void JSHandler::init(v8::TryCatch& trycatch) {
+    void JSHandler::init(v8::TryCatch& trycatch) const {
         call_callback(trycatch, init_cb);
     }
 
-    void JSHandler::before_nodes(v8::TryCatch& trycatch) {
+    void JSHandler::before_nodes(v8::TryCatch& trycatch) const {
         call_callback(trycatch, before_nodes_cb);
     }
 
-    void JSHandler::after_nodes(v8::TryCatch& trycatch) {
+    void JSHandler::after_nodes(v8::TryCatch& trycatch) const {
         call_callback(trycatch, after_nodes_cb);
     }
 
-    void JSHandler::before_ways(v8::TryCatch& trycatch) {
+    void JSHandler::before_ways(v8::TryCatch& trycatch) const {
         call_callback(trycatch, before_ways_cb);
     }
 
-    void JSHandler::after_ways(v8::TryCatch& trycatch) {
+    void JSHandler::after_ways(v8::TryCatch& trycatch) const {
         call_callback(trycatch, after_ways_cb);
     }
 
-    void JSHandler::before_relations(v8::TryCatch& trycatch) {
+    void JSHandler::before_relations(v8::TryCatch& trycatch) const {
         call_callback(trycatch, before_relations_cb);
     }
 
-    void JSHandler::after_relations(v8::TryCatch& trycatch) {
+    void JSHandler::after_relations(v8::TryCatch& trycatch) const {
         call_callback(trycatch, after_relations_cb);
     }
 
-    void JSHandler::before_changesets(v8::TryCatch& trycatch) {
+    void JSHandler::before_changesets(v8::TryCatch& trycatch) const {
         call_callback(trycatch, before_changesets_cb);
     }
 
-    void JSHandler::after_changesets(v8::TryCatch& trycatch) {
+    void JSHandler::after_changesets(v8::TryCatch& trycatch) const {
         call_callback(trycatch, after_changesets_cb);
     }
 
-    void JSHandler::done(v8::TryCatch& trycatch) {
+    void JSHandler::done(v8::TryCatch& trycatch) const {
         call_callback(trycatch, done_cb);
     }
 
