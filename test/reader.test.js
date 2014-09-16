@@ -1,4 +1,5 @@
 var osmium = require('../');
+var fs = require('fs');
 var assert = require('assert');
 
 describe('reader', function() {
@@ -44,6 +45,30 @@ describe('reader', function() {
 
         osmium.apply(reader, handler);
         done();
+    });
+
+    it('should be able to create osmium.File with node.Buffer and read from it', function(done) {
+        var buffer = fs.readFileSync(__dirname + "/data/winthrop.osm");
+        assert.equal(buffer.length, 359898);
+
+        var file = new osmium.File(buffer, "osm");
+        assert.ok(file);
+
+        var reader = new osmium.Reader(file);
+        assert.ok(reader);
+
+        var handler = new osmium.Handler();
+
+        var count = 0;
+        handler.on('node', function(node) {
+            if (count == 0) {
+                assert.equal(node.id, 50031066);
+                done();
+            }
+            count++;
+        });
+
+        osmium.apply(reader, handler);
     });
 
 });

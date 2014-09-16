@@ -5,6 +5,9 @@
 // v8
 #include <v8.h>
 
+// node
+#include <node_buffer.h>
+
 #include "file_wrap.hpp"
 
 namespace node_osmium {
@@ -26,20 +29,12 @@ namespace node_osmium {
             return ThrowException(v8::Exception::Error(v8::String::New("Cannot call constructor as function, you need to use 'new' keyword")));
         }
 
-        if (args.Length() > 2) {
-            return ThrowException(v8::Exception::TypeError(v8::String::New("File is constructed with a maximum of two arguments")));
-        }
-
-        std::string filename;
-        if (args.Length() > 0) {
-            if (!args[0]->IsString()) {
-                return ThrowException(v8::Exception::TypeError(v8::String::New("first argument to File constructor (filename) must be a string")));
-            }
-            filename = *v8::String::Utf8Value(args[0]);
+        if (args.Length() == 0 || args.Length() > 2) {
+            return ThrowException(v8::Exception::TypeError(v8::String::New("File is constructed with one or two arguments: filename or node.Buffer and optional format")));
         }
 
         std::string format;
-        if (args.Length() > 1) {
+        if (args.Length() == 2) {
             if (!args[1]->IsString()) {
                 return ThrowException(v8::Exception::TypeError(v8::String::New("second argument to File constructor (format) must be a string")));
             }
@@ -47,9 +42,19 @@ namespace node_osmium {
         }
 
         try {
-            osmium::io::File file(filename, format);
-            file.check();
+            osmium::io::File file;
 
+            if (args[0]->IsString()) {
+                std::string filename = *v8::String::Utf8Value(args[0]);
+                file = osmium::io::File(filename, format);
+            } else if (args[0]->IsObject() && node::Buffer::HasInstance(args[0]->ToObject())) {
+                auto source = args[0]->ToObject();
+                file = osmium::io::File(node::Buffer::Data(source), node::Buffer::Length(source), format);
+            } else {
+                return ThrowException(v8::Exception::TypeError(v8::String::New("first argument to File constructor must be a string (filename) or node.Buffer")));
+            }
+
+            file.check();
             FileWrap* file_wrap = new FileWrap(std::move(file));
             file_wrap->Wrap(args.This());
             return args.This();
