@@ -33,8 +33,10 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <algorithm>
 #include <cstddef>
 #include <iosfwd>
+#include <iterator>
 
 #include <osmium/osm/types.hpp>
 
@@ -74,6 +76,8 @@ namespace osmium {
              */
             size_t m_buffer_offset { 0 };
 
+            bool m_removed = false;
+
         public:
 
             /**
@@ -107,6 +111,14 @@ namespace osmium {
                 m_buffer_offset = offset;
             }
 
+            bool removed() const {
+                return m_removed;
+            }
+
+            void remove() {
+                m_removed = true;
+            }
+
         }; // class MemberMeta
 
         /**
@@ -122,6 +134,21 @@ namespace osmium {
         inline std::basic_ostream<TChar, TTraits>& operator<<(std::basic_ostream<TChar, TTraits>& out, const MemberMeta& mm) {
             out << "MemberMeta(member_id=" << mm.member_id() << " relation_pos=" << mm.relation_pos() << " member_pos=" << mm.member_pos() << " buffer_offset=" << mm.buffer_offset() << ")";
             return out;
+        }
+
+        /**
+         * Count the number of MemberMeta objects in the iterator range
+         * that are not marked as removed.
+         *
+         * @tparam TIter Iterator that dereferences to a MemberMeta
+         * @param begin Begin of iterator range
+         * @param end End of iterator range
+         */
+        template <class TIter>
+        inline typename std::iterator_traits<TIter>::difference_type count_not_removed(TIter begin, TIter end) {
+            return std::count_if(begin, end, [](MemberMeta& mm) {
+                return !mm.removed();
+            });
         }
 
     } // namespace relations

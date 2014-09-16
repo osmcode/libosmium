@@ -146,7 +146,7 @@ namespace osmium {
                     auto& mmv = m_collector.member_meta(object.type());
                     auto range = std::equal_range(mmv.begin(), mmv.end(), MemberMeta(object.id()));
 
-                    if (range.first == range.second) {
+                    if (osmium::relations::count_not_removed(range.first, range.second) == 0) {
                         // nothing found
                         return false;
                     }
@@ -162,6 +162,9 @@ namespace osmium {
 
                     for (auto it = range.first; it != range.second; ++it) {
                         MemberMeta& member_meta = *it;
+                        if (member_meta.removed()) {
+                            break;
+                        }
                         assert(member_meta.member_id() == object.id());
                         assert(member_meta.relation_pos() < m_collector.m_relations.size());
                         RelationMeta& relation_meta = m_collector.m_relations[member_meta.relation_pos()];
@@ -176,6 +179,11 @@ namespace osmium {
                             m_collector.possibly_purge_removed_members();
                         }
                     }
+
+                    // Remove MemberMetas that were marked as removed.
+                    mmv.erase(std::remove_if(mmv.begin(), mmv.end(), [](MemberMeta& mm) {
+                        return mm.removed();
+                    }), mmv.end());
 
                     return true;
                 }
