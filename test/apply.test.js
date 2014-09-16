@@ -26,8 +26,7 @@ describe('apply', function() {
             count++;
         });
 
-        //var buffer = fs.readFileSync(__dirname + "/data/winthrop.osm");
-        var buffer = fs.readFileSync('/home/sqrt/data.osm.ser');
+        var buffer = fs.readFileSync(__dirname + "/data/winthrop.osm.ser");
 
         osmium.apply(buffer, handler);
     });
