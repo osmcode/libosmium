@@ -48,7 +48,7 @@ var nodes = 0;
 handler.on('node', function(node) {
     ++nodes;
 });
-reader.apply(handler);
+osmium.apply(reader, handler);
 console.log(nodes);
 ```
 
