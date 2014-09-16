@@ -90,6 +90,9 @@ namespace osmium {
 
             std::string m_filename;
 
+            const char* m_buffer;
+            size_t m_buffer_size;
+
             std::string m_format_string;
 
             file_format m_file_format {file_format::unknown};
@@ -113,6 +116,8 @@ namespace osmium {
             explicit File(const std::string& filename = "", const std::string& format = "") :
                 Options(),
                 m_filename(filename),
+                m_buffer(nullptr),
+                m_buffer_size(0),
                 m_format_string(format) {
 
                 // stdin/stdout
@@ -134,6 +139,29 @@ namespace osmium {
                 }
             }
 
+            /**
+             * Create File using buffer pointer and size and type and encoding
+             * from given format specification.
+             *
+             * @param buffer Pointer to buffer with data.
+             * @param size   Size of buffer.
+             * @param format File format as string. See the description of the
+             *               parse_format() function for details.
+             */
+            explicit File(const char* buffer, size_t size, const std::string& format = "") :
+                Options(),
+                m_filename(),
+                m_buffer(buffer),
+                m_buffer_size(size),
+                m_format_string(format) {
+
+                default_settings_for_stdinout();
+
+                if (format != "") {
+                    parse_format(format);
+                }
+            }
+
             File(const File& other) = default;
             File& operator=(const File& other) = default;
 
@@ -141,6 +169,14 @@ namespace osmium {
             File& operator=(File&& other) = default;
 
             ~File() = default;
+
+            const char* buffer() const {
+                return m_buffer;
+            }
+
+            size_t buffer_size() const {
+                return m_buffer_size;
+            }
 
             void parse_format(const std::string& format) {
                 std::vector<std::string> options = detail::split(format, ',');

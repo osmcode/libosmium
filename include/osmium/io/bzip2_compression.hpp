@@ -182,11 +182,64 @@ namespace osmium {
 
         }; // class Bzip2Decompressor
 
+        class Bzip2BufferDecompressor : public Decompressor {
+
+            const char* m_buffer;
+            size_t m_buffer_size;
+            bz_stream m_bzstream;
+
+        public:
+
+            Bzip2BufferDecompressor(const char* buffer, size_t size) :
+                m_buffer(buffer),
+                m_buffer_size(size),
+                m_bzstream() {
+                m_bzstream.next_in = const_cast<char*>(buffer);
+                m_bzstream.avail_in = static_cast_with_assert<unsigned int>(size);
+                int result = BZ2_bzDecompressInit(&m_bzstream, 0, 0);
+                if (result != BZ_OK) {
+                    std::string message("bz2 decompression error: init failed: ");
+                    detail::throw_bzip2_error(message, result);
+                }
+            }
+
+            ~Bzip2BufferDecompressor() override final {
+                BZ2_bzDecompressEnd(&m_bzstream);
+            }
+
+            std::string read() override final {
+                if (!m_buffer) {
+                    return std::string();
+                }
+
+                const size_t buffer_size = 10240;
+                std::string output(buffer_size, '\0');
+                m_bzstream.next_out = const_cast<char*>(output.data());
+                m_bzstream.avail_out = buffer_size;
+                int result = BZ2_bzDecompress(&m_bzstream);
+
+                if (result != BZ_OK) {
+                    m_buffer = nullptr;
+                    m_buffer_size = 0;
+                }
+
+                if (result != BZ_OK && result != BZ_STREAM_END) {
+                    std::string message("bz2 decompression error: decompress failed: ");
+                    detail::throw_bzip2_error(message, result);
+                }
+
+                output.resize(static_cast<unsigned long>(m_bzstream.next_out - output.data()));
+                return output;
+            }
+
+        }; // class Bzip2BufferDecompressor
+
         namespace {
 
             const bool registered_bzip2_compression = osmium::io::CompressionFactory::instance().register_compression(osmium::io::file_compression::bzip2,
                 [](int fd) { return new osmium::io::Bzip2Compressor(fd); },
-                [](int fd) { return new osmium::io::Bzip2Decompressor(fd); }
+                [](int fd) { return new osmium::io::Bzip2Decompressor(fd); },
+                [](const char* buffer, size_t size) { return new osmium::io::Bzip2BufferDecompressor(buffer, size); }
             );
 
         } // anonymous namespace

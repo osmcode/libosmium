@@ -5,6 +5,16 @@
 #include <osmium/visitor.hpp>
 #include <osmium/memory/buffer.hpp>
 
+struct CountHandler : public osmium::handler::Handler {
+
+    int count = 0;
+
+    void node(osmium::Node&) {
+        ++count;
+    }
+
+}; // class CountHandler
+
 TEST_CASE("Reader") {
 
     SECTION("reader can be initialized with file") {
@@ -45,6 +55,60 @@ TEST_CASE("Reader") {
 
         osmium::apply(reader, handler);
         osmium::apply(reader, handler);
+    }
+
+    SECTION("should work with a buffer with uncompressed data") {
+        int fd = osmium::io::detail::open_for_reading("t/io/data.osm");
+        REQUIRE(fd >= 0);
+
+        const size_t buffer_size = 1000;
+        char buffer[buffer_size];
+        ssize_t length = ::read(fd, buffer, buffer_size);
+        REQUIRE(length > 0);
+
+        osmium::io::File file(buffer, static_cast<size_t>(length), "osm");
+        osmium::io::Reader reader(file);
+        CountHandler handler;
+
+        REQUIRE(handler.count == 0);
+        osmium::apply(reader, handler);
+        REQUIRE(handler.count == 1);
+    }
+
+    SECTION("should work with a buffer with gzip-compressed data") {
+        int fd = osmium::io::detail::open_for_reading("t/io/data.osm.gz");
+        REQUIRE(fd >= 0);
+
+        const size_t buffer_size = 1000;
+        char buffer[buffer_size];
+        ssize_t length = ::read(fd, buffer, buffer_size);
+        REQUIRE(length > 0);
+
+        osmium::io::File file(buffer, static_cast<size_t>(length), "osm.gz");
+        osmium::io::Reader reader(file);
+        CountHandler handler;
+
+        REQUIRE(handler.count == 0);
+        osmium::apply(reader, handler);
+        REQUIRE(handler.count == 1);
+    }
+
+    SECTION("should work with a buffer with bzip2-compressed data") {
+        int fd = osmium::io::detail::open_for_reading("t/io/data.osm.bz2");
+        REQUIRE(fd >= 0);
+
+        const size_t buffer_size = 1000;
+        char buffer[buffer_size];
+        ssize_t length = ::read(fd, buffer, buffer_size);
+        REQUIRE(length > 0);
+
+        osmium::io::File file(buffer, static_cast<size_t>(length), "osm.bz2");
+        osmium::io::Reader reader(file);
+        CountHandler handler;
+
+        REQUIRE(handler.count == 0);
+        osmium::apply(reader, handler);
+        REQUIRE(handler.count == 1);
     }
 
 }

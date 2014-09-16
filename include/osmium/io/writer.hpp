@@ -90,6 +90,7 @@ namespace osmium {
                 m_output(osmium::io::detail::OutputFormatFactory::instance().create_output(m_file, m_output_queue)),
                 m_compressor(osmium::io::CompressionFactory::instance().create_compressor(file.compression(), osmium::io::detail::open_for_writing(m_file.filename(), allow_overwrite))),
                 m_write_task(m_output_queue, m_compressor.get()) {
+                assert(!m_file.buffer());
                 m_output->write_header(header);
             }
 

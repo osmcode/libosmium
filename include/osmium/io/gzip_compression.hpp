@@ -172,11 +172,70 @@ namespace osmium {
 
         }; // class GzipDecompressor
 
+        class GzipBufferDecompressor : public Decompressor {
+
+            const char* m_buffer;
+            size_t m_buffer_size;
+            z_stream m_zstream;
+
+        public:
+
+            GzipBufferDecompressor(const char* buffer, size_t size) :
+                m_buffer(buffer),
+                m_buffer_size(size),
+                m_zstream() {
+                m_zstream.next_in = reinterpret_cast<unsigned char*>(const_cast<char*>(buffer));
+                m_zstream.avail_in = static_cast_with_assert<unsigned int>(size);
+                int result = inflateInit2(&m_zstream, MAX_WBITS | 32);
+                if (result != Z_OK) {
+                    std::string message("gzip decompression error: init failed: ");
+                    if (m_zstream.msg) {
+                        message.append(m_zstream.msg);
+                    }
+                    throw osmium::gzip_error(message, result);
+                }
+            }
+
+            ~GzipBufferDecompressor() override final {
+                inflateEnd(&m_zstream);
+            }
+
+            std::string read() override final {
+                if (!m_buffer) {
+                    return std::string();
+                }
+
+                const size_t buffer_size = 10240;
+                std::string output(buffer_size, '\0');
+                m_zstream.next_out = reinterpret_cast<unsigned char*>(const_cast<char*>(output.data()));
+                m_zstream.avail_out = buffer_size;
+                int result = inflate(&m_zstream, Z_SYNC_FLUSH);
+
+                if (result != Z_OK) {
+                    m_buffer = nullptr;
+                    m_buffer_size = 0;
+                }
+
+                if (result != Z_OK && result != Z_STREAM_END) {
+                    std::string message("gzip decompression error: inflate failed: ");
+                    if (m_zstream.msg) {
+                        message.append(m_zstream.msg);
+                    }
+                    throw osmium::gzip_error(message, result);
+                }
+
+                output.resize(static_cast<unsigned long>(m_zstream.next_out - reinterpret_cast<const unsigned char*>(output.data())));
+                return output;
+            }
+
+        }; // class GzipBufferDecompressor
+
         namespace {
 
             const bool registered_gzip_compression = osmium::io::CompressionFactory::instance().register_compression(osmium::io::file_compression::gzip,
                 [](int fd) { return new osmium::io::GzipCompressor(fd); },
-                [](int fd) { return new osmium::io::GzipDecompressor(fd); }
+                [](int fd) { return new osmium::io::GzipDecompressor(fd); },
+                [](const char* buffer, size_t size) { return new osmium::io::GzipBufferDecompressor(buffer, size); }
             );
 
         } // anonymous namespace

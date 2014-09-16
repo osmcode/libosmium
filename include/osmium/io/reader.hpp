@@ -174,7 +174,9 @@ namespace osmium {
                 m_input_done(false),
                 m_childpid(0),
                 m_input_queue(),
-                m_decompressor(osmium::io::CompressionFactory::instance().create_decompressor(file.compression(), open_input_file_or_url(m_file.filename(), &m_childpid))),
+                m_decompressor(m_file.buffer() ?
+                    osmium::io::CompressionFactory::instance().create_decompressor(file.compression(), m_file.buffer(), m_file.buffer_size()) :
+                    osmium::io::CompressionFactory::instance().create_decompressor(file.compression(), open_input_file_or_url(m_file.filename(), &m_childpid))),
                 m_read_task(m_input_queue, m_decompressor.get(), m_input_done),
                 m_input(osmium::io::detail::InputFormatFactory::instance().create_input(m_file, m_read_which_entities, m_input_queue)) {
             }
