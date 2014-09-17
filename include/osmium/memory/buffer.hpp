@@ -267,7 +267,7 @@ namespace osmium {
             /**
              * Mark currently written bytes in the buffer as committed.
              *
-             * @return Last number of committed bytes before this commit.
+             * @returns Last number of committed bytes before this commit.
              */
             size_t commit() {
                 assert(is_aligned());
@@ -287,7 +287,7 @@ namespace osmium {
             /**
              * Clear the buffer.
              *
-             * @return Number of bytes in the buffer before it was cleared.
+             * @returns Number of bytes in the buffer before it was cleared.
              */
             size_t clear() {
                 const size_t committed = m_committed;
@@ -300,7 +300,7 @@ namespace osmium {
              * Get the data in the buffer at the given offset.
              *
              * @tparam T Type we want to the data to be interpreted as.
-             * @return Reference of given type pointing to the data in the buffer.
+             * @returns Reference of given type pointing to the data in the buffer.
              */
             template <class T>
             T& get(const size_t offset) const {
@@ -327,7 +327,7 @@ namespace osmium {
              * * Else the buffer_is_full exception is thrown.
              *
              * @param size Number of bytes to reserve.
-             * @return Pointer to reserved space. Note that this pointer is
+             * @returns Pointer to reserved space. Note that this pointer is
              *         only guaranteed to be valid until the next call to
              *         reserve_space().
              * @throws osmium::buffer_is_full Might be thrown if the buffer is full.
@@ -361,7 +361,7 @@ namespace osmium {
              *
              * @tparam T Class of the item to be copied.
              * @param item Reference to the item to be copied.
-             * @return Reference to newly copied data in the buffer.
+             * @returns Reference to newly copied data in the buffer.
              */
             template <class T>
             T& add_item(const T& item) {

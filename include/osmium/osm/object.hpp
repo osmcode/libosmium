@@ -141,7 +141,7 @@ namespace osmium {
         /**
          * Set ID of this object.
          *
-         * @return Reference to object to make calls chainable.
+         * @returns Reference to object to make calls chainable.
          */
         OSMObject& id(object_id_type id) {
             m_id = id;
@@ -151,7 +151,7 @@ namespace osmium {
         /**
          * Set ID of this object.
          *
-         * @return Reference to object to make calls chainable.
+         * @returns Reference to object to make calls chainable.
          */
         OSMObject& id(const char* id) {
             return this->id(osmium::string_to_object_id(id));
@@ -170,7 +170,7 @@ namespace osmium {
         /**
          * Mark this object as deleted (or not).
          *
-         * @return Reference to object to make calls chainable.
+         * @returns Reference to object to make calls chainable.
          */
         OSMObject& deleted(bool deleted) {
             m_deleted = deleted;
@@ -180,7 +180,7 @@ namespace osmium {
         /**
          * Mark this object as visible (ie not deleted) (or not).
          *
-         * @return Reference to object to make calls chainable.
+         * @returns Reference to object to make calls chainable.
          */
         OSMObject& visible(bool visible) {
             m_deleted = !visible;
@@ -191,7 +191,7 @@ namespace osmium {
          * Mark this object as visible (ie not deleted) or deleted.
          *
          * @param visible Either "true" or "false"
-         * @return Reference to object to make calls chainable.
+         * @returns Reference to object to make calls chainable.
          */
         OSMObject& visible(const char* visible) {
             if (!strcmp("true", visible)) {
@@ -212,7 +212,7 @@ namespace osmium {
         /**
          * Set object version.
          *
-         * @return Reference to object to make calls chainable.
+         * @returns Reference to object to make calls chainable.
          */
         OSMObject& version(object_version_type version) {
             m_version = version;
@@ -222,7 +222,7 @@ namespace osmium {
         /**
          * Set object version.
          *
-         * @return Reference to object to make calls chainable.
+         * @returns Reference to object to make calls chainable.
          */
         OSMObject& version(const char* version) {
             return this->version(string_to_object_version(version));
@@ -236,7 +236,7 @@ namespace osmium {
         /**
          * Set changeset id of this object.
          *
-         * @return Reference to object to make calls chainable.
+         * @returns Reference to object to make calls chainable.
          */
         OSMObject& changeset(changeset_id_type changeset) {
             m_changeset = changeset;
@@ -246,7 +246,7 @@ namespace osmium {
         /**
          * Set changeset id of this object.
          *
-         * @return Reference to object to make calls chainable.
+         * @returns Reference to object to make calls chainable.
          */
         OSMObject& changeset(const char* changeset) {
             return this->changeset(string_to_changeset_id(changeset));
@@ -260,7 +260,7 @@ namespace osmium {
         /**
          * Set user id of this object.
          *
-         * @return Reference to object to make calls chainable.
+         * @returns Reference to object to make calls chainable.
          */
         OSMObject& uid(user_id_type uid) {
             m_uid = uid;
@@ -271,7 +271,7 @@ namespace osmium {
          * Set user id of this object.
          * Sets uid to 0 (anonymous) if the given uid is smaller than 0.
          *
-         * @return Reference to object to make calls chainable.
+         * @returns Reference to object to make calls chainable.
          */
         OSMObject& uid_from_signed(signed_user_id_type uid) {
             m_uid = uid < 0 ? 0 : static_cast<user_id_type>(uid);
@@ -281,7 +281,7 @@ namespace osmium {
         /**
          * Set user id of this object.
          *
-         * @return Reference to object to make calls chainable.
+         * @returns Reference to object to make calls chainable.
          */
         OSMObject& uid(const char* uid) {
             return this->uid_from_signed(string_to_user_id(uid));
@@ -301,7 +301,7 @@ namespace osmium {
          * Set the timestamp when this object last changed.
          *
          * @param timestamp Timestamp
-         * @return Reference to object to make calls chainable.
+         * @returns Reference to object to make calls chainable.
          */
         OSMObject& timestamp(const osmium::Timestamp timestamp) {
             m_timestamp = timestamp;

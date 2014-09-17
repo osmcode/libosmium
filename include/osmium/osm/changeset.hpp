@@ -117,7 +117,7 @@ namespace osmium {
         /**
          * Set ID of this changeset
          *
-         * @return Reference to changeset to make calls chainable.
+         * @returns Reference to changeset to make calls chainable.
          */
         Changeset& id(changeset_id_type id) noexcept {
             m_id = id;
@@ -127,7 +127,7 @@ namespace osmium {
         /**
          * Set ID of this changeset.
          *
-         * @return Reference to object to make calls chainable.
+         * @returns Reference to object to make calls chainable.
          */
         Changeset& id(const char* id) {
             return this->id(osmium::string_to_changeset_id(id));
@@ -141,7 +141,7 @@ namespace osmium {
         /**
          * Set user id.
          *
-         * @return Reference to changeset to make calls chainable.
+         * @returns Reference to changeset to make calls chainable.
          */
         Changeset& uid(user_id_type uid) noexcept {
             m_uid = uid;
@@ -152,7 +152,7 @@ namespace osmium {
          * Set user id.
          * Sets uid to 0 (anonymous) if the given uid is smaller than 0.
          *
-         * @return Reference to changeset to make calls chainable.
+         * @returns Reference to changeset to make calls chainable.
          */
         Changeset& uid_from_signed(signed_user_id_type uid) noexcept {
             m_uid = uid < 0 ? 0 : static_cast<user_id_type>(uid);
@@ -162,7 +162,7 @@ namespace osmium {
         /**
          * Set user id.
          *
-         * @return Reference to changeset to make calls chainable.
+         * @returns Reference to changeset to make calls chainable.
          */
         Changeset& uid(const char* uid) {
             return this->uid_from_signed(string_to_user_id(uid));
@@ -200,7 +200,7 @@ namespace osmium {
          * Set the timestamp when this changeset was created.
          *
          * @param timestamp Timestamp
-         * @return Reference to changeset to make calls chainable.
+         * @returns Reference to changeset to make calls chainable.
          */
         Changeset& created_at(const osmium::Timestamp timestamp) {
             m_created_at = timestamp;
@@ -211,7 +211,7 @@ namespace osmium {
          * Set the timestamp when this changeset was closed.
          *
          * @param timestamp Timestamp
-         * @return Reference to changeset to make calls chainable.
+         * @returns Reference to changeset to make calls chainable.
          */
         Changeset& closed_at(const osmium::Timestamp timestamp) {
             m_closed_at = timestamp;

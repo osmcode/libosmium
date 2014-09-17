@@ -91,7 +91,7 @@ namespace osmium {
              * Note that no constructor is called for any of the objects in this memory!
              *
              * @param size Number of objects of type T that should fit into this memory
-             * @return Pointer to mapped memory
+             * @returns Pointer to mapped memory
              * @throws std::system_error If mmap(2) failed
              */
             static T* map(size_t size) {
@@ -115,7 +115,7 @@ namespace osmium {
              * @param size Number of objects of type T that should fit into this memory
              * @param fd File descriptor
              * @param write True if data should be writable
-             * @return Pointer to mapped memory
+             * @returns Pointer to mapped memory
              * @throws std::system_error If mmap(2) failed
              */
             static T* map(size_t size, int fd, bool write = false) {
@@ -176,7 +176,7 @@ namespace osmium {
              * Get number of objects of type T that would fit into a file.
              *
              * @param fd File descriptor
-             * @return Number of objects of type T in this file
+             * @returns Number of objects of type T in this file
              * @throws std::system_error If fstat(2) call failed
              * @throws std::length_error If size of the file isn't a multiple of sizeof(T)
              */

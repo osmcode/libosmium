@@ -96,7 +96,7 @@ namespace osmium {
              *
              * @param command Command to execute in the child.
              * @param filename Filename to give to command as argument.
-             * @return File descriptor of pipe in the parent.
+             * @returns File descriptor of pipe in the parent.
              * @throws std::system_error if a system call fails.
              */
             static int execute(const std::string& command, const std::string& filename, int* childpid) {
@@ -141,7 +141,7 @@ namespace osmium {
              * are opened by executing the "curl" program (which must be installed)
              * and reading from its output.
              *
-             * @return File descriptor of open file or pipe.
+             * @returns File descriptor of open file or pipe.
              * @throws std::system_error if a system call fails.
              */
             static int open_input_file_or_url(const std::string& filename, int* childpid) {

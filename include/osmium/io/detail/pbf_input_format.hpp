@@ -557,7 +557,7 @@ namespace osmium {
                  * the expected type) and a size field.
                  *
                  * @param expected_type Expected type of data ("OSMHeader" or "OSMData").
-                 * @return Size of the data read from BlobHeader (0 on EOF).
+                 * @returns Size of the data read from BlobHeader (0 on EOF).
                  */
                 int read_blob_header(const char* expected_type) {
                     uint32_t size_in_network_byte_order;
