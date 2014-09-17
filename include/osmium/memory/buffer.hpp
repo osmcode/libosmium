@@ -133,7 +133,7 @@ namespace osmium {
              *
              * @param data A pointer to some already initialized data.
              * @param size The size of the initialized data.
-             * @exception std::invalid_argument When the size isn't a multiple of the alignment.
+             * @throws std::invalid_argument When the size isn't a multiple of the alignment.
              */
             explicit Buffer(unsigned char* data, size_t size) :
                 m_memory(),
@@ -153,7 +153,7 @@ namespace osmium {
              * @param data A pointer to some (possibly initialized) data.
              * @param capacity The size of the memory for this buffer.
              * @param committed The size of the initialized data. If this is 0, the buffer startes out empty.
-             * @exception std::invalid_argument When the capacity or committed isn't a multiple of the alignment.
+             * @throws std::invalid_argument When the capacity or committed isn't a multiple of the alignment.
              */
             explicit Buffer(unsigned char* data, size_t capacity, size_t committed) :
                 m_memory(),
@@ -330,7 +330,7 @@ namespace osmium {
              * @return Pointer to reserved space. Note that this pointer is
              *         only guaranteed to be valid until the next call to
              *         reserve_space().
-             * @throw osmium::buffer_is_full Might be thrown if the buffer is full.
+             * @throws osmium::buffer_is_full Might be thrown if the buffer is full.
              */
             unsigned char* reserve_space(const size_t size) {
                 if (m_written + size > m_capacity) {

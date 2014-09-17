@@ -45,7 +45,7 @@ namespace osmium {
          * Create and open a temporary file. It is removed after opening.
          *
          * @return File descriptor of temporary file.
-         * @exception std::system_error if something went wrong.
+         * @throws std::system_error if something went wrong.
          */
         inline int create_tmp_file() {
             FILE* file = ::tmpfile();
