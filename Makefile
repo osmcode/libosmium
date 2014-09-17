@@ -6,6 +6,8 @@ INCLUDE_FILES := $(shell find src -name \*.hpp | sort)
 IWYU_REPORT_FILES := $(subst src,check_reports,$(INCLUDE_FILES:.hpp=.iwyu))
 INCLUDES_REPORT_FILES := $(subst src,check_reports,$(INCLUDE_FILES:.hpp=.compile))
 
+DEMOS := $(shell find demo -mindepth 1 -maxdepth 1 -type d)
+
 all: osmium.node
 
 ./node_modules/.bin/node-gyp:
@@ -20,6 +22,7 @@ osmium.node: Makefile ./build
 clean:
 	rm -rf ./build ./check_reports lib/binding
 	rm -f lib/osmium.node includes.log iwyu.log
+	rm -rf node_modules demo/*/node_modules
 
 rebuild:
 	@make clean
@@ -32,6 +35,16 @@ indent:
 	astyle --style=java --indent-namespaces --indent-switches --pad-header --lineend=linux --suffix=none src/\*pp
 
 check: test
+
+# Install all dependencies and run the demos. Because the demos usually need
+# one or more arguments that are not supplied, they dont't do much though.
+demos:
+	for demo in $(DEMOS); do \
+	    cd $${demo}; \
+	    npm install; \
+        ./index.js; \
+        cd ../..; \
+    done
 
 # This will try to compile include files on their own to detect missing
 # include directives and other dependency-related problems. Note that if this
