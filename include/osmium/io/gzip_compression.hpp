@@ -49,8 +49,8 @@ DEALINGS IN THE SOFTWARE.
 namespace osmium {
 
     /**
-     * Exception thrown when there are problems gzip compressing or
-     * uncompressing files.
+     * Exception thrown when there are problems compressing or
+     * decompressing gzip files.
      */
     struct gzip_error : public std::runtime_error {
 
@@ -67,22 +67,26 @@ namespace osmium {
 
     namespace io {
 
-        class GzipCompressor : public Compressor {
+        namespace detail {
 
-            gzFile m_gzfile;
-
-            OSMIUM_NORETURN inline void throw_gzip_error(const char* msg, int zlib_error=0) {
-                std::string error("gzip compress error: ");
+            OSMIUM_NORETURN inline void throw_gzip_error(gzFile gzfile, const char* msg, int zlib_error=0) {
+                std::string error("gzip error: ");
                 error += msg;
                 error += ": ";
                 int errnum = zlib_error;
                 if (zlib_error) {
                     error += std::to_string(zlib_error);
                 } else {
-                    error += ::gzerror(m_gzfile, &errnum);
+                    error += ::gzerror(gzfile, &errnum);
                 }
                 throw osmium::gzip_error(error, errnum);
             }
+
+        } // namespace detail
+
+        class GzipCompressor : public Compressor {
+
+            gzFile m_gzfile;
 
         public:
 
@@ -90,7 +94,7 @@ namespace osmium {
                 Compressor(),
                 m_gzfile(::gzdopen(fd, "w")) {
                 if (!m_gzfile) {
-                    throw_gzip_error("initialization failed");
+                    detail::throw_gzip_error(m_gzfile, "write initialization failed");
                 }
             }
 
@@ -102,7 +106,7 @@ namespace osmium {
                 if (!data.empty()) {
                     int nwrite = ::gzwrite(m_gzfile, data.data(), static_cast_with_assert<unsigned int>(data.size()));
                     if (nwrite == 0) {
-                        throw_gzip_error("write failed");
+                        detail::throw_gzip_error(m_gzfile, "write failed");
                     }
                 }
             }
@@ -112,7 +116,7 @@ namespace osmium {
                     int result = ::gzclose(m_gzfile);
                     m_gzfile = nullptr;
                     if (result != Z_OK) {
-                        throw_gzip_error("close failed", result);
+                        detail::throw_gzip_error(m_gzfile, "write close failed", result);
                     }
                 }
             }
@@ -123,26 +127,13 @@ namespace osmium {
 
             gzFile m_gzfile;
 
-            OSMIUM_NORETURN inline void throw_gzip_error(const char* msg, int zlib_error=0) {
-                std::string error("gzip decompress error: ");
-                error += msg;
-                error += ": ";
-                int errnum = zlib_error;
-                if (zlib_error) {
-                    error += std::to_string(zlib_error);
-                } else {
-                    error += ::gzerror(m_gzfile, &errnum);
-                }
-                throw osmium::gzip_error(error, errnum);
-            }
-
         public:
 
             explicit GzipDecompressor(int fd) :
                 Decompressor(),
                 m_gzfile(::gzdopen(fd, "r")) {
                 if (!m_gzfile) {
-                    throw_gzip_error("initialization failed");
+                    detail::throw_gzip_error(m_gzfile, "read initialization failed");
                 }
             }
 
@@ -154,7 +145,7 @@ namespace osmium {
                 std::string buffer(osmium::io::Decompressor::input_buffer_size, '\0');
                 int nread = ::gzread(m_gzfile, const_cast<char*>(buffer.data()), static_cast_with_assert<unsigned int>(buffer.size()));
                 if (nread < 0) {
-                    throw_gzip_error("read failed");
+                    detail::throw_gzip_error(m_gzfile, "read failed");
                 }
                 buffer.resize(static_cast<std::string::size_type>(nread));
                 return buffer;
@@ -165,7 +156,7 @@ namespace osmium {
                     int result = ::gzclose(m_gzfile);
                     m_gzfile = nullptr;
                     if (result != Z_OK) {
-                        throw_gzip_error("close failed", result);
+                        detail::throw_gzip_error(m_gzfile, "read close failed", result);
                     }
                 }
             }
@@ -188,7 +179,7 @@ namespace osmium {
                 m_zstream.avail_in = static_cast_with_assert<unsigned int>(size);
                 int result = inflateInit2(&m_zstream, MAX_WBITS | 32);
                 if (result != Z_OK) {
-                    std::string message("gzip decompression error: init failed: ");
+                    std::string message("gzip error: decompression init failed: ");
                     if (m_zstream.msg) {
                         message.append(m_zstream.msg);
                     }
@@ -217,7 +208,7 @@ namespace osmium {
                 }
 
                 if (result != Z_OK && result != Z_STREAM_END) {
-                    std::string message("gzip decompression error: inflate failed: ");
+                    std::string message("gzip error: inflate failed: ");
                     if (m_zstream.msg) {
                         message.append(m_zstream.msg);
                     }
