@@ -64,5 +64,5 @@ handler.on('done', function() {
 });
 
 var reader = new osmium.Reader(input_filename);
-reader.apply(handler);
+osmium.apply(reader, handler);
 

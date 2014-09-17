@@ -35,7 +35,7 @@ handler.on('relation', function(relation) {
 });
 
 var reader = new osmium.Reader(input_filename);
-reader.apply(handler);
+osmium.apply(reader, handler);
 console.log("first pass done");
 
 // SECOND PASS
@@ -52,7 +52,7 @@ handler.on('relation', function(relation) {
 });
 
 reader = new osmium.Reader(input_filename);
-reader.apply(handler);
+osmium.apply(reader, handler);
 console.log("second pass done");
 
 // THIRD PASS
@@ -82,7 +82,7 @@ geojsonOut.pipe(fileOut);
 var location_handler = new osmium.LocationHandler();
 
 reader = new osmium.Reader(input_filename);
-reader.apply(location_handler, handler);
+osmium.apply(reader, location_handler, handler);
 geojsonOut.end();
 console.log("third pass done");
 

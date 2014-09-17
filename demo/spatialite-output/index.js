@@ -71,7 +71,7 @@ child.on('exit', function(code, signal) {
 
     var location_handler = new osmium.LocationHandler();
     var reader = new osmium.Reader(input_filename);
-    reader.apply(location_handler, handler);
+    osmium.apply(reader, location_handler, handler);
     reader.close();
 
 });

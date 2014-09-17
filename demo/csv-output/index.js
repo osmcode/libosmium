@@ -38,6 +38,6 @@ handler.on('done', function() {
 
 var reader = new osmium.Reader(input_filename);
 var location_handler = new osmium.LocationHandler();
-reader.apply(location_handler, handler);
+osmium.apply(reader, location_handler, handler);
 reader.close();
 

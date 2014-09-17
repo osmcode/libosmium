@@ -47,4 +47,4 @@ handler.on('done',function() {
     geojsonOut.end();
 });
  
-reader.apply(handler);
+osmium.apply(reader, handler);
