@@ -35,4 +35,58 @@ describe('location handler', function() {
         done();
     });
 
+    it('should throw on missing location if ignoreErrors is not set', function(done) {
+        var reader = new osmium.Reader(__dirname + "/data/missing-node.osm", { 'node': true, 'way': true });
+        var location_handler = new osmium.LocationHandler();
+        var handler = new osmium.Handler();
+
+        assert.throws(function() {
+            osmium.apply(reader, location_handler, handler);
+        }, Error);
+        done();
+    });
+
+    it('should throw in wkb/wkt/node_coordinates function if ignoreErrors is set', function(done) {
+        var reader = new osmium.Reader(__dirname + "/data/missing-node.osm", { 'node': true, 'way': true });
+        var location_handler = new osmium.LocationHandler();
+        location_handler.ignoreErrors();
+
+        var handler = new osmium.Handler();
+
+        handler.on('way', function(way) {
+            assert.equal(way.id, 10);
+            assert.throws(function() {
+                way.wkb();
+            }, Error);
+            assert.throws(function() {
+                way.wkt();
+            }, Error);
+            assert.throws(function() {
+                way.node_coordinates();
+            }, Error);
+            done();
+        });
+
+        osmium.apply(reader, location_handler, handler);
+    });
+
+    it('should return undefined for node_coordinates(n) function if ignoreErrors is set', function(done) {
+        var reader = new osmium.Reader(__dirname + "/data/missing-node.osm", { 'node': true, 'way': true });
+        var location_handler = new osmium.LocationHandler();
+        location_handler.ignoreErrors();
+
+        var handler = new osmium.Handler();
+
+        handler.on('way', function(way) {
+            assert.equal(way.id, 10);
+            assert.deepEqual(way.node_refs(), [1, 2]);
+            assert.deepEqual(way.node_coordinates(0).lon, 1.02);
+            assert.deepEqual(way.node_coordinates(0).lat, 2.03);
+            assert.deepEqual(way.node_coordinates(1), undefined);
+            done();
+        });
+
+        osmium.apply(reader, location_handler, handler);
+    });
+
 });

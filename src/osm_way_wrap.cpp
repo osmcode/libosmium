@@ -53,8 +53,8 @@ namespace node_osmium {
 #else
             return scope.Close(node::Buffer::New(const_cast<char*>(wkb.data()), wkb.size())->handle_);
 #endif
-        } catch (osmium::geometry_error&) {
-            return scope.Close(v8::Undefined());
+        } catch (std::runtime_error& e) {
+            return ThrowException(v8::Exception::Error(v8::String::New(e.what())));
         }
     }
 
@@ -64,8 +64,8 @@ namespace node_osmium {
         try {
             std::string wkt { wkt_factory.create_linestring(wrapped(args.This())) };
             return scope.Close(v8::String::New(wkt.c_str()));
-        } catch (osmium::geometry_error&) {
-            return scope.Close(v8::Undefined());
+        } catch (std::runtime_error& e) {
+            return ThrowException(v8::Exception::Error(v8::String::New(e.what())));
         }
     }
 
@@ -115,15 +115,19 @@ namespace node_osmium {
 
         switch (args.Length()) {
             case 0: {
-                v8::Local<v8::Array> nodes = v8::Array::New(way.nodes().size());
-                int i = 0;
-                for (const auto& node_ref : way.nodes()) {
-                    const osmium::Location location = node_ref.location();
-                    v8::Local<v8::Value> argv[2] = { v8::Number::New(location.lon()), v8::Number::New(location.lat()) };
-                    nodes->Set(i, v8::Local<v8::Function>::Cast(cf)->NewInstance(2, argv));
-                    ++i;
+                try {
+                    v8::Local<v8::Array> nodes = v8::Array::New(way.nodes().size());
+                    int i = 0;
+                    for (const auto& node_ref : way.nodes()) {
+                        const osmium::Location location = node_ref.location();
+                        v8::Local<v8::Value> argv[2] = { v8::Number::New(location.lon()), v8::Number::New(location.lat()) };
+                        nodes->Set(i, v8::Local<v8::Function>::Cast(cf)->NewInstance(2, argv));
+                        ++i;
+                    }
+                    return scope.Close(nodes);
+                } catch (osmium::invalid_location&) {
+                    return ThrowException(v8::Exception::TypeError(v8::String::New("location of at least one of the nodes in this way not set")));
                 }
-                return scope.Close(nodes);
             }
             case 1: {
                 if (!args[0]->IsNumber()) {
@@ -132,8 +136,12 @@ namespace node_osmium {
                 int n = static_cast<int>(args[0]->ToNumber()->Value());
                 if (n >= 0 && n < static_cast<int>(way.nodes().size())) {
                     const osmium::Location location = way.nodes()[n].location();
-                    v8::Local<v8::Value> argv[2] = { v8::Number::New(location.lon()), v8::Number::New(location.lat()) };
-                    return scope.Close(v8::Local<v8::Function>::Cast(cf)->NewInstance(2, argv));
+                    if (location.valid()) {
+                        v8::Local<v8::Value> argv[2] = { v8::Number::New(location.lon()), v8::Number::New(location.lat()) };
+                        return scope.Close(v8::Local<v8::Function>::Cast(cf)->NewInstance(2, argv));
+                    } else {
+                        return scope.Close(v8::Undefined());
+                    }
                 } else {
                     return ThrowException(v8::Exception::RangeError(v8::String::New("argument to node_coordinates() out of range")));
                 }

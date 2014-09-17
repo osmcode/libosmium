@@ -70,20 +70,27 @@ namespace node_osmium {
     v8::Handle<v8::Value> OSMNodeWrap::wkb(const v8::Arguments& args) {
         v8::HandleScope scope;
 
-        std::string wkb { wkb_factory.create_point(wrapped(args.This())) };
+        try {
+            std::string wkb { wkb_factory.create_point(wrapped(args.This())) };
 #if NODE_VERSION_AT_LEAST(0, 10, 0)
-        return scope.Close(node::Buffer::New(wkb.data(), wkb.size())->handle_);
+            return scope.Close(node::Buffer::New(wkb.data(), wkb.size())->handle_);
 #else
-        return scope.Close(node::Buffer::New(const_cast<char*>(wkb.data()), wkb.size())->handle_);
+            return scope.Close(node::Buffer::New(const_cast<char*>(wkb.data()), wkb.size())->handle_);
 #endif
+        } catch (std::runtime_error& e) {
+            return ThrowException(v8::Exception::Error(v8::String::New(e.what())));
+        }
     }
 
     v8::Handle<v8::Value> OSMNodeWrap::wkt(const v8::Arguments& args) {
         v8::HandleScope scope;
 
-        std::string wkt { wkt_factory.create_point(wrapped(args.This())) };
-
-        return scope.Close(v8::String::New(wkt.c_str()));
+        try {
+            std::string wkt { wkt_factory.create_point(wrapped(args.This())) };
+            return scope.Close(v8::String::New(wkt.c_str()));
+        } catch (std::runtime_error& e) {
+            return ThrowException(v8::Exception::Error(v8::String::New(e.what())));
+        }
     }
 
 } // namespace node_osmium
