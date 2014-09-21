@@ -14,12 +14,12 @@ SECTION("node_builder") {
         {{"amenity", "pub"}, {"name", "OSM BAR"}},
         {3.5, 4.7});
 
-    node.id(17)
-        .version(3)
-        .visible(true)
-        .changeset(333)
-        .uid(21)
-        .timestamp(123);
+    node.set_id(17)
+        .set_version(3)
+        .set_visible(true)
+        .set_changeset(333)
+        .set_uid(21)
+        .set_timestamp(123);
 
     REQUIRE(17l == node.id());
     REQUIRE(17ul == node.positive_id());
@@ -33,7 +33,7 @@ SECTION("node_builder") {
     REQUIRE(osmium::Location(3.5, 4.7) == node.location());
     REQUIRE(2 == node.tags().size());
 
-    node.visible(false);
+    node.set_visible(false);
     REQUIRE(false == node.visible());
     REQUIRE(true == node.deleted());
 }
@@ -63,11 +63,11 @@ SECTION("set_node_attributes_from_string") {
         {{"amenity", "pub"}, {"name", "OSM BAR"}},
         {3.5, 4.7});
 
-    node.id("-17")
-        .version("3")
-        .visible(true)
-        .changeset("333")
-        .uid("21");
+    node.set_id("-17")
+        .set_version("3")
+        .set_visible(true)
+        .set_changeset("333")
+        .set_uid("21");
 
     REQUIRE(-17l == node.id());
     REQUIRE(17ul == node.positive_id());
@@ -83,12 +83,12 @@ SECTION("large_id") {
     osmium::Node& node = buffer_add_node(buffer, "", {}, osmium::Location{});
 
     int64_t id = 3000000000l;
-    node.id(id);
+    node.set_id(id);
 
     REQUIRE(id == node.id());
     REQUIRE(static_cast<osmium::unsigned_object_id_type>(id) == node.positive_id());
 
-    node.id(-id);
+    node.set_id(-id);
     REQUIRE(-id == node.id());
     REQUIRE(static_cast<osmium::unsigned_object_id_type>(id) == node.positive_id());
 }

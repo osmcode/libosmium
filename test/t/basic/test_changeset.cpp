@@ -13,11 +13,11 @@ SECTION("changeset_builder") {
         "user",
         {{"comment", "foo"}});
 
-    cs1.id(42)
-       .created_at(100)
-       .closed_at(200)
-       .num_changes(7)
-       .uid(9);
+    cs1.set_id(42)
+       .set_created_at(100)
+       .set_closed_at(200)
+       .set_num_changes(7)
+       .set_uid(9);
 
     REQUIRE(42 == cs1.id());
     REQUIRE(9 == cs1.uid());
@@ -32,10 +32,10 @@ SECTION("changeset_builder") {
         "user",
         {{"comment", "foo"}, {"foo", "bar"}});
 
-    cs2.id(43)
-       .created_at(120)
-       .num_changes(21)
-       .uid(9);
+    cs2.set_id(43)
+       .set_created_at(120)
+       .set_num_changes(21)
+       .set_uid(9);
 
     REQUIRE(43 == cs2.id());
     REQUIRE(9 == cs2.uid());

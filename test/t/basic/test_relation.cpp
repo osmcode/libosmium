@@ -19,12 +19,12 @@ SECTION("relation_builder") {
             std::make_tuple('w', 3, "outer")
         });
 
-    relation.id(17)
-        .version(3)
-        .visible(true)
-        .changeset(333)
-        .uid(21)
-        .timestamp(123);
+    relation.set_id(17)
+        .set_version(3)
+        .set_visible(true)
+        .set_changeset(333)
+        .set_uid(21)
+        .set_timestamp(123);
 
     REQUIRE(17 == relation.id());
     REQUIRE(3 == relation.version());

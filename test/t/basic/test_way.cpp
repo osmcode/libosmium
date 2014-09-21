@@ -15,12 +15,12 @@ SECTION("way_builder") {
         {{"highway", "residential"}, {"name", "High Street"}},
         {1, 3, 2});
 
-    way.id(17)
-        .version(3)
-        .visible(true)
-        .changeset(333)
-        .uid(21)
-        .timestamp(123);
+    way.set_id(17)
+        .set_version(3)
+        .set_visible(true)
+        .set_changeset(333)
+        .set_uid(21)
+        .set_timestamp(123);
 
     REQUIRE(17 == way.id());
     REQUIRE(3 == way.version());

@@ -143,7 +143,7 @@ namespace osmium {
          *
          * @returns Reference to object to make calls chainable.
          */
-        OSMObject& id(object_id_type id) {
+        OSMObject& set_id(object_id_type id) {
             m_id = id;
             return *this;
         }
@@ -153,8 +153,8 @@ namespace osmium {
          *
          * @returns Reference to object to make calls chainable.
          */
-        OSMObject& id(const char* id) {
-            return this->id(osmium::string_to_object_id(id));
+        OSMObject& set_id(const char* id) {
+            return this->set_id(osmium::string_to_object_id(id));
         }
 
         /// Is this object marked as deleted?
@@ -172,7 +172,7 @@ namespace osmium {
          *
          * @returns Reference to object to make calls chainable.
          */
-        OSMObject& deleted(bool deleted) {
+        OSMObject& set_deleted(bool deleted) {
             m_deleted = deleted;
             return *this;
         }
@@ -182,7 +182,7 @@ namespace osmium {
          *
          * @returns Reference to object to make calls chainable.
          */
-        OSMObject& visible(bool visible) {
+        OSMObject& set_visible(bool visible) {
             m_deleted = !visible;
             return *this;
         }
@@ -193,11 +193,11 @@ namespace osmium {
          * @param visible Either "true" or "false"
          * @returns Reference to object to make calls chainable.
          */
-        OSMObject& visible(const char* visible) {
+        OSMObject& set_visible(const char* visible) {
             if (!strcmp("true", visible)) {
-                this->visible(true);
+                this->set_visible(true);
             } else if (!strcmp("false", visible)) {
-                this->visible(false);
+                this->set_visible(false);
             } else {
                 throw std::invalid_argument("Unknown value for visible attribute (allowed is 'true' or 'false')");
             }
@@ -214,7 +214,7 @@ namespace osmium {
          *
          * @returns Reference to object to make calls chainable.
          */
-        OSMObject& version(object_version_type version) {
+        OSMObject& set_version(object_version_type version) {
             m_version = version;
             return *this;
         }
@@ -224,8 +224,8 @@ namespace osmium {
          *
          * @returns Reference to object to make calls chainable.
          */
-        OSMObject& version(const char* version) {
-            return this->version(string_to_object_version(version));
+        OSMObject& set_version(const char* version) {
+            return this->set_version(string_to_object_version(version));
         }
 
         /// Get changeset id of this object.
@@ -238,7 +238,7 @@ namespace osmium {
          *
          * @returns Reference to object to make calls chainable.
          */
-        OSMObject& changeset(changeset_id_type changeset) {
+        OSMObject& set_changeset(changeset_id_type changeset) {
             m_changeset = changeset;
             return *this;
         }
@@ -248,8 +248,8 @@ namespace osmium {
          *
          * @returns Reference to object to make calls chainable.
          */
-        OSMObject& changeset(const char* changeset) {
-            return this->changeset(string_to_changeset_id(changeset));
+        OSMObject& set_changeset(const char* changeset) {
+            return this->set_changeset(string_to_changeset_id(changeset));
         }
 
         /// Get user id of this object.
@@ -262,7 +262,7 @@ namespace osmium {
          *
          * @returns Reference to object to make calls chainable.
          */
-        OSMObject& uid(user_id_type uid) {
+        OSMObject& set_uid(user_id_type uid) {
             m_uid = uid;
             return *this;
         }
@@ -273,7 +273,7 @@ namespace osmium {
          *
          * @returns Reference to object to make calls chainable.
          */
-        OSMObject& uid_from_signed(signed_user_id_type uid) {
+        OSMObject& set_uid_from_signed(signed_user_id_type uid) {
             m_uid = uid < 0 ? 0 : static_cast<user_id_type>(uid);
             return *this;
         }
@@ -283,8 +283,8 @@ namespace osmium {
          *
          * @returns Reference to object to make calls chainable.
          */
-        OSMObject& uid(const char* uid) {
-            return this->uid_from_signed(string_to_user_id(uid));
+        OSMObject& set_uid(const char* uid) {
+            return this->set_uid_from_signed(string_to_user_id(uid));
         }
 
         /// Is this user anonymous?
@@ -303,7 +303,7 @@ namespace osmium {
          * @param timestamp Timestamp
          * @returns Reference to object to make calls chainable.
          */
-        OSMObject& timestamp(const osmium::Timestamp timestamp) {
+        OSMObject& set_timestamp(const osmium::Timestamp timestamp) {
             m_timestamp = timestamp;
             return *this;
         }
@@ -341,17 +341,17 @@ namespace osmium {
          */
         void set_attribute(const char* attr, const char* value) {
             if (!strcmp(attr, "id")) {
-                id(value);
+                set_id(value);
             } else if (!strcmp(attr, "version")) {
-                version(value);
+                set_version(value);
             } else if (!strcmp(attr, "changeset")) {
-                changeset(value);
+                set_changeset(value);
             } else if (!strcmp(attr, "timestamp")) {
-                timestamp(osmium::Timestamp(value));
+                set_timestamp(osmium::Timestamp(value));
             } else if (!strcmp(attr, "uid")) {
-                uid(value);
+                set_uid(value);
             } else if (!strcmp(attr, "visible")) {
-                visible(value);
+                set_visible(value);
             }
         }
 

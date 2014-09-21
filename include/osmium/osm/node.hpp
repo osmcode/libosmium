@@ -66,7 +66,7 @@ namespace osmium {
             return m_location;
         }
 
-        Node& location(const osmium::Location& location) {
+        Node& set_location(const osmium::Location& location) {
             m_location = location;
             return *this;
         }

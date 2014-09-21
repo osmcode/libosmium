@@ -340,13 +340,13 @@ namespace osmium {
                     const char* user = empty;
 
                     if (m_in_delete_section) {
-                        object.visible(false);
+                        object.set_visible(false);
                     }
                     for (int count = 0; attrs[count]; count += 2) {
                         if (!strcmp(attrs[count], "lon")) {
-                            static_cast<osmium::Node&>(object).location().lon(std::atof(attrs[count+1])); // XXX doesn't detect garbage after the number
+                            static_cast<osmium::Node&>(object).location().set_lon(std::atof(attrs[count+1])); // XXX doesn't detect garbage after the number
                         } else if (!strcmp(attrs[count], "lat")) {
-                            static_cast<osmium::Node&>(object).location().lat(std::atof(attrs[count+1])); // XXX doesn't detect garbage after the number
+                            static_cast<osmium::Node&>(object).location().set_lat(std::atof(attrs[count+1])); // XXX doesn't detect garbage after the number
                         } else if (!strcmp(attrs[count], "user")) {
                             user = attrs[count+1];
                         } else {
@@ -366,13 +366,13 @@ namespace osmium {
                     osmium::Location max;
                     for (int count = 0; attrs[count]; count += 2) {
                         if (!strcmp(attrs[count], "min_lon")) {
-                            min.lon(atof(attrs[count+1]));
+                            min.set_lon(atof(attrs[count+1]));
                         } else if (!strcmp(attrs[count], "min_lat")) {
-                            min.lat(atof(attrs[count+1]));
+                            min.set_lat(atof(attrs[count+1]));
                         } else if (!strcmp(attrs[count], "max_lon")) {
-                            max.lon(atof(attrs[count+1]));
+                            max.set_lon(atof(attrs[count+1]));
                         } else if (!strcmp(attrs[count], "max_lat")) {
-                            max.lat(atof(attrs[count+1]));
+                            max.set_lat(atof(attrs[count+1]));
                         } else if (!strcmp(attrs[count], "user")) {
                             user = attrs[count+1];
                         } else {
@@ -480,13 +480,13 @@ namespace osmium {
                                 osmium::Location max;
                                 for (int count = 0; attrs[count]; count += 2) {
                                     if (!strcmp(attrs[count], "minlon")) {
-                                        min.lon(atof(attrs[count+1]));
+                                        min.set_lon(atof(attrs[count+1]));
                                     } else if (!strcmp(attrs[count], "minlat")) {
-                                        min.lat(atof(attrs[count+1]));
+                                        min.set_lat(atof(attrs[count+1]));
                                     } else if (!strcmp(attrs[count], "maxlon")) {
-                                        max.lon(atof(attrs[count+1]));
+                                        max.set_lon(atof(attrs[count+1]));
                                     } else if (!strcmp(attrs[count], "maxlat")) {
-                                        max.lat(atof(attrs[count+1]));
+                                        max.set_lat(atof(attrs[count+1]));
                                     }
                                 }
                                 osmium::Box box;

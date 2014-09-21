@@ -119,7 +119,7 @@ namespace osmium {
          *
          * @returns Reference to changeset to make calls chainable.
          */
-        Changeset& id(changeset_id_type id) noexcept {
+        Changeset& set_id(changeset_id_type id) noexcept {
             m_id = id;
             return *this;
         }
@@ -129,8 +129,8 @@ namespace osmium {
          *
          * @returns Reference to object to make calls chainable.
          */
-        Changeset& id(const char* id) {
-            return this->id(osmium::string_to_changeset_id(id));
+        Changeset& set_id(const char* id) {
+            return this->set_id(osmium::string_to_changeset_id(id));
         }
 
         /// Get user id.
@@ -143,7 +143,7 @@ namespace osmium {
          *
          * @returns Reference to changeset to make calls chainable.
          */
-        Changeset& uid(user_id_type uid) noexcept {
+        Changeset& set_uid(user_id_type uid) noexcept {
             m_uid = uid;
             return *this;
         }
@@ -154,7 +154,7 @@ namespace osmium {
          *
          * @returns Reference to changeset to make calls chainable.
          */
-        Changeset& uid_from_signed(signed_user_id_type uid) noexcept {
+        Changeset& set_uid_from_signed(signed_user_id_type uid) noexcept {
             m_uid = uid < 0 ? 0 : static_cast<user_id_type>(uid);
             return *this;
         }
@@ -164,8 +164,8 @@ namespace osmium {
          *
          * @returns Reference to changeset to make calls chainable.
          */
-        Changeset& uid(const char* uid) {
-            return this->uid_from_signed(string_to_user_id(uid));
+        Changeset& set_uid(const char* uid) {
+            return this->set_uid_from_signed(string_to_user_id(uid));
         }
 
         /// Is this user anonymous?
@@ -202,7 +202,7 @@ namespace osmium {
          * @param timestamp Timestamp
          * @returns Reference to changeset to make calls chainable.
          */
-        Changeset& created_at(const osmium::Timestamp timestamp) {
+        Changeset& set_created_at(const osmium::Timestamp timestamp) {
             m_created_at = timestamp;
             return *this;
         }
@@ -213,7 +213,7 @@ namespace osmium {
          * @param timestamp Timestamp
          * @returns Reference to changeset to make calls chainable.
          */
-        Changeset& closed_at(const osmium::Timestamp timestamp) {
+        Changeset& set_closed_at(const osmium::Timestamp timestamp) {
             m_closed_at = timestamp;
             return *this;
         }
@@ -222,13 +222,13 @@ namespace osmium {
             return m_num_changes;
         }
 
-        Changeset& num_changes(num_changes_type num_changes) noexcept {
+        Changeset& set_num_changes(num_changes_type num_changes) noexcept {
             m_num_changes = num_changes;
             return *this;
         }
 
-        Changeset& num_changes(const char* num_changes) noexcept {
-            return this->num_changes(osmium::string_to_num_changes(num_changes));
+        Changeset& set_num_changes(const char* num_changes) noexcept {
+            return this->set_num_changes(osmium::string_to_num_changes(num_changes));
         }
 
         osmium::Box& bounds() noexcept {
@@ -262,15 +262,15 @@ namespace osmium {
          */
         void set_attribute(const char* attr, const char* value) {
             if (!strcmp(attr, "id")) {
-                id(value);
+                set_id(value);
             } else if (!strcmp(attr, "num_changes")) {
-                num_changes(value);
+                set_num_changes(value);
             } else if (!strcmp(attr, "created_at")) {
-                created_at(osmium::Timestamp(value));
+                set_created_at(osmium::Timestamp(value));
             } else if (!strcmp(attr, "closed_at")) {
-                closed_at(osmium::Timestamp(value));
+                set_closed_at(osmium::Timestamp(value));
             } else if (!strcmp(attr, "uid")) {
-                uid(value);
+                set_uid(value);
             }
         }
 

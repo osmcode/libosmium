@@ -168,12 +168,12 @@ namespace osmium {
             return m_y;
         }
 
-        Location& x(const int32_t x) noexcept {
+        Location& set_x(const int32_t x) noexcept {
             m_x = x;
             return *this;
         }
 
-        Location& y(const int32_t y) noexcept {
+        Location& set_y(const int32_t y) noexcept {
             m_y = y;
             return *this;
         }
@@ -216,12 +216,12 @@ namespace osmium {
             return fix_to_double(m_y);
         }
 
-        Location& lon(double lon) noexcept {
+        Location& set_lon(double lon) noexcept {
             m_x = double_to_fix(lon);
             return *this;
         }
 
-        Location& lat(double lat) noexcept {
+        Location& set_lat(double lat) noexcept {
             m_y = double_to_fix(lat);
             return *this;
         }

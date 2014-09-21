@@ -70,13 +70,13 @@ SECTION("buffer_node") {
         osmium::Node& node = node_builder.object();
         REQUIRE(osmium::item_type::node == node.type());
 
-        node.id(1);
-        node.version(3);
-        node.visible(true);
-        node.changeset(333);
-        node.uid(21);
-        node.timestamp(123);
-        node.location(osmium::Location(3.5, 4.7));
+        node.set_id(1);
+        node.set_version(3);
+        node.set_visible(true);
+        node.set_changeset(333);
+        node.set_uid(21);
+        node.set_timestamp(123);
+        node.set_location(osmium::Location(3.5, 4.7));
 
         node_builder.add_user("testuser");
 
@@ -89,13 +89,13 @@ SECTION("buffer_node") {
         osmium::Node& node = node_builder.object();
         REQUIRE(osmium::item_type::node == node.type());
 
-        node.id(2);
-        node.version(3);
-        node.visible(true);
-        node.changeset(333);
-        node.uid(21);
-        node.timestamp(123);
-        node.location(osmium::Location(3.5, 4.7));
+        node.set_id(2);
+        node.set_version(3);
+        node.set_visible(true);
+        node.set_changeset(333);
+        node.set_uid(21);
+        node.set_timestamp(123);
+        node.set_location(osmium::Location(3.5, 4.7));
 
         node_builder.add_user("testuser");
 

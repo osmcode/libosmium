@@ -167,15 +167,15 @@ namespace osmium {
                 void parse_attributes(TBuilder& builder, const TPBFObject& pbf_object) {
                     auto& object = builder.object();
 
-                    object.id(pbf_object.id());
+                    object.set_id(pbf_object.id());
 
                     if (pbf_object.has_info()) {
-                        object.version(static_cast_with_assert<object_version_type>(pbf_object.info().version()))
-                            .changeset(static_cast_with_assert<changeset_id_type>(pbf_object.info().changeset()))
-                            .timestamp(pbf_object.info().timestamp() * m_date_factor)
-                            .uid_from_signed(pbf_object.info().uid());
+                        object.set_version(static_cast_with_assert<object_version_type>(pbf_object.info().version()))
+                            .set_changeset(static_cast_with_assert<changeset_id_type>(pbf_object.info().changeset()))
+                            .set_timestamp(pbf_object.info().timestamp() * m_date_factor)
+                            .set_uid_from_signed(pbf_object.info().uid());
                         if (pbf_object.info().has_visible()) {
-                            object.visible(pbf_object.info().visible());
+                            object.set_visible(pbf_object.info().visible());
                         }
                         builder.add_user(m_stringtable->s(static_cast_with_assert<int>(pbf_object.info().user_sid())).data());
                     } else {
@@ -190,7 +190,7 @@ namespace osmium {
                         parse_attributes(builder, pbf_node);
 
                         if (builder.object().visible()) {
-                            builder.object().location(osmium::Location(
+                            builder.object().set_location(osmium::Location(
                                               (pbf_node.lon() * m_granularity + m_lon_offset) / (OSMPBF::lonlat_resolution / osmium::Location::coordinate_precision),
                                               (pbf_node.lat() * m_granularity + m_lat_offset) / (OSMPBF::lonlat_resolution / osmium::Location::coordinate_precision)));
                         }
@@ -324,23 +324,23 @@ namespace osmium {
                         osmium::builder::NodeBuilder builder(m_buffer);
                         osmium::Node& node = builder.object();
 
-                        node.id(last_dense_id);
+                        node.set_id(last_dense_id);
 
                         if (dense.has_denseinfo()) {
                             auto v = dense.denseinfo().version(i);
                             assert(v > 0);
-                            node.version(static_cast<osmium::object_version_type>(v));
-                            node.changeset(static_cast<osmium::changeset_id_type>(last_dense_changeset));
-                            node.timestamp(last_dense_timestamp * m_date_factor);
-                            node.uid_from_signed(static_cast<osmium::signed_user_id_type>(last_dense_uid));
-                            node.visible(visible);
+                            node.set_version(static_cast<osmium::object_version_type>(v));
+                            node.set_changeset(static_cast<osmium::changeset_id_type>(last_dense_changeset));
+                            node.set_timestamp(last_dense_timestamp * m_date_factor);
+                            node.set_uid_from_signed(static_cast<osmium::signed_user_id_type>(last_dense_uid));
+                            node.set_visible(visible);
                             builder.add_user(m_stringtable->s(static_cast<int>(last_dense_user_sid)).data());
                         } else {
                             builder.add_user("");
                         }
 
                         if (visible) {
-                            builder.object().location(osmium::Location(
+                            builder.object().set_location(osmium::Location(
                                               (last_dense_longitude * m_granularity + m_lon_offset) / (OSMPBF::lonlat_resolution / osmium::Location::coordinate_precision),
                                               (last_dense_latitude  * m_granularity + m_lat_offset) / (OSMPBF::lonlat_resolution / osmium::Location::coordinate_precision)));
                         }

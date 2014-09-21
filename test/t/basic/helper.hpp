@@ -19,7 +19,7 @@ inline osmium::Node& buffer_add_node(osmium::memory::Buffer& buffer, const char*
     builder.add_user(user);
     add_tags(buffer, builder, tags);
     buffer.commit();
-    return builder.object().location(location);
+    return builder.object().set_location(location);
 }
 
 inline osmium::Way& buffer_add_way(osmium::memory::Buffer& buffer, const char* user, const std::vector<std::pair<const char*, const char*>>& tags, const std::vector<osmium::object_id_type>& nodes) {

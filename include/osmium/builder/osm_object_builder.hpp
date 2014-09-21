@@ -185,12 +185,12 @@ namespace osmium {
              */
             void initialize_from_object(const osmium::OSMObject& source) {
                 osmium::Area& area = object();
-                area.id(osmium::object_id_to_area_id(source.id(), source.type()));
-                area.version(source.version());
-                area.changeset(source.changeset());
-                area.timestamp(source.timestamp());
-                area.visible(source.visible());
-                area.uid(source.uid());
+                area.set_id(osmium::object_id_to_area_id(source.id(), source.type()));
+                area.set_version(source.version());
+                area.set_changeset(source.changeset());
+                area.set_timestamp(source.timestamp());
+                area.set_visible(source.visible());
+                area.set_uid(source.uid());
 
                 add_user(source.user());
             }

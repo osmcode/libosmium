@@ -27,22 +27,22 @@ SECTION("order") {
     osmium::Node& node1 = static_cast<osmium::Node&>(*it);
     osmium::Node& node2 = static_cast<osmium::Node&>(*(++it));
 
-    node1.id(10);
-    node1.version(1);
-    node2.id(15);
-    node2.version(2);
+    node1.set_id(10);
+    node1.set_version(1);
+    node2.set_id(15);
+    node2.set_version(2);
     REQUIRE(true == node1 < node2);
     REQUIRE(false == node1 > node2);
-    node1.id(20);
-    node1.version(1);
-    node2.id(20);
-    node2.version(2);
+    node1.set_id(20);
+    node1.set_version(1);
+    node2.set_id(20);
+    node2.set_version(2);
     REQUIRE(true == node1 < node2);
     REQUIRE(false == node1 > node2);
-    node1.id(-10);
-    node1.version(2);
-    node2.id(-15);
-    node2.version(1);
+    node1.set_id(-10);
+    node1.set_version(2);
+    node2.set_id(-15);
+    node2.set_version(1);
     REQUIRE(true == node1 < node2);
     REQUIRE(false == node1 > node2);
 }
@@ -56,8 +56,8 @@ SECTION("order_types") {
         osmium::Node& node = node_builder.object();
         REQUIRE(osmium::item_type::node == node.type());
 
-        node.id(3);
-        node.version(3);
+        node.set_id(3);
+        node.set_version(3);
         node_builder.add_user("testuser");
 
         buffer.commit();
@@ -69,8 +69,8 @@ SECTION("order_types") {
         osmium::Node& node = node_builder.object();
         REQUIRE(osmium::item_type::node == node.type());
 
-        node.id(3);
-        node.version(4);
+        node.set_id(3);
+        node.set_version(4);
         node_builder.add_user("testuser");
 
         buffer.commit();
@@ -82,8 +82,8 @@ SECTION("order_types") {
         osmium::Node& node = node_builder.object();
         REQUIRE(osmium::item_type::node == node.type());
 
-        node.id(3);
-        node.version(4);
+        node.set_id(3);
+        node.set_version(4);
         node_builder.add_user("testuser");
 
         buffer.commit();
@@ -95,8 +95,8 @@ SECTION("order_types") {
         osmium::Way& way = way_builder.object();
         REQUIRE(osmium::item_type::way == way.type());
 
-        way.id(2);
-        way.version(2);
+        way.set_id(2);
+        way.set_version(2);
         way_builder.add_user("testuser");
 
         buffer.commit();
@@ -108,8 +108,8 @@ SECTION("order_types") {
         osmium::Relation& relation = relation_builder.object();
         REQUIRE(osmium::item_type::relation == relation.type());
 
-        relation.id(1);
-        relation.version(1);
+        relation.set_id(1);
+        relation.set_version(1);
         relation_builder.add_user("testuser");
 
         buffer.commit();
