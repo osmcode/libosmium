@@ -40,7 +40,7 @@ void check_node_2(osmium::Node& node) {
     REQUIRE(2 == std::distance(node.tags().begin(), node.tags().end()));
 
     int n = 0;
-    for (osmium::Tag& tag : node.tags()) {
+    for (const osmium::Tag& tag : node.tags()) {
         switch (n) {
             case 0:
                 REQUIRE(std::string("amenity") == tag.key());

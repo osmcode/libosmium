@@ -314,11 +314,6 @@ namespace osmium {
         }
 
         /// Get the list of tags for this object.
-        TagList& tags() {
-            return subitem_of_type<TagList>();
-        }
-
-        /// Get the list of tags for this object.
         const TagList& tags() const {
             return subitem_of_type<const TagList>();
         }

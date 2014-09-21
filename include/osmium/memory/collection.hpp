@@ -96,7 +96,7 @@ namespace osmium {
 
             template <typename TChar, typename TTraits>
             friend std::basic_ostream<TChar, TTraits>& operator<<(std::basic_ostream<TChar, TTraits>& out, const CollectionIterator<TMember>& iter) {
-                return out << static_cast<void*>(iter.m_data);
+                return out << static_cast<const void*>(iter.m_data);
             }
 
         }; // class CollectionIterator
