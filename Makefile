@@ -22,6 +22,8 @@ osmium.node: Makefile ./build
 clean:
 	rm -rf ./build ./check_reports lib/binding
 	rm -f lib/osmium.node includes.log iwyu.log
+
+distclean:
 	rm -rf node_modules demo/*/node_modules
 
 rebuild:

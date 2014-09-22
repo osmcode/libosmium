@@ -10,6 +10,7 @@ Provides bindings to the [libosmium](https://github.com/osmcode/libosmium) C++ l
 
  - Node.js v0.10.x
  - libosmium (https://github.com/osmcode/libosmium)
+ - Mocha (for tests)
 
 ## Installing
 
@@ -69,6 +70,10 @@ If you wish to develop on `node-osmium` you can check out the code and then buil
     git clone https://github.com/osmcode/node-osmium.git
     cd node-osmium
     make
+
+## Testing
+
+    npm install mocha
     make test
 
 ### Source build dependencies
