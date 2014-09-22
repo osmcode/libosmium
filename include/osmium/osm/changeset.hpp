@@ -86,30 +86,6 @@ namespace osmium {
             return data() + osmium::memory::padded_length(sizeof(Changeset) + m_user_size);
         }
 
-        template <class T>
-        T& subitem_of_type() {
-            for (iterator it = begin(); it != end(); ++it) {
-                if (it->type() == T::itemtype) {
-                    return reinterpret_cast<T&>(*it);
-                }
-            }
-
-            static T subitem;
-            return subitem;
-        }
-
-        template <class T>
-        const T& subitem_of_type() const {
-            for (const_iterator it = cbegin(); it != cend(); ++it) {
-                if (it->type() == T::itemtype) {
-                    return reinterpret_cast<const T&>(*it);
-                }
-            }
-
-            static const T subitem;
-            return subitem;
-        }
-
     public:
 
         /// Get ID of this changeset
@@ -269,7 +245,7 @@ namespace osmium {
 
         /// Get the list of tags.
         const TagList& tags() const {
-            return subitem_of_type<const TagList>();
+            return osmium::detail::subitem_of_type<const TagList>(cbegin(), cend());
         }
 
         /**

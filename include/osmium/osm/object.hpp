@@ -102,30 +102,6 @@ namespace osmium {
             *reinterpret_cast<string_size_type*>(user_position()) = size;
         }
 
-        template <class T>
-        T& subitem_of_type() {
-            for (iterator it = begin(); it != end(); ++it) {
-                if (it->type() == T::itemtype) {
-                    return reinterpret_cast<T&>(*it);
-                }
-            }
-
-            static T subitem;
-            return subitem;
-        }
-
-        template <class T>
-        const T& subitem_of_type() const {
-            for (const_iterator it = cbegin(); it != cend(); ++it) {
-                if (it->type() == T::itemtype) {
-                    return reinterpret_cast<const T&>(*it);
-                }
-            }
-
-            static const T subitem;
-            return subitem;
-        }
-
     public:
 
         /// Get ID of this object.
@@ -315,7 +291,7 @@ namespace osmium {
 
         /// Get the list of tags for this object.
         const TagList& tags() const {
-            return subitem_of_type<const TagList>();
+            return osmium::detail::subitem_of_type<const TagList>(cbegin(), cend());
         }
 
         /**

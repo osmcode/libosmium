@@ -173,11 +173,11 @@ namespace osmium {
         static constexpr osmium::item_type itemtype = osmium::item_type::relation;
 
         RelationMemberList& members() {
-            return subitem_of_type<RelationMemberList>();
+            return osmium::detail::subitem_of_type<RelationMemberList>(begin(), end());
         }
 
         const RelationMemberList& members() const {
-            return subitem_of_type<const RelationMemberList>();
+            return osmium::detail::subitem_of_type<const RelationMemberList>(cbegin(), cend());
         }
 
     }; // class Relation

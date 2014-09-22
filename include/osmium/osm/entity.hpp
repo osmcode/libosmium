@@ -37,6 +37,24 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
+    namespace detail {
+
+        template <class TSubitem, class TIter>
+        inline TSubitem& subitem_of_type(TIter it, TIter end) {
+            for (; it != end; ++it) {
+                if (it->type() == TSubitem::itemtype) {
+                    return reinterpret_cast<TSubitem&>(*it);
+                }
+            }
+
+            // If no subitem of the TSubitem type was found,
+            // return a default constructed one.
+            static TSubitem subitem;
+            return subitem;
+        }
+
+    } // namespace detail
+
     /**
      * \brief OSMEntity is the abstract base class for the OSMObject and
      *        Changeset classes.

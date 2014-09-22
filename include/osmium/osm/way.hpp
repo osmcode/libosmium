@@ -72,11 +72,11 @@ namespace osmium {
     public:
 
         WayNodeList& nodes() {
-            return subitem_of_type<WayNodeList>();
+            return osmium::detail::subitem_of_type<WayNodeList>(begin(), end());
         }
 
         const WayNodeList& nodes() const {
-            return subitem_of_type<const WayNodeList>();
+            return osmium::detail::subitem_of_type<const WayNodeList>(cbegin(), cend());
         }
 
         /**
