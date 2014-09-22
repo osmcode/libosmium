@@ -111,7 +111,7 @@ namespace osmium {
          * @returns Reference to object to make calls chainable.
          */
         Changeset& set_id(const char* id) {
-            return this->set_id(osmium::string_to_changeset_id(id));
+            return set_id(osmium::string_to_changeset_id(id));
         }
 
         /// Get user id.
@@ -149,7 +149,7 @@ namespace osmium {
          * @returns Reference to changeset to make calls chainable.
          */
         Changeset& set_uid(const char* uid) {
-            return this->set_uid_from_signed(string_to_user_id(uid));
+            return set_uid_from_signed(string_to_user_id(uid));
         }
 
         /// Is this user anonymous?
@@ -217,7 +217,7 @@ namespace osmium {
 
         /// Set the number of changes in this changeset
         Changeset& set_num_changes(const char* num_changes) noexcept {
-            return this->set_num_changes(osmium::string_to_num_changes(num_changes));
+            return set_num_changes(osmium::string_to_num_changes(num_changes));
         }
 
         /**

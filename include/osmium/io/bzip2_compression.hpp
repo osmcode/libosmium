@@ -107,7 +107,7 @@ namespace osmium {
             }
 
             ~Bzip2Compressor() override final {
-                this->close();
+                close();
             }
 
             void write(const std::string& data) override final {
@@ -154,7 +154,7 @@ namespace osmium {
             }
 
             ~Bzip2Decompressor() override final {
-                this->close();
+                close();
             }
 
             std::string read() override final {

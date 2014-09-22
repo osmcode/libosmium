@@ -192,7 +192,7 @@ namespace osmium {
             }
 
             ~NoCompressor() override final {
-                this->close();
+                close();
             }
 
             void write(const std::string& data) override final {
@@ -231,7 +231,7 @@ namespace osmium {
             }
 
             ~NoDecompressor() override final {
-                this->close();
+                close();
             }
 
             std::string read() override final {
