@@ -38,6 +38,7 @@ DEALINGS IN THE SOFTWARE.
 #include <cstdint>
 #include <cstring>
 #include <new>
+#include <type_traits>
 
 #include <osmium/memory/buffer.hpp>
 #include <osmium/memory/item.hpp>
@@ -151,18 +152,21 @@ namespace osmium {
 
         }; // class Builder
 
-        template <class T>
+        template <class TItem>
         class ObjectBuilder : public Builder {
+
+            static_assert(std::is_base_of<osmium::memory::Item, TItem>::value,
+                "ObjectBuilder can only build objects derived from osmium::memory::Item");
 
         public:
 
             explicit ObjectBuilder(osmium::memory::Buffer& buffer, Builder* parent=nullptr) :
-                Builder(buffer, parent, sizeof(T)) {
-                new (&item()) T();
+                Builder(buffer, parent, sizeof(TItem)) {
+                new (&item()) TItem();
             }
 
-            T& object() {
-                return static_cast<T&>(item());
+            TItem& object() {
+                return static_cast<TItem&>(item());
             }
 
             void add_user(const char* user) {
