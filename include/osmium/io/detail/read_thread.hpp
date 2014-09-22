@@ -78,7 +78,7 @@ namespace osmium {
                                 break;
                             }
                             m_queue.push(std::move(data));
-                            while (m_queue.size() > 10) {
+                            while (m_queue.size() > 10 && !m_done) {
                                 std::this_thread::sleep_for(std::chrono::milliseconds(10));
                             }
                         }
