@@ -33,6 +33,8 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <type_traits>
+
 #include <osmium/handler.hpp>
 #include <osmium/index/index.hpp>
 #include <osmium/index/map/dummy.hpp>
@@ -58,6 +60,12 @@ namespace osmium {
          */
         template <class TStoragePosIDs, class TStorageNegIDs = dummy_type>
         class NodeLocationsForWays : public osmium::handler::Handler {
+
+            static_assert(std::is_base_of<osmium::index::map::Map<osmium::unsigned_object_id_type, osmium::Location>, TStoragePosIDs>::value,
+                "Index class must be derived from osmium::index::map::Map<osmium::unsigned_object_id_type, osmium::Location>");
+
+            static_assert(std::is_base_of<osmium::index::map::Map<osmium::unsigned_object_id_type, osmium::Location>, TStorageNegIDs>::value,
+                "Index class must be derived from osmium::index::map::Map<osmium::unsigned_object_id_type, osmium::Location>");
 
             /// Object that handles the actual storage of the node locations (with positive IDs).
             TStoragePosIDs& m_storage_pos;
