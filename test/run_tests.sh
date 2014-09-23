@@ -19,12 +19,14 @@ if [ -z "$CXXFLAGS_WARNINGS" ]; then
     CXXFLAGS_WARNINGS="-Wall -Wextra -pedantic -Wredundant-decls -Wdisabled-optimization -Wctor-dtor-privacy -Wnon-virtual-dtor -Woverloaded-virtual -Wsign-promo -Wold-style-cast"
 fi
 
-if [ "$CXX" = "g++" ]; then
+COMPILER=`echo $CXX | sed -e's/-.*//'`
+
+if [ "$COMPILER" = "g++" ]; then
     # remove warnings that create false positives on g++
     CXXFLAGS_WARNINGS="$CXXFLAGS_WARNINGS -Wno-return-type -Wno-array-bounds"
 fi
 
-if [ "$CXX" = "clang++" ]; then
+if [ "$COMPILER" = "clang++" ]; then
     CXXFLAGS_WARNINGS="$CXXFLAGS_WARNINGS -Wdocumentation -Wunused-exception-parameter -Wmissing-declarations"
     CXXFLAGS_WARNINGS="$CXXFLAGS_WARNINGS -Weverything -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-unused-macros -Wno-exit-time-destructors -Wno-global-constructors -Wno-padded -Wno-switch-enum -Wno-missing-prototypes -Wno-weak-vtables"
     CXXFLAGS_WARNINGS="$CXXFLAGS_WARNINGS -Wno-cast-align -Wno-float-equal"
