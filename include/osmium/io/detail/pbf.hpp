@@ -59,7 +59,6 @@ namespace osmium {
             case OSMPBF::Relation::RELATION:
                 return item_type::relation;
         }
-        throw std::runtime_error("Unknown relation member type");
     }
 
     inline OSMPBF::Relation::MemberType item_type_to_osmpbf_membertype(const item_type type) {
