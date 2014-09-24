@@ -728,6 +728,11 @@ namespace osmium {
 
                 const osmium::TagList& area_tags = out_buffer.get<osmium::Area>(area_offset).tags(); // tags of the area we just built
 
+                // Find all closed ways that are inner rings and check their
+                // tags. If they are not the same as the tags of the area we
+                // just built, add them to a list and later build areas for
+                // them, too.
+                std::vector<const osmium::Way*> ways_that_should_be_areas;
                 if (m_inner_outer_mismatches == 0) {
                     auto memit = relation.members().begin();
                     for (size_t offset : members) {
@@ -747,14 +752,19 @@ namespace osmium {
                                     osmium::tags::KeyFilter::iterator area_fi_end(filter, area_tags.end(), area_tags.end());
 
                                     if (!std::equal(fi_begin, fi_end, area_fi_begin) || d != std::distance(area_fi_begin, area_fi_end)) {
-                                        Assembler assembler(m_config);
-                                        assembler(way, out_buffer);
+                                        ways_that_should_be_areas.push_back(&way);
                                     }
                                 }
                             }
                         }
                         ++memit;
                     }
+                }
+
+                // Now build areas for all ways found in the last step.
+                for (const osmium::Way* way : ways_that_should_be_areas) {
+                    Assembler assembler(m_config);
+                    assembler(*way, out_buffer);
                 }
             }
 
