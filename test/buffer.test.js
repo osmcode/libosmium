@@ -3,7 +3,7 @@ var assert = require('assert');
 
 describe('buffer', function() {
 
-    it('should not be able to create an osmium.OSMObject from Javascript', function(done) {
+    it('should not be able to create an osmium.OSMObject from Javascript', function() {
         var got_exception = false;
         try {
             var object = new osmium.OSMObject;
@@ -13,11 +13,10 @@ describe('buffer', function() {
             got_exception = true;
         } finally {
             assert.ok(got_exception);
-            done();
         }
     });
 
-    it('should not be able to create an osmium.Node from Javascript', function(done) {
+    it('should not be able to create an osmium.Node from Javascript', function() {
         var got_exception = false;
         try {
             var node = new osmium.Node;
@@ -27,11 +26,10 @@ describe('buffer', function() {
             got_exception = true;
         } finally {
             assert.ok(got_exception);
-            done();
         }
     });
 
-    it('should not be able to create an osmium.Way from Javascript', function(done) {
+    it('should not be able to create an osmium.Way from Javascript', function() {
         var got_exception = false;
         try {
             var way = new osmium.Way;
@@ -41,11 +39,10 @@ describe('buffer', function() {
             got_exception = true;
         } finally {
             assert.ok(got_exception);
-            done();
         }
     });
 
-    it('should not be able to create an osmium.Relation from Javascript', function(done) {
+    it('should not be able to create an osmium.Relation from Javascript', function() {
         var got_exception = false;
         try {
             var relation = new osmium.Relation;
@@ -55,7 +52,6 @@ describe('buffer', function() {
             got_exception = true;
         } finally {
             assert.ok(got_exception);
-            done();
         }
     });
 

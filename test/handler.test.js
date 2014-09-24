@@ -11,21 +11,19 @@ var get_size = function(obj) {
 
 describe('handler', function() {
 
-    it('should throw when Handler called as function', function(done) {
+    it('should throw when Handler called as function', function() {
         assert.throws(function() {
             var handler = osmium.Handler();
         }, Error);
-        done();
     });
 
-    it('should be able to initialize handler', function(done) {
+    it('should be able to initialize handler', function() {
         var handler = new osmium.Handler();
         handler.on('node', function(node) {
         });
-        done();
     });
 
-    it('should throw when handler initializion is wrong', function(done) {
+    it('should throw when handler initializion is wrong', function() {
         var handler = new osmium.Handler();
         assert.throws(function() {
             handler.on();
@@ -40,10 +38,9 @@ describe('handler', function() {
             handler.on("foo", function(node) {
             });
         }, RangeError);
-        done();
     });
 
-    it('should call all object callbacks of handler', function(done) {
+    it('should call all object callbacks of handler', function() {
         var handler = new osmium.Handler();
 
         var count_nodes = 0;
@@ -73,11 +70,9 @@ describe('handler', function() {
         assert.equal(count_ways, 98);
         assert.equal(count_relations, 2);
         assert.equal(count_changesets, 3);
-
-        done();
     });
 
-    it('should call all before and after callbacks of handler', function(done) {
+    it('should call all before and after callbacks of handler', function() {
         var handler = new osmium.Handler();
 
         var count = 0;
@@ -93,10 +88,9 @@ describe('handler', function() {
         osmium.apply(reader, handler);
 
         assert.equal(count, 8);
-        done();
     });
 
-    it('should call before_changesets and after_changesets callbacks of handler', function(done) {
+    it('should call before_changesets and after_changesets callbacks of handler', function() {
         var handler = new osmium.Handler();
 
         var count = 0;
@@ -112,10 +106,9 @@ describe('handler', function() {
         osmium.apply(reader, handler);
 
         assert.equal(count, 4);
-        done();
     });
 
-    it('should call node callback only for tagged nodes if tagged_nodes_only is set', function(done) {
+    it('should call node callback only for tagged nodes if tagged_nodes_only is set', function() {
         var handler = new osmium.Handler();
 
         var count = 0;
@@ -139,11 +132,9 @@ describe('handler', function() {
         osmium.apply(reader, handler);
 
         assert.equal(count, 0);
-
-        done();
     });
 
-    it('should if options() is called with wrong arguments', function(done) {
+    it('should if options() is called with wrong arguments', function() {
         var handler = new osmium.Handler();
 
         assert.throws(function() {
@@ -157,11 +148,9 @@ describe('handler', function() {
         assert.throws(function() {
             handler.options({}, "b");
         }, TypeError);
-
-        done();
     });
 
-    it('should allow a callback to be redefined', function(done) {
+    it('should allow a callback to be redefined', function() {
         var handler = new osmium.Handler();
 
         var count = 0;
@@ -183,11 +172,9 @@ describe('handler', function() {
         osmium.apply(reader, handler);
 
         assert.equal(count, 0);
-
-        done();
     });
 
-    it('should be able to get node data from handler parameter', function(done) {
+    it('should be able to get node data from handler parameter', function() {
         var handler = new osmium.Handler();
         var nodes = 0, ways = 0, relations = 0;
         handler.on('node', function(node) {
@@ -228,10 +215,9 @@ describe('handler', function() {
 
         var reader = new osmium.Reader(__dirname + "/data/winthrop.osm", { 'node': true, 'way': true });
         osmium.apply(reader, handler);
-        done();
     });
 
-    it('should be able to call two handlers one after the other', function(done) {
+    it('should be able to call two handlers one after the other', function() {
         var handler1 = new osmium.Handler();
         var handler2 = new osmium.Handler();
 
@@ -250,10 +236,9 @@ describe('handler', function() {
         osmium.apply(reader, handler1, handler2);
 
         assert.equal(count, 2);
-        done();
     });
 
-    it('should catch errors in handler callbacks and rethrow from apply function', function(done) {
+    it('should catch errors in handler callbacks and rethrow from apply function', function() {
         var handler = new osmium.Handler();
         handler.on('node', function(node) {
             throw new Error("test error");
@@ -265,8 +250,6 @@ describe('handler', function() {
         assert.throws(function() {
             osmium.apply(reader, handler);
         }, Error);
-
-        done();
     });
 
 });

@@ -17,25 +17,22 @@ function get_handler() {
 
 describe('location handler', function() {
 
-    it('should be able to use the default location handler', function(done) {
+    it('should be able to use the default location handler', function() {
         var reader = new osmium.Reader(__dirname + "/data/winthrop.osm", { 'node': true, 'way': true });
         osmium.apply(reader, new osmium.LocationHandler(), get_handler());
-        done();
     });
 
-    it('should be able to use the sparsetable location handler', function(done) {
+    it('should be able to use the sparsetable location handler', function() {
         var reader = new osmium.Reader(__dirname + "/data/winthrop.osm", { 'node': true, 'way': true });
         osmium.apply(reader, new osmium.LocationHandler("sparsetable"), get_handler());
-        done();
     });
 
-    it('should be able to use the stlmap location handler', function(done) {
+    it('should be able to use the stlmap location handler', function() {
         var reader = new osmium.Reader(__dirname + "/data/winthrop.osm", { 'node': true, 'way': true });
         osmium.apply(reader, new osmium.LocationHandler("stlmap"), get_handler());
-        done();
     });
 
-    it('should throw on missing location if ignoreErrors is not set', function(done) {
+    it('should throw on missing location if ignoreErrors is not set', function() {
         var reader = new osmium.Reader(__dirname + "/data/missing-node.osm", { 'node': true, 'way': true });
         var location_handler = new osmium.LocationHandler();
         var handler = new osmium.Handler();
@@ -43,7 +40,6 @@ describe('location handler', function() {
         assert.throws(function() {
             osmium.apply(reader, location_handler, handler);
         }, Error);
-        done();
     });
 
     it('should throw in wkb/wkt/node_coordinates function if ignoreErrors is set', function(done) {

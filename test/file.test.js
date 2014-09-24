@@ -3,41 +3,35 @@ var assert = require('assert');
 
 describe('file', function() {
 
-    it('should throw when File called as function', function(done) {
+    it('should throw when File called as function', function() {
         assert.throws(function() {
             var file = osmium.File();
         }, Error);
-        done();
     });
 
-    it('should create File object without parameters', function(done) {
+    it('should create File object without parameters', function() {
         assert.throws(function() {
             var file = new osmium.File();
         }, Error);
-        done();
     });
 
-    it('should create File object with one parameters', function(done) {
+    it('should create File object with one parameters', function() {
         var file = new osmium.File("file.osm");
-        done();
     });
 
-    it('should create File object with two parameters', function(done) {
+    it('should create File object with two parameters', function() {
         var file = new osmium.File("file.osm", "osm");
-        done();
     });
 
-    it('should create File object for stdin/stdout', function(done) {
+    it('should create File object for stdin/stdout', function() {
         var file = new osmium.File("", "osm");
         file = new osmium.File("-", "osm");
-        done();
     });
 
-    it('should not create File object with three parameters', function(done) {
+    it('should not create File object with three parameters', function() {
         assert.throws(function() {
             var file = new osmium.File("file.osm", "osm", "foo");
         }, TypeError);
-        done();
     });
 
 });
