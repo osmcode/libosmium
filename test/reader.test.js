@@ -61,11 +61,10 @@ describe('reader', function() {
 
         var count = 0;
         handler.on('node', function(node) {
-            if (count == 0) {
+            if (count++ == 0) {
                 assert.equal(node.id, 50031066);
                 done();
             }
-            count++;
         });
 
         osmium.apply(reader, handler);

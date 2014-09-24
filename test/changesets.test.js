@@ -7,7 +7,7 @@ describe('changesets', function() {
         var handler = new osmium.Handler();
         var count = 0;
         handler.on('changeset', function(changeset) {
-            if (count == 0) {
+            if (count++ == 0) {
                 assert.equal(changeset.id, 15449957);
                 assert.equal(changeset.user, "Elbert");
                 assert.equal(changeset.uid, 1237205);
@@ -23,7 +23,6 @@ describe('changesets', function() {
                 assert.ok(changeset.closed);
                 done();
             }
-            count++;
         });
         var file = new osmium.File(__dirname + "/data/changesets.osm");
         var reader = new osmium.Reader(file, {changeset: true});
@@ -34,7 +33,7 @@ describe('changesets', function() {
         var handler = new osmium.Handler();
         var count = 0;
         handler.on('changeset', function(changeset) {
-            if (count == 2) {
+            if (count++ == 2) {
                 assert.equal(changeset.id, 15450185);
                 assert.equal(changeset.user, "garl");
                 assert.equal(changeset.uid, 51196);
@@ -47,7 +46,6 @@ describe('changesets', function() {
                 assert.ok(changeset.open);
                 done();
             }
-            count++;
         });
         var file = new osmium.File(__dirname + "/data/changesets.osm");
         var reader = new osmium.Reader(file, {changeset: true});
@@ -58,12 +56,11 @@ describe('changesets', function() {
         var handler = new osmium.Handler();
         var count = 0;
         handler.on('changeset', function(changeset) {
-            if (count == 0) {
+            if (count++ == 0) {
                 assert.equal(changeset.tags().created_by, 'JOSM/1.5 (5356 en)');
                 assert.equal(changeset.tags('created_by'), 'JOSM/1.5 (5356 en)');
                 done();
             }
-            count++;
         });
         var file = new osmium.File(__dirname + "/data/changesets.osm");
         var reader = new osmium.Reader(file, {changeset: true});

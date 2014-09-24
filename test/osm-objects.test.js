@@ -7,7 +7,7 @@ describe('basic', function() {
         var handler = new osmium.Handler();
         var count = 0;
         handler.on('node', function(node) {
-            if (count == 0) {
+            if (count++ == 0) {
                 assert.equal(node.id, 50031066);
                 assert.equal(node.visible, true);
                 assert.equal(node.version, 2);
@@ -25,7 +25,6 @@ describe('basic', function() {
                 assert.equal(node.wkt(), "POINT(-120.189161 48.46558)");
                 done();
             }
-            count++;
         });
         var file = new osmium.File(__dirname + "/data/winthrop.osm");
         var reader = new osmium.Reader(file, {node: true});
@@ -36,7 +35,7 @@ describe('basic', function() {
         var handler = new osmium.Handler();
         var count = 0;
         handler.on('way', function(way) {
-            if (count == 0) {
+            if (count++ == 0) {
                 assert.equal(way.id, 6091729);
                 assert.equal(way.visible, true);
                 assert.equal(way.version, 1);
@@ -47,7 +46,6 @@ describe('basic', function() {
                 assert.equal(way.timestamp().toISOString(), '2007-09-13T03:53:56.000Z');
                 done();
             }
-            count++;
         });
         var file = new osmium.File(__dirname + "/data/winthrop.osm");
         var reader = new osmium.Reader(file, {way: true});
@@ -58,7 +56,7 @@ describe('basic', function() {
         var handler = new osmium.Handler();
         var count = 0;
         handler.on('relation', function(relation) {
-            if (count == 0) {
+            if (count++ == 0) {
                 assert.equal(relation.id, 237891);
                 assert.equal(relation.visible, true);
                 assert.equal(relation.version, 2);
@@ -69,7 +67,6 @@ describe('basic', function() {
                 assert.equal(relation.timestamp().toISOString(), '2013-02-25T00:11:34.000Z');
                 done();
             }
-            count++;
         });
         var file = new osmium.File(__dirname + "/data/winthrop.osm");
         var reader = new osmium.Reader(file, {relation: true});
@@ -80,12 +77,11 @@ describe('basic', function() {
         var handler = new osmium.Handler();
         var count = 0;
         handler.on('node', function(node) {
-            if (count == 0) {
+            if (count++ == 0) {
                 assert.deepEqual(node.tags(), {});
                 assert.equal(node.tags("foobar"), undefined);
                 done();
             }
-            count++;
         });
         var file = new osmium.File(__dirname + "/data/winthrop.osm");
         var reader = new osmium.Reader(file, {node: true});
@@ -96,7 +92,7 @@ describe('basic', function() {
         var handler = new osmium.Handler();
         var count = 0;
         handler.on('way', function(way) {
-            if (count == 0) {
+            if (count++ == 0) {
                 assert.equal(way.tags().name, "National Fish Hatchery Entranc");
                 assert.equal(way.tags().foobar, undefined);
                 assert.equal(way.tags("highway"), "residential");
@@ -109,7 +105,6 @@ describe('basic', function() {
                 }, TypeError);
                 done();
             }
-            count++;
         });
         var file = new osmium.File(__dirname + "/data/winthrop.osm");
         var reader = new osmium.Reader(file, {way: true});
@@ -120,7 +115,7 @@ describe('basic', function() {
         var handler = new osmium.Handler();
         var count = 0;
         handler.on('way', function(way) {
-            if (count == 0) {
+            if (count++ == 0) {
                 assert.equal(way.nodes_count, 6);
                 assert.equal(way.node_refs().length, 6);
                 assert.equal(way.node_refs()[0], 50253600);
@@ -138,7 +133,6 @@ describe('basic', function() {
                 }, TypeError);
                 done();
             }
-            count++;
         });
         var file = new osmium.File(__dirname + "/data/winthrop.osm");
         var reader = new osmium.Reader(file, {way: true});
@@ -149,7 +143,7 @@ describe('basic', function() {
         var handler = new osmium.Handler();
         var count = 0;
         handler.on('relation', function(relation) {
-            if (count == 0) {
+            if (count++ == 0) {
                 assert.equal(relation.members_count, 5);
                 assert.equal(relation.members().length, 5);
                 assert.deepEqual(relation.members()[0], {
@@ -174,7 +168,6 @@ describe('basic', function() {
                 }, TypeError);
                 done();
             }
-            count++;
         });
         var file = new osmium.File(__dirname + "/data/winthrop.osm");
         var reader = new osmium.Reader(file, {relation: true});

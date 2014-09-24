@@ -8,7 +8,7 @@ describe('apply', function() {
         var handler = new osmium.Handler();
         var count = 0;
         handler.on('node', function(node) {
-            if (count == 0) {
+            if (count++ == 0) {
                 assert.equal(node.id, 50031066);
                 assert.equal(node.visible, true);
                 assert.equal(node.version, 2);
@@ -23,7 +23,6 @@ describe('apply', function() {
                 assert.equal(node.lat, 48.4655800);
                 done();
             }
-            count++;
         });
 
         var buffer = fs.readFileSync(__dirname + "/data/winthrop.osm.ser");

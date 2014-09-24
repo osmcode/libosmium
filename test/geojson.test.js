@@ -7,14 +7,13 @@ describe('geojson', function() {
         var handler = new osmium.Handler();
         var count = 0;
         handler.on('node', function(node) {
-            if (count == 0) {
+            if (count++ == 0) {
                 assert.deepEqual(node.geojson(), {
                     type: 'Point',
                     coordinates: [-120.1891610, 48.4655800]
                 });
                 done();
             }
-            count++;
         });
         var file = new osmium.File(__dirname + "/data/winthrop.osm");
         var reader = new osmium.Reader(file, {node: true});
