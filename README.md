@@ -2,8 +2,8 @@
 
 Fast and flexible Javascript library for working with OpenStreetMap data.
 
-Provides bindings to the [libosmium](https://github.com/osmcode/libosmium) C++
-library.
+Provides bindings to the [libosmium](https://github.com/osmcode/libosmium)
+C++ library.
 
 [![Build Status](https://secure.travis-ci.org/osmcode/node-osmium.png)](http://travis-ci.org/osmcode/node-osmium)
 
@@ -11,7 +11,7 @@ library.
 
  - Node.js v0.10.x
  - libosmium (https://github.com/osmcode/libosmium)
- - Mocha (for tests)
+ - Mocha (http://visionmedia.github.io/mocha/, for tests)
 
 ## Installing
 

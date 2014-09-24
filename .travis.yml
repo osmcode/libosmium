@@ -5,7 +5,7 @@ compiler:
 
 env:
   matrix:
-   # static_build == portable, statically linked OSRM and deps
+   # static_build == portable, statically linked node-osmium and deps
    # shared_build == non-portable, shared libraries via package manager
    - NODE_NVM_VERSION="0.10" RUN_BUILD="static_build"
    #- NODE_NVM_VERSION="0.10" RUN_BUILD="shared_build"
@@ -44,7 +44,7 @@ before_script:
 - npm install --build-from-source
 - if [[ `uname -s` == 'Darwin' ]]; then otool -L ./lib/binding/* || true; fi
 - if [[ `uname -s` == 'Linux' ]]; then readelf -d ./lib/binding/* || true; fi
-- npm test
+- npm test -- --timeout 10s
 
 script:
 # now we publish the binary, if needed
