@@ -36,7 +36,7 @@ describe('geojson', function() {
         });
         var file = new osmium.File(__dirname + "/data/winthrop.osm");
         var reader = new osmium.Reader(file);
-        osmium.apply(reader, new osmium.LocationHandler(), handler);
+        osmium.apply(reader, new osmium.LocationHandler("stlmap"), handler);
     });
 
 });
