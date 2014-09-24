@@ -2,7 +2,8 @@
 
 Fast and flexible Javascript library for working with OpenStreetMap data.
 
-Provides bindings to the [libosmium](https://github.com/osmcode/libosmium) C++ library.
+Provides bindings to the [libosmium](https://github.com/osmcode/libosmium) C++
+library.
 
 [![Build Status](https://secure.travis-ci.org/osmcode/node-osmium.png)](http://travis-ci.org/osmcode/node-osmium)
 
@@ -14,58 +15,29 @@ Provides bindings to the [libosmium](https://github.com/osmcode/libosmium) C++ l
 
 ## Installing
 
-By default, binaries are provided and no external dependencies or compile is needed.
+By default, binaries are provided and no external dependencies or compile is
+needed.
 
 Just do:
 
     npm install osmium
 
-We currently provide binaries for 64 bit OS X and 64 bit Linux. Running `npm install` on other
-platforms will fall back to a source compile (see `Developing` below for build details).
+We currently provide binaries for 64 bit OS X and 64 bit Linux. Running `npm
+install` on other platforms will fall back to a source compile (see
+`Developing` below for build details).
+
 
 ## Usage
 
-### Get the bounds of an `.osm` file
+See [the tutorial](doc/tutorial.md) for an introduction. There are some demo
+applications in the 'demo' directory. See the [README.md](demo/README.md)
+there. You can also have a look at the tests in the `test` directory.
 
-```js
-var osmium = require('osmium');
-var reader = new osmium.Reader("test/data/winthrop.osm");
-var bounds = reader.header().bounds[0];
-console.log(bounds.left(), bounds.bottom(), bounds.right(), bounds.top());
-```
-
-Result:
-```
--120.2024 48.4636 -120.1569 48.4869
-```
-
-### Parse an OSM file and create a node handler callback to count total nodes
-
-```js
-var osmium = require('osmium');
-var reader = new osmium.Reader("test/data/winthrop.osm");
-var handler = new osmium.Handler();
-var nodes = 0;
-handler.on('node', function(node) {
-    ++nodes;
-});
-osmium.apply(reader, handler);
-console.log(nodes);
-```
-
-Result:
-```
-1525
-```
-
-## Demos
-
-There are some demo applications in the 'demo' directory. See the README.md
-there.
 
 ## Developing
 
-If you wish to develop on `node-osmium` you can check out the code and then build like:
+If you wish to develop on `node-osmium` you can check out the code and then
+build like:
 
     git clone https://github.com/osmcode/node-osmium.git
     cd node-osmium
@@ -92,7 +64,10 @@ Set dependencies up on Ubuntu Precise (12.04) like:
     sudo apt-add-repository --yes ppa:mapnik/boost
     sudo apt-add-repository --yes ppa:ubuntu-toolchain-r/test
     sudo apt-get -y update
-    sudo apt-get -y install git gcc-4.8 g++-4.8 build-essential nodejs libboost-dev zlib1g-dev protobuf-compiler libprotobuf-lite7 libprotobuf-dev libexpat1-dev libsparsehash-dev
+    sudo apt-get -y install git gcc-4.8 g++-4.8 build-essential nodejs
+    sudo apt-get -y install libboost-dev zlib1g-dev protobuf-compiler
+    sudo apt-get -y install libprotobuf-lite7 libprotobuf-dev libexpat1-dev
+    sudo apt-get -y install libsparsehash-dev
     export CC=gcc-4.8
     export CXX=g++-4.8
     git clone https://github.com/scrosby/OSM-binary.git
