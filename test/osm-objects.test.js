@@ -20,6 +20,9 @@ describe('basic', function() {
                 assert.equal(node.coordinates.lat, 48.4655800);
                 assert.equal(node.lon, -120.1891610);
                 assert.equal(node.lat, 48.4655800);
+                assert.equal(node.coordinates.lon, -120.1891610);
+                assert.equal(node.coordinates.lat, 48.4655800);
+                assert.equal(node.wkt(), "POINT(-120.189161 48.46558)");
                 done();
             }
             count++;
