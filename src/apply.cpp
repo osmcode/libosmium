@@ -22,32 +22,28 @@ namespace node_osmium {
 
     struct visitor_type : public boost::static_visitor<> {
 
-        v8::TryCatch& m_trycatch;
         osmium::OSMEntity& m_entity;
 
-        visitor_type(v8::TryCatch& trycatch, osmium::OSMEntity& entity) :
-            m_trycatch(trycatch),
+        visitor_type(osmium::OSMEntity& entity) :
             m_entity(entity) {
         }
 
         void operator()(JSHandler& handler) const {
-            handler.dispatch_entity(m_trycatch, m_entity);
+            handler.dispatch_entity(m_entity);
         }
 
         void operator()(location_handler_type& handler) const {
             osmium::apply_item(m_entity, handler);
         }
 
-    }; // visitor_type
+    }; // struct visitor_type
 
     struct visitor_before_after_type : public boost::static_visitor<> {
 
-        v8::TryCatch& m_trycatch;
         osmium::item_type m_last;
         osmium::item_type m_current;
 
-        visitor_before_after_type(v8::TryCatch& trycatch, osmium::item_type last, osmium::item_type current) :
-            m_trycatch(trycatch),
+        visitor_before_after_type(osmium::item_type last, osmium::item_type current) :
             m_last(last),
             m_current(current) {
         }
@@ -63,70 +59,72 @@ namespace node_osmium {
         void operator()(JSHandler& visitor) const {
             switch (m_last) {
                 case osmium::item_type::undefined:
-                    visitor.init(m_trycatch);
+                    visitor.init();
                     break;
                 case osmium::item_type::node:
-                    visitor.after_nodes(m_trycatch);
+                    visitor.after_nodes();
                     break;
                 case osmium::item_type::way:
-                    visitor.after_ways(m_trycatch);
+                    visitor.after_ways();
                     break;
                 case osmium::item_type::relation:
-                    visitor.after_relations(m_trycatch);
+                    visitor.after_relations();
                     break;
                 case osmium::item_type::changeset:
-                    visitor.after_changesets(m_trycatch);
+                    visitor.after_changesets();
                     break;
                 default:
                     break;
             }
             switch (m_current) {
                 case osmium::item_type::undefined:
-                    visitor.done(m_trycatch);
+                    visitor.done();
                     break;
                 case osmium::item_type::node:
-                    visitor.before_nodes(m_trycatch);
+                    visitor.before_nodes();
                     break;
                 case osmium::item_type::way:
-                    visitor.before_ways(m_trycatch);
+                    visitor.before_ways();
                     break;
                 case osmium::item_type::relation:
-                    visitor.before_relations(m_trycatch);
+                    visitor.before_relations();
                     break;
                 case osmium::item_type::changeset:
-                    visitor.before_changesets(m_trycatch);
+                    visitor.before_changesets();
                     break;
                 default:
                     break;
             }
         }
 
-    }; // visitor_before_after
+    }; // struct visitor_before_after
 
     typedef boost::variant<location_handler_type&, JSHandler&> some_handler_type;
 
     template <class TIter>
     v8::Handle<v8::Value> apply_iterator(TIter it, TIter end, std::vector<some_handler_type>& handlers) {
+        struct javascript_error {};
+
         v8::HandleScope scope;
+        v8::TryCatch trycatch;
         try {
             osmium::item_type last_type = osmium::item_type::undefined;
 
-            v8::TryCatch trycatch;
             for (; it != end; ++it) {
-                visitor_before_after_type visitor_before_after(trycatch, last_type, it->type());
-                if (trycatch.HasCaught()) {
-                    trycatch.ReThrow();
-                }
-                visitor_type visitor(trycatch, *it);
+                visitor_before_after_type visitor_before_after(last_type, it->type());
+                visitor_type visitor(*it);
 
                 for (auto& handler : handlers) {
                     if (last_type != it->type()) {
                         boost::apply_visitor(visitor_before_after, handler);
                         if (trycatch.HasCaught()) {
-                            trycatch.ReThrow();
+                            throw javascript_error();
                         }
                     }
                     boost::apply_visitor(visitor, handler);
+                    if (trycatch.HasCaught()) {
+                        throw javascript_error();
+                    }
                 }
 
                 if (last_type != it->type()) {
@@ -134,13 +132,15 @@ namespace node_osmium {
                 }
             }
 
-            visitor_before_after_type visitor_before_after(trycatch, last_type, osmium::item_type::undefined);
+            visitor_before_after_type visitor_before_after(last_type, osmium::item_type::undefined);
             for (auto& handler : handlers) {
                 boost::apply_visitor(visitor_before_after, handler);
                 if (trycatch.HasCaught()) {
-                    trycatch.ReThrow();
+                    throw javascript_error();
                 }
             }
+        } catch (const javascript_error& e) {
+            trycatch.ReThrow();
         } catch (const std::exception& e) {
             std::string msg("osmium error: ");
             msg += e.what();

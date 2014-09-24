@@ -159,7 +159,7 @@ namespace node_osmium {
     }
 
     template <class TWrapped>
-    void call_callback_with_entity(v8::TryCatch& trycatch, const v8::Persistent<v8::Function>& function, const osmium::OSMEntity& entity) {
+    void call_callback_with_entity(const v8::Persistent<v8::Function>& function, const osmium::OSMEntity& entity) {
         if (function.IsEmpty()) {
             return;
         }
@@ -171,7 +171,7 @@ namespace node_osmium {
         function->Call(v8::Context::GetCurrent()->Global(), 1, argv);
     }
 
-    void call_callback(v8::TryCatch& trycatch, const v8::Persistent<v8::Function>& function) {
+    void call_callback(const v8::Persistent<v8::Function>& function) {
         if (function.IsEmpty()) {
             return;
         }
@@ -181,26 +181,26 @@ namespace node_osmium {
         function->Call(v8::Context::GetCurrent()->Global(), 0, argv);
     }
 
-    void JSHandler::dispatch_entity(v8::TryCatch& trycatch, const osmium::OSMEntity& entity) const {
+    void JSHandler::dispatch_entity(const osmium::OSMEntity& entity) const {
         switch (entity.type()) {
             case osmium::item_type::node:
                 if (!node_cb.IsEmpty() && (!node_callback_for_tagged_only || !static_cast<const osmium::Node&>(entity).tags().empty())) {
-                    call_callback_with_entity<OSMNodeWrap>(trycatch, node_cb, entity);
+                    call_callback_with_entity<OSMNodeWrap>(node_cb, entity);
                 }
                 break;
             case osmium::item_type::way:
                 if (!way_cb.IsEmpty()) {
-                    call_callback_with_entity<OSMWayWrap>(trycatch, way_cb, entity);
+                    call_callback_with_entity<OSMWayWrap>(way_cb, entity);
                 }
                 break;
             case osmium::item_type::relation:
                 if (!relation_cb.IsEmpty()) {
-                    call_callback_with_entity<OSMRelationWrap>(trycatch, relation_cb, entity);
+                    call_callback_with_entity<OSMRelationWrap>(relation_cb, entity);
                 }
                 break;
             case osmium::item_type::changeset:
                 if (!changeset_cb.IsEmpty()) {
-                    call_callback_with_entity<OSMChangesetWrap>(trycatch, changeset_cb, entity);
+                    call_callback_with_entity<OSMChangesetWrap>(changeset_cb, entity);
                 }
                 break;
             default:
@@ -208,44 +208,44 @@ namespace node_osmium {
         }
     }
 
-    void JSHandler::init(v8::TryCatch& trycatch) const {
-        call_callback(trycatch, init_cb);
+    void JSHandler::init() const {
+        call_callback(init_cb);
     }
 
-    void JSHandler::before_nodes(v8::TryCatch& trycatch) const {
-        call_callback(trycatch, before_nodes_cb);
+    void JSHandler::before_nodes() const {
+        call_callback(before_nodes_cb);
     }
 
-    void JSHandler::after_nodes(v8::TryCatch& trycatch) const {
-        call_callback(trycatch, after_nodes_cb);
+    void JSHandler::after_nodes() const {
+        call_callback(after_nodes_cb);
     }
 
-    void JSHandler::before_ways(v8::TryCatch& trycatch) const {
-        call_callback(trycatch, before_ways_cb);
+    void JSHandler::before_ways() const {
+        call_callback(before_ways_cb);
     }
 
-    void JSHandler::after_ways(v8::TryCatch& trycatch) const {
-        call_callback(trycatch, after_ways_cb);
+    void JSHandler::after_ways() const {
+        call_callback(after_ways_cb);
     }
 
-    void JSHandler::before_relations(v8::TryCatch& trycatch) const {
-        call_callback(trycatch, before_relations_cb);
+    void JSHandler::before_relations() const {
+        call_callback(before_relations_cb);
     }
 
-    void JSHandler::after_relations(v8::TryCatch& trycatch) const {
-        call_callback(trycatch, after_relations_cb);
+    void JSHandler::after_relations() const {
+        call_callback(after_relations_cb);
     }
 
-    void JSHandler::before_changesets(v8::TryCatch& trycatch) const {
-        call_callback(trycatch, before_changesets_cb);
+    void JSHandler::before_changesets() const {
+        call_callback(before_changesets_cb);
     }
 
-    void JSHandler::after_changesets(v8::TryCatch& trycatch) const {
-        call_callback(trycatch, after_changesets_cb);
+    void JSHandler::after_changesets() const {
+        call_callback(after_changesets_cb);
     }
 
-    void JSHandler::done(v8::TryCatch& trycatch) const {
-        call_callback(trycatch, done_cb);
+    void JSHandler::done() const {
+        call_callback(done_cb);
     }
 
 } // namespace node_osmium
