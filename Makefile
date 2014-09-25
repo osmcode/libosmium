@@ -8,20 +8,24 @@ INCLUDES_REPORT_FILES := $(subst src,check_reports,$(INCLUDE_FILES:.hpp=.compile
 
 DEMOS := $(shell find demo -mindepth 1 -maxdepth 1 -type d)
 
-all: osmium.node
+all: build
 
-./node_modules/.bin/node-gyp:
-	npm install node-gyp
+./node_modules:
+	npm install --build-from-source
 
-./build: binding.gyp ./node_modules/.bin/node-gyp
-	./node_modules/.bin/node-gyp configure
+build: ./node_modules
+	./node_modules/.bin/node-pre-gyp build --loglevel=silent
 
-osmium.node: Makefile ./build
-	./node_modules/.bin/node-gyp build
+debug:
+	./node_modules/.bin/node-pre-gyp rebuild --debug
+
+verbose:
+	./node_modules/.bin/node-pre-gyp rebuild --loglevel=verbose
 
 clean:
 	rm -rf ./build ./check_reports lib/binding
-	rm -f lib/osmium.node includes.log iwyu.log
+	rm -f includes.log iwyu.log
+	rm -rf lib/binding/
 
 distclean:
 	rm -rf node_modules demo/*/node_modules
@@ -30,7 +34,7 @@ rebuild:
 	@make clean
 	@make
 
-test: osmium.node
+test: build
 	@PATH="./node_modules/mocha/bin:${PATH}" && NODE_PATH="./lib:$(NODE_PATH)" mocha -R spec --timeout 10s
 
 indent:
