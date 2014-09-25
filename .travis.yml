@@ -41,7 +41,7 @@ before_script:
 - npm install mocha aws-sdk
 # install from source, ensure this works first
 - git clone https://github.com/osmcode/libosmium.git ../libosmium
-- npm install --build-from-source
+- npm install --build-from-source --clang=1
 - if [[ `uname -s` == 'Darwin' ]]; then otool -L ./lib/binding/* || true; fi
 - if [[ `uname -s` == 'Linux' ]]; then readelf -d ./lib/binding/* || true; fi
 - npm test
