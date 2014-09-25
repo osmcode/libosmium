@@ -51,7 +51,7 @@ build like:
 ### Source build dependencies
 
  - Compiler that supports `-std=c++11` (>= clang++ 3.2 || >= g++ 4.8)
- - Boost >= 1.49 with development headers
+ - Boost >= 1.46 with development headers
  - OSM-Binary
  - Protocol buffers
  - zlib
@@ -61,7 +61,6 @@ See also the dependency information for the Osmium library.
 Set dependencies up on Ubuntu Precise (12.04) like:
 
     sudo apt-add-repository --yes ppa:chris-lea/node.js
-    sudo apt-add-repository --yes ppa:mapnik/boost
     sudo apt-add-repository --yes ppa:ubuntu-toolchain-r/test
     sudo apt-get -y update
     sudo apt-get -y install git gcc-4.8 g++-4.8 build-essential nodejs
