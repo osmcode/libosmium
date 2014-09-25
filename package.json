@@ -1,5 +1,6 @@
 {
     "name": "osmium",
+    "version": "0.2.0",
     "description": "Node.js bindings to Osmium",
     "url": "https://github.com/osmcode/node-osmium",
     "homepage": "http://osmcode.org/node-osmium",
@@ -7,7 +8,6 @@
     "contributors": [
         "Jochen Topf <joto>"
     ],
-    "version": "0.1.4",
     "main": "./lib/osmium.js",
     "bugs": {
         "email": "dane@mapbox.com",
@@ -24,25 +24,26 @@
         "url": "git://github.com/osmcode/node-osmium.git"
     },
     "binary": {
-        "module_name": "osmium",
+        "module_name" : "osmium",
         "module_path" : "./lib/binding/",
         "host"        : "https://mapbox-node-binary.s3.amazonaws.com",
         "remote_path" : "./{module_name}/v{version}",
         "package_name": "{node_abi}-{platform}-{arch}.tar.gz"
     },
     "dependencies": {
-        "node-pre-gyp": "~0.5.10"
+        "node-pre-gyp": "0.5.27"
     },
     "bundledDependencies":["node-pre-gyp"],
     "devDependencies": {
-        "mocha": "*"
+        "mocha": "*",
+        "aws-sdk": "2.0.12"
     },
     "licenses": [ { "type": "Boost" } ],
     "engines": {
-        "node": ">= 0.6.13 < 0.11.0"
+        "node": ">= 0.10.0 < 0.11.0"
     },
     "scripts": {
         "install": "node-pre-gyp install --fallback-to-build",
-        "test": "mocha -R spec"
+        "test": "mocha -R spec --timeout 10000"
     }
 }
