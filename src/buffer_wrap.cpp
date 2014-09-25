@@ -1,4 +1,7 @@
 
+// node
+#include <node_buffer.h>
+
 // node-osmium
 #include "buffer_wrap.hpp"
 #include "osm_node_wrap.hpp"
@@ -25,9 +28,16 @@ namespace node_osmium {
             v8::Local<v8::External> ext = v8::Local<v8::External>::Cast(args[0]);
             static_cast<BufferWrap*>(ext->Value())->Wrap(args.This());
             return args.This();
-        } else {
-            return ThrowException(v8::Exception::TypeError(v8::String::New("osmium.Buffer cannot be created in Javascript")));
+        } else if (args.Length() == 1 && args[0]->IsObject()) {
+            auto obj = args[0]->ToObject();
+            if (node::Buffer::HasInstance(obj)) {
+                osmium::memory::Buffer buffer(reinterpret_cast<unsigned char*>(node::Buffer::Data(obj)), node::Buffer::Length(obj));
+                BufferWrap* bw = new BufferWrap(std::move(buffer));
+                bw->Wrap(args.This());
+                return args.This();
+            }
         }
+        return ThrowException(v8::Exception::TypeError(v8::String::New("osmium.Buffer takes a single argument, a node::Buffer")));
     }
 
     v8::Handle<v8::Value> BufferWrap::next(const v8::Arguments& args) {
