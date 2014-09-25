@@ -43,6 +43,6 @@
     },
     "scripts": {
         "install": "node-pre-gyp install --fallback-to-build",
-        "test": "mocha -R spec"
+        "test": "mocha -R spec --timeout 10000"
     }
 }

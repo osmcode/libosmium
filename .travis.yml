@@ -44,7 +44,7 @@ before_script:
 - npm install --build-from-source
 - if [[ `uname -s` == 'Darwin' ]]; then otool -L ./lib/binding/* || true; fi
 - if [[ `uname -s` == 'Linux' ]]; then readelf -d ./lib/binding/* || true; fi
-- npm test -- --timeout 10s
+- npm test
 - node-pre-gyp package
 - node-pre-gyp testpackage
 
@@ -66,4 +66,4 @@ script:
 # if install returned non zero (errored) then we first unpublish and then call false so travis will bail at this line
 - if [[ $INSTALL_RESULT != 0 ]]; then echo "returned $INSTALL_RESULT";node-pre-gyp unpublish;false; fi
 # If success then we arrive here so let's test again
-- npm test -- --timeout 10s
+- npm test
