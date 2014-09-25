@@ -59,7 +59,7 @@ script:
 # if either are true, then publish the binary
 # Note: this publishing is done here, in the 'script' section, instead of the 'after_success'
 # since we want any failure here to stop the build immediately
-- if [[ $PUBLISH_BINARY == true ]]; then node-pre-gyp unpublish publish; fi
+- if [[ $PUBLISH_BINARY == true ]]; then node-pre-gyp publish; fi
 # now clean up to prepare to re-install from remote binary
 - node-pre-gyp clean
 # now install from published binary
