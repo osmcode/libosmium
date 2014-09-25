@@ -5,6 +5,8 @@ Fast and flexible Javascript library for working with OpenStreetMap data.
 Provides bindings to the [libosmium](https://github.com/osmcode/libosmium)
 C++ library.
 
+[![NPM](https://nodei.co/npm/osmium.png?downloads=true&downloadRank=true)](https://nodei.co/npm/osmium/)
+
 [![Build Status](https://secure.travis-ci.org/osmcode/node-osmium.png)](http://travis-ci.org/osmcode/node-osmium)
 
 ## Depends
