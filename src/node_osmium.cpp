@@ -17,6 +17,7 @@
 
 // node-osmium
 #include "apply.hpp"
+#include "buffer_wrap.hpp"
 #include "file_wrap.hpp"
 #include "handler.hpp"
 #include "location_handler_wrap.hpp"
@@ -49,6 +50,7 @@ namespace node_osmium {
             node_osmium::JSHandler::Initialize(target);
             node_osmium::FileWrap::Initialize(target);
             node_osmium::ReaderWrap::Initialize(target);
+            node_osmium::BufferWrap::Initialize(target);
         }
     }
 

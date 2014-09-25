@@ -9,6 +9,7 @@
       "target_name": "<(module_name)",
       "sources": [
         "src/apply.cpp",
+        "src/buffer_wrap.cpp",
         "src/file_wrap.cpp",
         "src/handler.cpp",
         "src/location_handler_wrap.cpp",

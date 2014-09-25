@@ -13,6 +13,7 @@
 
 // node-osmium
 #include "apply.hpp"
+#include "buffer_wrap.hpp"
 #include "handler.hpp"
 #include "location_handler_wrap.hpp"
 #include "reader_wrap.hpp"
@@ -178,6 +179,9 @@ namespace node_osmium {
                 typedef osmium::io::InputIterator<osmium::io::Reader, osmium::OSMEntity> input_iterator;
 
                 return scope.Close(apply_iterator(input_iterator{reader}, input_iterator{}, handlers));
+            } else if (BufferWrap::constructor->HasInstance(source)) {
+                osmium::memory::Buffer& buffer = unwrap<BufferWrap>(source);
+                return scope.Close(apply_iterator(buffer.begin(), buffer.end(), handlers));
             } else if (node::Buffer::HasInstance(source)) {
                 osmium::memory::Buffer buffer(reinterpret_cast<unsigned char*>(node::Buffer::Data(source)), node::Buffer::Length(source));
 

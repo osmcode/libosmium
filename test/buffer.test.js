@@ -3,55 +3,65 @@ var assert = require('assert');
 
 describe('buffer', function() {
 
-    it('should not be able to create an osmium.OSMObject from Javascript', function() {
-        var got_exception = false;
-        try {
-            var object = new osmium.OSMObject;
-        } catch (e) {
-            assert.ok(e instanceof TypeError);
-            assert.equal(e.message, 'osmium.OSMObject cannot be created in Javascript');
-            got_exception = true;
-        } finally {
-            assert.ok(got_exception);
+    it('should allow reading into buffer', function(done) {
+        var file = new osmium.File(__dirname + "/data/winthrop.osm");
+        var reader = new osmium.Reader(file);
+
+        var handler = new osmium.Handler();
+        var count = 0;
+        handler.on('node', function(node) {
+            if (count++ == 0) {
+                assert.equal(node.id, 50031066);
+                done();
+            }
+        });
+
+        var buffer = reader.read();
+        osmium.apply(buffer, handler);
+    });
+
+    it('should allow reading into buffer in a loop', function(done) {
+        var file = new osmium.File(__dirname + "/data/winthrop.osm");
+        var reader = new osmium.Reader(file);
+
+        var handler = new osmium.Handler();
+        var count = 0;
+        handler.on('node', function(node) {
+            if (count++ == 0) {
+                assert.equal(node.id, 50031066);
+                done();
+            }
+        });
+
+        var buffer;
+        while (buffer = reader.read()) {
+            osmium.apply(buffer, handler);
         }
     });
 
-    it('should not be able to create an osmium.Node from Javascript', function() {
-        var got_exception = false;
-        try {
-            var node = new osmium.Node;
-        } catch (e) {
-            assert.ok(e instanceof TypeError);
-            assert.equal(e.message, 'osmium.Node cannot be created in Javascript');
-            got_exception = true;
-        } finally {
-            assert.ok(got_exception);
-        }
-    });
+    it('should allow iterating over buffer', function() {
+        var file = new osmium.File(__dirname + "/data/winthrop.osm");
+        var reader = new osmium.Reader(file);
 
-    it('should not be able to create an osmium.Way from Javascript', function() {
-        var got_exception = false;
-        try {
-            var way = new osmium.Way;
-        } catch (e) {
-            assert.ok(e instanceof TypeError);
-            assert.equal(e.message, 'osmium.Way cannot be created in Javascript');
-            got_exception = true;
-        } finally {
-            assert.ok(got_exception);
-        }
-    });
+        var buffer;
+        while (buffer = reader.read()) {
+            var object = buffer.next();
+            assert.ok(object instanceof osmium.Node);
+            assert.equal(object.id, 50031066);
 
-    it('should not be able to create an osmium.Relation from Javascript', function() {
-        var got_exception = false;
-        try {
-            var relation = new osmium.Relation;
-        } catch (e) {
-            assert.ok(e instanceof TypeError);
-            assert.equal(e.message, 'osmium.Relation cannot be created in Javascript');
-            got_exception = true;
-        } finally {
-            assert.ok(got_exception);
+            object = buffer.next();
+            assert.ok(object instanceof osmium.Node);
+            assert.equal(object.id, 50031085);
+
+            var count=0, ways=0;
+            while (object = buffer.next()) {
+                if (ways == 0 && object instanceof osmium.Way) {
+                    ++ways;
+                    assert.equal(object.id, 6091729);
+                }
+                ++count;
+            }
+            assert.equal(count, 1525 /*nodes*/ + 98 /*ways*/ + 2 /*relations*/ - 2 /*already read*/);
         }
     });
 

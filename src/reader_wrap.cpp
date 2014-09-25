@@ -8,11 +8,12 @@
 #include <node.h>
 
 // node-osmium
-#include "reader_wrap.hpp"
+#include "buffer_wrap.hpp"
 #include "file_wrap.hpp"
 #include "handler.hpp"
 #include "location_handler_wrap.hpp"
 #include "osm_object_wrap.hpp"
+#include "reader_wrap.hpp"
 #include "utils.hpp"
 
 namespace node_osmium {
@@ -28,6 +29,7 @@ namespace node_osmium {
         constructor->SetClassName(v8::String::NewSymbol("Reader"));
         node::SetPrototypeMethod(constructor, "header", header);
         node::SetPrototypeMethod(constructor, "close", close);
+        node::SetPrototypeMethod(constructor, "read", read);
         target->Set(v8::String::NewSymbol("Reader"), constructor->GetFunction());
     }
 
@@ -109,6 +111,23 @@ namespace node_osmium {
         v8::HandleScope scope;
         try {
             unwrap<ReaderWrap>(args.This()).close();
+        } catch (const std::exception& e) {
+            std::string msg("osmium error: ");
+            msg += e.what();
+            return ThrowException(v8::Exception::Error(v8::String::New(msg.c_str())));
+        }
+        return scope.Close(v8::Undefined());
+    }
+
+    v8::Handle<v8::Value> ReaderWrap::read(const v8::Arguments& args) {
+        v8::HandleScope scope;
+        try {
+            osmium::memory::Buffer buffer = unwrap<ReaderWrap>(args.This()).read();
+            if (buffer) {
+                v8::Handle<v8::Value> ext = v8::External::New(new BufferWrap(std::move(buffer)));
+                v8::Local<v8::Object> obj = BufferWrap::constructor->GetFunction()->NewInstance(1, &ext);
+                return scope.Close(obj);
+            }
         } catch (const std::exception& e) {
             std::string msg("osmium error: ");
             msg += e.what();
