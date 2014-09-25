@@ -45,18 +45,18 @@ before_script:
 - if [[ `uname -s` == 'Darwin' ]]; then otool -L ./lib/binding/* || true; fi
 - if [[ `uname -s` == 'Linux' ]]; then readelf -d ./lib/binding/* || true; fi
 - npm test -- --timeout 10s
+- node-pre-gyp package
+- node-pre-gyp testpackage
 
 script:
 # now we publish the binary, if needed
 - PUBLISH_BINARY=false
-# check if this is a git tag built statically to be portable
-- if [[ $RUN_BUILD == "static_build" ]] && [[ $TRAVIS_BRANCH == `git describe --tags --always HEAD` ]]; then echo PUBLISH_BINARY;PUBLISH_BINARY=true; fi;
 # or check if we are manually requesting binary publishing via a commit keyword
-- if [[ $RUN_BUILD == "static_build" ]] && test "${COMMIT_MESSAGE#*'[publish binary]'}" != "$COMMIT_MESSAGE"; then echo PUBLISH_BINARY;PUBLISH_BINARY=true; fi;
+- if [[ $RUN_BUILD == "static_build" ]] && test "${COMMIT_MESSAGE#*'[publish binary]'}" != "$COMMIT_MESSAGE"; then PUBLISH_BINARY=true; fi;
 # if either are true, then publish the binary
 # Note: this publishing is done here, in the 'script' section, instead of the 'after_success'
 # since we want any failure here to stop the build immediately
-- if [[ $PUBLISH_BINARY == true ]]; then node-pre-gyp package publish; fi
+- if [[ $PUBLISH_BINARY == true ]]; then node-pre-gyp publish; fi
 # now clean up to prepare to re-install from remote binary
 - node-pre-gyp clean
 # now install from published binary
@@ -65,5 +65,5 @@ script:
 - if [[ $PUBLISH_BINARY == true ]]; then INSTALL_RESULT=$(npm install --fallback-to-build=false > /dev/null)$? || true; fi
 # if install returned non zero (errored) then we first unpublish and then call false so travis will bail at this line
 - if [[ $INSTALL_RESULT != 0 ]]; then echo "returned $INSTALL_RESULT";node-pre-gyp unpublish;false; fi
-# If success then we arrive here so lets clean up
-- node-pre-gyp clean
+# If success then we arrive here so let's test again
+- npm test -- --timeout 10s
