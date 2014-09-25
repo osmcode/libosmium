@@ -35,7 +35,8 @@
     },
     "bundledDependencies":["node-pre-gyp"],
     "devDependencies": {
-        "mocha": "*"
+        "mocha": "*",
+        "aws-sdk": "2.0.12"
     },
     "licenses": [ { "type": "Boost" } ],
     "engines": {

@@ -42,7 +42,6 @@ install:
 - cd ${NODE_MODULE_ROOT}
 
 before_script:
-- npm install mocha aws-sdk
 # install from source, ensure this works first
 - git clone https://github.com/osmcode/libosmium.git ../libosmium
 - npm install --build-from-source --clang=1
