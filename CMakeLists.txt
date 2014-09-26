@@ -62,6 +62,8 @@ endif()
 # check that the essential libraries were found
 if(BUILD_EXAMPLES OR BUILD_TESTING OR BUILD_TRY_HPPS)
 
+    find_package(Threads)
+
     find_package(Boost 1.38)
     mark_as_advanced(CLEAR BOOST_ROOT)
 
