@@ -805,7 +805,7 @@ namespace osmium {
 
                     // when the resulting file will carry history information, add
                     // HistoricalInformation as required feature
-                    if (this->m_file.has_multiple_object_versions()) {
+                    if (m_file.has_multiple_object_versions()) {
                         pbf_header_block.add_required_features("HistoricalInformation");
                     }
 

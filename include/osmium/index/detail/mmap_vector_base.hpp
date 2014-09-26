@@ -141,13 +141,13 @@ namespace osmium {
             }
 
             void resize(size_t new_size) {
-                if (new_size > this->capacity()) {
+                if (new_size > capacity()) {
                     static_cast<TDerived<T>*>(this)->reserve(new_size + osmium::detail::mmap_vector_size_increment);
                 }
-                if (new_size > this->size()) {
-                    new (this->data() + this->size()) T[new_size - this->size()];
+                if (new_size > size()) {
+                    new (data() + size()) T[new_size - size()];
                 }
-                this->m_size = new_size;
+                m_size = new_size;
             }
 
             iterator begin() {
