@@ -2,7 +2,7 @@
 
 #include <osmium/index/detail/typed_mmap.hpp>
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) || (defined(__GNUC__) && defined(_WIN32))
   #include "win_mkstemp.hpp"
 #endif
 
