@@ -60,8 +60,9 @@ all:
 
 clean:
 	rm -fr includes.log iwyu.log check_reports
-	rm -fr doc/html doc/xml doc/classes.txt doc/structs.txt doc/template-classes.txt doc/includes.txt test/tests tests/test_*.o
-	rm -fr test/tests tests/test_*.o
+	rm -fr doc/html doc/xml doc/classes.txt doc/structs.txt doc/template-classes.txt doc/includes.txt
+	rm -f test/tests test/test_*.o
+	$(MAKE) -C examples clean
 	$(MAKE) -C test/osm-testdata clean
 
 check:
