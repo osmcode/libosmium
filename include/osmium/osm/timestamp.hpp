@@ -82,7 +82,7 @@ namespace osmium {
          * Throws std::invalid_argument, if the timestamp can not be parsed.
          */
         explicit Timestamp(const char* timestamp) {
-#ifndef WIN32
+#ifndef _WIN32
             struct tm tm {
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
             };

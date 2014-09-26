@@ -77,7 +77,7 @@ namespace osmium {
                     } else {
                         flags |= O_EXCL;
                     }
-#ifdef WIN32
+#ifdef _WIN32
                     flags |= O_BINARY;
 #endif
                     int fd = ::open(filename.c_str(), flags, 0666);
@@ -101,7 +101,7 @@ namespace osmium {
                     return 0; // stdin
                 } else {
                     int flags = O_RDONLY;
-#ifdef WIN32
+#ifdef _WIN32
                     flags |= O_BINARY;
 #endif
                     int fd = ::open(filename.c_str(), flags);

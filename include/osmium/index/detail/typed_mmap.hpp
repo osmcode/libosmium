@@ -40,7 +40,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <sys/stat.h>
 
-#ifndef WIN32
+#ifndef _WIN32
 # include <sys/mman.h>
 #else
 # include <mmap_for_windows.hpp>
