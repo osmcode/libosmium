@@ -480,6 +480,11 @@ namespace osmium {
                         throw osmium::pbf_error(std::string("required feature not supported: ") + feature);
                     }
 
+                    for (int i=0; i < pbf_header_block.optional_features_size(); ++i) {
+                        const std::string& feature = pbf_header_block.optional_features(i);
+                        m_header.set("pbf_optional_feature_" + std::to_string(i), feature);
+                    }
+
                     if (pbf_header_block.has_writingprogram()) {
                         m_header.set("generator", pbf_header_block.writingprogram());
                     }
