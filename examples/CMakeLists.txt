@@ -1,3 +1,5 @@
+message(STATUS "Configuring examples...")
+
 if(CMAKE_COMPILER_IS_GNUCC)
     add_compile_options(
         -Wall
@@ -18,7 +20,15 @@ endif()
 
 add_definitions(-D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64)
 
-set(BASIC_LIBS ${EXPAT_LIBRARY} ${OSMPBF_LIBRARIES} ${PROTOBUF_LITE_LIBRARY} ${ZLIB_LIBRARY} ${BZIP2_LIBRARIES} ${WIN_LIBS} ${CMAKE_THREAD_LIBS_INIT})
+set(BASIC_LIBS
+    ${EXPAT_LIBRARY}
+    ${OSMPBF_LIBRARIES}
+    ${PROTOBUF_LITE_LIBRARY}
+    ${ZLIB_LIBRARY}
+    ${BZIP2_LIBRARIES}
+    ${WIN_LIBS}
+    ${CMAKE_THREAD_LIBS_INIT}
+)
 
 set(SIMPLE_EXAMPLES
     osmium_read
@@ -29,7 +39,7 @@ set(SIMPLE_EXAMPLES
     osmium_use_node_cache
 )
 
-if (SPARSEHASH_FOUND)
+if(SPARSEHASH_FOUND)
     list(APPEND SIMPLE_EXAMPLES osmium_area_test)
 else()
     message("Skipped osmium_area_test example - needed Google SparseHash")
@@ -37,7 +47,7 @@ endif()
 
 
 foreach(example ${SIMPLE_EXAMPLES})
-    message(${example})
+    message(STATUS "Configuring example ${example}...")
     add_executable(${example} "${example}.cpp")
     target_link_libraries(${example} ${BASIC_LIBS})
 endforeach(example)
@@ -50,7 +60,7 @@ if(Boost_PROGRAM_OPTIONS_FOUND)
     set(example
         osmium_index
     )
-    message(${example})
+    message(STATUS "Configuring example ${example}...")
     add_executable(${example} "${example}.cpp")
     target_link_libraries(${example} ${Boost_PROGRAM_OPTIONS_LIBRARY} ${BASIC_LIBS})
 else()
@@ -64,7 +74,7 @@ set(OGR_EXAMPLES
 
 if(GDAL_FOUND AND GEOS_FOUND AND SPARSEHASH_FOUND)
     foreach(example ${OGR_EXAMPLES})
-        message(${example})
+        message(STATUS "Configuring example ${example}...")
         add_executable(${example} "${example}.cpp")
         target_link_libraries(${example} ${GDAL_LIBRARIES} ${GEOS_LIBRARY} ${BASIC_LIBS})
     endforeach(example)

@@ -1,4 +1,10 @@
-if (NOT GDAL_FOUND OR NOT GEOS_FOUND OR NOT OSMPBF_FOUND OR NOT PROTOBUF_FOUND OR NOT EXPAT_FOUND)
+message(STATUS "Configuring osm-testdata tests...")
+
+if(NOT GDAL_FOUND OR
+   NOT GEOS_FOUND OR
+   NOT OSMPBF_FOUND OR
+   NOT PROTOBUF_FOUND OR
+   NOT EXPAT_FOUND)
     message("Sorry, building osm-testdata tests needs GEOS, GDAL, Expat, Protobuf and OSMPBF")
     return()
 endif()
@@ -17,12 +23,37 @@ endif()
 
 
 if(CMAKE_COMPILER_IS_GNUCC)
-    set(CXX_FLAGS_WARNINGS "-Wall -Wextra -Wredundant-decls -Wdisabled-optimization -pedantic -Wctor-dtor-privacy -Wnon-virtual-dtor -Woverloaded-virtual -Wsign-promo -Wno-long-long")
-    set(CXXFLAGS "-g")
+    add_compile_options(
+        -Wall
+        -Wextra
+        -pedantic
+        -Wredundant-decls
+        -Wdisabled-optimization
+        -Wctor-dtor-privacy
+        -Wnon-virtual-dtor
+        -Woverloaded-virtual
+        -Wsign-promo
+        -Wno-long-long
+        -Wno-unused-variable # suppress warnings from Catch unit test macros
+        $<$<CXX_COMPILER_ID:Clang>:-Wdocumentation>
+        $<$<CXX_COMPILER_ID:Clang>:-Wunused-exception-parameter>
+        $<$<CXX_COMPILER_ID:Clang>:-Wmissing-declarations>
+        $<$<CXX_COMPILER_ID:Clang>:-Weverything>
+        $<$<CXX_COMPILER_ID:Clang>:-Wno-c++98-compat>
+        $<$<CXX_COMPILER_ID:Clang>:-Wno-c++98-compat-pedantic>
+        $<$<CXX_COMPILER_ID:Clang>:-Wno-unused-macros>
+        $<$<CXX_COMPILER_ID:Clang>:-Wno-exit-time-destructors>
+        $<$<CXX_COMPILER_ID:Clang>:-Wno-global-constructors>
+        $<$<CXX_COMPILER_ID:Clang>:-Wno-padded>
+        $<$<CXX_COMPILER_ID:Clang>:-Wno-switch-enum>
+        $<$<CXX_COMPILER_ID:Clang>:-Wno-missing-prototypes>
+        $<$<CXX_COMPILER_ID:Clang>:-Wno-weak-vtables>
+        $<$<CXX_COMPILER_ID:Clang>:-Wno-cast-align>
+        $<$<CXX_COMPILER_ID:Clang>:-Wno-float-equal>
+    )
+    set(CXXFLAGS "-O3 -g")
     set(CMAKE_CXX_FLAGS "${CXXFLAGS} ${CXX_FLAGS_WARNINGS}")
 endif(CMAKE_COMPILER_IS_GNUCC)
-
-message(STATUS ${CMAKE_CXX_FLAGS})
 
 set(LIBS ${EXPAT_LIBRARY} ${OSMPBF_LIBRARIES} ${PROTOBUF_LITE_LIBRARY}
     ${ZLIB_LIBRARY} ${BZIP2_LIBRARIES} ${GEOS_LIBRARY} ${GDAL_LIBRARY}
@@ -45,7 +76,11 @@ if(MSVC)
 else()
     set(EXE_DIR .)
 endif()
-add_test(testdata-multipolygon ${CMAKE_SOURCE_DIR}/test/osm-testdata/${MULTIPOLYGON_TEST_SCRIPT} ${TESTDATA_DIR} ${EXE_DIR})
+add_test(testdata-multipolygon
+         ${CMAKE_SOURCE_DIR}/test/osm-testdata/${MULTIPOLYGON_TEST_SCRIPT}
+         ${TESTDATA_DIR}
+         ${EXE_DIR}
+)
 
 file(GLOB TESTCASE_CPPS testcases/*.cpp)
 add_executable(testdata-testcases testdata-testcases.cpp ${TESTCASE_CPPS})

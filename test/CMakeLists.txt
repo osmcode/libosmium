@@ -1,15 +1,26 @@
+message(STATUS "Configuring unit tests...")
+
 set(DART_TESTING_TIMEOUT 60)
 include(Dart)
 
 include_directories("include")
 
 if(CMAKE_COMPILER_IS_GNUCC)
-    set(CXX_FLAGS_WARNINGS "-Wall -Wextra -Wredundant-decls -Wdisabled-optimization -pedantic -Wctor-dtor-privacy -Wnon-virtual-dtor -Woverloaded-virtual -Wsign-promo -Wno-long-long")
+    add_compile_options(
+        -Wall
+        -Wextra
+        -pedantic
+        -Wredundant-decls
+        -Wdisabled-optimization
+        -Wctor-dtor-privacy
+        -Wnon-virtual-dtor
+        -Woverloaded-virtual
+        -Wsign-promo
+        -Wno-long-long
+    )
     set(CXXFLAGS "-g")
-    set(CMAKE_CXX_FLAGS "${CXXFLAGS} ${CXX_FLAGS_WARNINGS}")
+    set(CMAKE_CXX_FLAGS "${CXXFLAGS}")
 endif(CMAKE_COMPILER_IS_GNUCC)
-
-message(STATUS ${CMAKE_CXX_FLAGS})
 
 add_library(testlib STATIC test_main.cpp)
 
@@ -70,7 +81,7 @@ if(GEOS_FOUND AND PROJ_FOUND)
         test_wkt
     )
     set(LIBS ${GEOS_LIBRARY} ${PROJ_LIBRARY} ${BZIP2_LIBRARY})
-    if (GDAL_FOUND)
+    if(GDAL_FOUND)
       list(APPEND TESTS test_ogr)
       list(APPEND LIBS ${GDAL_LIBRARY})
     endif()
@@ -83,10 +94,10 @@ set(TEST_GROUP index)
 set(TESTS
     test_typed_mmap
 )
-if (SPARSEHASH_FOUND)
+if(SPARSEHASH_FOUND)
     list(APPEND TESTS test_id_to_location)
 else()
-    message("Skipped index/test_id_to_localtion test - needed Google SparseHash")
+    message("Skipped index/test_id_to_location test - needed Google SparseHash")
 endif()
 set(LIBS "")
 compile_tests()
@@ -101,7 +112,15 @@ compile_tests()
 set(TESTS
     test_reader
 )
-set(LIBS ${EXPAT_LIBRARY} ${OSMPBF_LIBRARIES} ${PROTOBUF_LITE_LIBRARY} ${ZLIB_LIBRARY} ${BZIP2_LIBRARIES} ${WIN_LIBS} ${CMAKE_THREAD_LIBS_INIT})
+set(LIBS
+    ${EXPAT_LIBRARY}
+    ${OSMPBF_LIBRARIES}
+    ${PROTOBUF_LITE_LIBRARY}
+    ${ZLIB_LIBRARY}
+    ${BZIP2_LIBRARIES}
+    ${WIN_LIBS}
+    ${CMAKE_THREAD_LIBS_INIT}
+)
 compile_tests()
 
 set(TEST_GROUP tags)
