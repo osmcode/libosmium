@@ -3,7 +3,7 @@ if (NOT GDAL_FOUND OR NOT GEOS_FOUND OR NOT OSMPBF_FOUND OR NOT PROTOBUF_FOUND O
     return()
 endif()
 
-set(DART_TESTING_TIMEOUT 60)
+set(DART_TESTING_TIMEOUT 300)
 include(Dart)
 
 include_directories("include")
