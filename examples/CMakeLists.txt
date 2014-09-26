@@ -31,11 +31,12 @@ set(BASIC_LIBS
 )
 
 set(SIMPLE_EXAMPLES
-    osmium_read
-    osmium_debug
     osmium_convert
-    osmium_serdump
+    osmium_count
     osmium_create_node_cache
+    osmium_debug
+    osmium_read
+    osmium_serdump
     osmium_use_node_cache
 )
 
