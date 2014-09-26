@@ -64,6 +64,7 @@ LIB_PRGOPT := -lboost_program_options
 PROGRAMS := \
     osmium_area_test \
     osmium_convert \
+    osmium_count \
     osmium_create_node_cache \
     osmium_use_node_cache \
     osmium_debug \
@@ -90,6 +91,9 @@ osmium_area_test: osmium_area_test.cpp
 	$(CXX) $(CXXFLAGS) $(CXXFLAGS_WARNINGS) -o $@ $< $(LDFLAGS) $(LIB_IO)
 
 osmium_convert: osmium_convert.cpp
+	$(CXX) $(CXXFLAGS) $(CXXFLAGS_WARNINGS) -o $@ $< $(LDFLAGS) $(LIB_IO)
+
+osmium_count: osmium_count.cpp
 	$(CXX) $(CXXFLAGS) $(CXXFLAGS_WARNINGS) -o $@ $< $(LDFLAGS) $(LIB_IO)
 
 osmium_create_node_cache: osmium_create_node_cache.cpp

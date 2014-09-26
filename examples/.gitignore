@@ -1,12 +1,13 @@
+core
+ogr_out
 osmium_area_test
-osmium_create_node_cache
-osmium_use_node_cache
 osmium_convert
+osmium_count
+osmium_create_node_cache
 osmium_debug
 osmium_index
 osmium_read
 osmium_serdump
 osmium_toogr
 osmium_toogr2
-ogr_out
-core
+osmium_use_node_cache
