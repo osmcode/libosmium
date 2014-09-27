@@ -85,10 +85,10 @@ int main(int argc, char* argv[]) {
     }
 
     std::string dir(argv[optind+1]);
-#ifndef _MSC_VER
+#ifndef _WIN32
     int result = ::mkdir(dir.c_str(), 0777);
 #else
-    int result = _mkdir(dir.c_str());
+    int result = mkdir(dir.c_str());
 #endif
     if (result == -1 && errno != EEXIST) {
         std::cerr << "Problem creating directory '" << dir << "': " << strerror(errno) << "\n";
