@@ -38,7 +38,7 @@ namespace node_osmium {
 
     v8::Handle<v8::Value> OSMRelationWrap::get_members_count(v8::Local<v8::String> /* property */, const v8::AccessorInfo& info) {
         v8::HandleScope scope;
-        return scope.Close(v8::Number::New(wrapped(info.This()).members().size()));
+        return scope.Close(v8::Uint32::New(wrapped(info.This()).members().size()));
     }
 
     v8::Handle<v8::Value> OSMRelationWrap::members(const v8::Arguments& args) {
@@ -63,11 +63,11 @@ namespace node_osmium {
                 return scope.Close(members);
             }
             case 1: {
-                if (!args[0]->IsNumber()) {
+                if (!args[0]->IsUint32()) {
                     return ThrowException(v8::Exception::TypeError(v8::String::New("call members() without parameters or the index of the member you want")));
                 }
-                int n = static_cast<int>(args[0]->ToNumber()->Value());
-                if (n >= 0 && n < static_cast<int>(relation.members().size())) {
+                uint32_t n = args[0]->ToUint32()->Value();
+                if (n < relation.members().size()) {
                     auto it = relation.members().begin();
                     std::advance(it, n);
                     const osmium::RelationMember& member = *it;

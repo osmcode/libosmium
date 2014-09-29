@@ -49,7 +49,7 @@ namespace node_osmium {
 
     v8::Handle<v8::Value> OSMChangesetWrap::get_uid(v8::Local<v8::String> /* property */, const v8::AccessorInfo& info) {
         v8::HandleScope scope;
-        return scope.Close(v8::Number::New(wrapped(info.This()).uid()));
+        return scope.Close(v8::Uint32::New(wrapped(info.This()).uid()));
     }
 
     v8::Handle<v8::Value> OSMChangesetWrap::get_user(v8::Local<v8::String> /* property */, const v8::AccessorInfo& info) {
@@ -59,17 +59,17 @@ namespace node_osmium {
 
     v8::Handle<v8::Value> OSMChangesetWrap::get_num_changes(v8::Local<v8::String> /* property */, const v8::AccessorInfo& info) {
         v8::HandleScope scope;
-        return scope.Close(v8::Number::New(wrapped(info.This()).num_changes()));
+        return scope.Close(v8::Uint32::New(wrapped(info.This()).num_changes()));
     }
 
     v8::Handle<v8::Value> OSMChangesetWrap::get_created_at(v8::Local<v8::String> /* property */, const v8::AccessorInfo& info) {
         v8::HandleScope scope;
-        return scope.Close(v8::Number::New(wrapped(info.This()).created_at()));
+        return scope.Close(v8::Uint32::New(wrapped(info.This()).created_at()));
     }
 
     v8::Handle<v8::Value> OSMChangesetWrap::get_closed_at(v8::Local<v8::String> /* property */, const v8::AccessorInfo& info) {
         v8::HandleScope scope;
-        return scope.Close(v8::Number::New(wrapped(info.This()).closed_at()));
+        return scope.Close(v8::Uint32::New(wrapped(info.This()).closed_at()));
     }
 
     v8::Handle<v8::Value> OSMChangesetWrap::get_open(v8::Local<v8::String> /* property */, const v8::AccessorInfo& info) {

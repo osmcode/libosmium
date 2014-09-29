@@ -71,7 +71,7 @@ namespace node_osmium {
 
     v8::Handle<v8::Value> OSMWayWrap::get_nodes_count(v8::Local<v8::String> /* property */, const v8::AccessorInfo& info) {
         v8::HandleScope scope;
-        return scope.Close(v8::Number::New(wrapped(info.This()).nodes().size()));
+        return scope.Close(v8::Uint32::New(wrapped(info.This()).nodes().size()));
     }
 
     v8::Handle<v8::Value> OSMWayWrap::node_refs(const v8::Arguments& args) {
@@ -90,11 +90,11 @@ namespace node_osmium {
                 return scope.Close(nodes);
             }
             case 1: {
-                if (!args[0]->IsNumber()) {
+                if (!args[0]->IsUint32()) {
                     return ThrowException(v8::Exception::TypeError(v8::String::New("call node_refs() without parameters or the index of the node you want")));
                 }
-                int n = static_cast<int>(args[0]->ToNumber()->Value());
-                if (n >= 0 && n < static_cast<int>(way.nodes().size())) {
+                uint32_t n = args[0]->ToUint32()->Value();
+                if (n < way.nodes().size()) {
                     return scope.Close(v8::Number::New(way.nodes()[n].ref()));
                 } else {
                     return ThrowException(v8::Exception::RangeError(v8::String::New("argument to node_refs() out of range")));
@@ -130,11 +130,11 @@ namespace node_osmium {
                 }
             }
             case 1: {
-                if (!args[0]->IsNumber()) {
+                if (!args[0]->IsUint32()) {
                     return ThrowException(v8::Exception::TypeError(v8::String::New("call node_coordinates() without parameters or the index of the node you want")));
                 }
-                int n = static_cast<int>(args[0]->ToNumber()->Value());
-                if (n >= 0 && n < static_cast<int>(way.nodes().size())) {
+                uint32_t n = args[0]->ToUint32()->Value();
+                if (n < way.nodes().size()) {
                     const osmium::Location location = way.nodes()[n].location();
                     if (location.valid()) {
                         v8::Local<v8::Value> argv[2] = { v8::Number::New(location.lon()), v8::Number::New(location.lat()) };
