@@ -58,11 +58,7 @@ namespace osmium {
 
         static constexpr osmium::item_type itemtype = osmium::item_type::node;
 
-        const osmium::Location location() const {
-            return m_location;
-        }
-
-        osmium::Location& location() {
+        osmium::Location location() const {
             return m_location;
         }
 

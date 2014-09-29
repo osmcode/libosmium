@@ -138,7 +138,7 @@ namespace osmium {
                 bool error = false;
                 for (auto& node_ref : way.nodes()) {
                     try {
-                        node_ref.location(get_node_location(node_ref.ref()));
+                        node_ref.set_location(get_node_location(node_ref.ref()));
                         if (!node_ref.location()) {
                             error = true;
                         }
@@ -152,8 +152,9 @@ namespace osmium {
             }
 
             /**
-             * Call clear on the location indexes. Makes the NodeLocationsForWays
-             * handler unusable. Used to explicitly free memory if thats needed.
+             * Call clear on the location indexes. Makes the
+             * NodeLocationsForWays handler unusable. Used to explicitly free
+             * memory if thats needed.
              */
             void clear() {
                 m_storage_pos.clear();

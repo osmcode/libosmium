@@ -342,16 +342,22 @@ namespace osmium {
                     if (m_in_delete_section) {
                         object.set_visible(false);
                     }
+
+                    osmium::Location location;
                     for (int count = 0; attrs[count]; count += 2) {
                         if (!strcmp(attrs[count], "lon")) {
-                            static_cast<osmium::Node&>(object).location().set_lon(std::atof(attrs[count+1])); // XXX doesn't detect garbage after the number
+                            location.set_lon(std::atof(attrs[count+1])); // XXX doesn't detect garbage after the number
                         } else if (!strcmp(attrs[count], "lat")) {
-                            static_cast<osmium::Node&>(object).location().set_lat(std::atof(attrs[count+1])); // XXX doesn't detect garbage after the number
+                            location.set_lat(std::atof(attrs[count+1])); // XXX doesn't detect garbage after the number
                         } else if (!strcmp(attrs[count], "user")) {
                             user = attrs[count+1];
                         } else {
                             object.set_attribute(attrs[count], attrs[count+1]);
                         }
+                    }
+
+                    if (location && object.type() == osmium::item_type::node) {
+                        static_cast<osmium::Node&>(object).set_location(location);
                     }
 
                     return user;

@@ -87,7 +87,7 @@ namespace osmium {
             return m_location.y();
         }
 
-        void location(const osmium::Location& location) {
+        void set_location(const osmium::Location& location) {
             m_location = location;
         }
 

@@ -28,10 +28,11 @@ SECTION("equality") {
 
 SECTION("set_location") {
     osmium::NodeRef node_ref(7);
+    REQUIRE(!node_ref.location().valid());
     REQUIRE(node_ref.location() == osmium::Location());
-    node_ref.location(osmium::Location(13.5, -7.2));
+    node_ref.set_location(osmium::Location(13.5, -7.2));
     REQUIRE(node_ref.location().lon() == 13.5);
-//    REQUIRE(node_ref.has_location());
+    REQUIRE(node_ref.location().valid());
 }
 
 SECTION("ordering") {

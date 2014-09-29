@@ -86,7 +86,7 @@ namespace osmium {
         void update_node_location(const NodeRef& new_node_ref) {
             for (auto& node_ref : nodes()) {
                 if (node_ref.ref() == new_node_ref.ref()) {
-                    node_ref.location(new_node_ref.location());
+                    node_ref.set_location(new_node_ref.location());
                 }
             }
         }
