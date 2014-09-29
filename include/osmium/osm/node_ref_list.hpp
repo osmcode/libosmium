@@ -54,11 +54,11 @@ namespace osmium {
 
         static constexpr osmium::item_type itemtype = TItemType;
 
-        NodeRefList():
+        NodeRefList() noexcept :
             osmium::memory::Item(sizeof(NodeRefList), TItemType) {
         }
 
-        bool empty() const {
+        bool empty() const noexcept {
             return sizeof(NodeRefList) == byte_size();
         }
 

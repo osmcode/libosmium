@@ -65,7 +65,7 @@ namespace osmium {
 
         friend class osmium::builder::ObjectBuilder<osmium::Way>;
 
-        Way() :
+        Way() noexcept :
             OSMObject(sizeof(Way), osmium::item_type::way) {
         }
 

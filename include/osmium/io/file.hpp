@@ -170,11 +170,11 @@ namespace osmium {
 
             ~File() = default;
 
-            const char* buffer() const {
+            const char* buffer() const noexcept {
                 return m_buffer;
             }
 
-            size_t buffer_size() const {
+            size_t buffer_size() const noexcept {
                 return m_buffer_size;
             }
 
@@ -309,29 +309,29 @@ namespace osmium {
                 m_file_compression = file_compression::none;
             }
 
-            file_format format() const {
+            file_format format() const noexcept {
                 return m_file_format;
             }
 
-            File& format(file_format format) {
+            File& format(file_format format) noexcept {
                 m_file_format = format;
                 return *this;
             }
 
-            file_compression compression() const {
+            file_compression compression() const noexcept {
                 return m_file_compression;
             }
 
-            File& compression(file_compression compression) {
+            File& compression(file_compression compression) noexcept {
                 m_file_compression = compression;
                 return *this;
             }
 
-            bool has_multiple_object_versions() const {
+            bool has_multiple_object_versions() const noexcept {
                 return m_has_multiple_object_versions;
             }
 
-            File& has_multiple_object_versions(bool value) {
+            File& has_multiple_object_versions(bool value) noexcept {
                 m_has_multiple_object_versions = value;
                 return *this;
             }
@@ -345,7 +345,7 @@ namespace osmium {
                 return *this;
             }
 
-            const std::string& filename() const {
+            const std::string& filename() const noexcept {
                 return m_filename;
             }
 

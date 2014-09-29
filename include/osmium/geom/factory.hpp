@@ -100,7 +100,7 @@ namespace osmium {
                 return Coordinates{location.lon(), location.lat()};
             }
 
-            int epsg() const {
+            int epsg() const noexcept {
                 return 4326;
             }
 

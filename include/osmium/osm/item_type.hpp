@@ -56,7 +56,7 @@ namespace osmium {
 
     }; // enum class item_type
 
-    inline item_type char_to_item_type(const char c) {
+    inline item_type char_to_item_type(const char c) noexcept {
         switch (c) {
             case 'X':
                 return item_type::undefined;
@@ -90,7 +90,7 @@ namespace osmium {
 // avoid g++ false positive
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wreturn-type"
-    inline char item_type_to_char(const item_type type) {
+    inline char item_type_to_char(const item_type type) noexcept {
         switch (type) {
             case item_type::undefined:
                 return 'X';
@@ -119,7 +119,7 @@ namespace osmium {
         }
     }
 
-    inline const char* item_type_to_name(const item_type type) {
+    inline const char* item_type_to_name(const item_type type) noexcept {
         switch (type) {
             case item_type::undefined:
                 return "undefined";

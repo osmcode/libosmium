@@ -142,7 +142,7 @@ namespace osmium {
                 }
             }
 
-            int epsg() const {
+            int epsg() const noexcept {
                 return m_epsg;
             }
 

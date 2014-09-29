@@ -92,7 +92,7 @@ namespace osmium {
                 return Coordinates {detail::lon_to_x(location.lon()), detail::lat_to_y(location.lat())};
             }
 
-            int epsg() const {
+            int epsg() const noexcept {
                 return 3857;
             }
 

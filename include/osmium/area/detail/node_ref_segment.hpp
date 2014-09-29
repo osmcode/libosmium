@@ -78,7 +78,7 @@ namespace osmium {
                     swap(m_first, m_second);
                 }
 
-                explicit NodeRefSegment() :
+                explicit NodeRefSegment() noexcept :
                     m_first(),
                     m_second(),
                     m_role(nullptr),
@@ -104,12 +104,12 @@ namespace osmium {
                 ~NodeRefSegment() = default;
 
                 /// Return first NodeRef of Segment according to sorting order (bottom left to top right).
-                const osmium::NodeRef& first() const {
+                const osmium::NodeRef& first() const noexcept {
                     return m_first;
                 }
 
                 /// Return second NodeRef of Segment according to sorting order (bottom left to top right).
-                const osmium::NodeRef& second() const {
+                const osmium::NodeRef& second() const noexcept {
                     return m_second;
                 }
 
@@ -138,26 +138,26 @@ namespace osmium {
                     return ((bx - ax)*(ly - ay) - (by - ay)*(lx - ax)) <= 0;
                 }
 
-                bool role_outer() const {
+                bool role_outer() const noexcept {
                     return !strcmp(m_role, "outer");
                 }
 
-                bool role_inner() const {
+                bool role_inner() const noexcept {
                     return !strcmp(m_role, "inner");
                 }
 
-                const osmium::Way* way() const {
+                const osmium::Way* way() const noexcept {
                     return m_way;
                 }
 
             }; // class NodeRefSegment
 
             /// NodeRefSegments are equal if both their locations are equal
-            inline bool operator==(const NodeRefSegment& lhs, const NodeRefSegment& rhs) {
+            inline bool operator==(const NodeRefSegment& lhs, const NodeRefSegment& rhs) noexcept {
                 return lhs.first().location() == rhs.first().location() && lhs.second().location() == rhs.second().location();
             }
 
-            inline bool operator!=(const NodeRefSegment& lhs, const NodeRefSegment& rhs) {
+            inline bool operator!=(const NodeRefSegment& lhs, const NodeRefSegment& rhs) noexcept {
                 return ! (lhs == rhs);
             }
 
@@ -166,19 +166,19 @@ namespace osmium {
              * segment. The first() location is checked first() and only if they have the
              * same first() location the second() location is taken into account.
              */
-            inline bool operator<(const NodeRefSegment& lhs, const NodeRefSegment& rhs) {
+            inline bool operator<(const NodeRefSegment& lhs, const NodeRefSegment& rhs) noexcept {
                 return (lhs.first().location() == rhs.first().location() && lhs.second().location() < rhs.second().location()) || lhs.first().location() < rhs.first().location();
             }
 
-            inline bool operator>(const NodeRefSegment& lhs, const NodeRefSegment& rhs) {
+            inline bool operator>(const NodeRefSegment& lhs, const NodeRefSegment& rhs) noexcept {
                 return rhs < lhs;
             }
 
-            inline bool operator<=(const NodeRefSegment& lhs, const NodeRefSegment& rhs) {
+            inline bool operator<=(const NodeRefSegment& lhs, const NodeRefSegment& rhs) noexcept {
                 return ! (rhs < lhs);
             }
 
-            inline bool operator>=(const NodeRefSegment& lhs, const NodeRefSegment& rhs) {
+            inline bool operator>=(const NodeRefSegment& lhs, const NodeRefSegment& rhs) noexcept {
                 return ! (lhs < rhs);
             }
 
@@ -187,7 +187,7 @@ namespace osmium {
                 return out << segment.first() << "--" << segment.second();
             }
 
-            inline bool outside_x_range(const NodeRefSegment& s1, const NodeRefSegment& s2) {
+            inline bool outside_x_range(const NodeRefSegment& s1, const NodeRefSegment& s2) noexcept {
                 if (s1.first().location().x() > s2.second().location().x()) {
                     return true;
                 }

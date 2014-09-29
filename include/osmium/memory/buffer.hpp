@@ -119,7 +119,7 @@ namespace osmium {
              * buffer, ie an empty hull of a buffer that has no actual memory
              * associated with it. It can be used to signify end-of-input.
              */
-            Buffer() :
+            Buffer() noexcept :
                 m_memory(),
                 m_data(nullptr),
                 m_capacity(0),
@@ -200,21 +200,21 @@ namespace osmium {
             /**
              * Return a pointer to data inside the buffer.
              */
-            unsigned char* data() const {
+            unsigned char* data() const noexcept {
                 return m_data;
             }
 
             /**
              * Returns the capacity of the buffer, ie how many bytes it can contain.
              */
-            size_t capacity() const {
+            size_t capacity() const noexcept {
                 return m_capacity;
             }
 
             /**
              * Returns the number of bytes already filled in this buffer.
              */
-            size_t committed() const {
+            size_t committed() const noexcept {
                 return m_committed;
             }
 
@@ -222,7 +222,7 @@ namespace osmium {
              * Returns the number of bytes currently filled in this buffer that
              * are not yet committed.
              */
-            size_t written() const {
+            size_t written() const noexcept {
                 return m_written;
             }
 
@@ -230,7 +230,7 @@ namespace osmium {
              * This tests if the current state of the buffer is aligned
              * properly. Can be used for asserts.
              */
-            bool is_aligned() const {
+            bool is_aligned() const noexcept {
                 return (m_written % align_bytes == 0) && (m_committed % align_bytes == 0);
             }
 
@@ -519,11 +519,11 @@ namespace osmium {
 
         }; // class Buffer
 
-        inline bool operator==(const Buffer& lhs, const Buffer& rhs) {
+        inline bool operator==(const Buffer& lhs, const Buffer& rhs) noexcept {
             return lhs.data() == rhs.data() && lhs.capacity() == rhs.capacity() && lhs.committed() == rhs.committed();
         }
 
-        inline bool operator!=(const Buffer& lhs, const Buffer& rhs) {
+        inline bool operator!=(const Buffer& lhs, const Buffer& rhs) noexcept {
             return ! (lhs == rhs);
         }
 

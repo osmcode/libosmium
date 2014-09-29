@@ -49,10 +49,10 @@ namespace osmium {
             double x;
             double y;
 
-            explicit Coordinates(double cx, double cy) : x(cx), y(cy) {
+            explicit Coordinates(double cx, double cy) noexcept : x(cx), y(cy) {
             }
 
-            Coordinates(const osmium::Location& location) : x(location.lon()), y(location.lat()) {
+            Coordinates(const osmium::Location& location) noexcept : x(location.lon()), y(location.lat()) {
             }
 
             void append_to_string(std::string& s, const char infix, int precision) const {
@@ -74,14 +74,14 @@ namespace osmium {
          * right result if the coordinates have been the result of some
          * calculation that introduced rounding errors.
          */
-        inline bool operator==(const Coordinates& lhs, const Coordinates& rhs) {
+        inline bool operator==(const Coordinates& lhs, const Coordinates& rhs) noexcept {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wfloat-equal"
             return lhs.x == rhs.x && lhs.y == rhs.y;
 #pragma GCC diagnostic pop
         }
 
-        inline bool operator!=(const Coordinates& lhs, const Coordinates& rhs) {
+        inline bool operator!=(const Coordinates& lhs, const Coordinates& rhs) noexcept {
             return ! operator==(lhs, rhs);
         }
 

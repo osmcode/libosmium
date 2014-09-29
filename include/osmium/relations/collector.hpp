@@ -103,7 +103,7 @@ namespace osmium {
 
             public:
 
-                HandlerPass1(TCollector& collector) :
+                HandlerPass1(TCollector& collector) noexcept :
                     m_collector(collector) {
                 }
 
@@ -190,7 +190,7 @@ namespace osmium {
 
             public:
 
-                HandlerPass2(TCollector& collector) :
+                HandlerPass2(TCollector& collector) noexcept :
                     m_collector(collector),
                     m_want_types((TNodes?1:0) + (TWays?1:0) + (TRelations?1:0)) {
                 }

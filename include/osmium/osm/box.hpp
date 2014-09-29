@@ -54,7 +54,7 @@ namespace osmium {
          * Create undefined Box. Use the extend() function
          * to add actual bounds.
          */
-        constexpr Box() :
+        constexpr Box() noexcept :
             m_bottom_left(),
             m_top_right() {
         }

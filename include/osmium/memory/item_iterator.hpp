@@ -49,42 +49,42 @@ namespace osmium {
         namespace detail {
 
             template <class T>
-            inline bool type_is_compatible(osmium::item_type) {
+            inline bool type_is_compatible(osmium::item_type) noexcept {
                 return true;
             }
 
             template <>
-            inline bool type_is_compatible<osmium::Node>(osmium::item_type t) {
+            inline bool type_is_compatible<osmium::Node>(osmium::item_type t) noexcept {
                 return t == osmium::item_type::node;
             }
 
             template <>
-            inline bool type_is_compatible<osmium::Way>(osmium::item_type t) {
+            inline bool type_is_compatible<osmium::Way>(osmium::item_type t) noexcept {
                 return t == osmium::item_type::way;
             }
 
             template <>
-            inline bool type_is_compatible<osmium::Relation>(osmium::item_type t) {
+            inline bool type_is_compatible<osmium::Relation>(osmium::item_type t) noexcept {
                 return t == osmium::item_type::relation;
             }
 
             template <>
-            inline bool type_is_compatible<osmium::Area>(osmium::item_type t) {
+            inline bool type_is_compatible<osmium::Area>(osmium::item_type t) noexcept {
                 return t == osmium::item_type::area;
             }
 
             template <>
-            inline bool type_is_compatible<osmium::Changeset>(osmium::item_type t) {
+            inline bool type_is_compatible<osmium::Changeset>(osmium::item_type t) noexcept {
                 return t == osmium::item_type::changeset;
             }
 
             template <>
-            inline bool type_is_compatible<osmium::OSMObject>(osmium::item_type t) {
+            inline bool type_is_compatible<osmium::OSMObject>(osmium::item_type t) noexcept {
                 return t == osmium::item_type::node || t == osmium::item_type::way || t == osmium::item_type::relation || t == osmium::item_type::area;
             }
 
             template <>
-            inline bool type_is_compatible<osmium::OSMEntity>(osmium::item_type t) {
+            inline bool type_is_compatible<osmium::OSMEntity>(osmium::item_type t) noexcept {
                 return t == osmium::item_type::node || t == osmium::item_type::way || t == osmium::item_type::relation || t == osmium::item_type::area || t == osmium::item_type::changeset;
             }
 
@@ -112,7 +112,7 @@ namespace osmium {
 
         public:
 
-            ItemIterator() :
+            ItemIterator() noexcept :
                 m_data(nullptr),
                 m_end(nullptr) {
             }

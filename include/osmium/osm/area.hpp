@@ -124,7 +124,7 @@ namespace osmium {
          * Was this area created from a way? (In contrast to areas
          * created from a relation and their members.)
          */
-        bool from_way() const {
+        bool from_way() const noexcept {
             return (positive_id() & 0x1) == 0;
         }
 

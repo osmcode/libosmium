@@ -117,7 +117,7 @@ namespace osmium {
                 }
             }
 
-            uint32_t size() const {
+            uint32_t size() const noexcept {
                 return item().byte_size();
             }
 
@@ -146,7 +146,7 @@ namespace osmium {
             }
 
             /// Return the buffer this builder is using.
-            osmium::memory::Buffer& buffer() {
+            osmium::memory::Buffer& buffer() noexcept {
                 return m_buffer;
             }
 
@@ -165,7 +165,7 @@ namespace osmium {
                 new (&item()) TItem();
             }
 
-            TItem& object() {
+            TItem& object() noexcept {
                 return static_cast<TItem&>(item());
             }
 

@@ -102,7 +102,7 @@ namespace osmium {
         /**
          * Create undefined Location.
          */
-        explicit constexpr Location() :
+        explicit constexpr Location() noexcept :
             m_x(undefined_coordinate),
             m_y(undefined_coordinate) {
         }
@@ -112,7 +112,7 @@ namespace osmium {
          * Note that these coordinates are coordinate_precision
          * times larger than the real coordinates.
          */
-        constexpr Location(const int32_t x, const int32_t y) :
+        constexpr Location(const int32_t x, const int32_t y) noexcept :
             m_x(x),
             m_y(y) {
         }
@@ -122,7 +122,7 @@ namespace osmium {
          * Note that these coordinates are coordinate_precision
          * times larger than the real coordinates.
          */
-        constexpr Location(const int64_t x, const int64_t y) :
+        constexpr Location(const int64_t x, const int64_t y) noexcept :
             m_x(static_cast<int32_t>(x)),
             m_y(static_cast<int32_t>(y)) {
         }
@@ -242,7 +242,7 @@ namespace osmium {
         return lhs.x() == rhs.x() && lhs.y() == rhs.y();
     }
 
-    inline OSMIUM_CONSTEXPR bool operator!=(const Location& lhs, const Location& rhs) {
+    inline OSMIUM_CONSTEXPR bool operator!=(const Location& lhs, const Location& rhs) noexcept {
         return ! (lhs == rhs);
     }
 
@@ -255,15 +255,15 @@ namespace osmium {
         return (lhs.x() == rhs.x() && lhs.y() < rhs.y()) || lhs.x() < rhs.x();
     }
 
-    inline OSMIUM_CONSTEXPR bool operator>(const Location& lhs, const Location& rhs) {
+    inline OSMIUM_CONSTEXPR bool operator>(const Location& lhs, const Location& rhs) noexcept {
         return rhs < lhs;
     }
 
-    inline OSMIUM_CONSTEXPR bool operator<=(const Location& lhs, const Location& rhs) {
+    inline OSMIUM_CONSTEXPR bool operator<=(const Location& lhs, const Location& rhs) noexcept {
         return ! (rhs < lhs);
     }
 
-    inline OSMIUM_CONSTEXPR bool operator>=(const Location& lhs, const Location& rhs) {
+    inline OSMIUM_CONSTEXPR bool operator>=(const Location& lhs, const Location& rhs) noexcept {
         return ! (lhs < rhs);
     }
 

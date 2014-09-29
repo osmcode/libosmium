@@ -85,37 +85,37 @@ namespace osmium {
              * member_pos is used to create dummy MemberMeta that can be compared
              * to the MemberMeta in the vectors using the equal_range algorithm.
              */
-            explicit MemberMeta(osmium::object_id_type member_id, size_t relation_pos=0, size_t member_pos=0) :
+            explicit MemberMeta(osmium::object_id_type member_id, size_t relation_pos=0, size_t member_pos=0) noexcept :
                 m_member_id(member_id),
                 m_relation_pos(relation_pos),
                 m_member_pos(member_pos) {
             }
 
-            osmium::object_id_type member_id() const {
+            osmium::object_id_type member_id() const noexcept {
                 return m_member_id;
             }
 
-            size_t relation_pos() const {
+            size_t relation_pos() const noexcept {
                 return m_relation_pos;
             }
 
-            size_t member_pos() const {
+            size_t member_pos() const noexcept {
                 return m_member_pos;
             }
 
-            size_t buffer_offset() const {
+            size_t buffer_offset() const noexcept {
                 return m_buffer_offset;
             }
 
-            void buffer_offset(size_t offset) {
+            void buffer_offset(size_t offset) noexcept {
                 m_buffer_offset = offset;
             }
 
-            bool removed() const {
+            bool removed() const noexcept {
                 return m_removed;
             }
 
-            void remove() {
+            void remove() noexcept {
                 m_removed = true;
             }
 
@@ -126,7 +126,7 @@ namespace osmium {
          * Used to sort a vector of MemberMeta objects and to later find
          * them using binary search.
          */
-        inline bool operator<(const MemberMeta& a, const MemberMeta& b) {
+        inline bool operator<(const MemberMeta& a, const MemberMeta& b) noexcept {
             return a.member_id() < b.member_id();
         }
 

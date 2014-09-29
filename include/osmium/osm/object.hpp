@@ -62,19 +62,19 @@ namespace osmium {
         user_id_type        m_uid;
         changeset_id_type   m_changeset;
 
-        size_t sizeof_object() const {
+        size_t sizeof_object() const noexcept {
             return sizeof(OSMObject) + (type() == item_type::node ? sizeof(osmium::Location) : 0) + sizeof(string_size_type);
         }
 
-        unsigned char* user_position() {
+        unsigned char* user_position() noexcept {
             return data() + sizeof_object() - sizeof(string_size_type);
         }
 
-        const unsigned char* user_position() const {
+        const unsigned char* user_position() const noexcept {
             return data() + sizeof_object() - sizeof(string_size_type);
         }
 
-        string_size_type user_size() const {
+        string_size_type user_size() const noexcept {
             return *reinterpret_cast<const string_size_type*>(user_position());
         }
 
@@ -105,12 +105,12 @@ namespace osmium {
     public:
 
         /// Get ID of this object.
-        object_id_type id() const {
+        object_id_type id() const noexcept {
             return m_id;
         }
 
         /// Get absolute value of the ID of this object.
-        unsigned_object_id_type positive_id() const {
+        unsigned_object_id_type positive_id() const noexcept {
             return static_cast<unsigned_object_id_type>(std::abs(m_id));
         }
 
@@ -119,7 +119,7 @@ namespace osmium {
          *
          * @returns Reference to object to make calls chainable.
          */
-        OSMObject& set_id(object_id_type id) {
+        OSMObject& set_id(object_id_type id) noexcept {
             m_id = id;
             return *this;
         }
@@ -134,12 +134,12 @@ namespace osmium {
         }
 
         /// Is this object marked as deleted?
-        bool deleted() const {
+        bool deleted() const noexcept {
             return m_deleted;
         }
 
         /// Is this object marked visible (ie not deleted)?
-        bool visible() const {
+        bool visible() const noexcept {
             return !deleted();
         }
 
@@ -148,7 +148,7 @@ namespace osmium {
          *
          * @returns Reference to object to make calls chainable.
          */
-        OSMObject& set_deleted(bool deleted) {
+        OSMObject& set_deleted(bool deleted) noexcept {
             m_deleted = deleted;
             return *this;
         }
@@ -158,7 +158,7 @@ namespace osmium {
          *
          * @returns Reference to object to make calls chainable.
          */
-        OSMObject& set_visible(bool visible) {
+        OSMObject& set_visible(bool visible) noexcept {
             m_deleted = !visible;
             return *this;
         }
@@ -181,7 +181,7 @@ namespace osmium {
         }
 
         /// Get version of this object.
-        object_version_type version() const {
+        object_version_type version() const noexcept {
             return m_version;
         }
 
@@ -190,7 +190,7 @@ namespace osmium {
          *
          * @returns Reference to object to make calls chainable.
          */
-        OSMObject& set_version(object_version_type version) {
+        OSMObject& set_version(object_version_type version) noexcept {
             m_version = version;
             return *this;
         }
@@ -205,7 +205,7 @@ namespace osmium {
         }
 
         /// Get changeset id of this object.
-        changeset_id_type changeset() const {
+        changeset_id_type changeset() const noexcept {
             return m_changeset;
         }
 
@@ -214,7 +214,7 @@ namespace osmium {
          *
          * @returns Reference to object to make calls chainable.
          */
-        OSMObject& set_changeset(changeset_id_type changeset) {
+        OSMObject& set_changeset(changeset_id_type changeset) noexcept {
             m_changeset = changeset;
             return *this;
         }
@@ -229,7 +229,7 @@ namespace osmium {
         }
 
         /// Get user id of this object.
-        user_id_type uid() const {
+        user_id_type uid() const noexcept {
             return m_uid;
         }
 
@@ -238,7 +238,7 @@ namespace osmium {
          *
          * @returns Reference to object to make calls chainable.
          */
-        OSMObject& set_uid(user_id_type uid) {
+        OSMObject& set_uid(user_id_type uid) noexcept {
             m_uid = uid;
             return *this;
         }
@@ -249,7 +249,7 @@ namespace osmium {
          *
          * @returns Reference to object to make calls chainable.
          */
-        OSMObject& set_uid_from_signed(signed_user_id_type uid) {
+        OSMObject& set_uid_from_signed(signed_user_id_type uid) noexcept {
             m_uid = uid < 0 ? 0 : static_cast<user_id_type>(uid);
             return *this;
         }
@@ -264,12 +264,12 @@ namespace osmium {
         }
 
         /// Is this user anonymous?
-        bool user_is_anonymous() const {
+        bool user_is_anonymous() const noexcept {
             return m_uid == 0;
         }
 
         /// Get timestamp when this object last changed.
-        osmium::Timestamp timestamp() const {
+        osmium::Timestamp timestamp() const noexcept {
             return m_timestamp;
         }
 
@@ -279,13 +279,13 @@ namespace osmium {
          * @param timestamp Timestamp
          * @returns Reference to object to make calls chainable.
          */
-        OSMObject& set_timestamp(const osmium::Timestamp timestamp) {
+        OSMObject& set_timestamp(const osmium::Timestamp timestamp) noexcept {
             m_timestamp = timestamp;
             return *this;
         }
 
         /// Get user name for this object.
-        const char* user() const {
+        const char* user() const noexcept {
             return reinterpret_cast<const char*>(data() + sizeof_object());
         }
 
@@ -360,13 +360,13 @@ namespace osmium {
     /**
      * OSMObjects are equal if their type, id, and version are equal.
      */
-    inline bool operator==(const OSMObject& lhs, const OSMObject& rhs) {
+    inline bool operator==(const OSMObject& lhs, const OSMObject& rhs) noexcept {
         return lhs.type() == rhs.type() &&
                lhs.id() == rhs.id() &&
                lhs.version() == rhs.version();
     }
 
-    inline bool operator!=(const OSMObject& lhs, const OSMObject& rhs) {
+    inline bool operator!=(const OSMObject& lhs, const OSMObject& rhs) noexcept {
         return ! (lhs == rhs);
     }
 
@@ -375,7 +375,7 @@ namespace osmium {
      * Note that we use the absolute value of the id for a
      * better ordering of objects with negative id.
      */
-    inline bool operator<(const OSMObject& lhs, const OSMObject& rhs) {
+    inline bool operator<(const OSMObject& lhs, const OSMObject& rhs) noexcept {
         if (lhs.type() != rhs.type()) {
             return lhs.type() < rhs.type();
         }
@@ -383,15 +383,15 @@ namespace osmium {
                lhs.positive_id() < rhs.positive_id();
     }
 
-    inline bool operator>(const OSMObject& lhs, const OSMObject& rhs) {
+    inline bool operator>(const OSMObject& lhs, const OSMObject& rhs) noexcept {
         return rhs < lhs;
     }
 
-    inline bool operator<=(const OSMObject& lhs, const OSMObject& rhs) {
+    inline bool operator<=(const OSMObject& lhs, const OSMObject& rhs) noexcept {
         return ! (rhs < lhs);
     }
 
-    inline bool operator>=(const OSMObject& lhs, const OSMObject& rhs) {
+    inline bool operator>=(const OSMObject& lhs, const OSMObject& rhs) noexcept {
         return ! (lhs < rhs);
     }
 

@@ -61,7 +61,7 @@ namespace osmium {
             size_t m_size;
             T* m_data;
 
-            explicit mmap_vector_base(int fd, size_t capacity, size_t size, T* data) :
+            explicit mmap_vector_base(int fd, size_t capacity, size_t size, T* data) noexcept :
                 m_fd(fd),
                 m_capacity(capacity),
                 m_size(size),
@@ -93,23 +93,23 @@ namespace osmium {
                 osmium::detail::typed_mmap<T>::unmap(m_data, m_capacity);
             }
 
-            size_t capacity() const {
+            size_t capacity() const noexcept {
                 return m_capacity;
             }
 
-            size_t size() const {
+            size_t size() const noexcept {
                 return m_size;
             }
 
-            bool empty() const {
+            bool empty() const noexcept {
                 return m_size == 0;
             }
 
-            const T* data() const {
+            const T* data() const noexcept {
                 return m_data;
             }
 
-            T* data() {
+            T* data() noexcept {
                 return m_data;
             }
 
@@ -124,7 +124,7 @@ namespace osmium {
                 return m_data[n];
             }
 
-            void clear() {
+            void clear() noexcept {
                 m_size = 0;
             }
 
@@ -150,27 +150,27 @@ namespace osmium {
                 m_size = new_size;
             }
 
-            iterator begin() {
+            iterator begin() noexcept {
                 return m_data;
             }
 
-            iterator end() {
+            iterator end() noexcept {
                 return m_data + m_size;
             }
 
-            const_iterator begin() const {
+            const_iterator begin() const noexcept {
                 return m_data;
             }
 
-            const_iterator end() const {
+            const_iterator end() const noexcept {
                 return m_data + m_size;
             }
 
-            const_iterator cbegin() {
+            const_iterator cbegin() noexcept {
                 return m_data;
             }
 
-            const_iterator cend() {
+            const_iterator cend() noexcept {
                 return m_data + m_size;
             }
 

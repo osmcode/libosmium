@@ -55,11 +55,11 @@ namespace osmium {
 
         public:
 
-            CollectionIterator() :
+            CollectionIterator() noexcept :
                 m_data(nullptr) {
             }
 
-            CollectionIterator(data_type data) :
+            CollectionIterator(data_type data) noexcept :
                 m_data(data) {
             }
 
@@ -74,15 +74,15 @@ namespace osmium {
                 return tmp;
             }
 
-            bool operator==(const CollectionIterator<TMember>& rhs) const {
+            bool operator==(const CollectionIterator<TMember>& rhs) const noexcept {
                 return m_data == rhs.m_data;
             }
 
-            bool operator!=(const CollectionIterator<TMember>& rhs) const {
+            bool operator!=(const CollectionIterator<TMember>& rhs) const noexcept {
                 return m_data != rhs.m_data;
             }
 
-            unsigned char* data() const {
+            unsigned char* data() const noexcept {
                 return m_data;
             }
 

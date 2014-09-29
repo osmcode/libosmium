@@ -67,13 +67,13 @@ namespace osmium {
 
     public:
 
-        constexpr Timestamp() :
+        constexpr Timestamp() noexcept :
             m_timestamp(0) {
         }
 
         // Not "explicit" so that conversions from time_t work
         // like in node.timestamp(123);
-        constexpr Timestamp(time_t timestamp) :
+        constexpr Timestamp(time_t timestamp) noexcept :
             m_timestamp(static_cast<uint32_t>(timestamp)) {
         }
 
@@ -105,11 +105,11 @@ namespace osmium {
 #endif
         }
 
-        constexpr time_t seconds_since_epoch() const {
+        constexpr time_t seconds_since_epoch() const noexcept {
             return static_cast<time_t>(m_timestamp);
         }
 
-        constexpr operator time_t() const {
+        constexpr operator time_t() const noexcept {
             return static_cast<time_t>(m_timestamp);
         }
 
@@ -140,11 +140,11 @@ namespace osmium {
 
     }; // class Timestamp
 
-    inline OSMIUM_CONSTEXPR Timestamp start_of_time() {
+    inline OSMIUM_CONSTEXPR Timestamp start_of_time() noexcept {
         return Timestamp(1);
     }
 
-    inline OSMIUM_CONSTEXPR Timestamp end_of_time() {
+    inline OSMIUM_CONSTEXPR Timestamp end_of_time() noexcept {
         return Timestamp(std::numeric_limits<time_t>::max());
     }
 
