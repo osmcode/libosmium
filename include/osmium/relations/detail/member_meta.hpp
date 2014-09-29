@@ -107,7 +107,7 @@ namespace osmium {
                 return m_buffer_offset;
             }
 
-            void buffer_offset(size_t offset) noexcept {
+            void set_buffer_offset(size_t offset) noexcept {
                 m_buffer_offset = offset;
             }
 

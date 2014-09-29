@@ -139,7 +139,7 @@ namespace osmium {
             Item& operator=(const Item&) = delete;
             Item& operator=(Item&&) = delete;
 
-            Item& type(const item_type item_type) noexcept {
+            Item& set_type(const item_type item_type) noexcept {
                 m_type = item_type;
                 return *this;
             }
@@ -162,7 +162,7 @@ namespace osmium {
                 return m_removed;
             }
 
-            void removed(bool removed) noexcept {
+            void set_removed(bool removed) noexcept {
                 m_removed = removed;
             }
 

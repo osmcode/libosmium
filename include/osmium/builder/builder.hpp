@@ -170,7 +170,7 @@ namespace osmium {
             }
 
             void add_user(const char* user) {
-                object().user_size(static_cast_with_assert<string_size_type>(std::strlen(user) + 1));
+                object().set_user_size(static_cast_with_assert<string_size_type>(std::strlen(user) + 1));
                 add_size(append(user));
                 add_padding(true);
             }

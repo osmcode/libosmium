@@ -98,7 +98,7 @@ namespace osmium {
             m_changeset(0) {
         }
 
-        void user_size(string_size_type size) {
+        void set_user_size(string_size_type size) {
             *reinterpret_cast<string_size_type*>(user_position()) = size;
         }
 

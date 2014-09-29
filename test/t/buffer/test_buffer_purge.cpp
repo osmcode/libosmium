@@ -57,7 +57,7 @@ TEST_CASE("Purge data from buffer") {
         {
             osmium::builder::NodeBuilder node_builder(buffer);
             node_builder.add_user("testuser");
-            node_builder.object().removed(true);
+            node_builder.object().set_removed(true);
         }
         buffer.commit();
         REQUIRE(std::distance(buffer.begin(), buffer.end()) == 1);
@@ -77,7 +77,7 @@ TEST_CASE("Purge data from buffer") {
         {
             osmium::builder::NodeBuilder node_builder(buffer);
             node_builder.add_user("testuser");
-            node_builder.object().removed(true);
+            node_builder.object().set_removed(true);
         }
         buffer.commit();
         size_t size1 = buffer.committed();
@@ -110,7 +110,7 @@ TEST_CASE("Purge data from buffer") {
         {
             osmium::builder::NodeBuilder node_builder(buffer);
             node_builder.add_user("testuser");
-            node_builder.object().removed(true);
+            node_builder.object().set_removed(true);
         }
         buffer.commit();
         size_t size2 = buffer.committed() - size1;
@@ -137,7 +137,7 @@ TEST_CASE("Purge data from buffer") {
         {
             osmium::builder::NodeBuilder node_builder(buffer);
             node_builder.add_user("testuser");
-            node_builder.object().removed(true);
+            node_builder.object().set_removed(true);
         }
         buffer.commit();
         size_t size2 = buffer.committed() - size1;
@@ -163,21 +163,21 @@ TEST_CASE("Purge data from buffer") {
         {
             osmium::builder::NodeBuilder node_builder(buffer);
             node_builder.add_user("testuser_longer_name");
-            node_builder.object().removed(true);
+            node_builder.object().set_removed(true);
         }
         buffer.commit();
         size_t size1 = buffer.committed();
         {
             osmium::builder::NodeBuilder node_builder(buffer);
             node_builder.add_user("testuser");
-            node_builder.object().removed(true);
+            node_builder.object().set_removed(true);
         }
         buffer.commit();
         size_t size2 = buffer.committed() - size1;
         {
             osmium::builder::NodeBuilder node_builder(buffer);
             node_builder.add_user("sn");
-            node_builder.object().removed(true);
+            node_builder.object().set_removed(true);
         }
         buffer.commit();
         size_t size3 = buffer.committed() - (size1 + size2);

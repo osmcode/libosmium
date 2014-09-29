@@ -179,7 +179,7 @@ namespace osmium {
                         // if this is the last time this object was needed
                         // then mark it as removed
                         if (osmium::relations::count_not_removed(range.first, range.second) == 1) {
-                            this->get_member(range.first->buffer_offset()).removed(true);
+                            this->get_member(range.first->buffer_offset()).set_removed(true);
                         }
 
                         for (auto it = range.first; it != range.second; ++it) {

@@ -473,7 +473,7 @@ namespace osmium {
                             continue;
                         }
                         if (feature == "HistoricalInformation") {
-                            m_header.has_multiple_object_versions(true);
+                            m_header.set_has_multiple_object_versions(true);
                             continue;
                         }
 

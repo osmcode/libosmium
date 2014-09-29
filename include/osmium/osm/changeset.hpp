@@ -74,7 +74,7 @@ namespace osmium {
             OSMEntity(sizeof(Changeset), osmium::item_type::changeset) {
         }
 
-        void user_size(string_size_type size) {
+        void set_user_size(string_size_type size) {
             m_user_size = size;
         }
 

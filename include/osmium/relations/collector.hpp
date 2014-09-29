@@ -156,7 +156,7 @@ namespace osmium {
                         const size_t member_offset = m_collector.members_buffer().commit();
 
                         for (auto it = range.first; it != range.second; ++it) {
-                            it->buffer_offset(member_offset);
+                            it->set_buffer_offset(member_offset);
                         }
                     }
 
@@ -491,7 +491,7 @@ namespace osmium {
                 auto range = std::equal_range(mmv.begin(), mmv.end(), osmium::relations::MemberMeta(object.id()));
                 for (auto it = range.first; it != range.second; ++it) {
                     assert(it->buffer_offset() == old_offset);
-                    it->buffer_offset(new_offset);
+                    it->set_buffer_offset(new_offset);
                 }
             }
 

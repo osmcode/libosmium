@@ -313,7 +313,7 @@ namespace osmium {
                 return m_file_format;
             }
 
-            File& format(file_format format) noexcept {
+            File& set_format(file_format format) noexcept {
                 m_file_format = format;
                 return *this;
             }
@@ -322,7 +322,7 @@ namespace osmium {
                 return m_file_compression;
             }
 
-            File& compression(file_compression compression) noexcept {
+            File& set_compression(file_compression compression) noexcept {
                 m_file_compression = compression;
                 return *this;
             }
@@ -331,7 +331,7 @@ namespace osmium {
                 return m_has_multiple_object_versions;
             }
 
-            File& has_multiple_object_versions(bool value) noexcept {
+            File& set_has_multiple_object_versions(bool value) noexcept {
                 m_has_multiple_object_versions = value;
                 return *this;
             }
