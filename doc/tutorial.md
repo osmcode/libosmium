@@ -357,6 +357,78 @@ This is, of course, only the "geometry part" of a full feature, you have to
 add the rest yourself. See the `demo/geojson-stream` example for a complete
 program using the GeoJSON function.
 
+## Working With Buffers
+
+Instead of calling `apply()` you can call `read()` on the Reader and you'll get
+an `osmium.Buffer` with zero or more OSM entities in it. If there is no more
+data in the file, `read()` returns `undefined`:
+
+    var reader = new osmium.Reader("foo.osm");
+    var buffer;
+    while (buffer = reader.read()) {
+        // do something here
+    }
+
+You can call `apply()` with a `Buffer` and handlers, just like you would do
+with the `Reader`:
+
+    osmium.apply(buffer, handler1, handler2);
+
+There are no guarantees how many entities are in one of those buffers. They can
+even be empty, but usually they will contain a few thousand entities, so they
+are "small" in comparison to a big OSM data file. So if you call `apply()` on a
+`Buffer` it will return much sooner than when calling `apply()` on the
+`Reader`. This allows you some amount of control over how fast the input is
+read.
+
+    var reader = new osmium.Reader("foo.osm");
+    var buffer;
+    while (buffer = reader.read()) {
+        osmium.apply(buffer, handler1, handler2);
+        // wait here if needed to slow down reading the file
+    }
+
+Note that calling `apply()` repeatedly in this way on the buffers instead of
+once on the `Reader`, confuses the `done`, `init`, and `before_*` and `after_*`
+handlers. You will get those handlers called for each `apply()` separately.
+
+### Iterating Over the Contents of a Buffer
+
+Instead of calling `apply()` you can iterate over the contents of the buffer by
+calling `next()`:
+
+    var object;
+    while (object = buffer.next()) {
+        console.log(object.id());
+    }
+
+`buffer.next()` returns `undefined` when there is no more data.
+
+If you use the `buffer.next()` call, you'll get the next object, whatever that
+is, you have to check with `object instanceof osmium.Node` or so if you got the
+right type. Note that you can not use the `LocationHandler` this way.
+
+Together you can read the content of a file like this:
+
+    var reader = new osmium.Reader("foo.osm");
+    var buffer;
+    while (buffer = reader.read()) {
+        var object;
+        while (object = buffer.next()) {
+            // do something here with object
+        }
+    }
+
+### Creating an Osmium Buffer From a Node Buffer
+
+You can also create an `osmium.Buffer` from a `node.Buffer`:
+
+    var node_buffer = new node.Buffer;
+    // fill it with OSM data somehow
+    var osmium_buffer = new osmium.Buffer(node_buffer);
+
+This buffer can now be used like the buffers we got from the `Reader`.
+
 ## A Complete Example
 
 Finally here is a complete example to get you started: This parses an OSM file
