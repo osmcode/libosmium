@@ -122,7 +122,7 @@ namespace osmium {
             }
 
             /**
-             * Flush writes to output file and close it. If you do not
+             * Flush writes to output file and closes it. If you do not
              * call this, the destructor of Writer will also do the same
              * thing. But because this call might thrown an exception,
              * it is better to call close() explicitly.
