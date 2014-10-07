@@ -67,6 +67,13 @@ namespace osmium {
             return static_cast<osmium::unsigned_object_id_type>(std::abs(m_ref));
         }
 
+        /**
+         * Get reference to location in this NodeRef. Can be used to update it.
+         */
+        osmium::Location& location() noexcept {
+            return m_location;
+        }
+
         osmium::Location location() const noexcept {
             return m_location;
         }
