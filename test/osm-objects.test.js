@@ -174,4 +174,28 @@ describe('basic', function() {
         osmium.apply(reader, handler);
     });
 
+   it('should be able to handle missing and invalid coordinates', function() {
+        var handler = new osmium.Handler();
+        var count = 0;
+        handler.on('node', function(node) {
+            count++;
+            if (count == 1) {
+                assert.equal(node.coordinates.lon, 1.02);
+                assert.equal(node.coordinates.lat, 2.03);
+                assert.equal(node.coordinates.valid(), true);
+            } else if (count == 2) {
+                assert.equal(node.coordinates.lon, undefined);
+                assert.equal(node.coordinates.lat, undefined);
+                assert.equal(node.coordinates.valid(), false);
+            } else if (count == 3) {
+                assert.equal(node.coordinates.lon, 190);
+                assert.equal(node.coordinates.lat, 190);
+                assert.equal(node.coordinates.valid(), false);
+            }
+        });
+        var file = new osmium.File(__dirname + "/data/coordinates-problems.osm");
+        var reader = new osmium.Reader(file, {node: true});
+        osmium.apply(reader, handler);
+    });
+
 });

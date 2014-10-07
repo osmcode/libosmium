@@ -47,24 +47,36 @@ namespace node_osmium {
     v8::Handle<v8::Value> OSMNodeWrap::get_coordinates(v8::Local<v8::String> /* property */, const v8::AccessorInfo& info) {
         v8::HandleScope scope;
 
-        auto lon = v8::Number::New(wrapped(info.This()).location().lon());
-        auto lat = v8::Number::New(wrapped(info.This()).location().lat());
-
         auto cf = module->Get(v8::String::NewSymbol("Coordinates"));
         assert(cf->IsFunction());
 
+        const osmium::Location& location = wrapped(info.This()).location();
+        if (!location) {
+            return scope.Close(v8::Local<v8::Function>::Cast(cf)->NewInstance());
+        }
+
+        v8::Local<v8::Value> lon = v8::Number::New(location.lon_without_check());
+        v8::Local<v8::Value> lat = v8::Number::New(location.lat_without_check());
         v8::Local<v8::Value> argv[2] = { lon, lat };
         return scope.Close(v8::Local<v8::Function>::Cast(cf)->NewInstance(2, argv));
     }
 
     v8::Handle<v8::Value> OSMNodeWrap::get_lon(v8::Local<v8::String> /* property */, const v8::AccessorInfo& info) {
         v8::HandleScope scope;
-        return scope.Close(v8::Number::New(wrapped(info.This()).location().lon()));
+        try {
+            return scope.Close(v8::Number::New(wrapped(info.This()).location().lon()));
+        } catch (osmium::invalid_location&) {
+            return scope.Close(v8::Undefined());
+        }
     }
 
     v8::Handle<v8::Value> OSMNodeWrap::get_lat(v8::Local<v8::String> /* property */, const v8::AccessorInfo& info) {
         v8::HandleScope scope;
-        return scope.Close(v8::Number::New(wrapped(info.This()).location().lat()));
+        try {
+            return scope.Close(v8::Number::New(wrapped(info.This()).location().lat()));
+        } catch (osmium::invalid_location&) {
+            return scope.Close(v8::Undefined());
+        }
     }
 
     v8::Handle<v8::Value> OSMNodeWrap::wkb(const v8::Arguments& args) {
