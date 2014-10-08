@@ -101,6 +101,23 @@ namespace osmium {
                     return std::move(m_linestring);
                 }
 
+                /* Polygon */
+
+                void polygon_start() {
+                    m_ring = std::unique_ptr<OGRLinearRing>(new OGRLinearRing());
+                }
+
+                void polygon_add_location(const osmium::geom::Coordinates& xy) {
+                    assert(!!m_ring);
+                    m_ring->addPoint(xy.x, xy.y);
+                }
+
+                polygon_type polygon_finish(size_t /* num_points */) {
+                    std::unique_ptr<OGRPolygon> polygon = std::unique_ptr<OGRPolygon>(new OGRPolygon());
+                    polygon->addRingDirectly(m_ring.release());
+                    return polygon;
+                }
+
                 /* MultiPolygon */
 
                 void multipolygon_start() {
