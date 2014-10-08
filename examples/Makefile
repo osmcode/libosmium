@@ -20,7 +20,7 @@ CXXFLAGS := $(CXXFLAGS)
 LDFLAGS := $(LDFLAGS)
 
 CXXFLAGS += -O3
-CXXFLAGS += -g
+CXXFLAGS += -g -fno-omit-frame-pointer
 CXXFLAGS += -std=c++11 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64
 CXXFLAGS += -I../include
 
