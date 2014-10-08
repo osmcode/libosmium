@@ -177,9 +177,9 @@ namespace osmium {
                         if (pbf_object.info().has_visible()) {
                             object.set_visible(pbf_object.info().visible());
                         }
-                        builder.add_user(m_stringtable->s(static_cast_with_assert<int>(pbf_object.info().user_sid())).data());
+                        builder.add_user(m_stringtable->s(static_cast_with_assert<int>(pbf_object.info().user_sid())));
                     } else {
-                        builder.add_user("");
+                        builder.add_user("", 1);
                     }
                 }
 
@@ -198,8 +198,8 @@ namespace osmium {
                         if (pbf_node.keys_size() > 0) {
                             osmium::builder::TagListBuilder tl_builder(m_buffer, &builder);
                             for (int tag=0; tag < pbf_node.keys_size(); ++tag) {
-                                tl_builder.add_tag(m_stringtable->s(static_cast<int>(pbf_node.keys(tag))).data(),
-                                                   m_stringtable->s(static_cast<int>(pbf_node.vals(tag))).data());
+                                tl_builder.add_tag(m_stringtable->s(static_cast<int>(pbf_node.keys(tag))),
+                                                   m_stringtable->s(static_cast<int>(pbf_node.vals(tag))));
                             }
                         }
 
@@ -225,8 +225,8 @@ namespace osmium {
                         if (pbf_way.keys_size() > 0) {
                             osmium::builder::TagListBuilder tl_builder(m_buffer, &builder);
                             for (int tag=0; tag < pbf_way.keys_size(); ++tag) {
-                                tl_builder.add_tag(m_stringtable->s(static_cast<int>(pbf_way.keys(tag))).data(),
-                                                   m_stringtable->s(static_cast<int>(pbf_way.vals(tag))).data());
+                                tl_builder.add_tag(m_stringtable->s(static_cast<int>(pbf_way.keys(tag))),
+                                                   m_stringtable->s(static_cast<int>(pbf_way.vals(tag))));
                             }
                         }
 
@@ -245,15 +245,15 @@ namespace osmium {
                             int64_t ref = 0;
                             for (int n=0; n < pbf_relation.types_size(); ++n) {
                                 ref += pbf_relation.memids(n);
-                                rml_builder.add_member(osmpbf_membertype_to_item_type(pbf_relation.types(n)), ref, m_stringtable->s(pbf_relation.roles_sid(n)).data());
+                                rml_builder.add_member(osmpbf_membertype_to_item_type(pbf_relation.types(n)), ref, m_stringtable->s(pbf_relation.roles_sid(n)));
                             }
                         }
 
                         if (pbf_relation.keys_size() > 0) {
                             osmium::builder::TagListBuilder tl_builder(m_buffer, &builder);
                             for (int tag=0; tag < pbf_relation.keys_size(); ++tag) {
-                                tl_builder.add_tag(m_stringtable->s(static_cast<int>(pbf_relation.keys(tag))).data(),
-                                                   m_stringtable->s(static_cast<int>(pbf_relation.vals(tag))).data());
+                                tl_builder.add_tag(m_stringtable->s(static_cast<int>(pbf_relation.keys(tag))),
+                                                   m_stringtable->s(static_cast<int>(pbf_relation.vals(tag))));
                             }
                         }
 
@@ -279,8 +279,8 @@ namespace osmium {
                             break;
                         }
 
-                        tl_builder.add_tag(m_stringtable->s(tag_key_pos).data(),
-                                           m_stringtable->s(dense.keys_vals(n)).data());
+                        tl_builder.add_tag(m_stringtable->s(tag_key_pos),
+                                           m_stringtable->s(dense.keys_vals(n)));
 
                         ++n;
                     }
@@ -334,9 +334,9 @@ namespace osmium {
                             node.set_timestamp(last_dense_timestamp * m_date_factor);
                             node.set_uid_from_signed(static_cast<osmium::signed_user_id_type>(last_dense_uid));
                             node.set_visible(visible);
-                            builder.add_user(m_stringtable->s(static_cast<int>(last_dense_user_sid)).data());
+                            builder.add_user(m_stringtable->s(static_cast<int>(last_dense_user_sid)));
                         } else {
-                            builder.add_user("");
+                            builder.add_user("", 1);
                         }
 
                         if (visible) {

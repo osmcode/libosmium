@@ -137,12 +137,23 @@ namespace osmium {
             }
 
             /**
+             * Append data to buffer.
+             *
+             * @param data Pointer to data.
+             * @param length Length of data in bytes. If data is a
+             *               \0-terminated string, length must contain the
+             *               \0 byte.
+             */
+            osmium::memory::item_size_type append(const char* data, const osmium::memory::item_size_type length) {
+                std::memcpy(m_buffer.reserve_space(length), data, length);
+                return length;
+            }
+
+            /**
              * Append \0-terminated string to buffer.
              */
             osmium::memory::item_size_type append(const char* str) {
-                osmium::memory::item_size_type length = static_cast<osmium::memory::item_size_type>(std::strlen(str) + 1);
-                std::memcpy(m_buffer.reserve_space(length), str, length);
-                return length;
+                return append(str, static_cast<osmium::memory::item_size_type>(std::strlen(str) + 1));
             }
 
             /// Return the buffer this builder is using.
@@ -169,10 +180,34 @@ namespace osmium {
                 return static_cast<TItem&>(item());
             }
 
-            void add_user(const char* user) {
-                object().set_user_size(static_cast_with_assert<string_size_type>(std::strlen(user) + 1));
-                add_size(append(user));
+            /**
+             * Add user name to buffer.
+             *
+             * @param user Pointer to user name.
+             * @param length Length of user name including \0 byte.
+             */
+            void add_user(const char* user, const string_size_type length) {
+                object().set_user_size(length);
+                add_size(append(user, length));
                 add_padding(true);
+            }
+
+            /**
+             * Add user name to buffer.
+             *
+             * @param user Pointer to \0-terminated user name.
+             */
+            void add_user(const char* user) {
+                add_user(user, static_cast_with_assert<string_size_type>(std::strlen(user) + 1));
+            }
+
+            /**
+             * Add user name to buffer.
+             *
+             * @param user User name.
+             */
+            void add_user(const std::string& user) {
+                add_user(user.data(), static_cast_with_assert<string_size_type>(user.size() + 1));
             }
 
         }; // class ObjectBuilder
