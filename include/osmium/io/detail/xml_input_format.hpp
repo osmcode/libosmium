@@ -402,8 +402,7 @@ namespace osmium {
                         for (int count = 0; attrs[count]; count += 2) {
                             if (attrs[count][0] == 'k' && attrs[count][1] == 0) {
                                 key = attrs[count+1];
-                            }
-                            if (attrs[count][0] == 'v' && attrs[count][1] == 0) {
+                            } else if (attrs[count][0] == 'v' && attrs[count][1] == 0) {
                                 value = attrs[count+1];
                             }
                         }
