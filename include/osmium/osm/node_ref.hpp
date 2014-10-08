@@ -94,8 +94,14 @@ namespace osmium {
             return m_location.y();
         }
 
-        void set_location(const osmium::Location& location) noexcept {
+        NodeRef& set_ref(const osmium::object_id_type ref) noexcept {
+            m_ref = ref;
+            return *this;
+        }
+
+        NodeRef& set_location(const osmium::Location& location) noexcept {
             m_location = location;
+            return *this;
         }
 
     }; // class NodeRef
