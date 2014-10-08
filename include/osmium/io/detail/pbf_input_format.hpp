@@ -93,7 +93,7 @@ namespace osmium {
 
             class PBFPrimitiveBlockParser {
 
-                static constexpr size_t initial_buffer_size = 10 * 1024;
+                static constexpr size_t initial_buffer_size = 2 * 1024 * 1024;
 
                 const void* m_data;
                 const int m_size;
