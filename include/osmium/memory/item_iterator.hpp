@@ -39,10 +39,22 @@ DEALINGS IN THE SOFTWARE.
 #include <type_traits>
 
 #include <osmium/memory/item.hpp>
-#include <osmium/osm.hpp>
 #include <osmium/osm/item_type.hpp>
 
 namespace osmium {
+
+    class Node;
+    class Way;
+    class Relation;
+    class Area;
+    class Changeset;
+    class OSMObject;
+    class OSMEntity;
+    class TagList;
+    class WayNodeList;
+    class RelationMemberList;
+    class InnerRing;
+    class OuterRing;
 
     namespace memory {
 
@@ -88,6 +100,31 @@ namespace osmium {
                 return t == osmium::item_type::node || t == osmium::item_type::way || t == osmium::item_type::relation || t == osmium::item_type::area || t == osmium::item_type::changeset;
             }
 
+            template <>
+            inline bool type_is_compatible<osmium::TagList>(osmium::item_type t) noexcept {
+                return t == osmium::item_type::tag_list;
+            }
+
+            template <>
+            inline bool type_is_compatible<osmium::WayNodeList>(osmium::item_type t) noexcept {
+                return t == osmium::item_type::way_node_list;
+            }
+
+            template <>
+            inline bool type_is_compatible<osmium::RelationMemberList>(osmium::item_type t) noexcept {
+                return t == osmium::item_type::relation_member_list || t == osmium::item_type::relation_member_list_with_full_members;
+            }
+
+            template <>
+            inline bool type_is_compatible<osmium::OuterRing>(osmium::item_type t) noexcept {
+                return t == osmium::item_type::outer_ring;
+            }
+
+            template <>
+            inline bool type_is_compatible<osmium::InnerRing>(osmium::item_type t) noexcept {
+                return t == osmium::item_type::inner_ring;
+            }
+
         } // namespace detail
 
         template <class TMember>
@@ -121,6 +158,11 @@ namespace osmium {
                 m_data(data),
                 m_end(end) {
                 advance_to_next_item_of_right_type();
+            }
+
+            template <class T>
+            ItemIterator<T> cast() const {
+                return ItemIterator<T>(m_data, m_end);
             }
 
             ItemIterator<TMember>& operator++() {

@@ -112,14 +112,6 @@ namespace osmium {
 
             friend class osmium::builder::Builder;
 
-            unsigned char* next() noexcept {
-                return data() + padded_size();
-            }
-
-            const unsigned char* next() const noexcept {
-                return data() + padded_size();
-            }
-
             Item& add_size(const item_size_type size) noexcept {
                 m_size += size;
                 return *this;
@@ -145,6 +137,14 @@ namespace osmium {
             }
 
         public:
+
+            unsigned char* next() noexcept {
+                return data() + padded_size();
+            }
+
+            const unsigned char* next() const noexcept {
+                return data() + padded_size();
+            }
 
             item_size_type byte_size() const noexcept {
                 return m_size;

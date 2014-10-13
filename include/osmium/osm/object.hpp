@@ -41,6 +41,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/memory/collection.hpp>
 #include <osmium/memory/item.hpp>
+#include <osmium/memory/item_iterator.hpp>
 #include <osmium/osm/entity.hpp>
 #include <osmium/osm/item_type.hpp>
 #include <osmium/osm/location.hpp>
@@ -334,7 +335,7 @@ namespace osmium {
         }
 
         iterator end() {
-            return iterator(data() + padded_size());
+            return iterator(next());
         }
 
         const_iterator cbegin() const {
@@ -342,7 +343,7 @@ namespace osmium {
         }
 
         const_iterator cend() const {
-            return const_iterator(data() + padded_size());
+            return const_iterator(next());
         }
 
         const_iterator begin() const {
@@ -351,6 +352,42 @@ namespace osmium {
 
         const_iterator end() const {
             return cend();
+        }
+
+        template <class T>
+        using t_iterator = osmium::memory::ItemIterator<T>;
+
+        template <class T>
+        using t_const_iterator = osmium::memory::ItemIterator<const T>;
+
+        template <class T>
+        t_iterator<T> begin() {
+            return t_iterator<T>(subitems_position(), next());
+        }
+
+        template <class T>
+        t_iterator<T> end() {
+            return t_iterator<T>(next(), next());
+        }
+
+        template <class T>
+        t_const_iterator<T> cbegin() const {
+            return t_const_iterator<T>(subitems_position(), next());
+        }
+
+        template <class T>
+        t_const_iterator<T> cend() const {
+            return t_const_iterator<T>(next(), next());
+        }
+
+        template <class T>
+        t_const_iterator<T> begin() const {
+            return cbegin<T>();
+        }
+
+        template <class T>
+        t_const_iterator<T> end() const {
+            return cend<T>();
         }
 
     }; // class OSMObject

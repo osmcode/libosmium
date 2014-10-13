@@ -42,6 +42,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/memory/buffer.hpp>
 #include <osmium/memory/item.hpp>
+#include <osmium/osm/types.hpp>
 #include <osmium/util/cast.hpp>
 
 namespace osmium {

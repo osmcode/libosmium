@@ -176,6 +176,14 @@ namespace osmium {
             return num_rings().first > 1;
         }
 
+        osmium::memory::ItemIterator<const osmium::InnerRing> inner_ring_cbegin(const osmium::memory::ItemIterator<const osmium::OuterRing>& it) const {
+            return it.cast<const osmium::InnerRing>();
+        }
+
+        osmium::memory::ItemIterator<const osmium::InnerRing> inner_ring_cend(const osmium::memory::ItemIterator<const osmium::OuterRing>& it) const {
+            return std::next(it).cast<const osmium::InnerRing>();
+        }
+
     }; // class Area
 
     static_assert(sizeof(Area) % osmium::memory::align_bytes == 0, "Class osmium::Area has wrong size to be aligned properly!");
