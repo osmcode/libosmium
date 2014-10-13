@@ -140,6 +140,10 @@ namespace osmium {
                     // default implementation is empty
                 }
 
+                virtual void dump_as_list(int /*fd*/) const {
+                    std::runtime_error("can't dump as list");
+                }
+
             }; // class Map
 
         } // namespace map

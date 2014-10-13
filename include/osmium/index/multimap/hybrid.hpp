@@ -174,7 +174,7 @@ namespace osmium {
                     m_main.sort();
                 }
 
-                void dump_as_list(int fd) {
+                void dump_as_list(int fd) override final {
                     consolidate();
                     m_main.dump_as_list(fd);
                 }
