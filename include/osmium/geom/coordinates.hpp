@@ -52,7 +52,7 @@ namespace osmium {
             explicit Coordinates(double cx, double cy) noexcept : x(cx), y(cy) {
             }
 
-            Coordinates(const osmium::Location& location) noexcept : x(location.lon()), y(location.lat()) {
+            Coordinates(const osmium::Location& location) : x(location.lon()), y(location.lat()) {
             }
 
             void append_to_string(std::string& s, const char infix, int precision) const {
