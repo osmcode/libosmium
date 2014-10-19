@@ -68,7 +68,7 @@ clean:
 check:
 	cppcheck --std=c++11 $(CPPCHECK_OPTIONS) -I include $(INCLUDE_FILES) */*.cpp test/t/*/test_*.cpp test/osm-testdata/*.cpp
 
-install: doc
+install:
 	install -m 755 -g $(INSTALL_GROUP) -o $(INSTALL_USER) -d $(DESTDIR)/usr/include
 	install -m 755 -g $(INSTALL_GROUP) -o $(INSTALL_USER) -d $(DESTDIR)/usr/share/doc/libosmium-dev
 	install -m 644 -g $(INSTALL_GROUP) -o $(INSTALL_USER) README.md $(DESTDIR)/usr/share/doc/libosmium-dev/README.md
