@@ -1,0 +1,10 @@
+.gitignore
+.gitmodules
+.npmignore
+.travis.yml
+Makefile
+build
+demo
+node_modules
+scripts
+test
