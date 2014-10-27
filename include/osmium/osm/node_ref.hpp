@@ -78,11 +78,11 @@ namespace osmium {
             return m_location;
         }
 
-        double lon() const noexcept {
+        double lon() const {
             return m_location.lon();
         }
 
-        double lat() const noexcept {
+        double lat() const {
             return m_location.lat();
         }
 
