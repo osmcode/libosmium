@@ -9,6 +9,7 @@ INCLUDES_REPORT_FILES := $(subst src,check_reports,$(INCLUDE_FILES:.hpp=.compile
 DEMOS := $(shell find demo -mindepth 1 -maxdepth 1 -type d)
 
 all: build
+.PHONY: all build
 
 ./node_modules:
 	npm install --build-from-source
