@@ -25,9 +25,9 @@ Here are some of the more important changes:
 * Usually you don't act on single OSM objects any more, but on groups of
   them in a Buffer.
 
-* The way reading and writing of OSM data is done is much simpler. Use the
-  Reader and Writer classes as they hide much of the detail and have much
-  nicer interfaces than the old Input/Output classes.
+* Reading and writing of OSM data is much simpler. Use the Reader and Writer
+  classes as they hide much of the detail and have much nicer interfaces
+  than the old Input/Output classes.
 
 * The class Osmium::OSM::Position was renamed to osmium::Location. This
   better reflects that it is a location on the planet we are talking about.
@@ -38,7 +38,6 @@ Here are some of the more important changes:
   features that used to be only available with boost, such as shared_ptr.
   Osmium now uses the C++11 versions of these.
 
-* Osmium now makes use of the new C++11 threading support. Currently this
-  is only used when reading OSM files, but it will be expanded in the
-  future.
+* Osmium now makes use of the new C++11 threading support when reading and
+  writing OSM files.
 
