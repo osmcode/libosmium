@@ -15,6 +15,7 @@ namespace osmium {
 }
 
 // node-osmium
+#include "node_osmium.hpp"
 #include "osm_entity_wrap.hpp"
 #include "osm_object_wrap.hpp"
 #include "utils.hpp"
@@ -23,9 +24,9 @@ namespace node_osmium {
 
     class OSMRelationWrap : public OSMObjectWrap {
 
-        static v8::Persistent<v8::String> symbol_type;
-        static v8::Persistent<v8::String> symbol_ref;
-        static v8::Persistent<v8::String> symbol_role;
+        static v8::Handle<v8::Value> get_type(v8::Local<v8::String> property, const v8::AccessorInfo& info) {
+            return symbol_relation;
+        }
 
         static v8::Handle<v8::Value> get_members_count(v8::Local<v8::String> /* property */, const v8::AccessorInfo& info);
         static v8::Handle<v8::Value> members(const v8::Arguments& args);

@@ -15,6 +15,7 @@ namespace osmium {
 }
 
 // node-osmium
+#include "node_osmium.hpp"
 #include "osm_entity_wrap.hpp"
 #include "osm_object_wrap.hpp"
 #include "utils.hpp"
@@ -22,6 +23,10 @@ namespace osmium {
 namespace node_osmium {
 
     class OSMNodeWrap : public OSMObjectWrap {
+
+        static v8::Handle<v8::Value> get_type(v8::Local<v8::String> property, const v8::AccessorInfo& info) {
+            return symbol_node;
+        }
 
         static v8::Handle<v8::Value> get_coordinates(v8::Local<v8::String> property, const v8::AccessorInfo& info);
         static v8::Handle<v8::Value> get_lon(v8::Local<v8::String> property, const v8::AccessorInfo& info);

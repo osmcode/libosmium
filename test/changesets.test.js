@@ -8,6 +8,7 @@ describe('changesets', function() {
         var count = 0;
         handler.on('changeset', function(changeset) {
             if (count++ == 0) {
+                assert.equal(changeset.type, "changeset");
                 assert.equal(changeset.id, 15449957);
                 assert.equal(changeset.user, "Elbert");
                 assert.equal(changeset.uid, 1237205);

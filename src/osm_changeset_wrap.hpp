@@ -15,12 +15,17 @@ namespace osmium {
 }
 
 // node-osmium
+#include "node_osmium.hpp"
 #include "osm_entity_wrap.hpp"
 #include "utils.hpp"
 
 namespace node_osmium {
 
     class OSMChangesetWrap : public OSMEntityWrap {
+
+        static v8::Handle<v8::Value> get_type(v8::Local<v8::String> property, const v8::AccessorInfo& info) {
+            return symbol_changeset;
+        }
 
         static v8::Handle<v8::Value> get_id(v8::Local<v8::String> property, const v8::AccessorInfo& info);
         static v8::Handle<v8::Value> get_uid(v8::Local<v8::String> property, const v8::AccessorInfo& info);

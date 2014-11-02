@@ -8,6 +8,7 @@ describe('basic', function() {
         var count = 0;
         handler.on('node', function(node) {
             if (count++ == 0) {
+                assert.equal(node.type, "node");
                 assert.equal(node.id, 50031066);
                 assert.equal(node.visible, true);
                 assert.equal(node.version, 2);
@@ -36,6 +37,7 @@ describe('basic', function() {
         var count = 0;
         handler.on('way', function(way) {
             if (count++ == 0) {
+                assert.equal(way.type, "way");
                 assert.equal(way.id, 6091729);
                 assert.equal(way.visible, true);
                 assert.equal(way.version, 1);
@@ -57,6 +59,7 @@ describe('basic', function() {
         var count = 0;
         handler.on('relation', function(relation) {
             if (count++ == 0) {
+                assert.equal(relation.type, "relation");
                 assert.equal(relation.id, 237891);
                 assert.equal(relation.visible, true);
                 assert.equal(relation.version, 2);

@@ -23,14 +23,15 @@ namespace node_osmium {
         constructor = v8::Persistent<v8::FunctionTemplate>::New(v8::FunctionTemplate::New(OSMWayWrap::New));
         constructor->Inherit(OSMObjectWrap::constructor);
         constructor->InstanceTemplate()->SetInternalFieldCount(1);
-        constructor->SetClassName(v8::String::NewSymbol("Way"));
+        constructor->SetClassName(symbol_Way);
         auto attributes = static_cast<v8::PropertyAttribute>(v8::ReadOnly | v8::DontDelete);
+        set_accessor(constructor, "type", get_type, attributes);
         set_accessor(constructor, "nodes_count", get_nodes_count, attributes);
         node::SetPrototypeMethod(constructor, "node_refs", node_refs);
         node::SetPrototypeMethod(constructor, "node_coordinates", node_coordinates);
         node::SetPrototypeMethod(constructor, "wkb", wkb);
         node::SetPrototypeMethod(constructor, "wkt", wkt);
-        target->Set(v8::String::NewSymbol("Way"), constructor->GetFunction());
+        target->Set(symbol_Way, constructor->GetFunction());
     }
 
     v8::Handle<v8::Value> OSMWayWrap::New(const v8::Arguments& args) {

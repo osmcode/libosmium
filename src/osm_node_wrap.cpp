@@ -23,15 +23,16 @@ namespace node_osmium {
         constructor = v8::Persistent<v8::FunctionTemplate>::New(v8::FunctionTemplate::New(OSMNodeWrap::New));
         constructor->Inherit(OSMObjectWrap::constructor);
         constructor->InstanceTemplate()->SetInternalFieldCount(1);
-        constructor->SetClassName(v8::String::NewSymbol("Node"));
+        constructor->SetClassName(symbol_Node);
         node::SetPrototypeMethod(constructor, "wkb", wkb);
         node::SetPrototypeMethod(constructor, "wkt", wkt);
         auto attributes = static_cast<v8::PropertyAttribute>(v8::ReadOnly | v8::DontDelete);
+        set_accessor(constructor, "type", get_type, attributes);
         set_accessor(constructor, "location", get_coordinates, attributes);
         set_accessor(constructor, "coordinates", get_coordinates, attributes);
         set_accessor(constructor, "lon", get_lon, attributes);
         set_accessor(constructor, "lat", get_lat, attributes);
-        target->Set(v8::String::NewSymbol("Node"), constructor->GetFunction());
+        target->Set(symbol_Node, constructor->GetFunction());
     }
 
     v8::Handle<v8::Value> OSMNodeWrap::New(const v8::Arguments& args) {

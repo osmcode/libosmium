@@ -15,6 +15,7 @@ namespace osmium {
 }
 
 // node-osmium
+#include "node_osmium.hpp"
 #include "osm_entity_wrap.hpp"
 #include "osm_object_wrap.hpp"
 #include "utils.hpp"
@@ -22,6 +23,10 @@ namespace osmium {
 namespace node_osmium {
 
     class OSMWayWrap : public OSMObjectWrap {
+
+        static v8::Handle<v8::Value> get_type(v8::Local<v8::String> property, const v8::AccessorInfo& info) {
+            return symbol_way;
+        }
 
         static v8::Handle<v8::Value> get_nodes_count(v8::Local<v8::String> /* property */, const v8::AccessorInfo& info);
         static v8::Handle<v8::Value> node_refs(const v8::Arguments& args);

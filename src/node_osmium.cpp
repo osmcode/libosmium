@@ -33,12 +33,39 @@ namespace node_osmium {
     osmium::geom::WKBFactory<> wkb_factory;
     osmium::geom::WKTFactory<> wkt_factory;
 
+    v8::Persistent<v8::String> symbol_Node;
+    v8::Persistent<v8::String> symbol_node;
+
+    v8::Persistent<v8::String> symbol_Way;
+    v8::Persistent<v8::String> symbol_way;
+
+    v8::Persistent<v8::String> symbol_Relation;
+    v8::Persistent<v8::String> symbol_relation;
+    v8::Persistent<v8::String> symbol_type;
+    v8::Persistent<v8::String> symbol_ref;
+    v8::Persistent<v8::String> symbol_role;
+
+    v8::Persistent<v8::String> symbol_Changeset;
+    v8::Persistent<v8::String> symbol_changeset;
+
     extern "C" {
         static void start(v8::Handle<v8::Object> target) {
             v8::HandleScope scope;
             module = v8::Persistent<v8::Object>::New(target);
 
             node::SetMethod(target, "apply", node_osmium::apply);
+
+            symbol_Node      = NODE_PSYMBOL("Node");
+            symbol_node      = NODE_PSYMBOL("node");
+            symbol_Way       = NODE_PSYMBOL("Way");
+            symbol_way       = NODE_PSYMBOL("way");
+            symbol_Relation  = NODE_PSYMBOL("Relation");
+            symbol_relation  = NODE_PSYMBOL("relation");
+            symbol_type      = NODE_PSYMBOL("type");
+            symbol_ref       = NODE_PSYMBOL("ref");
+            symbol_role      = NODE_PSYMBOL("role");
+            symbol_Changeset = NODE_PSYMBOL("Changeset");
+            symbol_changeset = NODE_PSYMBOL("changeset");
 
             node_osmium::OSMEntityWrap::Initialize(target);
             node_osmium::OSMObjectWrap::Initialize(target);

@@ -1,4 +1,5 @@
 
+// node-osmium
 #include "osm_changeset_wrap.hpp"
 #include "utils.hpp"
 
@@ -10,11 +11,13 @@ namespace node_osmium {
 
     void OSMChangesetWrap::Initialize(v8::Handle<v8::Object> target) {
         v8::HandleScope scope;
+
         constructor = v8::Persistent<v8::FunctionTemplate>::New(v8::FunctionTemplate::New(OSMChangesetWrap::New));
         constructor->Inherit(OSMEntityWrap::constructor);
         constructor->InstanceTemplate()->SetInternalFieldCount(1);
-        constructor->SetClassName(v8::String::NewSymbol("Changeset"));
+        constructor->SetClassName(symbol_Changeset);
         auto attributes = static_cast<v8::PropertyAttribute>(v8::ReadOnly | v8::DontDelete);
+        set_accessor(constructor, "type", get_type, attributes);
         set_accessor(constructor, "id", get_id, attributes);
         set_accessor(constructor, "uid", get_uid, attributes);
         set_accessor(constructor, "user", get_user, attributes);
@@ -25,7 +28,7 @@ namespace node_osmium {
         set_accessor(constructor, "closed", get_closed, attributes);
         set_accessor(constructor, "bounds", get_bounds, attributes);
         node::SetPrototypeMethod(constructor, "tags", tags);
-        target->Set(v8::String::NewSymbol("Changeset"), constructor->GetFunction());
+        target->Set(symbol_Changeset, constructor->GetFunction());
     }
 
     v8::Handle<v8::Value> OSMChangesetWrap::New(const v8::Arguments& args) {

@@ -1,29 +1,25 @@
 
+// node
 #include <node.h>
 
-#include <osm_relation_wrap.hpp>
+// node-osmium
+#include "osm_relation_wrap.hpp"
 
 namespace node_osmium {
 
     v8::Persistent<v8::FunctionTemplate> OSMRelationWrap::constructor;
-    v8::Persistent<v8::String> OSMRelationWrap::symbol_type;
-    v8::Persistent<v8::String> OSMRelationWrap::symbol_ref;
-    v8::Persistent<v8::String> OSMRelationWrap::symbol_role;
 
     void OSMRelationWrap::Initialize(v8::Handle<v8::Object> target) {
         v8::HandleScope scope;
         constructor = v8::Persistent<v8::FunctionTemplate>::New(v8::FunctionTemplate::New(OSMRelationWrap::New));
         constructor->Inherit(OSMObjectWrap::constructor);
         constructor->InstanceTemplate()->SetInternalFieldCount(1);
-        constructor->SetClassName(v8::String::NewSymbol("Relation"));
+        constructor->SetClassName(symbol_Relation);
         auto attributes = static_cast<v8::PropertyAttribute>(v8::ReadOnly | v8::DontDelete);
+        set_accessor(constructor, "type", get_type, attributes);
         set_accessor(constructor, "members_count", get_members_count, attributes);
         node::SetPrototypeMethod(constructor, "members", members);
-        target->Set(v8::String::NewSymbol("Relation"), constructor->GetFunction());
-
-        symbol_type = NODE_PSYMBOL("type");
-        symbol_ref  = NODE_PSYMBOL("ref");
-        symbol_role = NODE_PSYMBOL("role");
+        target->Set(symbol_Relation, constructor->GetFunction());
     }
 
     v8::Handle<v8::Value> OSMRelationWrap::New(const v8::Arguments& args) {
