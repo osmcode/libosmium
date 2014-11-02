@@ -22,7 +22,7 @@ namespace node_osmium {
 
     class FileWrap : public node::ObjectWrap {
 
-        std::shared_ptr<osmium::io::File> m_this;
+        osmium::io::File m_this;
 
     public:
 
@@ -32,11 +32,11 @@ namespace node_osmium {
 
         FileWrap(osmium::io::File&& file) :
             node::ObjectWrap(),
-            m_this(std::make_shared<osmium::io::File>(file)) {
+            m_this(std::move(file)) {
         }
 
         osmium::io::File& get() {
-            return *m_this;
+            return m_this;
         }
 
     private:

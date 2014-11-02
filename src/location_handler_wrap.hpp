@@ -67,7 +67,7 @@ namespace node_osmium {
         std::unique_ptr<index_pos_type> m_index_pos;
         std::unique_ptr<index_neg_type> m_index_neg;
 
-        std::shared_ptr<location_handler_type> m_this;
+        std::unique_ptr<location_handler_type> m_this;
 
         static v8::Handle<v8::Value> clear(const v8::Arguments& args);
         static v8::Handle<v8::Value> ignoreErrors(const v8::Arguments& args);
@@ -82,7 +82,7 @@ namespace node_osmium {
             ObjectWrap(),
             m_index_pos(node_cache_factory(cache_type)),
             m_index_neg(new index_neg_type),
-            m_this(std::make_shared<location_handler_type>(*m_index_pos, *m_index_neg)) {
+            m_this(new location_handler_type(*m_index_pos, *m_index_neg)) {
             if (!m_index_pos) {
                 throw std::runtime_error("unknown node cache type");
             }

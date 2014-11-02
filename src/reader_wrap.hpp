@@ -31,7 +31,7 @@ namespace node_osmium {
         static v8::Handle<v8::Value> close(const v8::Arguments& args);
         static v8::Handle<v8::Value> read(const v8::Arguments& args);
 
-        std::shared_ptr<osmium::io::Reader> m_this;
+        osmium::io::Reader m_this;
 
     public:
 
@@ -41,11 +41,11 @@ namespace node_osmium {
 
         ReaderWrap(const osmium::io::File& file, osmium::osm_entity_bits::type entities) :
             ObjectWrap(),
-            m_this(std::make_shared<osmium::io::Reader>(file, entities)) {
+            m_this(file, entities) {
         }
 
         osmium::io::Reader& get() {
-            return *m_this;
+            return m_this;
         }
 
     private:

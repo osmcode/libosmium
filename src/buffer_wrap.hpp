@@ -23,7 +23,7 @@ namespace node_osmium {
 
     class BufferWrap : public node::ObjectWrap {
 
-        std::shared_ptr<osmium::memory::Buffer> m_this;
+        osmium::memory::Buffer m_this;
         osmium::memory::Buffer::iterator m_iterator;
 
         static v8::Handle<v8::Value> next(const v8::Arguments& args);
@@ -35,12 +35,12 @@ namespace node_osmium {
         static v8::Handle<v8::Value> New(const v8::Arguments& args);
         BufferWrap(osmium::memory::Buffer&& buffer) :
             ObjectWrap(),
-            m_this(std::make_shared<osmium::memory::Buffer>(std::move(buffer))),
-            m_iterator(m_this->begin()) {
+            m_this(std::move(buffer)),
+            m_iterator(m_this.begin()) {
         }
 
         osmium::memory::Buffer& get() {
-            return *m_this;
+            return m_this;
         }
 
     private:

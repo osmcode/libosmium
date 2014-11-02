@@ -44,7 +44,7 @@ namespace node_osmium {
     v8::Handle<v8::Value> BufferWrap::next(const v8::Arguments& args) {
         BufferWrap* buffer_wrap = node::ObjectWrap::Unwrap<BufferWrap>(args.This());
         v8::HandleScope scope;
-        if (buffer_wrap->m_iterator == buffer_wrap->m_this->end()) {
+        if (buffer_wrap->m_iterator == buffer_wrap->m_this.end()) {
             return scope.Close(v8::Undefined());
         }
         osmium::OSMEntity& entity = *buffer_wrap->m_iterator;
