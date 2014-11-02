@@ -109,7 +109,7 @@ namespace node_osmium {
     v8::Handle<v8::Value> OSMWayWrap::node_coordinates(const v8::Arguments& args) {
         v8::HandleScope scope;
 
-        auto cf = module->Get(v8::String::NewSymbol("Coordinates"));
+        auto cf = module->Get(symbol_Coordinates);
         assert(cf->IsFunction());
 
         const osmium::Way& way = wrapped(args.This());

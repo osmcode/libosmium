@@ -33,6 +33,9 @@ namespace node_osmium {
     osmium::geom::WKBFactory<> wkb_factory;
     osmium::geom::WKTFactory<> wkt_factory;
 
+    v8::Persistent<v8::String> symbol_OSMEntity;
+    v8::Persistent<v8::String> symbol_OSMObject;
+
     v8::Persistent<v8::String> symbol_Node;
     v8::Persistent<v8::String> symbol_node;
 
@@ -48,6 +51,18 @@ namespace node_osmium {
     v8::Persistent<v8::String> symbol_Changeset;
     v8::Persistent<v8::String> symbol_changeset;
 
+    v8::Persistent<v8::String> symbol_Coordinates;
+    v8::Persistent<v8::String> symbol_Box;
+
+    v8::Persistent<v8::String> symbol_generator;
+    v8::Persistent<v8::String> symbol_bounds;
+
+    v8::Persistent<v8::String> symbol_Buffer;
+    v8::Persistent<v8::String> symbol_File;
+    v8::Persistent<v8::String> symbol_Handler;
+    v8::Persistent<v8::String> symbol_LocationHandler;
+    v8::Persistent<v8::String> symbol_Reader;
+
     extern "C" {
         static void start(v8::Handle<v8::Object> target) {
             v8::HandleScope scope;
@@ -55,17 +70,28 @@ namespace node_osmium {
 
             node::SetMethod(target, "apply", node_osmium::apply);
 
-            symbol_Node      = NODE_PSYMBOL("Node");
-            symbol_node      = NODE_PSYMBOL("node");
-            symbol_Way       = NODE_PSYMBOL("Way");
-            symbol_way       = NODE_PSYMBOL("way");
-            symbol_Relation  = NODE_PSYMBOL("Relation");
-            symbol_relation  = NODE_PSYMBOL("relation");
-            symbol_type      = NODE_PSYMBOL("type");
-            symbol_ref       = NODE_PSYMBOL("ref");
-            symbol_role      = NODE_PSYMBOL("role");
-            symbol_Changeset = NODE_PSYMBOL("Changeset");
-            symbol_changeset = NODE_PSYMBOL("changeset");
+            symbol_OSMEntity       = NODE_PSYMBOL("OSMEntity");
+            symbol_OSMObject       = NODE_PSYMBOL("OSMObject");
+            symbol_Node            = NODE_PSYMBOL("Node");
+            symbol_node            = NODE_PSYMBOL("node");
+            symbol_Way             = NODE_PSYMBOL("Way");
+            symbol_way             = NODE_PSYMBOL("way");
+            symbol_Relation        = NODE_PSYMBOL("Relation");
+            symbol_relation        = NODE_PSYMBOL("relation");
+            symbol_type            = NODE_PSYMBOL("type");
+            symbol_ref             = NODE_PSYMBOL("ref");
+            symbol_role            = NODE_PSYMBOL("role");
+            symbol_Changeset       = NODE_PSYMBOL("Changeset");
+            symbol_changeset       = NODE_PSYMBOL("changeset");
+            symbol_Coordinates     = NODE_PSYMBOL("Coordinates");
+            symbol_Box             = NODE_PSYMBOL("Box");
+            symbol_generator       = NODE_PSYMBOL("generator");
+            symbol_bounds          = NODE_PSYMBOL("bounds");
+            symbol_Buffer          = NODE_PSYMBOL("Buffer");
+            symbol_File            = NODE_PSYMBOL("File");
+            symbol_Handler         = NODE_PSYMBOL("Handler");
+            symbol_LocationHandler = NODE_PSYMBOL("LocationHandler");
+            symbol_Reader          = NODE_PSYMBOL("Reader");
 
             node_osmium::OSMEntityWrap::Initialize(target);
             node_osmium::OSMObjectWrap::Initialize(target);

@@ -8,6 +8,8 @@
 // node
 #include <node_buffer.h>
 
+// node-osmium
+#include "node_osmium.hpp"
 #include "file_wrap.hpp"
 
 namespace node_osmium {
@@ -18,8 +20,8 @@ namespace node_osmium {
         v8::HandleScope scope;
         constructor = v8::Persistent<v8::FunctionTemplate>::New(v8::FunctionTemplate::New(FileWrap::New));
         constructor->InstanceTemplate()->SetInternalFieldCount(1);
-        constructor->SetClassName(v8::String::NewSymbol("File"));
-        target->Set(v8::String::NewSymbol("File"), constructor->GetFunction());
+        constructor->SetClassName(symbol_File);
+        target->Set(symbol_File, constructor->GetFunction());
     }
 
     v8::Handle<v8::Value> FileWrap::New(const v8::Arguments& args) {

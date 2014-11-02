@@ -1,4 +1,6 @@
 
+// node-osmium
+#include "node_osmium.hpp"
 #include "osm_entity_wrap.hpp"
 
 namespace node_osmium {
@@ -9,8 +11,8 @@ namespace node_osmium {
         v8::HandleScope scope;
         constructor = v8::Persistent<v8::FunctionTemplate>::New(v8::FunctionTemplate::New(OSMEntityWrap::New));
         constructor->InstanceTemplate()->SetInternalFieldCount(1);
-        constructor->SetClassName(v8::String::NewSymbol("OSMEntity"));
-        target->Set(v8::String::NewSymbol("OSMEntity"), constructor->GetFunction());
+        constructor->SetClassName(symbol_OSMEntity);
+        target->Set(symbol_OSMEntity, constructor->GetFunction());
     }
 
     v8::Handle<v8::Value> OSMEntityWrap::New(const v8::Arguments& args) {

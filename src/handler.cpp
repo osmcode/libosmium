@@ -13,6 +13,7 @@
 #include <osmium/osm/object.hpp>
 
 // node-osmium
+#include "node_osmium.hpp"
 #include "handler.hpp"
 #include "osm_node_wrap.hpp"
 #include "osm_way_wrap.hpp"
@@ -29,10 +30,10 @@ namespace node_osmium {
         v8::HandleScope scope;
         constructor = v8::Persistent<v8::FunctionTemplate>::New(v8::FunctionTemplate::New(JSHandler::New));
         constructor->InstanceTemplate()->SetInternalFieldCount(1);
-        constructor->SetClassName(v8::String::NewSymbol("Handler"));
+        constructor->SetClassName(symbol_Handler);
         node::SetPrototypeMethod(constructor, "on", on);
         node::SetPrototypeMethod(constructor, "options", options);
-        target->Set(v8::String::NewSymbol("Handler"), constructor->GetFunction());
+        target->Set(symbol_Handler, constructor->GetFunction());
 
         symbol_tagged_nodes_only = NODE_PSYMBOL("tagged_nodes_only");
     }

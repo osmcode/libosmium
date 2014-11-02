@@ -8,6 +8,7 @@
 #include <node.h>
 
 // node-osmium
+#include "node_osmium.hpp"
 #include "buffer_wrap.hpp"
 #include "file_wrap.hpp"
 #include "handler.hpp"
@@ -26,11 +27,11 @@ namespace node_osmium {
         v8::HandleScope scope;
         constructor = v8::Persistent<v8::FunctionTemplate>::New(v8::FunctionTemplate::New(ReaderWrap::New));
         constructor->InstanceTemplate()->SetInternalFieldCount(1);
-        constructor->SetClassName(v8::String::NewSymbol("Reader"));
+        constructor->SetClassName(symbol_Reader);
         node::SetPrototypeMethod(constructor, "header", header);
         node::SetPrototypeMethod(constructor, "close", close);
         node::SetPrototypeMethod(constructor, "read", read);
-        target->Set(v8::String::NewSymbol("Reader"), constructor->GetFunction());
+        target->Set(symbol_Reader, constructor->GetFunction());
     }
 
     v8::Handle<v8::Value> ReaderWrap::New(const v8::Arguments& args) {
@@ -50,22 +51,22 @@ namespace node_osmium {
                 read_which_entities = osmium::osm_entity_bits::nothing;
                 v8::Local<v8::Object> options = args[1]->ToObject();
 
-                v8::Local<v8::Value> want_nodes = options->Get(v8::String::NewSymbol("node"));
+                v8::Local<v8::Value> want_nodes = options->Get(symbol_node);
                 if (want_nodes->IsBoolean() && want_nodes->BooleanValue()) {
                     read_which_entities |= osmium::osm_entity_bits::node;
                 }
 
-                v8::Local<v8::Value> want_ways = options->Get(v8::String::NewSymbol("way"));
+                v8::Local<v8::Value> want_ways = options->Get(symbol_way);
                 if (want_ways->IsBoolean() && want_ways->BooleanValue()) {
                     read_which_entities |= osmium::osm_entity_bits::way;
                 }
 
-                v8::Local<v8::Value> want_relations = options->Get(v8::String::NewSymbol("relation"));
+                v8::Local<v8::Value> want_relations = options->Get(symbol_relation);
                 if (want_relations->IsBoolean() && want_relations->BooleanValue()) {
                     read_which_entities |= osmium::osm_entity_bits::relation;
                 }
 
-                v8::Local<v8::Value> want_changesets = options->Get(v8::String::NewSymbol("changeset"));
+                v8::Local<v8::Value> want_changesets = options->Get(symbol_changeset);
                 if (want_changesets->IsBoolean() && want_changesets->BooleanValue()) {
                     read_which_entities |= osmium::osm_entity_bits::changeset;
                 }
@@ -94,7 +95,7 @@ namespace node_osmium {
         v8::HandleScope scope;
         v8::Local<v8::Object> obj = v8::Object::New();
         const osmium::io::Header& header = unwrap<ReaderWrap>(args.This()).header();
-        obj->Set(v8::String::NewSymbol("generator"), v8::String::New(header.get("generator").c_str()));
+        obj->Set(symbol_generator, v8::String::New(header.get("generator").c_str()));
 
         auto bounds_array = v8::Array::New(header.boxes().size());
 
@@ -103,7 +104,7 @@ namespace node_osmium {
             bounds_array->Set(i++, create_js_box(box));
         }
 
-        obj->Set(v8::String::NewSymbol("bounds"), bounds_array);
+        obj->Set(symbol_bounds, bounds_array);
         return scope.Close(obj);
     }
 

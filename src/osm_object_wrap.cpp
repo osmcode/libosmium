@@ -1,4 +1,6 @@
 
+// node-osmium
+#include "node_osmium.hpp"
 #include "osm_object_wrap.hpp"
 
 namespace node_osmium {
@@ -9,7 +11,7 @@ namespace node_osmium {
         v8::HandleScope scope;
         constructor = v8::Persistent<v8::FunctionTemplate>::New(v8::FunctionTemplate::New(OSMObjectWrap::New));
         constructor->InstanceTemplate()->SetInternalFieldCount(1);
-        constructor->SetClassName(v8::String::NewSymbol("OSMObject"));
+        constructor->SetClassName(symbol_OSMObject);
         auto attributes = static_cast<v8::PropertyAttribute>(v8::ReadOnly | v8::DontDelete);
         set_accessor(constructor, "id", get_id, attributes);
         set_accessor(constructor, "version", get_version, attributes);
@@ -19,7 +21,7 @@ namespace node_osmium {
         set_accessor(constructor, "uid", get_uid, attributes);
         set_accessor(constructor, "user", get_user, attributes);
         node::SetPrototypeMethod(constructor, "tags", tags);
-        target->Set(v8::String::NewSymbol("OSMObject"), constructor->GetFunction());
+        target->Set(symbol_OSMObject, constructor->GetFunction());
     }
 
     v8::Handle<v8::Value> OSMObjectWrap::New(const v8::Arguments& args) {

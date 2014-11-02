@@ -3,6 +3,7 @@
 #include <node_buffer.h>
 
 // node-osmium
+#include "node_osmium.hpp"
 #include "buffer_wrap.hpp"
 #include "osm_node_wrap.hpp"
 #include "osm_way_wrap.hpp"
@@ -18,9 +19,9 @@ namespace node_osmium {
         v8::HandleScope scope;
         constructor = v8::Persistent<v8::FunctionTemplate>::New(v8::FunctionTemplate::New(BufferWrap::New));
         constructor->InstanceTemplate()->SetInternalFieldCount(1);
-        constructor->SetClassName(v8::String::NewSymbol("Buffer"));
+        constructor->SetClassName(symbol_Buffer);
         node::SetPrototypeMethod(constructor, "next", next);
-        target->Set(v8::String::NewSymbol("Buffer"), constructor->GetFunction());
+        target->Set(symbol_Buffer, constructor->GetFunction());
     }
 
     v8::Handle<v8::Value> BufferWrap::New(const v8::Arguments& args) {

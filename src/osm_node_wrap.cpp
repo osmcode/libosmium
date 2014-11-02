@@ -48,7 +48,7 @@ namespace node_osmium {
     v8::Handle<v8::Value> OSMNodeWrap::get_coordinates(v8::Local<v8::String> /* property */, const v8::AccessorInfo& info) {
         v8::HandleScope scope;
 
-        auto cf = module->Get(v8::String::NewSymbol("Coordinates"));
+        auto cf = module->Get(symbol_Coordinates);
         assert(cf->IsFunction());
 
         const osmium::Location& location = wrapped(info.This()).location();

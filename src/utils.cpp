@@ -2,6 +2,7 @@
 // osmium
 #include <osmium/osm/box.hpp>
 
+#include "node_osmium.hpp"
 #include "utils.hpp"
 
 namespace node_osmium {
@@ -15,9 +16,9 @@ namespace node_osmium {
             return scope.Close(v8::Undefined());
         }
 
-        auto cf = module->Get(v8::String::NewSymbol("Coordinates"));
+        auto cf = module->Get(symbol_Coordinates);
         assert(cf->IsFunction());
-        auto bf = module->Get(v8::String::NewSymbol("Box"));
+        auto bf = module->Get(symbol_Box);
         assert(bf->IsFunction());
 
         v8::Local<v8::Value> argv_bl[2] = { v8::Number::New(box.bottom_left().lon()), v8::Number::New(box.bottom_left().lat()) };
