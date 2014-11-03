@@ -125,9 +125,7 @@ namespace node_osmium {
         try {
             osmium::memory::Buffer buffer = unwrap<ReaderWrap>(args.This()).read();
             if (buffer) {
-                v8::Handle<v8::Value> ext = v8::External::New(new BufferWrap(std::move(buffer)));
-                v8::Local<v8::Object> obj = BufferWrap::constructor->GetFunction()->NewInstance(1, &ext);
-                return scope.Close(obj);
+                return scope.Close(new_external<BufferWrap>(std::move(buffer)));
             }
         } catch (const std::exception& e) {
             std::string msg("osmium error: ");

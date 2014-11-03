@@ -8,6 +8,7 @@
 #include "osm_node_wrap.hpp"
 #include "osm_way_wrap.hpp"
 #include "osm_relation_wrap.hpp"
+#include "osm_area_wrap.hpp"
 #include "osm_changeset_wrap.hpp"
 #include "utils.hpp"
 
@@ -51,24 +52,19 @@ namespace node_osmium {
         ++buffer_wrap->m_iterator;
         switch (entity.type()) {
             case osmium::item_type::node: {
-                v8::Handle<v8::Value> ext = v8::External::New(new OSMNodeWrap(entity));
-                v8::Local<v8::Object> obj = OSMNodeWrap::constructor->GetFunction()->NewInstance(1, &ext);
-                return scope.Close(obj);
+                return scope.Close(new_external<OSMNodeWrap>(entity));
             }
             case osmium::item_type::way: {
-                v8::Handle<v8::Value> ext = v8::External::New(new OSMWayWrap(entity));
-                v8::Local<v8::Object> obj = OSMWayWrap::constructor->GetFunction()->NewInstance(1, &ext);
-                return scope.Close(obj);
+                return scope.Close(new_external<OSMWayWrap>(entity));
             }
             case osmium::item_type::relation: {
-                v8::Handle<v8::Value> ext = v8::External::New(new OSMRelationWrap(entity));
-                v8::Local<v8::Object> obj = OSMRelationWrap::constructor->GetFunction()->NewInstance(1, &ext);
-                return scope.Close(obj);
+                return scope.Close(new_external<OSMRelationWrap>(entity));
+            }
+            case osmium::item_type::area: {
+                return scope.Close(new_external<OSMAreaWrap>(entity));
             }
             case osmium::item_type::changeset: {
-                v8::Handle<v8::Value> ext = v8::External::New(new OSMChangesetWrap(entity));
-                v8::Local<v8::Object> obj = OSMChangesetWrap::constructor->GetFunction()->NewInstance(1, &ext);
-                return scope.Close(obj);
+                return scope.Close(new_external<OSMChangesetWrap>(entity));
             }
             default:
                 break;

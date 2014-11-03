@@ -75,9 +75,7 @@ namespace node_osmium {
                     handler.dispatch_entity(entity);
                 }
             });
-            v8::Handle<v8::Value> ext = v8::External::New(new MultipolygonHandlerWrap(mc_handler));
-            v8::Local<v8::Object> obj = MultipolygonHandlerWrap::constructor->GetFunction()->NewInstance(1, &ext);
-            return scope.Close(obj);
+            return scope.Close(new_external<MultipolygonHandlerWrap>(mc_handler));
 
         } catch (const std::exception& e) {
             std::string msg("osmium error: ");

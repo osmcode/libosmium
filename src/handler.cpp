@@ -169,9 +169,7 @@ namespace node_osmium {
         }
 
         v8::HandleScope scope;
-        v8::Handle<v8::Value> ext = v8::External::New(new TWrapped(entity));
-        v8::Local<v8::Object> obj = TWrapped::constructor->GetFunction()->NewInstance(1, &ext);
-        v8::Local<v8::Value> argv[1] = { obj };
+        v8::Local<v8::Value> argv[1] = { new_external<TWrapped>(entity) };
         function->Call(v8::Context::GetCurrent()->Global(), 1, argv);
     }
 
