@@ -77,8 +77,8 @@ namespace node_osmium {
             b->Wrap(args.This());
             return args.This();
         } else {
-            JSHandler* h = new JSHandler();
-            h->Wrap(args.This());
+            JSHandler* jshandler = new JSHandler();
+            jshandler->Wrap(args.This());
             return args.This();
         }
         return scope.Close(v8::Undefined());

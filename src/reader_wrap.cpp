@@ -74,13 +74,13 @@ namespace node_osmium {
             }
             if (args[0]->IsString()) {
                 osmium::io::File file(*v8::String::Utf8Value(args[0]));
-                ReaderWrap* q = new ReaderWrap(file, read_which_entities);
-                q->Wrap(args.This());
+                ReaderWrap* reader_wrap = new ReaderWrap(file, read_which_entities);
+                reader_wrap->Wrap(args.This());
                 return args.This();
             } else if (args[0]->IsObject() && FileWrap::constructor->HasInstance(args[0]->ToObject())) {
                 v8::Local<v8::Object> file_obj = args[0]->ToObject();
-                ReaderWrap* q = new ReaderWrap(unwrap<FileWrap>(file_obj), read_which_entities);
-                q->Wrap(args.This());
+                ReaderWrap* reader_wrap = new ReaderWrap(unwrap<FileWrap>(file_obj), read_which_entities);
+                reader_wrap->Wrap(args.This());
                 return args.This();
             } else {
                 return ThrowException(v8::Exception::TypeError(v8::String::New("please provide a File object or string for the first argument when creating a Reader")));

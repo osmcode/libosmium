@@ -33,8 +33,8 @@ namespace node_osmium {
             auto obj = args[0]->ToObject();
             if (node::Buffer::HasInstance(obj)) {
                 osmium::memory::Buffer buffer(reinterpret_cast<unsigned char*>(node::Buffer::Data(obj)), node::Buffer::Length(obj));
-                BufferWrap* bw = new BufferWrap(std::move(buffer));
-                bw->Wrap(args.This());
+                BufferWrap* buffer_wrap = new BufferWrap(std::move(buffer));
+                buffer_wrap->Wrap(args.This());
                 return args.This();
             }
         }

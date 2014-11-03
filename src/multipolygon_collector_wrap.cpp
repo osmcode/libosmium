@@ -37,8 +37,8 @@ namespace node_osmium {
         }
 
         try {
-            MultipolygonCollectorWrap* mpc_wrap = new MultipolygonCollectorWrap();
-            mpc_wrap->Wrap(args.This());
+            MultipolygonCollectorWrap* multipolygon_collector_wrap = new MultipolygonCollectorWrap();
+            multipolygon_collector_wrap->Wrap(args.This());
             return args.This();
         } catch (const std::exception& e) {
             return ThrowException(v8::Exception::TypeError(v8::String::New(e.what())));
