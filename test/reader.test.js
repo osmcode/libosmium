@@ -65,5 +65,23 @@ describe('reader', function() {
         osmium.apply(reader, handler);
     });
 
+    it('should read a whole file with Reader.read_all()', function(done) {
+        var file = new osmium.File(__dirname + "/data/winthrop.osm");
+        var reader = new osmium.Reader(file);
+        var buffer = reader.read_all();
+
+        var handler = new osmium.Handler();
+
+        var count = 0;
+        handler.on('node', function(node) {
+            if (count++ == 0) {
+                assert.equal(node.id, 50031066);
+                done();
+            }
+        });
+
+        osmium.apply(buffer, handler);
+    });
+
 });
 

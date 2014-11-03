@@ -31,6 +31,7 @@ namespace node_osmium {
         node::SetPrototypeMethod(constructor, "header", header);
         node::SetPrototypeMethod(constructor, "close", close);
         node::SetPrototypeMethod(constructor, "read", read);
+        node::SetPrototypeMethod(constructor, "read_all", read_all);
         target->Set(symbol_Reader, constructor->GetFunction());
     }
 
@@ -124,6 +125,26 @@ namespace node_osmium {
         v8::HandleScope scope;
         try {
             osmium::memory::Buffer buffer = unwrap<ReaderWrap>(args.This()).read();
+            if (buffer) {
+                return scope.Close(new_external<BufferWrap>(std::move(buffer)));
+            }
+        } catch (const std::exception& e) {
+            std::string msg("osmium error: ");
+            msg += e.what();
+            return ThrowException(v8::Exception::Error(v8::String::New(msg.c_str())));
+        }
+        return scope.Close(v8::Undefined());
+    }
+
+    v8::Handle<v8::Value> ReaderWrap::read_all(const v8::Arguments& args) {
+        osmium::memory::Buffer buffer(1024*1024, osmium::memory::Buffer::auto_grow::yes);
+        v8::HandleScope scope;
+        try {
+            osmium::io::Reader& reader = unwrap<ReaderWrap>(args.This());
+            while (osmium::memory::Buffer read_buffer = reader.read()) {
+                buffer.add_buffer(read_buffer);
+                buffer.commit();
+            }
             if (buffer) {
                 return scope.Close(new_external<BufferWrap>(std::move(buffer)));
             }
