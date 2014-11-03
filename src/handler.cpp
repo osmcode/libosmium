@@ -18,6 +18,7 @@
 #include "osm_node_wrap.hpp"
 #include "osm_way_wrap.hpp"
 #include "osm_relation_wrap.hpp"
+#include "osm_area_wrap.hpp"
 #include "osm_changeset_wrap.hpp"
 #include "utils.hpp"
 
@@ -57,6 +58,8 @@ namespace node_osmium {
         before_relations_cb.Dispose();
         relation_cb.Dispose();
         after_relations_cb.Dispose();
+
+        area_cb.Dispose();
 
         before_changesets_cb.Dispose();
         changeset_cb.Dispose();
@@ -119,6 +122,9 @@ namespace node_osmium {
         } else if (callback_name == "relation") {
             handler.relation_cb.Dispose();
             handler.relation_cb = v8::Persistent<v8::Function>::New(callback);
+        } else if (callback_name == "area") {
+            handler.area_cb.Dispose();
+            handler.area_cb = v8::Persistent<v8::Function>::New(callback);
         } else if (callback_name == "changeset") {
             handler.changeset_cb.Dispose();
             handler.changeset_cb = v8::Persistent<v8::Function>::New(callback);
@@ -197,6 +203,11 @@ namespace node_osmium {
             case osmium::item_type::relation:
                 if (!relation_cb.IsEmpty()) {
                     call_callback_with_entity<OSMRelationWrap>(relation_cb, entity);
+                }
+                break;
+            case osmium::item_type::area:
+                if (!area_cb.IsEmpty()) {
+                    call_callback_with_entity<OSMAreaWrap>(area_cb, entity);
                 }
                 break;
             case osmium::item_type::changeset:

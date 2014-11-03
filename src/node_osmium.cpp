@@ -21,6 +21,9 @@
 #include "file_wrap.hpp"
 #include "handler.hpp"
 #include "location_handler_wrap.hpp"
+#include "multipolygon_collector_wrap.hpp"
+#include "multipolygon_handler_wrap.hpp"
+#include "osm_area_wrap.hpp"
 #include "osm_changeset_wrap.hpp"
 #include "osm_node_wrap.hpp"
 #include "osm_relation_wrap.hpp"
@@ -48,6 +51,9 @@ namespace node_osmium {
     v8::Persistent<v8::String> symbol_ref;
     v8::Persistent<v8::String> symbol_role;
 
+    v8::Persistent<v8::String> symbol_Area;
+    v8::Persistent<v8::String> symbol_area;
+
     v8::Persistent<v8::String> symbol_Changeset;
     v8::Persistent<v8::String> symbol_changeset;
 
@@ -61,6 +67,8 @@ namespace node_osmium {
     v8::Persistent<v8::String> symbol_File;
     v8::Persistent<v8::String> symbol_Handler;
     v8::Persistent<v8::String> symbol_LocationHandler;
+    v8::Persistent<v8::String> symbol_MultipolygonCollector;
+    v8::Persistent<v8::String> symbol_MultipolygonHandler;
     v8::Persistent<v8::String> symbol_Reader;
 
     extern "C" {
@@ -81,24 +89,32 @@ namespace node_osmium {
             symbol_type            = NODE_PSYMBOL("type");
             symbol_ref             = NODE_PSYMBOL("ref");
             symbol_role            = NODE_PSYMBOL("role");
+            symbol_Area            = NODE_PSYMBOL("Area");
+            symbol_area            = NODE_PSYMBOL("area");
             symbol_Changeset       = NODE_PSYMBOL("Changeset");
             symbol_changeset       = NODE_PSYMBOL("changeset");
             symbol_Coordinates     = NODE_PSYMBOL("Coordinates");
             symbol_Box             = NODE_PSYMBOL("Box");
             symbol_generator       = NODE_PSYMBOL("generator");
             symbol_bounds          = NODE_PSYMBOL("bounds");
-            symbol_Buffer          = NODE_PSYMBOL("Buffer");
-            symbol_File            = NODE_PSYMBOL("File");
-            symbol_Handler         = NODE_PSYMBOL("Handler");
-            symbol_LocationHandler = NODE_PSYMBOL("LocationHandler");
-            symbol_Reader          = NODE_PSYMBOL("Reader");
+
+            symbol_Buffer                = NODE_PSYMBOL("Buffer");
+            symbol_File                  = NODE_PSYMBOL("File");
+            symbol_Handler               = NODE_PSYMBOL("Handler");
+            symbol_LocationHandler       = NODE_PSYMBOL("LocationHandler");
+            symbol_MultipolygonCollector = NODE_PSYMBOL("MultipolygonCollector");
+            symbol_MultipolygonHandler   = NODE_PSYMBOL("MultipolygonHandler");
+            symbol_Reader                = NODE_PSYMBOL("Reader");
 
             node_osmium::OSMEntityWrap::Initialize(target);
             node_osmium::OSMObjectWrap::Initialize(target);
             node_osmium::OSMNodeWrap::Initialize(target);
             node_osmium::OSMWayWrap::Initialize(target);
             node_osmium::OSMRelationWrap::Initialize(target);
+            node_osmium::OSMAreaWrap::Initialize(target);
             node_osmium::OSMChangesetWrap::Initialize(target);
+            node_osmium::MultipolygonCollectorWrap::Initialize(target);
+            node_osmium::MultipolygonHandlerWrap::Initialize(target);
             node_osmium::LocationHandlerWrap::Initialize(target);
             node_osmium::JSHandler::Initialize(target);
             node_osmium::FileWrap::Initialize(target);

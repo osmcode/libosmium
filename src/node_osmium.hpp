@@ -25,6 +25,9 @@ namespace node_osmium {
     extern v8::Persistent<v8::String> symbol_ref;
     extern v8::Persistent<v8::String> symbol_role;
 
+    extern v8::Persistent<v8::String> symbol_Area;
+    extern v8::Persistent<v8::String> symbol_area;
+
     extern v8::Persistent<v8::String> symbol_Changeset;
     extern v8::Persistent<v8::String> symbol_changeset;
 
@@ -38,6 +41,8 @@ namespace node_osmium {
     extern v8::Persistent<v8::String> symbol_File;
     extern v8::Persistent<v8::String> symbol_Handler;
     extern v8::Persistent<v8::String> symbol_LocationHandler;
+    extern v8::Persistent<v8::String> symbol_MultipolygonCollector;
+    extern v8::Persistent<v8::String> symbol_MultipolygonHandler;
     extern v8::Persistent<v8::String> symbol_Reader;
 
 } // namespace node_osmium

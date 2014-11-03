@@ -38,6 +38,8 @@ namespace node_osmium {
         v8::Persistent<v8::Function> relation_cb;
         v8::Persistent<v8::Function> after_relations_cb;
 
+        v8::Persistent<v8::Function> area_cb;
+
         v8::Persistent<v8::Function> before_changesets_cb;
         v8::Persistent<v8::Function> changeset_cb;
         v8::Persistent<v8::Function> after_changesets_cb;

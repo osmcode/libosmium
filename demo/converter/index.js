@@ -43,26 +43,24 @@ converter.add_layer('waterways').
     with_attribute('type', 'string').
     with_attribute('name', 'string');
 
-/*
 converter.add_layer('boundaries').
-    of_type('polygon').
+    of_type('multipolygon').
     with_attribute('osm_id', 'integer').
     with_attribute('level', 'integer').
     with_attribute('name', 'string');
 
 converter.add_layer('landuse').
-    of_type('polygon').
+    of_type('multipolygon').
     with_attribute('osm_id', 'integer').
     with_attribute('type', 'string').
     with_attribute('name', 'string');
 
 converter.add_layer('water').
-    of_type('polygon').
+    of_type('multipolygon').
     with_attribute('osm_id', 'integer').
     with_attribute('type', 'string').
     with_attribute('name', 'string');
 
-*/
 // ---- rules ----
 
 converter.node('natural', 'tree|peak|spring').
@@ -100,7 +98,6 @@ converter.way('railway', 'rail').
     to_layer('railways').
         attr('name');
 
-/*
 converter.area('boundary', 'administrative').
     to_layer('boundaries').
         attr('level', 'admin_level').
@@ -115,8 +112,6 @@ converter.area('natural', 'water').
     to_layer('water').
         attr('type', 'natural').
         attr('name');
-
-*/
 
 converter.convert(input_file);
 

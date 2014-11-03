@@ -16,6 +16,8 @@
 #include "buffer_wrap.hpp"
 #include "handler.hpp"
 #include "location_handler_wrap.hpp"
+#include "multipolygon_collector_wrap.hpp"
+#include "multipolygon_handler_wrap.hpp"
 #include "reader_wrap.hpp"
 #include "utils.hpp"
 
@@ -37,6 +39,10 @@ namespace node_osmium {
             osmium::apply_item(m_entity, handler);
         }
 
+        void operator()(osmium::area::MultipolygonCollector<osmium::area::Assembler>::HandlerPass2& handler) const {
+            osmium::apply_item(m_entity, handler);
+        }
+
     }; // struct visitor_type
 
     struct visitor_before_after_type : public boost::static_visitor<> {
@@ -55,6 +61,9 @@ namespace node_osmium {
         // any handler. Unfortunately a template function is not allowed
         // here.
         void operator()(location_handler_type& visitor) const {
+        }
+
+        void operator()(osmium::area::MultipolygonCollector<osmium::area::Assembler>::HandlerPass2& handler) const {
         }
 
         void operator()(JSHandler& visitor) const {
@@ -100,7 +109,7 @@ namespace node_osmium {
 
     }; // struct visitor_before_after
 
-    typedef boost::variant<location_handler_type&, JSHandler&> some_handler_type;
+    typedef boost::variant<location_handler_type&, JSHandler&, osmium::area::MultipolygonCollector<osmium::area::Assembler>::HandlerPass2&> some_handler_type;
 
     template <class TIter>
     v8::Handle<v8::Value> apply_iterator(TIter it, TIter end, std::vector<some_handler_type>& handlers) {
@@ -165,6 +174,8 @@ namespace node_osmium {
                     handlers.push_back(unwrap<JSHandler>(obj));
                 } else if (LocationHandlerWrap::constructor->HasInstance(obj)) {
                     handlers.push_back(unwrap<LocationHandlerWrap>(obj));
+                } else if (MultipolygonHandlerWrap::constructor->HasInstance(obj)) {
+                    handlers.push_back(unwrap<MultipolygonHandlerWrap>(obj));
                 }
             }
 
