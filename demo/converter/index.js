@@ -12,14 +12,12 @@ var output_file = process.argv[3];
 
 var converter = new osmium.Converter({ output: output_file, show_layers: true });
 
-converter.add_layer('natural_pois').
-    of_type('point').
+converter.create_layer('natural_pois', 'point').
     with_attribute('osm_id', 'string').
     with_attribute('type', 'string').
     with_attribute('name', 'string');
 
-converter.add_layer('roads').
-    of_type('linestring').
+converter.create_layer('roads', 'linestring').
     with_attribute('osm_id', 'integer').
     with_attribute('type', 'string').
     with_attribute('name', 'string').
@@ -27,58 +25,55 @@ converter.add_layer('roads').
     with_attribute('oneway', 'integer').
     with_attribute('maxspeed', 'integer');
 
-converter.add_layer('cycleways').
-    of_type('linestring').
+converter.create_layer('cycleways', 'linestring').
     with_attribute('osm_id', 'integer').
     with_attribute('name', 'string');
 
-converter.add_layer('railways').
-    of_type('linestring').
+converter.create_layer('railways', 'linestring').
     with_attribute('osm_id', 'integer').
     with_attribute('name', 'string');
 
-converter.add_layer('waterways').
-    of_type('linestring').
+converter.create_layer('waterways', 'linestring').
     with_attribute('osm_id', 'integer').
     with_attribute('type', 'string').
     with_attribute('name', 'string');
 
-converter.add_layer('boundaries').
-    of_type('multipolygon').
+converter.create_layer('boundaries', 'multipolygon').
     with_attribute('osm_id', 'integer').
     with_attribute('level', 'integer').
     with_attribute('name', 'string');
 
-converter.add_layer('landuse').
-    of_type('multipolygon').
+converter.create_layer('landuse', 'multipolygon').
     with_attribute('osm_id', 'integer').
     with_attribute('type', 'string').
     with_attribute('name', 'string');
 
-converter.add_layer('water').
-    of_type('multipolygon').
+converter.create_layer('water', 'multipolygon').
     with_attribute('osm_id', 'integer').
     with_attribute('type', 'string').
     with_attribute('name', 'string');
 
 // ---- rules ----
 
-converter.node('natural', 'tree|peak|spring').
+converter.add_nodes().
+    matching('natural', 'tree|peak|spring').
     to_layer('natural_pois').
-        attr('type', 'natural').
-        attr('name');
+        with_attribute('type', 'natural').
+        with_attribute('name');
 
-converter.way('waterway', 'stream|river|ditch|canal|drain').
+converter.add_ways().
+    matching('waterway', 'stream|river|ditch|canal|drain').
     to_layer('waterways').
-        attr('type', 'waterway').
-        attr('name');
+        with_attribute('type', 'waterway').
+        with_attribute('name');
 
-converter.way('highway', /^(motorway|trunk|primary|secondary)(_link)?$/).
+converter.add_ways().
+    matching('highway', /^(motorway|trunk|primary|secondary)(_link)?$/).
     to_layer('roads').
-        attr('type', 'highway').
-        attr('ref').
-        attr('name').
-        attr('oneway', function(tags) {
+        with_attribute('type', 'highway').
+        with_attribute('ref').
+        with_attribute('name').
+        with_attribute('oneway', function(tags) {
             var o = tags['oneway'];
             if (o == 'yes' || o == 'true' || o == '1') {
                 return 1;
@@ -88,30 +83,35 @@ converter.way('highway', /^(motorway|trunk|primary|secondary)(_link)?$/).
                 return 0;
             }
         }).
-        attr('maxspeed')
+        with_attribute('maxspeed')
 
-converter.way('highway', 'cycleway').
+converter.add_ways().
+    matching('highway', 'cycleway').
     to_layer('cycleways').
-        attr('name');
+        with_attribute('name');
 
-converter.way('railway', 'rail').
+converter.add_ways().
+    matching('railway', 'rail').
     to_layer('railways').
-        attr('name');
+        with_attribute('name');
 
-converter.area('boundary', 'administrative').
+converter.add_areas().
+    matching('boundary', 'administrative').
     to_layer('boundaries').
-        attr('level', 'admin_level').
-        attr('name');
+        with_attribute('level', 'admin_level').
+        with_attribute('name');
 
-converter.area('landuse', 'forest|grass|residential|farm|meadow|farmland|industrial|farmyard|cemetery|commercial|quarry|orchard|vineyard|allotments|retail|construction|recreation_ground|village_green').
+converter.add_areas().
+    matching('landuse', 'forest|grass|residential|farm|meadow|farmland|industrial|farmyard|cemetery|commercial|quarry|orchard|vineyard|allotments|retail|construction|recreation_ground|village_green').
     to_layer('landuse').
-        attr('type', 'landuse').
-        attr('name');
+        with_attribute('type', 'landuse').
+        with_attribute('name');
 
-converter.area('natural', 'water').
+converter.add_areas().
+    matching('natural', 'water').
     to_layer('water').
-        attr('type', 'natural').
-        attr('name');
+        with_attribute('type', 'natural').
+        with_attribute('name');
 
 converter.convert(input_file);
 
