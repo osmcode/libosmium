@@ -1,7 +1,4 @@
 
-// v8
-#include <v8.h>
-
 // node
 #include <node_buffer.h>
 

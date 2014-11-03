@@ -2,9 +2,6 @@
 // c++
 #include <string>
 
-// v8
-#include <v8.h>
-
 // node
 #include <node.h>
 #include <node_object_wrap.h>
