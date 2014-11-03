@@ -37,8 +37,7 @@ namespace node_osmium {
 
     private:
 
-        ~BufferWrap() {
-        }
+        ~BufferWrap() = default;
 
     }; // class BufferWrap
 

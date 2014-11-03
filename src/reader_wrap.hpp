@@ -39,8 +39,7 @@ namespace node_osmium {
 
     private:
 
-        ~ReaderWrap() {
-        }
+        ~ReaderWrap() = default;
 
     }; // class ReaderWrap
 

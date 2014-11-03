@@ -43,8 +43,7 @@ namespace node_osmium {
 
     private:
 
-        ~OSMRelationWrap() {
-        }
+        ~OSMRelationWrap() = default;
 
     }; // class OSMRelationWrap
 

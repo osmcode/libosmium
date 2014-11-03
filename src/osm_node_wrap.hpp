@@ -46,8 +46,7 @@ namespace node_osmium {
 
     private:
 
-        ~OSMNodeWrap() {
-        }
+        ~OSMNodeWrap() = default;
 
     }; // class OSMNodeWrap
 

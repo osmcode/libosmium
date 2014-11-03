@@ -89,8 +89,7 @@ namespace node_osmium {
 
     private:
 
-        ~LocationHandlerWrap() {
-        }
+        ~LocationHandlerWrap() = default;
 
     }; // class LocationHandlerWrap
 

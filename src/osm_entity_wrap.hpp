@@ -65,6 +65,10 @@ namespace node_osmium {
             return *m_entity;
         }
 
+    protected:
+
+        virtual ~OSMEntityWrap() = default;
+
     }; // class OSMEntityWrap
 
 } // namespace node_osmium

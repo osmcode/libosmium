@@ -43,8 +43,7 @@ namespace node_osmium {
 
     private:
 
-        ~OSMAreaWrap() {
-        }
+        ~OSMAreaWrap() = default;
 
     }; // class OSMAreaWrap
 

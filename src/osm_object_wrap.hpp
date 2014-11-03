@@ -41,6 +41,10 @@ namespace node_osmium {
             OSMEntityWrap(entity) {
         }
 
+    protected:
+
+        virtual ~OSMObjectWrap() = default;
+
     }; // class OSMObjectWrap
 
 } // namespace node_osmium

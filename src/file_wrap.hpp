@@ -35,8 +35,7 @@ namespace node_osmium {
 
     private:
 
-        ~FileWrap() {
-        }
+        ~FileWrap() = default;
 
     }; // class FileWrap
 

@@ -48,6 +48,10 @@ namespace node_osmium {
             OSMEntityWrap(entity) {
         }
 
+    private:
+
+        ~OSMChangesetWrap() = default;
+
     }; // class OSMChangesetWrap
 
 } // namespace node_osmium

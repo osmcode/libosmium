@@ -33,8 +33,7 @@ namespace node_osmium {
 
     private:
 
-        ~MultipolygonHandlerWrap() {
-        }
+        ~MultipolygonHandlerWrap() = default;
 
     }; // class MultipolygonHandlerWrap
 
