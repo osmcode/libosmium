@@ -115,6 +115,8 @@ namespace osmium {
 
             }; // class HandlerPass1
 
+        public:
+
             /**
              * This is the handler class for the second pass of the Collector.
              */
