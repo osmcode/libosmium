@@ -18,7 +18,13 @@ namespace node_osmium {
         osmium::memory::Buffer m_this;
         osmium::memory::Buffer::iterator m_iterator;
 
+        static v8::Handle<v8::Value> clear(const v8::Arguments& args) {
+            BufferWrap* buffer_wrap = node::ObjectWrap::Unwrap<BufferWrap>(args.This());
+            buffer_wrap->m_this = std::move(osmium::memory::Buffer());
+        }
+
         static v8::Handle<v8::Value> next(const v8::Arguments& args);
+        static v8::Handle<v8::Value> filter_point_in_time(const v8::Arguments& args);
 
     public:
 
