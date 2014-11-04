@@ -357,6 +357,45 @@ This is, of course, only the "geometry part" of a full feature, you have to
 add the rest yourself. See the `demo/geojson-stream` example for a complete
 program using the GeoJSON function.
 
+## Working with Multipolygons
+
+OSM doesn't have a data type for areas or polygons. Instead areas are stored
+as closed ways (ie first node == last node) or relations tagged as
+`type=multipolygon`. Osmium can hide this complexity and create pseudo-objects
+called "Areass" that are either based on closed ways or on those multipoygon
+relations. Usually OSM files have to be read twice to allow this, though. In
+the first pass, relations are read and prepared, in the second pass nodes and
+ways are read and everything is assembled. In addition to the `node`, `way`,
+and `relation` callbacks, you can define an `area` callback.
+
+Here is an example:
+
+    var handler = new osmium.Handler();
+
+    handler.on('area', function(area) {
+        var landuse = area.tags('landuse');
+        if (landuse) {
+            console.log(area.wkt() + ' ' + landuse);
+        }
+    });
+
+    var mp = new osmium.MultipolygonCollector();
+
+    var reader = new osmium.Reader(input_filename);
+    mp.read_relations(reader);
+    reader.close();
+
+    reader = new osmium.Reader(input_filename);
+    var location_handler = new osmium.LocationHandler();
+    osmium.apply(reader, location_handler, handler, mp.handler(handler));
+    reader.close();
+
+The code looks a bit complicated, because it is modelled after the C++ it is
+based on. It is likely we'll make this easier at some point. You can not re-use
+the reader from the first pass, you have to create a new one for the second
+pass.
+
+
 ## Working With Buffers
 
 Instead of calling `apply()` you can call `read()` on the Reader and you'll get
