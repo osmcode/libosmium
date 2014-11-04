@@ -7,6 +7,7 @@
 #include "multipolygon_collector_wrap.hpp"
 #include "multipolygon_handler_wrap.hpp"
 #include "handler.hpp"
+#include "buffer_wrap.hpp"
 #include "reader_wrap.hpp"
 #include "utils.hpp"
 #include "apply.hpp"
@@ -49,12 +50,19 @@ namespace node_osmium {
 
     v8::Handle<v8::Value> MultipolygonCollectorWrap::read_relations(const v8::Arguments& args) {
         v8::HandleScope scope;
-        if (args.Length() != 1 || !args[0]->IsObject() || !ReaderWrap::constructor->HasInstance(args[0]->ToObject())) {
-            return ThrowException(v8::Exception::Error(v8::String::New("call MultipolygonCollector.read_relation() with Reader object")));
+        if (args.Length() != 1 || !args[0]->IsObject()) {
+            return ThrowException(v8::Exception::Error(v8::String::New("call MultipolygonCollector.read_relation() with Reader or Buffer object")));
         }
         try {
-            osmium::io::Reader& reader = unwrap<ReaderWrap>(args[0]->ToObject());
-            unwrap<MultipolygonCollectorWrap>(args.This()).read_relations(reader);
+            if (ReaderWrap::constructor->HasInstance(args[0]->ToObject())) {
+                osmium::io::Reader& reader = unwrap<ReaderWrap>(args[0]->ToObject());
+                unwrap<MultipolygonCollectorWrap>(args.This()).read_relations(reader);
+            } else if (BufferWrap::constructor->HasInstance(args[0]->ToObject())) {
+                osmium::memory::Buffer& buffer = unwrap<BufferWrap>(args[0]->ToObject());
+                unwrap<MultipolygonCollectorWrap>(args.This()).read_relations(buffer.begin(), buffer.end());
+            } else {
+                return ThrowException(v8::Exception::Error(v8::String::New("call MultipolygonCollector.read_relation() with Reader or Buffer object")));
+            }
         } catch (const std::exception& e) {
             std::string msg("osmium error: ");
             msg += e.what();
