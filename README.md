@@ -136,8 +136,8 @@ needed which is included (`test/include/catch.hpp`).
 Run "make test" from the main directory or go to the "test" directory and type
 
     ./run_tests.sh
-    
-to compile and run the tests. You can run a single test by calling 
+
+to compile and run the tests. You can run a single test by calling
 
     ./run_test.sh TESTFILE
 

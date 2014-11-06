@@ -11,7 +11,7 @@
 #  CPLUS_INCLUDE_PATH - Include file search path.
 #  CXXFLAGS           - Extra compiler flags.
 #  LDFLAGS            - Extra linker flags.
-#  
+#
 #------------------------------------------------------------------------------
 
 # first inherit from env

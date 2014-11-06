@@ -7,7 +7,7 @@
 #
 #  -v  -- Run tests under valgrind
 #  -o  -- Show standard output also if tests passed
-#  
+#
 
 set -e
 
