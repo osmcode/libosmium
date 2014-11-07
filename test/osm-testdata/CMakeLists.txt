@@ -24,17 +24,6 @@ endif()
 
 if(CMAKE_COMPILER_IS_GNUCC)
     add_compile_options(
-        -Wall
-        -Wextra
-        -pedantic
-        -Wredundant-decls
-        -Wdisabled-optimization
-        -Wctor-dtor-privacy
-        -Wnon-virtual-dtor
-        -Woverloaded-virtual
-        -Wsign-promo
-        -Wno-long-long
-        -Wno-unused-variable # suppress warnings from Catch unit test macros
         $<$<CXX_COMPILER_ID:Clang>:-Wdocumentation>
         $<$<CXX_COMPILER_ID:Clang>:-Wunused-exception-parameter>
         $<$<CXX_COMPILER_ID:Clang>:-Wmissing-declarations>
@@ -51,20 +40,14 @@ if(CMAKE_COMPILER_IS_GNUCC)
         $<$<CXX_COMPILER_ID:Clang>:-Wno-cast-align>
         $<$<CXX_COMPILER_ID:Clang>:-Wno-float-equal>
     )
-    set(CXXFLAGS "-O3 -g")
-    set(CMAKE_CXX_FLAGS "${CXXFLAGS} ${CXX_FLAGS_WARNINGS}")
 endif(CMAKE_COMPILER_IS_GNUCC)
 
-set(LIBS ${EXPAT_LIBRARY} ${OSMPBF_LIBRARIES} ${PROTOBUF_LITE_LIBRARY}
-    ${ZLIB_LIBRARY} ${BZIP2_LIBRARIES} ${GEOS_LIBRARY} ${GDAL_LIBRARY}
-    ${WIN_LIBS} ${CMAKE_THREAD_LIBS_INIT})
-
 add_executable(testdata-overview testdata-overview.cpp)
-target_link_libraries(testdata-overview ${LIBS})
+target_link_libraries(testdata-overview ${OSMIUM_LIBRARIES})
 add_test(testdata-overview testdata-overview ${TESTDATA_DIR}/grid/data/all.osm)
 
 add_executable(testdata-multipolygon testdata-multipolygon.cpp)
-target_link_libraries(testdata-multipolygon ${LIBS})
+target_link_libraries(testdata-multipolygon ${OSMIUM_LIBRARIES})
 if(WIN32)
     set(MULTIPOLYGON_TEST_SCRIPT "run-testdata-multipolygon.bat")
 else()
@@ -84,13 +67,13 @@ add_test(testdata-multipolygon
 
 file(GLOB TESTCASE_CPPS testcases/*.cpp)
 add_executable(testdata-testcases testdata-testcases.cpp ${TESTCASE_CPPS})
-target_link_libraries(testdata-testcases ${LIBS})
+target_link_libraries(testdata-testcases ${OSMIUM_LIBRARIES})
 add_test(testdata-testcases testdata-testcases)
 set_tests_properties(testdata-testcases
     PROPERTIES ENVIRONMENT "TESTCASES_DIR=${TESTDATA_DIR}/grid/data")
 
 add_executable(testdata-xml testdata-xml.cpp)
-target_link_libraries(testdata-xml ${LIBS})
+target_link_libraries(testdata-xml ${OSMIUM_LIBRARIES})
 add_test(testdata-xml testdata-xml)
 set_tests_properties(testdata-xml
     PROPERTIES ENVIRONMENT "TESTDIR=${TESTDATA_DIR}/xml/data")

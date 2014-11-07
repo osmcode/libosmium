@@ -23,7 +23,5 @@ endforeach()
 file(APPEND ${GENFILE} "int main() { return 0; }\n")
 set_source_files_properties(${GENFILE} PROPERTIES GENERATED TRUE)
 add_executable(allinclude.exe ${GENFILE})
-target_link_libraries(allinclude.exe
-    ${EXPAT_LIBRARY} ${OSMPBF_LIBRARIES} ${PROTOBUF_LITE_LIBRARY} ${ZLIB_LIBRARY}
-    ${BZIP2_LIBRARIES} ${WIN_LIBS} ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(allinclude.exe ${OSMIUM_LIBRARIES})
 

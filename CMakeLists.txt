@@ -42,27 +42,9 @@ option(BUILD_TRY_HPPS "compile every hpp" ON)
 #
 #----------------------------------------------------------------------
 
-include(CheckIncludeFiles)
-check_include_files(winsock2.h HAVE_WINSOCK)
-if(HAVE_WINSOCK)
-    add_definitions(-DD_HAVE_WINSOCK)
-    list(APPEND WIN_LIBS ws2_32)
-endif()
-
-if(CMAKE_COMPILER_IS_GNUCC AND WIN32)
-    list(APPEND WIN_LIBS iconv)
-endif()
-
-if(MSVC)
-    add_definitions(-wd4996 -DNOMINMAX -DWIN32_LEAN_AND_MEAN -D_CRT_SECURE_NO_WARNINGS)
-else()
-    add_definitions(-std=c++11)
-endif()
-
 # check that the essential libraries were found
 if(BUILD_EXAMPLES OR BUILD_TESTING OR BUILD_TRY_HPPS)
 
-    find_package(Threads)
 
     find_package(Boost 1.38)
     mark_as_advanced(CLEAR BOOST_ROOT)
@@ -74,90 +56,23 @@ if(BUILD_EXAMPLES OR BUILD_TESTING OR BUILD_TRY_HPPS)
         message(FATAL_ERROR "PLEASE, specify the directory where the Boost library is installed in BOOST_ROOT")
     endif()
 
-    find_package(ZLIB)
-    if(ZLIB_FOUND)
-        include_directories(${ZLIB_INCLUDE_DIR})
-    else()
-        mark_as_advanced(CLEAR ZLIB_LIBRARY ZLIB_INCLUDE_DIR)
-        message(FATAL_ERROR "Please, specify the ZLIB includes directory and the library file")
-    endif()
-
-    find_package(BZip2)
-    if(BZIP2_FOUND)
-        include_directories(${BZIP2_INCLUDE_DIR})
-    else()
-        message(FATAL_ERROR "Please, specify the BZip2 includes directory and the library file")
-    endif()
-
-    find_package(EXPAT)
-    if(EXPAT_FOUND)
-        include_directories(${EXPAT_INCLUDE_DIR})
-    else()
-        mark_as_advanced(CLEAR EXPAT_LIBRARY EXPAT_INCLUDE_DIR)
-        message(FATAL_ERROR "Please, specify the EXPAT includes directory and the library file")
-    endif()
-
-    find_package(Protobuf)
-    if(PROTOBUF_INCLUDE_DIR AND PROTOBUF_LITE_LIBRARY)
-        include_directories(${PROTOBUF_INCLUDE_DIR})
-    else()
-        mark_as_advanced(CLEAR PROTOBUF_INCLUDE_DIR PROTOBUF_LITE_LIBRARY)
-        message(FATAL_ERROR "Please, specify the Google PROTOBUF library dir")
-    endif()
-
-    find_package(OSMPBF)
-    if(OSMPBF_FOUND)
-        include_directories(${OSMPBF_INCLUDE_DIRS})
-    else()
-        message(WARNING "OSMPBF library not found!\n")
-    endif()
-
-    ##### Find Google SparseHash
-    find_path(SPARSEHASH_INCLUDE_DIR google/sparsetable)
-    if(SPARSEHASH_INCLUDE_DIR)
-        message(STATUS "SparseHash library found")
-        set(SPARSEHASH_FOUND 1)
-        include_directories(${SPARSEHASH_INCLUDE_DIR})
-    else()
-        message(STATUS "SparseHash library not found")
-    endif()
-
-    ##### Find GEOS Library
-    find_path(GEOS_INCLUDE_DIR geos/geom.h)
-    find_library(GEOS_LIBRARY NAMES geos)
-    if(GEOS_INCLUDE_DIR AND GEOS_LIBRARY)
-        message(STATUS "GEOS library found")
-        SET(GEOS_FOUND 1)
-        include_directories(${GEOS_INCLUDE_DIR})
-    else()
-        message(STATUS "GEOS library not found")
-    endif()
-
-    ##### Find Proj.4 Library
-    find_path(PROJ_INCLUDE_DIR proj_api.h)
-    find_library(PROJ_LIBRARY NAMES proj)
-    if(PROJ_INCLUDE_DIR AND PROJ_LIBRARY)
-        message(STATUS "PROJ library found")
-        set(PROJ_FOUND 1)
-        include_directories(${PROJ_INCLUDE_DIR})
-    else()
-        message(STATUS "PROJ library not found")
-    endif()
-
-    find_package(GDAL)
-    if(GDAL_FOUND)
-        include_directories(${GDAL_INCLUDE_DIR})
-        set(GDAL_LIBRARIES ${GDAL_LIBRARY} ${ZLIB_LIBRARY} ${WIN_LIBS})
-    endif()
+    set(OSMIUM_INCLUDE_DIR include)
+    find_package(Osmium COMPONENTS io gdal geos proj sparsehash)
+    include_directories(${OSMIUM_INCLUDE_DIRS})
 
     if(MSVC)
         find_path(GETOPT_INCLUDE_DIR getopt.h)
         find_library(GETOPT_LIBRARY NAMES wingetopt)
         if(GETOPT_INCLUDE_DIR AND GETOPT_LIBRARY)
             include_directories(${GETOPT_INCLUDE_DIR})
-            list(APPEND WIN_LIBS ${GETOPT_LIBRARY})
+            list(APPEND OSMIUM_LIBRARIES ${GETOPT_LIBRARY})
+        else()
+            set(GETOPT_MISSING 1)
         endif()
     endif()
+
+    include_directories(include)
+    include(OsmiumOptions)
 endif()
 
 if(WIN32)
@@ -166,8 +81,6 @@ if(WIN32)
 else(WIN32)
     set(CPACK_GENERATOR TGZ)
 endif(WIN32)
-
-include_directories(BEFORE include)
 
 enable_testing()
 
