@@ -122,7 +122,8 @@ namespace osmium {
             explicit Item(item_size_type size=0, item_type type=item_type()) noexcept :
                 m_size(size),
                 m_type(type),
-                m_removed(false) {
+                m_removed(false),
+                m_padding(0) {
             }
 
             Item(const Item&) = delete;
