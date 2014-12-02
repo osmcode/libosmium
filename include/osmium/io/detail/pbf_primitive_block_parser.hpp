@@ -59,8 +59,7 @@ namespace osmium {
 
                 static constexpr size_t initial_buffer_size = 2 * 1024 * 1024;
 
-                const void* m_data;
-                const int m_size;
+                const std::string& m_data;
 
                 const OSMPBF::StringTable* m_stringtable;
                 int64_t m_lon_offset;
@@ -80,9 +79,8 @@ namespace osmium {
 
             public:
 
-                explicit PBFPrimitiveBlockParser(const void* data, const int size, osmium::osm_entity_bits::type read_types) :
+                explicit PBFPrimitiveBlockParser(const std::string& data, osmium::osm_entity_bits::type read_types) :
                     m_data(data),
-                    m_size(size),
                     m_stringtable(nullptr),
                     m_lon_offset(0),
                     m_lat_offset(0),
@@ -96,7 +94,7 @@ namespace osmium {
 
                 osmium::memory::Buffer operator()() {
                     OSMPBF::PrimitiveBlock pbf_primitive_block;
-                    if (!pbf_primitive_block.ParseFromArray(m_data, m_size)) {
+                    if (!pbf_primitive_block.ParseFromString(m_data)) {
                         throw osmium::pbf_error("failed to parse PrimitiveBlock");
                     }
 
