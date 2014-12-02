@@ -113,13 +113,11 @@ namespace osmium {
                 std::shared_ptr<unsigned char> m_input_buffer;
                 const int m_size;
                 const int m_blob_num;
-                InputQueueReader& m_input_queue_reader;
 
                 BlobParser(const int size, const int blob_num, InputQueueReader& input_queue_reader) :
                     m_input_buffer(new unsigned char[size], [](unsigned char* ptr) { delete[] ptr; }),
                     m_size(size),
-                    m_blob_num(blob_num),
-                    m_input_queue_reader(input_queue_reader) {
+                    m_blob_num(blob_num)  {
                     if (size < 0 || size > OSMPBF::max_uncompressed_blob_size) {
                         throw osmium::pbf_error(std::string("invalid blob size: " + std::to_string(size)));
                     }
