@@ -10,4 +10,5 @@ osmium_read
 osmium_serdump
 osmium_toogr
 osmium_toogr2
+osmium_toogr2_exp
 osmium_use_node_cache

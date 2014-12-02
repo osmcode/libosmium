@@ -72,7 +72,8 @@ PROGRAMS := \
     osmium_read \
     osmium_serdump \
     osmium_toogr \
-    osmium_toogr2
+    osmium_toogr2 \
+    osmium_toogr2_exp
 #    osmium_find_bbox \
 #    osmium_range_from_history \
 #    osmium_relation_members \
@@ -142,6 +143,9 @@ osmium_toogr: osmium_toogr.cpp
 	$(CXX) $(CXXFLAGS) $(CXXFLAGS_WARNINGS) $(CXXFLAGS_OGR) -o $@ $< $(LDFLAGS) $(LIB_IO) $(LIB_OGR)
 
 osmium_toogr2: osmium_toogr2.cpp
+	$(CXX) $(CXXFLAGS) $(CXXFLAGS_WARNINGS) $(CXXFLAGS_OGR) -o $@ $< $(LDFLAGS) $(LIB_IO) $(LIB_OGR)
+
+osmium_toogr2_exp: osmium_toogr2_exp.cpp
 	$(CXX) $(CXXFLAGS) $(CXXFLAGS_WARNINGS) $(CXXFLAGS_OGR) -o $@ $< $(LDFLAGS) $(LIB_IO) $(LIB_OGR)
 
 osmium_to_postgis: osmium_to_postgis.cpp
