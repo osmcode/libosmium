@@ -115,7 +115,7 @@ int main(int argc, char* argv[]) {
 
     std::cout << "Pass 2...\n";
     osmium::io::Reader reader2(infile);
-    osmium::apply(reader2, location_handler, collector.handler([&handler](const osmium::memory::Buffer& buffer) {
+    osmium::apply(reader2, location_handler, collector.handler([&handler](osmium::memory::Buffer&& buffer) {
         osmium::apply(buffer, handler);
     }));
     reader2.close();

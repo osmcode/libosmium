@@ -246,7 +246,7 @@ namespace osmium {
 
             int m_count_complete = 0;
 
-            typedef std::function<void(const osmium::memory::Buffer&)> callback_func_type;
+            typedef std::function<void(osmium::memory::Buffer&&)> callback_func_type;
             callback_func_type m_callback;
 
             static constexpr size_t initial_buffer_size = 1024 * 1024;
