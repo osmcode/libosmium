@@ -270,7 +270,7 @@ namespace osmium {
              * Has the end of file been reached? This is set after the last
              * data has been read. It is also set by calling close().
              */
-            bool eof() {
+            bool eof() const {
                 return m_input_done;
             }
 
