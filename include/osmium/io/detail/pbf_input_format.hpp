@@ -88,32 +88,39 @@ namespace osmium {
                 const size_t m_max_buffer_queue_size;
                 std::atomic<bool> m_done;
                 std::thread m_reader;
-                OSMPBF::BlobHeader m_blob_header;
                 osmium::thread::Queue<std::string>& m_input_queue;
-                std::string m_buffer;
+                std::string m_input_buffer;
 
+                /**
+                 * Read the given number of bytes from the input queue.
+                 *
+                 * @param size Number of bytes to read
+                 * @returns String with the data
+                 * @throws osmium::pbf_error If size bytes can't be read
+                 */
                 std::string read_from_input_queue(size_t size) {
-                    while (m_buffer.size() < size) {
+                    while (m_input_buffer.size() < size) {
                         std::string new_data;
                         m_input_queue.wait_and_pop(new_data);
                         if (new_data.empty()) {
                             throw osmium::pbf_error("truncated data (EOF encountered)");
                         }
-                        m_buffer += new_data;
+                        m_input_buffer += new_data;
                     }
 
-                    std::string output { m_buffer.substr(size) };
-                    m_buffer.resize(size);
-                    std::swap(output, m_buffer);
+                    std::string output { m_input_buffer.substr(size) };
+                    m_input_buffer.resize(size);
+                    std::swap(output, m_input_buffer);
                     return output;
                 }
 
                 /**
-                 * Read BlobHeader by first reading the size and then the BlobHeader.
-                 * The BlobHeader contains a type field (which is checked against
-                 * the expected type) and a size field.
+                 * Read BlobHeader by first reading the size and then the
+                 * BlobHeader. The BlobHeader contains a type field (which is
+                 * checked against the expected type) and a size field.
                  *
-                 * @param expected_type Expected type of data ("OSMHeader" or "OSMData").
+                 * @param expected_type Expected type of data ("OSMHeader" or
+                 *                      "OSMData").
                  * @returns Size of the data read from BlobHeader (0 on EOF).
                  */
                 size_t read_blob_header(const char* expected_type) {
@@ -131,15 +138,16 @@ namespace osmium {
                         throw osmium::pbf_error("invalid BlobHeader size (> max_blob_header_size)");
                     }
 
-                    if (!m_blob_header.ParseFromString(read_from_input_queue(size))) {
+                    OSMPBF::BlobHeader blob_header;
+                    if (!blob_header.ParseFromString(read_from_input_queue(size))) {
                         throw osmium::pbf_error("failed to parse BlobHeader");
                     }
 
-                    if (std::strcmp(m_blob_header.type().c_str(), expected_type)) {
+                    if (blob_header.type() != expected_type) {
                         throw osmium::pbf_error("blob does not have expected type (OSMHeader in first blob, OSMData in following blobs)");
                     }
 
-                    return static_cast<size_t>(m_blob_header.datasize());
+                    return static_cast<size_t>(blob_header.datasize());
                 }
 
                 void parse_osm_data(osmium::osm_entity_bits::type read_types) {
@@ -190,7 +198,8 @@ namespace osmium {
                     m_max_work_queue_size(10), // XXX tune these settings
                     m_max_buffer_queue_size(20), // XXX tune these settings
                     m_done(false),
-                    m_input_queue(input_queue) {
+                    m_input_queue(input_queue),
+                    m_input_buffer() {
                     GOOGLE_PROTOBUF_VERIFY_VERSION;
 
                     // handle OSMHeader
