@@ -51,12 +51,10 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/io/detail/input_format.hpp>
 #include <osmium/io/detail/pbf.hpp> // IWYU pragma: export
-#include <osmium/io/detail/pbf_primitive_block_parser.hpp>
-#include <osmium/io/detail/zlib.hpp>
+#include <osmium/io/detail/pbf_parser.hpp>
 #include <osmium/io/error.hpp>
 #include <osmium/io/file.hpp>
 #include <osmium/io/file_format.hpp>
-#include <osmium/io/header.hpp>
 #include <osmium/memory/buffer.hpp>
 #include <osmium/osm.hpp>
 #include <osmium/osm/box.hpp>
@@ -105,130 +103,6 @@ namespace osmium {
                 }
 
             }; // class InputQueueReader
-
-            /**
-             * PBF blobs can optionally be packed with the zlib algorithm.
-             * This function returns the raw data (if it was unpacked) or
-             * the unpacked data (if it was packed).
-             *
-             * @param input_data Reference to input data.
-             * @returns Unpacked data
-             * @throws osmium::pbf_error If there was a problem parsing the PBF
-             */
-            inline std::unique_ptr<const std::string> unpack_blob(const std::string& input_data) {
-                OSMPBF::Blob pbf_blob;
-                if (!pbf_blob.ParseFromString(input_data)) {
-                    throw osmium::pbf_error("failed to parse blob");
-                }
-
-                if (pbf_blob.has_raw()) {
-                    return std::unique_ptr<std::string>(pbf_blob.release_raw());
-                } else if (pbf_blob.has_zlib_data()) {
-                    auto raw_size = pbf_blob.raw_size();
-                    assert(raw_size >= 0);
-                    assert(raw_size <= OSMPBF::max_uncompressed_blob_size);
-                    return osmium::io::detail::zlib_uncompress(pbf_blob.zlib_data(), static_cast<unsigned long>(raw_size));
-                } else if (pbf_blob.has_lzma_data()) {
-                    throw osmium::pbf_error("lzma blobs not implemented");
-                } else {
-                    throw osmium::pbf_error("blob contains no data");
-                }
-            }
-
-            /**
-             * Parse blob as a HeaderBlock.
-             *
-             * @param input_buffer Blob data
-             * @returns Header object
-             * @throws osmium::pbf_error If there was a parsing error
-             */
-            inline osmium::io::Header parse_header_blob(const std::string& input_buffer) {
-                const std::unique_ptr<const std::string> data = unpack_blob(input_buffer);
-
-                OSMPBF::HeaderBlock pbf_header_block;
-                if (!pbf_header_block.ParseFromString(*data)) {
-                    throw osmium::pbf_error("failed to parse HeaderBlock");
-                }
-
-                osmium::io::Header header;
-                for (int i=0; i < pbf_header_block.required_features_size(); ++i) {
-                    const std::string& feature = pbf_header_block.required_features(i);
-
-                    if (feature == "OsmSchema-V0.6") continue;
-                    if (feature == "DenseNodes") {
-                        header.set("pbf_dense_nodes", true);
-                        continue;
-                    }
-                    if (feature == "HistoricalInformation") {
-                        header.set_has_multiple_object_versions(true);
-                        continue;
-                    }
-
-                    throw osmium::pbf_error(std::string("required feature not supported: ") + feature);
-                }
-
-                for (int i=0; i < pbf_header_block.optional_features_size(); ++i) {
-                    const std::string& feature = pbf_header_block.optional_features(i);
-                    header.set("pbf_optional_feature_" + std::to_string(i), feature);
-                }
-
-                if (pbf_header_block.has_writingprogram()) {
-                    header.set("generator", pbf_header_block.writingprogram());
-                }
-
-                if (pbf_header_block.has_bbox()) {
-                    const OSMPBF::HeaderBBox& pbf_bbox = pbf_header_block.bbox();
-                    const int64_t resolution_convert = OSMPBF::lonlat_resolution / osmium::Location::coordinate_precision;
-                    osmium::Box box;
-                    box.extend(osmium::Location(pbf_bbox.left()  / resolution_convert, pbf_bbox.bottom() / resolution_convert));
-                    box.extend(osmium::Location(pbf_bbox.right() / resolution_convert, pbf_bbox.top()    / resolution_convert));
-                    header.add_box(box);
-                }
-
-                if (pbf_header_block.has_osmosis_replication_timestamp()) {
-                    header.set("osmosis_replication_timestamp", osmium::Timestamp(pbf_header_block.osmosis_replication_timestamp()).to_iso());
-                }
-
-                if (pbf_header_block.has_osmosis_replication_sequence_number()) {
-                    header.set("osmosis_replication_sequence_number", std::to_string(pbf_header_block.osmosis_replication_sequence_number()));
-                }
-
-                if (pbf_header_block.has_osmosis_replication_base_url()) {
-                    header.set("osmosis_replication_base_url", pbf_header_block.osmosis_replication_base_url());
-                }
-
-                return header;
-            }
-
-            class DataBlobParser {
-
-                std::string m_input_buffer;
-                osmium::osm_entity_bits::type m_read_types;
-
-            public:
-
-                DataBlobParser(std::string&& input_buffer, osmium::osm_entity_bits::type read_types) :
-                    m_input_buffer(std::move(input_buffer)),
-                    m_read_types(read_types) {
-                    if (input_buffer.size() > OSMPBF::max_uncompressed_blob_size) {
-                        throw osmium::pbf_error(std::string("invalid blob size: " + std::to_string(input_buffer.size())));
-                    }
-                }
-
-                DataBlobParser(const DataBlobParser& other) :
-                    m_input_buffer(std::move(other.m_input_buffer)),
-                    m_read_types(other.m_read_types) {
-                }
-
-                DataBlobParser& operator=(const DataBlobParser& other) = delete;
-
-                osmium::memory::Buffer operator()() {
-                    const std::unique_ptr<const std::string> data = unpack_blob(m_input_buffer);
-                    PBFPrimitiveBlockParser parser(*data, m_read_types);
-                    return std::move(parser());
-                }
-
-            }; // class DataBlobParser
 
             /**
              * Class for parsing PBF files.
