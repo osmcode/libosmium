@@ -77,33 +77,6 @@ namespace osmium {
 
             typedef osmium::thread::Queue<std::future<osmium::memory::Buffer>> queue_type;
 
-            class InputQueueReader {
-
-                osmium::thread::Queue<std::string>& m_queue;
-                std::string m_buffer;
-
-            public:
-
-                InputQueueReader(osmium::thread::Queue<std::string>& queue) :
-                    m_queue(queue) {
-                }
-
-                bool operator()(const char* data, size_t size) {
-                    while (m_buffer.size() < size) {
-                        std::string new_data;
-                        m_queue.wait_and_pop(new_data);
-                        if (new_data.empty()) {
-                            return false;
-                        }
-                        m_buffer += new_data;
-                    }
-                    memcpy(const_cast<char*>(data), m_buffer.data(), size);
-                    m_buffer.erase(0, size);
-                    return true;
-                }
-
-            }; // class InputQueueReader
-
             /**
              * Class for parsing PBF files.
              */
@@ -116,7 +89,22 @@ namespace osmium {
                 std::atomic<bool> m_done;
                 std::thread m_reader;
                 OSMPBF::BlobHeader m_blob_header;
-                InputQueueReader m_input_queue_reader;
+                osmium::thread::Queue<std::string>& m_input_queue;
+                std::string m_buffer;
+
+                bool read_from_input_queue(const char* data, size_t size) {
+                    while (m_buffer.size() < size) {
+                        std::string new_data;
+                        m_input_queue.wait_and_pop(new_data);
+                        if (new_data.empty()) {
+                            return false;
+                        }
+                        m_buffer += new_data;
+                    }
+                    memcpy(const_cast<char*>(data), m_buffer.data(), size);
+                    m_buffer.erase(0, size);
+                    return true;
+                }
 
                 /**
                  * Read BlobHeader by first reading the size and then the BlobHeader.
@@ -129,7 +117,7 @@ namespace osmium {
                 int read_blob_header(const char* expected_type) {
                     uint32_t size_in_network_byte_order;
 
-                    if (! m_input_queue_reader(reinterpret_cast<char*>(&size_in_network_byte_order), sizeof(size_in_network_byte_order))) {
+                    if (! read_from_input_queue(reinterpret_cast<char*>(&size_in_network_byte_order), sizeof(size_in_network_byte_order))) {
                         return 0; // EOF
                     }
 
@@ -139,7 +127,7 @@ namespace osmium {
                     }
 
                     char blob_header_buffer[OSMPBF::max_blob_header_size];
-                    if (! m_input_queue_reader(blob_header_buffer, size)) {
+                    if (! read_from_input_queue(blob_header_buffer, size)) {
                         throw osmium::pbf_error("read error");
                     }
 
@@ -159,7 +147,7 @@ namespace osmium {
                     int n=0;
                     while (int size = read_blob_header("OSMData")) {
                         std::string input_data(static_cast<size_t>(size), '\0');
-                        if (! m_input_queue_reader(input_data.data(), static_cast<size_t>(size))) {
+                        if (! read_from_input_queue(input_data.data(), static_cast<size_t>(size))) {
                             throw osmium::pbf_error("truncated data (EOF encountered)");
                         }
                         DataBlobParser data_blob_parser(std::move(input_data), read_types);
@@ -206,7 +194,7 @@ namespace osmium {
                     m_max_work_queue_size(10), // XXX tune these settings
                     m_max_buffer_queue_size(20), // XXX tune these settings
                     m_done(false),
-                    m_input_queue_reader(input_queue) {
+                    m_input_queue(input_queue) {
                     GOOGLE_PROTOBUF_VERIFY_VERSION;
 
                     // handle OSMHeader
@@ -214,7 +202,7 @@ namespace osmium {
 
                     {
                         std::string input_data(static_cast<size_t>(size), '\0');
-                        if (! m_input_queue_reader(input_data.data(), static_cast<size_t>(size))) {
+                        if (! read_from_input_queue(input_data.data(), static_cast<size_t>(size))) {
                             throw osmium::pbf_error("truncated data (EOF encountered)");
                         }
                         m_header = parse_header_blob(input_data);
