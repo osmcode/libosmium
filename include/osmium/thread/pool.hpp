@@ -45,6 +45,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/thread/queue.hpp>
 #include <osmium/thread/name.hpp>
 #include <osmium/thread/function_wrapper.hpp>
+#include <osmium/util/config.hpp>
 
 namespace osmium {
 
@@ -116,12 +117,7 @@ namespace osmium {
                 m_num_threads(num_threads) {
 
                 if (m_num_threads == 0) {
-                    const char* env_threads = getenv("OSMIUM_POOL_THREADS");
-                    if (env_threads) {
-                        m_num_threads = std::atoi(env_threads);
-                    } else {
-                        m_num_threads = -2;
-                    }
+                    m_num_threads = osmium::config::get_pool_threads();
                 }
 
                 if (m_num_threads <= 0) {

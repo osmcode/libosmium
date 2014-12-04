@@ -66,6 +66,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/thread/pool.hpp>
 #include <osmium/thread/queue.hpp>
 #include <osmium/util/cast.hpp>
+#include <osmium/util/config.hpp>
 
 namespace osmium {
 
@@ -193,7 +194,7 @@ namespace osmium {
                  */
                 PBFInputFormat(const osmium::io::File& file, osmium::osm_entity_bits::type read_which_entities, osmium::thread::Queue<std::string>& input_queue) :
                     osmium::io::detail::InputFormat(file, read_which_entities, input_queue),
-                    m_use_thread_pool(true),
+                    m_use_thread_pool(osmium::config::use_pool_threads_for_pbf_parsing()),
                     m_queue(),
                     m_max_work_queue_size(10), // XXX tune these settings
                     m_max_buffer_queue_size(20), // XXX tune these settings
