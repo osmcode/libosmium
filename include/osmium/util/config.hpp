@@ -33,6 +33,9 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <cstdlib>
+#include <cstring>
+
 namespace osmium {
 
     namespace config {
