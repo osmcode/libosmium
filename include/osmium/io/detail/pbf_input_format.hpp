@@ -92,18 +92,20 @@ namespace osmium {
                 osmium::thread::Queue<std::string>& m_input_queue;
                 std::string m_buffer;
 
-                bool read_from_input_queue(const char* data, size_t size) {
+                std::string read_from_input_queue(size_t size) {
                     while (m_buffer.size() < size) {
                         std::string new_data;
                         m_input_queue.wait_and_pop(new_data);
                         if (new_data.empty()) {
-                            return false;
+                            throw osmium::pbf_error("truncated data (EOF encountered)");
                         }
                         m_buffer += new_data;
                     }
-                    memcpy(const_cast<char*>(data), m_buffer.data(), size);
-                    m_buffer.erase(0, size);
-                    return true;
+
+                    std::string output { m_buffer.substr(size) };
+                    m_buffer.resize(size);
+                    std::swap(output, m_buffer);
+                    return output;
                 }
 
                 /**
@@ -114,10 +116,13 @@ namespace osmium {
                  * @param expected_type Expected type of data ("OSMHeader" or "OSMData").
                  * @returns Size of the data read from BlobHeader (0 on EOF).
                  */
-                int read_blob_header(const char* expected_type) {
+                size_t read_blob_header(const char* expected_type) {
                     uint32_t size_in_network_byte_order;
 
-                    if (! read_from_input_queue(reinterpret_cast<char*>(&size_in_network_byte_order), sizeof(size_in_network_byte_order))) {
+                    try {
+                        std::string input_data = read_from_input_queue(sizeof(size_in_network_byte_order));
+                        size_in_network_byte_order = *reinterpret_cast<const uint32_t*>(input_data.data());
+                    } catch (osmium::pbf_error&) {
                         return 0; // EOF
                     }
 
@@ -126,12 +131,7 @@ namespace osmium {
                         throw osmium::pbf_error("invalid BlobHeader size (> max_blob_header_size)");
                     }
 
-                    char blob_header_buffer[OSMPBF::max_blob_header_size];
-                    if (! read_from_input_queue(blob_header_buffer, size)) {
-                        throw osmium::pbf_error("read error");
-                    }
-
-                    if (!m_blob_header.ParseFromArray(blob_header_buffer, static_cast<int>(size))) {
+                    if (!m_blob_header.ParseFromString(read_from_input_queue(size))) {
                         throw osmium::pbf_error("failed to parse BlobHeader");
                     }
 
@@ -139,18 +139,14 @@ namespace osmium {
                         throw osmium::pbf_error("blob does not have expected type (OSMHeader in first blob, OSMData in following blobs)");
                     }
 
-                    return m_blob_header.datasize();
+                    return static_cast<size_t>(m_blob_header.datasize());
                 }
 
                 void parse_osm_data(osmium::osm_entity_bits::type read_types) {
                     osmium::thread::set_thread_name("_osmium_pbf_in");
                     int n=0;
-                    while (int size = read_blob_header("OSMData")) {
-                        std::string input_data(static_cast<size_t>(size), '\0');
-                        if (! read_from_input_queue(input_data.data(), static_cast<size_t>(size))) {
-                            throw osmium::pbf_error("truncated data (EOF encountered)");
-                        }
-                        DataBlobParser data_blob_parser(std::move(input_data), read_types);
+                    while (auto size = read_blob_header("OSMData")) {
+                        DataBlobParser data_blob_parser(read_from_input_queue(size), read_types);
 
                         if (m_use_thread_pool) {
                             m_queue.push(osmium::thread::Pool::instance().submit(data_blob_parser));
@@ -198,15 +194,8 @@ namespace osmium {
                     GOOGLE_PROTOBUF_VERIFY_VERSION;
 
                     // handle OSMHeader
-                    int size = read_blob_header("OSMHeader");
-
-                    {
-                        std::string input_data(static_cast<size_t>(size), '\0');
-                        if (! read_from_input_queue(input_data.data(), static_cast<size_t>(size))) {
-                            throw osmium::pbf_error("truncated data (EOF encountered)");
-                        }
-                        m_header = parse_header_blob(input_data);
-                    }
+                    auto size = read_blob_header("OSMHeader");
+                    m_header = parse_header_blob(read_from_input_queue(size));
 
                     if (m_read_which_entities != osmium::osm_entity_bits::nothing) {
                         m_reader = std::thread(&PBFInputFormat::parse_osm_data, this, m_read_which_entities);
