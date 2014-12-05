@@ -189,8 +189,8 @@ namespace osmium {
                 OPLOutputBlock(const OPLOutputBlock&) = delete;
                 OPLOutputBlock& operator=(const OPLOutputBlock&) = delete;
 
-                OPLOutputBlock(OPLOutputBlock&& other) = default;
-                OPLOutputBlock& operator=(OPLOutputBlock&& other) = default;
+                OPLOutputBlock(OPLOutputBlock&&) = default;
+                OPLOutputBlock& operator=(OPLOutputBlock&&) = default;
 
                 std::string operator()() {
                     osmium::apply(m_input_buffer.cbegin(), m_input_buffer.cend(), *this);

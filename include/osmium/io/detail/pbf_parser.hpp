@@ -430,7 +430,7 @@ namespace osmium {
                     m_read_types(other.m_read_types) {
                 }
 
-                DataBlobParser& operator=(const DataBlobParser& other) = delete;
+                DataBlobParser& operator=(const DataBlobParser&) = delete;
 
                 osmium::memory::Buffer operator()() {
                     const std::unique_ptr<const std::string> data = unpack_blob(m_input_buffer);

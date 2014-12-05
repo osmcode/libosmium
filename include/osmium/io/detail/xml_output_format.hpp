@@ -233,8 +233,8 @@ namespace osmium {
                 XMLOutputBlock(const XMLOutputBlock&) = delete;
                 XMLOutputBlock& operator=(const XMLOutputBlock&) = delete;
 
-                XMLOutputBlock(XMLOutputBlock&& other) = default;
-                XMLOutputBlock& operator=(XMLOutputBlock&& other) = default;
+                XMLOutputBlock(XMLOutputBlock&&) = default;
+                XMLOutputBlock& operator=(XMLOutputBlock&&) = default;
 
                 std::string operator()() {
                     osmium::apply(m_input_buffer.cbegin(), m_input_buffer.cend(), *this);

@@ -302,11 +302,11 @@ namespace osmium {
                     m_done(other.m_done) {
                 }
 
-                XMLParser(XMLParser&& other) = default;
+                XMLParser(XMLParser&&) = default;
 
                 XMLParser& operator=(const XMLParser&) = delete;
 
-                XMLParser& operator=(XMLParser&& other) = default;
+                XMLParser& operator=(XMLParser&&) = default;
 
                 ~XMLParser() = default;
 

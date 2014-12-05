@@ -147,11 +147,11 @@ namespace osmium {
                 }
             }
 
-            File(const File& other) = default;
-            File& operator=(const File& other) = default;
+            File(const File&) = default;
+            File& operator=(const File&) = default;
 
-            File(File&& other) = default;
-            File& operator=(File&& other) = default;
+            File(File&&) = default;
+            File& operator=(File&&) = default;
 
             ~File() = default;
 
