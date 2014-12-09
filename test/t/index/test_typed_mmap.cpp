@@ -27,7 +27,10 @@ SECTION("MmapSizeZero") {
 }
 
 SECTION("MmapHugeSize") {
-    REQUIRE_THROWS_AS(osmium::detail::typed_mmap<uint64_t>::map(1L << 50), std::system_error);
+    // this is a horrible hack to only run the test on 64bit machines.
+    if (sizeof(size_t) >= 8) {
+        REQUIRE_THROWS_AS(osmium::detail::typed_mmap<uint64_t>::map(1ULL << (sizeof(size_t) * 6)), std::system_error);
+    }
 }
 
 #ifdef __linux__
