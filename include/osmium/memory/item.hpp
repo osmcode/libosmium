@@ -35,6 +35,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <cstddef>
 #include <cstdint>
+#include <type_traits>
 
 namespace osmium {
 
@@ -52,11 +53,10 @@ namespace osmium {
         // align datastructures to this many bytes
         constexpr item_size_type align_bytes = 8;
 
-        inline size_t padded_length(size_t length) noexcept {
-            return (length + align_bytes - 1) & ~(align_bytes - 1);
-        }
-
-        inline item_size_type padded_length(item_size_type length) noexcept {
+        template <typename T>
+        inline T padded_length(T length) noexcept {
+            static_assert(std::is_integral<T>::value && std::is_unsigned<T>::value,
+                          "Template parameter must be unsigned integral type");
             return (length + align_bytes - 1) & ~(align_bytes - 1);
         }
 
