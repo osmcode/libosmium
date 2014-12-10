@@ -42,9 +42,9 @@ DEALINGS IN THE SOFTWARE.
 #include <type_traits>
 #include <vector>
 
-#include <osmium/thread/queue.hpp>
-#include <osmium/thread/name.hpp>
 #include <osmium/thread/function_wrapper.hpp>
+#include <osmium/thread/queue.hpp>
+#include <osmium/thread/util.hpp>
 #include <osmium/util/config.hpp>
 
 namespace osmium {

@@ -69,7 +69,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/object.hpp>
 #include <osmium/osm/types.hpp>
 #include <osmium/thread/queue.hpp>
-#include <osmium/thread/checked_task.hpp>
+#include <osmium/thread/util.hpp>
 #include <osmium/util/cast.hpp>
 
 namespace osmium {
@@ -667,7 +667,7 @@ namespace osmium {
                 osmium::thread::Queue<osmium::memory::Buffer> m_queue;
                 std::atomic<bool> m_done;
                 std::promise<osmium::io::Header> m_header_promise;
-                osmium::thread::CheckedTask<XMLParser> m_parser_task;
+                std::future<bool> m_parser_future;
 
             public:
 
@@ -683,7 +683,7 @@ namespace osmium {
                     m_queue(),
                     m_done(false),
                     m_header_promise(),
-                    m_parser_task(input_queue, m_queue, m_header_promise, read_which_entities, m_done) {
+                    m_parser_future(std::async(std::launch::async, XMLParser(input_queue, m_queue, m_header_promise, read_which_entities, m_done))) {
                 }
 
                 ~XMLInputFormat() {
@@ -695,7 +695,7 @@ namespace osmium {
                 }
 
                 virtual osmium::io::Header header() override final {
-                    m_parser_task.check_for_exception();
+                    osmium::thread::check_for_exception(m_parser_future);
                     return m_header_promise.get_future().get();
                 }
 
@@ -705,13 +705,13 @@ namespace osmium {
                         m_queue.wait_and_pop(buffer);
                     }
 
-                    m_parser_task.check_for_exception();
+                    osmium::thread::check_for_exception(m_parser_future);
                     return buffer;
                 }
 
                 void close() {
                     m_done = true;
-                    m_parser_task.close();
+                    osmium::thread::wait_until_done(m_parser_future);
                 }
 
             }; // class XMLInputFormat
