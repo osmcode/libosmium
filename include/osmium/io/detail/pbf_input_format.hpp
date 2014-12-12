@@ -155,10 +155,9 @@ namespace osmium {
                     osmium::thread::set_thread_name("_osmium_pbf_in");
                     int n=0;
                     while (auto size = read_blob_header("OSMData")) {
-                        DataBlobParser data_blob_parser(read_from_input_queue(size), read_types);
 
                         if (m_use_thread_pool) {
-                            m_queue.push(osmium::thread::Pool::instance().submit(data_blob_parser));
+                            m_queue.push(osmium::thread::Pool::instance().submit(DataBlobParser{read_from_input_queue(size), read_types}));
 
                             // if the work queue is getting too large, wait for a while
                             while (!m_done && osmium::thread::Pool::instance().queue_size() >= m_max_work_queue_size) {
@@ -167,6 +166,7 @@ namespace osmium {
                         } else {
                             std::promise<osmium::memory::Buffer> promise;
                             m_queue.push(promise.get_future());
+                            DataBlobParser data_blob_parser{read_from_input_queue(size), read_types};
                             promise.set_value(data_blob_parser());
                         }
                         ++n;
