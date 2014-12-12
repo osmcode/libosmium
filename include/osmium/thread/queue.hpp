@@ -68,17 +68,6 @@ namespace osmium {
                 m_data_available.notify_one();
             }
 
-            size_t push_and_get_size(T&& value) {
-                std::lock_guard<std::mutex> lock(m_mutex);
-                m_queue.push(std::forward<T>(value));
-                m_data_available.notify_one();
-                return m_queue.size();
-            }
-
-            void push(T value, int) {
-                push(value);
-            }
-
             void wait_and_pop(T& value) {
                 std::unique_lock<std::mutex> lock(m_mutex);
                 m_data_available.wait(lock, [this] {
