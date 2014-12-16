@@ -75,12 +75,26 @@ if(BUILD_EXAMPLES OR BUILD_TESTING OR BUILD_TRY_HPPS)
     include(OsmiumOptions)
 endif()
 
+#----------------------------------------------------------------------
+#
+#  Decide which C++ version to use (Minimum/default: C++11).
+#
+#----------------------------------------------------------------------
+
+if(NOT USE_CPP_VERSION)
+    set(USE_CPP_VERSION c++11)
+endif()
+message(STATUS "Use C++ version: ${USE_CPP_VERSION}")
+add_compile_options(-std=${USE_CPP_VERSION})
+
+#----------------------------------------------------------------------
+
 if(WIN32)
     add_definitions(-DWIN32 -D_WIN32 -DMSWIN32 -DBGDWIN32 -DWINVER=0x0500 -D_WIN32_WINNT=0x0500 -D_WIN32_IE=0x0600)
     set(CPACK_GENERATOR ZIP)
-else(WIN32)
+else()
     set(CPACK_GENERATOR TGZ)
-endif(WIN32)
+endif()
 
 enable_testing()
 
