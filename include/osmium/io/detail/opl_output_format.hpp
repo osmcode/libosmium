@@ -283,9 +283,6 @@ namespace osmium {
 
                 void write_buffer(osmium::memory::Buffer&& buffer) override final {
                     m_output_queue.push(osmium::thread::Pool::instance().submit(OPLOutputBlock{std::move(buffer)}));
-                    while (m_output_queue.size() > 10) {
-                        std::this_thread::sleep_for(std::chrono::milliseconds(100)); // XXX
-                    }
                 }
 
                 void close() override final {

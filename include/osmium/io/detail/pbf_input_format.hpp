@@ -85,8 +85,6 @@ namespace osmium {
 
                 bool m_use_thread_pool;
                 queue_type m_queue;
-                const size_t m_max_work_queue_size;
-                const size_t m_max_buffer_queue_size;
                 std::atomic<bool> m_done;
                 std::thread m_reader;
                 osmium::thread::Queue<std::string>& m_input_queue;
@@ -158,11 +156,6 @@ namespace osmium {
 
                         if (m_use_thread_pool) {
                             m_queue.push(osmium::thread::Pool::instance().submit(DataBlobParser{read_from_input_queue(size), read_types}));
-
-                            // if the work queue is getting too large, wait for a while
-                            while (!m_done && osmium::thread::Pool::instance().queue_size() >= m_max_work_queue_size) {
-                                std::this_thread::sleep_for(std::chrono::milliseconds(10));
-                            }
                         } else {
                             std::promise<osmium::memory::Buffer> promise;
                             m_queue.push(promise.get_future());
@@ -170,11 +163,6 @@ namespace osmium {
                             promise.set_value(data_blob_parser());
                         }
                         ++n;
-
-                        // wait if the backlog of buffers with parsed data is too large
-                        while (!m_done && m_queue.size() > m_max_buffer_queue_size) {
-                            std::this_thread::sleep_for(std::chrono::milliseconds(10));
-                        }
 
                         if (m_done) {
                             return;
@@ -195,9 +183,7 @@ namespace osmium {
                 PBFInputFormat(const osmium::io::File& file, osmium::osm_entity_bits::type read_which_entities, osmium::thread::Queue<std::string>& input_queue) :
                     osmium::io::detail::InputFormat(file, read_which_entities, input_queue),
                     m_use_thread_pool(osmium::config::use_pool_threads_for_pbf_parsing()),
-                    m_queue(),
-                    m_max_work_queue_size(10), // XXX tune these settings
-                    m_max_buffer_queue_size(20), // XXX tune these settings
+                    m_queue(20, "pbf_parser_results"), // XXX
                     m_done(false),
                     m_input_queue(input_queue),
                     m_input_buffer() {

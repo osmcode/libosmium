@@ -24,6 +24,8 @@ CXXFLAGS += -g -fno-omit-frame-pointer
 CXXFLAGS += -std=c++11 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64
 CXXFLAGS += -I../include
 
+#CXXFLAGS += -DOSMIUM_DEBUG_QUEUE_SIZE
+
 OS:=$(shell uname -s)
 ifeq ($(OS),Darwin)
 	CXXFLAGS += -stdlib=libc++

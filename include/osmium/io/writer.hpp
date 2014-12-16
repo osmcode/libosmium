@@ -61,8 +61,9 @@ namespace osmium {
 
             osmium::io::File m_file;
 
-            std::unique_ptr<osmium::io::detail::OutputFormat> m_output;
             osmium::io::detail::data_queue_type m_output_queue;
+
+            std::unique_ptr<osmium::io::detail::OutputFormat> m_output;
 
             std::unique_ptr<osmium::io::Compressor> m_compressor;
 
@@ -87,6 +88,7 @@ namespace osmium {
              */
             explicit Writer(const osmium::io::File& file, const osmium::io::Header& header = osmium::io::Header(), overwrite allow_overwrite = overwrite::no) :
                 m_file(file),
+                m_output_queue(20, "raw_output"), // XXX
                 m_output(osmium::io::detail::OutputFormatFactory::instance().create_output(m_file, m_output_queue)),
                 m_compressor(osmium::io::CompressionFactory::instance().create_compressor(file.compression(), osmium::io::detail::open_for_writing(m_file.filename(), allow_overwrite))),
                 m_write_future(std::async(std::launch::async, detail::WriteThread(m_output_queue, m_compressor.get()))) {

@@ -179,8 +179,6 @@ namespace osmium {
 
                 osmium::osm_entity_bits::type m_read_types;
 
-                size_t m_max_queue_size;
-
                 std::atomic<bool>& m_done;
 
                 /**
@@ -271,7 +269,6 @@ namespace osmium {
                     m_queue(queue),
                     m_header_promise(header_promise),
                     m_read_types(read_types),
-                    m_max_queue_size(100),
                     m_done(done) {
                 }
 
@@ -298,7 +295,6 @@ namespace osmium {
                     m_queue(other.m_queue),
                     m_header_promise(other.m_header_promise),
                     m_read_types(other.m_read_types),
-                    m_max_queue_size(100),
                     m_done(other.m_done) {
                 }
 
@@ -651,10 +647,6 @@ namespace osmium {
                         m_queue.push(std::move(m_buffer));
                         osmium::memory::Buffer buffer(buffer_size);
                         std::swap(m_buffer, buffer);
-
-                        while (m_queue.size() > m_max_queue_size) {
-                            std::this_thread::sleep_for(std::chrono::milliseconds(10));
-                        }
                     }
                 }
 
@@ -662,7 +654,7 @@ namespace osmium {
 
             class XMLInputFormat : public osmium::io::detail::InputFormat {
 
-                static constexpr size_t m_max_queue_size = 100;
+                static constexpr size_t max_queue_size = 100;
 
                 osmium::thread::Queue<osmium::memory::Buffer> m_queue;
                 std::atomic<bool> m_done;
@@ -680,7 +672,7 @@ namespace osmium {
                  */
                 explicit XMLInputFormat(const osmium::io::File& file, osmium::osm_entity_bits::type read_which_entities, osmium::thread::Queue<std::string>& input_queue) :
                     osmium::io::detail::InputFormat(file, read_which_entities, input_queue),
-                    m_queue(),
+                    m_queue(max_queue_size, "xml_parser_results"),
                     m_done(false),
                     m_header_promise(),
                     m_parser_future(std::async(std::launch::async, XMLParser(input_queue, m_queue, m_header_promise, read_which_entities, m_done))) {

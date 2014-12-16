@@ -59,7 +59,10 @@ namespace osmium {
          */
         class Pool {
 
-            // This class makes sure pool threads are joined when the pool is destructed
+            /**
+             * This class makes sure all pool threads will be joined when
+             * the pool is destructed.
+             */
             class thread_joiner {
 
                 std::vector<std::thread>& m_threads;
@@ -109,9 +112,9 @@ namespace osmium {
              *
              * In all cases the minimum number of threads in the pool is 1.
              */
-            explicit Pool(int num_threads) :
+            explicit Pool(int num_threads, size_t max_queue_size) :
                 m_done(false),
-                m_work_queue(),
+                m_work_queue(max_queue_size, "work"),
                 m_threads(),
                 m_joiner(m_threads),
                 m_num_threads(num_threads) {
@@ -137,9 +140,10 @@ namespace osmium {
         public:
 
             static constexpr int default_num_threads = 0;
+            static constexpr size_t max_work_queue_size = 10;
 
             static Pool& instance() {
-                static Pool pool(default_num_threads);
+                static Pool pool(default_num_threads, max_work_queue_size);
                 return pool;
             }
 
