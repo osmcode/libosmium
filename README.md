@@ -30,6 +30,7 @@ you need for the programs you need.
         http://www.boost.org/
         Debian/Ubuntu: libboost-dev
         openSUSE: boost-devel
+        Homebrew: boost
 
     boost-program-options (for parsing command line options in some examples)
         http://www.boost.org/doc/libs/1_54_0/doc/html/program_options.html
@@ -39,6 +40,7 @@ you need for the programs you need.
         http://code.google.com/p/protobuf/ (at least version 2.3.0 needed)
         Debian/Ubuntu: libprotobuf-dev protobuf-compiler
         openSUSE: protobuf-devel
+        Homebrew: protobuf
         Also see http://wiki.openstreetmap.org/wiki/PBF_Format
 
     OSMPBF (for PBF support)
@@ -46,11 +48,13 @@ you need for the programs you need.
         Debian/Ubuntu: libosmpbf-dev
         (The package in Ubuntu 14.04 and older is too old, install from source
         in these cases.)
+        Homebrew: osm-pbf
 
     Expat (for parsing XML files)
         http://expat.sourceforge.net/
         Debian/Ubuntu: libexpat1-dev
         openSUSE: libexpat-devel
+        Homebrew: expat
 
     zlib (for PBF and for gzip support when reading/writing XML)
         http://www.zlib.net/
@@ -65,16 +69,19 @@ you need for the programs you need.
         http://code.google.com/p/google-sparsehash/
         Debian/Ubuntu: libsparsehash-dev
         openSUSE: sparsehash
+        Homebrew: google-sparsehash
 
     GDAL (for OGR support)
         http://gdal.org/
         Debian/Ubuntu: libgdal1-dev
         openSUSE: libgdal-devel
+        Homebrew: gdal
 
     GEOS (for GEOS support)
         http://trac.osgeo.org/geos/
         Debian/Ubuntu: libgeos++-dev
         openSUSE: libgeos-devel
+        Homebrew: geos
 
     libproj (for projection support)
         http://trac.osgeo.org/proj/
@@ -83,6 +90,7 @@ you need for the programs you need.
     Doxygen (to build API documentation) and tools
         http://www.stack.nl/~dimitri/doxygen/
         Debian/Ubuntu: doxygen graphviz xmlstarlet
+        Homebrew: doxygen
 
 You need to either install the packages for your distribution or install those
 libraries from source. Most libraries should be available in all distributions.
