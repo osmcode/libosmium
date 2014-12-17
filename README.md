@@ -30,6 +30,7 @@ you need for the programs you need.
         http://www.boost.org/
         Debian/Ubuntu: libboost-dev
         openSUSE: boost-devel
+        Homebrew: boost
 
     boost-program-options (for parsing command line options in some examples)
         http://www.boost.org/doc/libs/1_54_0/doc/html/program_options.html
@@ -39,6 +40,7 @@ you need for the programs you need.
         http://code.google.com/p/protobuf/ (at least version 2.3.0 needed)
         Debian/Ubuntu: libprotobuf-dev protobuf-compiler
         openSUSE: protobuf-devel
+        Homebrew: protobuf
         Also see http://wiki.openstreetmap.org/wiki/PBF_Format
 
     OSMPBF (for PBF support)
@@ -46,6 +48,7 @@ you need for the programs you need.
         Debian/Ubuntu: libosmpbf-dev
         (The package in Ubuntu 14.04 and older is too old, install from source
         in these cases.)
+        Homebrew: osm-pbf
 
     Expat (for parsing XML files)
         http://expat.sourceforge.net/
@@ -65,11 +68,13 @@ you need for the programs you need.
         http://code.google.com/p/google-sparsehash/
         Debian/Ubuntu: libsparsehash-dev
         openSUSE: sparsehash
+        Homebrew: google-sparsehash
 
     GDAL (for OGR support)
         http://gdal.org/
         Debian/Ubuntu: libgdal1-dev
         openSUSE: libgdal-devel
+        Homebrew: gdal
 
     GEOS (for GEOS support)
         http://trac.osgeo.org/geos/
