@@ -45,7 +45,6 @@ option(BUILD_TRY_HPPS "compile every hpp" ON)
 # check that the essential libraries were found
 if(BUILD_EXAMPLES OR BUILD_TESTING OR BUILD_TRY_HPPS)
 
-
     find_package(Boost 1.38)
     mark_as_advanced(CLEAR BOOST_ROOT)
 
@@ -72,7 +71,6 @@ if(BUILD_EXAMPLES OR BUILD_TESTING OR BUILD_TRY_HPPS)
     endif()
 
     include_directories(include)
-    include(OsmiumOptions)
 endif()
 
 #----------------------------------------------------------------------
@@ -92,9 +90,27 @@ add_definitions(-std=${USE_CPP_VERSION})
 
 #----------------------------------------------------------------------
 
-if(NOT MSVC)
-    add_definitions(${OSMIUM_WARNING_OPTIONS})
-endif()
+set(CMAKE_CXX_FLAGS_NONE "-O3 -g"
+    CACHE STRING "Flags used by the compiler during all builds."
+    FORCE)
+
+set(CMAKE_CXX_FLAGS_DEV "-O3 -g ${OSMIUM_WARNING_OPTIONS}"
+    CACHE STRING "Flags used by the compiler during developer builds."
+    FORCE)
+set(CMAKE_EXE_LINKER_FLAGS_DEV ""
+    CACHE STRING "Flags used by the linker during developer builds."
+    FORCE)
+mark_as_advanced(
+    CMAKE_CXX_FLAGS_DEV
+    CMAKE_EXE_LINKER_FLAGS_DEV
+)
+
+set(CMAKE_CONFIGURATION_TYPES "Debug Release RelWithDebInfo MinSizeRel Dev")
+
+# Update the documentation string of CMAKE_BUILD_TYPE for GUIs
+set(CMAKE_BUILD_TYPE "${CMAKE_BUILD_TYPE}" CACHE STRING
+    "Choose the type of build, options are: ${CMAKE_CONFIGURATION_TYPES}."
+    FORCE)
 
 
 #----------------------------------------------------------------------
