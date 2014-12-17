@@ -22,25 +22,26 @@ if(NOT EXISTS ${TESTDATA_DIR})
 endif()
 
 
-if(CMAKE_COMPILER_IS_GNUCC)
-    add_compile_options(
-        $<$<CXX_COMPILER_ID:Clang>:-Wdocumentation>
-        $<$<CXX_COMPILER_ID:Clang>:-Wunused-exception-parameter>
-        $<$<CXX_COMPILER_ID:Clang>:-Wmissing-declarations>
-        $<$<CXX_COMPILER_ID:Clang>:-Weverything>
-        $<$<CXX_COMPILER_ID:Clang>:-Wno-c++98-compat>
-        $<$<CXX_COMPILER_ID:Clang>:-Wno-c++98-compat-pedantic>
-        $<$<CXX_COMPILER_ID:Clang>:-Wno-unused-macros>
-        $<$<CXX_COMPILER_ID:Clang>:-Wno-exit-time-destructors>
-        $<$<CXX_COMPILER_ID:Clang>:-Wno-global-constructors>
-        $<$<CXX_COMPILER_ID:Clang>:-Wno-padded>
-        $<$<CXX_COMPILER_ID:Clang>:-Wno-switch-enum>
-        $<$<CXX_COMPILER_ID:Clang>:-Wno-missing-prototypes>
-        $<$<CXX_COMPILER_ID:Clang>:-Wno-weak-vtables>
-        $<$<CXX_COMPILER_ID:Clang>:-Wno-cast-align>
-        $<$<CXX_COMPILER_ID:Clang>:-Wno-float-equal>
-    )
-endif(CMAKE_COMPILER_IS_GNUCC)
+#if(CMAKE_COMPILER_IS_GNUCC)
+#    add_compile_options(
+##    add_definitions(
+#        $<$<CXX_COMPILER_ID:Clang>:-Wdocumentation>
+#        $<$<CXX_COMPILER_ID:Clang>:-Wunused-exception-parameter>
+#        $<$<CXX_COMPILER_ID:Clang>:-Wmissing-declarations>
+#        $<$<CXX_COMPILER_ID:Clang>:-Weverything>
+#        $<$<CXX_COMPILER_ID:Clang>:-Wno-c++98-compat>
+#        $<$<CXX_COMPILER_ID:Clang>:-Wno-c++98-compat-pedantic>
+#        $<$<CXX_COMPILER_ID:Clang>:-Wno-unused-macros>
+#        $<$<CXX_COMPILER_ID:Clang>:-Wno-exit-time-destructors>
+#        $<$<CXX_COMPILER_ID:Clang>:-Wno-global-constructors>
+#        $<$<CXX_COMPILER_ID:Clang>:-Wno-padded>
+#        $<$<CXX_COMPILER_ID:Clang>:-Wno-switch-enum>
+#        $<$<CXX_COMPILER_ID:Clang>:-Wno-missing-prototypes>
+#        $<$<CXX_COMPILER_ID:Clang>:-Wno-weak-vtables>
+#        $<$<CXX_COMPILER_ID:Clang>:-Wno-cast-align>
+#        $<$<CXX_COMPILER_ID:Clang>:-Wno-float-equal>
+#    )
+#endif(CMAKE_COMPILER_IS_GNUCC)
 
 add_executable(testdata-overview testdata-overview.cpp)
 target_link_libraries(testdata-overview ${OSMIUM_LIBRARIES})
