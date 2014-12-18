@@ -36,6 +36,10 @@ DEALINGS IN THE SOFTWARE.
 #include <cstdlib>
 #include <cstring>
 
+#ifdef _MSC_VER
+# define strcasecmp _stricmp
+#endif
+
 namespace osmium {
 
     namespace config {
