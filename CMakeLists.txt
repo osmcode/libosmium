@@ -34,7 +34,7 @@ set(LIBOSMIUM_VERSION ${OSMIUM_VERSION_MAJOR}.${OSMIUM_VERSION_MINOR}.${OSMIUM_V
 option(BUILD_EXAMPLES   "compile example programs" ON)
 option(BUILD_UNIT_TESTS "compile unit tests, please run them with ctest" ON)
 option(BUILD_DATA_TESTS "compile data tests, please run them with ctest" ON)
-option(BUILD_TRY_HPPS   "compile every hpp" ON)
+option(BUILD_HEADERS    "compile every header file on its own" ON)
 
 
 #----------------------------------------------------------------------
@@ -44,7 +44,7 @@ option(BUILD_TRY_HPPS   "compile every hpp" ON)
 #----------------------------------------------------------------------
 
 # check that the essential libraries were found
-if(BUILD_EXAMPLES OR BUILD_TESTING OR BUILD_UNIT_TESTS OR BUILD_DATA_TESTS OR BUILD_TRY_HPPS)
+if(BUILD_EXAMPLES OR BUILD_TESTING OR BUILD_UNIT_TESTS OR BUILD_DATA_TESTS OR BUILD_HEADERS)
 
     find_package(Boost 1.38)
     mark_as_advanced(CLEAR BOOST_ROOT)
@@ -137,8 +137,31 @@ if(BUILD_DATA_TESTS OR BUILD_TESTING)
     add_subdirectory(test/osm-testdata)
 endif()
 
-if(BUILD_TRY_HPPS)
-    add_subdirectory(include)
+# This will try to compile include files on their own to detect missing
+# include directives and other dependency-related problems. Note that if this
+# work, it is not enough to be sure it will compile in production code.
+# But if it reports an error we know we are missing something.
+if(BUILD_HEADERS)
+    file(GLOB_RECURSE ALL_HPPS RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/include" include/osmium/*.hpp)
+
+    # Make sure we compile with very strict settings.
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror ${OSMIUM_WARNING_OPTIONS}")
+
+    file(MAKE_DIRECTORY header_check)
+
+    foreach(hpp ${ALL_HPPS})
+        string(REPLACE ".hpp" "" tmp ${hpp})
+        string(REPLACE "/" "__" libname ${tmp})
+
+        # Create a dummy .cpp file that includes the header file we want to
+        # check.
+        set(DUMMYCPP ${CMAKE_BINARY_DIR}/header_check/${libname}.cpp)
+        file(WRITE ${DUMMYCPP} "#include <${hpp}>\n")
+
+        # There is no way in CMake to just compile but not link a C++ file,
+        # so we pretend to build a library here.
+        add_library(${libname} STATIC ${DUMMYCPP} include/${hpp})
+    endforeach()
 endif()
 
 install(DIRECTORY include/osmium DESTINATION include)
