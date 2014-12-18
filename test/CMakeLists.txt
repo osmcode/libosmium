@@ -7,99 +7,96 @@ include_directories(include)
 add_library(testlib STATIC test_main.cpp)
 
 #----------------------------------------------------------------------
-macro(compile_tests)
-    foreach(test_name ${TESTS})
-        add_executable(${test_name} t/${TEST_GROUP}/${test_name}.cpp)
-        target_link_libraries(${test_name} testlib ${OSMIUM_LIBRARIES})
-        add_test(${test_name} ${test_name} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-    endforeach(test_name)
-endmacro()
 
+set(ALL_TESTS "")
+
+# call with parameters:
+#  TGROUP - test group (directory)
+#  TNAME  - name of test
+#  ARGV2  - flag to enable test (optional)
+#  ARGV3  - libraries to add (optional)
+function(add_unit_test TGROUP TNAME)
+    set(ALL_TESTS "${ALL_TESTS};${TGROUP}/${TNAME}" PARENT_SCOPE)
+    if((${ARGC} EQUAL 2) OR (ARGV2))
+        if(Osmium_DEBUG)
+            message("Adding test ${TGROUP}/${TNAME}")
+        endif()
+        add_executable(${TNAME} t/${TGROUP}/${TNAME}.cpp)
+        target_link_libraries(${TNAME} testlib)
+        if((ARGV2) AND (DEFINED ARGV3))
+            target_link_libraries(${TNAME} ${ARGV3})
+        endif()
+        add_test(${TNAME} ${TNAME} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+        set_tests_properties(${TNAME} PROPERTIES LABELS "unit;${TGROUP}")
+    else()
+        message("Skipped test ${TGROUP}/${TNAME} because a dependency was not found")
+    endif()
+endfunction()
 
 #----------------------------------------------------------------------
-set(TEST_GROUP area)
-set(TESTS
-    test_area_id
-    test_node_ref_segment
-)
-compile_tests()
+#
+#  Add all tests.
+#
+#----------------------------------------------------------------------
 
-set(TEST_GROUP basic)
-set(TESTS
-    test_box
-    test_changeset
-    test_entity_bits
-    test_location
-    test_node
-    test_node_ref
-    test_object_comparisons
-    test_relation
-    test_timestamp
-    test_way
-)
-compile_tests()
+add_unit_test(area test_area_id)
+add_unit_test(area test_node_ref_segment)
 
+add_unit_test(basic test_box)
+add_unit_test(basic test_changeset)
+add_unit_test(basic test_entity_bits)
+add_unit_test(basic test_location)
+add_unit_test(basic test_node)
+add_unit_test(basic test_node_ref)
+add_unit_test(basic test_object_comparisons)
+add_unit_test(basic test_relation)
+add_unit_test(basic test_timestamp)
+add_unit_test(basic test_way)
 
-set(TEST_GROUP buffer)
-set(TESTS
-    test_buffer_node
-    test_buffer_purge
-)
-compile_tests()
+add_unit_test(buffer test_buffer_node)
+add_unit_test(buffer test_buffer_purge)
 
-if(GEOS_FOUND AND PROJ_FOUND)
-    set(TEST_GROUP geom)
-    set(TESTS
-        test_factory_with_projection
-        test_geojson
-        test_geos
-        test_geos_wkb
-        test_mercator
-        test_projection
-        test_wkb
-        test_wkt
-    )
-    if(GDAL_FOUND)
-      list(APPEND TESTS test_ogr)
+add_unit_test(geom test_factory_with_projection
+    "${GEOS_FOUND} AND ${PROJ_FOUND}"
+    "${GEOS_LIBRARY};${PROJ_LIBRARY}")
+add_unit_test(geom test_geojson)
+add_unit_test(geom test_geos ${GEOS_FOUND} ${GEOS_LIBRARY})
+add_unit_test(geom test_geos_wkb ${GEOS_FOUND} ${GEOS_LIBRARY})
+add_unit_test(geom test_mercator)
+add_unit_test(geom test_ogr ${GDAL_FOUND} ${GDAL_LIBRARY})
+add_unit_test(geom test_projection ${PROJ_FOUND} ${PROJ_LIBRARY})
+add_unit_test(geom test_wkb)
+add_unit_test(geom test_wkt)
+
+add_unit_test(index test_id_to_location ${SPARSEHASH_FOUND} "")
+add_unit_test(index test_typed_mmap)
+
+add_unit_test(io test_bzip2 ${BZIP2_FOUND} ${BZIP2_LIBRARIES})
+add_unit_test(io test_file_formats)
+add_unit_test(io test_reader TRUE
+    "${EXPAT_LIBRARIES};${BZIP2_LIBRARIES};${ZLIB_LIBRARIES};${CMAKE_THREAD_LIBS_INIT}")
+
+add_unit_test(tags test_filter)
+add_unit_test(tags test_operators)
+add_unit_test(tags test_tag_list)
+
+add_unit_test(util test_double)
+add_unit_test(util test_options)
+
+#----------------------------------------------------------------------
+#
+#  Check that all tests available in test/t/*/test_*.cpp are run.
+#
+#----------------------------------------------------------------------
+
+file(GLOB TESTS_IN_DIR RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/t" t/*/test_*.cpp)
+
+foreach(file ${TESTS_IN_DIR})
+    string(REPLACE ".cpp" "" out1 ${file})
+    string(REPLACE "//" "/" tname ${out1})
+    list(FIND ALL_TESTS ${tname} found)
+    if(${found} EQUAL -1)
+        message(WARNING "Test '${tname}' not found in cmake config. It will not be run!")
     endif()
-    compile_tests()
-else()
-    message("Skipped geom tests - needed GEOS and PROJ libraries")
-endif()
-
-set(TEST_GROUP index)
-set(TESTS
-    test_typed_mmap
-)
-if(SPARSEHASH_FOUND)
-    list(APPEND TESTS test_id_to_location)
-else()
-    message("Skipped index/test_id_to_location test - needed Google SparseHash")
-endif()
-compile_tests()
-
-set(TEST_GROUP io)
-set(TESTS
-    test_bzip2
-    test_file_formats
-)
-compile_tests()
-set(TESTS
-    test_reader
-)
-compile_tests()
-
-set(TEST_GROUP tags)
-set(TESTS
-    test_filter
-    test_operators
-    test_tag_list
-)
-compile_tests()
-
-set(TEST_GROUP util)
-set(TESTS
-    test_options
-)
-compile_tests()
+endforeach()
 

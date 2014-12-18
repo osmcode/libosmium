@@ -31,9 +31,10 @@ set(LIBOSMIUM_VERSION ${OSMIUM_VERSION_MAJOR}.${OSMIUM_VERSION_MINOR}.${OSMIUM_V
 #
 #----------------------------------------------------------------------
 
-option(BUILD_EXAMPLES "compile example programs" ON)
-option(BUILD_TESTING "compile tests, please run them with ctest" ON)
-option(BUILD_TRY_HPPS "compile every hpp" ON)
+option(BUILD_EXAMPLES   "compile example programs" ON)
+option(BUILD_UNIT_TESTS "compile unit tests, please run them with ctest" ON)
+option(BUILD_DATA_TESTS "compile data tests, please run them with ctest" ON)
+option(BUILD_TRY_HPPS   "compile every hpp" ON)
 
 
 #----------------------------------------------------------------------
@@ -43,7 +44,7 @@ option(BUILD_TRY_HPPS "compile every hpp" ON)
 #----------------------------------------------------------------------
 
 # check that the essential libraries were found
-if(BUILD_EXAMPLES OR BUILD_TESTING OR BUILD_TRY_HPPS)
+if(BUILD_EXAMPLES OR BUILD_TESTING OR BUILD_UNIT_TESTS OR BUILD_DATA_TESTS OR BUILD_TRY_HPPS)
 
     find_package(Boost 1.38)
     mark_as_advanced(CLEAR BOOST_ROOT)
@@ -128,8 +129,11 @@ if(BUILD_EXAMPLES)
     add_subdirectory(examples)
 endif()
 
-if(BUILD_TESTING)
+if(BUILD_UNIT_TESTS OR BUILD_TESTING)
     add_subdirectory(test)
+endif()
+
+if(BUILD_DATA_TESTS OR BUILD_TESTING)
     add_subdirectory(test/osm-testdata)
 endif()
 
