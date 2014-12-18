@@ -133,9 +133,11 @@ namespace osmium {
 
                 multipolygon_type multipolygon_finish() {
                     assert(!m_str.empty());
-                    m_str.back() = ']';
-                    m_str += "}";
-                    return std::move(m_str);
+                    std::string str;
+                    std::swap(str, m_str);
+                    str.back() = ']';
+                    str += "}";
+                    return str;
                 }
 
             }; // class GeoJSONFactoryImpl

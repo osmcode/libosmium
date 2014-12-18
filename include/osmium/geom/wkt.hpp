@@ -130,8 +130,10 @@ namespace osmium {
 
                 multipolygon_type multipolygon_finish() {
                     assert(!m_str.empty());
-                    m_str.back() = ')';
-                    return std::move(m_str);
+                    std::string str;
+                    std::swap(str, m_str);
+                    str.back() = ')';
+                    return str;
                 }
 
             }; // class WKTFactoryImpl
