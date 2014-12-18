@@ -435,7 +435,7 @@ namespace osmium {
                 osmium::memory::Buffer operator()() {
                     const std::unique_ptr<const std::string> data = unpack_blob(m_input_buffer);
                     PBFPrimitiveBlockParser parser(*data, m_read_types);
-                    return std::move(parser());
+                    return parser();
                 }
 
             }; // class DataBlobParser
