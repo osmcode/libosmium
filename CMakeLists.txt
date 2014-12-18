@@ -34,7 +34,7 @@ set(LIBOSMIUM_VERSION ${OSMIUM_VERSION_MAJOR}.${OSMIUM_VERSION_MINOR}.${OSMIUM_V
 option(BUILD_EXAMPLES   "compile example programs" ON)
 option(BUILD_UNIT_TESTS "compile unit tests, please run them with ctest" ON)
 option(BUILD_DATA_TESTS "compile data tests, please run them with ctest" ON)
-option(BUILD_HEADERS    "compile every header file on its own" ON)
+option(BUILD_HEADERS    "compile every header file on its own" OFF)
 
 
 #----------------------------------------------------------------------
