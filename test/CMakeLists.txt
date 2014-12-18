@@ -17,19 +17,25 @@ set(ALL_TESTS "")
 #  ARGV3  - libraries to add (optional)
 function(add_unit_test TGROUP TNAME)
     set(ALL_TESTS "${ALL_TESTS};${TGROUP}/${TNAME}" PARENT_SCOPE)
-    if((${ARGC} EQUAL 2) OR (ARGV2))
+    if((${ARGC} EQUAL 2) OR (${ARGV2}))
         if(Osmium_DEBUG)
             message("Adding test ${TGROUP}/${TNAME}")
         endif()
         add_executable(${TNAME} t/${TGROUP}/${TNAME}.cpp)
         target_link_libraries(${TNAME} testlib)
-        if((ARGV2) AND (DEFINED ARGV3))
+        if((${ARGV2}) AND (DEFINED ARGV3))
+            if(Osmium_DEBUG)
+                message("  Adding libs ${ARGV3}")
+            endif()
             target_link_libraries(${TNAME} ${ARGV3})
         endif()
         add_test(${TNAME} ${TNAME} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
         set_tests_properties(${TNAME} PROPERTIES LABELS "unit;${TGROUP}")
     else()
         message("Skipped test ${TGROUP}/${TNAME} because a dependency was not found")
+        set(OSMIUM_SKIPPED_TESTS
+            "${OSMIUM_SKIPPED_TESTS} ${TGROUP}/${TNAME}"
+            CACHE STRING "Tests that were skipped because of missing dependecies")
     endif()
 endfunction()
 
@@ -56,9 +62,15 @@ add_unit_test(basic test_way)
 add_unit_test(buffer test_buffer_node)
 add_unit_test(buffer test_buffer_purge)
 
+if (GEOS_FOUND AND PROJ_FOUND)
+    set(GEOS_AND_PROJ_FOUND TRUE)
+else()
+    set(GEOS_AND_PROJ_FOUND FALSE)
+endif()
 add_unit_test(geom test_factory_with_projection
-    "${GEOS_FOUND} AND ${PROJ_FOUND}"
+    ${GEOS_AND_PROJ_FOUND}
     "${GEOS_LIBRARY};${PROJ_LIBRARY}")
+
 add_unit_test(geom test_geojson)
 add_unit_test(geom test_geos ${GEOS_FOUND} ${GEOS_LIBRARY})
 add_unit_test(geom test_geos_wkb ${GEOS_FOUND} ${GEOS_LIBRARY})
@@ -68,7 +80,7 @@ add_unit_test(geom test_projection ${PROJ_FOUND} ${PROJ_LIBRARY})
 add_unit_test(geom test_wkb)
 add_unit_test(geom test_wkt)
 
-add_unit_test(index test_id_to_location ${SPARSEHASH_FOUND} "")
+add_unit_test(index test_id_to_location ${SPARSEHASH_FOUND})
 add_unit_test(index test_typed_mmap)
 
 add_unit_test(io test_bzip2 ${BZIP2_FOUND} ${BZIP2_LIBRARIES})
