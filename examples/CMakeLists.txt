@@ -20,6 +20,11 @@ else()
     message("Skipped osmium_area_test example - needed Google SparseHash")
 endif()
 
+# In 'Dev' mode: compile with very strict warnings and turn them into errors.
+if(CMAKE_BUILD_TYPE STREQUAL "Dev")
+    add_definitions(-Werror ${OSMIUM_WARNING_OPTIONS})
+endif()
+
 foreach(example ${SIMPLE_EXAMPLES})
     message(STATUS "Configuring example ${example}...")
     add_executable(${example} "${example}.cpp")

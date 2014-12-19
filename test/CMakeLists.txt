@@ -4,6 +4,11 @@ set(DART_TESTING_TIMEOUT 60)
 include(Dart)
 include_directories(include)
 
+# In 'Dev' mode: compile with very strict warnings and turn them into errors.
+if(CMAKE_BUILD_TYPE STREQUAL "Dev")
+    add_definitions(-Werror ${OSMIUM_WARNING_OPTIONS} -Wno-unused-variable)
+endif()
+
 add_library(testlib STATIC test_main.cpp)
 
 #----------------------------------------------------------------------
@@ -89,8 +94,7 @@ add_unit_test(index test_typed_mmap)
 
 add_unit_test(io test_bzip2 ${BZIP2_FOUND} ${BZIP2_LIBRARIES})
 add_unit_test(io test_file_formats)
-add_unit_test(io test_reader TRUE
-    "${EXPAT_LIBRARIES};${BZIP2_LIBRARIES};${ZLIB_LIBRARIES};${CMAKE_THREAD_LIBS_INIT}")
+add_unit_test(io test_reader TRUE "${OSMIUM_XML_LIBRARIES}")
 
 add_unit_test(tags test_filter)
 add_unit_test(tags test_operators)

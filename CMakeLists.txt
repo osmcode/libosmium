@@ -95,7 +95,7 @@ set(CMAKE_CXX_FLAGS_NONE "-O3 -g"
     CACHE STRING "Flags used by the compiler during all builds."
     FORCE)
 
-set(CMAKE_CXX_FLAGS_DEV "-O3 -g ${OSMIUM_WARNING_OPTIONS}"
+set(CMAKE_CXX_FLAGS_DEV "-O3 -g"
     CACHE STRING "Flags used by the compiler during developer builds."
     FORCE)
 set(CMAKE_EXE_LINKER_FLAGS_DEV ""
@@ -144,8 +144,10 @@ endif()
 if(BUILD_HEADERS)
     file(GLOB_RECURSE ALL_HPPS RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/include" include/osmium/*.hpp)
 
-    # Make sure we compile with very strict settings.
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror ${OSMIUM_WARNING_OPTIONS}")
+    # In 'Dev' mode: compile with very strict warnings and turn them into errors.
+    if(CMAKE_BUILD_TYPE STREQUAL "Dev")
+        add_definitions(-Werror ${OSMIUM_WARNING_OPTIONS})
+    endif()
 
     file(MAKE_DIRECTORY header_check)
 
