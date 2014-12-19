@@ -33,7 +33,7 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#define OSMIUM_LINK_WITH_LIBS_EXPAT -lexpat
+#define OSMIUM_LINK_WITH_LIBS_EXPAT -pthread -lexpat
 
 #include <atomic>
 #include <cassert>

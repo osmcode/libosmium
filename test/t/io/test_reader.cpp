@@ -1,6 +1,7 @@
 #include "catch.hpp"
 
 #include <osmium/handler.hpp>
+#include <osmium/io/any_compression.hpp>
 #include <osmium/io/xml_input.hpp>
 #include <osmium/visitor.hpp>
 #include <osmium/memory/buffer.hpp>
