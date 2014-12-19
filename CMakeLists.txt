@@ -34,7 +34,12 @@ set(LIBOSMIUM_VERSION ${OSMIUM_VERSION_MAJOR}.${OSMIUM_VERSION_MINOR}.${OSMIUM_V
 option(BUILD_EXAMPLES   "compile example programs" ON)
 option(BUILD_UNIT_TESTS "compile unit tests, please run them with ctest" ON)
 option(BUILD_DATA_TESTS "compile data tests, please run them with ctest" ON)
-option(BUILD_HEADERS    "compile every header file on its own" OFF)
+
+if(CMAKE_BUILD_TYPE STREQUAL "Dev")
+    option(BUILD_HEADERS    "compile every header file on its own" ON)
+else()
+    option(BUILD_HEADERS    "compile every header file on its own" OFF)
+endif()
 
 
 #----------------------------------------------------------------------
@@ -91,10 +96,6 @@ add_definitions(-std=${USE_CPP_VERSION})
 
 #----------------------------------------------------------------------
 
-set(CMAKE_CXX_FLAGS_NONE "-O3 -g"
-    CACHE STRING "Flags used by the compiler during all builds."
-    FORCE)
-
 set(CMAKE_CXX_FLAGS_DEV "-O3 -g"
     CACHE STRING "Flags used by the compiler during developer builds."
     FORCE)
@@ -106,12 +107,18 @@ mark_as_advanced(
     CMAKE_EXE_LINKER_FLAGS_DEV
 )
 
+set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O3 -g"
+    CACHE STRING "Flags used by the compiler during RELWITHDEBINFO builds."
+    FORCE)
+
 set(CMAKE_CONFIGURATION_TYPES "Debug Release RelWithDebInfo MinSizeRel Dev")
 
-# Update the documentation string of CMAKE_BUILD_TYPE for GUIs
-set(CMAKE_BUILD_TYPE "${CMAKE_BUILD_TYPE}" CACHE STRING
-    "Choose the type of build, options are: ${CMAKE_CONFIGURATION_TYPES}."
-    FORCE)
+# Force RelWithDebInfo build type if none was given
+if (CMAKE_BUILD_TYPE STREQUAL "")
+    set(CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING "Choose the type of build, options are: ${CMAKE_CONFIGURATION_TYPES}." FORCE)
+else()
+    set(CMAKE_BUILD_TYPE "${CMAKE_BUILD_TYPE}" CACHE STRING "Choose the type of build, options are: ${CMAKE_CONFIGURATION_TYPES}." FORCE)
+endif()
 
 
 #----------------------------------------------------------------------
