@@ -12,6 +12,7 @@ directory. See the [osmium-contrib](http://github.com/osmcode/osmium-contrib)
 repository for more example code.
 
 [![Build Status](https://secure.travis-ci.org/osmcode/libosmium.png)](http://travis-ci.org/osmcode/libosmium)
+[![Build status](https://ci.appveyor.com/api/projects/status/mkbg6e6stdgq7c1b?svg=true)](https://ci.appveyor.com/project/Mapbox/libosmium)
 
 Libosmium is developed on Linux, but also works on OSX and Windows (with some
 limitations).
