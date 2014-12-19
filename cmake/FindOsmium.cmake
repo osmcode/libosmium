@@ -102,10 +102,10 @@ if(OSMIUM_USE_PBF)
     find_package(Threads)
 
     if(OSMPBF_FOUND AND PROTOBUF_FOUND AND ZLIB_FOUND AND Threads_FOUND)
-        list(APPEND OSMIUM_LIBRARIES
+        list(APPEND OSMIUM_PBF_LIBRARIES
             ${OSMPBF_LIBRARIES}
             ${PROTOBUF_LITE_LIBRARY}
-            ${ZLIB_LIBRARY}
+            ${ZLIB_LIBRARIES}
             ${CMAKE_THREAD_LIBS_INIT}
         )
         list(APPEND OSMIUM_INCLUDE_DIRS
@@ -129,9 +129,10 @@ if(OSMIUM_USE_XML)
     find_package(BZip2)
     find_package(ZLIB)
     find_package(EXPAT)
+    find_package(Threads)
 
     if(EXPAT_FOUND AND BZIP2_FOUND AND ZLIB_FOUND)
-        list(APPEND OSMIUM_LIBRARIES
+        list(APPEND OSMIUM_XML_LIBRARIES
             ${EXPAT_LIBRARIES}
             ${BZIP2_LIBRARIES}
             ${ZLIB_LIBRARIES}
@@ -152,6 +153,15 @@ if(OSMIUM_USE_XML)
         endif()
     endif()
 endif()
+
+list(APPEND OSMIUM_IO_LIBRARIES
+    ${OSMIUM_PBF_LIBRARIES}
+    ${OSMIUM_XML_LIBRARIES}
+)
+
+list(APPEND OSMIUM_LIBRARIES
+    ${OSMIUM_IO_LIBRARIES}
+)
 
 # Component 'geos'
 if(OSMIUM_USE_GEOS)
@@ -235,6 +245,9 @@ endif()
 #----------------------------------------------------------------------
 
 list(REMOVE_DUPLICATES OSMIUM_INCLUDE_DIRS)
+list(REMOVE_DUPLICATES OSMIUM_XML_LIBRARIES)
+list(REMOVE_DUPLICATES OSMIUM_PBF_LIBRARIES)
+list(REMOVE_DUPLICATES OSMIUM_IO_LIBRARIES)
 list(REMOVE_DUPLICATES OSMIUM_LIBRARIES)
 
 # This is a set of recommended warning options that can be added when compiling
@@ -242,6 +255,9 @@ list(REMOVE_DUPLICATES OSMIUM_LIBRARIES)
 set(OSMIUM_WARNING_OPTIONS "-Wall -Wextra -pedantic -Wredundant-decls -Wdisabled-optimization -Wctor-dtor-privacy -Wnon-virtual-dtor -Woverloaded-virtual -Wsign-promo -Wold-style-cast -Wno-return-type" CACHE STRING "Recommended warning options for libosmium")
 
 if(Osmium_DEBUG)
+    message(STATUS "OSMIUM_XML_LIBRARIES=" ${OSMIUM_XML_LIBRARIES})
+    message(STATUS "OSMIUM_PBF_LIBRARIES=" ${OSMIUM_PBF_LIBRARIES})
+    message(STATUS "OSMIUM_IO_LIBRARIES=" ${OSMIUM_IO_LIBRARIES})
     message(STATUS "OSMIUM_LIBRARIES=" ${OSMIUM_LIBRARIES})
     message(STATUS "OSMIUM_INCLUDE_DIRS=" ${OSMIUM_INCLUDE_DIRS})
 endif()
