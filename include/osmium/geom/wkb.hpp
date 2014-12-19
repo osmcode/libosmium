@@ -35,7 +35,6 @@ DEALINGS IN THE SOFTWARE.
 
 #include <cstddef>
 #include <cstdint>
-#include <cstring>
 #include <string>
 
 // Windows is only available for little endian architectures
@@ -71,7 +70,7 @@ namespace osmium {
             inline void str_push(std::string& str, T data) {
                 size_t size = str.size();
                 str.resize(size + sizeof(T));
-                std::memcpy(const_cast<char *>(&str[size]), reinterpret_cast<char*>(&data), sizeof(T));
+                std::copy_n(reinterpret_cast<char*>(&data), sizeof(T), &str[size]);
             }
 
             inline std::string convert_to_hex(std::string& str) {
@@ -151,8 +150,7 @@ namespace osmium {
                 }
 
                 void set_size(const size_t offset, const size_t size) {
-                    const uint32_t s = static_cast_with_assert<uint32_t>(size);
-                    memcpy(&m_data[offset], &s, sizeof(uint32_t));
+                    *reinterpret_cast<uint32_t*>(&m_data[offset]) = static_cast_with_assert<uint32_t>(size);
                 }
 
             public:
