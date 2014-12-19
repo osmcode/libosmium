@@ -33,10 +33,10 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <algorithm>
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
-#include <cstring>
 #include <new>
 #include <type_traits>
 
@@ -101,7 +101,7 @@ namespace osmium {
             void add_padding(bool self=false) {
                 auto padding = osmium::memory::align_bytes - (size() % osmium::memory::align_bytes);
                 if (padding != osmium::memory::align_bytes) {
-                    std::memset(m_buffer.reserve_space(padding), 0, padding);
+                    std::fill_n(m_buffer.reserve_space(padding), padding, 0);
                     if (self) {
                         add_size(padding);
                     } else if (m_parent) {
@@ -123,7 +123,8 @@ namespace osmium {
             }
 
             void add_item(const osmium::memory::Item* item) {
-                std::memcpy(m_buffer.reserve_space(item->padded_size()), item, item->padded_size());
+                unsigned char* target = m_buffer.reserve_space(item->padded_size());
+                std::copy_n(reinterpret_cast<const unsigned char*>(item), item->padded_size(), target);
                 add_size(item->padded_size());
             }
 
@@ -146,7 +147,8 @@ namespace osmium {
              *               \0 byte.
              */
             osmium::memory::item_size_type append(const char* data, const osmium::memory::item_size_type length) {
-                std::memcpy(m_buffer.reserve_space(length), data, length);
+                unsigned char* target = m_buffer.reserve_space(length);
+                std::copy_n(reinterpret_cast<const unsigned char*>(data), length, target);
                 return length;
             }
 

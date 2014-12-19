@@ -33,6 +33,7 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <algorithm>
 #include <cassert>
 #include <cstddef>
 #include <cstring>
@@ -365,9 +366,9 @@ namespace osmium {
              */
             template <class T>
             T& add_item(const T& item) {
-                unsigned char* ptr = reserve_space(item.padded_size());
-                std::memcpy(ptr, &item, item.padded_size());
-                return *reinterpret_cast<T*>(ptr);
+                unsigned char* target = reserve_space(item.padded_size());
+                std::copy_n(reinterpret_cast<const unsigned char*>(&item), item.padded_size(), target);
+                return *reinterpret_cast<T*>(target);
             }
 
             /**
@@ -377,8 +378,8 @@ namespace osmium {
              * commit this data.
              */
             void add_buffer(const Buffer& buffer) {
-                unsigned char* ptr = reserve_space(buffer.committed());
-                std::memcpy(ptr, buffer.data(), buffer.committed());
+                unsigned char* target = reserve_space(buffer.committed());
+                std::copy_n(reinterpret_cast<const unsigned char*>(buffer.data()), buffer.committed(), target);
             }
 
             /**
