@@ -37,5 +37,11 @@ script:
  - cd build
  - cmake -L -DCMAKE_BUILD_TYPE=Dev ..
  - make VERBOSE=1
- - ctest
+ - ctest -V
+
+after_failure:
+ - cd build
+ - cat test/osm-testdata/multipolygon.log
+ - cat test/osm-testdata/compare-areas.log
+
 
