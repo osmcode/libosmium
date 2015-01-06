@@ -25,6 +25,8 @@ install:
  - make
  - sudo make install
  - cd ../..
+ # install 'json' ruby module needed for multipolygon tests
+ - gem install json
 
 #env:
 
