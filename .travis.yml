@@ -26,9 +26,9 @@ install:
  - sudo make install
  - cd ../..
  # install 'json' ruby module needed for multipolygon tests
- - gem1.8 install json
- - gem1.8 which json
- - gem --version
+ - /usr/bin/ruby /usr/bin/gem install json
+ - /usr/bin/ruby /usr/bin/gem which json
+ - /usr/bin/ruby /usr/bin/gem --version
  - ruby --version
  - /usr/bin/env ruby --version
  - /usr/bin/ruby --version
