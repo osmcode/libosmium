@@ -27,6 +27,10 @@ install:
  - cd ../..
  # install 'json' ruby module needed for multipolygon tests
  - gem install json
+ - gem which json
+ - gem --version
+ - ruby --version
+ - /usr/bin/ruby --version
 
 #env:
 
