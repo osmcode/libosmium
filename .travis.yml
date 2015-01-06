@@ -33,16 +33,9 @@ before_script:
 
 script:
  - if [ "${CXX}" = 'g++' ]; then export CXX=g++-4.8; fi;
- - make test
- - cd examples
- - make
-
-#notifications:
-#  irc:
-#    channels:
-#      - ""
-#    use_notice: true
-#  email:
-#    on_success: [never]
-#    on_failure: [change]
+ - mkdir build
+ - cd build
+ - cmake -L -DCMAKE_BUILD_TYPE=Dev ..
+ - make VERBOSE=1
+ - ctest
 
