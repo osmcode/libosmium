@@ -105,7 +105,7 @@ namespace osmium {
         }; // class CRS
 
         /**
-         * Functor that does projection from WGS84 (EPSG:4326) in to the given
+         * Functor that does projection from WGS84 (EPSG:4326) to the given
          * CRS.
          */
         class Projection {
