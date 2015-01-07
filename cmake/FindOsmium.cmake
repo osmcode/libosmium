@@ -276,6 +276,8 @@ endif()
 # libosmium code.
 set(OSMIUM_WARNING_OPTIONS "-Wall -Wextra -pedantic -Wredundant-decls -Wdisabled-optimization -Wctor-dtor-privacy -Wnon-virtual-dtor -Woverloaded-virtual -Wsign-promo -Wold-style-cast -Wno-return-type" CACHE STRING "Recommended warning options for libosmium")
 
+set(OSMIUM_DRACONIC_CLANG_OPTIONS "-Wdocumentation -Wunused-exception-parameter -Wmissing-declarations -Weverything -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-unused-macros -Wno-exit-time-destructors -Wno-global-constructors -Wno-padded -Wno-switch-enum -Wno-missing-prototypes -Wno-weak-vtables -Wno-cast-align -Wno-float-equal")
+
 if(Osmium_DEBUG)
     message(STATUS "OSMIUM_XML_LIBRARIES=" ${OSMIUM_XML_LIBRARIES})
     message(STATUS "OSMIUM_PBF_LIBRARIES=" ${OSMIUM_PBF_LIBRARIES})
