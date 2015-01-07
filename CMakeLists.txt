@@ -130,11 +130,17 @@ else()
     set(CPACK_GENERATOR TGZ)
 endif()
 
+
+#----------------------------------------------------------------------
+#
+#  Set up testing
+#
+#----------------------------------------------------------------------
 enable_testing()
 
-if(BUILD_EXAMPLES)
-    add_subdirectory(examples)
-endif()
+find_program(MEMORYCHECK_COMMAND valgrind)
+set(MEMORYCHECK_COMMAND_OPTIONS "--trace-children=yes --leak-check=full --show-reachable=yes --error-exitcode=1")
+set(MEMORYCHECK_SUPPRESSIONS_FILE "${PROJECT_SOURCE_DIR}/test/valgrind.supp")
 
 if(BUILD_UNIT_TESTS OR BUILD_TESTING)
     add_subdirectory(test)
@@ -142,6 +148,13 @@ endif()
 
 if(BUILD_DATA_TESTS OR BUILD_TESTING)
     add_subdirectory(test/osm-testdata)
+endif()
+
+
+#----------------------------------------------------------------------
+
+if(BUILD_EXAMPLES)
+    add_subdirectory(examples)
 endif()
 
 # This will try to compile include files on their own to detect missing

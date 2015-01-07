@@ -23,6 +23,13 @@
    fun:_dl_start
 }
 {
+   libpoppler_leak
+   Memcheck:Leak
+   fun:malloc
+   fun:gmalloc
+   fun:copyString
+}
+{
    tmpfile
    Memcheck:Leak
    fun:malloc
