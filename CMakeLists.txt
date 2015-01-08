@@ -199,7 +199,7 @@ endif(CPPCHECK)
 #----------------------------------------------------------------------
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
-    configure_file(doc/Doxyfile ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
+    configure_file(doc/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
     add_custom_target(doc
         ${DOXYGEN_EXECUTABLE}
         ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
