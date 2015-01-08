@@ -152,6 +152,45 @@ endif()
 
 
 #----------------------------------------------------------------------
+#
+#  Optional "cppcheck" target that checks C++ code
+#
+#----------------------------------------------------------------------
+message(STATUS "Looking for cppcheck")
+find_program(CPPCHECK cppcheck)
+
+if(CPPCHECK)
+    message(STATUS "Looking for cppcheck - found")
+    set(CPPCHECK_OPTIONS --enable=warning,style,performance,portability,information,missingInclude)
+
+    # cpp doesn't find system includes for some reason, suppress that report
+    set(CPPCHECK_OPTIONS ${CPPCHECK_OPTIONS} --suppress=missingIncludeSystem)
+
+    file(GLOB_RECURSE ALL_INCLUDES   include/osmium/*.hpp)
+    file(GLOB         ALL_EXAMPLES   examples/*.cpp)
+    file(GLOB         ALL_UNIT_TESTS test/t/*/test_*.cpp)
+    file(GLOB         ALL_DATA_TESTS test/osm-testdata/*.cpp)
+
+    message(STATUS "Checking includes      : ${ALL_INCLUDES}")
+    message(STATUS "Checking example code  : ${ALL_EXAMPLES}")
+    message(STATUS "Checking unit test code: ${ALL_UNIT_TESTS}")
+    message(STATUS "Checking data test code: ${ALL_DATA_TESTS}")
+
+    set(CPPCHECK_FILES ${ALL_INCLUDES} ${ALL_EXAMPLES} ${ALL_UNIT_TESTS} ${ALL_DATA_TESTS})
+
+    add_custom_target(
+        cppcheck ${CPPCHECK}
+        --std=c++11 ${CPPCHECK_OPTIONS}
+        -I ${CMAKE_SOURCE_DIR}/include
+        ${CPPCHECK_FILES}
+    )
+else()
+    message(STATUS "Looking for cppcheck - not found")
+    message(STATUS "  Make target cppcheck not available")
+endif(CPPCHECK)
+
+
+#----------------------------------------------------------------------
 
 if(BUILD_EXAMPLES)
     add_subdirectory(examples)
