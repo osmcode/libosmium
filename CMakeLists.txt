@@ -20,7 +20,7 @@ set(LIBOSMIUM_VERSION_MAJOR 0)
 set(LIBOSMIUM_VERSION_MINOR 0)
 set(LIBOSMIUM_VERSION_PATCH 1)
 
-set(LIBOSMIUM_VERSION ${OSMIUM_VERSION_MAJOR}.${OSMIUM_VERSION_MINOR}.${OSMIUM_VERSION_PATCH})
+set(LIBOSMIUM_VERSION ${LIBOSMIUM_VERSION_MAJOR}.${LIBOSMIUM_VERSION_MINOR}.${LIBOSMIUM_VERSION_PATCH})
 
 
 #----------------------------------------------------------------------
@@ -180,8 +180,8 @@ if(CPPCHECK)
 
     set(CPPCHECK_FILES ${ALL_INCLUDES} ${ALL_EXAMPLES} ${ALL_UNIT_TESTS} ${ALL_DATA_TESTS})
 
-    add_custom_target(
-        cppcheck ${CPPCHECK}
+    add_custom_target(cppcheck
+        ${CPPCHECK}
         --std=c++11 ${CPPCHECK_OPTIONS}
         -I ${CMAKE_SOURCE_DIR}/include
         ${CPPCHECK_FILES}
@@ -218,6 +218,7 @@ if(BUILD_EXAMPLES)
     add_subdirectory(examples)
 endif()
 
+#----------------------------------------------------------------------
 # This will try to compile include files on their own to detect missing
 # include directives and other dependency-related problems. Note that if this
 # work, it is not enough to be sure it will compile in production code.
@@ -253,5 +254,6 @@ install(DIRECTORY include/osmium DESTINATION include)
 # don't have it. We probably don't want to install it.
 #install(FILES include/boost_unicode_iterator.hpp DESTINATION include)
 
+#----------------------------------------------------------------------
 include(CPack)
 
