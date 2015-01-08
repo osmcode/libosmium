@@ -248,7 +248,10 @@ if(BUILD_HEADERS)
 endif()
 
 install(DIRECTORY include/osmium DESTINATION include)
-install(FILES include/boost_unicode_iterator.hpp DESTINATION include)
+
+# We only have a copy of this file so we can use older boost versions which
+# don't have it. We probably don't want to install it.
+#install(FILES include/boost_unicode_iterator.hpp DESTINATION include)
 
 include(CPack)
 
