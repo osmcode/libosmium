@@ -171,10 +171,12 @@ if(CPPCHECK)
     file(GLOB         ALL_UNIT_TESTS test/t/*/test_*.cpp)
     file(GLOB         ALL_DATA_TESTS test/osm-testdata/*.cpp)
 
-    message(STATUS "Checking includes      : ${ALL_INCLUDES}")
-    message(STATUS "Checking example code  : ${ALL_EXAMPLES}")
-    message(STATUS "Checking unit test code: ${ALL_UNIT_TESTS}")
-    message(STATUS "Checking data test code: ${ALL_DATA_TESTS}")
+    if(Osmium_DEBUG)
+        message(STATUS "Checking includes      : ${ALL_INCLUDES}")
+        message(STATUS "Checking example code  : ${ALL_EXAMPLES}")
+        message(STATUS "Checking unit test code: ${ALL_UNIT_TESTS}")
+        message(STATUS "Checking data test code: ${ALL_DATA_TESTS}")
+    endif()
 
     set(CPPCHECK_FILES ${ALL_INCLUDES} ${ALL_EXAMPLES} ${ALL_UNIT_TESTS} ${ALL_DATA_TESTS})
 
