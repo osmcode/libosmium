@@ -47,7 +47,6 @@ SECTION("changeset_builder") {
     REQUIRE(std::string("user") == cs2.user());
 
     REQUIRE(cs1 != cs2);
-    REQUIRE(cs1 == cs1);
 
     REQUIRE(cs1 < cs2);
     REQUIRE(cs1 <= cs2);

@@ -19,7 +19,6 @@ TEST_CASE("Purge data from buffer") {
     constexpr size_t buffer_size = 10000;
 
     SECTION("purge empty buffer") {
-        unsigned char data[buffer_size];
         osmium::memory::Buffer buffer(buffer_size);
         REQUIRE(std::distance(buffer.begin(), buffer.end()) == 0);
 
@@ -31,7 +30,6 @@ TEST_CASE("Purge data from buffer") {
     }
 
     SECTION("purge buffer with one object but nothing to delete") {
-        unsigned char data[buffer_size];
         osmium::memory::Buffer buffer(buffer_size);
 
         {
@@ -51,7 +49,6 @@ TEST_CASE("Purge data from buffer") {
     }
 
     SECTION("purge buffer with one object which gets deleted") {
-        unsigned char data[buffer_size];
         osmium::memory::Buffer buffer(buffer_size);
 
         {
@@ -71,7 +68,6 @@ TEST_CASE("Purge data from buffer") {
     }
 
     SECTION("purge buffer with two objects, first gets deleted") {
-        unsigned char data[buffer_size];
         osmium::memory::Buffer buffer(buffer_size);
 
         {
@@ -98,7 +94,6 @@ TEST_CASE("Purge data from buffer") {
     }
 
     SECTION("purge buffer with two objects, second gets deleted") {
-        unsigned char data[buffer_size];
         osmium::memory::Buffer buffer(buffer_size);
 
         {
@@ -125,7 +120,6 @@ TEST_CASE("Purge data from buffer") {
     }
 
     SECTION("purge buffer with three objects, middle one gets deleted") {
-        unsigned char data[buffer_size];
         osmium::memory::Buffer buffer(buffer_size);
 
         {
@@ -157,7 +151,6 @@ TEST_CASE("Purge data from buffer") {
     }
 
     SECTION("purge buffer with three objects, all get deleted") {
-        unsigned char data[buffer_size];
         osmium::memory::Buffer buffer(buffer_size);
 
         {
