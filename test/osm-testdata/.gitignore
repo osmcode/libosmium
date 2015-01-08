@@ -1,12 +1,1 @@
-testdata-overview
-testdata-overview.db
-testdata-multipolygon
-testdata-xml
-multipolygon.db
-multipolygon.log
 multipolygon.qgs~
-multipolygon-tests.json
-testdata-testcases
-testdata-testcases.o
-testcases/test-*.o
-compare-areas.log
