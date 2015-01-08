@@ -106,7 +106,7 @@ libraries from source. Most libraries should be available in all distributions.
 
 * test: Tests (see below).
 
-* doc: This is where the documentation will be build, call "make doc" to build.
+* doc: Config for documentation.
 
 
 ## Building
@@ -114,13 +114,25 @@ libraries from source. Most libraries should be available in all distributions.
 Osmium is a header-only library, so there is nothing to build for the
 library itself.
 
-Call "make doc" in the top-level directory to build the Osmium C++ docs.
+But there are some tests and examples that can be build. Libosmium uses
+cmake:
 
-Call "make install" to install the include files and documentation.
+    mkdir build
+    cd build
+    cmake ..
+    make
 
-Call "make clean" to clean up.
+This will build the examples and tests. Call `ctest` to run the tests.
 
-To build the examples go to the "examples" directory and type "make".
+To build the documentation you need Doxygen. If cmake can find it it will
+enable the `doc` target so you can build the documentation like this:
+
+    make doc
+
+If the 'cppcheck' binary is found, cmake will add another target to the
+Makfile which allows you to call cppheck on all `*.cpp` and `*.hpp` files:
+
+    make cppcheck
 
 For Mac users: If you have clang 3.2 or newer, use the system compiler.
 If not you have to build the compiler yourself. See the instructions
@@ -128,13 +140,10 @@ on http://clang.llvm.org/ .
 
 Preliminary support for cmake is provided. You can use this instead of "make":
 
-    mkdir build
-    cd build
-    cmake ..
-    make
-
 
 ## Testing
+
+### Unit Tests
 
 There are a few unit tests using the Catch unit test framework in the "test"
 directory. Many more tests are needed, any help appreciated.
@@ -142,21 +151,34 @@ directory. Many more tests are needed, any help appreciated.
 For [Catch](https://github.com/philsquared/Catch/) only one header file is
 needed which is included (`test/include/catch.hpp`).
 
-Run "make test" from the main directory or go to the "test" directory and type
+To compile these unit tests make sure `BUILD_UNIT_TESTS` is set in the cmake
+config, then build the project and call
 
-    ./run_tests.sh
+    ctest
 
-to compile and run the tests. You can run a single test by calling
+You can run tests matching a pattern by calling
 
-    ./run_test.sh TESTFILE
+    ctest -R test_name
 
 for instance:
 
-    ./run_test.sh t/basic/test_node.cpp
+    ctest basic_test_node
+
+will run the `basic_test_node` and `basic_test_node_ref` tests.
+
+### Data Tests
 
 In addition there are some test based on the OSM Test Data Repository at
-http://osmcode.org/osm-testdata/ . Go into the test/osm-testdata directory
-and type 'make' to run them all.
+http://osmcode.org/osm-testdata/ . Make sure `BUILD_DATA_TESTS` is set in the
+cmake config, then build the project and call `ctest`.
+
+Some of these tests need Ruby and then 'json' gem installed.
+
+### Valgrind
+
+Running tests with valgrind:
+
+    ctest -D ExperimentalMemCheck
 
 
 ## Switching from the old Osmium
