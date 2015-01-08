@@ -33,8 +33,6 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#define OSMIUM_LINK_WITH_LIBS_ZLIB -lz
-
 #include <memory>
 #include <stdexcept>
 #include <string>

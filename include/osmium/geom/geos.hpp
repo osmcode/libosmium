@@ -33,9 +33,6 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#define OSMIUM_COMPILE_WITH_CFLAGS_GEOS `geos-config --cflags`
-#define OSMIUM_LINK_WITH_LIBS_GEOS `geos-config --libs`
-
 #include <utility>
 
 #include <geos/geom/Coordinate.h>

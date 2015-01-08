@@ -33,9 +33,6 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#define OSMIUM_COMPILE_WITH_CFLAGS_OGR `gdal-config --cflags`
-#define OSMIUM_LINK_WITH_LIBS_OGR `gdal-config --libs`
-
 #pragma GCC diagnostic push
 #ifdef __clang__
 # pragma GCC diagnostic ignored "-Wdocumentation-unknown-command"
