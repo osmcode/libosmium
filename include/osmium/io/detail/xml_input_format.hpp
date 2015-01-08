@@ -671,7 +671,7 @@ namespace osmium {
                  * @param input_queue String queue where data is read from.
                  */
                 explicit XMLInputFormat(const osmium::io::File& file, osmium::osm_entity_bits::type read_which_entities, osmium::thread::Queue<std::string>& input_queue) :
-                    osmium::io::detail::InputFormat(file, read_which_entities, input_queue),
+                    osmium::io::detail::InputFormat(file, read_which_entities),
                     m_queue(max_queue_size, "xml_parser_results"),
                     m_done(false),
                     m_header_promise(),

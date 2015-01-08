@@ -181,7 +181,7 @@ namespace osmium {
                  * @param input_queue String queue where data is read from.
                  */
                 PBFInputFormat(const osmium::io::File& file, osmium::osm_entity_bits::type read_which_entities, osmium::thread::Queue<std::string>& input_queue) :
-                    osmium::io::detail::InputFormat(file, read_which_entities, input_queue),
+                    osmium::io::detail::InputFormat(file, read_which_entities),
                     m_use_thread_pool(osmium::config::use_pool_threads_for_pbf_parsing()),
                     m_queue(20, "pbf_parser_results"), // XXX
                     m_done(false),

@@ -69,13 +69,11 @@ namespace osmium {
 
                 osmium::io::File m_file;
                 osmium::osm_entity_bits::type m_read_which_entities;
-                osmium::thread::Queue<std::string>& m_input_queue;
                 osmium::io::Header m_header;
 
-                explicit InputFormat(const osmium::io::File& file, osmium::osm_entity_bits::type read_which_entities, osmium::thread::Queue<std::string>& input_queue) :
+                explicit InputFormat(const osmium::io::File& file, osmium::osm_entity_bits::type read_which_entities) :
                     m_file(file),
-                    m_read_which_entities(read_which_entities),
-                    m_input_queue(input_queue) {
+                    m_read_which_entities(read_which_entities) {
                     m_header.set_has_multiple_object_versions(m_file.has_multiple_object_versions());
                 }
 
