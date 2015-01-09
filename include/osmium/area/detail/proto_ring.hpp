@@ -155,7 +155,7 @@ namespace osmium {
                     m_inner.push_back(ring);
                 }
 
-                const std::vector<ProtoRing*> inner_rings() const {
+                const std::vector<ProtoRing*>& inner_rings() const {
                     return m_inner;
                 }
 
