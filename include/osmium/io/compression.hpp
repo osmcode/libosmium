@@ -235,22 +235,24 @@ namespace osmium {
             }
 
             std::string read() override final {
+                std::string buffer;
+
                 if (m_buffer) {
-                    if (m_buffer_size == 0) {
-                        return std::string();
+                    if (m_buffer_size != 0) {
+                        size_t size = m_buffer_size;
+                        m_buffer_size = 0;
+                        buffer.append(m_buffer, size);
                     }
-                    size_t size = m_buffer_size;
-                    m_buffer_size = 0;
-                    return std::string(m_buffer, size);
                 } else {
-                    std::string buffer(osmium::io::Decompressor::input_buffer_size, '\0');
+                    buffer.resize(osmium::io::Decompressor::input_buffer_size);
                     ssize_t nread = ::read(m_fd, const_cast<char*>(buffer.data()), buffer.size());
                     if (nread < 0) {
                         throw std::system_error(errno, std::system_category(), "Read failed");
                     }
                     buffer.resize(static_cast<size_t>(nread));
-                    return buffer;
                 }
+
+                return buffer;
             }
 
             void close() override final {

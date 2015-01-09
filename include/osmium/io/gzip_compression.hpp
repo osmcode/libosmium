@@ -190,30 +190,31 @@ namespace osmium {
             }
 
             std::string read() override final {
-                if (!m_buffer) {
-                    return std::string();
-                }
+                std::string output;
 
-                const size_t buffer_size = 10240;
-                std::string output(buffer_size, '\0');
-                m_zstream.next_out = reinterpret_cast<unsigned char*>(const_cast<char*>(output.data()));
-                m_zstream.avail_out = buffer_size;
-                int result = inflate(&m_zstream, Z_SYNC_FLUSH);
+                if (m_buffer) {
+                    const size_t buffer_size = 10240;
+                    output.append(buffer_size, '\0');
+                    m_zstream.next_out = reinterpret_cast<unsigned char*>(const_cast<char*>(output.data()));
+                    m_zstream.avail_out = buffer_size;
+                    int result = inflate(&m_zstream, Z_SYNC_FLUSH);
 
-                if (result != Z_OK) {
-                    m_buffer = nullptr;
-                    m_buffer_size = 0;
-                }
-
-                if (result != Z_OK && result != Z_STREAM_END) {
-                    std::string message("gzip error: inflate failed: ");
-                    if (m_zstream.msg) {
-                        message.append(m_zstream.msg);
+                    if (result != Z_OK) {
+                        m_buffer = nullptr;
+                        m_buffer_size = 0;
                     }
-                    throw osmium::gzip_error(message, result);
+
+                    if (result != Z_OK && result != Z_STREAM_END) {
+                        std::string message("gzip error: inflate failed: ");
+                        if (m_zstream.msg) {
+                            message.append(m_zstream.msg);
+                        }
+                        throw osmium::gzip_error(message, result);
+                    }
+
+                    output.resize(static_cast<unsigned long>(m_zstream.next_out - reinterpret_cast<const unsigned char*>(output.data())));
                 }
 
-                output.resize(static_cast<unsigned long>(m_zstream.next_out - reinterpret_cast<const unsigned char*>(output.data())));
                 return output;
             }
 

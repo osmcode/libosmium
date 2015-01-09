@@ -73,7 +73,7 @@ namespace osmium {
                 std::copy_n(reinterpret_cast<char*>(&data), sizeof(T), &str[size]);
             }
 
-            inline std::string convert_to_hex(std::string& str) {
+            inline std::string convert_to_hex(const std::string& str) {
                 static const char* lookup_hex = "0123456789ABCDEF";
                 std::string out;
 

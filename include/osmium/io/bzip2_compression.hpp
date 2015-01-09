@@ -156,37 +156,39 @@ namespace osmium {
             }
 
             std::string read() override final {
-                if (m_stream_end) {
-                    return std::string();
-                }
-                std::string buffer(osmium::io::Decompressor::input_buffer_size, '\0');
-                int error;
-                int nread = ::BZ2_bzRead(&error, m_bzfile, const_cast<char*>(buffer.data()), static_cast_with_assert<int>(buffer.size()));
-                if (error != BZ_OK && error != BZ_STREAM_END) {
-                    detail::throw_bzip2_error(m_bzfile, "read failed", error);
-                }
-                if (error == BZ_STREAM_END) {
-                    void* unused;
-                    int nunused;
-                    if (! feof(m_file)) {
-                        ::BZ2_bzReadGetUnused(&error, m_bzfile, &unused, &nunused);
-                        if (error != BZ_OK) {
-                            detail::throw_bzip2_error(m_bzfile, "get unused failed", error);
-                        }
-                        std::string unused_data(static_cast<const char*>(unused), static_cast<std::string::size_type>(nunused));
-                        ::BZ2_bzReadClose(&error, m_bzfile);
-                        if (error != BZ_OK) {
-                            detail::throw_bzip2_error(m_bzfile, "read close failed", error);
-                        }
-                        m_bzfile = ::BZ2_bzReadOpen(&error, m_file, 0, 0, const_cast<void*>(static_cast<const void*>(unused_data.data())), static_cast_with_assert<int>(unused_data.size()));
-                        if (error != BZ_OK) {
-                            detail::throw_bzip2_error(m_bzfile, "read open failed", error);
-                        }
-                    } else {
-                        m_stream_end = true;
+                std::string buffer;
+
+                if (!m_stream_end) {
+                    buffer.resize(osmium::io::Decompressor::input_buffer_size);
+                    int error;
+                    int nread = ::BZ2_bzRead(&error, m_bzfile, const_cast<char*>(buffer.data()), static_cast_with_assert<int>(buffer.size()));
+                    if (error != BZ_OK && error != BZ_STREAM_END) {
+                        detail::throw_bzip2_error(m_bzfile, "read failed", error);
                     }
+                    if (error == BZ_STREAM_END) {
+                        void* unused;
+                        int nunused;
+                        if (! feof(m_file)) {
+                            ::BZ2_bzReadGetUnused(&error, m_bzfile, &unused, &nunused);
+                            if (error != BZ_OK) {
+                                detail::throw_bzip2_error(m_bzfile, "get unused failed", error);
+                            }
+                            std::string unused_data(static_cast<const char*>(unused), static_cast<std::string::size_type>(nunused));
+                            ::BZ2_bzReadClose(&error, m_bzfile);
+                            if (error != BZ_OK) {
+                                detail::throw_bzip2_error(m_bzfile, "read close failed", error);
+                            }
+                            m_bzfile = ::BZ2_bzReadOpen(&error, m_file, 0, 0, const_cast<void*>(static_cast<const void*>(unused_data.data())), static_cast_with_assert<int>(unused_data.size()));
+                            if (error != BZ_OK) {
+                                detail::throw_bzip2_error(m_bzfile, "read open failed", error);
+                            }
+                        } else {
+                            m_stream_end = true;
+                        }
+                    }
+                    buffer.resize(static_cast<std::string::size_type>(nread));
                 }
-                buffer.resize(static_cast<std::string::size_type>(nread));
+
                 return buffer;
             }
 
@@ -232,27 +234,28 @@ namespace osmium {
             }
 
             std::string read() override final {
-                if (!m_buffer) {
-                    return std::string();
+                std::string output;
+
+                if (m_buffer) {
+                    const size_t buffer_size = 10240;
+                    output.resize(buffer_size);
+                    m_bzstream.next_out = const_cast<char*>(output.data());
+                    m_bzstream.avail_out = buffer_size;
+                    int result = BZ2_bzDecompress(&m_bzstream);
+
+                    if (result != BZ_OK) {
+                        m_buffer = nullptr;
+                        m_buffer_size = 0;
+                    }
+
+                    if (result != BZ_OK && result != BZ_STREAM_END) {
+                        std::string message("bzip2 error: decompress failed: ");
+                        throw bzip2_error(message, result);
+                    }
+
+                    output.resize(static_cast<unsigned long>(m_bzstream.next_out - output.data()));
                 }
 
-                const size_t buffer_size = 10240;
-                std::string output(buffer_size, '\0');
-                m_bzstream.next_out = const_cast<char*>(output.data());
-                m_bzstream.avail_out = buffer_size;
-                int result = BZ2_bzDecompress(&m_bzstream);
-
-                if (result != BZ_OK) {
-                    m_buffer = nullptr;
-                    m_buffer_size = 0;
-                }
-
-                if (result != BZ_OK && result != BZ_STREAM_END) {
-                    std::string message("bzip2 error: decompress failed: ");
-                    throw bzip2_error(message, result);
-                }
-
-                output.resize(static_cast<unsigned long>(m_bzstream.next_out - output.data()));
                 return output;
             }
 
