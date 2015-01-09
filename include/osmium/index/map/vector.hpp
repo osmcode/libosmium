@@ -54,6 +54,11 @@ namespace osmium {
 
             public:
 
+                typedef TValue element_type;
+                typedef TVector vector_type;
+                typedef typename vector_type::iterator iterator;
+                typedef typename vector_type::const_iterator const_iterator;
+
                 VectorBasedDenseMap() :
                     m_vector() {
                 }
@@ -98,6 +103,30 @@ namespace osmium {
                 void clear() override final {
                     m_vector.clear();
                     m_vector.shrink_to_fit();
+                }
+
+                iterator begin() {
+                    return m_vector.begin();
+                }
+
+                iterator end() {
+                    return m_vector.end();
+                }
+
+                const_iterator cbegin() const {
+                    return m_vector.cbegin();
+                }
+
+                const_iterator cend() const {
+                    return m_vector.cend();
+                }
+
+                const_iterator begin() const {
+                    return m_vector.cbegin();
+                }
+
+                const_iterator end() const {
+                    return m_vector.cend();
                 }
 
             }; // class VectorBasedDenseMap
