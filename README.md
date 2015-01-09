@@ -181,6 +181,21 @@ Running tests with valgrind:
     ctest -D ExperimentalMemCheck
 
 
+## Osmium on 32bit Machines
+
+Osmium works well on 64 bit machines, but on 32 bit machines there are some
+problems. Be aware that not everything will work on 32 bit architectures.
+This is mostly due to the 64 bit needed for node IDs. Also Osmium hasn't been
+tested well on 32 bit systems. Here are some issues you might run into:
+
+* Google Sparsehash does not work on 32 bit machines in our use case.
+* The `mmap` system call is called with a `size_t` argument, so it can't
+  give you more than 4GByte of memory on 32 bit systems. This might be a
+  problem.
+
+Please report any issues you have and we might be able to solve them.
+
+
 ## Switching from the old Osmium
 
 See `README-changes-from-old-osmium`.
