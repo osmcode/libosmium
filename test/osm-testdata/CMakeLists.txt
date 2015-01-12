@@ -1,10 +1,8 @@
 message(STATUS "Configuring osm-testdata tests...")
 
 if(NOT GDAL_FOUND OR
-   NOT OSMPBF_FOUND OR
-   NOT PROTOBUF_FOUND OR
    NOT EXPAT_FOUND)
-    message("Sorry, building osm-testdata tests needs GDAL, Expat, Protobuf and OSMPBF")
+    message("Sorry, building osm-testdata tests needs GDAL and Expat")
     return()
 endif()
 
@@ -29,7 +27,7 @@ endif()
 file(GLOB TESTCASE_CPPS testcases/*.cpp)
 add_executable(testdata-testcases testdata-testcases.cpp ${TESTCASE_CPPS})
 target_link_libraries(testdata-testcases
-                      ${OSMIUM_IO_LIBRARIES}
+                      ${OSMIUM_XML_LIBRARIES}
 )
 add_test(NAME testdata-testcases
          COMMAND testdata-testcases
@@ -41,7 +39,7 @@ set_tests_properties(testdata-testcases
 
 add_executable(testdata-overview testdata-overview.cpp)
 target_link_libraries(testdata-overview
-                      ${OSMIUM_IO_LIBRARIES}
+                      ${OSMIUM_XML_LIBRARIES}
                       ${GDAL_LIBRARIES}
 )
 add_test(NAME testdata-overview
