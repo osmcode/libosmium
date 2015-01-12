@@ -5,7 +5,7 @@
 
 This file is part of Osmium (http://osmcode.org/libosmium).
 
-Copyright 2013,2014 Jochen Topf <jochen@topf.org> and others (see README).
+Copyright 2013-2015 Jochen Topf <jochen@topf.org> and others (see README).
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -37,6 +37,9 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/index/map/vector.hpp>
 #include <osmium/index/detail/mmap_vector_anon.hpp>
+
+#define OSMIUM_HAS_INDEX_MAP_DENSE_MAP_MMAP
+#define OSMIUM_HAS_INDEX_MAP_SPARSE_MAP_MMAP
 
 namespace osmium {
 

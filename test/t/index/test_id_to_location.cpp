@@ -10,6 +10,8 @@
 #include <osmium/index/map/mmap_vector_anon.hpp>
 #include <osmium/index/map/mmap_vector_file.hpp>
 
+#include <osmium/index/node_locations_map.hpp>
+
 template <typename TIndex>
 void test_func_all(TIndex& index) {
     osmium::unsigned_object_id_type id1 = 12;
@@ -137,6 +139,24 @@ SECTION("SparseMapMem") {
 
     index_type index2;
     test_func_real<index_type>(index2);
+}
+
+SECTION("Dynamic map choice") {
+    typedef osmium::index::map::Map<osmium::unsigned_object_id_type, osmium::Location> map_type;
+    const auto& map_factory = osmium::index::MapFactory<osmium::unsigned_object_id_type, osmium::Location>::instance();
+
+    std::vector<std::string> map_type_names = map_factory.map_types();
+    REQUIRE(map_type_names.size() >= 5);
+
+    for (const auto& map_type_name : map_type_names) {
+        std::unique_ptr<map_type> index1 = map_factory.create_map(map_type_name);
+        index1->reserve(1000);
+        test_func_all<map_type>(*index1);
+
+        std::unique_ptr<map_type> index2 = map_factory.create_map(map_type_name);
+        index2->reserve(1000);
+        test_func_real<map_type>(*index2);
+    }
 }
 
 }
