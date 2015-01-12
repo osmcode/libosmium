@@ -35,8 +35,8 @@ DEALINGS IN THE SOFTWARE.
 
 #ifdef __linux__
 
-#include <osmium/index/map/vector.hpp>
 #include <osmium/index/detail/mmap_vector_anon.hpp>
+#include <osmium/index/detail/vector_map.hpp>
 
 #define OSMIUM_HAS_INDEX_MAP_DENSE_MAP_MMAP
 #define OSMIUM_HAS_INDEX_MAP_SPARSE_MAP_MMAP

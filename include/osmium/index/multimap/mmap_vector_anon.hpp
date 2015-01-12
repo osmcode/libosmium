@@ -35,8 +35,8 @@ DEALINGS IN THE SOFTWARE.
 
 #ifdef __linux__
 
-#include <osmium/index/multimap/vector.hpp>
 #include <osmium/index/detail/mmap_vector_anon.hpp>
+#include <osmium/index/detail/vector_multimap.hpp>
 
 namespace osmium {
 

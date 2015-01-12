@@ -1,5 +1,5 @@
-#ifndef OSMIUM_INDEX_MAP_VECTOR_HPP
-#define OSMIUM_INDEX_MAP_VECTOR_HPP
+#ifndef OSMIUM_INDEX_DETAIL_VECTOR_MAP_HPP
+#define OSMIUM_INDEX_DETAIL_VECTOR_MAP_HPP
 
 /*
 
@@ -234,4 +234,4 @@ namespace osmium {
 
 } // namespace osmium
 
-#endif // OSMIUM_INDEX_MAP_VECTOR_HPP
+#endif // OSMIUM_INDEX_DETAIL_VECTOR_MAP_HPP

@@ -1,11 +1,11 @@
-#ifndef OSMIUM_INDEX_MULTIMAP_VECTOR_HPP
-#define OSMIUM_INDEX_MULTIMAP_VECTOR_HPP
+#ifndef OSMIUM_INDEX_DETAIL_VECTOR_MULTIMAP_HPP
+#define OSMIUM_INDEX_DETAIL_VECTOR_MULTIMAP_HPP
 
 /*
 
 This file is part of Osmium (http://osmcode.org/libosmium).
 
-Copyright 2013,2014 Jochen Topf <jochen@topf.org> and others (see README).
+Copyright 2013-2015 Jochen Topf <jochen@topf.org> and others (see README).
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -148,4 +148,4 @@ namespace osmium {
 
 } // namespace osmium
 
-#endif // OSMIUM_INDEX_MULTIMAP_VECTOR_HPP
+#endif // OSMIUM_INDEX_DETAIL_VECTOR_MULTIMAP_HPP
