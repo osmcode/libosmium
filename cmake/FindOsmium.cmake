@@ -121,14 +121,14 @@ if(Osmium_USE_PBF)
             ${ZLIB_LIBRARIES}
             ${CMAKE_THREAD_LIBS_INIT}
         )
+        if(WIN32)
+            list(APPEND OSMIUM_PBF_LIBRARIES ws2_32)
+        endif()
         list(APPEND OSMIUM_INCLUDE_DIRS
             ${OSMPBF_INCLUDE_DIRS}
             ${PROTOBUF_INCLUDE_DIR}
             ${ZLIB_INCLUDE_DIR}
         )
-        if(WIN32)
-            list(APPEND OSMIUM_LIBRARIES ws2_32)
-        endif()
     else()
         set(_missing_libraries 1)
         message(WARNING "Osmium: Can not find some libraries for PBF input/output, please install them or configure the paths.")
@@ -155,9 +155,6 @@ if(Osmium_USE_XML)
             ${BZIP2_INCLUDE_DIR}
             ${ZLIB_INCLUDE_DIR}
         )
-        if(WIN32)
-            list(APPEND OSMIUM_LIBRARIES ws2_32)
-        endif()
     else()
         set(_missing_libraries 1)
         message(WARNING "Osmium: Can not find some libraries for XML input/output, please install them or configure the paths.")
