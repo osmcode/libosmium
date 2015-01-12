@@ -244,7 +244,7 @@ if(BUILD_HEADERS)
 
         # There is no way in CMake to just compile but not link a C++ file,
         # so we pretend to build a library here.
-        add_library(${libname} STATIC ${DUMMYCPP} include/${hpp})
+        add_library(${libname} OBJECT ${DUMMYCPP} include/${hpp})
     endforeach()
 endif()
 

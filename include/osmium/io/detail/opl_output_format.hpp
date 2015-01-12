@@ -189,8 +189,16 @@ namespace osmium {
                 OPLOutputBlock(const OPLOutputBlock&) = delete;
                 OPLOutputBlock& operator=(const OPLOutputBlock&) = delete;
 
-                OPLOutputBlock(OPLOutputBlock&&) = default;
-                OPLOutputBlock& operator=(OPLOutputBlock&&) = default;
+                OPLOutputBlock(OPLOutputBlock&& other) :
+                    m_input_buffer(std::move(other.m_input_buffer)),
+                    m_out(),
+                    m_tmp_buffer() {
+                }
+
+                OPLOutputBlock& operator=(OPLOutputBlock&& other) {
+                    m_input_buffer = std::move(other.m_input_buffer);
+                    return *this;
+                }
 
                 std::string operator()() {
                     osmium::apply(m_input_buffer.cbegin(), m_input_buffer.cend(), *this);

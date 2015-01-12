@@ -49,6 +49,7 @@ endif()
 set(OGR_EXAMPLES
     osmium_toogr
     osmium_toogr2
+    osmium_toogr2_exp
 )
 
 if(GDAL_FOUND AND GEOS_FOUND AND SPARSEHASH_FOUND)

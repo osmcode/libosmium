@@ -37,6 +37,8 @@ DEALINGS IN THE SOFTWARE.
 #include <cassert>
 #include <cmath>
 #include <cstdio>
+#include <iterator>
+#include <string>
 
 namespace osmium {
 
