@@ -102,6 +102,7 @@ add_unit_test(tags test_tag_list)
 
 add_unit_test(util test_double)
 add_unit_test(util test_options)
+add_unit_test(util test_string)
 
 #----------------------------------------------------------------------
 #
