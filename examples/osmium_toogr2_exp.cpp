@@ -310,14 +310,8 @@ int main(int argc, char* argv[]) {
 
     MyOGRHandler ogr_handler(output_format, output_filename);
 
-    while (true) {
-        auto buffers = exr.read();
-        if (buffers.empty()) {
-            break;
-        }
-        for (const auto& buffer : buffers) {
-            osmium::apply(buffer, ogr_handler);
-        }
+    while (auto buffer = exr.read()) {
+        osmium::apply(buffer, ogr_handler);
     }
 
     exr.close();

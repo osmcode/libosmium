@@ -87,23 +87,26 @@ namespace osmium {
                 FlexReader(osmium::io::File(filename), entities) {
             }
 
-            std::vector<osmium::memory::Buffer> read() {
-                std::vector<osmium::memory::Buffer> buffers;
+            osmium::memory::Buffer read() {
+                std::vector<osmium::memory::Buffer> area_buffers;
 
                 osmium::memory::Buffer buffer = m_reader.read();
 
                 if (buffer) {
-                    buffers.push_back(std::move(buffer));
                     if (m_with_areas) {
-                        osmium::apply(buffers[0], m_location_handler, m_collector.handler([&buffers](osmium::memory::Buffer&& area_buffer) {
-                            buffers.push_back(std::move(area_buffer));
+                        osmium::apply(buffer, m_location_handler, m_collector.handler([&area_buffers](osmium::memory::Buffer&& area_buffer) {
+                            area_buffers.push_back(std::move(area_buffer));
                         }));
+                        for (const osmium::memory::Buffer& b : area_buffers) {
+                            buffer.add_buffer(b);
+                            buffer.commit();
+                        }
                     } else if (m_entities & (osmium::osm_entity_bits::node | osmium::osm_entity_bits::way)) {
-                        osmium::apply(buffers[0], m_location_handler);
+                        osmium::apply(buffer, m_location_handler);
                     }
                 }
 
-                return buffers;
+                return buffer;
             }
 
             osmium::io::Header header() const {
