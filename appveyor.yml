@@ -25,7 +25,7 @@ clone_folder: c:\projects\libosmium
 platform: x64
 
 install:
-  - ""C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat"" amd64
+  - CALL "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" amd64
   - patch -N -p1 < libosmium.diff
   - SET LODEPSDIR=c:\projects\libosmium\libosmium-deps
   - SET LIBBZIP2=%LODEPSDIR%\bzip2\lib\libbz2.lib
