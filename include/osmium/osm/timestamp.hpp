@@ -101,7 +101,7 @@ namespace osmium {
             tm.tm_wday = 0;
             tm.tm_yday = 0;
             tm.tm_isdst = 0;
-            m_timestamp = _mkgmtime(&tm);
+            m_timestamp = static_cast<uint32_t>(_mkgmtime(&tm));
 #endif
         }
 
