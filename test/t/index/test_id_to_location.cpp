@@ -3,12 +3,15 @@
 #include <osmium/osm/types.hpp>
 #include <osmium/osm/location.hpp>
 
+#include <osmium/index/map/dense_file_array.hpp>
+#include <osmium/index/map/dense_mem_array.hpp>
+#include <osmium/index/map/dense_mmap_array.hpp>
 #include <osmium/index/map/dummy.hpp>
-#include <osmium/index/map/sparse_table.hpp>
-#include <osmium/index/map/stl_map.hpp>
-#include <osmium/index/map/stl_vector.hpp>
-#include <osmium/index/map/mmap_vector_anon.hpp>
-#include <osmium/index/map/mmap_vector_file.hpp>
+#include <osmium/index/map/sparse_file_array.hpp>
+#include <osmium/index/map/sparse_mem_array.hpp>
+#include <osmium/index/map/sparse_mem_map.hpp>
+#include <osmium/index/map/sparse_mem_table.hpp>
+#include <osmium/index/map/sparse_mmap_array.hpp>
 
 #include <osmium/index/node_locations_map.hpp>
 
@@ -69,8 +72,8 @@ SECTION("Dummy") {
     REQUIRE(0 == index1.used_memory());
 }
 
-SECTION("DenseMapMem") {
-    typedef osmium::index::map::DenseMapMem<osmium::unsigned_object_id_type, osmium::Location> index_type;
+SECTION("DenseMemArray") {
+    typedef osmium::index::map::DenseMemArray<osmium::unsigned_object_id_type, osmium::Location> index_type;
 
     index_type index1;
     index1.reserve(1000);
@@ -82,8 +85,8 @@ SECTION("DenseMapMem") {
 }
 
 #ifdef __linux__
-SECTION("DenseMapMmap") {
-    typedef osmium::index::map::DenseMapMmap<osmium::unsigned_object_id_type, osmium::Location> index_type;
+SECTION("DenseMmapArray") {
+    typedef osmium::index::map::DenseMmapArray<osmium::unsigned_object_id_type, osmium::Location> index_type;
 
     index_type index1;
     test_func_all<index_type>(index1);
@@ -95,8 +98,8 @@ SECTION("DenseMapMmap") {
 # pragma message "not running 'DenseMapMmap' test case on this machine"
 #endif
 
-SECTION("DenseMapFile") {
-    typedef osmium::index::map::DenseMapFile<osmium::unsigned_object_id_type, osmium::Location> index_type;
+SECTION("DenseFileArray") {
+    typedef osmium::index::map::DenseFileArray<osmium::unsigned_object_id_type, osmium::Location> index_type;
 
     index_type index1;
     test_func_all<index_type>(index1);
@@ -105,8 +108,8 @@ SECTION("DenseMapFile") {
     test_func_real<index_type>(index2);
 }
 
-SECTION("SparseTable") {
-    typedef osmium::index::map::SparseTable<osmium::unsigned_object_id_type, osmium::Location> index_type;
+SECTION("SparseMemTable") {
+    typedef osmium::index::map::SparseMemTable<osmium::unsigned_object_id_type, osmium::Location> index_type;
 
     index_type index1;
     test_func_all<index_type>(index1);
@@ -115,8 +118,8 @@ SECTION("SparseTable") {
     test_func_real<index_type>(index2);
 }
 
-SECTION("StlMap") {
-    typedef osmium::index::map::StlMap<osmium::unsigned_object_id_type, osmium::Location> index_type;
+SECTION("SparseMemMap") {
+    typedef osmium::index::map::SparseMemMap<osmium::unsigned_object_id_type, osmium::Location> index_type;
 
     index_type index1;
     test_func_all<index_type>(index1);
@@ -125,8 +128,8 @@ SECTION("StlMap") {
     test_func_real<index_type>(index2);
 }
 
-SECTION("SparseMapMem") {
-    typedef osmium::index::map::SparseMapMem<osmium::unsigned_object_id_type, osmium::Location> index_type;
+SECTION("SparseMemArray") {
+    typedef osmium::index::map::SparseMemArray<osmium::unsigned_object_id_type, osmium::Location> index_type;
 
     index_type index1;
 

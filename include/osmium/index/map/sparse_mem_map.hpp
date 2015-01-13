@@ -1,5 +1,5 @@
-#ifndef OSMIUM_INDEX_MAP_STL_MAP_HPP
-#define OSMIUM_INDEX_MAP_STL_MAP_HPP
+#ifndef OSMIUM_INDEX_MAP_SPARSE_MEM_MAP_HPP
+#define OSMIUM_INDEX_MAP_SPARSE_MEM_MAP_HPP
 
 /*
 
@@ -43,7 +43,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/index/map.hpp>
 #include <osmium/io/detail/read_write.hpp>
 
-#define OSMIUM_HAS_INDEX_MAP_STL_MAP
+#define OSMIUM_HAS_INDEX_MAP_SPARSE_MEM_MAP
 
 namespace osmium {
 
@@ -56,7 +56,7 @@ namespace osmium {
              * lot of memory, but might make sense for small maps.
              */
             template <typename TId, typename TValue>
-            class StlMap : public osmium::index::map::Map<TId, TValue> {
+            class SparseMemMap : public osmium::index::map::Map<TId, TValue> {
 
                 // This is a rough estimate for the memory needed for each
                 // element in the map (id + value + pointers to left, right,
@@ -68,9 +68,9 @@ namespace osmium {
 
             public:
 
-                StlMap() = default;
+                SparseMemMap() = default;
 
-                ~StlMap() override final = default;
+                ~SparseMemMap() override final = default;
 
                 void set(const TId id, const TValue value) override final {
                     m_elements[id] = value;
@@ -103,7 +103,7 @@ namespace osmium {
                     osmium::io::detail::reliable_write(fd, reinterpret_cast<const char*>(v.data()), sizeof(t) * v.size());
                 }
 
-            }; // class StlMap
+            }; // class SparseMemMap
 
         } // namespace map
 
@@ -111,4 +111,4 @@ namespace osmium {
 
 } // namespace osmium
 
-#endif // OSMIUM_INDEX_MAP_STL_MAP_HPP
+#endif // OSMIUM_INDEX_MAP_SPARSE_MEM_MAP_HPP

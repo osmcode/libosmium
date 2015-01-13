@@ -1,5 +1,5 @@
-#ifndef OSMIUM_INDEX_MAP_SPARSE_TABLE_HPP
-#define OSMIUM_INDEX_MAP_SPARSE_TABLE_HPP
+#ifndef OSMIUM_INDEX_MAP_SPARSE_MEM_TABLE_HPP
+#define OSMIUM_INDEX_MAP_SPARSE_MEM_TABLE_HPP
 
 /*
 
@@ -43,7 +43,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/index/map.hpp>
 #include <osmium/io/detail/read_write.hpp>
 
-#define OSMIUM_HAS_INDEX_MAP_SPARSE_TABLE
+#define OSMIUM_HAS_INDEX_MAP_SPARSE_MEM_TABLE
 
 namespace osmium {
 
@@ -52,9 +52,9 @@ namespace osmium {
         namespace map {
 
             /**
-            * The SparseTable index stores elements in a Google sparsetable,
+            * The SparseMemTable index stores elements in a Google sparsetable,
             * a data structure that can hold sparsly filled tables in a
-            * very space efficient way. It will resize automatically.
+            * space efficient way. It will resize automatically.
             *
             * Use this index if the ID space is only sparsly
             * populated, such as when working with smaller OSM files (like
@@ -63,7 +63,7 @@ namespace osmium {
             * This will only work on 64 bit machines.
             */
             template <typename TId, typename TValue>
-            class SparseTable : public osmium::index::map::Map<TId, TValue> {
+            class SparseMemTable : public osmium::index::map::Map<TId, TValue> {
 
                 TId m_grow_size;
 
@@ -81,12 +81,12 @@ namespace osmium {
                 *                  The storage will grow by at least this size
                 *                  every time it runs out of space.
                 */
-                explicit SparseTable(const TId grow_size=10000) :
+                explicit SparseMemTable(const TId grow_size=10000) :
                     m_grow_size(grow_size),
                     m_elements(grow_size) {
                 }
 
-                ~SparseTable() override final = default;
+                ~SparseMemTable() override final = default;
 
                 void set(const TId id, const TValue value) override final {
                     if (id >= m_elements.size()) {
@@ -131,7 +131,7 @@ namespace osmium {
                     osmium::io::detail::reliable_write(fd, reinterpret_cast<const char*>(v.data()), sizeof(std::pair<TId, TValue>) * v.size());
                 }
 
-            }; // class SparseTable
+            }; // class SparseMemTable
 
         } // namespace map
 
@@ -139,4 +139,4 @@ namespace osmium {
 
 } // namespace osmium
 
-#endif // OSMIUM_INDEX_BYID_SPARSE_TABLE_HPP
+#endif // OSMIUM_INDEX_BYID_SPARSE_MEM_TABLE_HPP

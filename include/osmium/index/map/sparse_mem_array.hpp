@@ -1,5 +1,5 @@
-#ifndef OSMIUM_INDEX_MAP_MMAP_VECTOR_FILE_HPP
-#define OSMIUM_INDEX_MAP_MMAP_VECTOR_FILE_HPP
+#ifndef OSMIUM_INDEX_MAP_SPARSE_MEM_ARRAY_HPP
+#define OSMIUM_INDEX_MAP_SPARSE_MEM_ARRAY_HPP
 
 /*
 
@@ -33,11 +33,11 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <osmium/index/detail/mmap_vector_file.hpp>
+#include <vector>
+
 #include <osmium/index/detail/vector_map.hpp>
 
-#define OSMIUM_HAS_INDEX_MAP_DENSE_MAP_FILE
-#define OSMIUM_HAS_INDEX_MAP_SPARSE_MAP_FILE
+#define OSMIUM_HAS_INDEX_MAP_SPARSE_MEM_ARRAY
 
 namespace osmium {
 
@@ -45,11 +45,11 @@ namespace osmium {
 
         namespace map {
 
-            template <typename TId, typename TValue>
-            using DenseMapFile = VectorBasedDenseMap<osmium::detail::mmap_vector_file<TValue>, TId, TValue>;
+            template <typename T>
+            using StdVectorWrap = std::vector<T>;
 
             template <typename TId, typename TValue>
-            using SparseMapFile = VectorBasedSparseMap<TId, TValue, osmium::detail::mmap_vector_file>;
+            using SparseMemArray = VectorBasedSparseMap<TId, TValue, StdVectorWrap>;
 
         } // namespace map
 
@@ -57,4 +57,4 @@ namespace osmium {
 
 } // namespace osmium
 
-#endif // OSMIUM_INDEX_MAP_MMAP_VECTOR_FILE_HPP
+#endif // OSMIUM_INDEX_MAP_SPARSE_MEM_ARRAY_HPP

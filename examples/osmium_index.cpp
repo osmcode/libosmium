@@ -14,15 +14,16 @@
 
 #include <boost/program_options.hpp>
 
-#include <osmium/index/map/mmap_vector_file.hpp>
+#include <osmium/index/map/dense_file_array.hpp>
+#include <osmium/index/map/sparse_file_array.hpp>
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/types.hpp>
 
 template <typename TKey, typename TValue>
 class IndexSearch {
 
-    typedef typename osmium::index::map::DenseMapFile<TKey, TValue> dense_index_type;
-    typedef typename osmium::index::map::SparseMapFile<TKey, TValue> sparse_index_type;
+    typedef typename osmium::index::map::DenseFileArray<TKey, TValue> dense_index_type;
+    typedef typename osmium::index::map::SparseFileArray<TKey, TValue> sparse_index_type;
 
     int m_fd;
     bool m_dense_format;

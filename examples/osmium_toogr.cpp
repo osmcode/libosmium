@@ -23,12 +23,15 @@
 # include <ogrsf_frmts.h>
 #pragma GCC diagnostic pop
 
+#include <osmium/index/map/dense_file_array.hpp>
+#include <osmium/index/map/dense_mem_array.hpp>
+#include <osmium/index/map/dense_mmap_array.hpp>
 #include <osmium/index/map/dummy.hpp>
-#include <osmium/index/map/stl_map.hpp>
-#include <osmium/index/map/sparse_table.hpp>
-#include <osmium/index/map/stl_vector.hpp>
-#include <osmium/index/map/mmap_vector_anon.hpp>
-#include <osmium/index/map/mmap_vector_file.hpp>
+#include <osmium/index/map/sparse_file_array.hpp>
+#include <osmium/index/map/sparse_mem_array.hpp>
+#include <osmium/index/map/sparse_mem_map.hpp>
+#include <osmium/index/map/sparse_mem_table.hpp>
+#include <osmium/index/map/sparse_mmap_array.hpp>
 
 #include <osmium/handler/node_locations_for_ways.hpp>
 #include <osmium/visitor.hpp>
