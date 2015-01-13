@@ -33,76 +33,38 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-namespace {
+#include <osmium/index/map.hpp>
 
-#ifdef OSMIUM_HAS_INDEX_MAP_SPARSE_MEM_MAP
-    const bool registered_index_map_sparse_mem_map = osmium::index::MapFactory<osmium::unsigned_object_id_type, osmium::Location>::instance().register_map("sparse_mem_map", [](const std::vector<std::string>&) {
-        return new osmium::index::map::SparseMemMap<osmium::unsigned_object_id_type, osmium::Location>();
-    });
-#endif
-
-#ifdef OSMIUM_HAS_INDEX_MAP_SPARSE_MEM_TABLE
-    const bool registered_index_map_sparse_mem_table = osmium::index::MapFactory<osmium::unsigned_object_id_type, osmium::Location>::instance().register_map("sparse_mem_table", [](const std::vector<std::string>&) {
-        return new osmium::index::map::SparseMemTable<osmium::unsigned_object_id_type, osmium::Location>();
-    });
-#endif
-
-#ifdef OSMIUM_HAS_INDEX_MAP_SPARSE_MEM_ARRAY
-    const bool registered_index_map_sparse_mem_array = osmium::index::MapFactory<osmium::unsigned_object_id_type, osmium::Location>::instance().register_map("sparse_mem_array", [](const std::vector<std::string>&) {
-        return new osmium::index::map::SparseMemArray<osmium::unsigned_object_id_type, osmium::Location>();
-    });
+#ifdef OSMIUM_HAS_INDEX_MAP_DENSE_FILE_ARRAY
+    REGISTER_MAP(osmium::unsigned_object_id_type, osmium::Location, osmium::index::map::DenseFileArray, dense_file_array);
 #endif
 
 #ifdef OSMIUM_HAS_INDEX_MAP_DENSE_MEM_ARRAY
-    const bool registered_index_map_dense_mem_array = osmium::index::MapFactory<osmium::unsigned_object_id_type, osmium::Location>::instance().register_map("dense_mem_array", [](const std::vector<std::string>&) {
-        return new osmium::index::map::DenseMemArray<osmium::unsigned_object_id_type, osmium::Location>();
-    });
-#endif
-
-#ifdef OSMIUM_HAS_INDEX_MAP_SPARSE_MMAP_ARRAY
-    const bool registered_index_map_sparse_mmap_array = osmium::index::MapFactory<osmium::unsigned_object_id_type, osmium::Location>::instance().register_map("sparse_mmap_array", [](const std::vector<std::string>&) {
-        return new osmium::index::map::SparseMmapArray<osmium::unsigned_object_id_type, osmium::Location>();
-    });
+    REGISTER_MAP(osmium::unsigned_object_id_type, osmium::Location, osmium::index::map::DenseMemArray, dense_mem_array);
 #endif
 
 #ifdef OSMIUM_HAS_INDEX_MAP_DENSE_MMAP_ARRAY
-    const bool registered_index_map_dense_mmap_array = osmium::index::MapFactory<osmium::unsigned_object_id_type, osmium::Location>::instance().register_map("dense_mmap_array", [](const std::vector<std::string>&) {
-        return new osmium::index::map::DenseMmapArray<osmium::unsigned_object_id_type, osmium::Location>();
-    });
+    REGISTER_MAP(osmium::unsigned_object_id_type, osmium::Location, osmium::index::map::DenseMmapArray, dense_mmap_array);
 #endif
 
 #ifdef OSMIUM_HAS_INDEX_MAP_SPARSE_FILE_ARRAY
-    const bool registered_index_map_sparse_file_array = osmium::index::MapFactory<osmium::unsigned_object_id_type, osmium::Location>::instance().register_map("sparse_file_array", [](const std::vector<std::string>& config) {
-        if (config.size() == 1) {
-            return new osmium::index::map::SparseFileArray<osmium::unsigned_object_id_type, osmium::Location>();
-        } else {
-            assert(config.size() > 1);
-            const std::string& filename = config[1];
-            int fd = ::open(filename.c_str(), O_CREAT | O_RDWR, 0644);
-            if (fd == -1) {
-                throw std::runtime_error(std::string("can't open file '") + filename + "': " + strerror(errno));
-            }
-            return new osmium::index::map::SparseFileArray<osmium::unsigned_object_id_type, osmium::Location>(fd);
-        }
-    });
+    REGISTER_MAP(osmium::unsigned_object_id_type, osmium::Location, osmium::index::map::SparseFileArray, sparse_file_array);
 #endif
 
-#ifdef OSMIUM_HAS_INDEX_MAP_DENSE_FILE_ARRAY
-    const bool registered_index_map_dense_map_file = osmium::index::MapFactory<osmium::unsigned_object_id_type, osmium::Location>::instance().register_map("dense_file_array", [](const std::vector<std::string>& config) {
-        if (config.size() == 1) {
-            return new osmium::index::map::DenseFileArray<osmium::unsigned_object_id_type, osmium::Location>();
-        } else {
-            assert(config.size() > 1);
-            const std::string& filename = config[1];
-            int fd = ::open(filename.c_str(), O_CREAT | O_RDWR, 0644);
-            if (fd == -1) {
-                throw std::runtime_error(std::string("can't open file '") + filename + "': " + strerror(errno));
-            }
-            return new osmium::index::map::DenseFileArray<osmium::unsigned_object_id_type, osmium::Location>(fd);
-        }
-    });
+#ifdef OSMIUM_HAS_INDEX_MAP_SPARSE_MEM_ARRAY
+    REGISTER_MAP(osmium::unsigned_object_id_type, osmium::Location, osmium::index::map::SparseMemArray, sparse_mem_array);
 #endif
 
-} // anonymous namespace
+#ifdef OSMIUM_HAS_INDEX_MAP_SPARSE_MEM_MAP
+    REGISTER_MAP(osmium::unsigned_object_id_type, osmium::Location, osmium::index::map::SparseMemMap, sparse_mem_map);
+#endif
+
+#ifdef OSMIUM_HAS_INDEX_MAP_SPARSE_MEM_TABLE
+    REGISTER_MAP(osmium::unsigned_object_id_type, osmium::Location, osmium::index::map::SparseMemTable, sparse_mem_table);
+#endif
+
+#ifdef OSMIUM_HAS_INDEX_MAP_SPARSE_MMAP_ARRAY
+    REGISTER_MAP(osmium::unsigned_object_id_type, osmium::Location, osmium::index::map::SparseMmapArray, sparse_mmap_array);
+#endif
 
 #endif // OSMIUM_INDEX_NODE_LOCATIONS_MAP_HPP

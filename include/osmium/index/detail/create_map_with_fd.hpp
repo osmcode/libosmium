@@ -1,5 +1,5 @@
-#ifndef OSMIUM_INDEX_DETAIL_MMAP_VECTOR_ANON_HPP
-#define OSMIUM_INDEX_DETAIL_MMAP_VECTOR_ANON_HPP
+#ifndef OSMIUM_INDEX_DETAIL_CREATE_MAP_WITH_FD_HPP
+#define OSMIUM_INDEX_DETAIL_CREATE_MAP_WITH_FD_HPP
 
 /*
 
@@ -33,46 +33,40 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#ifdef __linux__
-
-#include <cstddef>
-
-#include <osmium/index/detail/typed_mmap.hpp>
-#include <osmium/index/detail/mmap_vector_base.hpp>
+#include <cassert>
+#include <cstring>
+#include <fcntl.h>
+#include <stdexcept>
+#include <string>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <vector>
 
 namespace osmium {
 
-    namespace detail {
+    namespace index {
 
-        /**
-         * This class looks and behaves like STL vector, but uses mmap internally.
-         */
-        template <typename T>
-        class mmap_vector_anon : public mmap_vector_base<T, mmap_vector_anon> {
+        namespace detail {
 
-        public:
-
-            mmap_vector_anon() :
-                mmap_vector_base<T, osmium::detail::mmap_vector_anon>(
-                    -1,
-                    osmium::detail::mmap_vector_size_increment,
-                    0,
-                    osmium::detail::typed_mmap<T>::map(osmium::detail::mmap_vector_size_increment)) {
-            }
-
-            void reserve(size_t new_capacity) {
-                if (new_capacity > this->capacity()) {
-                    this->data(osmium::detail::typed_mmap<T>::remap(this->data(), this->capacity(), new_capacity));
-                    this->m_capacity = new_capacity;
+            template <class T>
+            inline T* create_map_with_fd(const std::vector<std::string>& config) {
+                if (config.size() == 1) {
+                    return new T();
+                } else {
+                    assert(config.size() > 1);
+                    const std::string& filename = config[1];
+                    int fd = ::open(filename.c_str(), O_CREAT | O_RDWR, 0644);
+                    if (fd == -1) {
+                        throw std::runtime_error(std::string("can't open file '") + filename + "': " + strerror(errno));
+                    }
+                    return new T(fd);
                 }
             }
 
-        }; // class mmap_vector_anon
+        } // namespace detail
 
-    } // namespace detail
+    } // namespace index
 
 } // namespace osmium
 
-#endif // __linux__
-
-#endif // OSMIUM_INDEX_DETAIL_MMAP_VECTOR_ANON_HPP
+#endif // OSMIUM_INDEX_DETAIL_CREATE_MAP_WITH_FD_HPP

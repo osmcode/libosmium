@@ -35,6 +35,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/index/detail/mmap_vector_file.hpp>
 #include <osmium/index/detail/vector_map.hpp>
+#include <osmium/index/detail/create_map_with_fd.hpp>
 
 #define OSMIUM_HAS_INDEX_MAP_SPARSE_FILE_ARRAY
 
@@ -46,6 +47,13 @@ namespace osmium {
 
             template <typename TId, typename TValue>
             using SparseFileArray = VectorBasedSparseMap<TId, TValue, osmium::detail::mmap_vector_file>;
+
+            template <typename TId, typename TValue>
+            struct create_map<TId, TValue, SparseFileArray> {
+                SparseFileArray<TId, TValue>* operator()(const std::vector<std::string>& config) {
+                    return osmium::index::detail::create_map_with_fd<SparseFileArray<TId, TValue>>(config);
+                }
+            };
 
         } // namespace map
 

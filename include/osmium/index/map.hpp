@@ -38,7 +38,9 @@ DEALINGS IN THE SOFTWARE.
 #include <functional>
 #include <map>
 #include <memory>
+#include <string>
 #include <type_traits>
+#include <vector>
 
 #include <osmium/index/index.hpp> // IWYU pragma: export
 #include <osmium/util/string.hpp>
@@ -221,6 +223,29 @@ namespace osmium {
             }
 
         }; // class MapFactory
+
+        namespace map {
+
+            template <typename TId, typename TValue, template<typename, typename> class TMap>
+            struct create_map {
+                TMap<TId, TValue>* operator()(const std::vector<std::string>&) {
+                    return new TMap<TId, TValue>();
+                }
+            };
+
+        } // namespace map
+
+        template <typename TId, typename TValue, template<typename, typename> class TMap>
+        inline bool register_map(const std::string& name) {
+            return osmium::index::MapFactory<TId, TValue>::instance().register_map(name, [](const std::vector<std::string>& config) {
+                return map::create_map<TId, TValue, TMap>()(config);
+            });
+        }
+
+#define REGISTER_MAP(id, value, klass, name) \
+namespace { \
+    const bool registered_index_map_##name = osmium::index::register_map<id, value, klass>(#name); \
+}
 
     } // namespace index
 
