@@ -36,35 +36,35 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/index/map.hpp>
 
 #ifdef OSMIUM_HAS_INDEX_MAP_DENSE_FILE_ARRAY
-    REGISTER_MAP(osmium::unsigned_object_id_type, osmium::Location, osmium::index::map::DenseFileArray, dense_file_array);
+    REGISTER_MAP(osmium::unsigned_object_id_type, osmium::Location, osmium::index::map::DenseFileArray, dense_file_array)
 #endif
 
 #ifdef OSMIUM_HAS_INDEX_MAP_DENSE_MEM_ARRAY
-    REGISTER_MAP(osmium::unsigned_object_id_type, osmium::Location, osmium::index::map::DenseMemArray, dense_mem_array);
+    REGISTER_MAP(osmium::unsigned_object_id_type, osmium::Location, osmium::index::map::DenseMemArray, dense_mem_array)
 #endif
 
 #ifdef OSMIUM_HAS_INDEX_MAP_DENSE_MMAP_ARRAY
-    REGISTER_MAP(osmium::unsigned_object_id_type, osmium::Location, osmium::index::map::DenseMmapArray, dense_mmap_array);
+    REGISTER_MAP(osmium::unsigned_object_id_type, osmium::Location, osmium::index::map::DenseMmapArray, dense_mmap_array)
 #endif
 
 #ifdef OSMIUM_HAS_INDEX_MAP_SPARSE_FILE_ARRAY
-    REGISTER_MAP(osmium::unsigned_object_id_type, osmium::Location, osmium::index::map::SparseFileArray, sparse_file_array);
+    REGISTER_MAP(osmium::unsigned_object_id_type, osmium::Location, osmium::index::map::SparseFileArray, sparse_file_array)
 #endif
 
 #ifdef OSMIUM_HAS_INDEX_MAP_SPARSE_MEM_ARRAY
-    REGISTER_MAP(osmium::unsigned_object_id_type, osmium::Location, osmium::index::map::SparseMemArray, sparse_mem_array);
+    REGISTER_MAP(osmium::unsigned_object_id_type, osmium::Location, osmium::index::map::SparseMemArray, sparse_mem_array)
 #endif
 
 #ifdef OSMIUM_HAS_INDEX_MAP_SPARSE_MEM_MAP
-    REGISTER_MAP(osmium::unsigned_object_id_type, osmium::Location, osmium::index::map::SparseMemMap, sparse_mem_map);
+    REGISTER_MAP(osmium::unsigned_object_id_type, osmium::Location, osmium::index::map::SparseMemMap, sparse_mem_map)
 #endif
 
 #ifdef OSMIUM_HAS_INDEX_MAP_SPARSE_MEM_TABLE
-    REGISTER_MAP(osmium::unsigned_object_id_type, osmium::Location, osmium::index::map::SparseMemTable, sparse_mem_table);
+    REGISTER_MAP(osmium::unsigned_object_id_type, osmium::Location, osmium::index::map::SparseMemTable, sparse_mem_table)
 #endif
 
 #ifdef OSMIUM_HAS_INDEX_MAP_SPARSE_MMAP_ARRAY
-    REGISTER_MAP(osmium::unsigned_object_id_type, osmium::Location, osmium::index::map::SparseMmapArray, sparse_mmap_array);
+    REGISTER_MAP(osmium::unsigned_object_id_type, osmium::Location, osmium::index::map::SparseMmapArray, sparse_mmap_array)
 #endif
 
 #endif // OSMIUM_INDEX_NODE_LOCATIONS_MAP_HPP
