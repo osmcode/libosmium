@@ -228,7 +228,10 @@ if(BUILD_HEADERS)
 
     # In 'Dev' mode: compile with very strict warnings and turn them into errors.
     if(CMAKE_BUILD_TYPE STREQUAL "Dev")
-        add_definitions(-Werror ${OSMIUM_WARNING_OPTIONS})
+        if(NOT MSVC)
+            add_definitions(-Werror)
+        endif()
+        add_definitions(${OSMIUM_WARNING_OPTIONS})
     endif()
 
     file(MAKE_DIRECTORY header_check)

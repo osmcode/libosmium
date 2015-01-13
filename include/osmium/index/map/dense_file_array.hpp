@@ -1,11 +1,11 @@
-#ifndef OSMIUM_INDEX_MULTIMAP_STL_VECTOR_HPP
-#define OSMIUM_INDEX_MULTIMAP_STL_VECTOR_HPP
+#ifndef OSMIUM_INDEX_MAP_DENSE_FILE_ARRAY_HPP
+#define OSMIUM_INDEX_MAP_DENSE_FILE_ARRAY_HPP
 
 /*
 
 This file is part of Osmium (http://osmcode.org/libosmium).
 
-Copyright 2013,2014 Jochen Topf <jochen@topf.org> and others (see README).
+Copyright 2013-2015 Jochen Topf <jochen@topf.org> and others (see README).
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -33,26 +33,32 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <vector>
+#include <osmium/index/detail/mmap_vector_file.hpp>
+#include <osmium/index/detail/vector_map.hpp>
+#include <osmium/index/detail/create_map_with_fd.hpp>
 
-#include <osmium/index/multimap/vector.hpp>
+#define OSMIUM_HAS_INDEX_MAP_DENSE_FILE_ARRAY
 
 namespace osmium {
 
     namespace index {
 
-        namespace multimap {
-
-            template <typename T>
-            using StdVectorWrap = std::vector<T>;
+        namespace map {
 
             template <typename TId, typename TValue>
-            using SparseMultimapMem = VectorBasedSparseMultimap<TId, TValue, StdVectorWrap>;
+            using DenseFileArray = VectorBasedDenseMap<osmium::detail::mmap_vector_file<TValue>, TId, TValue>;
 
-        } // namespace multimap
+            template <typename TId, typename TValue>
+            struct create_map<TId, TValue, DenseFileArray> {
+                DenseFileArray<TId, TValue>* operator()(const std::vector<std::string>& config) {
+                    return osmium::index::detail::create_map_with_fd<DenseFileArray<TId, TValue>>(config);
+                }
+            };
+
+        } // namespace map
 
     } // namespace index
 
 } // namespace osmium
 
-#endif // OSMIUM_INDEX_MULTIMAP_STL_VECTOR_HPP
+#endif // OSMIUM_INDEX_MAP_DENSE_FILE_ARRAY_HPP

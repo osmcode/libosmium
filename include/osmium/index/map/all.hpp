@@ -1,5 +1,5 @@
-#ifndef OSMIUM_INDEX_DETAIL_TMPFILE_HPP
-#define OSMIUM_INDEX_DETAIL_TMPFILE_HPP
+#ifndef OSMIUM_INDEX_MAP_ALL_HPP
+#define OSMIUM_INDEX_MAP_ALL_HPP
 
 /*
 
@@ -33,30 +33,14 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <cerrno>
-#include <cstdio>
-#include <system_error>
+#include <osmium/index/map/dense_file_array.hpp>
+#include <osmium/index/map/dense_mem_array.hpp>
+#include <osmium/index/map/dense_mmap_array.hpp>
+#include <osmium/index/map/dummy.hpp>
+#include <osmium/index/map/sparse_file_array.hpp>
+#include <osmium/index/map/sparse_mem_array.hpp>
+#include <osmium/index/map/sparse_mem_map.hpp>
+#include <osmium/index/map/sparse_mem_table.hpp>
+#include <osmium/index/map/sparse_mmap_array.hpp>
 
-namespace osmium {
-
-    namespace detail {
-
-        /**
-         * Create and open a temporary file. It is removed after opening.
-         *
-         * @returns File descriptor of temporary file.
-         * @throws std::system_error if something went wrong.
-         */
-        inline int create_tmp_file() {
-            FILE* file = ::tmpfile();
-            if (!file) {
-                throw std::system_error(errno, std::system_category(), "tempfile failed");
-            }
-            return fileno(file);
-        }
-
-    } // namespace detail
-
-} // namespace osmium
-
-#endif // OSMIUM_INDEX_DETAIL_TMPFILE_HPP
+#endif // OSMIUM_INDEX_MAP_ALL_HPP

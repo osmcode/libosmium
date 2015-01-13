@@ -16,6 +16,8 @@
 # include <ogrsf_frmts.h>
 #pragma GCC diagnostic pop
 
+#include <osmium/index/map/sparse_mem_array.hpp>
+
 #include <osmium/area/assembler.hpp>
 #include <osmium/area/multipolygon_collector.hpp>
 #include <osmium/area/problem_reporter_ogr.hpp>
@@ -23,14 +25,12 @@
 #include <osmium/geom/wkt.hpp>
 #include <osmium/handler.hpp>
 #include <osmium/handler/node_locations_for_ways.hpp>
-#include <osmium/index/map/dummy.hpp>
-#include <osmium/index/map/stl_vector.hpp>
 #include <osmium/io/xml_input.hpp>
 #include <osmium/visitor.hpp>
 
-typedef osmium::index::map::SparseMapMem<osmium::unsigned_object_id_type, osmium::Location> index_type;
+typedef osmium::index::map::SparseMemArray<osmium::unsigned_object_id_type, osmium::Location> index_type;
 
-typedef osmium::handler::NodeLocationsForWays<index_type, index_type> location_handler_type;
+typedef osmium::handler::NodeLocationsForWays<index_type> location_handler_type;
 
 struct less_charptr {
 
@@ -284,9 +284,8 @@ int main(int argc, char* argv[]) {
     reader1.close();
     std::cerr << "Pass 1 done\n";
 
-    index_type index_pos;
-    index_type index_neg;
-    location_handler_type location_handler(index_pos, index_neg);
+    index_type index;
+    location_handler_type location_handler(index);
     location_handler.ignore_errors();
 
     TestHandler test_handler(data_source);

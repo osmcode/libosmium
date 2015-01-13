@@ -1,5 +1,5 @@
-#ifndef OSMIUM_INDEX_DETAIL_TMPFILE_HPP
-#define OSMIUM_INDEX_DETAIL_TMPFILE_HPP
+#ifndef OSMIUM_INDEX_MAP_SPARSE_FILE_ARRAY_HPP
+#define OSMIUM_INDEX_MAP_SPARSE_FILE_ARRAY_HPP
 
 /*
 
@@ -33,30 +33,32 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <cerrno>
-#include <cstdio>
-#include <system_error>
+#include <osmium/index/detail/mmap_vector_file.hpp>
+#include <osmium/index/detail/vector_map.hpp>
+#include <osmium/index/detail/create_map_with_fd.hpp>
+
+#define OSMIUM_HAS_INDEX_MAP_SPARSE_FILE_ARRAY
 
 namespace osmium {
 
-    namespace detail {
+    namespace index {
 
-        /**
-         * Create and open a temporary file. It is removed after opening.
-         *
-         * @returns File descriptor of temporary file.
-         * @throws std::system_error if something went wrong.
-         */
-        inline int create_tmp_file() {
-            FILE* file = ::tmpfile();
-            if (!file) {
-                throw std::system_error(errno, std::system_category(), "tempfile failed");
-            }
-            return fileno(file);
-        }
+        namespace map {
 
-    } // namespace detail
+            template <typename TId, typename TValue>
+            using SparseFileArray = VectorBasedSparseMap<TId, TValue, osmium::detail::mmap_vector_file>;
+
+            template <typename TId, typename TValue>
+            struct create_map<TId, TValue, SparseFileArray> {
+                SparseFileArray<TId, TValue>* operator()(const std::vector<std::string>& config) {
+                    return osmium::index::detail::create_map_with_fd<SparseFileArray<TId, TValue>>(config);
+                }
+            };
+
+        } // namespace map
+
+    } // namespace index
 
 } // namespace osmium
 
-#endif // OSMIUM_INDEX_DETAIL_TMPFILE_HPP
+#endif // OSMIUM_INDEX_MAP_SPARSE_FILE_ARRAY_HPP

@@ -1,11 +1,11 @@
-#ifndef OSMIUM_INDEX_MAP_MMAP_VECTOR_FILE_HPP
-#define OSMIUM_INDEX_MAP_MMAP_VECTOR_FILE_HPP
+#ifndef OSMIUM_INDEX_DETAIL_CREATE_MAP_WITH_FD_HPP
+#define OSMIUM_INDEX_DETAIL_CREATE_MAP_WITH_FD_HPP
 
 /*
 
 This file is part of Osmium (http://osmcode.org/libosmium).
 
-Copyright 2013,2014 Jochen Topf <jochen@topf.org> and others (see README).
+Copyright 2013-2015 Jochen Topf <jochen@topf.org> and others (see README).
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -33,25 +33,40 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <osmium/index/map/vector.hpp>
-#include <osmium/index/detail/mmap_vector_file.hpp>
+#include <cassert>
+#include <cstring>
+#include <fcntl.h>
+#include <stdexcept>
+#include <string>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <vector>
 
 namespace osmium {
 
     namespace index {
 
-        namespace map {
+        namespace detail {
 
-            template <typename TId, typename TValue>
-            using DenseMapFile = VectorBasedDenseMap<osmium::detail::mmap_vector_file<TValue>, TId, TValue>;
+            template <class T>
+            inline T* create_map_with_fd(const std::vector<std::string>& config) {
+                if (config.size() == 1) {
+                    return new T();
+                } else {
+                    assert(config.size() > 1);
+                    const std::string& filename = config[1];
+                    int fd = ::open(filename.c_str(), O_CREAT | O_RDWR, 0644);
+                    if (fd == -1) {
+                        throw std::runtime_error(std::string("can't open file '") + filename + "': " + strerror(errno));
+                    }
+                    return new T(fd);
+                }
+            }
 
-            template <typename TId, typename TValue>
-            using SparseMapFile = VectorBasedSparseMap<TId, TValue, osmium::detail::mmap_vector_file>;
-
-        } // namespace map
+        } // namespace detail
 
     } // namespace index
 
 } // namespace osmium
 
-#endif // OSMIUM_INDEX_MAP_MMAP_VECTOR_FILE_HPP
+#endif // OSMIUM_INDEX_DETAIL_CREATE_MAP_WITH_FD_HPP

@@ -1,5 +1,5 @@
-#ifndef OSMIUM_INDEX_DETAIL_TMPFILE_HPP
-#define OSMIUM_INDEX_DETAIL_TMPFILE_HPP
+#ifndef OSMIUM_INDEX_MAP_DENSE_MEM_ARRAY_HPP
+#define OSMIUM_INDEX_MAP_DENSE_MEM_ARRAY_HPP
 
 /*
 
@@ -33,30 +33,25 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <cerrno>
-#include <cstdio>
-#include <system_error>
+#include <vector>
+
+#include <osmium/index/detail/vector_map.hpp>
+
+#define OSMIUM_HAS_INDEX_MAP_DENSE_MEM_ARRAY
 
 namespace osmium {
 
-    namespace detail {
+    namespace index {
 
-        /**
-         * Create and open a temporary file. It is removed after opening.
-         *
-         * @returns File descriptor of temporary file.
-         * @throws std::system_error if something went wrong.
-         */
-        inline int create_tmp_file() {
-            FILE* file = ::tmpfile();
-            if (!file) {
-                throw std::system_error(errno, std::system_category(), "tempfile failed");
-            }
-            return fileno(file);
-        }
+        namespace map {
 
-    } // namespace detail
+            template <typename TId, typename TValue>
+            using DenseMemArray = VectorBasedDenseMap<std::vector<TValue>, TId, TValue>;
+
+        } // namespace map
+
+    } // namespace index
 
 } // namespace osmium
 
-#endif // OSMIUM_INDEX_DETAIL_TMPFILE_HPP
+#endif // OSMIUM_INDEX_MAP_DENSE_MEM_ARRAY_HPP
