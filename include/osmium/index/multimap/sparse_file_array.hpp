@@ -1,11 +1,11 @@
-#ifndef OSMIUM_INDEX_MULTIMAP_STL_VECTOR_HPP
-#define OSMIUM_INDEX_MULTIMAP_STL_VECTOR_HPP
+#ifndef OSMIUM_INDEX_MULTIMAP_SPARSE_FILE_ARRAY_HPP
+#define OSMIUM_INDEX_MULTIMAP_SPARSE_FILE_ARRAY_HPP
 
 /*
 
 This file is part of Osmium (http://osmcode.org/libosmium).
 
-Copyright 2013,2014 Jochen Topf <jochen@topf.org> and others (see README).
+Copyright 2013-2015 Jochen Topf <jochen@topf.org> and others (see README).
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -33,8 +33,7 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <vector>
-
+#include <osmium/index/detail/mmap_vector_file.hpp>
 #include <osmium/index/detail/vector_multimap.hpp>
 
 namespace osmium {
@@ -43,11 +42,8 @@ namespace osmium {
 
         namespace multimap {
 
-            template <typename T>
-            using StdVectorWrap = std::vector<T>;
-
             template <typename TId, typename TValue>
-            using SparseMultimapMem = VectorBasedSparseMultimap<TId, TValue, StdVectorWrap>;
+            using SparseFileArray = VectorBasedSparseMultimap<TId, TValue, osmium::detail::mmap_vector_file>;
 
         } // namespace multimap
 
@@ -55,4 +51,4 @@ namespace osmium {
 
 } // namespace osmium
 
-#endif // OSMIUM_INDEX_MULTIMAP_STL_VECTOR_HPP
+#endif // OSMIUM_INDEX_MULTIMAP_SPARSE_FILE_ARRAY_HPP

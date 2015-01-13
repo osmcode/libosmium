@@ -5,7 +5,7 @@
 
 This file is part of Osmium (http://osmcode.org/libosmium).
 
-Copyright 2013,2014 Jochen Topf <jochen@topf.org> and others (see README).
+Copyright 2013-2015 Jochen Topf <jochen@topf.org> and others (see README).
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -37,8 +37,8 @@ DEALINGS IN THE SOFTWARE.
 #include <utility>
 
 #include <osmium/index/multimap.hpp>
-#include <osmium/index/multimap/stl_vector.hpp>
-#include <osmium/index/multimap/stl_multimap.hpp>
+#include <osmium/index/multimap/sparse_mem_array.hpp>
+#include <osmium/index/multimap/sparse_mem_multimap.hpp>
 
 namespace osmium {
 
@@ -49,8 +49,8 @@ namespace osmium {
             template <typename TId, typename TValue>
             class HybridIterator {
 
-                typedef SparseMultimapMem<TId, TValue> main_map_type;
-                typedef StlMultimap<TId, TValue> extra_map_type;
+                typedef SparseMemArray<TId, TValue> main_map_type;
+                typedef SparseMemMultimap<TId, TValue> extra_map_type;
 
                 typedef typename std::pair<TId, TValue> element_type;
 
@@ -117,8 +117,8 @@ namespace osmium {
             template <typename TId, typename TValue>
             class Hybrid : public Multimap<TId, TValue> {
 
-                typedef SparseMultimapMem<TId, TValue> main_map_type;
-                typedef StlMultimap<TId, TValue> extra_map_type;
+                typedef SparseMemArray<TId, TValue> main_map_type;
+                typedef SparseMemMultimap<TId, TValue> extra_map_type;
 
                 main_map_type m_main;
                 extra_map_type m_extra;
