@@ -119,7 +119,7 @@ namespace osmium {
                     m_elements.clear();
                 }
 
-                void dump_as_list(const int fd) const override final {
+                void dump_as_list(const int fd) override final {
                     std::vector<std::pair<TId, TValue>> v;
                     int n=0;
                     for (const TValue value : m_elements) {

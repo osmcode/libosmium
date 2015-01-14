@@ -198,7 +198,7 @@ namespace osmium {
                     std::sort(m_vector.begin(), m_vector.end());
                 }
 
-                void dump_as_list(int fd) const override final {
+                void dump_as_list(const int fd) override final {
                     osmium::io::detail::reliable_write(fd, reinterpret_cast<const char*>(m_vector.data()), byte_size());
                 }
 

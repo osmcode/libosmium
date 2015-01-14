@@ -147,7 +147,7 @@ namespace osmium {
                     // default implementation is empty
                 }
 
-                virtual void dump_as_list(int /*fd*/) const {
+                virtual void dump_as_list(const int /*fd*/) {
                     std::runtime_error("can't dump as list");
                 }
 
