@@ -4,6 +4,10 @@ compiler:
  - gcc
  - clang
 
+env:
+ - CONFIGURATION=Dev
+ - CONFIGURATION=Release
+
 before_install:
  # we need at least g++-4.8 for c++11 features
  - sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test
@@ -26,8 +30,6 @@ install:
  - sudo make install
  - cd ../..
 
-#env:
-
 before_script:
  - true
 
@@ -35,7 +37,7 @@ script:
  - if [ "${CXX}" = 'g++' ]; then export CXX=g++-4.8; fi;
  - mkdir build
  - cd build
- - cmake -L -DCMAKE_BUILD_TYPE=Dev ..
+ - cmake -L -DCMAKE_BUILD_TYPE=${CONFIGURATION} ..
  - make VERBOSE=1
  # Disable multipolygon test because it needs ruby and the 'json' gem, but the
  # travis ruby installation doesn't find the gem it did install itself.
