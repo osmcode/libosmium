@@ -178,7 +178,7 @@ int main(int argc, char* argv[]) {
     };
 
     std::string output_format { "SQLite" };
-    std::string location_store { "sparsetable" };
+    std::string location_store { "sparse_mem_array" };
 
     while (true) {
         int c = getopt_long(argc, argv, "hf:l:L", long_options, 0);
