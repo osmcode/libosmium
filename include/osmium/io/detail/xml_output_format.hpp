@@ -230,8 +230,8 @@ namespace osmium {
                     m_write_change_ops(write_change_ops) {
                 }
 
-                XMLOutputBlock(XMLOutputBlock& other) :
-                    m_input_buffer(std::move(other.m_input_buffer)),
+                XMLOutputBlock(const XMLOutputBlock& other) :
+                    m_input_buffer(std::move(const_cast<osmium::memory::Buffer&>(other.m_input_buffer))),
                     m_out(),
                     m_last_op(operation::op_none),
                     m_write_visible_flag(other.m_write_visible_flag),
