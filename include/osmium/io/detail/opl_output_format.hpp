@@ -186,8 +186,8 @@ namespace osmium {
                     m_tmp_buffer() {
                 }
 
-                OPLOutputBlock(OPLOutputBlock& other) :
-                    m_input_buffer(std::move(other.m_input_buffer)),
+                OPLOutputBlock(const OPLOutputBlock& other) :
+                    m_input_buffer(std::move(const_cast<osmium::memory::Buffer&>(other.m_input_buffer))),
                     m_out(),
                     m_tmp_buffer() {
                 }
