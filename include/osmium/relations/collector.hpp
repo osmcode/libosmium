@@ -509,7 +509,7 @@ namespace osmium {
                     const size_t size_before = m_members_buffer.committed();
                     m_members_buffer.purge_removed(this);
                     const size_t size_after = m_members_buffer.committed();
-                    double percent = size_before - size_after;
+                    double percent = static_cast<double>(size_before - size_after);
                     percent /= size_before;
                     percent *= 100;
                     std::cerr << "PURGE (size before=" << size_before << " after=" << size_after << " purged=" << (size_before - size_after) << " / " << static_cast<int>(percent) << "%)\n";
