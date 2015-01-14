@@ -279,7 +279,7 @@ endif()
 # This is a set of recommended warning options that can be added when compiling
 # libosmium code.
 if(MSVC)
-    set(OSMIUM_WARNING_OPTIONS "-Wall" CACHE STRING "Recommended warning options for libosmium")
+    set(OSMIUM_WARNING_OPTIONS "/W2 /wd4514" CACHE STRING "Recommended warning options for libosmium")
 else()
     set(OSMIUM_WARNING_OPTIONS "-Wall -Wextra -pedantic -Wredundant-decls -Wdisabled-optimization -Wctor-dtor-privacy -Wnon-virtual-dtor -Woverloaded-virtual -Wsign-promo -Wold-style-cast -Wno-return-type" CACHE STRING "Recommended warning options for libosmium")
 endif()
