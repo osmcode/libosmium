@@ -95,7 +95,7 @@ SECTION("DenseMmapArray") {
     test_func_real<index_type>(index2);
 }
 #else
-# pragma message "not running 'DenseMapMmap' test case on this machine"
+# pragma message("not running 'DenseMapMmap' test case on this machine")
 #endif
 
 SECTION("DenseFileArray") {
