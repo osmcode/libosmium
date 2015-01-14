@@ -256,7 +256,14 @@ endif()
 add_definitions(-D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64)
 
 if(MSVC)
-    add_definitions(-wd4996 -wd4068 -DNOMINMAX -DWIN32_LEAN_AND_MEAN -D_CRT_SECURE_NO_WARNINGS)
+    add_definitions(-wd4996)
+    add_definitions(-wd4068)
+
+    # Disable warning C4715: "not all control paths return a value" because
+    # it generates too many false positives.
+    add_definitions(-wd4715)
+
+    add_definitions(-DNOMINMAX -DWIN32_LEAN_AND_MEAN -D_CRT_SECURE_NO_WARNINGS)
 endif()
 
 if(APPLE)
