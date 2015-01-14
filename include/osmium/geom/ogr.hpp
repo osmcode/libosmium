@@ -5,7 +5,7 @@
 
 This file is part of Osmium (http://osmcode.org/libosmium).
 
-Copyright 2013,2014 Jochen Topf <jochen@topf.org> and others (see README).
+Copyright 2013-2015 Jochen Topf <jochen@topf.org> and others (see README).
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -38,14 +38,25 @@ DEALINGS IN THE SOFTWARE.
 #include <memory>
 #include <utility>
 
-#pragma GCC diagnostic push
-#ifdef __clang__
-# pragma GCC diagnostic ignored "-Wdocumentation-unknown-command"
+#ifdef _MSC_VER
+# pragma warning(push)
+# pragma warning(disable : 4458)
+#else
+# pragma GCC diagnostic push
+# ifdef __clang__
+#  pragma GCC diagnostic ignored "-Wdocumentation-unknown-command"
+# endif
+# pragma GCC diagnostic ignored "-Wfloat-equal"
+# pragma GCC diagnostic ignored "-Wpadded"
 #endif
-#pragma GCC diagnostic ignored "-Wfloat-equal"
-#pragma GCC diagnostic ignored "-Wpadded"
-# include <ogr_geometry.h>
-#pragma GCC diagnostic pop
+
+#include <ogr_geometry.h>
+
+#ifdef _MSC_VER
+# pragma warning(pop)
+#else
+# pragma GCC diagnostic pop
+#endif
 
 #include <osmium/geom/coordinates.hpp>
 #include <osmium/geom/factory.hpp>
