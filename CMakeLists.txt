@@ -190,7 +190,7 @@ if(CPPCHECK)
     )
 else()
     message(STATUS "Looking for cppcheck - not found")
-    message(STATUS "  Make target cppcheck not available")
+    message(STATUS "  Make target 'cppcheck' will not be available.")
 endif(CPPCHECK)
 
 
@@ -199,8 +199,10 @@ endif(CPPCHECK)
 #  Doxygen-based documentation
 #
 #----------------------------------------------------------------------
+message(STATUS "Looking for doxygen")
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
+    message(STATUS "Looking for doxygen - found")
     configure_file(doc/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
     add_custom_target(doc
         ${DOXYGEN_EXECUTABLE}
@@ -210,7 +212,8 @@ if(DOXYGEN_FOUND)
     )
     install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/doc/html" DESTINATION "share/doc/libosmium-dev")
 else()
-    message(STATUS "Doxygen not found, so 'doc' target will not be available.")
+    message(STATUS "Looking for doxygen - not found")
+    message(STATUS "  Make target 'doc' will not be available.")
 endif()
 
 
