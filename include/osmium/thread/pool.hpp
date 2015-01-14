@@ -160,11 +160,11 @@ namespace osmium {
             }
 
             template <typename TFunction>
-            std::future<typename std::result_of<TFunction()>::type> submit(TFunction f) {
+            std::future<typename std::result_of<TFunction()>::type> submit(TFunction&& func) {
 
                 typedef typename std::result_of<TFunction()>::type result_type;
 
-                std::packaged_task<result_type()> task(std::move(f));
+                std::packaged_task<result_type()> task(std::forward<TFunction>(func));
                 std::future<result_type> future_result(task.get_future());
                 m_work_queue.push(std::move(task));
 
