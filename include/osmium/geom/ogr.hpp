@@ -47,10 +47,19 @@ DEALINGS IN THE SOFTWARE.
 #  pragma GCC diagnostic ignored "-Wdocumentation-unknown-command"
 # endif
 # pragma GCC diagnostic ignored "-Wfloat-equal"
+# pragma GCC diagnostic ignored "-Wold-style-cast"
 # pragma GCC diagnostic ignored "-Wpadded"
+# pragma GCC diagnostic ignored "-Wredundant-decls"
+# pragma GCC diagnostic ignored "-Wshadow"
 #endif
 
-#include <ogr_geometry.h>
+/* Strictly speaking the following include would be enough here,
+   but everybody using this file will very likely need the other includes,
+   so we are adding them here, so that not everybody will need all those
+   pragmas to disable warnings. */
+//#include <ogr_geometry.h>
+#include <ogr_api.h>
+#include <ogrsf_frmts.h>
 
 #ifdef _MSC_VER
 # pragma warning(pop)
