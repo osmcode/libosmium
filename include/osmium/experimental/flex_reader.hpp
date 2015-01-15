@@ -5,7 +5,7 @@
 
 This file is part of Osmium (http://osmcode.org/libosmium).
 
-Copyright 2014 Jochen Topf <jochen@topf.org> and others (see README).
+Copyright 2013-2015 Jochen Topf <jochen@topf.org> and others (see README).
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -51,9 +51,7 @@ namespace osmium {
             bool m_with_areas;
             osmium::osm_entity_bits::type m_entities;
 
-            typename TLocationHandler::index_pos_type m_index_pos;
-            typename TLocationHandler::index_neg_type m_index_neg;
-            TLocationHandler m_location_handler;
+            TLocationHandler& m_location_handler;
 
             osmium::io::Reader m_reader;
             osmium::area::Assembler::config_type m_assembler_config;
@@ -61,12 +59,10 @@ namespace osmium {
 
         public:
 
-            explicit FlexReader(const osmium::io::File& file, osmium::osm_entity_bits::type entities = osmium::osm_entity_bits::nwr) :
+            explicit FlexReader(const osmium::io::File& file, TLocationHandler& location_handler, osmium::osm_entity_bits::type entities = osmium::osm_entity_bits::nwr) :
                 m_with_areas(entities & osmium::osm_entity_bits::area),
                 m_entities((entities & ~osmium::osm_entity_bits::area) | (m_with_areas ? osmium::osm_entity_bits::node | osmium::osm_entity_bits::way : osmium::osm_entity_bits::nothing)),
-                m_index_pos(),
-                m_index_neg(),
-                m_location_handler(m_index_pos, m_index_neg),
+                m_location_handler(location_handler),
                 m_reader(file, m_entities),
                 m_assembler_config(),
                 m_collector(m_assembler_config)
@@ -79,12 +75,12 @@ namespace osmium {
                 }
             }
 
-            explicit FlexReader(const std::string& filename, osmium::osm_entity_bits::type entities = osmium::osm_entity_bits::nwr) :
-                FlexReader(osmium::io::File(filename), entities) {
+            explicit FlexReader(const std::string& filename, TLocationHandler& location_handler, osmium::osm_entity_bits::type entities = osmium::osm_entity_bits::nwr) :
+                FlexReader(osmium::io::File(filename), location_handler, entities) {
             }
 
-            explicit FlexReader(const char* filename, osmium::osm_entity_bits::type entities = osmium::osm_entity_bits::nwr) :
-                FlexReader(osmium::io::File(filename), entities) {
+            explicit FlexReader(const char* filename, TLocationHandler& location_handler, osmium::osm_entity_bits::type entities = osmium::osm_entity_bits::nwr) :
+                FlexReader(osmium::io::File(filename), location_handler, entities) {
             }
 
             osmium::memory::Buffer read() {

@@ -15,11 +15,7 @@
 #include <iostream>
 #include <getopt.h>
 
-// usually you only need one or two of these
-#include <osmium/index/map/dummy.hpp>
-#include <osmium/index/map/sparse_mem_table.hpp>
-#include <osmium/index/map/sparse_mem_map.hpp>
-#include <osmium/index/map/sparse_mmap_array.hpp>
+#include <osmium/index/map/sparse_mem_array.hpp>
 
 #include <osmium/visitor.hpp>
 
@@ -30,13 +26,8 @@
 #include <osmium/handler.hpp>
 #include <osmium/experimental/flex_reader.hpp>
 
-typedef osmium::index::map::Dummy<osmium::unsigned_object_id_type, osmium::Location> index_neg_type;
-
-//typedef osmium::index::map::SparseMemArray<osmium::unsigned_object_id_type, osmium::Location> index_pos_type;
-//typedef osmium::index::map::SparseMmapArray<osmium::unsigned_object_id_type, osmium::Location> index_pos_type;
-typedef osmium::index::map::SparseMemTable<osmium::unsigned_object_id_type, osmium::Location> index_pos_type;
-
-typedef osmium::handler::NodeLocationsForWays<index_pos_type, index_neg_type> location_handler_type;
+typedef osmium::index::map::SparseMemArray<osmium::unsigned_object_id_type, osmium::Location> index_type;
+typedef osmium::handler::NodeLocationsForWays<index_type> location_handler_type;
 
 class MyOGRHandler : public osmium::handler::Handler {
 
@@ -290,10 +281,9 @@ int main(int argc, char* argv[]) {
         input_filename = "-";
     }
 
-    index_pos_type index_pos;
-    index_neg_type index_neg;
-    location_handler_type location_handler(index_pos, index_neg);
-    osmium::experimental::FlexReader<location_handler_type> exr(input_filename, osmium::osm_entity_bits::object);
+    index_type index_pos;
+    location_handler_type location_handler(index_pos);
+    osmium::experimental::FlexReader<location_handler_type> exr(input_filename, location_handler, osmium::osm_entity_bits::object);
 
     MyOGRHandler ogr_handler(output_format, output_filename);
 

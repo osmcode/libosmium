@@ -104,6 +104,9 @@ namespace osmium {
             NodeLocationsForWays(const NodeLocationsForWays&) = delete;
             NodeLocationsForWays& operator=(const NodeLocationsForWays&) = delete;
 
+            NodeLocationsForWays(NodeLocationsForWays&&) = default;
+            NodeLocationsForWays& operator=(NodeLocationsForWays&&) = default;
+
             ~NodeLocationsForWays() noexcept = default;
 
             void ignore_errors() {
