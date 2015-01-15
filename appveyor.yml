@@ -46,6 +46,8 @@ install:
   - SET LIBBZIP2=%LIBBZIP2:\=/%
   - ps: Start-FileDownload https://mapnik.s3.amazonaws.com/dist/dev/libosmium-deps-win-14.0-x64.7z -FileName lodeps.7z
   - 7z x lodeps.7z > nul
+  - dir %LODEPSDIR%
+  - tree %LODEPSDIR%
 
 build_script:
   - cd c:\projects\libosmium
