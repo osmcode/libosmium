@@ -60,7 +60,7 @@ namespace osmium {
         public:
 
             explicit FlexReader(const osmium::io::File& file, TLocationHandler& location_handler, osmium::osm_entity_bits::type entities = osmium::osm_entity_bits::nwr) :
-                m_with_areas(entities & osmium::osm_entity_bits::area),
+                m_with_areas((entities & osmium::osm_entity_bits::area) != 0),
                 m_entities((entities & ~osmium::osm_entity_bits::area) | (m_with_areas ? osmium::osm_entity_bits::node | osmium::osm_entity_bits::way : osmium::osm_entity_bits::nothing)),
                 m_location_handler(location_handler),
                 m_reader(file, m_entities),

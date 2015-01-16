@@ -187,11 +187,11 @@ public:
     }
 
     bool dense_format() const {
-        return vm.count("array");
+        return vm.count("array") != 0;
     }
 
     bool do_dump() const {
-        return vm.count("dump");
+        return vm.count("dump") != 0;
     }
 
     std::vector<osmium::unsigned_object_id_type> search_keys() const {
