@@ -41,6 +41,7 @@ DEALINGS IN THE SOFTWARE.
 #ifdef _MSC_VER
 # pragma warning(push)
 # pragma warning(disable : 4458)
+# pragma warning(disable : 4251)
 #else
 # pragma GCC diagnostic push
 # ifdef __clang__
