@@ -28,10 +28,27 @@ install:
   - cmake -version
   - CALL "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" amd64
   - SET LODEPSDIR=c:\projects\libosmium\libosmium-deps
+  - SET PROJ_LIB=%LODEPSDIR%\proj\share
+  - set GDAL_DATA=%LODEPSDIR%\gdal\data
+  #geos.dll
+  - SET PATH=%LODEPSDIR%\geos\lib;%PATH%
+  #gdal.dll
+  - SET PATH=%LODEPSDIR%\gdal\lib;%PATH%
+  #libexpat.dll
+  - SET PATH=%LODEPSDIR%\expat\lib;%PATH%
+  #libtiff.dll
+  - SET PATH=%LODEPSDIR%\libtiff\lib;%PATH%
+  #zlibwapi.dll
+  - SET PATH=%LODEPSDIR%\zlib\lib;%PATH%
+  #convert backslashes in bzip2 path to forward slashes
+  #cmake cannot find it otherwise
   - SET LIBBZIP2=%LODEPSDIR%\bzip2\lib\libbz2.lib
   - SET LIBBZIP2=%LIBBZIP2:\=/%
   - ps: Start-FileDownload https://mapnik.s3.amazonaws.com/dist/dev/libosmium-deps-win-14.0-x64.7z -FileName lodeps.7z
   - 7z x lodeps.7z > nul
+  - echo %LODEPSDIR%
+  - dir %LODEPSDIR%
+  #- tree %LODEPSDIR%
 
 build_script:
   - cd c:\projects\libosmium
