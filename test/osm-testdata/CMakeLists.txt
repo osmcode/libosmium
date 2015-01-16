@@ -12,10 +12,6 @@ include(Dart)
 include_directories("include")
 include_directories("../include")
 
-if(NOT MSVC)
-    add_definitions(-Wno-unused-variable)
-endif()
-
 get_filename_component(TESTDATA_DIR ../../../osm-testdata ABSOLUTE)
 if(NOT EXISTS ${TESTDATA_DIR})
     execute_process(COMMAND git clone https://github.com/osmcode/osm-testdata.git ${TESTDATA_DIR})

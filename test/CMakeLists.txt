@@ -4,10 +4,6 @@ set(DART_TESTING_TIMEOUT 60)
 include(Dart)
 include_directories(include)
 
-if(NOT MSVC)
-    add_definitions(-Wno-unused-variable)
-endif()
-
 add_library(testlib STATIC test_main.cpp)
 
 #----------------------------------------------------------------------
