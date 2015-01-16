@@ -4,12 +4,8 @@ set(DART_TESTING_TIMEOUT 60)
 include(Dart)
 include_directories(include)
 
-# In 'Dev' mode: compile with very strict warnings and turn them into errors.
-if(CMAKE_BUILD_TYPE STREQUAL "Dev")
-    if(NOT MSVC)
-        add_definitions(-Werror)
-    endif()
-    add_definitions(${OSMIUM_WARNING_OPTIONS} -Wno-unused-variable)
+if(NOT MSVC)
+    add_definitions(-Wno-unused-variable)
 endif()
 
 add_library(testlib STATIC test_main.cpp)

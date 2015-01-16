@@ -48,36 +48,32 @@ endif()
 #
 #----------------------------------------------------------------------
 
-# check that the essential libraries were found
-if(BUILD_EXAMPLES OR BUILD_TESTING OR BUILD_UNIT_TESTS OR BUILD_DATA_TESTS OR BUILD_HEADERS)
+find_package(Boost 1.38)
+mark_as_advanced(CLEAR BOOST_ROOT)
 
-    find_package(Boost 1.38)
-    mark_as_advanced(CLEAR BOOST_ROOT)
-
-    if(Boost_FOUND)
-        include_directories(${Boost_INCLUDE_DIRS})
-    else()
-        set(BOOST_ROOT "NOT FOUND: please choose" CACHE PATH "")
-        message(FATAL_ERROR "PLEASE, specify the directory where the Boost library is installed in BOOST_ROOT")
-    endif()
-
-    set(OSMIUM_INCLUDE_DIR include)
-    find_package(Osmium COMPONENTS io gdal geos proj sparsehash)
-    include_directories(${OSMIUM_INCLUDE_DIRS})
-
-    if(MSVC)
-        find_path(GETOPT_INCLUDE_DIR getopt.h)
-        find_library(GETOPT_LIBRARY NAMES wingetopt)
-        if(GETOPT_INCLUDE_DIR AND GETOPT_LIBRARY)
-            include_directories(${GETOPT_INCLUDE_DIR})
-            list(APPEND OSMIUM_LIBRARIES ${GETOPT_LIBRARY})
-        else()
-            set(GETOPT_MISSING 1)
-        endif()
-    endif()
-
-    include_directories(include)
+if(Boost_FOUND)
+    include_directories(${Boost_INCLUDE_DIRS})
+else()
+    set(BOOST_ROOT "NOT FOUND: please choose" CACHE PATH "")
+    message(FATAL_ERROR "PLEASE, specify the directory where the Boost library is installed in BOOST_ROOT")
 endif()
+
+set(OSMIUM_INCLUDE_DIR include)
+find_package(Osmium COMPONENTS io gdal geos proj sparsehash)
+include_directories(${OSMIUM_INCLUDE_DIRS})
+
+if(MSVC)
+    find_path(GETOPT_INCLUDE_DIR getopt.h)
+    find_library(GETOPT_LIBRARY NAMES wingetopt)
+    if(GETOPT_INCLUDE_DIR AND GETOPT_LIBRARY)
+        include_directories(${GETOPT_INCLUDE_DIR})
+        list(APPEND OSMIUM_LIBRARIES ${GETOPT_LIBRARY})
+    else()
+        set(GETOPT_MISSING 1)
+    endif()
+endif()
+
+include_directories(include)
 
 #----------------------------------------------------------------------
 #
@@ -98,9 +94,16 @@ endif()
 
 #----------------------------------------------------------------------
 
-set(CMAKE_CXX_FLAGS_DEV "-O3 -g"
+if(MSVC)
+    set(USUAL_COMPILE_OPTIONS "/Ox")
+else()
+    set(USUAL_COMPILE_OPTIONS "-O3 -g")
+endif()
+
+set(CMAKE_CXX_FLAGS_DEV "${USUAL_COMPILE_OPTIONS}"
     CACHE STRING "Flags used by the compiler during developer builds."
     FORCE)
+
 set(CMAKE_EXE_LINKER_FLAGS_DEV ""
     CACHE STRING "Flags used by the linker during developer builds."
     FORCE)
@@ -109,11 +112,19 @@ mark_as_advanced(
     CMAKE_EXE_LINKER_FLAGS_DEV
 )
 
-set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O3 -g"
+set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${USUAL_COMPILE_OPTIONS}"
     CACHE STRING "Flags used by the compiler during RELWITHDEBINFO builds."
     FORCE)
 
 set(CMAKE_CONFIGURATION_TYPES "Debug Release RelWithDebInfo MinSizeRel Dev")
+
+# In 'Dev' mode: compile with very strict warnings and turn them into errors.
+if(CMAKE_BUILD_TYPE STREQUAL "Dev")
+    if(NOT MSVC)
+        add_definitions(-Werror)
+    endif()
+    add_definitions(${OSMIUM_WARNING_OPTIONS})
+endif()
 
 # Force RelWithDebInfo build type if none was given
 if (CMAKE_BUILD_TYPE STREQUAL "")
@@ -230,14 +241,6 @@ endif()
 # But if it reports an error we know we are missing something.
 if(BUILD_HEADERS)
     file(GLOB_RECURSE ALL_HPPS RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/include" include/osmium/*.hpp)
-
-    # In 'Dev' mode: compile with very strict warnings and turn them into errors.
-    if(CMAKE_BUILD_TYPE STREQUAL "Dev")
-        if(NOT MSVC)
-            add_definitions(-Werror)
-        endif()
-        add_definitions(${OSMIUM_WARNING_OPTIONS})
-    endif()
 
     file(MAKE_DIRECTORY header_check)
 
