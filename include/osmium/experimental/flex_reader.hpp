@@ -84,12 +84,11 @@ namespace osmium {
             }
 
             osmium::memory::Buffer read() {
-                std::vector<osmium::memory::Buffer> area_buffers;
-
                 osmium::memory::Buffer buffer = m_reader.read();
 
                 if (buffer) {
                     if (m_with_areas) {
+                        std::vector<osmium::memory::Buffer> area_buffers;
                         osmium::apply(buffer, m_location_handler, m_collector.handler([&area_buffers](osmium::memory::Buffer&& area_buffer) {
                             area_buffers.push_back(std::move(area_buffer));
                         }));
