@@ -258,6 +258,14 @@ if(BUILD_HEADERS)
         # so we pretend to build a library here.
         add_library(${libname} STATIC ${DUMMYCPP} include/${hpp})
 
+        if(MSVC)
+            # Remove warning LNK4221: "This object file does not define any
+            # previously undefined public symbols, so it will not be used by
+            # any link operation that consumes this library". This is a dummy
+            # library anyways.
+            target_link_libraries(${libname} /wd4221)
+        endif()
+
         #### this is better but only supported from cmake 3.0:
         ###add_library(${libname} OBJECT ${DUMMYCPP} include/${hpp})
 
