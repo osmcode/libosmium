@@ -1,9 +1,5 @@
 message(STATUS "Configuring examples")
 
-if(GETOPT_MISSING)
-    message(FATAL_ERROR "On Visual Studio the wingetopt library is needed to compile examples")
-endif()
-
 set(EXAMPLES
     area_test
     convert
@@ -19,6 +15,26 @@ set(EXAMPLES
     use_node_cache
     CACHE STRING "Example programs"
 )
+
+#----------------------------------------------------------------------
+#
+#  Examples depending on wingetopt
+#
+#----------------------------------------------------------------------
+
+set(GETOPT_EXAMPLES area_test convert serdump toogr toogr2 toogr2_exp)
+if(NOT GETOPT_MISSING)
+    foreach(example ${GETOPT_EXAMPLES})
+        set(EXAMPLE_LIBS_${example} ${GETOPT_LIBRARY})
+    endforeach()
+else()
+    message(STATUS "Configuring examples - Skipping examples because on Visual Studio the wingetopt library is needed and was not found:")
+    foreach(example ${GETOPT_EXAMPLES})
+        message(STATUS "  - osmium_${example}")
+        list(REMOVE_ITEM EXAMPLES ${example})
+    endforeach()
+endif()
+
 
 #----------------------------------------------------------------------
 #
@@ -61,13 +77,13 @@ set(OGR_EXAMPLES toogr toogr2 toogr2_exp)
 if(GDAL_FOUND AND PROJ_FOUND AND SPARSEHASH_FOUND)
     foreach(example ${OGR_EXAMPLES})
         set(EXAMPLE_LIBS_${example} ${GDAL_LIBRARIES} ${PROJ_LIBRARIES})
-    endforeach(example)
+    endforeach()
 else()
     message(STATUS "Configuring examples - Skipping examples because GDAL and/or Proj.4 and/or SparseHash not found:")
     foreach(example ${OGR_EXAMPLES})
         message(STATUS "  - osmium_${example}")
         list(REMOVE_ITEM EXAMPLES ${example})
-    endforeach(example)
+    endforeach()
 endif()
 
 #----------------------------------------------------------------------
@@ -81,7 +97,7 @@ foreach(example ${EXAMPLES})
     message(STATUS "  - osmium_${example}")
     add_executable(osmium_${example} "osmium_${example}.cpp")
     target_link_libraries(osmium_${example} ${OSMIUM_IO_LIBRARIES} ${EXAMPLE_LIBS_${example}})
-endforeach(example)
+endforeach()
 
 message(STATUS "Configuring examples done")
 
