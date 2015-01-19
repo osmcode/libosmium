@@ -94,8 +94,9 @@ namespace osmium {
             }
 
             function_wrapper(const function_wrapper&) = delete;
-            function_wrapper(function_wrapper&) = delete;
             function_wrapper& operator=(const function_wrapper&) = delete;
+
+            ~function_wrapper() = default;
 
             explicit operator bool() const {
                 return static_cast<bool>(impl);
