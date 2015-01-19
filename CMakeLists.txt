@@ -37,8 +37,10 @@ option(BUILD_DATA_TESTS "compile data tests, please run them with ctest" ON)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Dev")
     option(BUILD_HEADERS    "compile every header file on its own" ON)
+    option(BUILD_BENCHMARKS "compile benchmark programs" ON)
 else()
     option(BUILD_HEADERS    "compile every header file on its own" OFF)
+    option(BUILD_BENCHMARKS "compile benchmark programs" OFF)
 endif()
 
 
@@ -233,6 +235,10 @@ endif()
 
 if(BUILD_EXAMPLES)
     add_subdirectory(examples)
+endif()
+
+if(BUILD_BENCHMARKS)
+    add_subdirectory(benchmarks)
 endif()
 
 #----------------------------------------------------------------------
