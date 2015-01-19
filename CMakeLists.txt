@@ -127,10 +127,11 @@ if(CMAKE_BUILD_TYPE STREQUAL "Dev")
 endif()
 
 # Force RelWithDebInfo build type if none was given
-if (CMAKE_BUILD_TYPE STREQUAL "")
-    set(CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING "Choose the type of build, options are: ${CMAKE_CONFIGURATION_TYPES}." FORCE)
+SET(BUILD_TYPE_INFO "Choose the type of build, options are: ${CMAKE_CONFIGURATION_TYPES}.")
+if (NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING ${BUILD_TYPE_INFO} FORCE)
 else()
-    set(CMAKE_BUILD_TYPE "${CMAKE_BUILD_TYPE}" CACHE STRING "Choose the type of build, options are: ${CMAKE_CONFIGURATION_TYPES}." FORCE)
+    set(CMAKE_BUILD_TYPE "${CMAKE_BUILD_TYPE}" CACHE STRING ${BUILD_TYPE_INFO} FORCE)
 endif()
 
 
