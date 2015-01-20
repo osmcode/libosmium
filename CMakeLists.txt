@@ -231,31 +231,7 @@ endif(CPPCHECK)
 
 #-----------------------------------------------------------------------------
 #
-#  Doxygen-based documentation
-#
-#-----------------------------------------------------------------------------
-message(STATUS "Looking for doxygen")
-find_package(Doxygen)
-if(DOXYGEN_FOUND)
-    message(STATUS "Looking for doxygen - found")
-    configure_file(doc/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
-    add_custom_target(doc
-        ${DOXYGEN_EXECUTABLE}
-        ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-        COMMENT "Generating API documentation with Doxygen" VERBATIM
-    )
-    install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/doc/html"
-            DESTINATION "share/doc/libosmium-dev")
-else()
-    message(STATUS "Looking for doxygen - not found")
-    message(STATUS "  Make target 'doc' will not be available.")
-endif()
-
-
-#-----------------------------------------------------------------------------
-#
-#  Examples and benchmarks
+#  Examples, benchmarks and documentation
 #
 #-----------------------------------------------------------------------------
 
@@ -266,6 +242,8 @@ endif()
 if(BUILD_BENCHMARKS)
     add_subdirectory(benchmarks)
 endif()
+
+add_subdirectory(doc)
 
 
 #-----------------------------------------------------------------------------
