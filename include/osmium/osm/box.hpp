@@ -123,7 +123,7 @@ namespace osmium {
          * Box are valid, ie. defined and inside usual bounds
          * (-180<=lon<=180, -90<=lat<=90).
          */
-        constexpr bool valid() const noexcept {
+        OSMIUM_CONSTEXPR bool valid() const noexcept {
             return bottom_left().valid() && top_right().valid();
         }
 
