@@ -39,7 +39,7 @@ script:
  - if [ "${CXX}" = 'g++' ]; then export CXX=g++-4.8; fi;
  - mkdir build
  - cd build
- - cmake -L -DCMAKE_BUILD_TYPE=${CONFIGURATION} ..
+ - cmake -LA -DCMAKE_BUILD_TYPE=${CONFIGURATION} ..
  - make VERBOSE=1
  # Disable multipolygon test because it needs ruby and the 'json' gem, but the
  # travis ruby installation doesn't find the gem it did install itself.
