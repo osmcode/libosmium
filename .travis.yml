@@ -24,6 +24,7 @@ install:
  - sudo apt-get install --yes make libgdal1h libgdal-dev
  # OSMPBF is too old, install from git
  #- sudo apt-get install --yes libosmpbf-dev
+ - git clone https://github.com/osmcode/osm-testdata.git
  - git clone https://github.com/scrosby/OSM-binary.git
  - cd OSM-binary/src
  - make

@@ -49,6 +49,8 @@ install:
   - echo %LODEPSDIR%
   - dir %LODEPSDIR%
   #- tree %LODEPSDIR%
+  - cd c:\projects
+  - git clone https://github.com/osmcode/osm-testdata.git
 
 build_script:
   - cd c:\projects\libosmium

@@ -169,8 +169,15 @@ will run the `basic_test_node` and `basic_test_node_ref` tests.
 ### Data Tests
 
 In addition there are some test based on the OSM Test Data Repository at
-http://osmcode.org/osm-testdata/ . Make sure `BUILD_DATA_TESTS` is set in the
-cmake config, then build the project and call `ctest`.
+http://osmcode.org/osm-testdata/ . To run those tests call
+
+    git clone https://github.com/osmcode/osm-testdata.git
+
+in the same directory libosmium is in. (If you want to use a different
+directory you have to set the cmake variable `OSM_TESTDATA` to that directory.)
+
+Enable the `BUILD_DATA_TESTS` option in cmake (will get enabled automatically
+for `Dev` builds), then build the project and call `ctest`.
 
 Some of these tests need Spatialite, Ruby and the 'json' gem installed.
 

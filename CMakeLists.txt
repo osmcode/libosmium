@@ -288,3 +288,18 @@ install(DIRECTORY include/osmium DESTINATION include)
 #----------------------------------------------------------------------
 include(CPack)
 
+#----------------------------------------------------------------------
+#
+#  Print warnings at the end
+#
+#----------------------------------------------------------------------
+
+if(BUILD_DATA_TESTS AND OSM_TESTDATA STREQUAL "OSM_TESTDATA-NOTFOUND")
+    message("\n========================== WARNING ==========================")
+    message("osm-testdata directory not found, data tests were disabled!\n")
+    message("You can get it from https://github.com/osmcode/osm-testdata")
+    message("Clone it into the same directory libosmium is in")
+    message("or set the OSM_TESTDATA cmake variable to its path.")
+    message("=============================================================\n")
+endif()
+

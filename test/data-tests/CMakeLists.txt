@@ -11,10 +11,13 @@ include(Dart)
 include_directories("include")
 include_directories("../include")
 
-get_filename_component(TESTDATA_DIR ../../../osm-testdata ABSOLUTE)
-if(NOT EXISTS ${TESTDATA_DIR})
-    execute_process(COMMAND git clone https://github.com/osmcode/osm-testdata.git ${TESTDATA_DIR})
+message(STATUS "Looking for osm-testdata")
+find_path(OSM_TESTDATA grid/data/all.osm HINT ../../../osm-testdata)
+if (OSM_TESTDATA STREQUAL "OSM_TESTDATA-NOTFOUND")
+    message(STATUS "Looking for osm-testdata - not found (data tests disabled)")
+    return()
 endif()
+message(STATUS "Looking for osm-testdata - found")
 
 #----------------------------------------------------------------------
 
@@ -27,7 +30,7 @@ add_test(NAME testdata-testcases
          COMMAND testdata-testcases
 )
 set_tests_properties(testdata-testcases
-    PROPERTIES ENVIRONMENT "TESTCASES_DIR=${TESTDATA_DIR}/grid/data")
+    PROPERTIES ENVIRONMENT "TESTCASES_DIR=${OSM_TESTDATA}/grid/data")
 
 #----------------------------------------------------------------------
 
@@ -37,7 +40,7 @@ target_link_libraries(testdata-overview
                       ${GDAL_LIBRARIES}
 )
 add_test(NAME testdata-overview
-         COMMAND testdata-overview ${TESTDATA_DIR}/grid/data/all.osm
+         COMMAND testdata-overview ${OSM_TESTDATA}/grid/data/all.osm
 )
 
 #----------------------------------------------------------------------
@@ -50,7 +53,7 @@ add_test(NAME testdata-xml
          COMMAND testdata-xml
 )
 set_tests_properties(testdata-xml
-    PROPERTIES ENVIRONMENT "TESTDIR=${TESTDATA_DIR}/xml/data")
+    PROPERTIES ENVIRONMENT "TESTDIR=${OSM_TESTDATA}/xml/data")
 
 #----------------------------------------------------------------------
 
@@ -74,7 +77,7 @@ endif()
 
 add_test(NAME testdata-multipolygon
          COMMAND ${CMAKE_SOURCE_DIR}/test/data-tests/${MULTIPOLYGON_TEST_SCRIPT}
-         ${TESTDATA_DIR}
+         ${OSM_TESTDATA}
          ${EXE_DIR}
 )
 
