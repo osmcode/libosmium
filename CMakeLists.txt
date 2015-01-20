@@ -31,17 +31,18 @@ set(LIBOSMIUM_VERSION ${LIBOSMIUM_VERSION_MAJOR}.${LIBOSMIUM_VERSION_MINOR}.${LI
 #
 #----------------------------------------------------------------------
 
-option(BUILD_EXAMPLES   "compile example programs" ON)
-option(BUILD_UNIT_TESTS "compile unit tests, please run them with ctest" ON)
-option(BUILD_DATA_TESTS "compile data tests, please run them with ctest" ON)
-
 if(CMAKE_BUILD_TYPE STREQUAL "Dev")
-    option(BUILD_HEADERS    "compile every header file on its own" ON)
-    option(BUILD_BENCHMARKS "compile benchmark programs" ON)
+    set(dev_build ON)
 else()
-    option(BUILD_HEADERS    "compile every header file on its own" OFF)
-    option(BUILD_BENCHMARKS "compile benchmark programs" OFF)
+    set(dev_build OFF)
 endif()
+
+option(BUILD_EXAMPLES   "compile example programs" ON)
+option(BUILD_TESTING    "compile unit tests, please run them with ctest" ON)
+
+option(BUILD_HEADERS    "compile every header file on its own" ${dev_build})
+option(BUILD_BENCHMARKS "compile benchmark programs" ${dev_build})
+option(BUILD_DATA_TESTS "compile data tests, please run them with ctest" ${dev_build})
 
 
 #----------------------------------------------------------------------
@@ -158,11 +159,11 @@ find_program(MEMORYCHECK_COMMAND valgrind)
 set(MEMORYCHECK_COMMAND_OPTIONS "--trace-children=yes --leak-check=full --show-reachable=yes --error-exitcode=1")
 set(MEMORYCHECK_SUPPRESSIONS_FILE "${PROJECT_SOURCE_DIR}/test/valgrind.supp")
 
-if(BUILD_UNIT_TESTS OR BUILD_TESTING)
+if(BUILD_TESTING)
     add_subdirectory(test)
 endif()
 
-if(BUILD_DATA_TESTS OR BUILD_TESTING)
+if(BUILD_DATA_TESTS)
     add_subdirectory(test/osm-testdata)
 endif()
 

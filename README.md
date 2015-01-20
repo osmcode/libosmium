@@ -151,7 +151,7 @@ directory. Many more tests are needed, any help appreciated.
 For [Catch](https://github.com/philsquared/Catch/) only one header file is
 needed which is included (`test/include/catch.hpp`).
 
-To compile these unit tests make sure `BUILD_UNIT_TESTS` is set in the cmake
+To compile these unit tests make sure `BUILD_TESTING` is set in the cmake
 config, then build the project and call
 
     ctest
@@ -172,7 +172,7 @@ In addition there are some test based on the OSM Test Data Repository at
 http://osmcode.org/osm-testdata/ . Make sure `BUILD_DATA_TESTS` is set in the
 cmake config, then build the project and call `ctest`.
 
-Some of these tests need Ruby and then 'json' gem installed.
+Some of these tests need Spatialite, Ruby and the 'json' gem installed.
 
 ### Valgrind
 
