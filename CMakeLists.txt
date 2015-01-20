@@ -303,12 +303,18 @@ install(DIRECTORY include/osmium DESTINATION include)
 #  Packaging
 #
 #-----------------------------------------------------------------------------
-include(CPack)
+
+set(CPACK_PACKAGE_VERSION_MAJOR ${LIBOSMIUM_VERSION_MAJOR})
+set(CPACK_PACKAGE_VERSION_MINOR ${LIBOSMIUM_VERSION_MINOR})
+set(CPACK_PACKAGE_VERSION_PATCH ${LIBOSMIUM_VERSION_PATCH})
+
 if(WIN32)
     set(CPACK_GENERATOR ZIP)
 else()
-    set(CPACK_GENERATOR TBZ2)
+    set(CPACK_GENERATOR TGZ)
 endif()
+
+include(CPack)
 
 
 #-----------------------------------------------------------------------------
