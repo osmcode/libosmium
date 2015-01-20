@@ -1,18 +1,20 @@
-#----------------------------------------------------------------------
+#-----------------------------------------------------------------------------
 #
-#  Libosmium CMakeLists.txt
+#  CMake Config
 #
-#----------------------------------------------------------------------
+#  Libosmium
+#
+#-----------------------------------------------------------------------------
 
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
 
-#----------------------------------------------------------------------
+#-----------------------------------------------------------------------------
 #
 #  Project version
 #
-#----------------------------------------------------------------------
+#-----------------------------------------------------------------------------
 
 project(libosmium)
 
@@ -20,16 +22,17 @@ set(LIBOSMIUM_VERSION_MAJOR 0)
 set(LIBOSMIUM_VERSION_MINOR 0)
 set(LIBOSMIUM_VERSION_PATCH 1)
 
-set(LIBOSMIUM_VERSION ${LIBOSMIUM_VERSION_MAJOR}.${LIBOSMIUM_VERSION_MINOR}.${LIBOSMIUM_VERSION_PATCH})
+set(LIBOSMIUM_VERSION
+    ${LIBOSMIUM_VERSION_MAJOR}.${LIBOSMIUM_VERSION_MINOR}.${LIBOSMIUM_VERSION_PATCH})
 
 
-#----------------------------------------------------------------------
+#-----------------------------------------------------------------------------
 #
 #  Build options
 #
 #  (Change with -DOPTION=VALUE on cmake command line.)
 #
-#----------------------------------------------------------------------
+#-----------------------------------------------------------------------------
 
 if(CMAKE_BUILD_TYPE STREQUAL "Dev")
     set(dev_build ON)
@@ -45,11 +48,11 @@ option(BUILD_BENCHMARKS "compile benchmark programs" ${dev_build})
 option(BUILD_DATA_TESTS "compile data tests, please run them with ctest" ${dev_build})
 
 
-#----------------------------------------------------------------------
+#-----------------------------------------------------------------------------
 #
 #  Find external dependencies
 #
-#----------------------------------------------------------------------
+#-----------------------------------------------------------------------------
 
 find_package(Boost 1.38)
 mark_as_advanced(CLEAR BOOST_ROOT)
@@ -78,12 +81,12 @@ endif()
 
 include_directories(include)
 
-#----------------------------------------------------------------------
+
+#-----------------------------------------------------------------------------
 #
 #  Decide which C++ version to use (Minimum/default: C++11).
 #
-#----------------------------------------------------------------------
-
+#-----------------------------------------------------------------------------
 IF(NOT MSVC)
     if(NOT USE_CPP_VERSION)
         set(USE_CPP_VERSION c++11)
@@ -95,12 +98,21 @@ IF(NOT MSVC)
     add_definitions(-std=${USE_CPP_VERSION})
 endif()
 
-#----------------------------------------------------------------------
 
+#-----------------------------------------------------------------------------
+#
+#  Compiler and Linker flags
+#
+#-----------------------------------------------------------------------------
 if(MSVC)
     set(USUAL_COMPILE_OPTIONS "/Ox")
 else()
     set(USUAL_COMPILE_OPTIONS "-O3 -g")
+endif()
+
+if(WIN32)
+    add_definitions(-DWIN32 -D_WIN32 -DMSWIN32 -DBGDWIN32
+                    -DWINVER=0x0500 -D_WIN32_WINNT=0x0500 -D_WIN32_IE=0x0600)
 endif()
 
 set(CMAKE_CXX_FLAGS_DEV "${USUAL_COMPILE_OPTIONS}"
@@ -119,6 +131,12 @@ set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${USUAL_COMPILE_OPTIONS}"
     CACHE STRING "Flags used by the compiler during RELWITHDEBINFO builds."
     FORCE)
 
+
+#-----------------------------------------------------------------------------
+#
+#  Build Type
+#
+#-----------------------------------------------------------------------------
 set(CMAKE_CONFIGURATION_TYPES "Debug Release RelWithDebInfo MinSizeRel Dev")
 
 # In 'Dev' mode: compile with very strict warnings and turn them into errors.
@@ -130,33 +148,30 @@ if(CMAKE_BUILD_TYPE STREQUAL "Dev")
 endif()
 
 # Force RelWithDebInfo build type if none was given
-SET(BUILD_TYPE_INFO "Choose the type of build, options are: ${CMAKE_CONFIGURATION_TYPES}.")
-if (NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING ${BUILD_TYPE_INFO} FORCE)
+if(CMAKE_BUILD_TYPE)
+    set(build_type ${CMAKE_BUILD_TYPE})
 else()
-    set(CMAKE_BUILD_TYPE "${CMAKE_BUILD_TYPE}" CACHE STRING ${BUILD_TYPE_INFO} FORCE)
+    set(build_type "RelWithDebInfo")
 endif()
 
-
-#----------------------------------------------------------------------
-
-if(WIN32)
-    add_definitions(-DWIN32 -D_WIN32 -DMSWIN32 -DBGDWIN32 -DWINVER=0x0500 -D_WIN32_WINNT=0x0500 -D_WIN32_IE=0x0600)
-    set(CPACK_GENERATOR ZIP)
-else()
-    set(CPACK_GENERATOR TGZ)
-endif()
+set(CMAKE_BUILD_TYPE ${build_type}
+    CACHE STRING
+    "Choose the type of build, options are: ${CMAKE_CONFIGURATION_TYPES}."
+    FORCE)
 
 
-#----------------------------------------------------------------------
+#-----------------------------------------------------------------------------
 #
-#  Set up testing
+#  Unit and data tests
 #
-#----------------------------------------------------------------------
+#-----------------------------------------------------------------------------
 enable_testing()
 
 find_program(MEMORYCHECK_COMMAND valgrind)
-set(MEMORYCHECK_COMMAND_OPTIONS "--trace-children=yes --leak-check=full --show-reachable=yes --error-exitcode=1")
+
+set(MEMORYCHECK_COMMAND_OPTIONS
+    "--trace-children=yes --leak-check=full --show-reachable=yes --error-exitcode=1")
+
 set(MEMORYCHECK_SUPPRESSIONS_FILE "${PROJECT_SOURCE_DIR}/test/valgrind.supp")
 
 if(BUILD_TESTING)
@@ -168,17 +183,18 @@ if(BUILD_DATA_TESTS)
 endif()
 
 
-#----------------------------------------------------------------------
+#-----------------------------------------------------------------------------
 #
 #  Optional "cppcheck" target that checks C++ code
 #
-#----------------------------------------------------------------------
+#-----------------------------------------------------------------------------
 message(STATUS "Looking for cppcheck")
 find_program(CPPCHECK cppcheck)
 
 if(CPPCHECK)
     message(STATUS "Looking for cppcheck - found")
-    set(CPPCHECK_OPTIONS --enable=warning,style,performance,portability,information,missingInclude)
+    set(CPPCHECK_OPTIONS
+        --enable=warning,style,performance,portability,information,missingInclude)
 
     # cpp doesn't find system includes for some reason, suppress that report
     set(CPPCHECK_OPTIONS ${CPPCHECK_OPTIONS} --suppress=missingIncludeSystem)
@@ -195,7 +211,11 @@ if(CPPCHECK)
         message(STATUS "Checking data test code: ${ALL_DATA_TESTS}")
     endif()
 
-    set(CPPCHECK_FILES ${ALL_INCLUDES} ${ALL_EXAMPLES} ${ALL_UNIT_TESTS} ${ALL_DATA_TESTS})
+    set(CPPCHECK_FILES
+        ${ALL_INCLUDES}
+        ${ALL_EXAMPLES}
+        ${ALL_UNIT_TESTS}
+        ${ALL_DATA_TESTS})
 
     add_custom_target(cppcheck
         ${CPPCHECK}
@@ -209,11 +229,11 @@ else()
 endif(CPPCHECK)
 
 
-#----------------------------------------------------------------------
+#-----------------------------------------------------------------------------
 #
 #  Doxygen-based documentation
 #
-#----------------------------------------------------------------------
+#-----------------------------------------------------------------------------
 message(STATUS "Looking for doxygen")
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
@@ -225,14 +245,19 @@ if(DOXYGEN_FOUND)
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
         COMMENT "Generating API documentation with Doxygen" VERBATIM
     )
-    install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/doc/html" DESTINATION "share/doc/libosmium-dev")
+    install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/doc/html"
+            DESTINATION "share/doc/libosmium-dev")
 else()
     message(STATUS "Looking for doxygen - not found")
     message(STATUS "  Make target 'doc' will not be available.")
 endif()
 
 
-#----------------------------------------------------------------------
+#-----------------------------------------------------------------------------
+#
+#  Examples and benchmarks
+#
+#-----------------------------------------------------------------------------
 
 if(BUILD_EXAMPLES)
     add_subdirectory(examples)
@@ -242,13 +267,22 @@ if(BUILD_BENCHMARKS)
     add_subdirectory(benchmarks)
 endif()
 
-#----------------------------------------------------------------------
-# This will try to compile include files on their own to detect missing
-# include directives and other dependency-related problems. Note that if this
-# work, it is not enough to be sure it will compile in production code.
-# But if it reports an error we know we are missing something.
+
+#-----------------------------------------------------------------------------
+#
+#  Headers
+#
+#  This will try to compile include files on their own to detect missing
+#  include directives and other dependency-related problems. Note that if this
+#  work, it is not enough to be sure it will compile in production code.
+#  But if it reports an error we know we are missing something.
+#
+#-----------------------------------------------------------------------------
 if(BUILD_HEADERS)
-    file(GLOB_RECURSE ALL_HPPS RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/include" include/osmium/*.hpp)
+    file(GLOB_RECURSE
+         ALL_HPPS
+         RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/include"
+         include/osmium/*.hpp)
 
     file(MAKE_DIRECTORY header_check)
 
@@ -285,15 +319,25 @@ install(DIRECTORY include/osmium DESTINATION include)
 # don't have it. We probably don't want to install it.
 #install(FILES include/boost_unicode_iterator.hpp DESTINATION include)
 
-#----------------------------------------------------------------------
-include(CPack)
 
-#----------------------------------------------------------------------
+#-----------------------------------------------------------------------------
+#
+#  Packaging
+#
+#-----------------------------------------------------------------------------
+include(CPack)
+if(WIN32)
+    set(CPACK_GENERATOR ZIP)
+else()
+    set(CPACK_GENERATOR TBZ2)
+endif()
+
+
+#-----------------------------------------------------------------------------
 #
 #  Print warnings at the end
 #
-#----------------------------------------------------------------------
-
+#-----------------------------------------------------------------------------
 if(BUILD_DATA_TESTS AND OSM_TESTDATA STREQUAL "OSM_TESTDATA-NOTFOUND")
     message("\n========================== WARNING ==========================")
     message("osm-testdata directory not found, data tests were disabled!\n")
@@ -303,3 +347,4 @@ if(BUILD_DATA_TESTS AND OSM_TESTDATA STREQUAL "OSM_TESTDATA-NOTFOUND")
     message("=============================================================\n")
 endif()
 
+#-----------------------------------------------------------------------------

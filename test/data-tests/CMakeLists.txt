@@ -1,9 +1,27 @@
-message(STATUS "Configuring data tests...")
+#-----------------------------------------------------------------------------
+#
+#  CMake Config
+#
+#  Libosmium data tests
+#
+#-----------------------------------------------------------------------------
+
+message(STATUS "Configuring data tests")
 
 if(NOT GDAL_FOUND OR NOT EXPAT_FOUND)
-    message("Sorry, building data tests needs GDAL and Expat")
+    message(STATUS "Sorry, building data tests needs GDAL and Expat")
+    message(STATUS "Configuring data tests - failed")
     return()
 endif()
+
+message(STATUS "Looking for osm-testdata")
+find_path(OSM_TESTDATA grid/data/all.osm HINT ../../../osm-testdata)
+if(OSM_TESTDATA STREQUAL "OSM_TESTDATA-NOTFOUND")
+    message(STATUS "Looking for osm-testdata - not found (data tests disabled)")
+    message(STATUS "Configuring data tests - failed")
+    return()
+endif()
+message(STATUS "Looking for osm-testdata - found")
 
 set(DART_TESTING_TIMEOUT 300)
 include(Dart)
@@ -11,16 +29,12 @@ include(Dart)
 include_directories("include")
 include_directories("../include")
 
-message(STATUS "Looking for osm-testdata")
-find_path(OSM_TESTDATA grid/data/all.osm HINT ../../../osm-testdata)
-if (OSM_TESTDATA STREQUAL "OSM_TESTDATA-NOTFOUND")
-    message(STATUS "Looking for osm-testdata - not found (data tests disabled)")
-    return()
-endif()
-message(STATUS "Looking for osm-testdata - found")
 
-#----------------------------------------------------------------------
-
+#-----------------------------------------------------------------------------
+#
+#  testcases
+#
+#-----------------------------------------------------------------------------
 file(GLOB TESTCASE_CPPS testcases/*.cpp)
 add_executable(testdata-testcases testdata-testcases.cpp ${TESTCASE_CPPS})
 target_link_libraries(testdata-testcases
@@ -32,8 +46,12 @@ add_test(NAME testdata-testcases
 set_tests_properties(testdata-testcases
     PROPERTIES ENVIRONMENT "TESTCASES_DIR=${OSM_TESTDATA}/grid/data")
 
-#----------------------------------------------------------------------
 
+#-----------------------------------------------------------------------------
+#
+#  overview
+#
+#-----------------------------------------------------------------------------
 add_executable(testdata-overview testdata-overview.cpp)
 target_link_libraries(testdata-overview
                       ${OSMIUM_XML_LIBRARIES}
@@ -43,8 +61,12 @@ add_test(NAME testdata-overview
          COMMAND testdata-overview ${OSM_TESTDATA}/grid/data/all.osm
 )
 
-#----------------------------------------------------------------------
 
+#-----------------------------------------------------------------------------
+#
+#  xml
+#
+#-----------------------------------------------------------------------------
 add_executable(testdata-xml testdata-xml.cpp)
 target_link_libraries(testdata-xml
                       ${OSMIUM_XML_LIBRARIES}
@@ -55,8 +77,12 @@ add_test(NAME testdata-xml
 set_tests_properties(testdata-xml
     PROPERTIES ENVIRONMENT "TESTDIR=${OSM_TESTDATA}/xml/data")
 
-#----------------------------------------------------------------------
 
+#-----------------------------------------------------------------------------
+#
+#  multipolygon
+#
+#-----------------------------------------------------------------------------
 add_executable(testdata-multipolygon testdata-multipolygon.cpp)
 target_link_libraries(testdata-multipolygon
                       ${OSMIUM_XML_LIBRARIES}
@@ -81,4 +107,9 @@ add_test(NAME testdata-multipolygon
          ${EXE_DIR}
 )
 
-#----------------------------------------------------------------------
+
+#-----------------------------------------------------------------------------
+message(STATUS "Configuring data tests - done")
+
+
+#-----------------------------------------------------------------------------

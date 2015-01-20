@@ -1,3 +1,11 @@
+#-----------------------------------------------------------------------------
+#
+#  CMake Config
+#
+#  Libosmium examples
+#
+#-----------------------------------------------------------------------------
+
 message(STATUS "Configuring examples")
 
 set(EXAMPLES
@@ -16,12 +24,12 @@ set(EXAMPLES
     CACHE STRING "Example programs"
 )
 
-#----------------------------------------------------------------------
+
+#-----------------------------------------------------------------------------
 #
 #  Examples depending on wingetopt
 #
-#----------------------------------------------------------------------
-
+#-----------------------------------------------------------------------------
 set(GETOPT_EXAMPLES area_test convert serdump toogr toogr2 toogr2_exp)
 if(NOT GETOPT_MISSING)
     foreach(example ${GETOPT_EXAMPLES})
@@ -36,24 +44,23 @@ else()
 endif()
 
 
-#----------------------------------------------------------------------
+#-----------------------------------------------------------------------------
 #
 #  Examples depending on SparseHash
 #
-#----------------------------------------------------------------------
-
+#-----------------------------------------------------------------------------
 if(NOT SPARSEHASH_FOUND)
     list(REMOVE_ITEM EXAMPLES area_test)
     message(STATUS "Configuring examples - Skipping examples because Google SparseHash not found:")
     message(STATUS "  - osmium_area_test")
 endif()
 
-#----------------------------------------------------------------------
+
+#-----------------------------------------------------------------------------
 #
 #  Examples depending on Boost Program Options
 #
-#----------------------------------------------------------------------
-
+#-----------------------------------------------------------------------------
 unset(Boost_LIBRARIES)
 unset(Boost_FOUND)
 find_package(Boost 1.38 COMPONENTS program_options)
@@ -66,12 +73,12 @@ else()
     message(STATUS "  - osmium_index")
 endif()
 
-#----------------------------------------------------------------------
+
+#-----------------------------------------------------------------------------
 #
 #  Examples depending on GDAL/PROJ.4/SparseHash
 #
-#----------------------------------------------------------------------
-
+#-----------------------------------------------------------------------------
 set(OGR_EXAMPLES toogr toogr2 toogr2_exp)
 
 if(GDAL_FOUND AND PROJ_FOUND AND SPARSEHASH_FOUND)
@@ -87,12 +94,12 @@ else()
     endforeach()
 endif()
 
-#----------------------------------------------------------------------
+
+#-----------------------------------------------------------------------------
 #
 #  Configure examples
 #
-#----------------------------------------------------------------------
-
+#-----------------------------------------------------------------------------
 message(STATUS "Configuring examples - Building these examples:")
 foreach(example ${EXAMPLES})
     message(STATUS "  - osmium_${example}")
@@ -100,5 +107,9 @@ foreach(example ${EXAMPLES})
     target_link_libraries(osmium_${example} ${OSMIUM_IO_LIBRARIES} ${EXAMPLE_LIBS_${example}})
 endforeach()
 
-message(STATUS "Configuring examples done")
 
+#-----------------------------------------------------------------------------
+message(STATUS "Configuring examples - done")
+
+
+#-----------------------------------------------------------------------------
