@@ -1,8 +1,7 @@
-message(STATUS "Configuring osm-testdata tests...")
+message(STATUS "Configuring data tests...")
 
-if(NOT GDAL_FOUND OR
-   NOT EXPAT_FOUND)
-    message("Sorry, building osm-testdata tests needs GDAL and Expat")
+if(NOT GDAL_FOUND OR NOT EXPAT_FOUND)
+    message("Sorry, building data tests needs GDAL and Expat")
     return()
 endif()
 
@@ -74,7 +73,7 @@ else()
 endif()
 
 add_test(NAME testdata-multipolygon
-         COMMAND ${CMAKE_SOURCE_DIR}/test/osm-testdata/${MULTIPOLYGON_TEST_SCRIPT}
+         COMMAND ${CMAKE_SOURCE_DIR}/test/data-tests/${MULTIPOLYGON_TEST_SCRIPT}
          ${TESTDATA_DIR}
          ${EXE_DIR}
 )

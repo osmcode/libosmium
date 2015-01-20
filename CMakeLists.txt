@@ -164,7 +164,7 @@ if(BUILD_TESTING)
 endif()
 
 if(BUILD_DATA_TESTS)
-    add_subdirectory(test/osm-testdata)
+    add_subdirectory(test/data-tests)
 endif()
 
 
@@ -186,7 +186,7 @@ if(CPPCHECK)
     file(GLOB_RECURSE ALL_INCLUDES   include/osmium/*.hpp)
     file(GLOB         ALL_EXAMPLES   examples/*.cpp)
     file(GLOB         ALL_UNIT_TESTS test/t/*/test_*.cpp)
-    file(GLOB         ALL_DATA_TESTS test/osm-testdata/*.cpp)
+    file(GLOB         ALL_DATA_TESTS test/data-tests/*.cpp)
 
     if(Osmium_DEBUG)
         message(STATUS "Checking includes      : ${ALL_INCLUDES}")
