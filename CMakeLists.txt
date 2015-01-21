@@ -167,12 +167,14 @@ set(CMAKE_BUILD_TYPE ${build_type}
 #-----------------------------------------------------------------------------
 enable_testing()
 
-find_program(MEMORYCHECK_COMMAND valgrind)
+if(BUILD_TESTING OR BUILD_DATA_TESTS)
+    find_program(MEMORYCHECK_COMMAND valgrind)
 
-set(MEMORYCHECK_COMMAND_OPTIONS
-    "--trace-children=yes --leak-check=full --show-reachable=yes --error-exitcode=1")
+    set(MEMORYCHECK_COMMAND_OPTIONS
+        "--trace-children=yes --leak-check=full --show-reachable=yes --error-exitcode=1")
 
-set(MEMORYCHECK_SUPPRESSIONS_FILE "${PROJECT_SOURCE_DIR}/test/valgrind.supp")
+    set(MEMORYCHECK_SUPPRESSIONS_FILE "${PROJECT_SOURCE_DIR}/test/valgrind.supp")
+endif()
 
 if(BUILD_TESTING)
     add_subdirectory(test)
@@ -225,7 +227,7 @@ if(CPPCHECK)
     )
 else()
     message(STATUS "Looking for cppcheck - not found")
-    message(STATUS "  Make target 'cppcheck' will not be available.")
+    message(STATUS "  Build target 'cppcheck' will not be available.")
 endif(CPPCHECK)
 
 
