@@ -43,8 +43,9 @@ target_link_libraries(testdata-testcases
 add_test(NAME testdata-testcases
          COMMAND testdata-testcases
 )
-set_tests_properties(testdata-testcases
-    PROPERTIES ENVIRONMENT "TESTCASES_DIR=${OSM_TESTDATA}/grid/data")
+set_tests_properties(testdata-testcases PROPERTIES
+    ENVIRONMENT "TESTCASES_DIR=${OSM_TESTDATA}/grid/data"
+    LABELS "data;fast")
 
 
 #-----------------------------------------------------------------------------
@@ -60,6 +61,9 @@ target_link_libraries(testdata-overview
 add_test(NAME testdata-overview
          COMMAND testdata-overview ${OSM_TESTDATA}/grid/data/all.osm
 )
+set_tests_properties(testdata-overview PROPERTIES
+    LABELS "data;slow")
+
 
 
 #-----------------------------------------------------------------------------
@@ -74,8 +78,9 @@ target_link_libraries(testdata-xml
 add_test(NAME testdata-xml
          COMMAND testdata-xml
 )
-set_tests_properties(testdata-xml
-    PROPERTIES ENVIRONMENT "TESTDIR=${OSM_TESTDATA}/xml/data")
+set_tests_properties(testdata-xml PROPERTIES
+    ENVIRONMENT "TESTDIR=${OSM_TESTDATA}/xml/data"
+    LABELS "data;fast")
 
 
 #-----------------------------------------------------------------------------
@@ -106,6 +111,8 @@ add_test(NAME testdata-multipolygon
          ${OSM_TESTDATA}
          ${EXE_DIR}
 )
+set_tests_properties(testdata-multipolygon PROPERTIES
+    LABELS "data;slow")
 
 
 #-----------------------------------------------------------------------------
