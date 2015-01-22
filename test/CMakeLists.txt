@@ -48,7 +48,7 @@ function(add_unit_test TGROUP TNAME)
                  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
                  COMMAND ${TESTNAME}
         )
-        set_tests_properties(${TESTNAME} PROPERTIES LABELS "unit;${TGROUP}")
+        set_tests_properties(${TESTNAME} PROPERTIES LABELS "unit;fast;${TGROUP}")
     else()
         message("Skipped test ${TGROUP}/${TNAME} because a dependency was not found")
         set(OSMIUM_SKIPPED_TESTS

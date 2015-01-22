@@ -88,9 +88,13 @@ you need for the programs you need.
         http://trac.osgeo.org/proj/
         Debian/Ubuntu: libproj-dev
 
+    CMake (to build the examples, tests, and benchmarks)
+        http://www.cmake.org/
+        Debian/Ubuntu: cmake
+
     Doxygen (to build API documentation) and tools
         http://www.stack.nl/~dimitri/doxygen/
-        Debian/Ubuntu: doxygen graphviz xmlstarlet
+        Debian/Ubuntu: doxygen graphviz
         Homebrew: doxygen
 
 You need to either install the packages for your distribution or install those
@@ -137,8 +141,6 @@ Makfile which allows you to call cppheck on all `*.cpp` and `*.hpp` files:
 For Mac users: If you have clang 3.2 or newer, use the system compiler.
 If not you have to build the compiler yourself. See the instructions
 on http://clang.llvm.org/ .
-
-Preliminary support for cmake is provided. You can use this instead of "make":
 
 
 ## Testing
