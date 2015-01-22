@@ -25,6 +25,9 @@ clone_folder: c:\projects\libosmium
 platform: x64
 
 install:
+  # show all availble env vars
+  - SET
+  - bla bla
   - ECHO cmake on AppVeyor
   - cmake -version
   - CALL "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" amd64
