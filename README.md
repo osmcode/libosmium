@@ -20,85 +20,14 @@ limitations).
 ## Prerequisites
 
 Because Osmium uses many C++11 features you need a modern compiler and standard
-C++ library. Osmium needs at least GCC 4.8 or clang (LLVM) 3.2. (Some parts may
+C++ library. Osmium needs at least GCC 4.8 or clang (LLVM) 3.4. (Some parts may
 work with older versions.)
 
 Different parts of Osmium (and the applications built on top of it) need
 different libraries. You DO NOT NEED to install all of them, just install those
 you need for the programs you need.
 
-    boost-iterator, boost-regex
-        http://www.boost.org/
-        Debian/Ubuntu: libboost-dev
-        openSUSE: boost-devel
-        Homebrew: boost
-
-    boost-program-options (for parsing command line options in some examples)
-        http://www.boost.org/doc/libs/1_54_0/doc/html/program_options.html
-        Debian/Ubuntu: libboost-program-options-dev
-
-    Google protocol buffers (for PBF support)
-        http://code.google.com/p/protobuf/ (at least version 2.3.0 needed)
-        Debian/Ubuntu: libprotobuf-dev protobuf-compiler
-        openSUSE: protobuf-devel
-        Homebrew: protobuf
-        Also see http://wiki.openstreetmap.org/wiki/PBF_Format
-
-    OSMPBF (for PBF support)
-        https://github.com/scrosby/OSM-binary
-        Debian/Ubuntu: libosmpbf-dev
-        (The package in Ubuntu 14.04 and older is too old, install from source
-        in these cases.)
-        Homebrew: osm-pbf
-
-    Expat (for parsing XML files)
-        http://expat.sourceforge.net/
-        Debian/Ubuntu: libexpat1-dev
-        openSUSE: libexpat-devel
-        Homebrew: expat
-
-    zlib (for PBF and for gzip support when reading/writing XML)
-        http://www.zlib.net/
-        Debian/Ubuntu: zlib1g-dev
-        openSUSE: zlib-devel
-
-    bz2lib (for bzip2 support when reading/writing XML)
-        http://www.bzip.org/
-        Debian/Ubuntu: libbz2-dev
-
-    Google sparsehash
-        http://code.google.com/p/google-sparsehash/
-        Debian/Ubuntu: libsparsehash-dev
-        openSUSE: sparsehash
-        Homebrew: google-sparsehash
-
-    GDAL (for OGR support)
-        http://gdal.org/
-        Debian/Ubuntu: libgdal1-dev
-        openSUSE: libgdal-devel
-        Homebrew: gdal
-
-    GEOS (for GEOS support)
-        http://trac.osgeo.org/geos/
-        Debian/Ubuntu: libgeos++-dev
-        openSUSE: libgeos-devel
-        Homebrew: geos
-
-    libproj (for projection support)
-        http://trac.osgeo.org/proj/
-        Debian/Ubuntu: libproj-dev
-
-    CMake (to build the examples, tests, and benchmarks)
-        http://www.cmake.org/
-        Debian/Ubuntu: cmake
-
-    Doxygen (to build API documentation) and tools
-        http://www.stack.nl/~dimitri/doxygen/
-        Debian/Ubuntu: doxygen graphviz
-        Homebrew: doxygen
-
-You need to either install the packages for your distribution or install those
-libraries from source. Most libraries should be available in all distributions.
+See the [list of dependencies](https://github.com/osmcode/libosmium/wiki/Libosmium-dependencies).
 
 
 ## Directories
@@ -128,66 +57,15 @@ cmake:
 
 This will build the examples and tests. Call `ctest` to run the tests.
 
-To build the documentation you need Doxygen. If cmake can find it it will
-enable the `doc` target so you can build the documentation like this:
-
-    make doc
-
-If the 'cppcheck' binary is found, cmake will add another target to the
-Makfile which allows you to call cppheck on all `*.cpp` and `*.hpp` files:
-
-    make cppcheck
-
-For Mac users: If you have clang 3.2 or newer, use the system compiler.
-If not you have to build the compiler yourself. See the instructions
-on http://clang.llvm.org/ .
+For more see the
+[Libosmium Wiki](https://github.com/osmcode/libosmium/wiki/Building-Libosmium).
 
 
 ## Testing
 
-### Unit Tests
-
-There are a few unit tests using the Catch unit test framework in the "test"
-directory. Many more tests are needed, any help appreciated.
-
-For [Catch](https://github.com/philsquared/Catch/) only one header file is
-needed which is included (`test/include/catch.hpp`).
-
-To compile these unit tests make sure `BUILD_TESTING` is set in the cmake
-config, then build the project and call
-
-    ctest
-
-You can run tests matching a pattern by calling
-
-    ctest -R test_name
-
-for instance:
-
-    ctest basic_test_node
-
-will run the `basic_test_node` and `basic_test_node_ref` tests.
-
-### Data Tests
-
-In addition there are some test based on the OSM Test Data Repository at
-http://osmcode.org/osm-testdata/ . To run those tests call
-
-    git clone https://github.com/osmcode/osm-testdata.git
-
-in the same directory libosmium is in. (If you want to use a different
-directory you have to set the cmake variable `OSM_TESTDATA` to that directory.)
-
-Enable the `BUILD_DATA_TESTS` option in cmake (will get enabled automatically
-for `Dev` builds), then build the project and call `ctest`.
-
-Some of these tests need Spatialite, Ruby and the 'json' gem installed.
-
-### Valgrind
-
-Running tests with valgrind:
-
-    ctest -D ExperimentalMemCheck
+See the
+[Libosmium Wiki](https://github.com/osmcode/libosmium/wiki/Testing-Libosmium)
+for instructions.
 
 
 ## Osmium on 32bit Machines
@@ -207,7 +85,8 @@ Please report any issues you have and we might be able to solve them.
 
 ## Switching from the old Osmium
 
-See `README-changes-from-old-osmium`.
+See the
+[Libosmium Wiki](https://github.com/osmcode/libosmium/wiki/Changes-from-old-versions-of-Osmium).
 
 
 ## License
