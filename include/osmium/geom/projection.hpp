@@ -33,6 +33,15 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+/**
+ * @file
+ *
+ * This file contains code for projecting OSM locations to arbitrary
+ * coordinate reference systems. It is based on the Proj.4 library.
+ *
+ * @attention If you include this file, you'll need to link with `libproj`.
+ */
+
 #include <memory>
 #include <string>
 
