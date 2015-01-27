@@ -69,7 +69,7 @@ namespace osmium {
         }
 
         bool type_is_in(osmium::osm_entity_bits::type entity_bits) const {
-            return osm_entity_bits::from_item_type(type()) & entity_bits;
+            return (osm_entity_bits::from_item_type(type()) & entity_bits) != 0;
         }
 
     }; // class OSMEntity
