@@ -15,6 +15,8 @@ flags = [
 '-Wextra',
 '-pedantic',
 '-Wno-return-type',
+'-Wno-unused-parameter',
+'-Wno-unused-variable',
 
 '-std=c++11',
 
