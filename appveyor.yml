@@ -1,6 +1,8 @@
+#-----------------------------------------------------------------------------
 #
-# Configuration for appveyor.com
+#  Configuration for continuous integration service at appveyor.com
 #
+#-----------------------------------------------------------------------------
 
 environment:
   matrix:
