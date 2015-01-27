@@ -42,6 +42,8 @@ DEALINGS IN THE SOFTWARE.
  * @attention If you include this file, you'll need to link with `libbz2`.
  */
 
+#include <cerrno>
+#include <cstddef>
 #include <cstdio>
 #include <stdexcept>
 #include <string>

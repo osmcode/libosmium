@@ -38,6 +38,7 @@ DEALINGS IN THE SOFTWARE.
 #include <stdexcept>
 #include <utility>
 
+#include <osmium/index/index.hpp>
 #include <osmium/index/map.hpp>
 #include <osmium/io/detail/read_write.hpp>
 

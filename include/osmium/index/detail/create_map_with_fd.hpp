@@ -34,6 +34,7 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <cassert>
+#include <cerrno>
 #include <cstring>
 #include <fcntl.h>
 #include <stdexcept>

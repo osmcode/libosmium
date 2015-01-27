@@ -33,9 +33,9 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <osmium/index/multimap/sparse_file_array.hpp>
-#include <osmium/index/multimap/sparse_mem_array.hpp>
-#include <osmium/index/multimap/sparse_mem_multimap.hpp>
-#include <osmium/index/multimap/sparse_mmap_array.hpp>
+#include <osmium/index/multimap/sparse_file_array.hpp>   // IWYU pragma: keep
+#include <osmium/index/multimap/sparse_mem_array.hpp>    // IWYU pragma: keep
+#include <osmium/index/multimap/sparse_mem_multimap.hpp> // IWYU pragma: keep
+#include <osmium/index/multimap/sparse_mmap_array.hpp>   // IWYU pragma: keep
 
 #endif // OSMIUM_INDEX_MULTIMAP_ALL_HPP

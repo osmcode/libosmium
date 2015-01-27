@@ -34,12 +34,12 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <cstddef>
-#include <stdexcept>
 #include <utility>
 #include <vector>
 
 #include <google/sparsetable>
 
+#include <osmium/index/index.hpp>
 #include <osmium/index/map.hpp>
 #include <osmium/io/detail/read_write.hpp>
 

@@ -33,7 +33,7 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <osmium/index/map.hpp>
+#include <osmium/index/map.hpp> // IWYU pragma: keep
 
 #ifdef OSMIUM_HAS_INDEX_MAP_DENSE_FILE_ARRAY
     REGISTER_MAP(osmium::unsigned_object_id_type, osmium::Location, osmium::index::map::DenseFileArray, dense_file_array)
