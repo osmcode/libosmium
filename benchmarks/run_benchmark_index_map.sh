@@ -9,7 +9,7 @@ BENCHMARK_NAME=index_map
 
 . @CMAKE_BINARY_DIR@/benchmarks/setup.sh
 
-CMD=$OB_DIR/osmium_benchmark_index_map
+CMD=$OB_DIR/osmium_benchmark_$BENCHMARK_NAME
 
 #MAPS="sparse_mem_map sparse_mem_table sparse_mem_array sparse_mmap_array sparse_file_array dense_mem_array dense_mmap_array dense_file_array"
 MAPS="sparse_mem_map sparse_mem_table sparse_mem_array sparse_mmap_array sparse_file_array"

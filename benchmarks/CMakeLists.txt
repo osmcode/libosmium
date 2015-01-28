@@ -10,6 +10,7 @@ message(STATUS "Configuring benchmarks")
 
 set(BENCHMARKS
     count
+    count_tag
     index_map
     static_vs_dynamic_index
     CACHE STRING "Benchmark programs"
