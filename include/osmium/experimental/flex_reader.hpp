@@ -41,7 +41,7 @@ DEALINGS IN THE SOFTWARE.
 namespace osmium {
 
     /**
-     * @short Experimental code that is not "officially" supported.
+     * @brief Experimental code that is not "officially" supported.
      */
     namespace experimental {
 

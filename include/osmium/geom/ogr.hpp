@@ -33,6 +33,15 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+/**
+ * @file
+ *
+ * This file contains code for conversion of OSM geometries into OGR
+ * geometries.
+ *
+ * @attention If you include this file, you'll need to link with `libgdal`.
+ */
+
 #include <cassert>
 #include <cstddef>
 #include <memory>

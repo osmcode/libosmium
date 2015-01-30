@@ -23,8 +23,8 @@ if(OSM_TESTDATA STREQUAL "OSM_TESTDATA-NOTFOUND")
 endif()
 message(STATUS "Looking for osm-testdata - found")
 
-set(DART_TESTING_TIMEOUT 300)
-include(Dart)
+
+#-----------------------------------------------------------------------------
 
 include_directories("include")
 include_directories("../include")
@@ -50,24 +50,6 @@ set_tests_properties(testdata-testcases PROPERTIES
 
 #-----------------------------------------------------------------------------
 #
-#  overview
-#
-#-----------------------------------------------------------------------------
-add_executable(testdata-overview testdata-overview.cpp)
-target_link_libraries(testdata-overview
-                      ${OSMIUM_XML_LIBRARIES}
-                      ${GDAL_LIBRARIES}
-)
-add_test(NAME testdata-overview
-         COMMAND testdata-overview ${OSM_TESTDATA}/grid/data/all.osm
-)
-set_tests_properties(testdata-overview PROPERTIES
-    LABELS "data;slow")
-
-
-
-#-----------------------------------------------------------------------------
-#
 #  xml
 #
 #-----------------------------------------------------------------------------
@@ -81,6 +63,23 @@ add_test(NAME testdata-xml
 set_tests_properties(testdata-xml PROPERTIES
     ENVIRONMENT "TESTDIR=${OSM_TESTDATA}/xml/data"
     LABELS "data;fast")
+
+
+#-----------------------------------------------------------------------------
+#
+#  overview
+#
+#-----------------------------------------------------------------------------
+add_executable(testdata-overview testdata-overview.cpp)
+target_link_libraries(testdata-overview
+                      ${OSMIUM_XML_LIBRARIES}
+                      ${GDAL_LIBRARIES}
+)
+add_test(NAME testdata-overview
+         COMMAND testdata-overview ${OSM_TESTDATA}/grid/data/all.osm
+)
+set_tests_properties(testdata-overview PROPERTIES
+    LABELS "data;slow")
 
 
 #-----------------------------------------------------------------------------

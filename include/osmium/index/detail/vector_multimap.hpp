@@ -37,6 +37,7 @@ DEALINGS IN THE SOFTWARE.
 #include <cstddef>
 #include <utility>
 
+#include <osmium/index/index.hpp>
 #include <osmium/index/multimap.hpp>
 #include <osmium/io/detail/read_write.hpp>
 

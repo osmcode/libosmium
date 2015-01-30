@@ -1,9 +1,11 @@
 
 # Benchmarks
 
-# Preparations
+Benchmarks check the performance of different parts of Libosmium.
 
-To run those benchmarks first make a directory for the data files somewhere
+## Preparations
+
+To run the benchmarks first make a directory for the data files somewhere
 (outside the repository) and set the `DATA_DIR` environment variable:
 
     export DATA_DIR=benchmark_data
@@ -22,12 +24,13 @@ order.
 The files don't have to be in that directory, you can add soft links from that
 directory to the real file locations if that suits you.
 
-# Compiling the benchmarks
+## Compiling the benchmarks
 
-To build the benchmarks set the `BUILD_BENCHMARKS` option in `cmake` and run
-the compilation by calling `make` (or whatever build tool you are using).
+To build the benchmarks set the `BUILD_BENCHMARKS` option when configuring with
+CMake and run the compilation by calling `make` (or whatever build tool you
+are using).
 
-# Running the benchmarks
+## Running the benchmarks
 
 Go to the build directory and run `benchmarks/run_benchmarks.sh`. You can also
 run each benchmark on its own by calling the respective script in the

@@ -8,9 +8,6 @@
 
 message(STATUS "Configuring unit tests")
 
-set(DART_TESTING_TIMEOUT 60)
-include(Dart)
-
 include_directories(include)
 
 add_library(testlib STATIC test_main.cpp)
@@ -45,10 +42,13 @@ function(add_unit_test TGROUP TNAME)
             target_link_libraries(${TESTNAME} ${ARGV3})
         endif()
         add_test(NAME ${TESTNAME}
-                 WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                 WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                  COMMAND ${TESTNAME}
         )
-        set_tests_properties(${TESTNAME} PROPERTIES LABELS "unit;fast;${TGROUP}")
+        set_tests_properties(${TESTNAME} PROPERTIES
+            LABELS "unit;fast;${TGROUP}"
+            ENVIRONMENT "OSMIUM_TEST_DATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}"
+        )
     else()
         message("Skipped test ${TGROUP}/${TNAME} because a dependency was not found")
         set(OSMIUM_SKIPPED_TESTS
@@ -103,6 +103,7 @@ add_unit_test(index test_typed_mmap)
 add_unit_test(io test_bzip2 ${BZIP2_FOUND} ${BZIP2_LIBRARIES})
 add_unit_test(io test_file_formats)
 add_unit_test(io test_reader TRUE "${OSMIUM_XML_LIBRARIES}")
+add_unit_test(io test_output_iterator ${Threads_FOUND} ${CMAKE_THREAD_LIBS_INIT})
 
 add_unit_test(tags test_filter)
 add_unit_test(tags test_operators)

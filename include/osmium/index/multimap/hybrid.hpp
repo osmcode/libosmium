@@ -36,6 +36,7 @@ DEALINGS IN THE SOFTWARE.
 #include <cstddef>
 #include <utility>
 
+#include <osmium/index/index.hpp>
 #include <osmium/index/multimap.hpp>
 #include <osmium/index/multimap/sparse_mem_array.hpp>
 #include <osmium/index/multimap/sparse_mem_multimap.hpp>

@@ -16,7 +16,7 @@ OB_SEQ=`seq -s' ' 1 $OB_RUNS`
 OB_TIME_CMD=/usr/bin/time
 OB_TIME_FORMAT="%M %e %S %U %P %C"
 
-OB_DATA_FILES=$DATA_DIR/*
+OB_DATA_FILES=`find -L $DATA_DIR -mindepth 1 -maxdepth 1 -type f | sort`
 
 echo "BENCHMARK: $BENCHMARK_NAME"
 echo "---------------------"

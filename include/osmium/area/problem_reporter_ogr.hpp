@@ -33,6 +33,15 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+/**
+ * @file
+ *
+ * This file contains code for reporting problems through OGR when
+ * assembling multipolygons.
+ *
+ * @attention If you include this file, you'll need to link with `libgdal`.
+ */
+
 #ifdef _MSC_VER
 # pragma warning(push)
 # pragma warning(disable : 4458)

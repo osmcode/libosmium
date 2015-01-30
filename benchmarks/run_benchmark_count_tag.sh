@@ -1,11 +1,11 @@
 #!/bin/sh
 #
-#  run_benchmark_count.sh
+#  run_benchmark_count_tag.sh
 #
 
 set -e
 
-BENCHMARK_NAME=count
+BENCHMARK_NAME=count_tag
 
 . @CMAKE_BINARY_DIR@/benchmarks/setup.sh
 

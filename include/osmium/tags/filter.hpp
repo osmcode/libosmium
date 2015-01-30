@@ -135,6 +135,20 @@ namespace osmium {
                 return m_default_result;
             }
 
+            /**
+             * Return the number of rules in this filter.
+             */
+            size_t count() const {
+                return m_rules.count();
+            }
+
+            /**
+             * Is this filter empty, ie are there no rules defined?
+             */
+            bool empty() const {
+                return m_rules.empty();
+            }
+
         }; // class Filter
 
         typedef Filter<std::string, std::string> KeyValueFilter;
