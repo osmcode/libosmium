@@ -106,6 +106,7 @@ add_unit_test(index test_typed_mmap)
 add_unit_test(io test_bzip2 ${BZIP2_FOUND} ${BZIP2_LIBRARIES})
 add_unit_test(io test_file_formats)
 add_unit_test(io test_reader TRUE "${OSMIUM_XML_LIBRARIES}")
+add_unit_test(io test_output_iterator ${Threads_FOUND} ${CMAKE_THREAD_LIBS_INIT})
 
 add_unit_test(tags test_filter)
 add_unit_test(tags test_operators)
