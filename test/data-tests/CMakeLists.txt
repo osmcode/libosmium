@@ -23,8 +23,8 @@ if(OSM_TESTDATA STREQUAL "OSM_TESTDATA-NOTFOUND")
 endif()
 message(STATUS "Looking for osm-testdata - found")
 
-set(DART_TESTING_TIMEOUT 300)
-include(Dart)
+
+#-----------------------------------------------------------------------------
 
 include_directories("include")
 include_directories("../include")

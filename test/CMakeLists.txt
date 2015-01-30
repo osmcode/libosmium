@@ -8,9 +8,6 @@
 
 message(STATUS "Configuring unit tests")
 
-set(DART_TESTING_TIMEOUT 60)
-include(Dart)
-
 include_directories(include)
 
 add_library(testlib STATIC test_main.cpp)
