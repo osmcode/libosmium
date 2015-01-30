@@ -87,7 +87,7 @@ include_directories(include)
 #  Decide which C++ version to use (Minimum/default: C++11).
 #
 #-----------------------------------------------------------------------------
-IF(NOT MSVC)
+if(NOT MSVC)
     if(NOT USE_CPP_VERSION)
         set(USE_CPP_VERSION c++11)
     endif()
