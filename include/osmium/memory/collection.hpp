@@ -38,6 +38,7 @@ DEALINGS IN THE SOFTWARE.
 #include <type_traits>
 
 #include <osmium/memory/item.hpp>
+#include <osmium/util/compatibility.hpp>
 
 namespace osmium {
 
