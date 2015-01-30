@@ -39,6 +39,12 @@ DEALINGS IN THE SOFTWARE.
 #include <string>
 #include <system_error>
 
+#ifndef _MSC_VER
+# include <unistd.h>
+#else
+# include <io.h>
+#endif
+
 #include <osmium/io/overwrite.hpp>
 
 namespace osmium {
