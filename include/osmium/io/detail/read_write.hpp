@@ -39,13 +39,6 @@ DEALINGS IN THE SOFTWARE.
 #include <string>
 #include <system_error>
 
-#ifndef _MSC_VER
-# include <unistd.h>
-#else
-# include <io.h>
-typedef int ssize_t;
-#endif
-
 #include <osmium/io/overwrite.hpp>
 
 namespace osmium {
@@ -125,7 +118,7 @@ namespace osmium {
             inline void reliable_write(const int fd, const unsigned char* output_buffer, const size_t size) {
                 size_t offset = 0;
                 do {
-                    ssize_t length = ::write(fd, output_buffer + offset, size - offset);
+                    auto length = ::write(fd, output_buffer + offset, size - offset);
                     if (length < 0) {
                         throw std::system_error(errno, std::system_category(), "Write failed");
                     }
