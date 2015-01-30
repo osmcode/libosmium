@@ -38,6 +38,7 @@ DEALINGS IN THE SOFTWARE.
 #include <stdexcept>
 
 #include <osmium/index/detail/typed_mmap.hpp>
+#include <osmium/util/compatibility.hpp>
 
 namespace osmium {
 
