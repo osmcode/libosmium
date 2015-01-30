@@ -45,10 +45,13 @@ function(add_unit_test TGROUP TNAME)
             target_link_libraries(${TESTNAME} ${ARGV3})
         endif()
         add_test(NAME ${TESTNAME}
-                 WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                 WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                  COMMAND ${TESTNAME}
         )
-        set_tests_properties(${TESTNAME} PROPERTIES LABELS "unit;fast;${TGROUP}")
+        set_tests_properties(${TESTNAME} PROPERTIES
+            LABELS "unit;fast;${TGROUP}"
+            ENVIRONMENT "OSMIUM_TEST_DATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}"
+        )
     else()
         message("Skipped test ${TGROUP}/${TNAME} because a dependency was not found")
         set(OSMIUM_SKIPPED_TESTS
