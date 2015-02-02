@@ -50,8 +50,8 @@ int main(int argc, char* argv[]) {
 
     const auto& map_factory = osmium::index::MapFactory<osmium::unsigned_object_id_type, osmium::Location>::instance();
 
-    const auto buffer_size = buffer.committed() / (1024ul*1024ul); // buffer size in MBytes
-    const auto runs = std::max(10ul, 5000ul / buffer_size);
+    const auto buffer_size = buffer.committed() / (1024*1024); // buffer size in MBytes
+    const int runs = std::max(10, static_cast<int>(5000ull / buffer_size));
 
     std::cout << "input: filename=" << input_filename << " buffer_size=" << buffer_size << "MBytes\n";
     std::cout << "runs: " << runs << "\n";
@@ -64,7 +64,7 @@ int main(int argc, char* argv[]) {
     double dynamic_sum = 0;
     double dynamic_max = 0;
 
-    for (auto i = 0ul; i < runs; ++i) {
+    for (int i = 0; i < runs; ++i) {
 
         {
             // static index
