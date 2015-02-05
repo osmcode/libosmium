@@ -699,7 +699,7 @@ namespace osmium {
                     return buffer;
                 }
 
-                void close() {
+                void close() override {
                     m_done = true;
                     osmium::thread::wait_until_done(m_parser_future);
                 }
