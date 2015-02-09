@@ -284,7 +284,7 @@ if(BUILD_HEADERS)
             # previously undefined public symbols, so it will not be used by
             # any link operation that consumes this library". This is a dummy
             # library anyways.
-            target_link_libraries(${libname} /wd4221)
+            target_link_libraries(${libname} -wd4221)
         endif()
 
         #### this is better but only supported from cmake 3.0:
