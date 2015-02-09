@@ -34,8 +34,13 @@
 #define MAP_ANON      MAP_ANONYMOUS
 #define MAP_FAILED    ((void *) -1)
 
-#define DWORD_HI(x) (x >> 32)
-#define DWORD_LO(x) ((x) & 0xffffffff)
+static DWORD dword_hi(uint64_t x) {
+    return static_cast<DWORD>(x >> 32);
+}
+
+static DWORD dword_lo(uint64_t x) {
+    return static_cast<DWORD>(x & 0xffffffff);
+}
 
 static void *mmap(void *start, size_t length, int prot, int flags, int fd, off_t offset)
 {
@@ -68,7 +73,7 @@ static void *mmap(void *start, size_t length, int prot, int flags, int fd, off_t
     else
         mmap_fd = (HANDLE)_get_osfhandle(fd);
 
-    HANDLE h = CreateFileMapping(mmap_fd, NULL, flProtect, DWORD_HI(end), DWORD_LO(end), NULL);
+    HANDLE h = CreateFileMapping(mmap_fd, NULL, flProtect, dword_hi(end), dword_lo(end), NULL);
     if (h == NULL)
         return MAP_FAILED;
 
@@ -81,7 +86,7 @@ static void *mmap(void *start, size_t length, int prot, int flags, int fd, off_t
         dwDesiredAccess |= FILE_MAP_EXECUTE;
     if (flags & MAP_PRIVATE)
         dwDesiredAccess |= FILE_MAP_COPY;
-    void *ret = MapViewOfFile(h, dwDesiredAccess, DWORD_HI(offset), DWORD_LO(offset), length);
+    void *ret = MapViewOfFile(h, dwDesiredAccess, dword_hi(offset), dword_lo(offset), length);
     if (ret == NULL) {
         CloseHandle(h);
         ret = MAP_FAILED;
@@ -95,8 +100,5 @@ static int munmap(void *addr, size_t length)
     return 0;
     /* ruh-ro, we leaked handle from CreateFileMapping() ... */
 }
-
-#undef DWORD_HI
-#undef DWORD_LO
 
 #endif
