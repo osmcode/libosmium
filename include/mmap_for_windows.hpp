@@ -34,13 +34,8 @@
 #define MAP_ANON      MAP_ANONYMOUS
 #define MAP_FAILED    ((void *) -1)
 
-#ifdef __USE_FILE_OFFSET64
-# define DWORD_HI(x) (x >> 32)
-# define DWORD_LO(x) ((x) & 0xffffffff)
-#else
-# define DWORD_HI(x) (0)
-# define DWORD_LO(x) (x)
-#endif
+#define DWORD_HI(x) (x >> 32)
+#define DWORD_LO(x) ((x) & 0xffffffff)
 
 static void *mmap(void *start, size_t length, int prot, int flags, int fd, off_t offset)
 {
@@ -66,13 +61,14 @@ static void *mmap(void *start, size_t length, int prot, int flags, int fd, off_t
     } else
         flProtect = PAGE_READONLY;
 
-    off_t end = length + offset;
-    HANDLE mmap_fd, h;
+    uint64_t end = static_cast<uint64_t>(length) + offset;
+    HANDLE mmap_fd;
     if (fd == -1)
         mmap_fd = INVALID_HANDLE_VALUE;
     else
         mmap_fd = (HANDLE)_get_osfhandle(fd);
-    h = CreateFileMapping(mmap_fd, NULL, flProtect, DWORD_HI(end), DWORD_LO(end), NULL);
+
+    HANDLE h = CreateFileMapping(mmap_fd, NULL, flProtect, DWORD_HI(end), DWORD_LO(end), NULL);
     if (h == NULL)
         return MAP_FAILED;
 
