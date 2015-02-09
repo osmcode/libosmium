@@ -73,5 +73,5 @@ build_script:
 
 test_script:
   # Disable multipolygon test because it needs ruby and the 'json' gem
-  - ctest -V -C %config% -E testdata-multipolygon
+  - ctest --output-on-failure -C %config% -E testdata-multipolygon
 

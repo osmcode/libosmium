@@ -47,5 +47,5 @@ script:
  - make VERBOSE=1
  # Disable multipolygon test because it needs ruby and the 'json' gem, but the
  # travis ruby installation doesn't find the gem it did install itself.
- - ctest -V -E testdata-multipolygon
+ - ctest --output-on-failure -E testdata-multipolygon
 
