@@ -39,6 +39,8 @@ DEALINGS IN THE SOFTWARE.
 
 #include <zlib.h>
 
+#include <osmium/util/cast.hpp>
+
 namespace osmium {
 
     namespace io {
@@ -48,18 +50,21 @@ namespace osmium {
             /**
              * Compress data using zlib.
              *
+             * Note that this function can not compress data larger than
+             * what fits in an unsigned long, on Windows this is usually 32bit.
+             *
              * @param input Data to compress.
              * @returns Compressed data.
              */
             inline std::string zlib_compress(const std::string& input) {
-                unsigned long output_size = ::compressBound(input.size());
+                unsigned long output_size = ::compressBound(osmium::static_cast_with_assert<unsigned long>(input.size()));
 
                 std::string output(output_size, '\0');
 
                 if (::compress(reinterpret_cast<unsigned char*>(const_cast<char *>(output.data())),
                                &output_size,
                                reinterpret_cast<const unsigned char*>(input.data()),
-                               input.size()) != Z_OK) {
+                               osmium::static_cast_with_assert<unsigned long>(input.size())) != Z_OK) {
                     throw std::runtime_error("failed to compress data");
                 }
 
@@ -71,6 +76,9 @@ namespace osmium {
             /**
              * Uncompress data using zlib.
              *
+             * Note that this function can not uncompress data larger than
+             * what fits in an unsigned long, on Windows this is usually 32bit.
+             *
              * @param input Compressed input data.
              * @param raw_size Size of uncompressed data.
              * @returns Uncompressed data.
@@ -81,7 +89,7 @@ namespace osmium {
                 if (::uncompress(reinterpret_cast<unsigned char*>(const_cast<char *>(output->data())),
                                  &raw_size,
                                  reinterpret_cast<const unsigned char*>(input.data()),
-                                 input.size()) != Z_OK) {
+                                 osmium::static_cast_with_assert<unsigned long>(input.size())) != Z_OK) {
                     throw std::runtime_error("failed to uncompress data");
                 }
 
