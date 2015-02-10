@@ -224,8 +224,23 @@ if(Osmium_USE_SPARSEHASH)
     find_path(SPARSEHASH_INCLUDE_DIR google/sparsetable)
 
     if(SPARSEHASH_INCLUDE_DIR)
-        set(SPARSEHASH_FOUND 1)
-        list(APPEND OSMIUM_INCLUDE_DIRS ${SPARSEHASH_INCLUDE_DIR})
+        # Find size of sparsetable::size_type.
+        include(CheckTypeSize)
+        set(CMAKE_REQUIRED_INCLUDES ${SPARSEHASH_INCLUDE_DIR})
+        set(CMAKE_EXTRA_INCLUDE_FILES "google/sparsetable")
+        check_type_size("google::sparsetable<int>::size_type" SPARSETABLE_SIZE_TYPE LANGUAGE CXX)
+        set(CMAKE_EXTRA_INCLUDE_FILES)
+        set(CMAKE_REQUIRED_INCLUDES)
+
+        # Sparsetable::size_type must be at least 8 bytes (64bit), otherwise
+        # OSM object IDs will not fit.
+        if(SPARSETABLE_SIZE_TYPE GREATER 7)
+            set(SPARSEHASH_FOUND 1)
+            add_definitions(-DOSMIUM_WITH_SPARSEHASH=${SPARSEHASH_FOUND})
+            list(APPEND OSMIUM_INCLUDE_DIRS ${SPARSEHASH_INCLUDE_DIR})
+        else()
+            message(WARNING "Osmium: Disabled Google SparseHash library on 32bit system.")
+        endif()
     else()
         set(_missing_libraries 1)
         message(WARNING "Osmium: Google SparseHash library is required but not found, please install it or configure the paths.")
