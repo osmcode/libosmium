@@ -61,11 +61,15 @@ namespace osmium {
 
                 std::string output(output_size, '\0');
 
-                if (::compress(reinterpret_cast<unsigned char*>(const_cast<char *>(output.data())),
-                               &output_size,
-                               reinterpret_cast<const unsigned char*>(input.data()),
-                               osmium::static_cast_with_assert<unsigned long>(input.size())) != Z_OK) {
-                    throw std::runtime_error("failed to compress data");
+                auto result = ::compress(
+                    reinterpret_cast<unsigned char*>(const_cast<char *>(output.data())),
+                    &output_size,
+                    reinterpret_cast<const unsigned char*>(input.data()),
+                    osmium::static_cast_with_assert<unsigned long>(input.size())
+                );
+
+                if (result != Z_OK) {
+                    throw std::runtime_error(std::string("failed to compress data: ") + zError(result));
                 }
 
                 output.resize(output_size);
@@ -86,11 +90,15 @@ namespace osmium {
             inline std::unique_ptr<std::string> zlib_uncompress(const std::string& input, unsigned long raw_size) {
                 auto output = std::unique_ptr<std::string>(new std::string(raw_size, '\0'));
 
-                if (::uncompress(reinterpret_cast<unsigned char*>(const_cast<char *>(output->data())),
-                                 &raw_size,
-                                 reinterpret_cast<const unsigned char*>(input.data()),
-                                 osmium::static_cast_with_assert<unsigned long>(input.size())) != Z_OK) {
-                    throw std::runtime_error("failed to uncompress data");
+                auto result = ::uncompress(
+                    reinterpret_cast<unsigned char*>(const_cast<char *>(output->data())),
+                    &raw_size,
+                    reinterpret_cast<const unsigned char*>(input.data()),
+                    osmium::static_cast_with_assert<unsigned long>(input.size())
+                );
+
+                if (result != Z_OK) {
+                    throw std::runtime_error(std::string("failed to uncompress data: ") + zError(result));
                 }
 
                 return output;
