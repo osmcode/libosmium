@@ -71,7 +71,7 @@ SECTION("FileSize") {
     osmium::detail::typed_mmap<uint64_t>::grow_file(size * 2, fd);
     REQUIRE((size * 2) == osmium::detail::typed_mmap<uint64_t>::file_size(fd));
 
-    close(fd);
+    REQUIRE(0 == close(fd));
     std::cout << "XXXXXXXX filename=" << filename << "\n";
     REQUIRE(0 == unlink(filename));
 }
@@ -95,7 +95,8 @@ SECTION("GrowAndMap") {
 
     osmium::detail::typed_mmap<uint64_t>::unmap(data, size);
 
-    close(fd);
+    REQUIRE(0 == close(fd));
+    std::cout << "XXXXXXXX filename=" << filename << "\n";
     REQUIRE(0 == unlink(filename));
 }
 
