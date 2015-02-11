@@ -55,7 +55,7 @@ SECTION("Remap") {
 
 SECTION("FileSize") {
     const int size = 100;
-    char filename[] = "test_typed_mmap_data_XXXXXX";
+    char filename[] = "test_mmap_file_size_XXXXXX";
     const int fd = mkstemp(filename);
     REQUIRE(fd > 0);
     REQUIRE(0 == osmium::detail::typed_mmap<uint64_t>::file_size(fd));
@@ -78,7 +78,7 @@ SECTION("FileSize") {
 
 SECTION("GrowAndMap") {
     const int size = 100;
-    char filename[] = "test_typed_mmap_data_XXXXXX";
+    char filename[] = "test_mmap_grow_and_map_XXXXXX";
     const int fd = mkstemp(filename);
     REQUIRE(fd > 0);
 
