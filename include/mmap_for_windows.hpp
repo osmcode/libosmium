@@ -96,8 +96,7 @@ static void *mmap(void *start, size_t length, int prot, int flags, int fd, off_t
 
 static int munmap(void *addr, size_t length)
 {
-    UnmapViewOfFile(addr);
-    return 0;
+    return UnmapViewOfFile(addr) ? 0 : -1;
     /* ruh-ro, we leaked handle from CreateFileMapping() ... */
 }
 
