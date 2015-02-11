@@ -53,7 +53,7 @@ SECTION("Remap") {
 
 SECTION("FileSize") {
     const int size = 100;
-    char filename[] = "/tmp/osmium_unit_test_XXXXXX";
+    char filename[] = "test_typed_mmap_data_XXXXXX";
     const int fd = mkstemp(filename);
     REQUIRE(fd > 0);
     REQUIRE(0 == unlink(filename));
@@ -73,7 +73,7 @@ SECTION("FileSize") {
 
 SECTION("GrowAndMap") {
     const int size = 100;
-    char filename[] = "/tmp/osmium_unit_test_XXXXXX";
+    char filename[] = "test_typed_mmap_data_XXXXXX";
     const int fd = mkstemp(filename);
     REQUIRE(fd > 0);
     REQUIRE(0 == unlink(filename));
