@@ -1,7 +1,5 @@
 #include "catch.hpp"
 
-#include <iostream>
-
 #include <osmium/index/detail/typed_mmap.hpp>
 
 #if defined(_MSC_VER) || (defined(__GNUC__) && defined(_WIN32))
@@ -72,7 +70,6 @@ SECTION("FileSize") {
     REQUIRE((size * 2) == osmium::detail::typed_mmap<uint64_t>::file_size(fd));
 
     REQUIRE(0 == close(fd));
-    std::cout << "XXXXXXXX filename=" << filename << "\n";
     REQUIRE(0 == unlink(filename));
 }
 
@@ -96,7 +93,6 @@ SECTION("GrowAndMap") {
     osmium::detail::typed_mmap<uint64_t>::unmap(data, size);
 
     REQUIRE(0 == close(fd));
-    std::cout << "XXXXXXXX filename=" << filename << "\n";
     REQUIRE(0 == unlink(filename));
 }
 
