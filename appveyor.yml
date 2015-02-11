@@ -72,6 +72,5 @@ build_script:
   #- nmake
 
 test_script:
-  # Disable multipolygon test because it needs ruby and the 'json' gem
-  - ctest --output-on-failure -C %config% -E testdata-multipolygon
+  - ctest --output-on-failure -C %config%
 
