@@ -1,5 +1,7 @@
 #include "catch.hpp"
 
+#include <iostream>
+
 #include <osmium/index/detail/typed_mmap.hpp>
 
 #if defined(_MSC_VER) || (defined(__GNUC__) && defined(_WIN32))
@@ -53,10 +55,9 @@ SECTION("Remap") {
 
 SECTION("FileSize") {
     const int size = 100;
-    char filename[] = "/tmp/osmium_unit_test_XXXXXX";
+    char filename[] = "test_typed_mmap_data_XXXXXX";
     const int fd = mkstemp(filename);
     REQUIRE(fd > 0);
-    REQUIRE(0 == unlink(filename));
     REQUIRE(0 == osmium::detail::typed_mmap<uint64_t>::file_size(fd));
     REQUIRE(0 == ftruncate(fd, size * sizeof(uint64_t)));
     REQUIRE(size == osmium::detail::typed_mmap<uint64_t>::file_size(fd));
@@ -69,14 +70,17 @@ SECTION("FileSize") {
 
     osmium::detail::typed_mmap<uint64_t>::grow_file(size * 2, fd);
     REQUIRE((size * 2) == osmium::detail::typed_mmap<uint64_t>::file_size(fd));
+
+    close(fd);
+    std::cout << "XXXXXXXX filename=" << filename << "\n";
+    REQUIRE(0 == unlink(filename));
 }
 
 SECTION("GrowAndMap") {
     const int size = 100;
-    char filename[] = "/tmp/osmium_unit_test_XXXXXX";
+    char filename[] = "test_typed_mmap_data_XXXXXX";
     const int fd = mkstemp(filename);
     REQUIRE(fd > 0);
-    REQUIRE(0 == unlink(filename));
 
     uint64_t* data = osmium::detail::typed_mmap<uint64_t>::grow_and_map(size, fd);
     REQUIRE(size == osmium::detail::typed_mmap<uint64_t>::file_size(fd));
@@ -90,6 +94,9 @@ SECTION("GrowAndMap") {
     REQUIRE(27ul == data[99]);
 
     osmium::detail::typed_mmap<uint64_t>::unmap(data, size);
+
+    close(fd);
+    REQUIRE(0 == unlink(filename));
 }
 
 }
