@@ -84,7 +84,7 @@ foreach(Gem_NAME ${Gem_FIND_COMPONENTS})
             )
 
             # Create a list from the output results of the gem command
-            string(REPLACE "\n" ";" GEM_CONTENT_LIST ${GEM_LOCAL_INFO})
+            string(REPLACE "\n" ";" GEM_CONTENT_LIST "${GEM_LOCAL_INFO}")
             foreach(_gem_CONTENT_PATH ${GEM_CONTENT_LIST})
                 
                 # Convert so that only '/' Unix path separator are being using
