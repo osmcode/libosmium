@@ -16,6 +16,11 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 #
 #-----------------------------------------------------------------------------
 
+set(CMAKE_CONFIGURATION_TYPES "Debug;Release;RelWithDebInfo;MinSizeRel;Dev"
+    CACHE STRING
+    "List of available configuration types"
+    FORCE)
+
 project(libosmium)
 
 set(LIBOSMIUM_VERSION_MAJOR 0)
@@ -137,11 +142,6 @@ set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${USUAL_COMPILE_OPTIONS}"
 #  Build Type
 #
 #-----------------------------------------------------------------------------
-set(CMAKE_CONFIGURATION_TYPES "Debug;Release;RelWithDebInfo;MinSizeRel;Dev"
-    CACHE STRING
-    "List of available configuration types"
-    FORCE)
-
 # In 'Dev' mode: compile with very strict warnings and turn them into errors.
 if(CMAKE_BUILD_TYPE STREQUAL "Dev")
     if(NOT MSVC)
