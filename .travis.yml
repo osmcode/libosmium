@@ -35,7 +35,8 @@ install:
  - cd OSM-binary/src
  - make
  - sudo make install
- - cd ..
+ - cd ../..
+ - cd libosmium
 
 before_script:
  - true
