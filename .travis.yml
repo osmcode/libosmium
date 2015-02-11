@@ -20,6 +20,7 @@ before_install:
  - sudo apt-get update --yes --quiet
 
 install:
+ - cd ..
  # upgrade compilers
  - sudo apt-get install --yes gcc-4.8 g++-4.8
  # make sure 'cpp' is the just installed current one
@@ -35,6 +36,7 @@ install:
  - make
  - sudo make install
  - cd ../..
+ - cd libosmium
 
 before_script:
  - true
