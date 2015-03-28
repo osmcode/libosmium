@@ -44,18 +44,15 @@ DEALINGS IN THE SOFTWARE.
 namespace osmium {
 
     /**
-     * A vector of NodeRef objects. Usually this is not instatiated directly,
+     * A vector of NodeRef objects. Usually this is not instantiated directly,
      * but one of its subclasses are used.
      */
-    template <osmium::item_type TItemType>
     class NodeRefList : public osmium::memory::Item {
 
     public:
 
-        static constexpr osmium::item_type itemtype = TItemType;
-
-        NodeRefList() noexcept :
-            osmium::memory::Item(sizeof(NodeRefList), TItemType) {
+        NodeRefList(osmium::item_type itemtype) noexcept :
+            osmium::memory::Item(sizeof(NodeRefList), itemtype) {
         }
 
         bool empty() const noexcept {

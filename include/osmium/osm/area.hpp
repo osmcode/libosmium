@@ -53,12 +53,14 @@ namespace osmium {
     /**
      * An outer ring of an Area.
      */
-    class OuterRing : public NodeRefList<osmium::item_type::outer_ring> {
+    class OuterRing : public NodeRefList {
 
     public:
 
+        static constexpr osmium::item_type itemtype = osmium::item_type::outer_ring;
+
         OuterRing():
-            NodeRefList<osmium::item_type::outer_ring>() {
+            NodeRefList(itemtype) {
         }
 
     }; // class OuterRing
@@ -68,12 +70,14 @@ namespace osmium {
     /**
      * An inner ring of an Area.
      */
-    class InnerRing : public NodeRefList<osmium::item_type::inner_ring> {
+    class InnerRing : public NodeRefList {
 
     public:
 
+        static constexpr osmium::item_type itemtype = osmium::item_type::inner_ring;
+
         InnerRing():
-            NodeRefList<osmium::item_type::inner_ring>() {
+            NodeRefList(itemtype) {
         }
 
     }; // class InnerRing
