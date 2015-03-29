@@ -55,8 +55,7 @@ namespace osmium {
 
         template <typename T>
         inline T padded_length(T length) noexcept {
-            static_assert(std::is_integral<T>::value && std::is_unsigned<T>::value,
-                          "Template parameter must be unsigned integral type");
+            static_assert(std::is_integral<T>::value && std::is_unsigned<T>::value, "Template parameter must be unsigned integral type");
             return (length + align_bytes - 1) & ~(align_bytes - 1);
         }
 

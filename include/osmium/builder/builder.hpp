@@ -171,8 +171,7 @@ namespace osmium {
         template <class TItem>
         class ObjectBuilder : public Builder {
 
-            static_assert(std::is_base_of<osmium::memory::Item, TItem>::value,
-                "ObjectBuilder can only build objects derived from osmium::memory::Item");
+            static_assert(std::is_base_of<osmium::memory::Item, TItem>::value, "ObjectBuilder can only build objects derived from osmium::memory::Item");
 
         public:
 
