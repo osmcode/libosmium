@@ -85,7 +85,7 @@ namespace osmium {
 
                 bool m_use_thread_pool;
                 queue_type m_queue;
-                std::atomic<bool> m_done;
+                std::atomic<bool> m_quit_input_thread;
                 std::thread m_reader;
                 osmium::thread::Queue<std::string>& m_input_queue;
                 std::string m_input_buffer;
@@ -164,7 +164,7 @@ namespace osmium {
                         }
                         ++n;
 
-                        if (m_done) {
+                        if (m_quit_input_thread) {
                             return;
                         }
                     }
@@ -174,6 +174,10 @@ namespace osmium {
                     std::promise<osmium::memory::Buffer> promise;
                     m_queue.push(promise.get_future());
                     promise.set_value(osmium::memory::Buffer{});
+                }
+
+                void signal_input_thread_to_quit() {
+                    m_quit_input_thread = true;
                 }
 
             public:
@@ -189,7 +193,7 @@ namespace osmium {
                     osmium::io::detail::InputFormat(file, read_which_entities),
                     m_use_thread_pool(osmium::config::use_pool_threads_for_pbf_parsing()),
                     m_queue(20, "pbf_parser_results"), // XXX
-                    m_done(false),
+                    m_quit_input_thread(false),
                     m_input_queue(input_queue),
                     m_input_buffer() {
                     GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -204,7 +208,7 @@ namespace osmium {
                 }
 
                 ~PBFInputFormat() {
-                    m_done = true;
+                    signal_input_thread_to_quit();
                     if (m_reader.joinable()) {
                         m_reader.join();
                     }
@@ -233,8 +237,8 @@ namespace osmium {
                         }
                         return buffer;
                     } catch (...) {
-                        m_done = true;
                         eof = true;
+                        signal_input_thread_to_quit();
                         throw;
                     }
                 }
