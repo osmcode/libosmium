@@ -84,6 +84,7 @@ namespace osmium {
             class PBFInputFormat : public osmium::io::detail::InputFormat {
 
                 bool m_use_thread_pool;
+                bool m_eof { false };
                 queue_type m_queue;
                 std::atomic<bool> m_quit_input_thread;
                 std::thread m_reader;
@@ -220,10 +221,8 @@ namespace osmium {
                  * Returns an empty buffer at end of input.
                  */
                 osmium::memory::Buffer read() override {
-                    static bool eof = false;
-
                     osmium::memory::Buffer buffer;
-                    if (eof) {
+                    if (m_eof) {
                         return buffer;
                     }
 
@@ -233,11 +232,11 @@ namespace osmium {
                     try {
                         buffer = std::move(buffer_future.get());
                         if (!buffer) {
-                            eof = true;
+                            m_eof = true;
                         }
                         return buffer;
                     } catch (...) {
-                        eof = true;
+                        m_eof = true;
                         signal_input_thread_to_quit();
                         throw;
                     }
