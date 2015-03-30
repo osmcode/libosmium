@@ -25,12 +25,18 @@ SECTION("instantiation_and_extend_with_undefined") {
 
 SECTION("instantiation_and_extend") {
     osmium::Box b;
-    b.extend(osmium::Location(1.2, 3.4));
+    osmium::Location loc1 { 1.2, 3.4 };
+    b.extend(loc1);
     REQUIRE(!!b);
     REQUIRE(!!b.bottom_left());
     REQUIRE(!!b.top_right());
-    b.extend(osmium::Location(3.4, 4.5));
-    b.extend(osmium::Location(5.6, 7.8));
+    REQUIRE(b.contains(loc1));
+
+    osmium::Location loc2 { 3.4, 4.5 };
+    osmium::Location loc3 { 5.6, 7.8 };
+
+    b.extend(loc2);
+    b.extend(loc3);
     REQUIRE(b.bottom_left() == osmium::Location(1.2, 3.4));
     REQUIRE(b.top_right() == osmium::Location(5.6, 7.8));
 
@@ -38,6 +44,10 @@ SECTION("instantiation_and_extend") {
     b.extend(osmium::Location());
     REQUIRE(b.bottom_left() == osmium::Location(1.2, 3.4));
     REQUIRE(b.top_right() == osmium::Location(5.6, 7.8));
+
+    REQUIRE(b.contains(loc1));
+    REQUIRE(b.contains(loc2));
+    REQUIRE(b.contains(loc3));
 }
 
 SECTION("output_defined") {
