@@ -168,7 +168,12 @@ namespace osmium {
                             return;
                         }
                     }
-                    m_done = true;
+
+                    // Send an empty buffer to signal the reader that we are
+                    // done.
+                    std::promise<osmium::memory::Buffer> promise;
+                    m_queue.push(promise.get_future());
+                    promise.set_value(osmium::memory::Buffer{});
                 }
 
             public:
@@ -206,23 +211,32 @@ namespace osmium {
                 }
 
                 /**
-                 * Returns the next buffer with OSM data read from the PBF file.
-                 * Blocks if data is not available yet.
+                 * Returns the next buffer with OSM data read from the PBF
+                 * file. Blocks if data is not available yet.
                  * Returns an empty buffer at end of input.
                  */
                 osmium::memory::Buffer read() override {
-                    if (!m_done || !m_queue.empty()) {
-                        std::future<osmium::memory::Buffer> buffer_future;
-                        m_queue.wait_and_pop(buffer_future);
-                        try {
-                            return buffer_future.get();
-                        } catch (...) {
-                            m_done = true;
-                            throw;
-                        }
+                    static bool eof = false;
+
+                    osmium::memory::Buffer buffer;
+                    if (eof) {
+                        return buffer;
                     }
 
-                    return osmium::memory::Buffer();
+                    std::future<osmium::memory::Buffer> buffer_future;
+                    m_queue.wait_and_pop(buffer_future);
+
+                    try {
+                        buffer = std::move(buffer_future.get());
+                        if (!buffer) {
+                            eof = true;
+                        }
+                        return buffer;
+                    } catch (...) {
+                        m_done = true;
+                        eof = true;
+                        throw;
+                    }
                 }
 
             }; // class PBFInputFormat
