@@ -295,6 +295,14 @@ namespace osmium {
                 bool m_use_compression {true};
 
                 /**
+                 * Should the string tables in the data blocks be sorted?
+                 *
+                 * Not sorting the string tables makes writing PBF files
+                 * slightly faster.
+                 */
+                bool m_sort_stringtables { true };
+
+                /**
                  * While the .osm.pbf-format is able to carry all meta information, it is
                  * also able to omit this information to reduce size.
                  */
@@ -339,6 +347,21 @@ namespace osmium {
                 }
 
                 ///// Blob writing /////
+
+                void delta_encode_string_ids() {
+                    if (pbf_nodes && pbf_nodes->has_dense()) {
+                        OSMPBF::DenseNodes* dense = pbf_nodes->mutable_dense();
+
+                        if (dense->has_denseinfo()) {
+                            OSMPBF::DenseInfo* denseinfo = dense->mutable_denseinfo();
+
+                            for (int i=0, l=denseinfo->user_sid_size(); i<l; ++i) {
+                                auto user_sid = denseinfo->user_sid(i);
+                                denseinfo->set_user_sid(i, m_delta_user_sid.update(user_sid));
+                            }
+                        }
+                    }
+                }
 
                 /**
                  * Before a PrimitiveBlock gets serialized, all interim StringTable-ids needs to be
@@ -518,11 +541,13 @@ namespace osmium {
                     pbf_primitive_block.set_granularity(location_granularity());
                     pbf_primitive_block.set_date_granularity(date_granularity());
 
-                    // store the interim StringTable into the protobuf object
-                    string_table.store_stringtable(pbf_primitive_block.mutable_stringtable());
+                    string_table.store_stringtable(pbf_primitive_block.mutable_stringtable(), m_sort_stringtables);
 
-                    // map all interim string ids to real ids
-                    map_string_ids();
+                    if (m_sort_stringtables) {
+                        map_string_ids();
+                    } else {
+                        delta_encode_string_ids();
+                    }
 
                     std::promise<std::string> promise;
                     m_output_queue.push(promise.get_future());
@@ -742,6 +767,9 @@ namespace osmium {
                     }
                     if (file.get("pbf_compression") == "none" || file.get("pbf_compression") == "false") {
                         m_use_compression = false;
+                    }
+                    if (file.get("pbf_sort_stringtables") == "false") {
+                        m_sort_stringtables = false;
                     }
                     if (file.get("pbf_add_metadata") == "false") {
                         m_should_add_metadata = false;
