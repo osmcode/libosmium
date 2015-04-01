@@ -122,6 +122,7 @@ add_unit_test(geom test_wkt)
 
 add_unit_test(index test_id_to_location ENABLE_IF ${SPARSEHASH_FOUND})
 add_unit_test(index test_typed_mmap)
+add_unit_test(index test_typed_mmap_grow LABELS "fails_on_windows")
 
 add_unit_test(io test_bzip2 ENABLE_IF ${BZIP2_FOUND} LIBS ${BZIP2_LIBRARIES})
 add_unit_test(io test_file_formats)
