@@ -355,7 +355,7 @@ namespace osmium {
                         if (dense->has_denseinfo()) {
                             OSMPBF::DenseInfo* denseinfo = dense->mutable_denseinfo();
 
-                            for (int i=0, l=denseinfo->user_sid_size(); i<l; ++i) {
+                            for (int i = 0, l=denseinfo->user_sid_size(); i<l; ++i) {
                                 auto user_sid = denseinfo->user_sid(i);
                                 denseinfo->set_user_sid(i, m_delta_user_sid.update(user_sid));
                             }
@@ -374,7 +374,7 @@ namespace osmium {
                     // test, if the node-block has been allocated
                     if (pbf_nodes) {
                         // iterate over all nodes, passing them to the map_common_string_ids function
-                        for (int i=0, l=pbf_nodes->nodes_size(); i<l; ++i) {
+                        for (int i = 0, l=pbf_nodes->nodes_size(); i<l; ++i) {
                             map_common_string_ids(pbf_nodes->mutable_nodes(i));
                         }
 
@@ -386,7 +386,7 @@ namespace osmium {
                             // in the densenodes structure keys and vals are encoded in an intermixed
                             // array, individual nodes are seperated by a value of 0 (0 in the StringTable
                             // is always unused). String-ids of 0 are thus kept alone.
-                            for (int i=0, l=dense->keys_vals_size(); i<l; ++i) {
+                            for (int i = 0, l=dense->keys_vals_size(); i<l; ++i) {
                                 // map interim string-ids > 0 to real string ids
                                 auto sid = dense->keys_vals(i);
                                 if (sid > 0) {
@@ -400,7 +400,7 @@ namespace osmium {
                                 OSMPBF::DenseInfo* denseinfo = dense->mutable_denseinfo();
 
                                 // iterate over all username string-ids
-                                for (int i=0, l=denseinfo->user_sid_size(); i<l; ++i) {
+                                for (int i = 0, l=denseinfo->user_sid_size(); i<l; ++i) {
                                     // map interim string-ids > 0 to real string ids
                                     auto user_sid = string_table.map_string_id(denseinfo->user_sid(i));
 
@@ -414,7 +414,7 @@ namespace osmium {
                     // test, if the ways-block has been allocated
                     if (pbf_ways) {
                         // iterate over all ways, passing them to the map_common_string_ids function
-                        for (int i=0, l=pbf_ways->ways_size(); i<l; ++i) {
+                        for (int i = 0, l=pbf_ways->ways_size(); i<l; ++i) {
                             map_common_string_ids(pbf_ways->mutable_ways(i));
                         }
                     }
@@ -422,7 +422,7 @@ namespace osmium {
                     // test, if the relations-block has been allocated
                     if (pbf_relations) {
                         // iterate over all relations
-                        for (int i=0, l=pbf_relations->relations_size(); i<l; ++i) {
+                        for (int i = 0, l=pbf_relations->relations_size(); i<l; ++i) {
                             // get a pointer to the relation
                             OSMPBF::Relation* relation = pbf_relations->mutable_relations(i);
 
@@ -431,7 +431,7 @@ namespace osmium {
 
                             // iterate over all relation members, mapping the interim string-ids
                             // of the role to real string ids
-                            for (int mi=0; mi < relation->roles_sid_size(); ++mi) {
+                            for (int mi = 0; mi < relation->roles_sid_size(); ++mi) {
                                 relation->set_roles_sid(mi, string_table.map_string_id(relation->roles_sid(mi)));
                             }
                         }
@@ -454,7 +454,7 @@ namespace osmium {
                     }
 
                     // iterate over all tags and map the interim-ids of the key and the value to real ids
-                    for (int i=0, l=in->keys_size(); i<l; ++i) {
+                    for (int i = 0, l=in->keys_size(); i<l; ++i) {
                         in->set_keys(i, string_table.map_string_id(in->keys(i)));
                         in->set_vals(i, string_table.map_string_id(in->vals(i)));
                     }

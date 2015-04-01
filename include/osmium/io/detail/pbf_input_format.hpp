@@ -152,7 +152,7 @@ namespace osmium {
 
                 void parse_osm_data(osmium::osm_entity_bits::type read_types) {
                     osmium::thread::set_thread_name("_osmium_pbf_in");
-                    int n=0;
+                    int n = 0;
                     while (auto size = read_blob_header("OSMData")) {
 
                         if (m_use_thread_pool) {

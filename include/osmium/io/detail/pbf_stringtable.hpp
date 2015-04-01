@@ -162,7 +162,7 @@ namespace osmium {
                                             return std::pair<string_info, std::string>(p.second, p.first);
                                     });
 
-                        string_id_type n=0;
+                        string_id_type n = 0;
 
                         for (const auto& mapping : sortedbycount) {
                             // add the string of the current item to the pbf StringTable

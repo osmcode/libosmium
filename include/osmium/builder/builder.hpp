@@ -100,7 +100,7 @@ namespace osmium {
              *             parent item (if any).
              *
              */
-            void add_padding(bool self=false) {
+            void add_padding(bool self = false) {
                 auto padding = osmium::memory::align_bytes - (size() % osmium::memory::align_bytes);
                 if (padding != osmium::memory::align_bytes) {
                     std::fill_n(m_buffer.reserve_space(padding), padding, 0);
@@ -175,7 +175,7 @@ namespace osmium {
 
         public:
 
-            explicit ObjectBuilder(osmium::memory::Buffer& buffer, Builder* parent=nullptr) :
+            explicit ObjectBuilder(osmium::memory::Buffer& buffer, Builder* parent = nullptr) :
                 Builder(buffer, parent, sizeof(TItem)) {
                 new (&item()) TItem();
             }
