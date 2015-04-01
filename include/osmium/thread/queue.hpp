@@ -49,7 +49,7 @@ namespace osmium {
 
     namespace thread {
 
-        OSMIUM_CONSTEXPR std::chrono::milliseconds full_queue_sleep_duration { 10 }; // XXX
+        OSMIUM_CONSTEXPR const std::chrono::milliseconds full_queue_sleep_duration { 10 }; // XXX
 
         /**
          *  A thread-safe queue.
