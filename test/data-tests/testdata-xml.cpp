@@ -319,6 +319,11 @@ TEST_CASE("Reading OSM XML 122") {
 
 // =============================================
 
+// workaround for missing support for u8 string literals on Windows
+#if defined(_MSC_VER)
+# define u8
+#endif
+
 TEST_CASE("Reading OSM XML 140") {
 
     SECTION("Using Reader") {
