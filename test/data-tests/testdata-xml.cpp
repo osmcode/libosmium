@@ -319,11 +319,6 @@ TEST_CASE("Reading OSM XML 122") {
 
 // =============================================
 
-// workaround for missing support for u8 string literals on Windows
-#if defined(_MSC_VER)
-# define u8
-#endif
-
 TEST_CASE("Reading OSM XML 140") {
 
     SECTION("Using Reader") {
@@ -344,6 +339,8 @@ TEST_CASE("Reading OSM XML 140") {
 
             REQUIRE(!strcmp(uc, t["unicode_xml"]));
 
+// workaround for missing support for u8 string literals on Windows
+#if !defined(_MSC_VER)
             switch (count) {
                 case 1:
                     REQUIRE(!strcmp(uc, u8"a"));
@@ -363,6 +360,7 @@ TEST_CASE("Reading OSM XML 140") {
                 default:
                     REQUIRE(false); // should not be here
             }
+#endif
         }
         REQUIRE(count == 5);
     }
