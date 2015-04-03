@@ -29,6 +29,19 @@ TEST_CASE("Timestamp") {
         REQUIRE("2000-01-01T00:00:00Z" == t.to_iso());
     }
 
+    SECTION("can be implicitly cast to time_t") {
+        osmium::Timestamp t(4242);
+        time_t x = t;
+        REQUIRE(x == 4242);
+    }
+
+    SECTION("uint32_t can be initialized from Timestamp") {
+        osmium::Timestamp t(4242);
+        uint32_t x { t };
+
+        REQUIRE(x == 4242);
+    }
+
     SECTION("can be compared") {
         osmium::Timestamp t1(10);
         osmium::Timestamp t2(50);
