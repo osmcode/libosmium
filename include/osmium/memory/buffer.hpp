@@ -414,6 +414,15 @@ namespace osmium {
             }
 
             template <class T>
+            t_iterator<T> get_iterator(size_t offset) {
+                return t_iterator<T>(m_data + offset, m_data + m_committed);
+            }
+
+            iterator get_iterator(size_t offset) {
+                return iterator(m_data + offset, m_data + m_committed);
+            }
+
+            template <class T>
             t_iterator<T> end() {
                 return t_iterator<T>(m_data + m_committed, m_data + m_committed);
             }
@@ -429,6 +438,15 @@ namespace osmium {
 
             const_iterator cbegin() const {
                 return const_iterator(m_data, m_data + m_committed);
+            }
+
+            template <class T>
+            t_const_iterator<T> get_iterator(size_t offset) const {
+                return t_const_iterator<T>(m_data + offset, m_data + m_committed);
+            }
+
+            const_iterator get_iterator(size_t offset) const {
+                return const_iterator(m_data + offset, m_data + m_committed);
             }
 
             template <class T>
