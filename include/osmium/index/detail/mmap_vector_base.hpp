@@ -91,6 +91,14 @@ namespace osmium {
             typedef const T* const_iterator;
 
             ~mmap_vector_base() {
+                try {
+                    close();
+                } catch (std::system_error &) {
+                    // ignore
+                }
+            }
+
+            void close() {
                 osmium::detail::typed_mmap<T>::unmap(m_data, m_capacity);
             }
 
