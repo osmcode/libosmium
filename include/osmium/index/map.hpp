@@ -242,9 +242,13 @@ namespace osmium {
             });
         }
 
+#define OSMIUM_CONCATENATE_DETAIL_(x, y) x##y
+#define OSMIUM_CONCATENATE_(x, y) OSMIUM_CONCATENATE_DETAIL_(x, y)
+#define OSMIUM_MAKE_UNIQUE_(x) OSMIUM_CONCATENATE_(x, __COUNTER__)
+
 #define REGISTER_MAP(id, value, klass, name) \
 namespace { \
-    const bool registered_index_map_##name = osmium::index::register_map<id, value, klass>(#name); \
+    const bool OSMIUM_MAKE_UNIQUE_(registered_index_map_##name) = osmium::index::register_map<id, value, klass>(#name); \
 }
 
     } // namespace index
