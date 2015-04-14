@@ -175,11 +175,11 @@ namespace osmium {
                 return m_data + m_size;
             }
 
-            const_iterator cbegin() noexcept {
+            const_iterator cbegin() const noexcept {
                 return m_data;
             }
 
-            const_iterator cend() noexcept {
+            const_iterator cend() const noexcept {
                 return m_data + m_size;
             }
 
