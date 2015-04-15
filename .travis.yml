@@ -17,17 +17,20 @@ env:
 before_install:
  # we need at least g++-4.8 for c++11 features
  - sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test
- - sudo apt-get update --yes --quiet
+ - sudo apt-get update --yes -qq
 
 install:
  - cd ..
- # upgrade compilers
- - sudo apt-get install --yes gcc-4.8 g++-4.8
- - gcc-4.8 --version
- - sudo apt-get remove --purge --yes gcc-4.6 gcc-4.6-base g++-4.6 c++-4.6 
- # make sure 'cpp' is the just installed current one
- #- sudo rm /usr/bin/cpp
- #- sudo ln -s /usr/bin/cpp-4.8 /usr/bin/cpp
+ # upgrade compiler
+ - gcc_version=4.9
+ - sudo apt-get install --yes gcc-${gcc_version} g++-${gcc_version}
+ - gcc-${gcc_version} --version
+ - if [ "${CXX}" = 'g++' ]; then export CXX=g++-${gcc_version} CC=gcc-${gcc_version}; fi;
+ # make sure compiler executables point to the just installed current version
+ - sudo rm -f /usr/bin/cpp /usr/bin/gcc /usr/bin/g++
+ - sudo ln -s /usr/bin/cpp-${gcc_version} /usr/bin/cpp
+ - sudo ln -s /usr/bin/gcc-${gcc_version} /usr/bin/gcc
+ - sudo ln -s /usr/bin/g++-${gcc_version} /usr/bin/g++
  # upgrade libosmium dependencies
  - sudo apt-get install --yes make libboost-dev libboost-program-options-dev libsparsehash-dev libprotobuf-dev protobuf-compiler libgeos++-dev libproj-dev libgdal1h libgdal-dev
  - git clone https://github.com/osmcode/osm-testdata.git
