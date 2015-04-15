@@ -23,10 +23,11 @@ install:
  - cd ..
  # upgrade compilers
  - sudo apt-get install --yes gcc-4.8 g++-4.8
- - gcc --version
+ - gcc-4.8 --version
+ - sudo apt-get remove --purge --yes gcc-4.6 gcc-4.6-base g++-4.6 c++-4.6 
  # make sure 'cpp' is the just installed current one
- - sudo rm /usr/bin/cpp
- - sudo ln -s /usr/bin/cpp-4.8 /usr/bin/cpp
+ #- sudo rm /usr/bin/cpp
+ #- sudo ln -s /usr/bin/cpp-4.8 /usr/bin/cpp
  # upgrade libosmium dependencies
  - sudo apt-get install --yes make libboost-dev libboost-program-options-dev libsparsehash-dev libprotobuf-dev protobuf-compiler libgeos++-dev libproj-dev libgdal1h libgdal-dev
  - git clone https://github.com/osmcode/osm-testdata.git
