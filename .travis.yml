@@ -23,6 +23,7 @@ install:
  - cd ..
  # upgrade compilers
  - sudo apt-get install --yes gcc-4.8 g++-4.8
+ - gcc --version
  # make sure 'cpp' is the just installed current one
  - sudo rm /usr/bin/cpp
  - sudo ln -s /usr/bin/cpp-4.8 /usr/bin/cpp
@@ -42,7 +43,7 @@ before_script:
  - true
 
 script:
- - if [ "${CXX}" = 'g++' ]; then export CXX=g++-4.8; fi;
+ - if [ "${CXX}" = 'g++' ]; then export CXX=g++-4.8; export CC=gcc-4.8; fi;
  - mkdir build
  - cd build
  - cmake -LA -DCMAKE_BUILD_TYPE=${CONFIGURATION} ..
