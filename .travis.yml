@@ -22,7 +22,7 @@ before_install:
 install:
  - cd ..
  # upgrade compiler
- - gcc_version=4.9
+ - gcc_version=4.8
  - sudo apt-get install --yes gcc-${gcc_version} g++-${gcc_version}
  - gcc-${gcc_version} --version
  - if [ "${CXX}" = 'g++' ]; then export CXX=g++-${gcc_version} CC=gcc-${gcc_version}; fi;
