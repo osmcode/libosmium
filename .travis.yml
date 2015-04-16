@@ -15,22 +15,21 @@ env:
  - CONFIGURATION=Release
 
 before_install:
- # we need at least g++-4.8 for c++11 features
+ # upgrade compiler (we need at least g++-4.8 for C++11 features)
  - sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test
  - sudo apt-get update --yes -qq
-
-install:
- - cd ..
- # upgrade compiler
  - gcc_version=4.8
  - sudo apt-get install --yes gcc-${gcc_version} g++-${gcc_version}
  - gcc-${gcc_version} --version
- - if [ "${CXX}" = 'g++' ]; then export CXX=g++-${gcc_version} CC=gcc-${gcc_version}; fi;
+ #- if [ "${CXX}" = 'g++' ]; then export CXX=g++-${gcc_version} CC=gcc-${gcc_version}; fi;
  # make sure compiler executables point to the just installed current version
- - sudo rm -f /usr/bin/cpp /usr/bin/gcc /usr/bin/g++
- - sudo ln -s /usr/bin/cpp-${gcc_version} /usr/bin/cpp
- - sudo ln -s /usr/bin/gcc-${gcc_version} /usr/bin/gcc
- - sudo ln -s /usr/bin/g++-${gcc_version} /usr/bin/g++
+ #- sudo rm -f /usr/bin/cpp /usr/bin/gcc /usr/bin/g++
+ - sudo ln -sf /usr/bin/cpp-${gcc_version} /usr/bin/cpp
+ - sudo ln -sf /usr/bin/gcc-${gcc_version} /usr/bin/gcc
+ - sudo ln -sf /usr/bin/g++-${gcc_version} /usr/bin/g++
+ 
+install:
+ - cd ..
  # upgrade libosmium dependencies
  - sudo apt-get install --yes make libboost-dev libboost-program-options-dev libsparsehash-dev libprotobuf-dev protobuf-compiler libgeos++-dev libproj-dev libgdal1h libgdal-dev
  - git clone https://github.com/osmcode/osm-testdata.git
@@ -47,10 +46,11 @@ before_script:
  - true
 
 script:
- - if [ "${CXX}" = 'g++' ]; then export CXX=g++-4.8; export CC=gcc-4.8; fi;
+ #- if [ "${CXX}" = 'g++' ]; then export CXX=g++-4.8; export CC=gcc-4.8; fi;
  - mkdir build
  - cd build
- - cmake -LA -DCMAKE_BUILD_TYPE=${CONFIGURATION} -DCMAKE_CXX_FLAGS=-Wno-return-type ..
+ - if [ "${CXX}" = 'g++' ]; then WORKAROUND="-DCMAKE_CXX_FLAGS=-Wno-return-type"; else WORKAROUND=""; fi
+ - cmake -LA -DCMAKE_BUILD_TYPE=${CONFIGURATION} ${WORKAROUND} ..
  - make VERBOSE=1
  - ctest --output-on-failure
 
