@@ -21,21 +21,17 @@ before_install:
  - gcc_version=4.8
  - sudo apt-get install --yes gcc-${gcc_version} g++-${gcc_version}
  - gcc-${gcc_version} --version
- #- if [ "${CXX}" = 'g++' ]; then export CXX=g++-${gcc_version} CC=gcc-${gcc_version}; fi;
- # make sure compiler executables point to the just installed current version
- #- sudo rm -f /usr/bin/cpp /usr/bin/gcc /usr/bin/g++
+ # make sure compiler executables point to the just installed version
  - sudo ln -sf /usr/bin/cpp-${gcc_version} /usr/bin/cpp
  - sudo ln -sf /usr/bin/gcc-${gcc_version} /usr/bin/gcc
  - sudo ln -sf /usr/bin/g++-${gcc_version} /usr/bin/g++
- 
+ # install libosmium dependencies
+ - sudo apt-get install --yes make libboost-dev libboost-program-options-dev libsparsehash-dev libprotobuf-dev protobuf-compiler libgeos++-dev libproj-dev libgdal1h libgdal-dev spatialite-bin
+
 install:
  - cd ..
- # upgrade libosmium dependencies
- - sudo apt-get install --yes make libboost-dev libboost-program-options-dev libsparsehash-dev libprotobuf-dev protobuf-compiler libgeos++-dev libproj-dev libgdal1h libgdal-dev
- - git clone https://github.com/osmcode/osm-testdata.git
- # OSMPBF is too old, install from git
- #- sudo apt-get install --yes libosmpbf-dev
- - git clone https://github.com/scrosby/OSM-binary.git
+ - git clone --quiet https://github.com/osmcode/osm-testdata.git
+ - git clone --quiet https://github.com/scrosby/OSM-binary.git
  - cd OSM-binary/src
  - make
  - sudo make install
@@ -46,9 +42,9 @@ before_script:
  - true
 
 script:
- #- if [ "${CXX}" = 'g++' ]; then export CXX=g++-4.8; export CC=gcc-4.8; fi;
  - mkdir build
  - cd build
+ # GCC ignores the pragmas in the code that disable the "return-type" warning selectively, so use this workaround
  - if [ "${CXX}" = 'g++' ]; then WORKAROUND="-DCMAKE_CXX_FLAGS=-Wno-return-type"; else WORKAROUND=""; fi
  - cmake -LA -DCMAKE_BUILD_TYPE=${CONFIGURATION} ${WORKAROUND} ..
  - make VERBOSE=1
