@@ -307,8 +307,6 @@ if(MSVC)
     # old compilers anyway.
     add_definitions(-wd4351)
 
-    add_definitions(-wd4099)
-
     add_definitions(-DNOMINMAX -DWIN32_LEAN_AND_MEAN -D_CRT_SECURE_NO_WARNINGS)
 endif()
 
