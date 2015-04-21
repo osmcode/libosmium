@@ -148,6 +148,8 @@ set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${USUAL_COMPILE_OPTIONS}"
 if(CMAKE_BUILD_TYPE STREQUAL "Dev")
     if(NOT MSVC)
         add_definitions(-Werror)
+    else()
+        add_definitions(/debug)
     endif()
     add_definitions(${OSMIUM_WARNING_OPTIONS})
 endif()
