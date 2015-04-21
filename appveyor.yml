@@ -15,6 +15,8 @@ branches:
   only:
     - master
 
+shallow_clone: true
+
 # Operating system (build VM template)
 os: Visual Studio 2014 CTP4
 
@@ -59,7 +61,7 @@ install:
   - echo our own cmake
   - cmake -version
   - cd c:\projects
-  - git clone https://github.com/osmcode/osm-testdata.git
+  - git clone --depth 1 https://github.com/osmcode/osm-testdata.git
 
 build_script:
   - cd c:\projects\libosmium
