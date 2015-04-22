@@ -286,12 +286,13 @@ TEST_CASE("Reading OSM XML 121") {
     }
 
     SECTION("Using Reader") {
-        REQUIRE_THROWS_AS({
+        // can throw osmium::gzip_error or osmium::xml_error
+        REQUIRE_THROWS({
             osmium::io::Reader reader(filename("121-truncated_gzip_file", "osm.gz"));
             osmium::io::Header header = reader.header();
             osmium::memory::Buffer buffer = reader.read();
             reader.close();
-        }, osmium::gzip_error);
+        });
     }
 
 }
