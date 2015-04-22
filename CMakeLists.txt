@@ -113,8 +113,10 @@ endif()
 #-----------------------------------------------------------------------------
 if(MSVC)
     set(USUAL_COMPILE_OPTIONS "/Ox")
+    set(USUAL_LINK_OPTIONS "/debug")
 else()
     set(USUAL_COMPILE_OPTIONS "-O3 -g")
+    set(USUAL_LINK_OPTIONS "")
 endif()
 
 if(WIN32)
@@ -126,7 +128,7 @@ set(CMAKE_CXX_FLAGS_DEV "${USUAL_COMPILE_OPTIONS}"
     CACHE STRING "Flags used by the compiler during developer builds."
     FORCE)
 
-set(CMAKE_EXE_LINKER_FLAGS_DEV ""
+set(CMAKE_EXE_LINKER_FLAGS_DEV "${USUAL_LINK_OPTIONS}"
     CACHE STRING "Flags used by the linker during developer builds."
     FORCE)
 mark_as_advanced(
