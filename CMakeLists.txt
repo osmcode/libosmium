@@ -149,7 +149,11 @@ if(CMAKE_BUILD_TYPE STREQUAL "Dev")
     if(NOT MSVC)
         add_definitions(-Werror)
     else()
-        set(CMAKE_EXE_LINKER_FLAGS /debug /wd4099)
+        set(CMAKE_EXE_LINKER_FLAGS "/debug /wd4099"
+            CACHE STRING
+            "Flags used by the linker."
+            FORCE
+        )
     endif()
     add_definitions(${OSMIUM_WARNING_OPTIONS})
 endif()
