@@ -40,6 +40,11 @@ DEALINGS IN THE SOFTWARE.
 #include <sys/stat.h>
 #include <sys/types.h>
 
+#ifdef _WIN32
+# include <io.h>
+# include <windows.h>
+#endif
+
 #ifndef _MSC_VER
 # include <unistd.h>
 #else

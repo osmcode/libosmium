@@ -4,11 +4,6 @@
 
 #include <osmium/util/data_file.hpp>
 
-#ifdef _WIN32
-# include <io.h>
-# include <windows.h>
-#endif
-
 TEST_CASE("temporary file") {
 
     SECTION("create/open") {
