@@ -97,14 +97,16 @@ namespace osmium {
             /**
              * Create anonymous memory mapping of given size.
              *
+             * @param size Size of the mapping in bytes
              * @throws std::system_error if the mapping fails
              */
             MemoryMapping(size_t size);
 
             /**
-             * Create file-backed memory mapping of given size.
+             * Create file-backed memory mapping of given size. The file must
+             * contain at least `size` bytes!
              *
-             * @param size Size of the mapping
+             * @param size Size of the mapping in bytes
              * @param writable Should the mapping be writable?
              * @param fd Open file descriptor of a file we want to map
              * @param offset Offset into the file where the mapping should start
@@ -156,6 +158,7 @@ namespace osmium {
              * This function is only available on Linux systems (which have
              * the necessary mremap() function).
              *
+             * @param new_size Number of bytes to resize to
              * @throws std::system_error if the remapping fails
              */
             void resize(size_t new_size);
@@ -200,6 +203,12 @@ namespace osmium {
 
         }; // class MemoryMapping
 
+        /**
+         * A thin wrapper around the MemoryMapping class used when all the
+         * data in the mapped memory is of the same type. Instead of thinking
+         * about the number of bytes mapped, this counts sizes in the number
+         * of objects of that type.
+         */
         template <typename T>
         class TypedMemoryMapping {
 
@@ -208,11 +217,27 @@ namespace osmium {
 
         public:
 
+            /**
+             * Create anonymous memory mapping of given size.
+             *
+             * @param size Number of objects of type T to be mapped
+             * @throws std::system_error if the mapping fails
+             */
             TypedMemoryMapping(size_t size) :
                 m_mapping(sizeof(T) * size),
                 m_size(size) {
             }
 
+            /**
+             * Create file-backed memory mapping of given size. The file must
+             * contain at least `sizeof(T) * size` bytes!
+             *
+             * @param size Number of objects of type T to be mapped
+             * @param writable Should the mapping be writable?
+             * @param fd Open file descriptor of a file we want to map
+             * @param offset Offset into the file where the mapping should start
+             * @throws std::system_error if the mapping fails
+             */
             TypedMemoryMapping(size_t size, bool writable, int fd, off_t offset = 0) :
                 m_mapping(sizeof(T) * size, writable, fd, sizeof(T) * offset),
                 m_size(size) {
@@ -224,34 +249,77 @@ namespace osmium {
             /// You can not copy a MemoryMapping.
             TypedMemoryMapping& operator=(const TypedMemoryMapping&) = delete;
 
+            /**
+             * Move construct a mapping from another one. The other mapping
+             * will be marked as invalid.
+             */
             TypedMemoryMapping(TypedMemoryMapping&& other) = default;
 
+            /**
+             * Move a mapping. The other mapping will be marked as invalid.
+             */
             TypedMemoryMapping& operator=(TypedMemoryMapping&& other) = default;
 
+            /**
+             * Releases the mapping by calling unmap(). Will never throw.
+             * Call unmap() instead if you want to be notified of any error.
+             */
             ~TypedMemoryMapping() = default;
 
+            /**
+             * Unmap a mapping. If the mapping is not valid, it will do
+             * nothing.
+             *
+             * @throws std::system_error if the unmapping fails
+             */
             void unmap() {
                 m_mapping.unmap();
             }
 
 #ifdef __linux__
+            /**
+             * Resize a mapping to the given new size.
+             *
+             * This function is only available on Linux systems (which have
+             * the necessary mremap() function).
+             *
+             * @param new_size Number of objects of type T to resize to
+             * @throws std::system_error if the remapping fails
+             */
             void resize(size_t new_size) {
                 m_mapping.resize(sizeof(T) * new_size);
             }
 #endif
 
+            /**
+             * In a boolean context a TypedMemoryMapping is true when it is
+             * a valid existing mapping.
+             */
             operator bool() const noexcept {
                 return !!m_mapping;
             }
 
+            /**
+             * The number of objects of class T mapped. This is the same size
+             * you created the mapping with. The actual mapping will probably
+             * be larger because the system will round it to the page size.
+             */
             size_t size() const noexcept {
                 return m_size;
             }
 
+            /**
+             * Was this mapping created as a writable mapping?
+             */
             bool writable() const noexcept {
                 return m_mapping.writable();
             }
 
+            /**
+             * Get the address of the mapping.
+             *
+             * @throws std::runtime_error if the mapping is invalid
+             */
             T* get_addr() const {
                 return m_mapping.get_addr<T>();
             }
