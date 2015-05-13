@@ -453,7 +453,7 @@ inline osmium::util::MemoryMapping::MemoryMapping(size_t size) :
 
 inline osmium::util::MemoryMapping::MemoryMapping(size_t size, bool writable, int fd, off_t offset) :
     m_size(size),
-    m_handle(CreateFileMapping(static_cast<HANDLE>(_get_osfhandle(fd)), nullptr, writable ? PAGE_READWRITE : PAGE_READONLY, dword_hi(static_cast<uint64_t>(size) + offset), dword_lo(static_cast<uint64_t>(size) + offset), nullptr)),
+    m_handle(CreateFileMapping(reinterpret_cast<HANDLE>(_get_osfhandle(fd)), nullptr, writable ? PAGE_READWRITE : PAGE_READONLY, dword_hi(static_cast<uint64_t>(size) + offset), dword_lo(static_cast<uint64_t>(size) + offset), nullptr)),
     m_addr(nullptr),
     m_writable(writable) {
 
