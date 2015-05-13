@@ -200,6 +200,64 @@ namespace osmium {
 
         }; // class MemoryMapping
 
+        template <typename T>
+        class TypedMemoryMapping {
+
+            MemoryMapping m_mapping;
+            size_t m_size;
+
+        public:
+
+            TypedMemoryMapping(size_t size) :
+                m_mapping(sizeof(T) * size),
+                m_size(size) {
+            }
+
+            TypedMemoryMapping(size_t size, bool writable, int fd, off_t offset = 0) :
+                m_mapping(sizeof(T) * size, writable, fd, sizeof(T) * offset),
+                m_size(size) {
+            }
+
+            /// You can not copy construct a TypedMemoryMapping.
+            TypedMemoryMapping(const TypedMemoryMapping&) = delete;
+
+            /// You can not copy a MemoryMapping.
+            TypedMemoryMapping& operator=(const TypedMemoryMapping&) = delete;
+
+            TypedMemoryMapping(TypedMemoryMapping&& other) = default;
+
+            TypedMemoryMapping& operator=(TypedMemoryMapping&& other) = default;
+
+            ~TypedMemoryMapping() = default;
+
+            void unmap() {
+                m_mapping.unmap();
+            }
+
+#ifdef __linux__
+            void resize(size_t new_size) {
+                m_mapping.resize(sizeof(T) * new_size);
+            }
+#endif
+
+            operator bool() const noexcept {
+                return !!m_mapping;
+            }
+
+            size_t size() const noexcept {
+                return m_size;
+            }
+
+            bool writable() const noexcept {
+                return m_mapping.writable();
+            }
+
+            T* get_addr() const {
+                return m_mapping.get_addr<T>();
+            }
+
+        }; // class TypedMemoryMapping
+
     } // namespace util
 
 } // namespace osmium
