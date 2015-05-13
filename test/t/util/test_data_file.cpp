@@ -4,6 +4,11 @@
 
 #include <osmium/util/data_file.hpp>
 
+#ifdef _WIN32
+# include <io.h>
+# include <windows.h>
+#endif
+
 TEST_CASE("temporary file") {
 
     SECTION("create/open") {
@@ -15,7 +20,7 @@ TEST_CASE("temporary file") {
         REQUIRE(fd > 0);
 
         const char buf[] = "foobar";
-        write(fd, buf, sizeof(buf));
+        REQUIRE(::write(fd, buf, sizeof(buf)) == sizeof(buf));
 
         file.close();
 
@@ -38,7 +43,7 @@ TEST_CASE("named file") {
             REQUIRE(file.size() == 0);
 
             const char buf[] = "foobar";
-            ::write(fd, buf, sizeof(buf) - 1);
+            REQUIRE(::write(fd, buf, sizeof(buf) - 1) == sizeof(buf) - 1);
 
             file.close();
 
