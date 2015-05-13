@@ -1,6 +1,11 @@
 #include "catch.hpp"
 
-#include <unistd.h>
+#ifndef _MSC_VER
+# include <unistd.h>
+#else
+# define ftruncate _chsize
+#endif
+
 #include <sys/types.h>
 
 #include <osmium/util/memory_mapping.hpp>
@@ -13,9 +18,8 @@ TEST_CASE("anonymous mapping") {
 
     SECTION("simple memory mapping should work") {
         osmium::util::MemoryMapping mapping(1024);
-        int* addr = mapping.get_addr<int>();
+        volatile int* addr = mapping.get_addr<int>();
 
-        REQUIRE(addr > 0);
         REQUIRE(mapping.writable());
 
         *addr = 42;
@@ -28,7 +32,7 @@ TEST_CASE("anonymous mapping") {
     }
 
     SECTION("memory mapping a huge area should fail") {
-        const size_t huge = 1024 * 1024 * 1024 * 1024 * 1024;
+        const size_t huge = 1024ULL * 1024ULL * 1024ULL * 1024ULL;
         REQUIRE_THROWS_AS(osmium::util::MemoryMapping mapping(huge),
             std::system_error);
     }
