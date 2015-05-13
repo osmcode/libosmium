@@ -7,12 +7,15 @@
 #endif
 
 #include <sys/types.h>
+#include <limits>
 
 #include <osmium/util/memory_mapping.hpp>
 
 #if defined(_MSC_VER) || (defined(__GNUC__) && defined(_WIN32))
 #include "win_mkstemp.hpp"
 #endif
+
+static const size_t huge = std::numeric_limits<size_t>::max();
 
 TEST_CASE("anonymous mapping") {
 
@@ -34,7 +37,6 @@ TEST_CASE("anonymous mapping") {
     }
 
     SECTION("memory mapping a huge area should fail") {
-        const size_t huge = 1024ULL * 1024ULL * 1024ULL * 1024ULL;
         REQUIRE_THROWS_AS(osmium::util::MemoryMapping mapping(huge),
             std::system_error);
     }
@@ -165,7 +167,6 @@ TEST_CASE("typed anonymous mapping") {
     }
 
     SECTION("memory mapping a huge area should fail") {
-        const size_t huge = 1024ULL * 1024ULL * 1024ULL * 1024ULL;
         REQUIRE_THROWS_AS(osmium::util::TypedMemoryMapping<uint32_t> mapping(huge),
             std::system_error);
     }
