@@ -137,6 +137,7 @@ add_unit_test(thread test_pool ENABLE_IF ${Threads_FOUND} LIBS ${CMAKE_THREAD_LI
 
 add_unit_test(util test_cast_with_assert)
 add_unit_test(util test_double)
+add_unit_test(util test_memory_mapping)
 add_unit_test(util test_options)
 add_unit_test(util test_string)
 
