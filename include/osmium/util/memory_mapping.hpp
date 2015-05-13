@@ -190,7 +190,7 @@ namespace osmium {
              *
              * @throws std::runtime_error if the mapping is invalid
              */
-            template <typename T>
+            template <typename T = void>
             T* get_addr() const {
                 if (is_valid()) {
                     return reinterpret_cast<T*>(m_addr);

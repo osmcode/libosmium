@@ -18,6 +18,8 @@ TEST_CASE("anonymous mapping") {
 
     SECTION("simple memory mapping should work") {
         osmium::util::MemoryMapping mapping(1024);
+        REQUIRE(mapping.get_addr() != nullptr);
+
         volatile int* addr = mapping.get_addr<int>();
 
         REQUIRE(mapping.writable());
@@ -103,6 +105,10 @@ TEST_CASE("anonymous mapping") {
         REQUIRE(*addr2 == 42);
     }
 #endif
+
+}
+
+TEST_CASE("file-based mapping") {
 
     SECTION("writing to a mapped file should work") {
         const int size = 100;
