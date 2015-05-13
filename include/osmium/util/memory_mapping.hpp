@@ -490,7 +490,7 @@ inline void osmium::util::MemoryMapping::unmap() {
         if (! UnmapViewOfFile(m_addr)) {
             throw std::system_error(GetLastError(), std::system_category(), "UnmapViewOfFile failed");
         }
-        other.make_invalid();
+        make_invalid();
     }
 
     if (m_handle) {
