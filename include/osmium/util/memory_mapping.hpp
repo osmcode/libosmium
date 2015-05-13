@@ -33,6 +33,7 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <cerrno>
 #include <stdexcept>
 #include <system_error>
 
@@ -364,7 +365,7 @@ inline osmium::util::MemoryMapping::MemoryMapping(size_t size) :
 
 inline osmium::util::MemoryMapping::MemoryMapping(size_t size, bool writable, int fd, off_t offset) :
     m_size(size),
-    m_addr(::mmap(nullptr, size, PROT_READ | (writable ? PROT_WRITE : PROT_NONE), MAP_SHARED, fd, offset)),
+    m_addr(::mmap(nullptr, size, (writable ? PROT_READ | PROT_WRITE : PROT_READ), MAP_SHARED, fd, offset)),
     m_writable(writable) {
     if (!is_valid()) {
         throw std::system_error(errno, std::system_category(), "mmap failed");
@@ -453,7 +454,7 @@ inline osmium::util::MemoryMapping::MemoryMapping(size_t size) :
 
 inline osmium::util::MemoryMapping::MemoryMapping(size_t size, bool writable, int fd, off_t offset) :
     m_size(size),
-    m_handle(CreateFileMapping(reinterpret_cast<HANDLE>(_get_osfhandle(fd)), nullptr, writable ? PAGE_READWRITE : PAGE_READONLY, dword_hi(static_cast<uint64_t>(size) + offset), dword_lo(static_cast<uint64_t>(size) + offset), nullptr)),
+    m_handle(CreateFileMapping(reinterpret_cast<HANDLE>(_get_osfhandle(fd)), nullptr, (writable ? PAGE_READWRITE : PAGE_READONLY), dword_hi(static_cast<uint64_t>(size) + offset), dword_lo(static_cast<uint64_t>(size) + offset), nullptr)),
     m_addr(nullptr),
     m_writable(writable) {
 
@@ -461,7 +462,7 @@ inline osmium::util::MemoryMapping::MemoryMapping(size_t size, bool writable, in
         throw std::system_error(GetLastError(), std::system_category(), "CreateFileMapping failed");
     }
 
-    m_addr = MapViewOfFile(m_handle, writable ? FILE_MAP_WRITE | FILE_MAP_READ, dword_hi(offset), dword_lo(offset), m_size);
+    m_addr = MapViewOfFile(m_handle, (writable ? FILE_MAP_WRITE : FILE_MAP_READ), dword_hi(offset), dword_lo(offset), m_size);
     if (!is_valid()) {
         throw std::system_error(GetLastError(), std::system_category(), "MapViewOfFile failed");
     }
