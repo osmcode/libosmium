@@ -322,3 +322,52 @@ TEST_CASE("typed file-based mapping") {
 
 }
 
+TEST_CASE("anonymous memory mapping class") {
+
+    SECTION("simple memory mapping should work") {
+        osmium::util::AnonymousMemoryMapping mapping(1024);
+        REQUIRE(mapping.get_addr() != nullptr);
+
+        volatile int* addr = mapping.get_addr<int>();
+
+        REQUIRE(mapping.writable());
+
+        *addr = 42;
+        REQUIRE(*addr == 42);
+
+        REQUIRE(!!mapping);
+        mapping.unmap();
+        REQUIRE(!mapping);
+        mapping.unmap(); // second unmap is okay
+    }
+
+#ifdef __linux__
+    SECTION("remapping to larger size should work") {
+        osmium::util::AnonymousMemoryMapping mapping(1024);
+        REQUIRE(mapping.size() == 1024);
+
+        int* addr1 = mapping.get_addr<int>();
+        *addr1 = 42;
+
+        mapping.resize(2048);
+
+        int* addr2 = mapping.get_addr<int>();
+        REQUIRE(*addr2 == 42);
+    }
+
+    SECTION("remapping to smaller size should work") {
+        osmium::util::AnonymousMemoryMapping mapping(1024);
+        REQUIRE(mapping.size() == 1024);
+
+        int* addr1 = mapping.get_addr<int>();
+        *addr1 = 42;
+
+        mapping.resize(512);
+
+        int* addr2 = mapping.get_addr<int>();
+        REQUIRE(*addr2 == 42);
+    }
+#endif
+
+}
+

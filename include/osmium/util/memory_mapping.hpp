@@ -60,9 +60,9 @@ namespace osmium {
          *
          * Usage for anonymous mapping:
          * @code
-         * MemoryMapping mapping(1024);      // create anonymous mapping with size
-         * auto ptr = mapping.addr<char*>(); // get pointer to memory
-         * mapping.unmap();                  // release mapping by calling unmap() (or at end of scope)
+         * MemoryMapping mapping(1024);          // create anonymous mapping with size
+         * auto ptr = mapping.get_addr<char*>(); // get pointer to memory
+         * mapping.unmap();                      // release mapping by calling unmap() (or at end of scope)
          * @endcode
          *
          * Or for file-backed mapping:
@@ -219,6 +219,34 @@ namespace osmium {
         }; // class MemoryMapping
 
         /**
+         * Anonymous memory mapping.
+         *
+         * Usage for anonymous mapping:
+         * @code
+         * AnonymousMemoryMapping mapping(1024); // create anonymous mapping with size
+         * auto ptr = mapping.get_addr<char*>(); // get pointer to memory
+         * mapping.unmap();                      // release mapping by calling unmap() (or at end of scope)
+         * @endcode
+         */
+        class AnonymousMemoryMapping : public MemoryMapping {
+
+        public:
+
+            AnonymousMemoryMapping(size_t size) :
+                MemoryMapping(size) {
+            }
+
+#ifndef __linux__
+            /**
+             * On systems other than Linux anonymous mappings can not be
+             * resized!
+             */
+            void resize(size_t) = delete;
+#endif
+
+        }; // class AnonymousMemoryMapping
+
+        /**
          * A thin wrapper around the MemoryMapping class used when all the
          * data in the mapped memory is of the same type. Instead of thinking
          * about the number of bytes mapped, this counts sizes in the number
@@ -340,6 +368,25 @@ namespace osmium {
 
         }; // class TypedMemoryMapping
 
+        template <typename T>
+        class AnonymousTypedMemoryMapping : public TypedMemoryMapping<T> {
+
+        public:
+
+            AnonymousTypedMemoryMapping(size_t size) :
+                TypedMemoryMapping<T>(size) {
+            }
+
+#ifndef __linux__
+            /**
+             * On systems other than Linux anonymous mappings can not be
+             * resized!
+             */
+            void resize(size_t) = delete;
+#endif
+
+        }; // class AnonymousTypedMemoryMapping
+
     } // namespace util
 
 } // namespace osmium
@@ -429,7 +476,7 @@ inline void osmium::util::MemoryMapping::resize(size_t new_size) {
         throw std::system_error(errno, std::system_category(), "mremap failed");
     }
 #else
-    assert(m_fd != -1); // XXX
+    assert(m_fd != -1);
     unmap();
     m_addr = ::mmap(nullptr, new_size, get_protection(), get_flags(), m_fd, m_offset);
     if (!is_valid()) {
