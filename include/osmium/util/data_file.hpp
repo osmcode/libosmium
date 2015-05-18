@@ -78,10 +78,21 @@ namespace osmium {
             }
 
             /**
+             * Create and open a temporary file with the specified size. It
+             * is removed after opening.
+             *
+             * @throws std::system_error if something went wrong.
+             */
+            DataFile(size_t size) :
+                DataFile() {
+                grow(size);
+            }
+
+            /**
              * Create and open a named file.
              *
              * @param filename the name of the file
-             * @param writeable should the file be writable?
+             * @param writable should the file be writable?
              * @throws std::system_error if something went wrong.
              */
             DataFile(const char* filename, bool writable) :
@@ -95,7 +106,7 @@ namespace osmium {
              * Create and open a named file.
              *
              * @param filename the name of the file
-             * @param writeable should the file be writable?
+             * @param writable should the file be writable?
              * @throws std::system_error if something went wrong.
              */
             DataFile(const std::string& filename, bool writable) :
