@@ -113,12 +113,11 @@ TEST_CASE("anonymous mapping") {
 TEST_CASE("file-based mapping") {
 
     SECTION("writing to a mapped file should work") {
-        const int size = 100;
-        char filename[] = "test_mmap_file_size_XXXXXX";
+        char filename[] = "test_mmap_write_XXXXXX";
         const int fd = mkstemp(filename);
         REQUIRE(fd > 0);
 
-        REQUIRE(0 == ::ftruncate(fd, size));
+        REQUIRE(0 == ::ftruncate(fd, 100));
 
         {
             osmium::util::MemoryMapping mapping(100, true, fd);
@@ -147,6 +146,51 @@ TEST_CASE("file-based mapping") {
         REQUIRE(0 == unlink(filename));
     }
 
+    SECTION("remapping to larger size should work") {
+        char filename[] = "test_mmap_grow_XXXXXX";
+        const int fd = mkstemp(filename);
+        REQUIRE(fd > 0);
+
+        REQUIRE(0 == ::ftruncate(fd, 200));
+
+        osmium::util::MemoryMapping mapping(100, true, fd);
+        REQUIRE(mapping.size() == 100);
+
+        int* addr1 = mapping.get_addr<int>();
+        *addr1 = 42;
+
+        mapping.resize(200);
+        REQUIRE(mapping.size() == 200);
+
+        int* addr2 = mapping.get_addr<int>();
+        REQUIRE(*addr2 == 42);
+
+        REQUIRE(0 == close(fd));
+        REQUIRE(0 == unlink(filename));
+    }
+
+    SECTION("remapping to smaller size should work") {
+        char filename[] = "test_mmap_shrink_XXXXXX";
+        const int fd = mkstemp(filename);
+        REQUIRE(fd > 0);
+
+        REQUIRE(0 == ::ftruncate(fd, 100));
+
+        osmium::util::MemoryMapping mapping(100, true, fd);
+        REQUIRE(mapping.size() == 100);
+
+        int* addr1 = mapping.get_addr<int>();
+        *addr1 = 42;
+
+        mapping.resize(50);
+        REQUIRE(mapping.size() == 50);
+
+        int* addr2 = mapping.get_addr<int>();
+        REQUIRE(*addr2 == 42);
+
+        REQUIRE(0 == close(fd));
+        REQUIRE(0 == unlink(filename));
+    }
 }
 
 TEST_CASE("typed anonymous mapping") {
@@ -243,12 +287,11 @@ TEST_CASE("typed anonymous mapping") {
 TEST_CASE("typed file-based mapping") {
 
     SECTION("writing to a mapped file should work") {
-        const int size = 100;
         char filename[] = "test_mmap_file_size_XXXXXX";
         const int fd = mkstemp(filename);
         REQUIRE(fd > 0);
 
-        REQUIRE(0 == ::ftruncate(fd, size));
+        REQUIRE(0 == ::ftruncate(fd, 100));
 
         {
             osmium::util::TypedMemoryMapping<uint32_t> mapping(100, true, fd);

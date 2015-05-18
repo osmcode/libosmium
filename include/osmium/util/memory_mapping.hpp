@@ -33,6 +33,7 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <cassert>
 #include <cerrno>
 #include <stdexcept>
 #include <system_error>
@@ -79,6 +80,15 @@ namespace osmium {
             /// The size of the mapping
             size_t m_size;
 
+            /// File handle we got the mapping from
+            int m_fd;
+
+            /// Offset into the file
+            off_t m_offset;
+
+            /// Is the memory writable?
+            bool m_writable;
+
 #ifdef _WIN32
             HANDLE m_handle;
 #endif
@@ -86,22 +96,27 @@ namespace osmium {
             /// The address where the memory is mapped
             void* m_addr;
 
-            /// Is the memory writable?
-            bool m_writable;
-
             bool is_valid() const noexcept;
 
             void make_invalid() noexcept;
 
-        public:
+#ifdef _WIN32
+            typedef DWORD flag_type;
+#else
+            typedef int flag_type;
+#endif
 
-            /**
-             * Create anonymous memory mapping of given size.
-             *
-             * @param size Size of the mapping in bytes
-             * @throws std::system_error if the mapping fails
-             */
-            MemoryMapping(size_t size);
+            flag_type get_protection() const noexcept;
+
+            flag_type get_flags() const noexcept;
+
+#ifdef _WIN32
+            HANDLE get_handle() const noexcept;
+            HANDLE osmium::util::MemoryMapping::create_file_mapping() const noexcept;
+            void* osmium::util::MemoryMapping::map_view_of_file() const noexcept;
+#endif
+
+        public:
 
             /**
              * Create file-backed memory mapping of given size. The file must
@@ -113,7 +128,7 @@ namespace osmium {
              * @param offset Offset into the file where the mapping should start
              * @throws std::system_error if the mapping fails
              */
-            MemoryMapping(size_t size, bool writable, int fd, off_t offset=0);
+            MemoryMapping(size_t size, bool writable=true, int fd=-1, off_t offset=0);
 
             /// You can not copy construct a MemoryMapping.
             MemoryMapping(const MemoryMapping&) = delete;
@@ -152,18 +167,17 @@ namespace osmium {
              */
             void unmap();
 
-#ifdef __linux__
             /**
              * Resize a mapping to the given new size.
              *
-             * This function is only available on Linux systems (which have
-             * the necessary mremap() function).
+             * On Linux systems this will use the mremap() function. On other
+             * systems it will unmap and remap the memory. This can only be
+             * done for file-based mappings, not anonymous mappings!
              *
              * @param new_size Number of bytes to resize to
              * @throws std::system_error if the remapping fails
              */
             void resize(size_t new_size);
-#endif
 
             /**
              * In a boolean context a MemoryMapping is true when it is a valid
@@ -277,12 +291,12 @@ namespace osmium {
                 m_mapping.unmap();
             }
 
-#ifdef __linux__
             /**
              * Resize a mapping to the given new size.
              *
-             * This function is only available on Linux systems (which have
-             * the necessary mremap() function).
+             * On Linux systems this will use the mremap() function. On other
+             * systems it will unmap and remap the memory. This can only be
+             * done for file-based mappings, not anonymous mappings!
              *
              * @param new_size Number of objects of type T to resize to
              * @throws std::system_error if the remapping fails
@@ -290,7 +304,6 @@ namespace osmium {
             void resize(size_t new_size) {
                 m_mapping.resize(sizeof(T) * new_size);
             }
-#endif
 
             /**
              * In a boolean context a TypedMemoryMapping is true when it is
@@ -354,47 +367,51 @@ inline void osmium::util::MemoryMapping::make_invalid() noexcept {
 # define MAP_ANONYMOUS MAP_ANON
 #endif
 
-inline osmium::util::MemoryMapping::MemoryMapping(size_t size) :
-    m_size(size),
-    m_addr(::mmap(nullptr, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0)),
-    m_writable(true) {
-    if (!is_valid()) {
-        throw std::system_error(errno, std::system_category(), "mmap failed");
+inline int osmium::util::MemoryMapping::get_protection() const noexcept {
+    if (m_writable) {
+        return PROT_READ | PROT_WRITE;
     }
+    return PROT_READ;
+}
+
+inline int osmium::util::MemoryMapping::get_flags() const noexcept {
+    if (m_fd == -1) {
+        return MAP_PRIVATE | MAP_ANONYMOUS;
+    }
+    return MAP_SHARED;
 }
 
 inline osmium::util::MemoryMapping::MemoryMapping(size_t size, bool writable, int fd, off_t offset) :
     m_size(size),
-    m_addr(::mmap(nullptr, size, (writable ? PROT_READ | PROT_WRITE : PROT_READ), MAP_SHARED, fd, offset)),
-    m_writable(writable) {
+    m_fd(fd),
+    m_offset(offset),
+    m_writable(writable),
+    m_addr(::mmap(nullptr, size, get_protection(), get_flags(), m_fd, m_offset)) {
+    assert(writable || fd != -1);
     if (!is_valid()) {
         throw std::system_error(errno, std::system_category(), "mmap failed");
     }
 }
 
 inline osmium::util::MemoryMapping::MemoryMapping(MemoryMapping&& other) :
-    m_size(std::move(other.m_size)),
-    m_addr(std::move(other.m_addr)) {
+    m_size(other.m_size),
+    m_fd(other.m_fd),
+    m_offset(other.m_offset),
+    m_writable(other.m_writable),
+    m_addr(other.m_addr) {
     other.make_invalid();
 }
 
 inline osmium::util::MemoryMapping& osmium::util::MemoryMapping::operator=(osmium::util::MemoryMapping&& other) {
     unmap();
-    m_size = std::move(other.m_size);
-    m_addr = std::move(other.m_addr);
+    m_size     = other.m_size;
+    m_fd       = other.m_fd;
+    m_offset   = other.m_offset;
+    m_writable = other.m_writable;
+    m_addr     = other.m_addr;
     other.make_invalid();
     return *this;
 }
-
-#ifdef __linux__
-inline void osmium::util::MemoryMapping::resize(size_t new_size) {
-    m_addr = ::mremap(m_addr, m_size, new_size, MREMAP_MAYMOVE);
-    if (!is_valid()) {
-        throw std::system_error(errno, std::system_category(), "mremap failed");
-    }
-    m_size = new_size;
-}
-#endif
 
 inline void osmium::util::MemoryMapping::unmap() {
     if (is_valid()) {
@@ -403,6 +420,23 @@ inline void osmium::util::MemoryMapping::unmap() {
         }
         make_invalid();
     }
+}
+
+inline void osmium::util::MemoryMapping::resize(size_t new_size) {
+#ifdef __linux__
+    m_addr = ::mremap(m_addr, m_size, new_size, MREMAP_MAYMOVE);
+    if (!is_valid()) {
+        throw std::system_error(errno, std::system_category(), "mremap failed");
+    }
+#else
+    assert(m_fd != -1); // XXX
+    unmap();
+    m_addr = ::mmap(nullptr, new_size, get_protection(), get_flags(), m_fd, m_offset);
+    if (!is_valid()) {
+        throw std::system_error(errno, std::system_category(), "mmap failed");
+    }
+#endif
+    m_size = new_size;
 }
 
 #else
@@ -428,6 +462,38 @@ namespace {
 
 } // anonymous namespace
 
+inline DWORD osmium::util::MemoryMapping::get_protection() const noexcept {
+    if (m_writable) {
+        return PAGE_READWRITE;
+    }
+    return PAGE_READONLY;
+}
+
+inline DWORD osmium::util::MemoryMapping::get_flags() const noexcept {
+    if (m_fd == -1) {
+        return FILE_MAP_WRITE | FILE_MAP_COPY;
+    }
+    if (m_writable) {
+        return FILE_MAP_WRITE;
+    }
+    return FILE_MAP_READ;
+}
+
+inline HANDLE osmium::util::MemoryMapping::get_handle() const noexcept {
+    if (m_fd == -1) {
+        return INVALID_HANDLE_VALUE;
+    }
+    return reinterpret_cast<HANDLE>(_get_osfhandle(fd));
+}
+
+inline HANDLE osmium::util::MemoryMapping::create_file_mapping() const noexcept {
+    return CreateFileMapping(get_handle(), nullptr, get_protection(), dword_hi(static_cast<uint64_t>(m_size) + m_offset), dword_lo(static_cast<uint64_t>(m_size) + m_offset), nullptr);
+}
+
+inline void* osmium::util::MemoryMapping::map_view_of_file() const noexcept {
+    return MapViewOfFile(m_handle, get_flags(), dword_hi(m_offset), dword_lo(m_offset), m_size);
+}
+
 inline bool osmium::util::MemoryMapping::is_valid() const noexcept {
     return m_addr != nullptr;
 }
@@ -436,51 +502,43 @@ inline void osmium::util::MemoryMapping::make_invalid() noexcept {
     m_addr = nullptr;
 }
 
-inline osmium::util::MemoryMapping::MemoryMapping(size_t size) :
-    m_size(size),
-    m_handle(CreateFileMapping(INVALID_HANDLE_VALUE, nullptr, PAGE_READWRITE, dword_hi(size), dword_lo(size), nullptr)),
-    m_addr(nullptr),
-    m_writable(true) {
-
-    if (!m_handle) {
-        throw std::system_error(GetLastError(), std::system_category(), "CreateFileMapping failed");
-    }
-
-    m_addr = MapViewOfFile(m_handle, FILE_MAP_WRITE | FILE_MAP_COPY, 0, 0, m_size);
-    if (!is_valid()) {
-        throw std::system_error(GetLastError(), std::system_category(), "MapViewOfFile failed");
-    }
-}
-
 inline osmium::util::MemoryMapping::MemoryMapping(size_t size, bool writable, int fd, off_t offset) :
     m_size(size),
-    m_handle(CreateFileMapping(reinterpret_cast<HANDLE>(_get_osfhandle(fd)), nullptr, (writable ? PAGE_READWRITE : PAGE_READONLY), dword_hi(static_cast<uint64_t>(size) + offset), dword_lo(static_cast<uint64_t>(size) + offset), nullptr)),
-    m_addr(nullptr),
-    m_writable(writable) {
+    m_fd(fd),
+    m_offset(offset),
+    m_writable(writable),
+    m_handle(create_file_mapping()),
+    m_addr(nullptr) {
 
     if (!m_handle) {
         throw std::system_error(GetLastError(), std::system_category(), "CreateFileMapping failed");
     }
 
-    m_addr = MapViewOfFile(m_handle, (writable ? FILE_MAP_WRITE : FILE_MAP_READ), dword_hi(offset), dword_lo(offset), m_size);
+    m_addr = map_view_of_file();
     if (!is_valid()) {
         throw std::system_error(GetLastError(), std::system_category(), "MapViewOfFile failed");
     }
 }
 
 inline osmium::util::MemoryMapping::MemoryMapping(MemoryMapping&& other) :
-    m_size(std::move(other.m_size)),
+    m_size(other.m_size),
+    m_fd(other.m_fd),
+    m_offset(other.m_offset),
+    m_writable(other.m_writable),
     m_handle(std::move(other.m_handle)),
-    m_addr(std::move(other.m_addr)) {
+    m_addr(other.m_addr) {
     other.make_invalid();
     other.m_handle = nullptr;
 }
 
 inline osmium::util::MemoryMapping& osmium::util::MemoryMapping::operator=(osmium::util::MemoryMapping&& other) {
     unmap();
-    m_size = std::move(other.m_size);
-    m_handle = std::move(other.m_handle);
-    m_addr = std::move(other.m_addr);
+    m_size     = other.m_size;
+    m_fd       = other.m_fd;
+    m_offset   = other.m_offset;
+    m_writable = other.m_writable;
+    m_handle   = std::move(other.m_handle);
+    m_addr     = other.m_addr;
     other.make_invalid();
     other.m_handle = nullptr;
     return *this;
@@ -499,6 +557,22 @@ inline void osmium::util::MemoryMapping::unmap() {
             throw std::system_error(GetLastError(), std::system_category(), "CloseHandle failed");
         }
         m_handle = nullptr;
+    }
+}
+
+inline void osmium::util::MemoryMapping::resize(size_t new_size) {
+    unmap();
+
+    m_size = new_size;
+
+    m_handle = create_file_mapping();
+    if (!m_handle) {
+        throw std::system_error(GetLastError(), std::system_category(), "CreateFileMapping failed");
+    }
+
+    m_addr = map_view_of_file();
+    if (!is_valid()) {
+        throw std::system_error(GetLastError(), std::system_category(), "MapViewOfFile failed");
     }
 }
 
