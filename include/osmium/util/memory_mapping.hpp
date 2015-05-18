@@ -530,7 +530,7 @@ inline HANDLE osmium::util::MemoryMapping::get_handle() const noexcept {
     if (m_fd == -1) {
         return INVALID_HANDLE_VALUE;
     }
-    return reinterpret_cast<HANDLE>(_get_osfhandle(fd));
+    return reinterpret_cast<HANDLE>(_get_osfhandle(m_fd));
 }
 
 inline HANDLE osmium::util::MemoryMapping::create_file_mapping() const noexcept {
