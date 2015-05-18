@@ -83,7 +83,7 @@ namespace osmium {
              *
              * @throws std::system_error if something went wrong.
              */
-            DataFile(size_t size) :
+            explicit DataFile(size_t size) :
                 DataFile() {
                 grow(size);
             }
