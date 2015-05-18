@@ -165,6 +165,8 @@ TEST_CASE("file-based mapping") {
         int* addr2 = mapping.get_addr<int>();
         REQUIRE(*addr2 == 42);
 
+        mapping.unmap();
+
         REQUIRE(0 == close(fd));
         REQUIRE(0 == unlink(filename));
     }
@@ -176,17 +178,19 @@ TEST_CASE("file-based mapping") {
 
         REQUIRE(0 == ::ftruncate(fd, 100));
 
-        osmium::util::MemoryMapping mapping(100, true, fd);
-        REQUIRE(mapping.size() == 100);
+        {
+            osmium::util::MemoryMapping mapping(100, true, fd);
+            REQUIRE(mapping.size() == 100);
 
-        int* addr1 = mapping.get_addr<int>();
-        *addr1 = 42;
+            int* addr1 = mapping.get_addr<int>();
+            *addr1 = 42;
 
-        mapping.resize(50);
-        REQUIRE(mapping.size() == 50);
+            mapping.resize(50);
+            REQUIRE(mapping.size() == 50);
 
-        int* addr2 = mapping.get_addr<int>();
-        REQUIRE(*addr2 == 42);
+            int* addr2 = mapping.get_addr<int>();
+            REQUIRE(*addr2 == 42);
+        }
 
         REQUIRE(0 == close(fd));
         REQUIRE(0 == unlink(filename));
