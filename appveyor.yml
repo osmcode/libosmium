@@ -128,9 +128,7 @@ build_script:
 test_script:
   # "-E testdata-overview" exempts one test we know fails on Appveyor
   #    because we currently don't have spatialite support.
-  # "-LE fails_on_windows" exempts tests we know will fail
   - ctest --output-on-failure
     -C %config%
     -E testdata-overview
-    -LE fails_on_windows
 

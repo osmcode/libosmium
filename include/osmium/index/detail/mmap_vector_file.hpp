@@ -35,7 +35,6 @@ DEALINGS IN THE SOFTWARE.
 
 #include <cstddef>
 
-#include <osmium/index/detail/typed_mmap.hpp>
 #include <osmium/index/detail/mmap_vector_base.hpp>
 #include <osmium/index/detail/tmpfile.hpp>
 
@@ -59,8 +58,8 @@ namespace osmium {
 
             explicit mmap_vector_file(int fd) : mmap_vector_base<T>(
                     fd,
-                    osmium::detail::typed_mmap<T>::file_size(fd),
-                    osmium::detail::typed_mmap<T>::file_size(fd)) {
+                    osmium::util::file_size(fd) / sizeof(T),
+                    osmium::util::file_size(fd) / sizeof(T)) {
             }
 
         }; // class mmap_vector_file
