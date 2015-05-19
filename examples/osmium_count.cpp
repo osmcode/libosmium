@@ -7,6 +7,7 @@
 
 */
 
+#include <cstdint>
 #include <iostream>
 
 #include <osmium/io/any_input.hpp>
@@ -15,9 +16,9 @@
 
 struct CountHandler : public osmium::handler::Handler {
 
-    int nodes = 0;
-    int ways = 0;
-    int relations = 0;
+    uint64_t nodes = 0;
+    uint64_t ways = 0;
+    uint64_t relations = 0;
 
     void node(osmium::Node&) {
         ++nodes;
