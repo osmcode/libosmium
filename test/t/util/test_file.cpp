@@ -28,6 +28,7 @@ TEST_CASE("file_size") {
 
 }
 
+#if 0
 TEST_CASE("resize_file") {
 
     SECTION("illegal fd should throw") {
@@ -40,4 +41,5 @@ TEST_CASE("resize_file") {
     }
 
 }
+#endif
 
