@@ -38,6 +38,8 @@ DEALINGS IN THE SOFTWARE.
 #include <stdexcept>
 #include <system_error>
 
+#include <osmium/util/file.hpp>
+
 #ifndef _WIN32
 # include <sys/mman.h>
 #else
@@ -80,11 +82,11 @@ namespace osmium {
             /// The size of the mapping
             size_t m_size;
 
-            /// File handle we got the mapping from
-            int m_fd;
-
             /// Offset into the file
             off_t m_offset;
+
+            /// File handle we got the mapping from
+            int m_fd;
 
             /// Is the memory writable?
             bool m_writable;
@@ -115,6 +117,19 @@ namespace osmium {
             HANDLE osmium::util::MemoryMapping::create_file_mapping() const noexcept;
             void* osmium::util::MemoryMapping::map_view_of_file() const noexcept;
 #endif
+
+            int resize_fd(int fd) {
+                // Anonymous mapping doesn't need resizing.
+                if (fd == -1) {
+                    return -1;
+                }
+
+                // Make sure the file backing this mapping is large enough.
+                if (osmium::util::file_size(fd) < m_size + m_offset) {
+                    osmium::util::resize_file(fd, m_size + m_offset);
+                }
+                return fd;
+            }
 
         public:
 
@@ -194,6 +209,15 @@ namespace osmium {
              */
             size_t size() const noexcept {
                 return m_size;
+            }
+
+            /**
+             * The file descriptor this mapping was created from.
+             *
+             * @returns file descriptor, -1 for anonymous mappings
+             */
+            int fd() const noexcept {
+                return m_fd;
             }
 
             /**
@@ -351,6 +375,15 @@ namespace osmium {
             }
 
             /**
+             * The file descriptor this mapping was created from.
+             *
+             * @returns file descriptor, -1 for anonymous mappings
+             */
+            int fd() const noexcept {
+                return m_mapping.fd();
+            }
+
+            /**
              * Was this mapping created as a writable mapping?
              */
             bool writable() const noexcept {
@@ -429,11 +462,11 @@ inline int osmium::util::MemoryMapping::get_flags() const noexcept {
 }
 
 inline osmium::util::MemoryMapping::MemoryMapping(size_t size, bool writable, int fd, off_t offset) :
-    m_size(size),
-    m_fd(fd),
+    m_size(osmium::util::round_to_pagesize(size)),
     m_offset(offset),
+    m_fd(resize_fd(fd)),
     m_writable(writable),
-    m_addr(::mmap(nullptr, size, get_protection(), get_flags(), m_fd, m_offset)) {
+    m_addr(::mmap(nullptr, m_size, get_protection(), get_flags(), m_fd, m_offset)) {
     assert(writable || fd != -1);
     if (!is_valid()) {
         throw std::system_error(errno, std::system_category(), "mmap failed");
@@ -442,8 +475,8 @@ inline osmium::util::MemoryMapping::MemoryMapping(size_t size, bool writable, in
 
 inline osmium::util::MemoryMapping::MemoryMapping(MemoryMapping&& other) :
     m_size(other.m_size),
-    m_fd(other.m_fd),
     m_offset(other.m_offset),
+    m_fd(other.m_fd),
     m_writable(other.m_writable),
     m_addr(other.m_addr) {
     other.make_invalid();
@@ -452,8 +485,8 @@ inline osmium::util::MemoryMapping::MemoryMapping(MemoryMapping&& other) :
 inline osmium::util::MemoryMapping& osmium::util::MemoryMapping::operator=(osmium::util::MemoryMapping&& other) {
     unmap();
     m_size     = other.m_size;
-    m_fd       = other.m_fd;
     m_offset   = other.m_offset;
+    m_fd       = other.m_fd;
     m_writable = other.m_writable;
     m_addr     = other.m_addr;
     other.make_invalid();
@@ -470,20 +503,26 @@ inline void osmium::util::MemoryMapping::unmap() {
 }
 
 inline void osmium::util::MemoryMapping::resize(size_t new_size) {
+    if (m_fd == -1) { // anonymous mapping
 #ifdef __linux__
-    m_addr = ::mremap(m_addr, m_size, new_size, MREMAP_MAYMOVE);
-    if (!is_valid()) {
-        throw std::system_error(errno, std::system_category(), "mremap failed");
-    }
+        size_t old_size = m_size;
+        m_size = osmium::util::round_to_pagesize(new_size);
+        m_addr = ::mremap(m_addr, old_size, m_size, MREMAP_MAYMOVE);
+        if (!is_valid()) {
+            throw std::system_error(errno, std::system_category(), "mremap failed");
+        }
 #else
-    assert(m_fd != -1);
-    unmap();
-    m_addr = ::mmap(nullptr, new_size, get_protection(), get_flags(), m_fd, m_offset);
-    if (!is_valid()) {
-        throw std::system_error(errno, std::system_category(), "mmap failed");
-    }
+        assert(false && "can't resize anonymous mappings on non-linux systems");
 #endif
-    m_size = new_size;
+    } else { // file-based mapping
+        unmap();
+        m_size = osmium::util::round_to_pagesize(new_size);
+        resize_fd(m_fd);
+        m_addr = ::mmap(nullptr, new_size, get_protection(), get_flags(), m_fd, m_offset);
+        if (!is_valid()) {
+            throw std::system_error(errno, std::system_category(), "mmap (remap) failed");
+        }
+    }
 }
 
 #else
@@ -550,9 +589,9 @@ inline void osmium::util::MemoryMapping::make_invalid() noexcept {
 }
 
 inline osmium::util::MemoryMapping::MemoryMapping(size_t size, bool writable, int fd, off_t offset) :
-    m_size(size),
-    m_fd(fd),
+    m_size(osmium::util::round_to_pagesize(size)),
     m_offset(offset),
+    m_fd(resize_fd(fd)),
     m_writable(writable),
     m_handle(create_file_mapping()),
     m_addr(nullptr) {
@@ -569,8 +608,8 @@ inline osmium::util::MemoryMapping::MemoryMapping(size_t size, bool writable, in
 
 inline osmium::util::MemoryMapping::MemoryMapping(MemoryMapping&& other) :
     m_size(other.m_size),
-    m_fd(other.m_fd),
     m_offset(other.m_offset),
+    m_fd(other.m_fd),
     m_writable(other.m_writable),
     m_handle(std::move(other.m_handle)),
     m_addr(other.m_addr) {
@@ -581,8 +620,8 @@ inline osmium::util::MemoryMapping::MemoryMapping(MemoryMapping&& other) :
 inline osmium::util::MemoryMapping& osmium::util::MemoryMapping::operator=(osmium::util::MemoryMapping&& other) {
     unmap();
     m_size     = other.m_size;
-    m_fd       = other.m_fd;
     m_offset   = other.m_offset;
+    m_fd       = other.m_fd;
     m_writable = other.m_writable;
     m_handle   = std::move(other.m_handle);
     m_addr     = other.m_addr;
@@ -610,7 +649,8 @@ inline void osmium::util::MemoryMapping::unmap() {
 inline void osmium::util::MemoryMapping::resize(size_t new_size) {
     unmap();
 
-    m_size = new_size;
+    m_size = osmium::util::round_to_pagesize(new_size);
+    resize_fd(m_fd);
 
     m_handle = create_file_mapping();
     if (!m_handle) {
