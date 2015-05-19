@@ -37,19 +37,13 @@ DEALINGS IN THE SOFTWARE.
 #include <cstdio>
 #include <string>
 #include <system_error>
-#include <sys/stat.h>
-#include <sys/types.h>
 
 #ifdef _WIN32
 # include <io.h>
 # include <windows.h>
 #endif
 
-#ifndef _MSC_VER
-# include <unistd.h>
-#else
-# define ftruncate _chsize
-#endif
+#include <osmium/util/file.hpp>
 
 namespace osmium {
 
@@ -171,11 +165,7 @@ namespace osmium {
              * @throws std::system_error if fstat(2) call failed
              */
             size_t size() const {
-                struct stat s;
-                if (::fstat(fd(), &s) < 0) {
-                    throw std::system_error(errno, std::system_category(), "fstat failed");
-                }
-                return static_cast<size_t>(s.st_size);
+                return osmium::util::file_size(fd());
             }
 
             /**
@@ -188,9 +178,7 @@ namespace osmium {
              */
             void grow(size_t new_size) const {
                 if (size() < new_size) {
-                    if (::ftruncate(fd(), static_cast<off_t>(new_size)) < 0) {
-                        throw std::system_error(errno, std::system_category(), "ftruncate failed");
-                    }
+                    osmium::util::resize_file(fd(), new_size);
                 }
             }
 
