@@ -47,7 +47,7 @@ DEALINGS IN THE SOFTWARE.
 #ifndef _MSC_VER
 # include <unistd.h>
 #else
-# define ftruncate _chsize
+# define ftruncate _chsize_s
 #endif
 
 namespace osmium {
@@ -79,7 +79,7 @@ namespace osmium {
          * @throws std::system_error If ftruncate(2) call failed
          */
         inline void resize_file(int fd, size_t new_size) {
-            if (::ftruncate(fd, new_size) < 0) {
+            if (::ftruncate(fd, new_size) != 0) {
                 throw std::system_error(errno, std::system_category(), "ftruncate failed");
             }
         }
