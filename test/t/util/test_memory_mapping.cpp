@@ -20,8 +20,10 @@ static const size_t huge = std::numeric_limits<size_t>::max();
 TEST_CASE("anonymous mapping") {
 
     SECTION("simple memory mapping should work") {
-        osmium::util::MemoryMapping mapping(1024);
+        osmium::util::MemoryMapping mapping(1000);
         REQUIRE(mapping.get_addr() != nullptr);
+
+        REQUIRE(mapping.size() >= 1000);
 
         volatile int* addr = mapping.get_addr<int>();
 
@@ -36,13 +38,24 @@ TEST_CASE("anonymous mapping") {
         mapping.unmap(); // second unmap is okay
     }
 
+    SECTION("memory mapping of zero length should work") {
+        osmium::util::MemoryMapping mapping(0);
+        REQUIRE(mapping.get_addr() != nullptr);
+
+        REQUIRE(mapping.size() == osmium::util::get_pagesize());
+
+        REQUIRE(!!mapping);
+        mapping.unmap();
+        REQUIRE(!mapping);
+    }
+
     SECTION("memory mapping a huge area should fail") {
         REQUIRE_THROWS_AS(osmium::util::MemoryMapping mapping(huge),
             std::system_error);
     }
 
     SECTION("moving a memory mapping should work") {
-        osmium::util::MemoryMapping mapping1(1024);
+        osmium::util::MemoryMapping mapping1(1000);
         int* addr1 = mapping1.get_addr<int>();
         *addr1 = 42;
 
@@ -60,8 +73,8 @@ TEST_CASE("anonymous mapping") {
     }
 
     SECTION("move assignment should work") {
-        osmium::util::MemoryMapping mapping1(1024);
-        osmium::util::MemoryMapping mapping2(1024);
+        osmium::util::MemoryMapping mapping1(1000);
+        osmium::util::MemoryMapping mapping2(1000);
 
         REQUIRE(!!mapping1);
         REQUIRE(!!mapping2);
@@ -82,26 +95,32 @@ TEST_CASE("anonymous mapping") {
 
 #ifdef __linux__
     SECTION("remapping to larger size should work") {
-        osmium::util::MemoryMapping mapping(1024);
-        REQUIRE(mapping.size() == 1024);
+        osmium::util::MemoryMapping mapping(1000);
+        REQUIRE(mapping.size() >= 1000);
+
+        size_t size1 = mapping.size();
 
         int* addr1 = mapping.get_addr<int>();
         *addr1 = 42;
 
-        mapping.resize(2048);
+        mapping.resize(8000);
+        REQUIRE(mapping.size() > size1);
 
         int* addr2 = mapping.get_addr<int>();
         REQUIRE(*addr2 == 42);
     }
 
     SECTION("remapping to smaller size should work") {
-        osmium::util::MemoryMapping mapping(1024);
-        REQUIRE(mapping.size() == 1024);
+        osmium::util::MemoryMapping mapping(8000);
+        REQUIRE(mapping.size() >= 1000);
+
+        size_t size1 = mapping.size();
 
         int* addr1 = mapping.get_addr<int>();
         *addr1 = 42;
 
-        mapping.resize(512);
+        mapping.resize(500);
+        REQUIRE(mapping.size() < size1);
 
         int* addr2 = mapping.get_addr<int>();
         REQUIRE(*addr2 == 42);
@@ -124,19 +143,21 @@ TEST_CASE("file-based mapping") {
             REQUIRE(mapping.writable());
 
             REQUIRE(!!mapping);
-            REQUIRE(mapping.size() == 100);
+            REQUIRE(mapping.size() >= 100);
 
             *mapping.get_addr<int>() = 1234;
 
             mapping.unmap();
         }
 
+        REQUIRE(osmium::util::file_size(fd) == osmium::util::get_pagesize());
+
         {
             osmium::util::MemoryMapping mapping(100, false, fd);
             REQUIRE(!mapping.writable());
 
             REQUIRE(!!mapping);
-            REQUIRE(mapping.size() == 100);
+            REQUIRE(mapping.size() >= 100);
             REQUIRE(*mapping.get_addr<int>() == 1234);
 
             mapping.unmap();
@@ -151,16 +172,16 @@ TEST_CASE("file-based mapping") {
         const int fd = mkstemp(filename);
         REQUIRE(fd > 0);
 
-        REQUIRE(0 == ::ftruncate(fd, 200));
-
         osmium::util::MemoryMapping mapping(100, true, fd);
-        REQUIRE(mapping.size() == 100);
+        REQUIRE(mapping.size() >= 100);
+        size_t size1 = mapping.size();
 
         int* addr1 = mapping.get_addr<int>();
         *addr1 = 42;
 
-        mapping.resize(200);
-        REQUIRE(mapping.size() == 200);
+        mapping.resize(8000);
+        REQUIRE(mapping.size() >= 8000);
+        REQUIRE(mapping.size() > size1);
 
         int* addr2 = mapping.get_addr<int>();
         REQUIRE(*addr2 == 42);
@@ -176,17 +197,17 @@ TEST_CASE("file-based mapping") {
         const int fd = mkstemp(filename);
         REQUIRE(fd > 0);
 
-        REQUIRE(0 == ::ftruncate(fd, 100));
-
         {
-            osmium::util::MemoryMapping mapping(100, true, fd);
-            REQUIRE(mapping.size() == 100);
+            osmium::util::MemoryMapping mapping(8000, true, fd);
+            REQUIRE(mapping.size() >= 8000);
+            size_t size1 = mapping.size();
 
             int* addr1 = mapping.get_addr<int>();
             *addr1 = 42;
 
             mapping.resize(50);
-            REQUIRE(mapping.size() == 50);
+            REQUIRE(mapping.size() >= 50);
+            REQUIRE(mapping.size() < size1);
 
             int* addr2 = mapping.get_addr<int>();
             REQUIRE(*addr2 == 42);
@@ -200,7 +221,7 @@ TEST_CASE("file-based mapping") {
 TEST_CASE("typed anonymous mapping") {
 
     SECTION("simple memory mapping should work") {
-        osmium::util::TypedMemoryMapping<uint32_t> mapping(1024);
+        osmium::util::TypedMemoryMapping<uint32_t> mapping(1000);
         volatile uint32_t* addr = mapping.get_addr();
 
         REQUIRE(mapping.writable());
@@ -220,7 +241,7 @@ TEST_CASE("typed anonymous mapping") {
     }
 
     SECTION("moving a memory mapping should work") {
-        osmium::util::TypedMemoryMapping<uint32_t> mapping1(1024);
+        osmium::util::TypedMemoryMapping<uint32_t> mapping1(1000);
         uint32_t* addr1 = mapping1.get_addr();
         *addr1 = 42;
 
@@ -238,8 +259,8 @@ TEST_CASE("typed anonymous mapping") {
     }
 
     SECTION("move assignment should work") {
-        osmium::util::TypedMemoryMapping<uint32_t> mapping1(1024);
-        osmium::util::TypedMemoryMapping<uint32_t> mapping2(1024);
+        osmium::util::TypedMemoryMapping<uint32_t> mapping1(1000);
+        osmium::util::TypedMemoryMapping<uint32_t> mapping2(1000);
 
         REQUIRE(!!mapping1);
         REQUIRE(!!mapping2);
@@ -260,26 +281,26 @@ TEST_CASE("typed anonymous mapping") {
 
 #ifdef __linux__
     SECTION("remapping to larger size should work") {
-        osmium::util::TypedMemoryMapping<uint32_t> mapping(1024);
-        REQUIRE(mapping.size() == 1024);
+        osmium::util::TypedMemoryMapping<uint32_t> mapping(1000);
+        REQUIRE(mapping.size() >= 1000);
 
         auto addr1 = mapping.get_addr();
         *addr1 = 42;
 
-        mapping.resize(2048);
+        mapping.resize(8000);
 
         auto addr2 = mapping.get_addr();
         REQUIRE(*addr2 == 42);
     }
 
     SECTION("remapping to smaller size should work") {
-        osmium::util::TypedMemoryMapping<uint32_t> mapping(1024);
-        REQUIRE(mapping.size() == 1024);
+        osmium::util::TypedMemoryMapping<uint32_t> mapping(8000);
+        REQUIRE(mapping.size() >= 8000);
 
         auto addr1 = mapping.get_addr();
         *addr1 = 42;
 
-        mapping.resize(512);
+        mapping.resize(500);
 
         auto addr2 = mapping.get_addr();
         REQUIRE(*addr2 == 42);
@@ -302,7 +323,7 @@ TEST_CASE("typed file-based mapping") {
             REQUIRE(mapping.writable());
 
             REQUIRE(!!mapping);
-            REQUIRE(mapping.size() == 100);
+            REQUIRE(mapping.size() >= 100);
 
             *mapping.get_addr() = 1234;
 
@@ -314,7 +335,7 @@ TEST_CASE("typed file-based mapping") {
             REQUIRE(!mapping.writable());
 
             REQUIRE(!!mapping);
-            REQUIRE(mapping.size() == 100);
+            REQUIRE(mapping.size() >= 100);
             REQUIRE(*mapping.get_addr() == 1234);
 
             mapping.unmap();
@@ -329,7 +350,7 @@ TEST_CASE("typed file-based mapping") {
 TEST_CASE("anonymous memory mapping class") {
 
     SECTION("simple memory mapping should work") {
-        osmium::util::AnonymousMemoryMapping mapping(1024);
+        osmium::util::AnonymousMemoryMapping mapping(1000);
         REQUIRE(mapping.get_addr() != nullptr);
 
         volatile int* addr = mapping.get_addr<int>();
@@ -347,26 +368,26 @@ TEST_CASE("anonymous memory mapping class") {
 
 #ifdef __linux__
     SECTION("remapping to larger size should work") {
-        osmium::util::AnonymousMemoryMapping mapping(1024);
-        REQUIRE(mapping.size() == 1024);
+        osmium::util::AnonymousMemoryMapping mapping(1000);
+        REQUIRE(mapping.size() >= 1000);
 
         int* addr1 = mapping.get_addr<int>();
         *addr1 = 42;
 
-        mapping.resize(2048);
+        mapping.resize(2000);
 
         int* addr2 = mapping.get_addr<int>();
         REQUIRE(*addr2 == 42);
     }
 
     SECTION("remapping to smaller size should work") {
-        osmium::util::AnonymousMemoryMapping mapping(1024);
-        REQUIRE(mapping.size() == 1024);
+        osmium::util::AnonymousMemoryMapping mapping(2000);
+        REQUIRE(mapping.size() >= 2000);
 
         int* addr1 = mapping.get_addr<int>();
         *addr1 = 42;
 
-        mapping.resize(512);
+        mapping.resize(500);
 
         int* addr2 = mapping.get_addr<int>();
         REQUIRE(*addr2 == 42);
