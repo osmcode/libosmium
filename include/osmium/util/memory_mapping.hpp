@@ -536,17 +536,21 @@ inline void osmium::util::MemoryMapping::resize(size_t new_size) {
  * UnmapViewOfFile:   http://msdn.microsoft.com/en-us/library/aa366882(VS.85).aspx
  */
 
-namespace {
+namespace osmium {
 
-    inline DWORD dword_hi(uint64_t x) {
-        return static_cast<DWORD>(x >> 32);
-    }
+    namespace util {
 
-    inline DWORD dword_lo(uint64_t x) {
-        return static_cast<DWORD>(x & 0xffffffff);
-    }
+        inline DWORD dword_hi(uint64_t x) {
+            return static_cast<DWORD>(x >> 32);
+        }
 
-} // anonymous namespace
+        inline DWORD dword_lo(uint64_t x) {
+            return static_cast<DWORD>(x & 0xffffffff);
+        }
+
+    } // namespace util
+
+} // namespace osmium
 
 inline DWORD osmium::util::MemoryMapping::get_protection() const noexcept {
     if (m_writable) {
@@ -573,11 +577,11 @@ inline HANDLE osmium::util::MemoryMapping::get_handle() const noexcept {
 }
 
 inline HANDLE osmium::util::MemoryMapping::create_file_mapping() const noexcept {
-    return CreateFileMapping(get_handle(), nullptr, get_protection(), dword_hi(static_cast<uint64_t>(m_size) + m_offset), dword_lo(static_cast<uint64_t>(m_size) + m_offset), nullptr);
+    return CreateFileMapping(get_handle(), nullptr, get_protection(), osmium::util::dword_hi(static_cast<uint64_t>(m_size) + m_offset), osmium::util::dword_lo(static_cast<uint64_t>(m_size) + m_offset), nullptr);
 }
 
 inline void* osmium::util::MemoryMapping::map_view_of_file() const noexcept {
-    return MapViewOfFile(m_handle, get_flags(), dword_hi(m_offset), dword_lo(m_offset), m_size);
+    return MapViewOfFile(m_handle, get_flags(), osmium::util::dword_hi(m_offset), osmium::util::dword_lo(m_offset), m_size);
 }
 
 inline bool osmium::util::MemoryMapping::is_valid() const noexcept {
