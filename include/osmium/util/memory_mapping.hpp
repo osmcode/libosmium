@@ -538,11 +538,11 @@ inline void osmium::util::MemoryMapping::resize(size_t new_size) {
 
 namespace {
 
-    static DWORD dword_hi(uint64_t x) {
+    inline DWORD dword_hi(uint64_t x) {
         return static_cast<DWORD>(x >> 32);
     }
 
-    static DWORD dword_lo(uint64_t x) {
+    inline DWORD dword_lo(uint64_t x) {
         return static_cast<DWORD>(x & 0xffffffff);
     }
 
