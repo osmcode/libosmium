@@ -48,32 +48,19 @@ namespace osmium {
          * internally.
          */
         template <typename T>
-        class mmap_vector_file : public mmap_vector_base<T, mmap_vector_file> {
+        class mmap_vector_file : public mmap_vector_base<T> {
 
         public:
 
-            explicit mmap_vector_file() :
-                mmap_vector_base<T, osmium::detail::mmap_vector_file>(
+            explicit mmap_vector_file() : mmap_vector_base<T>(
                     osmium::detail::create_tmp_file(),
-                    osmium::detail::mmap_vector_size_increment,
-                    0) {
+                    osmium::detail::mmap_vector_size_increment) {
             }
 
-            explicit mmap_vector_file(int fd) :
-                mmap_vector_base<T, osmium::detail::mmap_vector_file>(
+            explicit mmap_vector_file(int fd) : mmap_vector_base<T>(
                     fd,
-                    osmium::detail::typed_mmap<T>::file_size(fd) == 0 ?
-                        osmium::detail::mmap_vector_size_increment :
-                        osmium::detail::typed_mmap<T>::file_size(fd),
+                    osmium::detail::typed_mmap<T>::file_size(fd),
                     osmium::detail::typed_mmap<T>::file_size(fd)) {
-            }
-
-            void reserve(size_t new_capacity) {
-                if (new_capacity > this->capacity()) {
-                    typed_mmap<T>::unmap(this->data(), this->capacity());
-                    this->data(typed_mmap<T>::grow_and_map(new_capacity, this->m_fd));
-                    this->m_capacity = new_capacity;
-                }
             }
 
         }; // class mmap_vector_file
