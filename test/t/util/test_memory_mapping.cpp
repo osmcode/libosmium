@@ -1,14 +1,9 @@
 #include "catch.hpp"
 
-#ifndef _MSC_VER
-# include <unistd.h>
-#else
-# define ftruncate _chsize
-#endif
-
 #include <sys/types.h>
 #include <limits>
 
+#include <osmium/util/file.hpp>
 #include <osmium/util/memory_mapping.hpp>
 
 #if defined(_MSC_VER) || (defined(__GNUC__) && defined(_WIN32))
@@ -136,7 +131,7 @@ TEST_CASE("file-based mapping") {
         const int fd = mkstemp(filename);
         REQUIRE(fd > 0);
 
-        REQUIRE(0 == ::ftruncate(fd, 100));
+        osmium::util::resize_file(fd, 100);
 
         {
             osmium::util::MemoryMapping mapping(100, true, fd);
@@ -316,7 +311,7 @@ TEST_CASE("typed file-based mapping") {
         const int fd = mkstemp(filename);
         REQUIRE(fd > 0);
 
-        REQUIRE(0 == ::ftruncate(fd, 100));
+        osmium::util::resize_file(fd, 100);
 
         {
             osmium::util::TypedMemoryMapping<uint32_t> mapping(100, true, fd);
