@@ -55,11 +55,6 @@ namespace osmium {
         /**
          * Class for wrapping memory mapping system calls.
          *
-         * There are different implementations for Unix and Windows systems.
-         * On Unix systems this wraps the mmap(), munmap(), and the mremap()
-         * system calls. On Windows it wraps the CreateFileMapping(),
-         * CloseHandle(), MapViewOfFile(), and UnmapViewOfFile() functions.
-         *
          * Usage for anonymous mapping:
          * @code
          * MemoryMapping mapping(1024);          // create anonymous mapping with size
@@ -76,6 +71,20 @@ namespace osmium {
          * }
          * ::close(fd);
          * @endcode
+         *
+         * If the file backing a file-backed mapping is not large enough, it
+         * will be resized. This works, of course, only for writable files,
+         * so for read-only files you have to make sure they are large enough
+         * for any mapping you want.
+         *
+         * If you ask for a zero-sized mapping, a mapping of the systems page
+         * size will be created instead. For file-backed mapping this will only
+         * work if the file is writable.
+         *
+         * There are different implementations for Unix and Windows systems.
+         * On Unix systems this wraps the mmap(), munmap(), and the mremap()
+         * system calls. On Windows it wraps the CreateFileMapping(),
+         * CloseHandle(), MapViewOfFile(), and UnmapViewOfFile() functions.
          */
         class MemoryMapping {
 
@@ -145,8 +154,13 @@ namespace osmium {
         public:
 
             /**
-             * Create file-backed memory mapping of given size. The file must
-             * contain at least `size` bytes!
+             * Create memory mapping of given size.
+             *
+             * If fd is not set (or fd == -1), an anonymous mapping will be
+             * created, otherwise a mapping based on the file descriptor will
+             * be created.
+             *
+             * @pre size > 0 or writable==true
              *
              * @param size Size of the mapping in bytes
              * @param writable Should the mapping be writable?
