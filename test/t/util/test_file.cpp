@@ -16,6 +16,8 @@ TEST_CASE("pagesize") {
 }
 
 #ifdef _WIN32
+// https://msdn.microsoft.com/en-us/library/ksazx244.aspx
+// https://msdn.microsoft.com/en-us/library/a9yf33zb.aspx
 class DoNothingInvalidParameterHandler {
 
     static void invalid_parameter_handler(
