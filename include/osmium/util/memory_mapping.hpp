@@ -305,7 +305,6 @@ namespace osmium {
         class TypedMemoryMapping {
 
             MemoryMapping m_mapping;
-            size_t m_size;
 
         public:
 
@@ -316,8 +315,7 @@ namespace osmium {
              * @throws std::system_error if the mapping fails
              */
             TypedMemoryMapping(size_t size) :
-                m_mapping(sizeof(T) * size),
-                m_size(size) {
+                m_mapping(sizeof(T) * size) {
             }
 
             /**
@@ -331,8 +329,7 @@ namespace osmium {
              * @throws std::system_error if the mapping fails
              */
             TypedMemoryMapping(size_t size, bool writable, int fd, off_t offset = 0) :
-                m_mapping(sizeof(T) * size, writable, fd, sizeof(T) * offset),
-                m_size(size) {
+                m_mapping(sizeof(T) * size, writable, fd, sizeof(T) * offset) {
             }
 
             /// You can not copy construct a TypedMemoryMapping.
@@ -396,7 +393,8 @@ namespace osmium {
              * be larger because the system will round it to the page size.
              */
             size_t size() const noexcept {
-                return m_size;
+                assert(m_mapping.size() % sizeof(T) == 0);
+                return m_mapping.size() / sizeof(T);
             }
 
             /**
