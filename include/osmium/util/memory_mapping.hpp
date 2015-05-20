@@ -300,6 +300,9 @@ namespace osmium {
          * data in the mapped memory is of the same type. Instead of thinking
          * about the number of bytes mapped, this counts sizes in the number
          * of objects of that type.
+         *
+         * Note that no effort is made to actually initialize the objects in
+         * this memory. This has to be done by the caller!
          */
         template <typename T>
         class TypedMemoryMapping {
@@ -414,12 +417,37 @@ namespace osmium {
             }
 
             /**
-             * Get the address of the mapping.
+             * Get the address of the beginning of the mapping.
              *
              * @throws std::runtime_error if the mapping is invalid
              */
-            T* get_addr() const {
+            T* begin() {
                 return m_mapping.get_addr<T>();
+            }
+
+            /**
+             * Get the address one past the end of the mapping.
+             *
+             * @throws std::runtime_error if the mapping is invalid
+             */
+            T* end() {
+                return m_mapping.get_addr<T>() + size();
+            }
+
+            const T* cbegin() const {
+                return m_mapping.get_addr<T>();
+            }
+
+            const T* cend() const {
+                return m_mapping.get_addr<T>() + size();
+            }
+
+            const T* begin() const {
+                return m_mapping.get_addr<T>();
+            }
+
+            const T* end() const {
+                return m_mapping.get_addr<T>() + size();
             }
 
         }; // class TypedMemoryMapping

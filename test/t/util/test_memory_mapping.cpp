@@ -217,7 +217,7 @@ TEST_CASE("typed anonymous mapping") {
 
     SECTION("simple memory mapping should work") {
         osmium::util::TypedMemoryMapping<uint32_t> mapping(1000);
-        volatile uint32_t* addr = mapping.get_addr();
+        volatile uint32_t* addr = mapping.begin();
 
         REQUIRE(mapping.writable());
 
@@ -237,7 +237,7 @@ TEST_CASE("typed anonymous mapping") {
 
     SECTION("moving a memory mapping should work") {
         osmium::util::TypedMemoryMapping<uint32_t> mapping1(1000);
-        uint32_t* addr1 = mapping1.get_addr();
+        uint32_t* addr1 = mapping1.begin();
         *addr1 = 42;
 
         REQUIRE(!!mapping1);
@@ -246,7 +246,7 @@ TEST_CASE("typed anonymous mapping") {
         REQUIRE(!mapping1);
         mapping1.unmap();
 
-        auto addr2 = mapping2.get_addr();
+        auto addr2 = mapping2.begin();
         REQUIRE(*addr2 == 42);
 
         mapping2.unmap();
@@ -260,14 +260,14 @@ TEST_CASE("typed anonymous mapping") {
         REQUIRE(!!mapping1);
         REQUIRE(!!mapping2);
 
-        auto addr1 = mapping1.get_addr();
+        auto addr1 = mapping1.begin();
         *addr1 = 42;
 
         mapping2 = std::move(mapping1);
         REQUIRE(!!mapping2);
         REQUIRE(!mapping1);
 
-        auto addr2 = mapping2.get_addr();
+        auto addr2 = mapping2.begin();
         REQUIRE(*addr2 == 42);
 
         mapping2.unmap();
@@ -279,12 +279,12 @@ TEST_CASE("typed anonymous mapping") {
         osmium::util::TypedMemoryMapping<uint32_t> mapping(1000);
         REQUIRE(mapping.size() >= 1000);
 
-        auto addr1 = mapping.get_addr();
+        auto addr1 = mapping.begin();
         *addr1 = 42;
 
         mapping.resize(8000);
 
-        auto addr2 = mapping.get_addr();
+        auto addr2 = mapping.begin();
         REQUIRE(*addr2 == 42);
     }
 
@@ -292,12 +292,12 @@ TEST_CASE("typed anonymous mapping") {
         osmium::util::TypedMemoryMapping<uint32_t> mapping(8000);
         REQUIRE(mapping.size() >= 8000);
 
-        auto addr1 = mapping.get_addr();
+        auto addr1 = mapping.begin();
         *addr1 = 42;
 
         mapping.resize(500);
 
-        auto addr2 = mapping.get_addr();
+        auto addr2 = mapping.begin();
         REQUIRE(*addr2 == 42);
     }
 #endif
@@ -320,7 +320,7 @@ TEST_CASE("typed file-based mapping") {
             REQUIRE(!!mapping);
             REQUIRE(mapping.size() >= 100);
 
-            *mapping.get_addr() = 1234;
+            *mapping.begin() = 1234;
 
             mapping.unmap();
         }
@@ -331,7 +331,7 @@ TEST_CASE("typed file-based mapping") {
 
             REQUIRE(!!mapping);
             REQUIRE(mapping.size() >= 100);
-            REQUIRE(*mapping.get_addr() == 1234);
+            REQUIRE(*mapping.begin() == 1234);
 
             mapping.unmap();
         }

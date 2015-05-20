@@ -97,11 +97,11 @@ namespace osmium {
             }
 
             const T* data() const {
-                return m_mapping.get_addr();
+                return m_mapping.begin();
             }
 
             T* data() {
-                return m_mapping.get_addr();
+                return m_mapping.begin();
             }
 
             T& operator[](size_t n) {
