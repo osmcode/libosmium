@@ -111,21 +111,6 @@ namespace osmium {
 #endif
         }
 
-        /**
-         * Round the given size up to the page size for this system.
-         * 0 will be rounded up to one page size.
-         */
-        inline size_t round_to_pagesize(size_t size) {
-            // Because we can't map 0 bytes, we round 0 up to the page
-            // size. This way we don't have a special case for a mapping
-            // of size 0 in the rest of the code.
-            if (size == 0) {
-                return get_pagesize();
-            }
-            size_t p = get_pagesize() - 1;
-            return (size + p) & (~p);
-        }
-
     } // namespace util
 
 } // namespace osmium

@@ -145,7 +145,7 @@ TEST_CASE("file-based mapping") {
             mapping.unmap();
         }
 
-        REQUIRE(osmium::util::file_size(fd) == osmium::util::get_pagesize());
+        REQUIRE(osmium::util::file_size(fd) == 100);
 
         {
             osmium::util::MemoryMapping mapping(100, false, fd);

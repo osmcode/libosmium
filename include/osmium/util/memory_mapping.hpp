@@ -112,6 +112,17 @@ namespace osmium {
 
             flag_type get_flags() const noexcept;
 
+            // A zero-sized mapping is not allowed by the operating system.
+            // So if the user asks for a mapping of size 0, we map a full
+            // page instead. This way we don't have a special case in the rest
+            // of the code.
+            static size_t initial_size(size_t size) {
+                if (size == 0) {
+                    return osmium::util::get_pagesize();
+                }
+                return size;
+            }
+
 #ifdef _WIN32
             HANDLE get_handle() const noexcept;
             HANDLE osmium::util::MemoryMapping::create_file_mapping() const noexcept;
@@ -462,7 +473,7 @@ inline int osmium::util::MemoryMapping::get_flags() const noexcept {
 }
 
 inline osmium::util::MemoryMapping::MemoryMapping(size_t size, bool writable, int fd, off_t offset) :
-    m_size(osmium::util::round_to_pagesize(size)),
+    m_size(initial_size(size)),
     m_offset(offset),
     m_fd(resize_fd(fd)),
     m_writable(writable),
@@ -503,20 +514,20 @@ inline void osmium::util::MemoryMapping::unmap() {
 }
 
 inline void osmium::util::MemoryMapping::resize(size_t new_size) {
+    assert(new_size > 0 && "can not resize to zero size");
     if (m_fd == -1) { // anonymous mapping
 #ifdef __linux__
-        size_t old_size = m_size;
-        m_size = osmium::util::round_to_pagesize(new_size);
-        m_addr = ::mremap(m_addr, old_size, m_size, MREMAP_MAYMOVE);
+        m_addr = ::mremap(m_addr, m_size, new_size, MREMAP_MAYMOVE);
         if (!is_valid()) {
             throw std::system_error(errno, std::system_category(), "mremap failed");
         }
+        m_size = new_size;
 #else
         assert(false && "can't resize anonymous mappings on non-linux systems");
 #endif
     } else { // file-based mapping
         unmap();
-        m_size = osmium::util::round_to_pagesize(new_size);
+        m_size = new_size;
         resize_fd(m_fd);
         m_addr = ::mmap(nullptr, new_size, get_protection(), get_flags(), m_fd, m_offset);
         if (!is_valid()) {
@@ -593,7 +604,7 @@ inline void osmium::util::MemoryMapping::make_invalid() noexcept {
 }
 
 inline osmium::util::MemoryMapping::MemoryMapping(size_t size, bool writable, int fd, off_t offset) :
-    m_size(osmium::util::round_to_pagesize(size)),
+    m_size(initial_size(size)),
     m_offset(offset),
     m_fd(resize_fd(fd)),
     m_writable(writable),
@@ -653,7 +664,7 @@ inline void osmium::util::MemoryMapping::unmap() {
 inline void osmium::util::MemoryMapping::resize(size_t new_size) {
     unmap();
 
-    m_size = osmium::util::round_to_pagesize(new_size);
+    m_size = new_size;
     resize_fd(m_fd);
 
     m_handle = create_file_mapping();
