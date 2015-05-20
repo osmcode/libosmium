@@ -47,6 +47,7 @@ DEALINGS IN THE SOFTWARE.
 #ifndef _MSC_VER
 # include <unistd.h>
 #else
+// https://msdn.microsoft.com/en-us/library/whx354w1.aspx
 # define ftruncate _chsize_s
 #endif
 
@@ -56,18 +57,29 @@ namespace osmium {
 
         /**
          * Get file size.
-         * Small wrapper around fstat(2) system call.
+         * This is a small wrapper around a system call.
          *
          * @param fd File descriptor
          * @returns file size
-         * @throws std::system_error If fstat(2) call failed
+         * @throws std::system_error If system call failed
          */
         inline size_t file_size(int fd) {
+#ifdef _MSC_VER
+            // Windows implementation
+            // https://msdn.microsoft.com/en-us/library/dfbc2kec.aspx
+            auto size = ::_filelengthi64(fd);
+            if (size == -1L) {
+                throw std::system_error(errno, std::system_category(), "_filelengthi64 failed");
+            }
+            return size_t(size);
+#else
+            // Unix implementation
             struct stat s;
-            if (::fstat(fd, &s) < 0) {
+            if (::fstat(fd, &s) != 0) {
                 throw std::system_error(errno, std::system_category(), "fstat failed");
             }
             return size_t(s.st_size);
+#endif
         }
 
         /**
@@ -89,10 +101,12 @@ namespace osmium {
          */
         inline size_t get_pagesize() {
 #ifdef _WIN32
+            // Windows implementation
             SYSTEM_INFO si;
             GetSystemInfo(&si);
             return si.dwPageSize;
-#else // Unix
+#else
+            // Unix implementation
             return ::sysconf(_SC_PAGESIZE);
 #endif
         }
