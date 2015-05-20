@@ -35,7 +35,7 @@ class DoNothingInvalidParameterHandler {
 public:
 
     DoNothingInvalidParameterHandler() :
-        old_handler(set_invalid_parameter_handler(invalid_parameter_handler)) {
+        old_handler(set_invalid_parameter_handler(DoNothingInvalidParameterHandler::invalid_parameter_handler)) {
     }
 
     ~DoNothingInvalidParameterHandler() {
