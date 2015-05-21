@@ -30,7 +30,9 @@ set(LIBOSMIUM_VERSION_MINOR 1)
 set(LIBOSMIUM_VERSION_PATCH 0)
 
 set(LIBOSMIUM_VERSION
-    ${LIBOSMIUM_VERSION_MAJOR}.${LIBOSMIUM_VERSION_MINOR}.${LIBOSMIUM_VERSION_PATCH})
+    "${LIBOSMIUM_VERSION_MAJOR}.${LIBOSMIUM_VERSION_MINOR}.${LIBOSMIUM_VERSION_PATCH}"
+    CACHE STRING
+    "Libosmium version")
 
 
 #-----------------------------------------------------------------------------
