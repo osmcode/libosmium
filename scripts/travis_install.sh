@@ -6,7 +6,7 @@
 if [ "$TRAVIS_OS_NAME" = "linux" ]; then
 
     # install dependencies
-    sudo apt-get install --yes make libsparsehash-dev libgdal-dev spatialite-bin
+    sudo apt-get install --yes make libgdal-dev spatialite-bin
 
 elif [ "$TRAVIS_OS_NAME" = "osx" ]; then
 

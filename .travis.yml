@@ -42,6 +42,7 @@ addons:
             - libgeos++-dev
             - libproj-dev
             - libprotobuf-dev
+            - libsparsehash-dev
             - protobuf-compiler
 
 install:
