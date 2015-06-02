@@ -4,6 +4,7 @@
 
 */
 
+#include <cstdint>
 #include <iostream>
 
 #include <osmium/io/any_input.hpp>
@@ -12,8 +13,8 @@
 
 struct CountHandler : public osmium::handler::Handler {
 
-    int counter = 0;
-    int all = 0;
+    uint64_t counter = 0;
+    uint64_t all = 0;
 
     void node(osmium::Node& node) {
         ++all;
