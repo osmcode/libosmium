@@ -283,6 +283,42 @@ namespace osmium {
                 return m_impl.polygon_finish(num_points);
             }
 
+            polygon_type create_polygon(const osmium::WayNodeList& wnl, use_nodes un = use_nodes::unique, direction dir = direction::forward) {
+                polygon_start();
+                size_t num_points = 0;
+
+                if (un == use_nodes::unique) {
+                    osmium::Location last_location;
+                    switch (dir) {
+                        case direction::forward:
+                            num_points = fill_polygon_unique(wnl.cbegin(), wnl.cend());
+                            break;
+                        case direction::backward:
+                            num_points = fill_polygon_unique(wnl.crbegin(), wnl.crend());
+                            break;
+                    }
+                } else {
+                    switch (dir) {
+                        case direction::forward:
+                            num_points = fill_polygon(wnl.cbegin(), wnl.cend());
+                            break;
+                        case direction::backward:
+                            num_points = fill_polygon(wnl.crbegin(), wnl.crend());
+                            break;
+                    }
+                }
+
+                if (num_points < 2) {
+                    throw osmium::geometry_error("not enough points for polygon");
+                }
+
+                return polygon_finish(num_points);
+            }
+
+            polygon_type create_polygon(const osmium::Way& way, use_nodes un=use_nodes::unique, direction dir=direction::forward) {
+                return create_polygon(way.nodes(), un, dir);
+            }
+
             /* MultiPolygon */
 
             multipolygon_type create_multipolygon(const osmium::Area& area) {
