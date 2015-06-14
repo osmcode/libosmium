@@ -83,7 +83,7 @@ namespace osmium {
          * Buffers exist in two flavours, those with external memory management and
          * those with internal memory management. If you already have some memory
          * with data in it (for instance read from disk), you create a Buffer with
-         * external memory managment. It is your job then to free the memory once
+         * external memory management. It is your job then to free the memory once
          * the buffer isn't used any more. If you don't have memory already, you can
          * create a Buffer object and have it manage the memory internally. It will
          * dynamically allocate memory and free it again after use.

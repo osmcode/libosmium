@@ -29,7 +29,7 @@ clone_folder: c:\projects\libosmium
 platform: x64
 
 install:
-  # show all availble env vars
+  # show all available env vars
   - set
   - echo cmake on AppVeyor
   - cmake -version

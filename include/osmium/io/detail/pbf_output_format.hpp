@@ -384,7 +384,7 @@ namespace osmium {
                             OSMPBF::DenseNodes* dense = pbf_nodes->mutable_dense();
 
                             // in the densenodes structure keys and vals are encoded in an intermixed
-                            // array, individual nodes are seperated by a value of 0 (0 in the StringTable
+                            // array, individual nodes are separated by a value of 0 (0 in the StringTable
                             // is always unused). String-ids of 0 are thus kept alone.
                             for (int i = 0, l=dense->keys_vals_size(); i<l; ++i) {
                                 // map interim string-ids > 0 to real string ids
@@ -641,7 +641,7 @@ namespace osmium {
                     dense->add_lat(m_delta_lat.update(lonlat2int(node.location().lat_without_check())));
 
                     // in the densenodes structure keys and vals are encoded in an intermixed
-                    // array, individual nodes are seperated by a value of 0 (0 in the StringTable
+                    // array, individual nodes are separated by a value of 0 (0 in the StringTable
                     // is always unused)
                     // so for three nodes the keys_vals array may look like this: 3 5 2 1 0 0 8 5
                     // the first node has two tags (3=>5 and 2=>1), the second node does not
