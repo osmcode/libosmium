@@ -5,6 +5,10 @@
 
   The code in this example file is released into the Public Domain.
 
+  The code can be compiled with, e.g.,
+
+    g++ osmium_count.cpp --std=c++11 -lpthread -lprotobuf-lite -lexpat -losmpbf -lbz2 -lz
+
 */
 
 #include <cstdint>
@@ -16,8 +20,8 @@
 
 struct CountHandler : public osmium::handler::Handler {
 
-    uint64_t nodes = 0;
-    uint64_t ways = 0;
+    uint64_t nodes     = 0;
+    uint64_t ways      = 0;
     uint64_t relations = 0;
 
     void node(osmium::Node&) {
@@ -38,20 +42,20 @@ struct CountHandler : public osmium::handler::Handler {
 int main(int argc, char* argv[]) {
 
     if (argc != 2) {
-        std::cerr << "Usage: " << argv[0] << " OSMFILE\n";
+        std::cerr << "Usage: " << argv[0] << " OSMFILE" << std::endl;
         exit(1);
     }
 
-    osmium::io::File infile(argv[1]);
+    osmium::io::File   infile(argv[1]);
     osmium::io::Reader reader(infile);
 
     CountHandler handler;
     osmium::apply(reader, handler);
     reader.close();
 
-    std::cout << "Nodes: "     << handler.nodes << "\n";
-    std::cout << "Ways: "      << handler.ways << "\n";
-    std::cout << "Relations: " << handler.relations << "\n";
+    std::cout << "Nodes: "     << handler.nodes     << std::endl;
+    std::cout << "Ways: "      << handler.ways      << std::endl;
+    std::cout << "Relations: " << handler.relations << std::endl;
 
     google::protobuf::ShutdownProtobufLibrary();
 }
