@@ -38,7 +38,7 @@ struct CountHandler : public osmium::handler::Handler {
 int main(int argc, char* argv[]) {
 
     if (argc != 2) {
-        std::cerr << "Usage: " << argv[0] << " OSMFILE\n";
+        std::cerr << "Usage: " << argv[0] << " OSMFILE" << std::endl;
         exit(1);
     }
 
@@ -49,9 +49,9 @@ int main(int argc, char* argv[]) {
     osmium::apply(reader, handler);
     reader.close();
 
-    std::cout << "Nodes: "     << handler.nodes << "\n";
-    std::cout << "Ways: "      << handler.ways << "\n";
-    std::cout << "Relations: " << handler.relations << "\n";
+    std::cout << "Nodes: "     << handler.nodes     << std::endl;
+    std::cout << "Ways: "      << handler.ways      << std::endl;
+    std::cout << "Relations: " << handler.relations << std::endl;
 
     google::protobuf::ShutdownProtobufLibrary();
 }
