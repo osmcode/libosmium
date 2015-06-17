@@ -16,8 +16,8 @@
 
 struct CountHandler : public osmium::handler::Handler {
 
-    uint64_t nodes = 0;
-    uint64_t ways = 0;
+    uint64_t nodes     = 0;
+    uint64_t ways      = 0;
     uint64_t relations = 0;
 
     void node(osmium::Node&) {
@@ -42,7 +42,7 @@ int main(int argc, char* argv[]) {
         exit(1);
     }
 
-    osmium::io::File infile(argv[1]);
+    osmium::io::File   infile(argv[1]);
     osmium::io::Reader reader(infile);
 
     CountHandler handler;
