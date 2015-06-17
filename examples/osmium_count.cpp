@@ -5,6 +5,10 @@
 
   The code in this example file is released into the Public Domain.
 
+  The code can be compiled with, e.g.,
+
+    g++ osmium_count.cpp --std=c++11 -lpthread -lprotobuf-lite -lexpat -losmpbf -lbz2 -lz
+
 */
 
 #include <cstdint>
