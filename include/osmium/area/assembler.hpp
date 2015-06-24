@@ -537,7 +537,7 @@ namespace osmium {
                 }
 
                 for (const auto ringptr : m_outer_rings) {
-                    for (const auto segment : ringptr->segments()) {
+                    for (const auto& segment : ringptr->segments()) {
                         if (!segment.role_outer()) {
                             ++m_inner_outer_mismatches;
                             if (debug()) {
@@ -550,7 +550,7 @@ namespace osmium {
                     }
                 }
                 for (const auto ringptr : m_inner_rings) {
-                    for (const auto segment : ringptr->segments()) {
+                    for (const auto& segment : ringptr->segments()) {
                         if (!segment.role_inner()) {
                             ++m_inner_outer_mismatches;
                             if (debug()) {
