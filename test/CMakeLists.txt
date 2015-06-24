@@ -111,6 +111,7 @@ add_unit_test(geom test_factory_with_projection
     ENABLE_IF ${GEOS_AND_PROJ_FOUND}
     LIBS ${GEOS_LIBRARY} ${PROJ_LIBRARY})
 
+add_unit_test(geom test_exception)
 add_unit_test(geom test_geojson)
 add_unit_test(geom test_geos ENABLE_IF ${GEOS_FOUND} LIBS ${GEOS_LIBRARY})
 add_unit_test(geom test_geos_wkb ENABLE_IF ${GEOS_FOUND} LIBS ${GEOS_LIBRARY})
