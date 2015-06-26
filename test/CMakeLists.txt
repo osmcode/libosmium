@@ -140,6 +140,7 @@ add_unit_test(util test_data_file)
 add_unit_test(util test_double)
 add_unit_test(util test_file)
 add_unit_test(util test_memory_mapping)
+add_unit_test(util test_minmax)
 add_unit_test(util test_options)
 add_unit_test(util test_string)
 

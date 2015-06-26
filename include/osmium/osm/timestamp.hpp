@@ -42,6 +42,7 @@ DEALINGS IN THE SOFTWARE.
 #include <time.h>
 
 #include <osmium/util/compatibility.hpp>
+#include <osmium/util/minmax.hpp>
 
 namespace osmium {
 
@@ -168,6 +169,16 @@ namespace osmium {
     inline std::basic_ostream<TChar, TTraits>& operator<<(std::basic_ostream<TChar, TTraits>& out, Timestamp timestamp) {
         out << timestamp.to_iso();
         return out;
+    }
+
+    template <>
+    inline osmium::Timestamp min_op_start_value<osmium::Timestamp>() {
+        return end_of_time();
+    }
+
+    template <>
+    inline osmium::Timestamp max_op_start_value<osmium::Timestamp>() {
+        return start_of_time();
     }
 
 } // namespace osmium
