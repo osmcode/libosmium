@@ -44,6 +44,7 @@ addons:
             - libprotobuf-dev
             - libsparsehash-dev
             - protobuf-compiler
+            - spatialite-bin
 
 install:
     - scripts/travis_install.sh
