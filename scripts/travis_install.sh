@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-#  travis_before_install.sh
+#  travis_install.sh
 #
 
 if [ "$TRAVIS_OS_NAME" = "linux" ]; then
