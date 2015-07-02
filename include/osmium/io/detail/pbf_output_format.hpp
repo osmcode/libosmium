@@ -129,6 +129,7 @@ More complete outlines of real .osm.pbf files can be created using the osmpbf-ou
 #include <osmium/osm/timestamp.hpp>
 #include <osmium/osm/way.hpp>
 #include <osmium/util/cast.hpp>
+#include <osmium/util/delta.hpp>
 #include <osmium/visitor.hpp>
 
 namespace osmium {
@@ -188,34 +189,6 @@ namespace osmium {
             } // anonymous namespace
 
             class PBFOutputFormat : public osmium::io::detail::OutputFormat, public osmium::handler::Handler {
-
-                /**
-                 * This class models a variable that keeps track of the value
-                 * it was last set to and returns the delta between old and
-                 * new value from the update() call.
-                 */
-                template <typename T>
-                class Delta {
-
-                    T m_value;
-
-                public:
-
-                    Delta() :
-                        m_value(0) {
-                    }
-
-                    void clear() {
-                        m_value = 0;
-                    }
-
-                    T update(T new_value) {
-                        using std::swap;
-                        swap(m_value, new_value);
-                        return m_value - new_value;
-                    }
-
-                }; // class Delta
 
                 /**
                  * Maximum number of items in a primitive block.
@@ -332,13 +305,13 @@ namespace osmium {
                  * delta-encoding while storing dense-nodes. It holds the last seen values
                  * from which the difference is stored into the protobuf.
                  */
-                Delta<int64_t> m_delta_id;
-                Delta<int64_t> m_delta_lat;
-                Delta<int64_t> m_delta_lon;
-                Delta<int64_t> m_delta_timestamp;
-                Delta<int64_t> m_delta_changeset;
-                Delta<int64_t> m_delta_uid;
-                Delta<::google::protobuf::int32> m_delta_user_sid;
+                osmium::util::DeltaEncode<int64_t> m_delta_id;
+                osmium::util::DeltaEncode<int64_t> m_delta_lat;
+                osmium::util::DeltaEncode<int64_t> m_delta_lon;
+                osmium::util::DeltaEncode<int64_t> m_delta_timestamp;
+                osmium::util::DeltaEncode<int64_t> m_delta_changeset;
+                osmium::util::DeltaEncode<int64_t> m_delta_uid;
+                osmium::util::DeltaEncode<::google::protobuf::int32> m_delta_user_sid;
 
                 bool debug;
 
@@ -690,7 +663,7 @@ namespace osmium {
                     apply_common_info(way, pbf_way);
 
                     // last way-node-id used for delta-encoding
-                    Delta<int64_t> delta_id;
+                    osmium::util::DeltaEncode<int64_t> delta_id;
 
                     for (const auto& node_ref : way.nodes()) {
                         // copy the way-node-id, delta encoded
@@ -713,7 +686,7 @@ namespace osmium {
                     // copy the common meta-info from the osmium-object to the pbf-object
                     apply_common_info(relation, pbf_relation);
 
-                    Delta<int64_t> delta_id;
+                    osmium::util::DeltaEncode<int64_t> delta_id;
 
                     for (const auto& member : relation.members()) {
                         // record the relation-member role to the interim stringtable and copy the
