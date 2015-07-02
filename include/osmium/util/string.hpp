@@ -43,10 +43,34 @@ namespace osmium {
      * Split string on the separator character.
      *
      * @param str The string to be split.
-     * @param sep The separastor character.
+     * @param sep The separator character.
      * @returns Vector with the parts of the string split up.
      */
     inline std::vector<std::string> split_string(const std::string& str, const char sep) {
+        std::vector<std::string> tokens;
+
+        if (!str.empty()) {
+            size_t pos = 0;
+            size_t nextpos = str.find_first_of(sep);
+            while (nextpos != std::string::npos) {
+                tokens.push_back(str.substr(pos, nextpos-pos));
+                pos = nextpos + 1;
+                nextpos = str.find_first_of(sep, pos);
+            }
+            tokens.push_back(str.substr(pos));
+        }
+
+        return tokens;
+    }
+
+    /**
+     * Split string on the separator character(s).
+     *
+     * @param str The string to be split.
+     * @param sep The separator character(s).
+     * @returns Vector with the parts of the string split up.
+     */
+    inline std::vector<std::string> split_string(const std::string& str, const char* sep) {
         std::vector<std::string> tokens;
 
         if (!str.empty()) {
