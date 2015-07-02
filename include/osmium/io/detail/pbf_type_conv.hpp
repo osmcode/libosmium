@@ -1,5 +1,5 @@
-#ifndef OSMIUM_IO_DETAIL_PBF_HPP
-#define OSMIUM_IO_DETAIL_PBF_HPP
+#ifndef OSMIUM_IO_DETAIL_PBF_TYPE_CONV_HPP
+#define OSMIUM_IO_DETAIL_PBF_TYPE_CONV_HPP
 
 /*
 
@@ -33,35 +33,41 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <stdexcept>
+#include <osmpbf/osmpbf.h>
 
-// needed for htonl and ntohl
-#ifndef _WIN32
-# include <netinet/in.h>
-#else
-# include <winsock2.h>
-#endif
-
-#include <osmium/io/error.hpp>
+#include <osmium/osm/item_type.hpp>
 
 namespace osmium {
 
-    /**
-     * Exception thrown when there was a problem with parsing the PBF format of
-     * a file.
-     */
-    struct pbf_error : public io_error {
-
-        pbf_error(const std::string& what) :
-            io_error(std::string("PBF error: ") + what) {
+// avoid g++ false positive
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wreturn-type"
+    inline item_type osmpbf_membertype_to_item_type(const OSMPBF::Relation::MemberType mt) {
+        switch (mt) {
+            case OSMPBF::Relation::NODE:
+                return item_type::node;
+            case OSMPBF::Relation::WAY:
+                return item_type::way;
+            case OSMPBF::Relation::RELATION:
+                return item_type::relation;
         }
+    }
+#pragma GCC diagnostic pop
 
-        pbf_error(const char* what) :
-            io_error(std::string("PBF error: ") + what) {
+    inline OSMPBF::Relation::MemberType item_type_to_osmpbf_membertype(const item_type type) {
+        switch (type) {
+            case item_type::node:
+                return OSMPBF::Relation::NODE;
+            case item_type::way:
+                return OSMPBF::Relation::WAY;
+            case item_type::relation:
+                return OSMPBF::Relation::RELATION;
+            default:
+                throw std::runtime_error("Unknown relation member type");
         }
+    }
 
-    }; // struct pbf_error
 
 } // namespace osmium
 
-#endif // OSMIUM_IO_DETAIL_PBF_HPP
+#endif // OSMIUM_IO_DETAIL_PBF_TYPE_CONV_HPP

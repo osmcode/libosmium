@@ -42,6 +42,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/builder/osm_object_builder.hpp>
 #include <osmium/io/detail/pbf.hpp> // IWYU pragma: export
+#include <osmium/io/detail/pbf_type_conv.hpp>
 #include <osmium/io/detail/zlib.hpp>
 #include <osmium/io/header.hpp>
 #include <osmium/osm/location.hpp>

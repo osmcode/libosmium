@@ -112,6 +112,7 @@ More complete outlines of real .osm.pbf files can be created using the osmpbf-ou
 #include <osmium/handler.hpp>
 #include <osmium/io/detail/output_format.hpp>
 #include <osmium/io/detail/pbf.hpp> // IWYU pragma: export
+#include <osmium/io/detail/pbf_type_conv.hpp>
 #include <osmium/io/detail/pbf_stringtable.hpp>
 #include <osmium/io/detail/zlib.hpp>
 #include <osmium/io/file.hpp>

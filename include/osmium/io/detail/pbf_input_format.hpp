@@ -51,6 +51,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/io/detail/input_format.hpp>
 #include <osmium/io/detail/pbf.hpp> // IWYU pragma: export
+#include <osmium/io/detail/pbf_type_conv.hpp>
 #include <osmium/io/detail/pbf_parser.hpp>
 #include <osmium/io/error.hpp>
 #include <osmium/io/file.hpp>
