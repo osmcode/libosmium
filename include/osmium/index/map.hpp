@@ -148,11 +148,11 @@ namespace osmium {
                 }
 
                 virtual void dump_as_list(const int /*fd*/) {
-                    std::runtime_error("can't dump as list");
+                    throw std::runtime_error("can't dump as list");
                 }
 
                 virtual void dump_as_array(const int /*fd*/) {
-                    std::runtime_error("can't dump as array");
+                    throw std::runtime_error("can't dump as array");
                 }
 
             }; // class Map
