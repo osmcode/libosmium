@@ -97,6 +97,7 @@ add_unit_test(basic test_node_ref)
 add_unit_test(basic test_object_comparisons)
 add_unit_test(basic test_relation)
 add_unit_test(basic test_timestamp)
+add_unit_test(basic test_types_from_string)
 add_unit_test(basic test_way)
 
 add_unit_test(buffer test_buffer_node)
