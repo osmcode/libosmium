@@ -66,6 +66,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/object.hpp>
 #include <osmium/osm/types.hpp>
+#include <osmium/osm/types_from_string.hpp>
 #include <osmium/thread/queue.hpp>
 #include <osmium/thread/util.hpp>
 #include <osmium/util/cast.hpp>
