@@ -11,11 +11,13 @@ message(STATUS "Configuring examples")
 set(EXAMPLES
     area_test
     convert
+    convertn
     count
     create_node_cache
     debug
     index
     read
+    readn
     serdump
     toogr
     toogr2
@@ -30,7 +32,7 @@ set(EXAMPLES
 #  Examples depending on wingetopt
 #
 #-----------------------------------------------------------------------------
-set(GETOPT_EXAMPLES area_test convert serdump toogr toogr2 toogr2_exp)
+set(GETOPT_EXAMPLES area_test convert convertn serdump toogr toogr2 toogr2_exp)
 if(NOT GETOPT_MISSING)
     foreach(example ${GETOPT_EXAMPLES})
         list(APPEND EXAMPLE_LIBS_${example} ${GETOPT_LIBRARY})

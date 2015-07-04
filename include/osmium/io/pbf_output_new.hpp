@@ -1,5 +1,5 @@
-#ifndef OSMIUM_IO_DETAIL_PBF_HPP
-#define OSMIUM_IO_DETAIL_PBF_HPP
+#ifndef OSMIUM_IO_PBF_OUTPUT_NEW_HPP
+#define OSMIUM_IO_PBF_OUTPUT_NEW_HPP
 
 /*
 
@@ -33,53 +33,16 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <string>
+/**
+ * @file
+ *
+ * Include this file if you want to write OSM PBF files.
+ *
+ * @attention If you include this file, you'll need to link with
+ *            `libz`, and enable multithreading.
+ */
 
-// needed for htonl and ntohl
-#ifndef _WIN32
-# include <netinet/in.h>
-#else
-# include <winsock2.h>
-#endif
+#include <osmium/io/writer.hpp> // IWYU pragma: export
+#include <osmium/io/detail/pbf_output_format_new.hpp> // IWYU pragma: export
 
-#include <osmium/io/error.hpp>
-
-namespace osmium {
-
-    /**
-     * Exception thrown when there was a problem with parsing the PBF format of
-     * a file.
-     */
-    struct pbf_error : public io_error {
-
-        pbf_error(const std::string& what) :
-            io_error(std::string("PBF error: ") + what) {
-        }
-
-        pbf_error(const char* what) :
-            io_error(std::string("PBF error: ") + what) {
-        }
-
-    }; // struct pbf_error
-
-    namespace io {
-
-        namespace detail {
-
-            // the maximum size of a blob header in bytes
-            const int max_blob_header_size = 64 * 1024; // 64 kB
-
-            // the maximum size of an uncompressed blob in bytes
-            const int max_uncompressed_blob_size = 32 * 1024 * 1024; // 32 MB
-
-            // resolution for longitude/latitude used for conversion
-            // between representation as double and as int
-            const int lonlat_resolution = 1000 * 1000 * 1000;
-
-        }
-
-    }
-
-} // namespace osmium
-
-#endif // OSMIUM_IO_DETAIL_PBF_HPP
+#endif // OSMIUM_IO_PBF_OUTPUT_NEW_HPP

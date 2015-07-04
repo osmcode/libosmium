@@ -104,6 +104,23 @@ namespace osmium {
                 return output;
             }
 
+            inline std::string zlib_uncompress_string(const std::string& input, unsigned long raw_size) {
+                std::string output(raw_size, '\0');
+
+                auto result = ::uncompress(
+                    reinterpret_cast<unsigned char*>(const_cast<char *>(output.data())),
+                    &raw_size,
+                    reinterpret_cast<const unsigned char*>(input.data()),
+                    osmium::static_cast_with_assert<unsigned long>(input.size())
+                );
+
+                if (result != Z_OK) {
+                    throw std::runtime_error(std::string("failed to uncompress data: ") + zError(result));
+                }
+
+                return output;
+            }
+
         } // namespace detail
 
     } // namespace io
