@@ -15,6 +15,9 @@ add_library(testlib STATIC test_main.cpp)
 
 set(ALL_TESTS "")
 
+# Otherwise GCC throws a lot of warnings for REQUIRE(...) from Catch v.1.2.1
+add_definitions(-Wno-parentheses)
+
 
 #-----------------------------------------------------------------------------
 #
