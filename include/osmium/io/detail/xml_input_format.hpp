@@ -344,8 +344,7 @@ namespace osmium {
             private:
 
                 const char* init_object(osmium::OSMObject& object, const XML_Char** attrs) {
-                    static const char* empty = "";
-                    const char* user = empty;
+                    const char* user = "";
 
                     if (m_in_delete_section) {
                         object.set_visible(false);
@@ -372,8 +371,7 @@ namespace osmium {
                 }
 
                 void init_changeset(osmium::builder::ChangesetBuilder* builder, const XML_Char** attrs) {
-                    static const char* empty = "";
-                    const char* user = empty;
+                    const char* user = "";
                     osmium::Changeset& new_changeset = builder->object();
 
                     osmium::Location min;
