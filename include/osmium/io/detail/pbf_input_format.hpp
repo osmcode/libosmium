@@ -49,9 +49,10 @@ DEALINGS IN THE SOFTWARE.
 #include <thread>
 #include <type_traits>
 
+#include <pbf_reader.hpp>
+
 #include <osmium/io/detail/input_format.hpp>
 #include <osmium/io/detail/pbf.hpp> // IWYU pragma: export
-#include <osmium/io/detail/pbf_type_conv.hpp>
 #include <osmium/io/detail/pbf_parser.hpp>
 #include <osmium/io/error.hpp>
 #include <osmium/io/file.hpp>
@@ -135,20 +136,38 @@ namespace osmium {
                     }
 
                     uint32_t size = ntohl(size_in_network_byte_order);
-                    if (size > static_cast<uint32_t>(OSMPBF::max_blob_header_size)) {
+                    if (size > static_cast<uint32_t>(max_blob_header_size)) {
                         throw osmium::pbf_error("invalid BlobHeader size (> max_blob_header_size)");
                     }
 
-                    OSMPBF::BlobHeader blob_header;
-                    if (!blob_header.ParseFromString(read_from_input_queue(size))) {
-                        throw osmium::pbf_error("failed to parse BlobHeader");
+                    std::string data = read_from_input_queue(size);
+                    mapbox::util::pbf pbf_blob_header(data);
+
+                    std::string blob_header_type;
+                    size_t blob_header_datasize = 0;
+                    while (pbf_blob_header.next()) {
+                        switch (pbf_blob_header.tag()) {
+                            case 1: // required string type
+                                blob_header_type = pbf_blob_header.get_string();
+                                break;
+                            case 3: // required int32 datasize
+                                blob_header_datasize = pbf_blob_header.get_int32();
+                                break;
+                            default:
+                                pbf_blob_header.skip();
+                                break;
+                        }
                     }
 
-                    if (blob_header.type() != expected_type) {
+                    if (blob_header_type != expected_type) {
                         throw osmium::pbf_error("blob does not have expected type (OSMHeader in first blob, OSMData in following blobs)");
                     }
 
-                    return static_cast<size_t>(blob_header.datasize());
+                    if (blob_header_datasize == 0) {
+                        throw osmium::pbf_error("PBF format error: BlobHeader.datasize missing or zero.");
+                    }
+
+                    return blob_header_datasize;
                 }
 
                 void parse_osm_data(osmium::osm_entity_bits::type read_types) {
@@ -198,7 +217,6 @@ namespace osmium {
                     m_quit_input_thread(false),
                     m_input_queue(input_queue),
                     m_input_buffer() {
-                    GOOGLE_PROTOBUF_VERIFY_VERSION;
 
                     // handle OSMHeader
                     auto size = read_blob_header("OSMHeader");
