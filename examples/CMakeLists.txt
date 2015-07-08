@@ -16,7 +16,6 @@ set(EXAMPLES
     debug
     index
     read
-    readn
     serdump
     toogr
     toogr2
