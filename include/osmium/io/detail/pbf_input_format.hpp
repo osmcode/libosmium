@@ -78,12 +78,12 @@ namespace osmium {
 
         namespace detail {
 
-            typedef osmium::thread::Queue<std::future<osmium::memory::Buffer>> queue_type;
-
             /**
              * Class for parsing PBF files.
              */
             class PBFInputFormat : public osmium::io::detail::InputFormat {
+
+                typedef osmium::thread::Queue<std::future<osmium::memory::Buffer>> queue_type;
 
                 bool m_use_thread_pool;
                 bool m_eof { false };
@@ -125,7 +125,9 @@ namespace osmium {
                  *                      "OSMData").
                  * @returns Size of the data read from BlobHeader (0 on EOF).
                  */
-                size_t read_blob_header(const char* expected_type) {
+                size_t read_size_from_blob_header(const char* expected_type) {
+                    assert(expected_type);
+
                     uint32_t size_in_network_byte_order;
 
                     try {
@@ -135,7 +137,7 @@ namespace osmium {
                         return 0; // EOF
                     }
 
-                    uint32_t size = ntohl(size_in_network_byte_order);
+                    const uint32_t size = ntohl(size_in_network_byte_order);
                     if (size > static_cast<uint32_t>(max_blob_header_size)) {
                         throw osmium::pbf_error("invalid BlobHeader size (> max_blob_header_size)");
                     }
@@ -173,7 +175,7 @@ namespace osmium {
                 void parse_osm_data(osmium::osm_entity_bits::type read_types) {
                     osmium::thread::set_thread_name("_osmium_pbf_in");
                     int n = 0;
-                    while (auto size = read_blob_header("OSMData")) {
+                    while (auto size = read_size_from_blob_header("OSMData")) {
 
                         if (m_use_thread_pool) {
                             m_queue.push(osmium::thread::Pool::instance().submit(DataBlobParser{read_from_input_queue(size), read_types}));
@@ -219,7 +221,7 @@ namespace osmium {
                     m_input_buffer() {
 
                     // handle OSMHeader
-                    auto size = read_blob_header("OSMHeader");
+                    const auto size = read_size_from_blob_header("OSMHeader");
                     m_header = parse_header_blob(read_from_input_queue(size));
 
                     if (m_read_which_entities != osmium::osm_entity_bits::nothing) {
