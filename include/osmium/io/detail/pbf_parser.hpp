@@ -93,7 +93,7 @@ namespace osmium {
 
                 static constexpr size_t initial_buffer_size = 2 * 1024 * 1024;
 
-                const std::string& m_data;
+                std::pair<const char*, size_t> m_data;
 
                 LookupTable m_stringtable;
 
@@ -512,7 +512,7 @@ namespace osmium {
 
             public:
 
-                explicit PBFPrimitiveBlockParser(const std::string& data, osmium::osm_entity_bits::type read_types) :
+                explicit PBFPrimitiveBlockParser(const std::pair<const char*, size_t>& data, osmium::osm_entity_bits::type read_types) :
                     m_data(data),
                     m_stringtable(),
                     m_lon_offset(0),
@@ -549,7 +549,7 @@ namespace osmium {
              * @returns Unpacked data
              * @throws osmium::pbf_error If there was a problem parsing the PBF
              */
-            inline const std::string unpack_blob(const std::string& input_data) {
+            inline std::pair<const char*, size_t> unpack_blob(const std::string& input_data, std::string& output) {
                 mapbox::util::pbf pbf_blob(input_data);
 
                 bool has_zlib = false;
@@ -558,7 +558,7 @@ namespace osmium {
                 while (pbf_blob.next()) {
                     switch (pbf_blob.tag()) {
                         case 1: // optional bytes raw
-                            return pbf_blob.get_bytes();
+                            return pbf_blob.get_data();
                         case 2: // optional int32 raw_size
                             raw_size = pbf_blob.get_int32();
                             break;
@@ -576,7 +576,7 @@ namespace osmium {
                 if (has_zlib) {
                     assert(raw_size >= 0);
                     assert(raw_size <= max_uncompressed_blob_size);
-                    return osmium::io::detail::zlib_uncompress_string(zlib_data, static_cast<unsigned long>(raw_size));
+                    return osmium::io::detail::zlib_uncompress_string(zlib_data, static_cast<unsigned long>(raw_size), output);
                 } else {
                     throw osmium::pbf_error("blob contains no data");
                 }
@@ -620,8 +620,8 @@ namespace osmium {
              * @throws osmium::pbf_error If there was a parsing error
              */
             inline osmium::io::Header parse_header_blob(const std::string& input_buffer) {
-                const std::string data = std::move(unpack_blob(input_buffer));
-                mapbox::util::pbf pbf_header_block(data);
+                std::string output;
+                mapbox::util::pbf pbf_header_block(unpack_blob(input_buffer, output));
 
                 osmium::io::Header header;
                 int i = 0;
@@ -691,8 +691,8 @@ namespace osmium {
                 ~DataBlobParser() = default;
 
                 osmium::memory::Buffer operator()() {
-                    const std::string data = unpack_blob(*m_input_buffer);
-                    PBFPrimitiveBlockParser parser(data, m_read_types);
+                    std::string output;
+                    PBFPrimitiveBlockParser parser(unpack_blob(*m_input_buffer, output), m_read_types);
                     return parser();
                 }
 
