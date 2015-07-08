@@ -194,6 +194,8 @@ public:
      */
     inline pbf(const char *data, size_t length);
 
+    inline pbf(std::pair<const char *, size_t> data);
+
     inline pbf(const std::string& data);
 
     inline pbf() = default;
@@ -779,6 +781,13 @@ public:
 pbf::pbf(const char *data, size_t length)
     : m_data(data),
       m_end(data + length),
+      m_wire_type(pbf_wire_type::unknown),
+      m_tag(0) {
+}
+
+pbf::pbf(std::pair<const char *, size_t> data)
+    : m_data(data.first),
+      m_end(data.first + data.second),
       m_wire_type(pbf_wire_type::unknown),
       m_tag(0) {
 }
