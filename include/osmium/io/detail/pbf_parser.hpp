@@ -677,9 +677,6 @@ namespace osmium {
                 DataBlobParser(std::string&& input_buffer, osmium::osm_entity_bits::type read_types) :
                     m_input_buffer(std::make_shared<std::string>(std::move(input_buffer))),
                     m_read_types(read_types) {
-                    if (input_buffer.size() > max_uncompressed_blob_size) {
-                        throw osmium::pbf_error(std::string("invalid blob size: " + std::to_string(input_buffer.size())));
-                    }
                 }
 
                 DataBlobParser(const DataBlobParser&) = default;

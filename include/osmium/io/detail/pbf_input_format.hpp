@@ -176,13 +176,17 @@ namespace osmium {
                     osmium::thread::set_thread_name("_osmium_pbf_in");
                     int n = 0;
                     while (auto size = read_size_from_blob_header("OSMData")) {
+                        std::string input_buffer { read_from_input_queue(size) };
+                        if (input_buffer.size() > max_uncompressed_blob_size) {
+                            throw osmium::pbf_error(std::string("invalid blob size: " + std::to_string(input_buffer.size())));
+                        }
 
                         if (m_use_thread_pool) {
-                            m_queue.push(osmium::thread::Pool::instance().submit(DataBlobParser{read_from_input_queue(size), read_types}));
+                            m_queue.push(osmium::thread::Pool::instance().submit(DataBlobParser{ std::move(input_buffer), read_types }));
                         } else {
                             std::promise<osmium::memory::Buffer> promise;
                             m_queue.push(promise.get_future());
-                            DataBlobParser data_blob_parser{read_from_input_queue(size), read_types};
+                            DataBlobParser data_blob_parser{ std::move(input_buffer), read_types };
                             promise.set_value(data_blob_parser());
                         }
                         ++n;
