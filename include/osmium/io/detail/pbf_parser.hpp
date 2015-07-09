@@ -61,41 +61,13 @@ namespace osmium {
 
         namespace detail {
 
-            class LookupTable {
-
-                std::string m_data;
-                std::vector<int> m_index;
-
-            public:
-
-                LookupTable() = default;
-
-                void load(mapbox::util::pbf&& pbf_string_table) {
-                    m_data.clear();
-                    m_data.reserve(pbf_string_table.length());
-                    m_index.clear();
-                    m_index.reserve(10000);
-                    while (pbf_string_table.next(1 /* repeated bytes s*/)) {
-                        auto d = pbf_string_table.get_data();
-                        m_index.push_back(m_data.size());
-                        m_data.append(d.first, d.second);
-                        m_data.append(1, '\0');
-                    }
-                }
-
-                const char* operator[](uint32_t id) {
-                    return m_data.data() + m_index[id];
-                }
-
-            }; // class LookupTable
-
             class PBFPrimitiveBlockParser {
 
                 static constexpr size_t initial_buffer_size = 2 * 1024 * 1024;
 
                 std::pair<const char*, size_t> m_data;
 
-                LookupTable m_stringtable;
+                std::vector<std::pair<const char*, size_t>> m_stringtable;
 
                 int64_t m_lon_offset;
                 int64_t m_lat_offset;
@@ -106,13 +78,20 @@ namespace osmium {
 
                 osmium::memory::Buffer m_buffer;
 
+                void read_stringtable(mapbox::util::pbf&& pbf_string_table) {
+                    assert(m_stringtable.empty());
+                    while (pbf_string_table.next(1 /* repeated bytes s*/)) {
+                        m_stringtable.push_back(pbf_string_table.get_data());
+                    }
+                }
+
                 void read_primitive_block_metadata() {
                     mapbox::util::pbf pbf_primitive_block(m_data);
 
                     while (pbf_primitive_block.next()) {
                         switch (pbf_primitive_block.tag()) {
                             case 1: // required StringTable stringtable
-                                m_stringtable.load(std::move(pbf_primitive_block.get_message()));
+                                read_stringtable(std::move(pbf_primitive_block.get_message()));
                                 break;
                             case 17: // optional int32 granularity
                                 m_granularity = pbf_primitive_block.get_int32();
@@ -166,8 +145,8 @@ namespace osmium {
                     }
                 }
 
-                const char* parse_info(osmium::OSMObject& object, mapbox::util::pbf&& pbf_info) {
-                    const char* user = "";
+                std::pair<const char*, size_t> parse_info(osmium::OSMObject& object, mapbox::util::pbf&& pbf_info) {
+                    auto user = std::make_pair<const char*, size_t>("", 0);
 
                     while (pbf_info.next()) {
                         switch (pbf_info.tag()) {
@@ -184,7 +163,7 @@ namespace osmium {
                                 object.set_uid_from_signed(pbf_info.get_int32());
                                 break;
                             case 5: // optional uint32 user_sid
-                                user = m_stringtable[pbf_info.get_uint32()];
+                                user = m_stringtable.at(pbf_info.get_uint32());
                                 break;
                             case 6: // optional bool visible
                                 object.set_visible(pbf_info.get_bool());
@@ -206,7 +185,9 @@ namespace osmium {
                         auto kit = keys.first;
                         auto vit = vals.first;
                         while (kit != keys.second && vit != vals.second) {
-                            tl_builder.add_tag(m_stringtable[*kit++], m_stringtable[*vit++]);
+                            const auto& k = m_stringtable.at(*kit++);
+                            const auto& v = m_stringtable.at(*vit++);
+                            tl_builder.add_tag(k.first, k.second, v.first, v.second);
                         }
                     }
                 }
@@ -231,7 +212,10 @@ namespace osmium {
                                 vals = pbf_node.get_packed_uint32();
                                 break;
                             case 4: // Optional Info info
-                                builder.add_user(parse_info(builder.object(), std::move(pbf_node.get_message())));
+                                {
+                                    const auto u = parse_info(builder.object(), std::move(pbf_node.get_message()));
+                                    builder.add_user(u.first, u.second);
+                                }
                                 break;
                             case 8: // required sint64 lat
                                 lat = pbf_node.get_sint64();
@@ -274,8 +258,10 @@ namespace osmium {
                                 vals = pbf_way.get_packed_uint32();
                                 break;
                             case 4: // optional Info info
-                                //parse_info(builder, std::move(pbf_way.get_message()));
-                                builder.add_user(parse_info(builder.object(), std::move(pbf_way.get_message())));
+                                {
+                                    const auto u = parse_info(builder.object(), std::move(pbf_way.get_message()));
+                                    builder.add_user(u.first, u.second);
+                                }
                                 break;
                             case 8: // repeated sint64 refs [packed = true] DELTA encoded
                                 refs = pbf_way.get_packed_sint64();
@@ -320,8 +306,10 @@ namespace osmium {
                                 vals = pbf_relation.get_packed_uint32();
                                 break;
                             case 4: // optional Info info
-                                //parse_info(builder, std::move(pbf_relation.get_message()));
-                                builder.add_user(parse_info(builder.object(), std::move(pbf_relation.get_message())));
+                                {
+                                    const auto u = parse_info(builder.object(), std::move(pbf_relation.get_message()));
+                                    builder.add_user(u.first, u.second);
+                                }
                                 break;
                             case 8: // repeated int32 roles_sid [packed = true]
                                 roles = pbf_relation.get_packed_int32();
@@ -344,10 +332,12 @@ namespace osmium {
                         auto ref_it = refs.first;
                         auto type_it = types.first;
                         while (roles_it != roles.second && ref_it != refs.second && type_it != types.second) {
+                            const auto& r = m_stringtable.at(*roles_it++);
                             rml_builder.add_member(
                                 osmium::item_type(*type_it++ + 1),
                                 ref.update(*ref_it++),
-                                m_stringtable[*roles_it++]
+                                r.first,
+                                r.second
                             );
                         }
                     }
@@ -478,7 +468,8 @@ namespace osmium {
                             }
                             node.set_visible(visible);
 
-                            builder.add_user(m_stringtable[static_cast<int>(dense_user_sid.update(*user_sid_it++))]);
+                            const auto& u = m_stringtable.at(dense_user_sid.update(*user_sid_it++));
+                            builder.add_user(u.first, u.second);
                         } else {
                             builder.add_user("");
                         }
@@ -492,12 +483,12 @@ namespace osmium {
                         if (tag_it != tags.second) {
                             osmium::builder::TagListBuilder tl_builder(m_buffer, &builder);
                             while (tag_it != tags.second && *tag_it != 0) {
-                                const char* key = m_stringtable[*tag_it++];
+                                const auto& k = m_stringtable.at(*tag_it++);
                                 if (tag_it == tags.second) {
                                     throw osmium::pbf_error("PBF format error"); // this is against the spec, keys/vals must come in pairs
                                 }
-                                const char* val = m_stringtable[*tag_it++];
-                                tl_builder.add_tag(key, val);
+                                const auto& v = m_stringtable.at(*tag_it++);
+                                tl_builder.add_tag(k.first, k.second, v.first, v.second);
                             }
 
                             if (tag_it != tags.second) {
@@ -689,8 +680,12 @@ namespace osmium {
 
                 osmium::memory::Buffer operator()() {
                     std::string output;
-                    PBFPrimitiveBlockParser parser(unpack_blob(*m_input_buffer, output), m_read_types);
-                    return parser();
+                    try {
+                        PBFPrimitiveBlockParser parser(unpack_blob(*m_input_buffer, output), m_read_types);
+                        return parser();
+                    } catch (std::out_of_range&) {
+                        throw osmium::pbf_error("string id out of range");
+                    }
                 }
 
             }; // class DataBlobParser
