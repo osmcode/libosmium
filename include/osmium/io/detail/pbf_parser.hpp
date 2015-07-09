@@ -61,7 +61,7 @@ namespace osmium {
 
         namespace detail {
 
-            class PBFPrimitiveBlockParser {
+            class PBFPrimitiveBlockDecoder {
 
                 static constexpr size_t initial_buffer_size = 2 * 1024 * 1024;
 
@@ -500,18 +500,18 @@ namespace osmium {
 
             public:
 
-                explicit PBFPrimitiveBlockParser(const std::pair<const char*, size_t>& data, osmium::osm_entity_bits::type read_types) :
+                explicit PBFPrimitiveBlockDecoder(const std::pair<const char*, size_t>& data, osmium::osm_entity_bits::type read_types) :
                     m_data(data),
                     m_read_types(read_types) {
                 }
 
-                PBFPrimitiveBlockParser(const PBFPrimitiveBlockParser&) = delete;
-                PBFPrimitiveBlockParser& operator=(const PBFPrimitiveBlockParser&) = delete;
+                PBFPrimitiveBlockDecoder(const PBFPrimitiveBlockDecoder&) = delete;
+                PBFPrimitiveBlockDecoder& operator=(const PBFPrimitiveBlockDecoder&) = delete;
 
-                PBFPrimitiveBlockParser(PBFPrimitiveBlockParser&&) = delete;
-                PBFPrimitiveBlockParser& operator=(PBFPrimitiveBlockParser&&) = delete;
+                PBFPrimitiveBlockDecoder(PBFPrimitiveBlockDecoder&&) = delete;
+                PBFPrimitiveBlockDecoder& operator=(PBFPrimitiveBlockDecoder&&) = delete;
 
-                ~PBFPrimitiveBlockParser() = default;
+                ~PBFPrimitiveBlockDecoder() = default;
 
                 osmium::memory::Buffer operator()() {
                     try {
@@ -524,7 +524,7 @@ namespace osmium {
                     return std::move(m_buffer);
                 }
 
-            }; // class PBFPrimitiveBlockParser
+            }; // class PBFPrimitiveBlockDecoder
 
             inline std::pair<const char*, size_t> decode_blob(const std::string& blob_data, std::string& output) {
                 mapbox::util::pbf pbf_blob(blob_data);
@@ -671,8 +671,8 @@ namespace osmium {
 
                 osmium::memory::Buffer operator()() {
                     std::string output;
-                    PBFPrimitiveBlockParser parser(decode_blob(*m_input_buffer, output), m_read_types);
-                    return parser();
+                    PBFPrimitiveBlockDecoder decoder(decode_blob(*m_input_buffer, output), m_read_types);
+                    return decoder();
                 }
 
             }; // class DataBlobParser
