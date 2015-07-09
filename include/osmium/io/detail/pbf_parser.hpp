@@ -69,14 +69,14 @@ namespace osmium {
 
                 std::vector<std::pair<const char*, size_t>> m_stringtable;
 
-                int64_t m_lon_offset;
-                int64_t m_lat_offset;
-                int64_t m_date_factor;
-                int32_t m_granularity;
+                int64_t m_lon_offset = 0;
+                int64_t m_lat_offset = 0;
+                int64_t m_date_factor = 1;
+                int32_t m_granularity = 100;
 
                 osmium::osm_entity_bits::type m_read_types;
 
-                osmium::memory::Buffer m_buffer;
+                osmium::memory::Buffer m_buffer { initial_buffer_size };
 
                 void decode_stringtable(mapbox::util::pbf&& pbf_string_table) {
                     if (!m_stringtable.empty()) {
@@ -502,13 +502,7 @@ namespace osmium {
 
                 explicit PBFPrimitiveBlockParser(const std::pair<const char*, size_t>& data, osmium::osm_entity_bits::type read_types) :
                     m_data(data),
-                    m_stringtable(),
-                    m_lon_offset(0),
-                    m_lat_offset(0),
-                    m_date_factor(1),
-                    m_granularity(100),
-                    m_read_types(read_types),
-                    m_buffer(initial_buffer_size) {
+                    m_read_types(read_types) {
                 }
 
                 PBFPrimitiveBlockParser(const PBFPrimitiveBlockParser&) = delete;
