@@ -520,18 +520,21 @@ namespace osmium {
                 ~PBFPrimitiveBlockParser() = default;
 
                 osmium::memory::Buffer operator()() {
-                    decode_primitive_block_metadata();
-                    decode_primitive_block_data();
+                    try {
+                        decode_primitive_block_metadata();
+                        decode_primitive_block_data();
+                    } catch (std::out_of_range&) {
+                        throw osmium::pbf_error("string id out of range");
+                    }
 
                     return std::move(m_buffer);
                 }
 
             }; // class PBFPrimitiveBlockParser
 
-            inline std::pair<const char*, size_t> unpack_blob(const std::string& blob_data, std::string& output) {
+            inline std::pair<const char*, size_t> decode_blob(const std::string& blob_data, std::string& output) {
                 mapbox::util::pbf pbf_blob(blob_data);
 
-                bool has_zlib = false;
                 int32_t raw_size;
                 std::string zlib_data;
                 while (pbf_blob.next()) {
@@ -543,7 +546,6 @@ namespace osmium {
                             break;
                         case 3: // optional bytes zlib_data
                             zlib_data = std::move(pbf_blob.get_bytes());
-                            has_zlib = true;
                             break;
                         case 4: // optional bytes lzma_data
                             throw osmium::pbf_error("lzma blobs not implemented");
@@ -552,13 +554,13 @@ namespace osmium {
                     }
                 }
 
-                if (has_zlib) {
+                if (!zlib_data.empty()) {
                     assert(raw_size >= 0);
                     assert(raw_size <= max_uncompressed_blob_size);
                     return osmium::io::detail::zlib_uncompress_string(zlib_data, static_cast<unsigned long>(raw_size), output);
-                } else {
-                    throw osmium::pbf_error("blob contains no data");
                 }
+
+                throw osmium::pbf_error("blob contains no data");
             }
 
             inline void parse_header_bbox(osmium::io::Header& header, mapbox::util::pbf&& pbf_header_bbox) {
@@ -600,7 +602,7 @@ namespace osmium {
              */
             inline osmium::io::Header decode_header_block(const std::string& header_block_data) {
                 std::string output;
-                mapbox::util::pbf pbf_header_block(unpack_blob(header_block_data, output));
+                mapbox::util::pbf pbf_header_block(decode_blob(header_block_data, output));
 
                 osmium::io::Header header;
                 int i = 0;
@@ -668,12 +670,8 @@ namespace osmium {
 
                 osmium::memory::Buffer operator()() {
                     std::string output;
-                    try {
-                        PBFPrimitiveBlockParser parser(unpack_blob(*m_input_buffer, output), m_read_types);
-                        return parser();
-                    } catch (std::out_of_range&) {
-                        throw osmium::pbf_error("string id out of range");
-                    }
+                    PBFPrimitiveBlockParser parser(decode_blob(*m_input_buffer, output), m_read_types);
+                    return parser();
                 }
 
             }; // class DataBlobParser
