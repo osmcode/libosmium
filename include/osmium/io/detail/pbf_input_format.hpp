@@ -236,7 +236,7 @@ namespace osmium {
 
                     // handle OSMHeader
                     const auto size = check_type_and_get_blob_size("OSMHeader");
-                    m_header = parse_header_blob(read_from_input_queue(size));
+                    m_header = decode_header_block(read_from_input_queue(size));
 
                     if (m_read_which_entities != osmium::osm_entity_bits::nothing) {
                         m_reader = std::thread(&PBFInputFormat::parse_osm_data, this, m_read_which_entities);

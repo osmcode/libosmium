@@ -528,17 +528,8 @@ namespace osmium {
 
             }; // class PBFPrimitiveBlockParser
 
-            /**
-             * PBF blobs can optionally be packed with the zlib algorithm.
-             * This function returns the raw data (if it was unpacked) or
-             * the unpacked data (if it was packed).
-             *
-             * @param input_data Reference to input data.
-             * @returns Unpacked data
-             * @throws osmium::pbf_error If there was a problem parsing the PBF
-             */
-            inline std::pair<const char*, size_t> unpack_blob(const std::string& input_data, std::string& output) {
-                mapbox::util::pbf pbf_blob(input_data);
+            inline std::pair<const char*, size_t> unpack_blob(const std::string& blob_data, std::string& output) {
+                mapbox::util::pbf pbf_blob(blob_data);
 
                 bool has_zlib = false;
                 int32_t raw_size;
@@ -601,15 +592,15 @@ namespace osmium {
             }
 
             /**
-             * Parse blob as a HeaderBlock.
+             * Decode HeaderBlock.
              *
-             * @param input_buffer Blob data
+             * @param header_block_data Input data
              * @returns Header object
              * @throws osmium::pbf_error If there was a parsing error
              */
-            inline osmium::io::Header parse_header_blob(const std::string& input_buffer) {
+            inline osmium::io::Header decode_header_block(const std::string& header_block_data) {
                 std::string output;
-                mapbox::util::pbf pbf_header_block(unpack_blob(input_buffer, output));
+                mapbox::util::pbf pbf_header_block(unpack_blob(header_block_data, output));
 
                 osmium::io::Header header;
                 int i = 0;
