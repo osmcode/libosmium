@@ -72,11 +72,23 @@ namespace osmium {
             /**
              * Add tag to buffer.
              *
-             * @param key Tag key.
-             * @param value Tag value.
+             * @param key Tag key (0-terminated string).
+             * @param value Tag value (0-terminated string).
              */
             void add_tag(const char* key, const char* value) {
                 add_size(append(key) + append(value));
+            }
+
+            /**
+             * Add tag to buffer.
+             *
+             * @param key Pointer to tag key.
+             * @param key_length Length of key (not including the \0 byte).
+             * @param value Pointer to tag value.
+             * @param value_length Length of value (not including the \0 byte).
+             */
+            void add_tag(const char* key, const string_size_type key_length, const char* value, const string_size_type value_length) {
+                add_size(append(key, key_length) + append_zero() + append(value, value_length) + append_zero());
             }
 
             /**

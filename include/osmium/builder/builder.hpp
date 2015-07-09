@@ -147,6 +147,7 @@ namespace osmium {
              * @param length Length of data in bytes. If data is a
              *               \0-terminated string, length must contain the
              *               \0 byte.
+             * @returns The number of bytes appended (length).
              */
             osmium::memory::item_size_type append(const char* data, const osmium::memory::item_size_type length) {
                 unsigned char* target = m_buffer.reserve_space(length);
@@ -156,9 +157,22 @@ namespace osmium {
 
             /**
              * Append \0-terminated string to buffer.
+             *
+             * @param str \0-terminated string.
+             * @returns The number of bytes appended (strlen(str) + 1).
              */
             osmium::memory::item_size_type append(const char* str) {
                 return append(str, static_cast<osmium::memory::item_size_type>(std::strlen(str) + 1));
+            }
+
+            /**
+             * Append '\0' to the buffer.
+             *
+             * @returns The number of bytes appended (always 1).
+             */
+            osmium::memory::item_size_type append_zero() {
+                *m_buffer.reserve_space(1) = '\0';
+                return 1;
             }
 
             /// Return the buffer this builder is using.
