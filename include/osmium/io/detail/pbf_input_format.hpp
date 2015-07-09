@@ -117,17 +117,10 @@ namespace osmium {
                 }
 
                 /**
-                 * Read BlobHeader by first reading the size and then the
-                 * BlobHeader. The BlobHeader contains a type field (which is
-                 * checked against the expected type) and a size field.
-                 *
-                 * @param expected_type Expected type of data ("OSMHeader" or
-                 *                      "OSMData").
-                 * @returns Size of the data read from BlobHeader (0 on EOF).
+                 * Read 4 bytes in network byte order from file. They contain
+                 * the length of the following BlobHeader.
                  */
-                size_t read_size_from_blob_header(const char* expected_type) {
-                    assert(expected_type);
-
+                uint32_t read_blob_header_size_from_file() {
                     uint32_t size_in_network_byte_order;
 
                     try {
@@ -142,41 +135,59 @@ namespace osmium {
                         throw osmium::pbf_error("invalid BlobHeader size (> max_blob_header_size)");
                     }
 
-                    std::string data = read_from_input_queue(size);
-                    mapbox::util::pbf pbf_blob_header(data);
+                    return size;
+                }
 
-                    std::string blob_header_type;
+                /**
+                 * Decode the BlobHeader. Make sure it contains the expected
+                 * type. Return the size of the following Blob.
+                 */
+                size_t decode_blob_header(mapbox::util::pbf&& pbf_blob_header, const char* expected_type) {
+                    std::pair<const char*, size_t> blob_header_type;
                     size_t blob_header_datasize = 0;
+
                     while (pbf_blob_header.next()) {
                         switch (pbf_blob_header.tag()) {
                             case 1: // required string type
-                                blob_header_type = pbf_blob_header.get_string();
+                                blob_header_type = pbf_blob_header.get_data();
                                 break;
                             case 3: // required int32 datasize
                                 blob_header_datasize = pbf_blob_header.get_int32();
                                 break;
                             default:
                                 pbf_blob_header.skip();
-                                break;
                         }
-                    }
-
-                    if (blob_header_type != expected_type) {
-                        throw osmium::pbf_error("blob does not have expected type (OSMHeader in first blob, OSMData in following blobs)");
                     }
 
                     if (blob_header_datasize == 0) {
                         throw osmium::pbf_error("PBF format error: BlobHeader.datasize missing or zero.");
                     }
 
+                    if (strncmp(expected_type, blob_header_type.first, blob_header_type.second)) {
+                        throw osmium::pbf_error("blob does not have expected type (OSMHeader in first blob, OSMData in following blobs)");
+                    }
+
                     return blob_header_datasize;
+                }
+
+                size_t check_type_and_get_blob_size(const char* expected_type) {
+                    assert(expected_type);
+
+                    auto size = read_blob_header_size_from_file();
+                    if (size == 0) { // EOF
+                        return 0;
+                    }
+
+                    std::string blob_header = read_from_input_queue(size);
+
+                    return decode_blob_header(mapbox::util::pbf(blob_header), expected_type);
                 }
 
                 void parse_osm_data(osmium::osm_entity_bits::type read_types) {
                     osmium::thread::set_thread_name("_osmium_pbf_in");
-                    int n = 0;
-                    while (auto size = read_size_from_blob_header("OSMData")) {
-                        std::string input_buffer { read_from_input_queue(size) };
+
+                    while (auto size = check_type_and_get_blob_size("OSMData")) {
+                        std::string input_buffer = read_from_input_queue(size);
                         if (input_buffer.size() > max_uncompressed_blob_size) {
                             throw osmium::pbf_error(std::string("invalid blob size: " + std::to_string(input_buffer.size())));
                         }
@@ -189,7 +200,6 @@ namespace osmium {
                             DataBlobParser data_blob_parser{ std::move(input_buffer), read_types };
                             promise.set_value(data_blob_parser());
                         }
-                        ++n;
 
                         if (m_quit_input_thread) {
                             return;
@@ -225,7 +235,7 @@ namespace osmium {
                     m_input_buffer() {
 
                     // handle OSMHeader
-                    const auto size = read_size_from_blob_header("OSMHeader");
+                    const auto size = check_type_and_get_blob_size("OSMHeader");
                     m_header = parse_header_blob(read_from_input_queue(size));
 
                     if (m_read_which_entities != osmium::osm_entity_bits::nothing) {
