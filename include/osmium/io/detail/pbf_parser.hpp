@@ -199,9 +199,8 @@ namespace osmium {
 
                     kv_type keys;
                     kv_type vals;
-
-                    int64_t lat;
                     int64_t lon;
+                    int64_t lat;
                     while (pbf_node.next()) {
                         switch (pbf_node.tag()) {
                             case 1: // required sint64 id
@@ -276,9 +275,8 @@ namespace osmium {
                     if (refs.first != refs.second) {
                         osmium::builder::WayNodeListBuilder wnl_builder(m_buffer, &builder);
                         osmium::util::DeltaDecode<int64_t> ref;
-                        auto it = refs.first;
-                        while (it != refs.second) {
-                            wnl_builder.add_node_ref(ref.update(*it++));
+                        while (refs.first != refs.second) {
+                            wnl_builder.add_node_ref(ref.update(*refs.first++));
                         }
                     }
 
@@ -330,14 +328,11 @@ namespace osmium {
                     if (refs.first != refs.second) {
                         osmium::builder::RelationMemberListBuilder rml_builder(m_buffer, &builder);
                         osmium::util::DeltaDecode<int64_t> ref;
-                        auto roles_it = roles.first;
-                        auto ref_it = refs.first;
-                        auto type_it = types.first;
-                        while (roles_it != roles.second && ref_it != refs.second && type_it != types.second) {
-                            const auto& r = m_stringtable.at(*roles_it++);
+                        while (roles.first != roles.second && refs.first != refs.second && types.first != types.second) {
+                            const auto& r = m_stringtable.at(*roles.first++);
                             rml_builder.add_member(
-                                osmium::item_type(*type_it++ + 1),
-                                ref.update(*ref_it++),
+                                osmium::item_type(*types.first++ + 1),
+                                ref.update(*refs.first++),
                                 r.first,
                                 r.second
                             );
