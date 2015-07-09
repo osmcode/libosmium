@@ -612,15 +612,17 @@ namespace osmium {
                             break;
                         case 4: // repeated string required_features
                             {
-                                const std::string& feature = pbf_header_block.get_string();
-                                if (feature == "OsmSchema-V0.6") {
+                                auto feature = pbf_header_block.get_data();
+                                if (!strncmp("OsmSchema-V0.6", feature.first, feature.second)) {
                                     // intentionally left blank
-                                } else if (feature == "DenseNodes") {
+                                } else if (!strncmp("DenseNodes", feature.first, feature.second)) {
                                     header.set("pbf_dense_nodes", true);
-                                } else if (feature == "HistoricalInformation") {
+                                } else if (!strncmp("HistoricalInformation", feature.first, feature.second)) {
                                     header.set_has_multiple_object_versions(true);
                                 } else {
-                                    throw osmium::pbf_error(std::string("required feature not supported: ") + feature);
+                                    std::string msg("required feature not supported: ");
+                                    msg.append(feature.first, feature.second);
+                                    throw osmium::pbf_error(msg);
                                 }
                             }
                             break;
