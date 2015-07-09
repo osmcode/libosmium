@@ -78,20 +78,22 @@ namespace osmium {
 
                 osmium::memory::Buffer m_buffer;
 
-                void read_stringtable(mapbox::util::pbf&& pbf_string_table) {
-                    assert(m_stringtable.empty());
+                void decode_stringtable(mapbox::util::pbf&& pbf_string_table) {
+                    if (!m_stringtable.empty()) {
+                        throw osmium::pbf_error("more than one stringtable in pbf file");
+                    }
                     while (pbf_string_table.next(1 /* repeated bytes s*/)) {
                         m_stringtable.push_back(pbf_string_table.get_data());
                     }
                 }
 
-                void read_primitive_block_metadata() {
+                void decode_primitive_block_metadata() {
                     mapbox::util::pbf pbf_primitive_block(m_data);
 
                     while (pbf_primitive_block.next()) {
                         switch (pbf_primitive_block.tag()) {
                             case 1: // required StringTable stringtable
-                                read_stringtable(std::move(pbf_primitive_block.get_message()));
+                                decode_stringtable(std::move(pbf_primitive_block.get_message()));
                                 break;
                             case 17: // optional int32 granularity
                                 m_granularity = pbf_primitive_block.get_int32();
@@ -111,7 +113,7 @@ namespace osmium {
                     }
                 }
 
-                void read_primitive_block_data() {
+                void decode_primitive_block_data() {
                     mapbox::util::pbf pbf_primitive_block(m_data);
 
                     while (pbf_primitive_block.next(2 /* repeated PrimitiveGroup primitivegroup */)) {
@@ -120,32 +122,32 @@ namespace osmium {
                             switch (pbf_primitive_group.tag()) {
                                 case 1: // repeated Node nodes
                                     if (m_read_types & osmium::osm_entity_bits::node) {
-                                        parse_node(std::move(pbf_primitive_group.get_message()));
+                                        decode_node(std::move(pbf_primitive_group.get_message()));
                                     }
                                     break;
                                 case 2: // optional DenseNodes dense
                                     if (m_read_types & osmium::osm_entity_bits::node) {
-                                        parse_dense_nodes(std::move(pbf_primitive_group.get_message()));
+                                        decode_dense_nodes(std::move(pbf_primitive_group.get_message()));
                                     }
                                     break;
                                 case 3: // repeated Way ways
                                     if (m_read_types & osmium::osm_entity_bits::way) {
-                                        parse_way(std::move(pbf_primitive_group.get_message()));
+                                        decode_way(std::move(pbf_primitive_group.get_message()));
                                     }
                                     break;
                                 case 4: // repeated Relation relations
                                     if (m_read_types & osmium::osm_entity_bits::relation) {
-                                        parse_relation(std::move(pbf_primitive_group.get_message()));
+                                        decode_relation(std::move(pbf_primitive_group.get_message()));
                                     }
                                     break;
                                 default:
-                                    throw osmium::pbf_error("group of unknown type");
+                                    pbf_primitive_group.skip();
                             }
                         }
                     }
                 }
 
-                std::pair<const char*, size_t> parse_info(osmium::OSMObject& object, mapbox::util::pbf&& pbf_info) {
+                std::pair<const char*, size_t> decode_info(osmium::OSMObject& object, mapbox::util::pbf&& pbf_info) {
                     auto user = std::make_pair<const char*, size_t>("", 0);
 
                     while (pbf_info.next()) {
@@ -179,7 +181,7 @@ namespace osmium {
 
                 using kv_type = std::pair<mapbox::util::pbf::const_uint32_iterator, mapbox::util::pbf::const_uint32_iterator>;
 
-                void parse_tags(osmium::builder::Builder& builder, const kv_type& keys, const kv_type& vals) {
+                void decode_tags(osmium::builder::Builder& builder, const kv_type& keys, const kv_type& vals) {
                     if (keys.first != keys.second) {
                         osmium::builder::TagListBuilder tl_builder(m_buffer, &builder);
                         auto kit = keys.first;
@@ -192,7 +194,7 @@ namespace osmium {
                     }
                 }
 
-                void parse_node(mapbox::util::pbf&& pbf_node) {
+                void decode_node(mapbox::util::pbf&& pbf_node) {
                     osmium::builder::NodeBuilder builder(m_buffer);
 
                     kv_type keys;
@@ -213,7 +215,7 @@ namespace osmium {
                                 break;
                             case 4: // Optional Info info
                                 {
-                                    const auto u = parse_info(builder.object(), std::move(pbf_node.get_message()));
+                                    const auto u = decode_info(builder.object(), std::move(pbf_node.get_message()));
                                     builder.add_user(u.first, u.second);
                                 }
                                 break;
@@ -234,12 +236,12 @@ namespace osmium {
                                             (lat * m_granularity + m_lat_offset) / (lonlat_resolution / osmium::Location::coordinate_precision)));
                     }
 
-                    parse_tags(builder, keys, vals);
+                    decode_tags(builder, keys, vals);
 
                     m_buffer.commit();
                 }
 
-                void parse_way(mapbox::util::pbf&& pbf_way) {
+                void decode_way(mapbox::util::pbf&& pbf_way) {
                     osmium::builder::WayBuilder builder(m_buffer);
 
                     kv_type keys;
@@ -259,7 +261,7 @@ namespace osmium {
                                 break;
                             case 4: // optional Info info
                                 {
-                                    const auto u = parse_info(builder.object(), std::move(pbf_way.get_message()));
+                                    const auto u = decode_info(builder.object(), std::move(pbf_way.get_message()));
                                     builder.add_user(u.first, u.second);
                                 }
                                 break;
@@ -280,12 +282,12 @@ namespace osmium {
                         }
                     }
 
-                    parse_tags(builder, keys, vals);
+                    decode_tags(builder, keys, vals);
 
                     m_buffer.commit();
                 }
 
-                void parse_relation(mapbox::util::pbf&& pbf_relation) {
+                void decode_relation(mapbox::util::pbf&& pbf_relation) {
                     osmium::builder::RelationBuilder builder(m_buffer);
 
                     kv_type keys;
@@ -307,7 +309,7 @@ namespace osmium {
                                 break;
                             case 4: // optional Info info
                                 {
-                                    const auto u = parse_info(builder.object(), std::move(pbf_relation.get_message()));
+                                    const auto u = decode_info(builder.object(), std::move(pbf_relation.get_message()));
                                     builder.add_user(u.first, u.second);
                                 }
                                 break;
@@ -342,12 +344,12 @@ namespace osmium {
                         }
                     }
 
-                    parse_tags(builder, keys, vals);
+                    decode_tags(builder, keys, vals);
 
                     m_buffer.commit();
                 }
 
-                void parse_dense_nodes(mapbox::util::pbf&& pbf_dense_nodes) {
+                void decode_dense_nodes(mapbox::util::pbf&& pbf_dense_nodes) {
                     bool has_info     = false;
                     bool has_visibles = false;
 
@@ -523,8 +525,8 @@ namespace osmium {
                 ~PBFPrimitiveBlockParser() = default;
 
                 osmium::memory::Buffer operator()() {
-                    read_primitive_block_metadata();
-                    read_primitive_block_data();
+                    decode_primitive_block_metadata();
+                    decode_primitive_block_data();
 
                     return std::move(m_buffer);
                 }
