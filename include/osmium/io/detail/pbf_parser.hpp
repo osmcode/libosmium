@@ -144,7 +144,7 @@ namespace osmium {
                         }
                         builder.add_user(m_stringtable->s(static_cast_with_assert<int>(pbf_object.info().user_sid())));
                     } else {
-                        builder.add_user("", 1);
+                        builder.add_user("");
                     }
                 }
 
@@ -301,7 +301,7 @@ namespace osmium {
                             node.set_visible(visible);
                             builder.add_user(m_stringtable->s(static_cast<int>(last_dense_user_sid)));
                         } else {
-                            builder.add_user("", 1);
+                            builder.add_user("");
                         }
 
                         if (visible) {

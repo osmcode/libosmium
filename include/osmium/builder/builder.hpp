@@ -202,11 +202,11 @@ namespace osmium {
              * Add user name to buffer.
              *
              * @param user Pointer to user name.
-             * @param length Length of user name including \0 byte.
+             * @param length Length of user name (without \0 termination).
              */
             void add_user(const char* user, const string_size_type length) {
-                object().set_user_size(length);
-                add_size(append(user, length));
+                object().set_user_size(length + 1);
+                add_size(append(user, length) + append_zero());
                 add_padding(true);
             }
 
@@ -216,7 +216,7 @@ namespace osmium {
              * @param user Pointer to \0-terminated user name.
              */
             void add_user(const char* user) {
-                add_user(user, static_cast_with_assert<string_size_type>(std::strlen(user) + 1));
+                add_user(user, static_cast_with_assert<string_size_type>(std::strlen(user)));
             }
 
             /**
@@ -225,7 +225,7 @@ namespace osmium {
              * @param user User name.
              */
             void add_user(const std::string& user) {
-                add_user(user.data(), static_cast_with_assert<string_size_type>(user.size() + 1));
+                add_user(user.data(), static_cast_with_assert<string_size_type>(user.size()));
             }
 
         }; // class ObjectBuilder

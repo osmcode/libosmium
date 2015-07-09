@@ -10,6 +10,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
+* Changed `add_user()` and `add_role()` in builders to use string length
+  without the 0-termination.
+
 ### Fixed
 
 ## [2.2.0] - 2015-07-04
