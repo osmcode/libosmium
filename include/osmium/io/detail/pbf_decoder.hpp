@@ -410,6 +410,7 @@ namespace osmium {
                         }
                     }
 
+#ifndef NDEBUG
                     auto count = std::distance(ids.first, ids.second);
                     assert(count == std::distance(lats.first, lats.second));
                     assert(count == std::distance(lons.first, lons.second));
@@ -425,6 +426,7 @@ namespace osmium {
                             assert(count == std::distance(visibles.first, visibles.second));
                         }
                     }
+#endif
 
                     osmium::util::DeltaDecode<int64_t> dense_id;
                     osmium::util::DeltaDecode<int64_t> dense_latitude;
@@ -434,38 +436,28 @@ namespace osmium {
                     osmium::util::DeltaDecode<int64_t> dense_changeset;
                     osmium::util::DeltaDecode<int64_t> dense_timestamp;
 
-                    auto id_it  = ids.first;
-                    auto lat_it = lats.first;
-                    auto lon_it = lons.first;
+                    auto tag_it = tags.first;
 
-                    auto version_it   = versions.first;
-                    auto timestamp_it = timestamps.first;
-                    auto changeset_it = changesets.first;
-                    auto uid_it       = uids.first;
-                    auto user_sid_it  = user_sids.first;
-                    auto visible_it   = visibles.first;
-                    auto tag_it       = tags.first;
-
-                    while (id_it != ids.second) {
+                    while (ids.first != ids.second) {
                         bool visible = true;
 
                         osmium::builder::NodeBuilder builder(m_buffer);
                         osmium::Node& node = builder.object();
 
-                        node.set_id(dense_id.update(*id_it++));
+                        node.set_id(dense_id.update(*ids.first++));
 
                         if (has_info) {
-                            node.set_version(static_cast<osmium::object_version_type>(*version_it++));
-                            node.set_changeset(static_cast<osmium::changeset_id_type>(dense_changeset.update(*changeset_it++)));
-                            node.set_timestamp(dense_timestamp.update(*timestamp_it++) * m_date_factor);
-                            node.set_uid_from_signed(static_cast<osmium::signed_user_id_type>(dense_uid.update(*uid_it++)));
+                            node.set_version(static_cast<osmium::object_version_type>(*versions.first++));
+                            node.set_changeset(static_cast<osmium::changeset_id_type>(dense_changeset.update(*changesets.first++)));
+                            node.set_timestamp(dense_timestamp.update(*timestamps.first++) * m_date_factor);
+                            node.set_uid_from_signed(static_cast<osmium::signed_user_id_type>(dense_uid.update(*uids.first++)));
 
                             if (has_visibles) {
-                                visible = *visible_it++;
+                                visible = *visibles.first++;
                             }
                             node.set_visible(visible);
 
-                            const auto& u = m_stringtable.at(dense_user_sid.update(*user_sid_it++));
+                            const auto& u = m_stringtable.at(dense_user_sid.update(*user_sids.first++));
                             builder.add_user(u.first, u.second);
                         } else {
                             builder.add_user("");
@@ -473,8 +465,8 @@ namespace osmium {
 
                         if (visible) {
                             builder.object().set_location(osmium::Location(
-                                              (dense_longitude.update(*lon_it++) * m_granularity + m_lon_offset) / (lonlat_resolution / osmium::Location::coordinate_precision),
-                                              (dense_latitude.update(*lat_it++)  * m_granularity + m_lat_offset) / (lonlat_resolution / osmium::Location::coordinate_precision)));
+                                              (dense_longitude.update(*lons.first++) * m_granularity + m_lon_offset) / (lonlat_resolution / osmium::Location::coordinate_precision),
+                                              (dense_latitude.update(*lats.first++)  * m_granularity + m_lat_offset) / (lonlat_resolution / osmium::Location::coordinate_precision)));
                         }
 
                         if (tag_it != tags.second) {
