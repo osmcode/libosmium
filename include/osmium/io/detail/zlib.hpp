@@ -88,14 +88,14 @@ namespace osmium {
              * @param output Uncompressed result data.
              * @returns Pointer and size to incompressed data.
              */
-            inline std::pair<const char*, size_t> zlib_uncompress_string(const std::string& input, unsigned long raw_size, std::string& output) {
+            inline std::pair<const char*, size_t> zlib_uncompress_string(const char* input, unsigned long input_size, unsigned long raw_size, std::string& output) {
                 output.resize(raw_size);
 
                 auto result = ::uncompress(
                     reinterpret_cast<unsigned char*>(const_cast<char *>(output.data())),
                     &raw_size,
-                    reinterpret_cast<const unsigned char*>(input.data()),
-                    osmium::static_cast_with_assert<unsigned long>(input.size())
+                    reinterpret_cast<const unsigned char*>(input),
+                    input_size
                 );
 
                 if (result != Z_OK) {

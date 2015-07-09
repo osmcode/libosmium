@@ -530,7 +530,7 @@ namespace osmium {
                 mapbox::util::pbf pbf_blob(blob_data);
 
                 int32_t raw_size;
-                std::string zlib_data;
+                std::pair<const char*, mapbox::util::pbf_length_type> zlib_data;
                 while (pbf_blob.next()) {
                     switch (pbf_blob.tag()) {
                         case 1: // optional bytes raw
@@ -539,7 +539,7 @@ namespace osmium {
                             raw_size = pbf_blob.get_int32();
                             break;
                         case 3: // optional bytes zlib_data
-                            zlib_data = std::move(pbf_blob.get_bytes());
+                            zlib_data = pbf_blob.get_data();
                             break;
                         case 4: // optional bytes lzma_data
                             throw osmium::pbf_error("lzma blobs not implemented");
@@ -548,10 +548,15 @@ namespace osmium {
                     }
                 }
 
-                if (!zlib_data.empty()) {
+                if (zlib_data.second != 0) {
                     assert(raw_size >= 0);
                     assert(raw_size <= max_uncompressed_blob_size);
-                    return osmium::io::detail::zlib_uncompress_string(zlib_data, static_cast<unsigned long>(raw_size), output);
+                    return osmium::io::detail::zlib_uncompress_string(
+                        zlib_data.first,
+                        static_cast<unsigned long>(zlib_data.second),
+                        static_cast<unsigned long>(raw_size),
+                        output
+                    );
                 }
 
                 throw osmium::pbf_error("blob contains no data");
