@@ -351,6 +351,7 @@ namespace osmium {
                     std::pair<mapbox::util::pbf::const_sint64_iterator, mapbox::util::pbf::const_sint64_iterator> ids;
                     std::pair<mapbox::util::pbf::const_sint64_iterator, mapbox::util::pbf::const_sint64_iterator> lats;
                     std::pair<mapbox::util::pbf::const_sint64_iterator, mapbox::util::pbf::const_sint64_iterator> lons;
+
                     std::pair<mapbox::util::pbf::const_int32_iterator,  mapbox::util::pbf::const_int32_iterator>  tags;
 
                     std::pair<mapbox::util::pbf::const_int32_iterator,  mapbox::util::pbf::const_int32_iterator>  versions;
@@ -410,24 +411,6 @@ namespace osmium {
                         }
                     }
 
-#ifndef NDEBUG
-                    auto count = std::distance(ids.first, ids.second);
-                    assert(count == std::distance(lats.first, lats.second));
-                    assert(count == std::distance(lons.first, lons.second));
-
-                    if (has_info) {
-                        assert(count == std::distance(versions.first, versions.second));
-                        assert(count == std::distance(timestamps.first, timestamps.second));
-                        assert(count == std::distance(changesets.first, changesets.second));
-                        assert(count == std::distance(uids.first, uids.second));
-                        assert(count == std::distance(user_sids.first, user_sids.second));
-
-                        if (has_visibles) {
-                            assert(count == std::distance(visibles.first, visibles.second));
-                        }
-                    }
-#endif
-
                     osmium::util::DeltaDecode<int64_t> dense_id;
                     osmium::util::DeltaDecode<int64_t> dense_latitude;
                     osmium::util::DeltaDecode<int64_t> dense_longitude;
@@ -439,6 +422,12 @@ namespace osmium {
                     auto tag_it = tags.first;
 
                     while (ids.first != ids.second) {
+                        if (lons.first == lons.second ||
+                            lats.first == lats.second) {
+                            // this is against the spec, must have same number of elements
+                            throw osmium::pbf_error("PBF format error");
+                        }
+
                         bool visible = true;
 
                         osmium::builder::NodeBuilder builder(m_buffer);
@@ -447,12 +436,24 @@ namespace osmium {
                         node.set_id(dense_id.update(*ids.first++));
 
                         if (has_info) {
+                            if (versions.first == versions.second ||
+                                changesets.first == changesets.second ||
+                                timestamps.first == timestamps.second ||
+                                uids.first == uids.second ||
+                                user_sids.first == user_sids.second) {
+                                // this is against the spec, must have same number of elements
+                                throw osmium::pbf_error("PBF format error");
+                            }
                             node.set_version(static_cast<osmium::object_version_type>(*versions.first++));
                             node.set_changeset(static_cast<osmium::changeset_id_type>(dense_changeset.update(*changesets.first++)));
                             node.set_timestamp(dense_timestamp.update(*timestamps.first++) * m_date_factor);
                             node.set_uid_from_signed(static_cast<osmium::signed_user_id_type>(dense_uid.update(*uids.first++)));
 
                             if (has_visibles) {
+                                if (visibles.first == visibles.second) {
+                                    // this is against the spec, must have same number of elements
+                                    throw osmium::pbf_error("PBF format error");
+                                }
                                 visible = *visibles.first++;
                             }
                             node.set_visible(visible);
