@@ -597,19 +597,11 @@ namespace osmium {
                     return box;
             }
 
-            /**
-             * Decode HeaderBlock.
-             *
-             * @param header_block_data Input data
-             * @returns Header object
-             * @throws osmium::pbf_error If there was a parsing error
-             */
-            inline osmium::io::Header decode_header_block(const std::string& header_block_data) {
-                std::string output;
-                mapbox::util::pbf pbf_header_block(decode_blob(header_block_data, output));
-
+            inline osmium::io::Header decode_header_block(const ptr_len_type& data) {
                 osmium::io::Header header;
                 int i = 0;
+
+                mapbox::util::pbf pbf_header_block(data);
                 while (pbf_header_block.next()) {
                     switch (pbf_header_block.tag()) {
                         case 1: // optional HeaderBBox bbox
@@ -652,6 +644,19 @@ namespace osmium {
                 }
 
                 return header;
+            }
+
+            /**
+             * Decode HeaderBlock.
+             *
+             * @param header_block_data Input data
+             * @returns Header object
+             * @throws osmium::pbf_error If there was a parsing error
+             */
+            inline osmium::io::Header decode_header(const std::string& header_block_data) {
+                std::string output;
+
+                return decode_header_block(decode_blob(header_block_data, output));
             }
 
             class PBFBlobDecoder {
