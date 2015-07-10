@@ -92,7 +92,7 @@ namespace osmium {
                 output.resize(raw_size);
 
                 auto result = ::uncompress(
-                    reinterpret_cast<unsigned char*>(const_cast<char *>(output.data())),
+                    reinterpret_cast<unsigned char*>(&*output.begin()),
                     &raw_size,
                     reinterpret_cast<const unsigned char*>(input),
                     input_size
