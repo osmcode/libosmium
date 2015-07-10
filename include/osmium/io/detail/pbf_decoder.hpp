@@ -659,25 +659,25 @@ namespace osmium {
                 return decode_header_block(decode_blob(header_block_data, output));
             }
 
-            class PBFBlobDecoder {
+            class PBFDataBlobDecoder {
 
                 std::shared_ptr<std::string> m_input_buffer;
                 osmium::osm_entity_bits::type m_read_types;
 
             public:
 
-                PBFBlobDecoder(std::string&& input_buffer, osmium::osm_entity_bits::type read_types) :
+                PBFDataBlobDecoder(std::string&& input_buffer, osmium::osm_entity_bits::type read_types) :
                     m_input_buffer(std::make_shared<std::string>(std::move(input_buffer))),
                     m_read_types(read_types) {
                 }
 
-                PBFBlobDecoder(const PBFBlobDecoder&) = default;
-                PBFBlobDecoder& operator=(const PBFBlobDecoder&) = default;
+                PBFDataBlobDecoder(const PBFDataBlobDecoder&) = default;
+                PBFDataBlobDecoder& operator=(const PBFDataBlobDecoder&) = default;
 
-                PBFBlobDecoder(PBFBlobDecoder&&) = default;
-                PBFBlobDecoder& operator=(PBFBlobDecoder&&) = default;
+                PBFDataBlobDecoder(PBFDataBlobDecoder&&) = default;
+                PBFDataBlobDecoder& operator=(PBFDataBlobDecoder&&) = default;
 
-                ~PBFBlobDecoder() = default;
+                ~PBFDataBlobDecoder() = default;
 
                 osmium::memory::Buffer operator()() {
                     std::string output;
@@ -685,7 +685,7 @@ namespace osmium {
                     return decoder();
                 }
 
-            }; // class PBFBlobDecoder
+            }; // class PBFDataBlobDecoder
 
         } // namespace detail
 

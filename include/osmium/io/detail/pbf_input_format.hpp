@@ -193,11 +193,11 @@ namespace osmium {
                         }
 
                         if (m_use_thread_pool) {
-                            m_queue.push(osmium::thread::Pool::instance().submit(PBFBlobDecoder{ std::move(input_buffer), read_types }));
+                            m_queue.push(osmium::thread::Pool::instance().submit(PBFDataBlobDecoder{ std::move(input_buffer), read_types }));
                         } else {
                             std::promise<osmium::memory::Buffer> promise;
                             m_queue.push(promise.get_future());
-                            PBFBlobDecoder data_blob_parser{ std::move(input_buffer), read_types };
+                            PBFDataBlobDecoder data_blob_parser{ std::move(input_buffer), read_types };
                             promise.set_value(data_blob_parser());
                         }
 
