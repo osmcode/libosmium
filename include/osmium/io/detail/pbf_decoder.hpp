@@ -61,13 +61,14 @@ namespace osmium {
 
         namespace detail {
 
+            using ptr_len_type = std::pair<const char*, size_t>;
+
             class PBFPrimitiveBlockDecoder {
 
                 static constexpr size_t initial_buffer_size = 2 * 1024 * 1024;
 
-                std::pair<const char*, size_t> m_data;
-
-                std::vector<std::pair<const char*, size_t>> m_stringtable;
+                ptr_len_type m_data;
+                std::vector<ptr_len_type> m_stringtable;
 
                 int64_t m_lon_offset = 0;
                 int64_t m_lat_offset = 0;
@@ -78,10 +79,12 @@ namespace osmium {
 
                 osmium::memory::Buffer m_buffer { initial_buffer_size };
 
-                void decode_stringtable(mapbox::util::pbf&& pbf_string_table) {
+                void decode_stringtable(const ptr_len_type& data) {
                     if (!m_stringtable.empty()) {
                         throw osmium::pbf_error("more than one stringtable in pbf file");
                     }
+
+                    mapbox::util::pbf pbf_string_table(data);
                     while (pbf_string_table.next(1 /* repeated bytes s*/)) {
                         m_stringtable.push_back(pbf_string_table.get_data());
                     }
@@ -89,11 +92,10 @@ namespace osmium {
 
                 void decode_primitive_block_metadata() {
                     mapbox::util::pbf pbf_primitive_block(m_data);
-
                     while (pbf_primitive_block.next()) {
                         switch (pbf_primitive_block.tag()) {
                             case 1: // required StringTable stringtable
-                                decode_stringtable(std::move(pbf_primitive_block.get_message()));
+                                decode_stringtable(pbf_primitive_block.get_data());
                                 break;
                             case 17: // optional int32 granularity
                                 m_granularity = pbf_primitive_block.get_int32();
@@ -115,29 +117,28 @@ namespace osmium {
 
                 void decode_primitive_block_data() {
                     mapbox::util::pbf pbf_primitive_block(m_data);
-
                     while (pbf_primitive_block.next(2 /* repeated PrimitiveGroup primitivegroup */)) {
                         auto pbf_primitive_group = pbf_primitive_block.get_message();
                         while (pbf_primitive_group.next()) {
                             switch (pbf_primitive_group.tag()) {
                                 case 1: // repeated Node nodes
                                     if (m_read_types & osmium::osm_entity_bits::node) {
-                                        decode_node(std::move(pbf_primitive_group.get_message()));
+                                        decode_node(pbf_primitive_group.get_data());
                                     }
                                     break;
                                 case 2: // optional DenseNodes dense
                                     if (m_read_types & osmium::osm_entity_bits::node) {
-                                        decode_dense_nodes(std::move(pbf_primitive_group.get_message()));
+                                        decode_dense_nodes(pbf_primitive_group.get_data());
                                     }
                                     break;
                                 case 3: // repeated Way ways
                                     if (m_read_types & osmium::osm_entity_bits::way) {
-                                        decode_way(std::move(pbf_primitive_group.get_message()));
+                                        decode_way(pbf_primitive_group.get_data());
                                     }
                                     break;
                                 case 4: // repeated Relation relations
                                     if (m_read_types & osmium::osm_entity_bits::relation) {
-                                        decode_relation(std::move(pbf_primitive_group.get_message()));
+                                        decode_relation(pbf_primitive_group.get_data());
                                     }
                                     break;
                                 default:
@@ -147,9 +148,10 @@ namespace osmium {
                     }
                 }
 
-                std::pair<const char*, size_t> decode_info(osmium::OSMObject& object, mapbox::util::pbf&& pbf_info) {
+                ptr_len_type decode_info(const ptr_len_type& data, osmium::OSMObject& object) {
                     auto user = std::make_pair<const char*, size_t>("", 0);
 
+                    mapbox::util::pbf pbf_info(data);
                     while (pbf_info.next()) {
                         switch (pbf_info.tag()) {
                             case 1: // optional int32 version
@@ -178,15 +180,18 @@ namespace osmium {
                     return user;
                 }
 
-
                 using kv_type = std::pair<mapbox::util::pbf::const_uint32_iterator, mapbox::util::pbf::const_uint32_iterator>;
 
-                void decode_tags(osmium::builder::Builder& builder, const kv_type& keys, const kv_type& vals) {
+                void build_tag_list(osmium::builder::Builder& builder, const kv_type& keys, const kv_type& vals) {
                     if (keys.first != keys.second) {
                         osmium::builder::TagListBuilder tl_builder(m_buffer, &builder);
                         auto kit = keys.first;
                         auto vit = vals.first;
-                        while (kit != keys.second && vit != vals.second) {
+                        while (kit != keys.second) {
+                            if (vit == vals.second) {
+                                // this is against the spec, must have same number of elements
+                                throw osmium::pbf_error("PBF format error");
+                            }
                             const auto& k = m_stringtable.at(*kit++);
                             const auto& v = m_stringtable.at(*vit++);
                             tl_builder.add_tag(k.first, k.second, v.first, v.second);
@@ -194,13 +199,15 @@ namespace osmium {
                     }
                 }
 
-                void decode_node(mapbox::util::pbf&& pbf_node) {
+                void decode_node(const ptr_len_type& data) {
                     osmium::builder::NodeBuilder builder(m_buffer);
 
                     kv_type keys;
                     kv_type vals;
                     int64_t lon;
                     int64_t lat;
+
+                    mapbox::util::pbf pbf_node(data);
                     while (pbf_node.next()) {
                         switch (pbf_node.tag()) {
                             case 1: // required sint64 id
@@ -214,7 +221,7 @@ namespace osmium {
                                 break;
                             case 4: // Optional Info info
                                 {
-                                    const auto u = decode_info(builder.object(), std::move(pbf_node.get_message()));
+                                    const auto u = decode_info(pbf_node.get_data(), builder.object());
                                     builder.add_user(u.first, u.second);
                                 }
                                 break;
@@ -235,18 +242,19 @@ namespace osmium {
                                             (lat * m_granularity + m_lat_offset) / (lonlat_resolution / osmium::Location::coordinate_precision)));
                     }
 
-                    decode_tags(builder, keys, vals);
+                    build_tag_list(builder, keys, vals);
 
                     m_buffer.commit();
                 }
 
-                void decode_way(mapbox::util::pbf&& pbf_way) {
+                void decode_way(const ptr_len_type& data) {
                     osmium::builder::WayBuilder builder(m_buffer);
 
                     kv_type keys;
                     kv_type vals;
                     std::pair<mapbox::util::pbf::const_sint64_iterator, mapbox::util::pbf::const_sint64_iterator> refs;
 
+                    mapbox::util::pbf pbf_way(data);
                     while (pbf_way.next()) {
                         switch (pbf_way.tag()) {
                             case 1: // required int64 id
@@ -260,7 +268,7 @@ namespace osmium {
                                 break;
                             case 4: // optional Info info
                                 {
-                                    const auto u = decode_info(builder.object(), std::move(pbf_way.get_message()));
+                                    const auto u = decode_info(pbf_way.get_data(), builder.object());
                                     builder.add_user(u.first, u.second);
                                 }
                                 break;
@@ -280,12 +288,12 @@ namespace osmium {
                         }
                     }
 
-                    decode_tags(builder, keys, vals);
+                    build_tag_list(builder, keys, vals);
 
                     m_buffer.commit();
                 }
 
-                void decode_relation(mapbox::util::pbf&& pbf_relation) {
+                void decode_relation(const ptr_len_type& data) {
                     osmium::builder::RelationBuilder builder(m_buffer);
 
                     kv_type keys;
@@ -294,6 +302,7 @@ namespace osmium {
                     std::pair<mapbox::util::pbf::const_sint64_iterator, mapbox::util::pbf::const_sint64_iterator> refs;
                     std::pair<mapbox::util::pbf::const_int32_iterator,  mapbox::util::pbf::const_int32_iterator> types;
 
+                    mapbox::util::pbf pbf_relation(data);
                     while (pbf_relation.next()) {
                         switch (pbf_relation.tag()) {
                             case 1: // required int64 id
@@ -307,7 +316,7 @@ namespace osmium {
                                 break;
                             case 4: // optional Info info
                                 {
-                                    const auto u = decode_info(builder.object(), std::move(pbf_relation.get_message()));
+                                    const auto u = decode_info(pbf_relation.get_data(), builder.object());
                                     builder.add_user(u.first, u.second);
                                 }
                                 break;
@@ -339,12 +348,12 @@ namespace osmium {
                         }
                     }
 
-                    decode_tags(builder, keys, vals);
+                    build_tag_list(builder, keys, vals);
 
                     m_buffer.commit();
                 }
 
-                void decode_dense_nodes(mapbox::util::pbf&& pbf_dense_nodes) {
+                void decode_dense_nodes(const ptr_len_type& data) {
                     bool has_info     = false;
                     bool has_visibles = false;
 
@@ -361,6 +370,7 @@ namespace osmium {
                     std::pair<mapbox::util::pbf::const_sint32_iterator, mapbox::util::pbf::const_sint32_iterator> user_sids;
                     std::pair<mapbox::util::pbf::const_int32_iterator,  mapbox::util::pbf::const_int32_iterator>  visibles;
 
+                    mapbox::util::pbf pbf_dense_nodes(data);
                     while (pbf_dense_nodes.next()) {
                         switch (pbf_dense_nodes.tag()) {
                             case 1: // repeated sint64 id [packed = true] DELTA encoded
@@ -493,7 +503,7 @@ namespace osmium {
 
             public:
 
-                explicit PBFPrimitiveBlockDecoder(const std::pair<const char*, size_t>& data, osmium::osm_entity_bits::type read_types) :
+                explicit PBFPrimitiveBlockDecoder(const ptr_len_type& data, osmium::osm_entity_bits::type read_types) :
                     m_data(data),
                     m_read_types(read_types) {
                 }
@@ -519,11 +529,11 @@ namespace osmium {
 
             }; // class PBFPrimitiveBlockDecoder
 
-            inline std::pair<const char*, size_t> decode_blob(const std::string& blob_data, std::string& output) {
-                mapbox::util::pbf pbf_blob(blob_data);
-
+            inline ptr_len_type decode_blob(const std::string& blob_data, std::string& output) {
                 int32_t raw_size;
                 std::pair<const char*, mapbox::util::pbf_length_type> zlib_data;
+
+                mapbox::util::pbf pbf_blob(blob_data);
                 while (pbf_blob.next()) {
                     switch (pbf_blob.tag()) {
                         case 1: // optional bytes raw
@@ -555,11 +565,12 @@ namespace osmium {
                 throw osmium::pbf_error("blob contains no data");
             }
 
-            inline void parse_header_bbox(osmium::io::Header& header, mapbox::util::pbf&& pbf_header_bbox) {
+            inline osmium::Box decode_header_bbox(const ptr_len_type& data) {
                     const int64_t resolution_convert = lonlat_resolution / osmium::Location::coordinate_precision;
 
                     int64_t left, right, top, bottom;
 
+                    mapbox::util::pbf pbf_header_bbox(data);
                     while (pbf_header_bbox.next()) {
                         switch (pbf_header_bbox.tag()) {
                             case 1: // required sint64 left
@@ -582,7 +593,8 @@ namespace osmium {
                     osmium::Box box;
                     box.extend(osmium::Location(left  / resolution_convert, bottom / resolution_convert));
                     box.extend(osmium::Location(right / resolution_convert, top    / resolution_convert));
-                    header.add_box(box);
+
+                    return box;
             }
 
             /**
@@ -601,7 +613,7 @@ namespace osmium {
                 while (pbf_header_block.next()) {
                     switch (pbf_header_block.tag()) {
                         case 1: // optional HeaderBBox bbox
-                            parse_header_bbox(header, pbf_header_block.get_message());
+                            header.add_box(decode_header_bbox(pbf_header_block.get_data()));
                             break;
                         case 4: // repeated string required_features
                             {
