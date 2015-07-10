@@ -34,7 +34,7 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <cstddef>
-#include <new>
+#include <new> // IWYU pragma: keep
 #include <stdexcept>
 
 #include <osmium/util/memory_mapping.hpp>

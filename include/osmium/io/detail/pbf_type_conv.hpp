@@ -33,6 +33,8 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <stdexcept>
+
 #include <osmpbf/osmpbf.h>
 
 #include <osmium/osm/item_type.hpp>

@@ -33,7 +33,7 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <stdexcept>
+#include <string>
 
 // needed for htonl and ntohl
 #ifndef _WIN32
