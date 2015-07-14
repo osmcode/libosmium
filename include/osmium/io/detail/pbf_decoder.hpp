@@ -40,7 +40,7 @@ DEALINGS IN THE SOFTWARE.
 #include <algorithm>
 #include <iterator>
 
-#include <pbf_reader.hpp>
+#include <protozero/pbf_reader.hpp>
 
 #include <osmium/builder/osm_object_builder.hpp>
 #include <osmium/io/detail/pbf.hpp> // IWYU pragma: export
@@ -84,14 +84,14 @@ namespace osmium {
                         throw osmium::pbf_error("more than one stringtable in pbf file");
                     }
 
-                    mapbox::util::pbf pbf_string_table(data);
+                    protozero::pbf_reader pbf_string_table(data);
                     while (pbf_string_table.next(1 /* repeated bytes s*/)) {
                         m_stringtable.push_back(pbf_string_table.get_data());
                     }
                 }
 
                 void decode_primitive_block_metadata() {
-                    mapbox::util::pbf pbf_primitive_block(m_data);
+                    protozero::pbf_reader pbf_primitive_block(m_data);
                     while (pbf_primitive_block.next()) {
                         switch (pbf_primitive_block.tag()) {
                             case 1: // required StringTable stringtable
@@ -116,7 +116,7 @@ namespace osmium {
                 }
 
                 void decode_primitive_block_data() {
-                    mapbox::util::pbf pbf_primitive_block(m_data);
+                    protozero::pbf_reader pbf_primitive_block(m_data);
                     while (pbf_primitive_block.next(2 /* repeated PrimitiveGroup primitivegroup */)) {
                         auto pbf_primitive_group = pbf_primitive_block.get_message();
                         while (pbf_primitive_group.next()) {
@@ -151,7 +151,7 @@ namespace osmium {
                 ptr_len_type decode_info(const ptr_len_type& data, osmium::OSMObject& object) {
                     auto user = std::make_pair<const char*, size_t>("", 0);
 
-                    mapbox::util::pbf pbf_info(data);
+                    protozero::pbf_reader pbf_info(data);
                     while (pbf_info.next()) {
                         switch (pbf_info.tag()) {
                             case 1: // optional int32 version
@@ -180,7 +180,7 @@ namespace osmium {
                     return user;
                 }
 
-                using kv_type = std::pair<mapbox::util::pbf::const_uint32_iterator, mapbox::util::pbf::const_uint32_iterator>;
+                using kv_type = std::pair<protozero::pbf_reader::const_uint32_iterator, protozero::pbf_reader::const_uint32_iterator>;
 
                 void build_tag_list(osmium::builder::Builder& builder, const kv_type& keys, const kv_type& vals) {
                     if (keys.first != keys.second) {
@@ -207,7 +207,7 @@ namespace osmium {
                     int64_t lon;
                     int64_t lat;
 
-                    mapbox::util::pbf pbf_node(data);
+                    protozero::pbf_reader pbf_node(data);
                     while (pbf_node.next()) {
                         switch (pbf_node.tag()) {
                             case 1: // required sint64 id
@@ -252,9 +252,9 @@ namespace osmium {
 
                     kv_type keys;
                     kv_type vals;
-                    std::pair<mapbox::util::pbf::const_sint64_iterator, mapbox::util::pbf::const_sint64_iterator> refs;
+                    std::pair<protozero::pbf_reader::const_sint64_iterator, protozero::pbf_reader::const_sint64_iterator> refs;
 
-                    mapbox::util::pbf pbf_way(data);
+                    protozero::pbf_reader pbf_way(data);
                     while (pbf_way.next()) {
                         switch (pbf_way.tag()) {
                             case 1: // required int64 id
@@ -298,11 +298,11 @@ namespace osmium {
 
                     kv_type keys;
                     kv_type vals;
-                    std::pair<mapbox::util::pbf::const_int32_iterator,  mapbox::util::pbf::const_int32_iterator> roles;
-                    std::pair<mapbox::util::pbf::const_sint64_iterator, mapbox::util::pbf::const_sint64_iterator> refs;
-                    std::pair<mapbox::util::pbf::const_int32_iterator,  mapbox::util::pbf::const_int32_iterator> types;
+                    std::pair<protozero::pbf_reader::const_int32_iterator,  protozero::pbf_reader::const_int32_iterator> roles;
+                    std::pair<protozero::pbf_reader::const_sint64_iterator, protozero::pbf_reader::const_sint64_iterator> refs;
+                    std::pair<protozero::pbf_reader::const_int32_iterator,  protozero::pbf_reader::const_int32_iterator> types;
 
-                    mapbox::util::pbf pbf_relation(data);
+                    protozero::pbf_reader pbf_relation(data);
                     while (pbf_relation.next()) {
                         switch (pbf_relation.tag()) {
                             case 1: // required int64 id
@@ -357,20 +357,20 @@ namespace osmium {
                     bool has_info     = false;
                     bool has_visibles = false;
 
-                    std::pair<mapbox::util::pbf::const_sint64_iterator, mapbox::util::pbf::const_sint64_iterator> ids;
-                    std::pair<mapbox::util::pbf::const_sint64_iterator, mapbox::util::pbf::const_sint64_iterator> lats;
-                    std::pair<mapbox::util::pbf::const_sint64_iterator, mapbox::util::pbf::const_sint64_iterator> lons;
+                    std::pair<protozero::pbf_reader::const_sint64_iterator, protozero::pbf_reader::const_sint64_iterator> ids;
+                    std::pair<protozero::pbf_reader::const_sint64_iterator, protozero::pbf_reader::const_sint64_iterator> lats;
+                    std::pair<protozero::pbf_reader::const_sint64_iterator, protozero::pbf_reader::const_sint64_iterator> lons;
 
-                    std::pair<mapbox::util::pbf::const_int32_iterator,  mapbox::util::pbf::const_int32_iterator>  tags;
+                    std::pair<protozero::pbf_reader::const_int32_iterator,  protozero::pbf_reader::const_int32_iterator>  tags;
 
-                    std::pair<mapbox::util::pbf::const_int32_iterator,  mapbox::util::pbf::const_int32_iterator>  versions;
-                    std::pair<mapbox::util::pbf::const_sint64_iterator, mapbox::util::pbf::const_sint64_iterator> timestamps;
-                    std::pair<mapbox::util::pbf::const_sint64_iterator, mapbox::util::pbf::const_sint64_iterator> changesets;
-                    std::pair<mapbox::util::pbf::const_sint32_iterator, mapbox::util::pbf::const_sint32_iterator> uids;
-                    std::pair<mapbox::util::pbf::const_sint32_iterator, mapbox::util::pbf::const_sint32_iterator> user_sids;
-                    std::pair<mapbox::util::pbf::const_int32_iterator,  mapbox::util::pbf::const_int32_iterator>  visibles;
+                    std::pair<protozero::pbf_reader::const_int32_iterator,  protozero::pbf_reader::const_int32_iterator>  versions;
+                    std::pair<protozero::pbf_reader::const_sint64_iterator, protozero::pbf_reader::const_sint64_iterator> timestamps;
+                    std::pair<protozero::pbf_reader::const_sint64_iterator, protozero::pbf_reader::const_sint64_iterator> changesets;
+                    std::pair<protozero::pbf_reader::const_sint32_iterator, protozero::pbf_reader::const_sint32_iterator> uids;
+                    std::pair<protozero::pbf_reader::const_sint32_iterator, protozero::pbf_reader::const_sint32_iterator> user_sids;
+                    std::pair<protozero::pbf_reader::const_int32_iterator,  protozero::pbf_reader::const_int32_iterator>  visibles;
 
-                    mapbox::util::pbf pbf_dense_nodes(data);
+                    protozero::pbf_reader pbf_dense_nodes(data);
                     while (pbf_dense_nodes.next()) {
                         switch (pbf_dense_nodes.tag()) {
                             case 1: // repeated sint64 id [packed = true] DELTA encoded
@@ -531,9 +531,9 @@ namespace osmium {
 
             inline ptr_len_type decode_blob(const std::string& blob_data, std::string& output) {
                 int32_t raw_size;
-                std::pair<const char*, mapbox::util::pbf_length_type> zlib_data;
+                std::pair<const char*, protozero::pbf_length_type> zlib_data;
 
-                mapbox::util::pbf pbf_blob(blob_data);
+                protozero::pbf_reader pbf_blob(blob_data);
                 while (pbf_blob.next()) {
                     switch (pbf_blob.tag()) {
                         case 1: // optional bytes raw
@@ -570,7 +570,7 @@ namespace osmium {
 
                     int64_t left, right, top, bottom;
 
-                    mapbox::util::pbf pbf_header_bbox(data);
+                    protozero::pbf_reader pbf_header_bbox(data);
                     while (pbf_header_bbox.next()) {
                         switch (pbf_header_bbox.tag()) {
                             case 1: // required sint64 left
@@ -601,7 +601,7 @@ namespace osmium {
                 osmium::io::Header header;
                 int i = 0;
 
-                mapbox::util::pbf pbf_header_block(data);
+                protozero::pbf_reader pbf_header_block(data);
                 while (pbf_header_block.next()) {
                     switch (pbf_header_block.tag()) {
                         case 1: // optional HeaderBBox bbox

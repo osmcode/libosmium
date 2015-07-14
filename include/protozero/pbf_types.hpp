@@ -1,9 +1,24 @@
-#ifndef MAPBOX_UTIL_PBF_COMMON_HPP
-#define MAPBOX_UTIL_PBF_COMMON_HPP
+#ifndef PROTOZERO_PBF_TYPES_HPP
+#define PROTOZERO_PBF_TYPES_HPP
+
+/*****************************************************************************
+
+protozero - Minimalistic protocol buffer decoder and encoder in C++.
+
+This file is from https://github.com/mapbox/protozero where you can find more
+documentation.
+
+*****************************************************************************/
+
+/**
+ * @file pbf_types.hpp
+ *
+ * @brief Contains the declaration of low-level types used in the pbf format.
+ */
 
 #include <cstdint>
 
-namespace mapbox { namespace util {
+namespace protozero {
 
     /**
      * The type used for field tags (field numbers).
@@ -29,6 +44,6 @@ namespace mapbox { namespace util {
      */
     typedef uint32_t pbf_length_type;
 
-}} // end namespace mapbox::util
+} // end namespace protozero
 
-#endif // MAPBOX_UTIL_PBF_COMMON_HPP
+#endif // PROTOZERO_PBF_TYPES_HPP

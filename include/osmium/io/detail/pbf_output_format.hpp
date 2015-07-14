@@ -110,7 +110,7 @@ More complete outlines of real .osm.pbf files can be created using the osmpbf-ou
 #include <time.h>
 #include <utility>
 
-#include <pbf_writer.hpp>
+#include <protozero/pbf_writer.hpp>
 
 #include <osmium/handler.hpp>
 #include <osmium/io/detail/output_format.hpp>
@@ -173,7 +173,7 @@ namespace osmium {
              */
             inline std::string serialize_blob(const std::string& type, const std::string& msg, bool use_compression) {
                 std::string blob_data;
-                mapbox::util::pbf_writer pbf_blob(blob_data);
+                protozero::pbf_writer pbf_blob(blob_data);
 
                 if (!use_compression) {
                     pbf_blob.add_bytes(1 /* optional bytes raw */, msg);
@@ -186,7 +186,7 @@ namespace osmium {
                 }
 
                 std::string blob_header_data;
-                mapbox::util::pbf_writer pbf_blob_header(blob_header_data);
+                protozero::pbf_writer pbf_blob_header(blob_header_data);
 
                 pbf_blob_header.add_string(1 /* required string type */, type);
                 pbf_blob_header.add_int32(3 /* required int32 datasize */, blob_data.size());
@@ -250,7 +250,7 @@ namespace osmium {
                     return n;
                 }
 
-                void write(mapbox::util::pbf_writer& pbf_string_table) {
+                void write(protozero::pbf_writer& pbf_string_table) {
                     for (const auto& s : m_strings) {
                         pbf_string_table.add_bytes(1 /* repeated bytes s */, s);
                     }
@@ -346,12 +346,12 @@ namespace osmium {
 
                 std::string serialize() const {
                     std::string data;
-                    mapbox::util::pbf_writer pbf_dense_nodes(data);
+                    protozero::pbf_writer pbf_dense_nodes(data);
 
                     pbf_dense_nodes.add_packed_sint64(1 /* repeated sint64 id [packed = true] */, m_ids.cbegin(), m_ids.cend());
 
                     if (true) { // XXX
-                        mapbox::util::pbf_subwriter pbf_dense_info(pbf_dense_nodes, 5 /* optional DenseInfo densinfo */);
+                        protozero::pbf_subwriter pbf_dense_info(pbf_dense_nodes, 5 /* optional DenseInfo densinfo */);
                         pbf_dense_nodes.add_packed_int32(1 /* repeated int32 version [packed = true] */, m_versions.cbegin(), m_versions.cend());
                         pbf_dense_nodes.add_packed_sint64(2 /* repeated sint64 timestamp [packed = true] */, m_timestamps.cbegin(), m_timestamps.cend());
                         pbf_dense_nodes.add_packed_sint64(3 /* repeated sint64 changeset [packed = true] */, m_changesets.cbegin(), m_changesets.cend());
@@ -378,7 +378,7 @@ namespace osmium {
                 std::string m_pbf_primitive_group_data;
                 Stringtable m_stringtable;
                 DenseNodes m_dense_nodes;
-                mapbox::util::pbf_writer m_pbf_primitive_group;
+                protozero::pbf_writer m_pbf_primitive_group;
                 int m_type;
                 int m_count;
 
@@ -408,7 +408,7 @@ namespace osmium {
                     m_count = 0;
                 }
 
-                void write_stringtable(mapbox::util::pbf_writer& pbf) {
+                void write_stringtable(protozero::pbf_writer& pbf) {
                     m_stringtable.write(pbf);
                 }
 
@@ -511,7 +511,7 @@ namespace osmium {
                     return false;
                 }
 
-                class pbf_primitive_block_writer : public mapbox::util::pbf_writer {
+                class pbf_primitive_block_writer : public protozero::pbf_writer {
 
                 public:
 
@@ -521,7 +521,7 @@ namespace osmium {
 
                     void set_stringtable(PBFPrimitiveBlock& block) {
                         std::string data;
-                        mapbox::util::pbf_writer w(data);
+                        protozero::pbf_writer w(data);
 
                         block.write_stringtable(w);
 
@@ -544,10 +544,10 @@ namespace osmium {
                     }
 
                     std::string primitive_block_data;
-                    mapbox::util::pbf_writer pbf_primitive_block(primitive_block_data);
+                    protozero::pbf_writer pbf_primitive_block(primitive_block_data);
 
                     {
-                        mapbox::util::pbf_subwriter pbf_string_table(pbf_primitive_block, 1 /* required StringTable stringtable */);
+                        protozero::pbf_subwriter pbf_string_table(pbf_primitive_block, 1 /* required StringTable stringtable */);
                         m_pbf_primitive_block.write_stringtable(pbf_primitive_block);
                     }
 
@@ -558,7 +558,7 @@ namespace osmium {
                     promise.set_value(serialize_blob("OSMData", primitive_block_data, m_use_compression));
                 }
 
-                void add_common_info(const osmium::OSMObject& object, mapbox::util::pbf_writer& pbf_object) {
+                void add_common_info(const osmium::OSMObject& object, protozero::pbf_writer& pbf_object) {
                     std::vector<uint32_t> keys;
                     std::vector<uint32_t> vals;
                     for (const auto& tag : object.tags()) {
@@ -569,7 +569,7 @@ namespace osmium {
                     pbf_object.add_packed_uint32(3 /* vals */, vals.cbegin(), vals.cend());
 
                     if (m_should_add_metadata) {
-                        mapbox::util::pbf_subwriter pbf_info(pbf_object, 4 /* info */);
+                        protozero::pbf_subwriter pbf_info(pbf_object, 4 /* info */);
 
                         pbf_object.add_int32(1 /* version */, object.version());
                         pbf_object.add_int64(2 /* timestamp */, object.timestamp());
@@ -611,10 +611,10 @@ namespace osmium {
 
                 void write_header(const osmium::io::Header& header) override final {
                     std::string data;
-                    mapbox::util::pbf_writer pbf_header_block(data);
+                    protozero::pbf_writer pbf_header_block(data);
 
                     if (!header.boxes().empty()) {
-                        mapbox::util::pbf_subwriter pbf_header_bbox(pbf_header_block, 1 /* bbox */);
+                        protozero::pbf_subwriter pbf_header_bbox(pbf_header_block, 1 /* bbox */);
 
                         osmium::Box box = header.joined_boxes();
                         pbf_header_block.add_sint64(1 /* left */, box.bottom_left().lon() * lonlat_resolution);
@@ -689,7 +689,7 @@ namespace osmium {
                     primitive_block_type(1);
 
                     std::string data;
-                    mapbox::util::pbf_writer pbf_node(data);
+                    protozero::pbf_writer pbf_node(data);
 
                     pbf_node.add_sint64(1 /* id */, node.id());
                     add_common_info(node, pbf_node);
@@ -711,7 +711,7 @@ namespace osmium {
                     primitive_block_type(3);
 
                     std::string data;
-                    mapbox::util::pbf_writer pbf_way(data);
+                    protozero::pbf_writer pbf_way(data);
 
                     pbf_way.add_int64(1 /* id */, way.id());
                     add_common_info(way, pbf_way);
@@ -738,7 +738,7 @@ namespace osmium {
                     primitive_block_type(4);
 
                     std::string data;
-                    mapbox::util::pbf_writer pbf_relation(data);
+                    protozero::pbf_writer pbf_relation(data);
 
                     pbf_relation.add_int64(1 /* id */, relation.id());
                     add_common_info(relation, pbf_relation);

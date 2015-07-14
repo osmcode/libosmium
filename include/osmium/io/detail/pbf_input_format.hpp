@@ -49,7 +49,7 @@ DEALINGS IN THE SOFTWARE.
 #include <thread>
 #include <type_traits>
 
-#include <pbf_reader.hpp>
+#include <protozero/pbf_reader.hpp>
 
 #include <osmium/io/detail/input_format.hpp>
 #include <osmium/io/detail/pbf.hpp> // IWYU pragma: export
@@ -142,7 +142,7 @@ namespace osmium {
                  * Decode the BlobHeader. Make sure it contains the expected
                  * type. Return the size of the following Blob.
                  */
-                size_t decode_blob_header(mapbox::util::pbf&& pbf_blob_header, const char* expected_type) {
+                size_t decode_blob_header(protozero::pbf_reader&& pbf_blob_header, const char* expected_type) {
                     std::pair<const char*, size_t> blob_header_type;
                     size_t blob_header_datasize = 0;
 
@@ -180,7 +180,7 @@ namespace osmium {
 
                     std::string blob_header = read_from_input_queue(size);
 
-                    return decode_blob_header(mapbox::util::pbf(blob_header), expected_type);
+                    return decode_blob_header(protozero::pbf_reader(blob_header), expected_type);
                 }
 
                 void parse_osm_data(osmium::osm_entity_bits::type read_types) {

@@ -1,17 +1,20 @@
-#ifndef MAPBOX_UTIL_PBF_READER_HPP
-#define MAPBOX_UTIL_PBF_READER_HPP
+#ifndef PROTOZERO_PBF_READER_HPP
+#define PROTOZERO_PBF_READER_HPP
 
 /*****************************************************************************
 
-Minimalistic fast C++ decoder for a subset of the protocol buffer format.
+protozero - Minimalistic protocol buffer decoder and encoder in C++.
 
-This is header-only, meaning there is nothing to build. Just include this file
-in your C++ application.
-
-This file is from https://github.com/mapbox/pbf.hpp where you can find more
+This file is from https://github.com/mapbox/protozero where you can find more
 documentation.
 
 *****************************************************************************/
+
+/**
+ * @file pbf_reader.hpp
+ *
+ * @brief Contains the pbf_reader class.
+ */
 
 #if __BYTE_ORDER != __LITTLE_ENDIAN
 # error "This code only works on little endian machines."
@@ -21,18 +24,20 @@ documentation.
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
-#include <exception>
 #include <iterator>
 #include <string>
 #include <utility>
 
-#include "pbf_common.hpp"
+#include <protozero/pbf_types.hpp>
+#include <protozero/exception.hpp>
+#include <protozero/varint.hpp>
 
+/// Wrapper for assert() used for testing
 #ifndef pbf_assert
 # define pbf_assert(x) assert(x)
 #endif
 
-namespace mapbox { namespace util {
+namespace protozero {
 
 /**
  * This class represents a protobuf message. Either a top-level message or
@@ -42,60 +47,19 @@ namespace mapbox { namespace util {
  * @code
  *    std::string buffer;
  *    // fill buffer...
- *    pbf message(buffer.data(), buffer.size());
+ *    pbf_reader message(buffer.data(), buffer.size());
  * @endcode
  *
  * Sub-messages are created using get_message():
  *
  * @code
- *    pbf message(...);
+ *    pbf_reader message(...);
  *    message.next();
- *    pbf submessage = message.get_message();
+ *    pbf_reader submessage = message.get_message();
  * @endcode
  *
  */
-class pbf {
-
-    // The maximum length of a 64bit varint.
-    static const int8_t max_varint_length = sizeof(uint64_t) * 8 / 7 + 1;
-
-    // from https://github.com/facebook/folly/blob/master/folly/Varint.h
-    static uint64_t decode_varint(const char** data, const char* end) {
-        const int8_t* begin = reinterpret_cast<const int8_t*>(*data);
-        const int8_t* iend = reinterpret_cast<const int8_t*>(end);
-        const int8_t* p = begin;
-        uint64_t val = 0;
-
-        if (iend - begin >= max_varint_length) {  // fast path
-            do {
-                int64_t b;
-                b = *p++; val  = uint64_t((b & 0x7f)      ); if (b >= 0) break;
-                b = *p++; val |= uint64_t((b & 0x7f) <<  7); if (b >= 0) break;
-                b = *p++; val |= uint64_t((b & 0x7f) << 14); if (b >= 0) break;
-                b = *p++; val |= uint64_t((b & 0x7f) << 21); if (b >= 0) break;
-                b = *p++; val |= uint64_t((b & 0x7f) << 28); if (b >= 0) break;
-                b = *p++; val |= uint64_t((b & 0x7f) << 35); if (b >= 0) break;
-                b = *p++; val |= uint64_t((b & 0x7f) << 42); if (b >= 0) break;
-                b = *p++; val |= uint64_t((b & 0x7f) << 49); if (b >= 0) break;
-                b = *p++; val |= uint64_t((b & 0x7f) << 56); if (b >= 0) break;
-                b = *p++; val |= uint64_t((b & 0x7f) << 63); if (b >= 0) break;
-                throw varint_too_long_exception();
-            } while (false);
-        } else {
-            int shift = 0;
-            while (p != iend && *p < 0) {
-                val |= uint64_t(*p++ & 0x7f) << shift;
-                shift += 7;
-            }
-            if (p == iend) {
-                throw end_of_buffer_exception();
-            }
-            val |= uint64_t(*p++) << shift;
-        }
-
-        *data = reinterpret_cast<const char*>(p);
-        return val;
-    }
+class pbf_reader {
 
     // A pointer to the next unread data.
     const char *m_data = nullptr;
@@ -123,99 +87,57 @@ class pbf {
 public:
 
     /**
-     * Decodes a 32 bit ZigZag-encoded integer.
-     *
-     * This is a helper function used inside the pbf class, but could be
-     * useful in other contexts.
-     */
-    static inline int32_t decode_zigzag32(uint32_t value) noexcept;
-
-    /**
-     * Decodes a 64 bit ZigZag-encoded integer.
-     *
-     * This is a helper function used inside the pbf class, but could be
-     * useful in other contexts.
-     */
-    static inline int64_t decode_zigzag64(uint64_t value) noexcept;
-
-    /**
-     * All exceptions thrown by the functions of the pbf class derive from
-     * this exception.
-     */
-    struct exception : std::exception {
-        /// Returns the explanatory string.
-        const char *what() const noexcept { return "pbf exception"; }
-    };
-
-    /**
-     * This exception is thrown when parsing a varint thats larger than allowed.
-     * This should never happen unless the data is corrupted.
-     * After the exception the pbf object is in an unknown
-     * state and you cannot recover from that.
-     */
-    struct varint_too_long_exception : exception {
-        /// Returns the explanatory string.
-        const char *what() const noexcept { return "pbf varint too long exception"; }
-    };
-
-    /**
-     * This exception is thrown when the type of a field is unknown.
-     * This should never happen unless the data is corrupted.
-     * After the exception the pbf object is in an unknown
-     * state and you cannot recover from that.
-     */
-    struct unknown_field_type_exception : exception {
-        /// Returns the explanatory string.
-        const char *what() const noexcept { return "pbf unknown field type exception"; }
-    };
-
-    /**
-     * This exception is thrown when we are trying to read a field and there
-     * are not enough bytes left in the buffer to read it. Almost all functions
-     * can throw this exception.
-     * This should never happen unless the data is corrupted or you have
-     * initialized the pbf object with incomplete data.
-     * After the exception the pbf object is in an unknown
-     * state and you cannot recover from that.
-     */
-    struct end_of_buffer_exception : exception {
-        /// Returns the explanatory string.
-        const char *what() const noexcept { return "pbf end of buffer exception"; }
-    };
-
-    /**
-     * Construct a pbf message from a data pointer and a length. The pointer
-     * will be stored inside the pbf object, no data is copied. So you must
-     * make sure the buffer stays valid as long as the pbf object is used.
+     * Construct a pbf_reader message from a data pointer and a length. The pointer
+     * will be stored inside the pbf_reader object, no data is copied. So you must
+     * make sure the buffer stays valid as long as the pbf_reader object is used.
      *
      * The buffer must contain a complete protobuf message.
      *
      * @post There is no current field.
      */
-    inline pbf(const char *data, size_t length);
-
-    inline pbf(std::pair<const char *, size_t> data);
-
-    inline pbf(const std::string& data);
-
-    inline pbf() = default;
-
-    /// pbf messages can be copied trivially.
-    inline pbf(const pbf&) = default;
-
-    /// pbf messages can be moved trivially.
-    inline pbf(pbf&&) = default;
-
-    /// pbf messages can be copied trivially.
-    inline pbf& operator=(const pbf& other) = default;
-
-    /// pbf messages can be moved trivially.
-    inline pbf& operator=(pbf&& other) = default;
-
-    inline ~pbf() = default;
+    inline pbf_reader(const char *data, size_t length);
 
     /**
-     * In a boolean context the pbf class evaluates to `true` if there are
+     * Construct a pbf_reader message from a data pointer and a length. The pointer
+     * will be stored inside the pbf_reader object, no data is copied. So you must
+     * make sure the buffer stays valid as long as the pbf_reader object is used.
+     *
+     * The buffer must contain a complete protobuf message.
+     *
+     * @post There is no current field.
+     */
+    inline pbf_reader(std::pair<const char *, size_t> data);
+
+    /**
+     * Construct a pbf_reader message from a std::string. A pointer to the string
+     * internals will be stored inside the pbf_reader object, no data is copied.
+     * So you must make sure the string is unchanged as long as the pbf_reader
+     * object is used.
+     *
+     * The string must contain a complete protobuf message.
+     *
+     * @post There is no current field.
+     */
+    inline pbf_reader(const std::string& data);
+
+    inline pbf_reader() = default;
+
+    /// pbf_reader messages can be copied trivially.
+    inline pbf_reader(const pbf_reader&) = default;
+
+    /// pbf_reader messages can be moved trivially.
+    inline pbf_reader(pbf_reader&&) = default;
+
+    /// pbf_reader messages can be copied trivially.
+    inline pbf_reader& operator=(const pbf_reader& other) = default;
+
+    /// pbf_reader messages can be moved trivially.
+    inline pbf_reader& operator=(pbf_reader&& other) = default;
+
+    inline ~pbf_reader() = default;
+
+    /**
+     * In a boolean context the pbf_reader class evaluates to `true` if there are
      * still fields available and to `false` if the last field has been read.
      */
     inline operator bool() const noexcept;
@@ -238,7 +160,7 @@ public:
      * called in a while loop:
      *
      * @code
-     *    pbf message(...);
+     *    pbf_reader message(...);
      *    while (message.next()) {
      *        // handle field
      *    }
@@ -256,7 +178,7 @@ public:
      * loop for repeated fields:
      *
      * @code
-     *    pbf message(...);
+     *    pbf_reader message(...);
      *    while (message.next(17)) {
      *        // handle field
      *    }
@@ -265,7 +187,7 @@ public:
      * or you can call it just once to get the one field with this tag:
      *
      * @code
-     *    pbf message(...);
+     *    pbf_reader message(...);
      *    if (message.next(17)) {
      *        // handle field
      *    }
@@ -508,7 +430,7 @@ public:
      * @pre The current field must be of type "message".
      * @post The current field was consumed and there is no current field now.
      */
-    inline pbf get_message();
+    inline pbf_reader get_message();
 
     ///@}
 
@@ -695,7 +617,7 @@ public:
      * @pre The current field must be of type "repeated packed bool".
      * @post The current field was consumed and there is no current field now.
      */
-    inline std::pair<pbf::const_bool_iterator, pbf::const_bool_iterator> get_packed_bool();
+    inline std::pair<pbf_reader::const_bool_iterator, pbf_reader::const_bool_iterator> get_packed_bool();
 
     /**
      * Consume current "repeated packed enum" field.
@@ -706,7 +628,7 @@ public:
      * @pre The current field must be of type "repeated packed enum".
      * @post The current field was consumed and there is no current field now.
      */
-    inline std::pair<pbf::const_enum_iterator, pbf::const_enum_iterator> get_packed_enum();
+    inline std::pair<pbf_reader::const_enum_iterator, pbf_reader::const_enum_iterator> get_packed_enum();
 
     /**
      * Consume current "repeated packed int32" field.
@@ -717,7 +639,7 @@ public:
      * @pre The current field must be of type "repeated packed int32".
      * @post The current field was consumed and there is no current field now.
      */
-    inline std::pair<pbf::const_int32_iterator, pbf::const_int32_iterator> get_packed_int32();
+    inline std::pair<pbf_reader::const_int32_iterator, pbf_reader::const_int32_iterator> get_packed_int32();
 
     /**
      * Consume current "repeated packed uint32" field.
@@ -728,7 +650,7 @@ public:
      * @pre The current field must be of type "repeated packed uint32".
      * @post The current field was consumed and there is no current field now.
      */
-    inline std::pair<pbf::const_uint32_iterator, pbf::const_uint32_iterator> get_packed_uint32();
+    inline std::pair<pbf_reader::const_uint32_iterator, pbf_reader::const_uint32_iterator> get_packed_uint32();
 
     /**
      * Consume current "repeated packed sint32" field.
@@ -739,7 +661,7 @@ public:
      * @pre The current field must be of type "repeated packed sint32".
      * @post The current field was consumed and there is no current field now.
      */
-    inline std::pair<pbf::const_sint32_iterator, pbf::const_sint32_iterator> get_packed_sint32();
+    inline std::pair<pbf_reader::const_sint32_iterator, pbf_reader::const_sint32_iterator> get_packed_sint32();
 
     /**
      * Consume current "repeated packed int64" field.
@@ -750,7 +672,7 @@ public:
      * @pre The current field must be of type "repeated packed int64".
      * @post The current field was consumed and there is no current field now.
      */
-    inline std::pair<pbf::const_int64_iterator, pbf::const_int64_iterator> get_packed_int64();
+    inline std::pair<pbf_reader::const_int64_iterator, pbf_reader::const_int64_iterator> get_packed_int64();
 
     /**
      * Consume current "repeated packed uint64" field.
@@ -761,7 +683,7 @@ public:
      * @pre The current field must be of type "repeated packed uint64".
      * @post The current field was consumed and there is no current field now.
      */
-    inline std::pair<pbf::const_uint64_iterator, pbf::const_uint64_iterator> get_packed_uint64();
+    inline std::pair<pbf_reader::const_uint64_iterator, pbf_reader::const_uint64_iterator> get_packed_uint64();
 
     /**
      * Consume current "repeated packed sint64" field.
@@ -772,38 +694,38 @@ public:
      * @pre The current field must be of type "repeated packed sint64".
      * @post The current field was consumed and there is no current field now.
      */
-    inline std::pair<pbf::const_sint64_iterator, pbf::const_sint64_iterator> get_packed_sint64();
+    inline std::pair<pbf_reader::const_sint64_iterator, pbf_reader::const_sint64_iterator> get_packed_sint64();
 
     ///@}
 
-}; // class pbf
+}; // class pbf_reader
 
-pbf::pbf(const char *data, size_t length)
+pbf_reader::pbf_reader(const char *data, size_t length)
     : m_data(data),
       m_end(data + length),
       m_wire_type(pbf_wire_type::unknown),
       m_tag(0) {
 }
 
-pbf::pbf(std::pair<const char *, size_t> data)
+pbf_reader::pbf_reader(std::pair<const char *, size_t> data)
     : m_data(data.first),
       m_end(data.first + data.second),
       m_wire_type(pbf_wire_type::unknown),
       m_tag(0) {
 }
 
-pbf::pbf(const std::string& data)
+pbf_reader::pbf_reader(const std::string& data)
     : m_data(data.data()),
       m_end(data.data() + data.size()),
       m_wire_type(pbf_wire_type::unknown),
       m_tag(0) {
 }
 
-pbf::operator bool() const noexcept {
+pbf_reader::operator bool() const noexcept {
     return m_data < m_end;
 }
 
-bool pbf::next() {
+bool pbf_reader::next() {
     if (m_data < m_end) {
         auto value = get_varint<uint32_t>();
         m_tag = value >> 3;
@@ -820,7 +742,7 @@ bool pbf::next() {
     return false;
 }
 
-bool pbf::next(pbf_tag_type requested_tag) {
+bool pbf_reader::next(pbf_tag_type requested_tag) {
     while (next()) {
         if (m_tag == requested_tag) {
             return true;
@@ -831,19 +753,19 @@ bool pbf::next(pbf_tag_type requested_tag) {
     return false;
 }
 
-pbf_tag_type pbf::tag() const noexcept {
+pbf_tag_type pbf_reader::tag() const noexcept {
     return m_tag;
 }
 
-pbf_wire_type pbf::wire_type() const noexcept {
+pbf_wire_type pbf_reader::wire_type() const noexcept {
     return m_wire_type;
 }
 
-bool pbf::has_wire_type(pbf_wire_type type) const noexcept {
+bool pbf_reader::has_wire_type(pbf_wire_type type) const noexcept {
     return wire_type() == type;
 }
 
-void pbf::skip_bytes(pbf_length_type len) {
+void pbf_reader::skip_bytes(pbf_length_type len) {
     if (m_data + len > m_end) {
         throw end_of_buffer_exception();
     }
@@ -856,7 +778,7 @@ void pbf::skip_bytes(pbf_length_type len) {
 #endif
 }
 
-void pbf::skip() {
+void pbf_reader::skip() {
     pbf_assert(tag() != 0 && "call next() before calling skip()");
     switch (wire_type()) {
         case pbf_wire_type::varint:
@@ -872,80 +794,72 @@ void pbf::skip() {
             skip_bytes(4);
             break;
         default:
-            throw unknown_field_type_exception();
+            throw unknown_pbf_field_type_exception();
     }
 }
 
-pbf_length_type pbf::get_len_and_skip() {
+pbf_length_type pbf_reader::get_len_and_skip() {
     auto len = get_length();
     skip_bytes(len);
     return len;
 }
 
-inline int32_t pbf::decode_zigzag32(uint32_t value) noexcept {
-    return int32_t(value >> 1) ^ -int32_t(value & 1);
-}
-
-inline int64_t pbf::decode_zigzag64(uint64_t value) noexcept {
-    return int64_t(value >> 1) ^ -int64_t(value & 1);
-}
-
 template <typename T>
-T pbf::get_varint() {
+T pbf_reader::get_varint() {
     return static_cast<T>(decode_varint(&m_data, m_end));
 }
 
 template <typename T>
-T pbf::get_svarint() {
+T pbf_reader::get_svarint() {
     pbf_assert((has_wire_type(pbf_wire_type::varint) || has_wire_type(pbf_wire_type::length_delimited)) && "not a varint");
     return static_cast<T>(decode_zigzag64(decode_varint(&m_data, m_end)));
 }
 
 template <typename T>
-T pbf::get_fixed() {
+T pbf_reader::get_fixed() {
     skip_bytes(sizeof(T));
     T result;
     memcpy(&result, m_data - sizeof(T), sizeof(T));
     return result;
 }
 
-uint32_t pbf::get_fixed32() {
+uint32_t pbf_reader::get_fixed32() {
     pbf_assert(tag() != 0 && "call next() before accessing field value");
     pbf_assert(has_wire_type(pbf_wire_type::fixed32) && "not a 32-bit fixed");
     return get_fixed<uint32_t>();
 }
 
-int32_t pbf::get_sfixed32() {
+int32_t pbf_reader::get_sfixed32() {
     pbf_assert(tag() != 0 && "call next() before accessing field value");
     pbf_assert(has_wire_type(pbf_wire_type::fixed32) && "not a 32-bit fixed");
     return get_fixed<int32_t>();
 }
 
-uint64_t pbf::get_fixed64() {
+uint64_t pbf_reader::get_fixed64() {
     pbf_assert(tag() != 0 && "call next() before accessing field value");
     pbf_assert(has_wire_type(pbf_wire_type::fixed64) && "not a 64-bit fixed");
     return get_fixed<uint64_t>();
 }
 
-int64_t pbf::get_sfixed64() {
+int64_t pbf_reader::get_sfixed64() {
     pbf_assert(tag() != 0 && "call next() before accessing field value");
     pbf_assert(has_wire_type(pbf_wire_type::fixed64) && "not a 64-bit fixed");
     return get_fixed<int64_t>();
 }
 
-float pbf::get_float() {
+float pbf_reader::get_float() {
     pbf_assert(tag() != 0 && "call next() before accessing field value");
     pbf_assert(has_wire_type(pbf_wire_type::fixed32) && "not a 32-bit fixed");
     return get_fixed<float>();
 }
 
-double pbf::get_double() {
+double pbf_reader::get_double() {
     pbf_assert(tag() != 0 && "call next() before accessing field value");
     pbf_assert(has_wire_type(pbf_wire_type::fixed64) && "not a 64-bit fixed");
     return get_fixed<double>();
 }
 
-bool pbf::get_bool() {
+bool pbf_reader::get_bool() {
     pbf_assert(tag() != 0 && "call next() before accessing field value");
     pbf_assert(has_wire_type(pbf_wire_type::varint) && "not a varint");
     pbf_assert((*m_data & 0x80) == 0 && "not a 1 byte varint");
@@ -953,101 +867,101 @@ bool pbf::get_bool() {
     return m_data[-1] != 0; // -1 okay because we incremented m_data the line before
 }
 
-std::pair<const char*, pbf_length_type> pbf::get_data() {
+std::pair<const char*, pbf_length_type> pbf_reader::get_data() {
     pbf_assert(tag() != 0 && "call next() before accessing field value");
     pbf_assert(has_wire_type(pbf_wire_type::length_delimited) && "not of type string, bytes or message");
     auto len = get_len_and_skip();
     return std::make_pair(m_data-len, len);
 }
 
-std::string pbf::get_bytes() {
+std::string pbf_reader::get_bytes() {
     auto d = get_data();
     return std::string(d.first, d.second);
 }
 
-std::string pbf::get_string() {
+std::string pbf_reader::get_string() {
     return get_bytes();
 }
 
-pbf pbf::get_message() {
+pbf_reader pbf_reader::get_message() {
     auto d = get_data();
-    return pbf(d.first, d.second);
+    return pbf_reader(d.first, d.second);
 }
 
 template <typename T>
-std::pair<const T*, const T*> pbf::packed_fixed() {
+std::pair<const T*, const T*> pbf_reader::packed_fixed() {
     pbf_assert(tag() != 0 && "call next() before accessing field value");
     auto len = get_len_and_skip();
     pbf_assert(len % sizeof(T) == 0);
     return std::make_pair(reinterpret_cast<const T*>(m_data-len), reinterpret_cast<const T*>(m_data));
 }
 
-std::pair<const uint32_t*, const uint32_t*> pbf::get_packed_fixed32() {
+std::pair<const uint32_t*, const uint32_t*> pbf_reader::get_packed_fixed32() {
     return packed_fixed<uint32_t>();
 }
 
-std::pair<const uint64_t*, const uint64_t*> pbf::get_packed_fixed64() {
+std::pair<const uint64_t*, const uint64_t*> pbf_reader::get_packed_fixed64() {
     return packed_fixed<uint64_t>();
 }
 
-std::pair<const int32_t*, const int32_t*> pbf::get_packed_sfixed32() {
+std::pair<const int32_t*, const int32_t*> pbf_reader::get_packed_sfixed32() {
     return packed_fixed<int32_t>();
 }
 
-std::pair<const int64_t*, const int64_t*> pbf::get_packed_sfixed64() {
+std::pair<const int64_t*, const int64_t*> pbf_reader::get_packed_sfixed64() {
     return packed_fixed<int64_t>();
 }
 
-std::pair<pbf::const_bool_iterator, pbf::const_bool_iterator> pbf::get_packed_bool() {
+std::pair<pbf_reader::const_bool_iterator, pbf_reader::const_bool_iterator> pbf_reader::get_packed_bool() {
     return get_packed_int32();
 }
 
-std::pair<pbf::const_enum_iterator, pbf::const_enum_iterator> pbf::get_packed_enum() {
+std::pair<pbf_reader::const_enum_iterator, pbf_reader::const_enum_iterator> pbf_reader::get_packed_enum() {
     return get_packed_int32();
 }
 
-std::pair<pbf::const_int32_iterator, pbf::const_int32_iterator> pbf::get_packed_int32() {
+std::pair<pbf_reader::const_int32_iterator, pbf_reader::const_int32_iterator> pbf_reader::get_packed_int32() {
     pbf_assert(tag() != 0 && "call next() before accessing field value");
     auto len = get_len_and_skip();
-    return std::make_pair(pbf::const_int32_iterator(m_data-len, m_data),
-                          pbf::const_int32_iterator(m_data, m_data));
+    return std::make_pair(pbf_reader::const_int32_iterator(m_data-len, m_data),
+                          pbf_reader::const_int32_iterator(m_data, m_data));
 }
 
-std::pair<pbf::const_uint32_iterator, pbf::const_uint32_iterator> pbf::get_packed_uint32() {
+std::pair<pbf_reader::const_uint32_iterator, pbf_reader::const_uint32_iterator> pbf_reader::get_packed_uint32() {
     pbf_assert(tag() != 0 && "call next() before accessing field value");
     auto len = get_len_and_skip();
-    return std::make_pair(pbf::const_uint32_iterator(m_data-len, m_data),
-                          pbf::const_uint32_iterator(m_data, m_data));
+    return std::make_pair(pbf_reader::const_uint32_iterator(m_data-len, m_data),
+                          pbf_reader::const_uint32_iterator(m_data, m_data));
 }
 
-std::pair<pbf::const_sint32_iterator, pbf::const_sint32_iterator> pbf::get_packed_sint32() {
+std::pair<pbf_reader::const_sint32_iterator, pbf_reader::const_sint32_iterator> pbf_reader::get_packed_sint32() {
     pbf_assert(tag() != 0 && "call next() before accessing field value");
     auto len = get_len_and_skip();
-    return std::make_pair(pbf::const_sint32_iterator(m_data-len, m_data),
-                          pbf::const_sint32_iterator(m_data, m_data));
+    return std::make_pair(pbf_reader::const_sint32_iterator(m_data-len, m_data),
+                          pbf_reader::const_sint32_iterator(m_data, m_data));
 }
 
-std::pair<pbf::const_int64_iterator, pbf::const_int64_iterator> pbf::get_packed_int64() {
+std::pair<pbf_reader::const_int64_iterator, pbf_reader::const_int64_iterator> pbf_reader::get_packed_int64() {
     pbf_assert(tag() != 0 && "call next() before accessing field value");
     auto len = get_len_and_skip();
-    return std::make_pair(pbf::const_int64_iterator(m_data-len, m_data),
-                          pbf::const_int64_iterator(m_data, m_data));
+    return std::make_pair(pbf_reader::const_int64_iterator(m_data-len, m_data),
+                          pbf_reader::const_int64_iterator(m_data, m_data));
 }
 
-std::pair<pbf::const_uint64_iterator, pbf::const_uint64_iterator> pbf::get_packed_uint64() {
+std::pair<pbf_reader::const_uint64_iterator, pbf_reader::const_uint64_iterator> pbf_reader::get_packed_uint64() {
     pbf_assert(tag() != 0 && "call next() before accessing field value");
     auto len = get_len_and_skip();
-    return std::make_pair(pbf::const_uint64_iterator(m_data-len, m_data),
-                          pbf::const_uint64_iterator(m_data, m_data));
+    return std::make_pair(pbf_reader::const_uint64_iterator(m_data-len, m_data),
+                          pbf_reader::const_uint64_iterator(m_data, m_data));
 }
 
-std::pair<pbf::const_sint64_iterator, pbf::const_sint64_iterator> pbf::get_packed_sint64() {
+std::pair<pbf_reader::const_sint64_iterator, pbf_reader::const_sint64_iterator> pbf_reader::get_packed_sint64() {
     pbf_assert(tag() != 0 && "call next() before accessing field value");
     auto len = get_len_and_skip();
-    return std::make_pair(pbf::const_sint64_iterator(m_data-len, m_data),
-                          pbf::const_sint64_iterator(m_data, m_data));
+    return std::make_pair(pbf_reader::const_sint64_iterator(m_data-len, m_data),
+                          pbf_reader::const_sint64_iterator(m_data, m_data));
 }
 
-}} // end namespace mapbox::util
+} // end namespace protozero
 
-#endif // MAPBOX_UTIL_PBF_READER_HPP
+#endif // PROTOZERO_PBF_READER_HPP
