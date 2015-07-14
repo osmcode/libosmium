@@ -72,7 +72,7 @@ namespace osmium {
 
                 int64_t m_lon_offset = 0;
                 int64_t m_lat_offset = 0;
-                int64_t m_date_factor = 1;
+                int64_t m_date_factor = 1000;
                 int32_t m_granularity = 100;
 
                 osmium::osm_entity_bits::type m_read_types;
@@ -101,7 +101,7 @@ namespace osmium {
                                 m_granularity = pbf_primitive_block.get_int32();
                                 break;
                             case 18: // optional int32 date_granularity
-                                m_date_factor = pbf_primitive_block.get_int32() / 1000;
+                                m_date_factor = pbf_primitive_block.get_int32();
                                 break;
                             case 19: // optional int64 lat_offset
                                 m_lat_offset = pbf_primitive_block.get_int64();
@@ -158,7 +158,7 @@ namespace osmium {
                                 object.set_version(static_cast_with_assert<object_version_type>(pbf_info.get_int32()));
                                 break;
                             case 2: // optional int64 timestamp
-                                object.set_timestamp(pbf_info.get_int64() * m_date_factor);
+                                object.set_timestamp(pbf_info.get_int64() * m_date_factor / 1000);
                                 break;
                             case 3: // optional int64 changeset
                                 object.set_changeset(static_cast_with_assert<changeset_id_type>(pbf_info.get_int64()));
@@ -456,7 +456,7 @@ namespace osmium {
                             }
                             node.set_version(static_cast<osmium::object_version_type>(*versions.first++));
                             node.set_changeset(static_cast<osmium::changeset_id_type>(dense_changeset.update(*changesets.first++)));
-                            node.set_timestamp(dense_timestamp.update(*timestamps.first++) * m_date_factor);
+                            node.set_timestamp(dense_timestamp.update(*timestamps.first++) * m_date_factor / 1000);
                             node.set_uid_from_signed(static_cast<osmium::signed_user_id_type>(dense_uid.update(*uids.first++)));
 
                             if (has_visibles) {
