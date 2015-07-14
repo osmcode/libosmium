@@ -199,6 +199,10 @@ namespace osmium {
                     }
                 }
 
+                int32_t convert_pbf_coordinate(int64_t c) const {
+                    return (c * m_granularity + m_lon_offset) / resolution_convert;
+                }
+
                 void decode_node(const ptr_len_type& data) {
                     osmium::builder::NodeBuilder builder(m_buffer);
 
@@ -238,8 +242,9 @@ namespace osmium {
 
                     if (builder.object().visible()) {
                         builder.object().set_location(osmium::Location(
-                                            (lon * m_granularity + m_lon_offset) / (lonlat_resolution / osmium::Location::coordinate_precision),
-                                            (lat * m_granularity + m_lat_offset) / (lonlat_resolution / osmium::Location::coordinate_precision)));
+                                convert_pbf_coordinate(lon),
+                                convert_pbf_coordinate(lat)
+                        ));
                     }
 
                     build_tag_list(builder, keys, vals);
@@ -476,8 +481,9 @@ namespace osmium {
 
                         if (visible) {
                             builder.object().set_location(osmium::Location(
-                                              (dense_longitude.update(*lons.first++) * m_granularity + m_lon_offset) / (lonlat_resolution / osmium::Location::coordinate_precision),
-                                              (dense_latitude.update(*lats.first++)  * m_granularity + m_lat_offset) / (lonlat_resolution / osmium::Location::coordinate_precision)));
+                                    convert_pbf_coordinate(dense_longitude.update(*lons.first++)),
+                                    convert_pbf_coordinate(dense_latitude.update(*lats.first++))
+                            ));
                         }
 
                         if (tag_it != tags.second) {
@@ -566,8 +572,6 @@ namespace osmium {
             }
 
             inline osmium::Box decode_header_bbox(const ptr_len_type& data) {
-                    const int64_t resolution_convert = lonlat_resolution / osmium::Location::coordinate_precision;
-
                     int64_t left, right, top, bottom;
 
                     protozero::pbf_reader pbf_header_bbox(data);

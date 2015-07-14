@@ -43,6 +43,7 @@ DEALINGS IN THE SOFTWARE.
 #endif
 
 #include <osmium/io/error.hpp>
+#include <osmium/osm/location.hpp>
 
 namespace osmium {
 
@@ -74,7 +75,9 @@ namespace osmium {
 
             // resolution for longitude/latitude used for conversion
             // between representation as double and as int
-            const int lonlat_resolution = 1000 * 1000 * 1000;
+            const int64_t lonlat_resolution = 1000 * 1000 * 1000;
+
+            const int64_t resolution_convert = lonlat_resolution / osmium::Location::coordinate_precision;
 
         }
 
