@@ -33,68 +33,6 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-/*
-
-About the .osm.pbf file format
-This is an excerpt of <http://wiki.openstreetmap.org/wiki/PBF_Format>
-
-The .osm.pbf format and it's derived formats (.osh.pbf and .osc.pbf) are encoded
-using googles protobuf library for the low-level storage. They are constructed
-by nesting data on two levels:
-
-On the lower level the file is constructed using BlobHeaders and Blobs. A .osm.pbf
-file contains multiple sequences of
- 1. a 4-byte header size, stored in network-byte-order
- 2. a BlobHeader of exactly this size
- 3. a Blob
-
-The BlobHeader tells the reader about the type and size of the following Blob. The
-Blob can contain data in raw or zlib-compressed form. After uncompressing the blob
-it is treated differently depending on the type specified in the BlobHeader.
-
-The contents of the Blob belongs to the higher level. It contains either an HeaderBlock
-(type="OSMHeader") or an PrimitiveBlock (type="OSMData"). The file needs to have
-at least one HeaderBlock before the first PrimitiveBlock.
-
-The HeaderBlock contains meta-information like the writing program or a bbox. It may
-also contain multiple "required features" that describe what kinds of input a
-reading program needs to handle in order to fully understand the files' contents.
-
-The PrimitiveBlock can store multiple types of objects (i.e. 5 nodes, 2 ways and
-1 relation). It contains one or more PrimitiveGroup which in turn contain multiple
-nodes, ways or relations. A PrimitiveGroup should only contain one kind of object.
-
-There's a special kind of "object type" called dense-nodes. It is used to store nodes
-in a very dense format, avoiding message overheads and using delta-encoding for nearly
-all ids.
-
-All Strings are stored as indexes to rows in a StringTable. The StringTable contains
-one row for each used string, so strings that are used multiple times need to be
-stored only once. The StringTable is sorted by usage-count, so the most often used
-string is stored at index 1.
-
-A simple outline of a .osm.pbf file could look like this:
-
-  4-bytes header size
-  BlobHeader
-  Blob
-    HeaderBlock
-  4-bytes header size
-  BlobHeader
-  Blob
-    PrimitiveBlock
-      StringTable
-      PrimitiveGroup
-        5 nodes
-      PrimitiveGroup
-        2 ways
-      PrimitiveGroup
-        1 relation
-
-More complete outlines of real .osm.pbf files can be created using the osmpbf-outline tool:
- <https://github.com/MaZderMind/OSM-binary/tree/osmpbf-outline>
-*/
-
 #include <algorithm>
 #include <chrono>
 #include <cmath>
