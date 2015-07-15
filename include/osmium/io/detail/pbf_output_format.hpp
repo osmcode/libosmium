@@ -289,15 +289,15 @@ namespace osmium {
                     pbf_dense_nodes.add_packed_sint64(1 /* repeated sint64 id [packed = true] */, m_ids.cbegin(), m_ids.cend());
 
                     if (true) { // XXX
-                        protozero::pbf_subwriter pbf_dense_info(pbf_dense_nodes, 5 /* optional DenseInfo densinfo */);
-                        pbf_dense_nodes.add_packed_int32(1 /* repeated int32 version [packed = true] */, m_versions.cbegin(), m_versions.cend());
-                        pbf_dense_nodes.add_packed_sint64(2 /* repeated sint64 timestamp [packed = true] */, m_timestamps.cbegin(), m_timestamps.cend());
-                        pbf_dense_nodes.add_packed_sint64(3 /* repeated sint64 changeset [packed = true] */, m_changesets.cbegin(), m_changesets.cend());
-                        pbf_dense_nodes.add_packed_sint32(4 /* repeated sint32 uid [packed = true] */, m_uids.cbegin(), m_uids.cend());
-                        pbf_dense_nodes.add_packed_sint32(5 /* repeated sint32 user_sid [packed = true] */, m_user_sids.cbegin(), m_user_sids.cend());
+                        protozero::pbf_writer pbf_dense_info(pbf_dense_nodes, 5 /* optional DenseInfo densinfo */);
+                        pbf_dense_info.add_packed_int32(1 /* repeated int32 version [packed = true] */, m_versions.cbegin(), m_versions.cend());
+                        pbf_dense_info.add_packed_sint64(2 /* repeated sint64 timestamp [packed = true] */, m_timestamps.cbegin(), m_timestamps.cend());
+                        pbf_dense_info.add_packed_sint64(3 /* repeated sint64 changeset [packed = true] */, m_changesets.cbegin(), m_changesets.cend());
+                        pbf_dense_info.add_packed_sint32(4 /* repeated sint32 uid [packed = true] */, m_uids.cbegin(), m_uids.cend());
+                        pbf_dense_info.add_packed_sint32(5 /* repeated sint32 user_sid [packed = true] */, m_user_sids.cbegin(), m_user_sids.cend());
 
                         if (true) { // XXX
-                            pbf_dense_nodes.add_packed_int32(6 /* repeated bool visible [packed = true] */, m_visibles.cbegin(), m_visibles.cend()); // XXX bool
+                            pbf_dense_info.add_packed_int32(6 /* repeated bool visible [packed = true] */, m_visibles.cbegin(), m_visibles.cend()); // XXX bool
                         }
                     }
 
@@ -485,8 +485,8 @@ namespace osmium {
                     protozero::pbf_writer pbf_primitive_block(primitive_block_data);
 
                     {
-                        protozero::pbf_subwriter pbf_string_table(pbf_primitive_block, 1 /* required StringTable stringtable */);
-                        m_pbf_primitive_block.write_stringtable(pbf_primitive_block);
+                        protozero::pbf_writer pbf_string_table(pbf_primitive_block, 1 /* required StringTable stringtable */);
+                        m_pbf_primitive_block.write_stringtable(pbf_string_table);
                     }
 
                     pbf_primitive_block.add_message(2 /* repeated PrimitiveGroup primitivegroup */, m_pbf_primitive_block.group_data());
@@ -507,15 +507,15 @@ namespace osmium {
                     pbf_object.add_packed_uint32(3 /* vals */, vals.cbegin(), vals.cend());
 
                     if (m_should_add_metadata) {
-                        protozero::pbf_subwriter pbf_info(pbf_object, 4 /* info */);
+                        protozero::pbf_writer pbf_info(pbf_object, 4 /* info */);
 
-                        pbf_object.add_int32(1 /* version */, object.version());
-                        pbf_object.add_int64(2 /* timestamp */, object.timestamp());
-                        pbf_object.add_int64(3 /* changeset */, object.changeset());
-                        pbf_object.add_int32(4 /* uid */, object.uid());
-                        pbf_object.add_uint32(5 /* user_sid */, m_pbf_primitive_block.add_string(object.user()));
+                        pbf_info.add_int32(1 /* version */, object.version());
+                        pbf_info.add_int64(2 /* timestamp */, object.timestamp());
+                        pbf_info.add_int64(3 /* changeset */, object.changeset());
+                        pbf_info.add_int32(4 /* uid */, object.uid());
+                        pbf_info.add_uint32(5 /* user_sid */, m_pbf_primitive_block.add_string(object.user()));
                         if (m_add_visible) {
-                            pbf_object.add_bool(6 /* visible*/, object.visible());
+                            pbf_info.add_bool(6 /* visible*/, object.visible());
                         }
                     }
                 }
@@ -552,13 +552,13 @@ namespace osmium {
                     protozero::pbf_writer pbf_header_block(data);
 
                     if (!header.boxes().empty()) {
-                        protozero::pbf_subwriter pbf_header_bbox(pbf_header_block, 1 /* bbox */);
+                        protozero::pbf_writer pbf_header_bbox(pbf_header_block, 1 /* bbox */);
 
                         osmium::Box box = header.joined_boxes();
-                        pbf_header_block.add_sint64(1 /* left */, box.bottom_left().lon() * lonlat_resolution);
-                        pbf_header_block.add_sint64(2 /* right */, box.top_right().lon() * lonlat_resolution);
-                        pbf_header_block.add_sint64(3 /* top */, box.top_right().lat() * lonlat_resolution);
-                        pbf_header_block.add_sint64(4 /* bottom */, box.bottom_left().lat() * lonlat_resolution);
+                        pbf_header_bbox.add_sint64(1 /* left */, box.bottom_left().lon() * lonlat_resolution);
+                        pbf_header_bbox.add_sint64(2 /* right */, box.top_right().lon() * lonlat_resolution);
+                        pbf_header_bbox.add_sint64(3 /* top */, box.top_right().lat() * lonlat_resolution);
+                        pbf_header_bbox.add_sint64(4 /* bottom */, box.bottom_left().lat() * lonlat_resolution);
                     }
 
                     // add the schema version as required feature to the HeaderBlock
