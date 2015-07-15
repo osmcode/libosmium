@@ -449,29 +449,6 @@ namespace osmium {
                     return false;
                 }
 
-                class pbf_primitive_block_writer : public protozero::pbf_writer {
-
-                public:
-
-                    pbf_primitive_block_writer(std::string& data) :
-                        pbf_writer(data) {
-                    }
-
-                    void set_stringtable(PBFPrimitiveBlock& block) {
-                        std::string data;
-                        protozero::pbf_writer w(data);
-
-                        block.write_stringtable(w);
-
-                        add_message(1 /* stringtable */, data);
-                    }
-
-                    void set_primitive_group(const std::string& group_data) {
-                        add_message(2 /* primitive_group */, group_data);
-                    }
-
-                };
-
                 void store_primitive_block() {
                     if (m_pbf_primitive_block.type() == 0 || m_pbf_primitive_block.count() == 0) {
                         return;
