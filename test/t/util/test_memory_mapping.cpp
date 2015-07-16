@@ -44,11 +44,6 @@ TEST_CASE("anonymous mapping") {
         REQUIRE(!mapping);
     }
 
-    SECTION("memory mapping a huge area should fail") {
-        REQUIRE_THROWS_AS(osmium::util::MemoryMapping mapping(huge),
-            std::system_error);
-    }
-
     SECTION("moving a memory mapping should work") {
         osmium::util::MemoryMapping mapping1(1000);
         int* addr1 = mapping1.get_addr<int>();
@@ -228,11 +223,6 @@ TEST_CASE("typed anonymous mapping") {
         mapping.unmap();
         REQUIRE(!mapping);
         mapping.unmap(); // second unmap is okay
-    }
-
-    SECTION("memory mapping a huge area should fail") {
-        REQUIRE_THROWS_AS(osmium::util::TypedMemoryMapping<uint32_t> mapping(huge),
-            std::system_error);
     }
 
     SECTION("moving a memory mapping should work") {
