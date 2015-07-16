@@ -468,10 +468,15 @@ namespace osmium {
 
             namespace {
 
+// we want the register_output_format() function to run, setting the variable
+// is only a side-effect, it will never be used
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-variable"
                 const bool registered_xml_output = osmium::io::detail::OutputFormatFactory::instance().register_output_format(osmium::io::file_format::xml,
                     [](const osmium::io::File& file, data_queue_type& output_queue) {
                         return new osmium::io::detail::XMLOutputFormat(file, output_queue);
                 });
+#pragma GCC diagnostic pop
 
             } // anonymous namespace
 

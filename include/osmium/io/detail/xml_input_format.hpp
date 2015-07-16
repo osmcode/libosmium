@@ -721,10 +721,15 @@ namespace osmium {
 
             namespace {
 
+// we want the register_input_format() function to run, setting the variable
+// is only a side-effect, it will never be used
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-variable"
                 const bool registered_xml_input = osmium::io::detail::InputFormatFactory::instance().register_input_format(osmium::io::file_format::xml,
                     [](const osmium::io::File& file, osmium::osm_entity_bits::type read_which_entities, osmium::thread::Queue<std::string>& input_queue) {
                         return new osmium::io::detail::XMLInputFormat(file, read_which_entities, input_queue);
                 });
+#pragma GCC diagnostic pop
 
             } // anonymous namespace
 

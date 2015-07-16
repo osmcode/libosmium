@@ -298,6 +298,8 @@ namespace osmium {
 
             namespace {
 
+// we want the register_output_format() function to run, setting the variable
+// is only a side-effect, it will never be used
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-variable"
                 const bool registered_opl_output = osmium::io::detail::OutputFormatFactory::instance().register_output_format(osmium::io::file_format::opl,
