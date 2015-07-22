@@ -15,7 +15,7 @@ static const size_t huge = std::numeric_limits<size_t>::max();
 TEST_CASE("anonymous mapping") {
 
     SECTION("simple memory mapping should work") {
-        osmium::util::MemoryMapping mapping(1000);
+        osmium::util::MemoryMapping mapping(1000, osmium::util::MemoryMapping::mapping_mode::write_private);
         REQUIRE(mapping.get_addr() != nullptr);
 
         REQUIRE(mapping.size() >= 1000);
@@ -34,7 +34,7 @@ TEST_CASE("anonymous mapping") {
     }
 
     SECTION("memory mapping of zero length should work") {
-        osmium::util::MemoryMapping mapping(0);
+        osmium::util::MemoryMapping mapping(0, osmium::util::MemoryMapping::mapping_mode::write_private);
         REQUIRE(mapping.get_addr() != nullptr);
 
         REQUIRE(mapping.size() == osmium::util::get_pagesize());
@@ -45,7 +45,7 @@ TEST_CASE("anonymous mapping") {
     }
 
     SECTION("moving a memory mapping should work") {
-        osmium::util::MemoryMapping mapping1(1000);
+        osmium::util::MemoryMapping mapping1(1000, osmium::util::MemoryMapping::mapping_mode::write_private);
         int* addr1 = mapping1.get_addr<int>();
         *addr1 = 42;
 
@@ -63,8 +63,8 @@ TEST_CASE("anonymous mapping") {
     }
 
     SECTION("move assignment should work") {
-        osmium::util::MemoryMapping mapping1(1000);
-        osmium::util::MemoryMapping mapping2(1000);
+        osmium::util::MemoryMapping mapping1(1000, osmium::util::MemoryMapping::mapping_mode::write_private);
+        osmium::util::MemoryMapping mapping2(1000, osmium::util::MemoryMapping::mapping_mode::write_private);
 
         REQUIRE(!!mapping1);
         REQUIRE(!!mapping2);
@@ -85,7 +85,7 @@ TEST_CASE("anonymous mapping") {
 
 #ifdef __linux__
     SECTION("remapping to larger size should work") {
-        osmium::util::MemoryMapping mapping(1000);
+        osmium::util::MemoryMapping mapping(1000, osmium::util::MemoryMapping::mapping_mode::write_private);
         REQUIRE(mapping.size() >= 1000);
 
         size_t size1 = mapping.size();
@@ -101,7 +101,7 @@ TEST_CASE("anonymous mapping") {
     }
 
     SECTION("remapping to smaller size should work") {
-        osmium::util::MemoryMapping mapping(8000);
+        osmium::util::MemoryMapping mapping(8000, osmium::util::MemoryMapping::mapping_mode::write_private);
         REQUIRE(mapping.size() >= 1000);
 
         size_t size1 = mapping.size();
@@ -129,7 +129,7 @@ TEST_CASE("file-based mapping") {
         osmium::util::resize_file(fd, 100);
 
         {
-            osmium::util::MemoryMapping mapping(100, true, fd);
+            osmium::util::MemoryMapping mapping(100, osmium::util::MemoryMapping::mapping_mode::write_shared, fd);
             REQUIRE(mapping.writable());
 
             REQUIRE(!!mapping);
@@ -143,7 +143,7 @@ TEST_CASE("file-based mapping") {
         REQUIRE(osmium::util::file_size(fd) == 100);
 
         {
-            osmium::util::MemoryMapping mapping(100, false, fd);
+            osmium::util::MemoryMapping mapping(100, osmium::util::MemoryMapping::mapping_mode::readonly, fd);
             REQUIRE(!mapping.writable());
 
             REQUIRE(!!mapping);
@@ -157,12 +157,48 @@ TEST_CASE("file-based mapping") {
         REQUIRE(0 == unlink(filename));
     }
 
+    SECTION("writing to a privately mapped file should work") {
+        char filename[] = "test_mmap_write_XXXXXX";
+        const int fd = mkstemp(filename);
+        REQUIRE(fd > 0);
+
+        osmium::util::resize_file(fd, 100);
+
+        {
+            osmium::util::MemoryMapping mapping(100, osmium::util::MemoryMapping::mapping_mode::write_private, fd);
+            REQUIRE(mapping.writable());
+
+            REQUIRE(!!mapping);
+            REQUIRE(mapping.size() >= 100);
+
+            *mapping.get_addr<int>() = 1234;
+
+            mapping.unmap();
+        }
+
+        REQUIRE(osmium::util::file_size(fd) == 100);
+
+        {
+            osmium::util::MemoryMapping mapping(100, osmium::util::MemoryMapping::mapping_mode::readonly, fd);
+            REQUIRE(!mapping.writable());
+
+            REQUIRE(!!mapping);
+            REQUIRE(mapping.size() >= 100);
+            REQUIRE(*mapping.get_addr<int>() == 0); // should not see the value set above
+
+            mapping.unmap();
+        }
+
+        REQUIRE(0 == close(fd));
+        REQUIRE(0 == unlink(filename));
+    }
+
     SECTION("remapping to larger size should work") {
         char filename[] = "test_mmap_grow_XXXXXX";
         const int fd = mkstemp(filename);
         REQUIRE(fd > 0);
 
-        osmium::util::MemoryMapping mapping(100, true, fd);
+        osmium::util::MemoryMapping mapping(100, osmium::util::MemoryMapping::mapping_mode::write_shared, fd);
         REQUIRE(mapping.size() >= 100);
         size_t size1 = mapping.size();
 
@@ -188,7 +224,7 @@ TEST_CASE("file-based mapping") {
         REQUIRE(fd > 0);
 
         {
-            osmium::util::MemoryMapping mapping(8000, true, fd);
+            osmium::util::MemoryMapping mapping(8000, osmium::util::MemoryMapping::mapping_mode::write_shared, fd);
             REQUIRE(mapping.size() >= 8000);
             size_t size1 = mapping.size();
 
@@ -304,7 +340,7 @@ TEST_CASE("typed file-based mapping") {
         osmium::util::resize_file(fd, 100);
 
         {
-            osmium::util::TypedMemoryMapping<uint32_t> mapping(100, true, fd);
+            osmium::util::TypedMemoryMapping<uint32_t> mapping(100, osmium::util::MemoryMapping::mapping_mode::write_shared, fd);
             REQUIRE(mapping.writable());
 
             REQUIRE(!!mapping);
@@ -316,7 +352,7 @@ TEST_CASE("typed file-based mapping") {
         }
 
         {
-            osmium::util::TypedMemoryMapping<uint32_t> mapping(100, false, fd);
+            osmium::util::TypedMemoryMapping<uint32_t> mapping(100, osmium::util::MemoryMapping::mapping_mode::readonly, fd);
             REQUIRE(!mapping.writable());
 
             REQUIRE(!!mapping);

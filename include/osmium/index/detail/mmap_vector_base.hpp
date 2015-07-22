@@ -62,7 +62,7 @@ namespace osmium {
 
             explicit mmap_vector_base(int fd, size_t capacity, size_t size = 0) :
                 m_size(size),
-                m_mapping(capacity, true, fd) {
+                m_mapping(capacity, osmium::util::MemoryMapping::mapping_mode::write_shared, fd) {
             }
 
             explicit mmap_vector_base(size_t capacity = mmap_vector_size_increment) :
