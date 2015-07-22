@@ -617,7 +617,7 @@ namespace osmium {
 
 inline DWORD osmium::util::MemoryMapping::get_protection() const noexcept {
     switch (m_mapping_mode) {
-        case mapping_mode::readyonly:
+        case mapping_mode::readonly:
             return PAGE_READONLY;
         case mapping_mode::write_private:
             return PAGE_WRITECOPY;
@@ -628,7 +628,7 @@ inline DWORD osmium::util::MemoryMapping::get_protection() const noexcept {
 
 inline DWORD osmium::util::MemoryMapping::get_flags() const noexcept {
     switch (m_mapping_mode) {
-        case mapping_mode::readyonly:
+        case mapping_mode::readonly:
             return FILE_MAP_READ;
         case mapping_mode::write_private:
             return FILE_MAP_COPY;
