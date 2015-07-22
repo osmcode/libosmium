@@ -6,7 +6,7 @@
 
 language: cpp
 
-sudo: required
+sudo: false
 
 matrix:
     include:
@@ -39,6 +39,7 @@ addons:
             - gcc-4.8
             - libboost-dev
             - libboost-program-options-dev
+            - libgdal-dev
             - libgeos++-dev
             - libproj-dev
             - libprotobuf-dev

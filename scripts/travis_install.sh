@@ -3,12 +3,7 @@
 #  travis_install.sh
 #
 
-if [ "$TRAVIS_OS_NAME" = "linux" ]; then
-
-    # install dependencies
-    sudo apt-get install --yes make libgdal-dev
-
-elif [ "$TRAVIS_OS_NAME" = "osx" ]; then
+if [ "$TRAVIS_OS_NAME" = "osx" ]; then
 
     brew install protobuf osm-pbf google-sparsehash || true
 
