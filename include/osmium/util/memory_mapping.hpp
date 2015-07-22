@@ -179,6 +179,11 @@ private:
              */
             MemoryMapping(size_t size, mapping_mode mapping_mode, int fd=-1, off_t offset=0);
 
+            /// DEPRECATED: For backwards compatibility
+            MemoryMapping(size_t size, bool writable=true, int fd=-1, off_t offset=0) :
+                MemoryMapping(size, writable ? mapping_mode::write_shared : mapping_mode::readonly, fd, offset)  {
+            }
+
             /// You can not copy construct a MemoryMapping.
             MemoryMapping(const MemoryMapping&) = delete;
 
@@ -342,6 +347,11 @@ private:
              */
             TypedMemoryMapping(size_t size, MemoryMapping::mapping_mode mapping_mode, int fd, off_t offset = 0) :
                 m_mapping(sizeof(T) * size, mapping_mode, fd, sizeof(T) * offset) {
+            }
+
+            /// DEPRECATED: For backwards compatibility
+            TypedMemoryMapping(size_t size, bool writable, int fd, off_t offset = 0) :
+                m_mapping(sizeof(T) * size, writable ? MemoryMapping::mapping_mode::write_shared : MemoryMapping::mapping_mode::readonly, fd, sizeof(T) * offset) {
             }
 
             /// You can not copy construct a TypedMemoryMapping.
