@@ -124,21 +124,29 @@ namespace osmium {
                                 case 1: // repeated Node nodes
                                     if (m_read_types & osmium::osm_entity_bits::node) {
                                         decode_node(pbf_primitive_group.get_data());
+                                    } else {
+                                        pbf_primitive_group.skip();
                                     }
                                     break;
                                 case 2: // optional DenseNodes dense
                                     if (m_read_types & osmium::osm_entity_bits::node) {
                                         decode_dense_nodes(pbf_primitive_group.get_data());
+                                    } else {
+                                        pbf_primitive_group.skip();
                                     }
                                     break;
                                 case 3: // repeated Way ways
                                     if (m_read_types & osmium::osm_entity_bits::way) {
                                         decode_way(pbf_primitive_group.get_data());
+                                    } else {
+                                        pbf_primitive_group.skip();
                                     }
                                     break;
                                 case 4: // repeated Relation relations
                                     if (m_read_types & osmium::osm_entity_bits::relation) {
                                         decode_relation(pbf_primitive_group.get_data());
+                                    } else {
+                                        pbf_primitive_group.skip();
                                     }
                                     break;
                                 default:
