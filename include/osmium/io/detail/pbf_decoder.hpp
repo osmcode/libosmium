@@ -205,17 +205,20 @@ namespace osmium {
 
                 void decode_node(const ptr_len_type& data) {
                     osmium::builder::NodeBuilder builder(m_buffer);
+                    osmium::Node& node = builder.object();
 
                     kv_type keys;
                     kv_type vals;
                     int64_t lon;
                     int64_t lat;
 
+                    ptr_len_type user = { "", 0 };
+
                     protozero::pbf_reader pbf_node(data);
                     while (pbf_node.next()) {
                         switch (pbf_node.tag()) {
                             case 1: // required sint64 id
-                                builder.object().set_id(pbf_node.get_sint64());
+                                node.set_id(pbf_node.get_sint64());
                                 break;
                             case 2: // repeated uint32 keys [packed = true]
                                 keys = pbf_node.get_packed_uint32();
@@ -224,10 +227,7 @@ namespace osmium {
                                 vals = pbf_node.get_packed_uint32();
                                 break;
                             case 4: // Optional Info info
-                                {
-                                    const auto u = decode_info(pbf_node.get_data(), builder.object());
-                                    builder.add_user(u.first, u.second);
-                                }
+                                user = decode_info(pbf_node.get_data(), builder.object());
                                 break;
                             case 8: // required sint64 lat
                                 lat = pbf_node.get_sint64();
@@ -240,12 +240,14 @@ namespace osmium {
                         }
                     }
 
-                    if (builder.object().visible()) {
-                        builder.object().set_location(osmium::Location(
+                    if (node.visible()) {
+                        node.set_location(osmium::Location(
                                 convert_pbf_coordinate(lon),
                                 convert_pbf_coordinate(lat)
                         ));
                     }
+
+                    builder.add_user(user.first, user.second);
 
                     build_tag_list(builder, keys, vals);
 
@@ -258,6 +260,8 @@ namespace osmium {
                     kv_type keys;
                     kv_type vals;
                     std::pair<protozero::pbf_reader::const_sint64_iterator, protozero::pbf_reader::const_sint64_iterator> refs;
+
+                    ptr_len_type user = { "", 0 };
 
                     protozero::pbf_reader pbf_way(data);
                     while (pbf_way.next()) {
@@ -272,10 +276,7 @@ namespace osmium {
                                 vals = pbf_way.get_packed_uint32();
                                 break;
                             case 4: // optional Info info
-                                {
-                                    const auto u = decode_info(pbf_way.get_data(), builder.object());
-                                    builder.add_user(u.first, u.second);
-                                }
+                                user = decode_info(pbf_way.get_data(), builder.object());
                                 break;
                             case 8: // repeated sint64 refs [packed = true] DELTA encoded
                                 refs = pbf_way.get_packed_sint64();
@@ -284,6 +285,8 @@ namespace osmium {
                                 pbf_way.skip();
                         }
                     }
+
+                    builder.add_user(user.first, user.second);
 
                     if (refs.first != refs.second) {
                         osmium::builder::WayNodeListBuilder wnl_builder(m_buffer, &builder);
@@ -307,6 +310,8 @@ namespace osmium {
                     std::pair<protozero::pbf_reader::const_sint64_iterator, protozero::pbf_reader::const_sint64_iterator> refs;
                     std::pair<protozero::pbf_reader::const_int32_iterator,  protozero::pbf_reader::const_int32_iterator> types;
 
+                    ptr_len_type user = { "", 0 };
+
                     protozero::pbf_reader pbf_relation(data);
                     while (pbf_relation.next()) {
                         switch (pbf_relation.tag()) {
@@ -320,10 +325,7 @@ namespace osmium {
                                 vals = pbf_relation.get_packed_uint32();
                                 break;
                             case 4: // optional Info info
-                                {
-                                    const auto u = decode_info(pbf_relation.get_data(), builder.object());
-                                    builder.add_user(u.first, u.second);
-                                }
+                                user = decode_info(pbf_relation.get_data(), builder.object());
                                 break;
                             case 8: // repeated int32 roles_sid [packed = true]
                                 roles = pbf_relation.get_packed_int32();
@@ -338,6 +340,8 @@ namespace osmium {
                                 pbf_relation.skip();
                         }
                     }
+
+                    builder.add_user(user.first, user.second);
 
                     if (refs.first != refs.second) {
                         osmium::builder::RelationMemberListBuilder rml_builder(m_buffer, &builder);
