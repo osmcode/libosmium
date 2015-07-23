@@ -240,7 +240,7 @@ namespace osmium {
                         }
                         *m_out += item_type_to_char(member.type());
                         output_formatted("%" PRId64 "@", member.ref());
-                        *m_out += member.role();
+                        append_encoded_string(member.role());
                     }
                     *m_out += '\n';
                 }
