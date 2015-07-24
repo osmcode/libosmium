@@ -54,11 +54,7 @@ DEALINGS IN THE SOFTWARE.
 # pragma clang diagnostic ignored "-Wsign-conversion"
 #endif
 
-#if BOOST_VERSION >= 104800
-# include <boost/regex/pending/unicode_iterator.hpp>
-#else
-# include <boost_unicode_iterator.hpp>
-#endif
+#include <utf8.h>
 
 #ifdef __clang__
 # pragma clang diagnostic pop
@@ -117,13 +113,12 @@ namespace osmium {
                     *m_out += m_tmp_buffer;
                 }
 
-                void append_encoded_string(const std::string& data) {
-                    boost::u8_to_u32_iterator<std::string::const_iterator> it(data.cbegin(), data.cbegin(), data.cend());
-                    boost::u8_to_u32_iterator<std::string::const_iterator> end(data.cend(), data.cend(), data.cend());
-                    boost::utf8_output_iterator<std::back_insert_iterator<std::string>> oit(std::back_inserter(*m_out));
+                void append_encoded_string(const char* data) {
+                    const char* end = data + std::strlen(data);
 
-                    for (; it != end; ++it) {
-                        uint32_t c = *it;
+                    while (data != end) {
+                        const char* last = data;
+                        uint32_t c = utf8::next(data, end);
 
                         // This is a list of Unicode code points that we let
                         // through instead of escaping them. It is incomplete
@@ -138,7 +133,7 @@ namespace osmium {
                             (0x0041 <= c && c <= 0x007e) ||
                             (0x00a1 <= c && c <= 0x00ac) ||
                             (0x00ae <= c && c <= 0x05ff)) {
-                            *oit = c;
+                            m_out->append(last, data);
                         } else {
                             *m_out += '%';
                             output_formatted("%04x", c);
