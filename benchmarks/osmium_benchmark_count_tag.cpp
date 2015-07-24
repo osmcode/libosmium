@@ -50,7 +50,5 @@ int main(int argc, char* argv[]) {
     reader.close();
 
     std::cout << "r_all=" << handler.all << " r_counter="  << handler.counter << "\n";
-
-    google::protobuf::ShutdownProtobufLibrary();
 }
 

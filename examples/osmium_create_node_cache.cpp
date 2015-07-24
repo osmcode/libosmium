@@ -50,8 +50,6 @@ int main(int argc, char* argv[]) {
     osmium::apply(reader, location_handler);
     reader.close();
 
-    google::protobuf::ShutdownProtobufLibrary();
-
     return 0;
 }
 

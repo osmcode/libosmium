@@ -49,7 +49,5 @@ int main(int argc, char* argv[]) {
     std::cout << "Nodes: "     << handler.nodes << "\n";
     std::cout << "Ways: "      << handler.ways << "\n";
     std::cout << "Relations: " << handler.relations << "\n";
-
-    google::protobuf::ShutdownProtobufLibrary();
 }
 

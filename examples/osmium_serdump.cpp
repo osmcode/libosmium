@@ -202,7 +202,5 @@ int main(int argc, char* argv[]) {
         map_relation2relation.dump_as_list(fd);
         close(fd);
     }
-
-    google::protobuf::ShutdownProtobufLibrary();
 }
 
