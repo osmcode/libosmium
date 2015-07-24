@@ -350,9 +350,9 @@ namespace osmium {
                     m_stringtable.write(pbf);
                 }
 
-                void add_object(const std::string& data) {
-                    m_pbf_primitive_group.add_message(m_type, data);
+                protozero::pbf_writer& group() {
                     ++m_count;
+                    return m_pbf_primitive_group;
                 }
 
                 void add_dense_node(const osmium::Node& node) {
@@ -473,7 +473,7 @@ namespace osmium {
                     promise.set_value(serialize_blob("OSMData", primitive_block_data, m_use_compression));
                 }
 
-                void add_common_info(const osmium::OSMObject& object, protozero::pbf_writer& pbf_object) {
+                void add_meta(const osmium::OSMObject& object, protozero::pbf_writer& pbf_object) {
                     std::vector<uint32_t> keys;
                     std::vector<uint32_t> vals;
                     for (const auto& tag : object.tags()) {
@@ -587,49 +587,32 @@ namespace osmium {
                     }
                 }
 
-                /**
-                 * Add a node to the pbf.
-                 *
-                 * A call to this method won't write the node to the file directly but
-                 * cache it for later bulk-writing. Calling close() ensures that everything
-                 * gets written and every file pointer is closed.
-                 */
+                protozero::pbf_writer pbf_group(int type) {
+                    primitive_block_type(type);
+                    return protozero::pbf_writer(m_pbf_primitive_block.group(), type);
+                }
+
                 void node(const osmium::Node& node) {
                     if (m_use_dense_nodes) {
-                        primitive_block_type(2);
+                        primitive_block_type(2 /* DenseNode*/);
                         m_pbf_primitive_block.add_dense_node(node);
                         return;
                     }
 
-                    primitive_block_type(1);
-
-                    std::string data;
-                    protozero::pbf_writer pbf_node(data);
+                    protozero::pbf_writer pbf_node = pbf_group(1 /* Node */);
 
                     pbf_node.add_sint64(1 /* id */, node.id());
-                    add_common_info(node, pbf_node);
+                    add_meta(node, pbf_node);
 
                     pbf_node.add_sint64(8 /* lat */, lonlat2int(node.location().lat_without_check()));
                     pbf_node.add_sint64(9 /* lon */, lonlat2int(node.location().lon_without_check()));
-
-                    m_pbf_primitive_block.add_object(data);
                 }
 
-                /**
-                 * Add a way to the pbf.
-                 *
-                 * A call to this method won't write the way to the file directly but
-                 * cache it for later bulk-writing. Calling close() ensures that everything
-                 * gets written and every file pointer is closed.
-                 */
                 void way(const osmium::Way& way) {
-                    primitive_block_type(3);
-
-                    std::string data;
-                    protozero::pbf_writer pbf_way(data);
+                    protozero::pbf_writer pbf_way = pbf_group(3 /* Way */);
 
                     pbf_way.add_int64(1 /* id */, way.id());
-                    add_common_info(way, pbf_way);
+                    add_meta(way, pbf_way);
 
                     osmium::util::DeltaEncode<int64_t> delta_id;
 
@@ -638,25 +621,13 @@ namespace osmium {
                         refs.push_back(delta_id.update(node_ref.ref()));
                     }
                     pbf_way.add_packed_sint64(8 /* refs */, refs.cbegin(), refs.cend());
-
-                    m_pbf_primitive_block.add_object(data);
                 }
 
-                /**
-                 * Add a relation to the pbf.
-                 *
-                 * A call to this method won't write the way to the file directly but
-                 * cache it for later bulk-writing. Calling close() ensures that everything
-                 * gets written and every file pointer is closed.
-                 */
                 void relation(const osmium::Relation& relation) {
-                    primitive_block_type(4);
-
-                    std::string data;
-                    protozero::pbf_writer pbf_relation(data);
+                    protozero::pbf_writer pbf_relation = pbf_group(4 /* Relation */);
 
                     pbf_relation.add_int64(1 /* id */, relation.id());
-                    add_common_info(relation, pbf_relation);
+                    add_meta(relation, pbf_relation);
 
                     osmium::util::DeltaEncode<int64_t> delta_id;
 
@@ -671,8 +642,6 @@ namespace osmium {
                     pbf_relation.add_packed_int32(8 /* roles_sid */, roles_sids.cbegin(), roles_sids.cend());
                     pbf_relation.add_packed_sint64(9 /* memids */, refs.cbegin(), refs.cend());
                     pbf_relation.add_packed_int32(10 /* types */, types.cbegin(), types.cend());
-
-                    m_pbf_primitive_block.add_object(data);
                 }
 
                 /**
