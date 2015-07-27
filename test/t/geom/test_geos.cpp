@@ -25,6 +25,16 @@ SECTION("non_default_srid") {
     REQUIRE(4326 == point->getSRID());
 }
 
+SECTION("with externally created GEOS factory") {
+    geos::geom::GeometryFactory geos_factory;
+    osmium::geom::GEOSFactory<> factory(geos_factory);
+
+    std::unique_ptr<geos::geom::Point> point {factory.create_point(osmium::Location(3.2, 4.2))};
+    REQUIRE(3.2 == point->getX());
+    REQUIRE(4.2 == point->getY());
+    REQUIRE(0 == point->getSRID());
+}
+
 SECTION("empty_point") {
     osmium::geom::GEOSFactory<> factory;
 
