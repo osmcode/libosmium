@@ -484,14 +484,22 @@ namespace osmium {
                 }
 
                 void add_meta(const osmium::OSMObject& object, protozero::pbf_writer& pbf_object) {
-                    std::vector<uint32_t> keys;
-                    std::vector<uint32_t> vals;
-                    for (const auto& tag : object.tags()) {
-                        keys.push_back(m_pbf_primitive_block.add_string(tag.key()));
-                        vals.push_back(m_pbf_primitive_block.add_string(tag.value()));
-                    }
-                    pbf_object.add_packed_uint32(2 /* keys */, keys.cbegin(), keys.cend());
-                    pbf_object.add_packed_uint32(3 /* vals */, vals.cbegin(), vals.cend());
+                    const osmium::TagList& tags = object.tags();
+
+                    auto map_tag_key = [this](const osmium::Tag& tag) {
+                        return m_pbf_primitive_block.add_string(tag.key());
+                    };
+                    auto map_tag_value = [this](const osmium::Tag& tag) {
+                        return m_pbf_primitive_block.add_string(tag.value());
+                    };
+
+                    pbf_object.add_packed_uint32(2 /* keys */,
+                        boost::make_transform_iterator(tags.begin(), map_tag_key),
+                        boost::make_transform_iterator(tags.end(), map_tag_key));
+
+                    pbf_object.add_packed_uint32(3 /* vals */,
+                        boost::make_transform_iterator(tags.begin(), map_tag_value),
+                        boost::make_transform_iterator(tags.end(), map_tag_value));
 
                     if (m_should_add_metadata) {
                         protozero::pbf_writer pbf_info(pbf_object, 4 /* info */);
