@@ -48,6 +48,8 @@ DEALINGS IN THE SOFTWARE.
 #include <time.h>
 #include <utility>
 
+#include <boost/iterator/transform_iterator.hpp>
+
 #include <protozero/pbf_writer.hpp>
 
 #include <osmium/handler.hpp>
@@ -609,18 +611,20 @@ namespace osmium {
                 }
 
                 void way(const osmium::Way& way) {
+                    static auto map_node_ref = [](osmium::NodeRefList::const_iterator node_ref) noexcept {
+                        return node_ref->ref();
+                    };
+                    typedef osmium::util::DeltaEncodeIterator<osmium::NodeRefList::const_iterator, decltype(map_node_ref), osmium::object_id_type> it_type;
+
                     protozero::pbf_writer pbf_way = pbf_group(3 /* Way */);
 
                     pbf_way.add_int64(1 /* id */, way.id());
                     add_meta(way, pbf_way);
 
-                    osmium::util::DeltaEncode<int64_t> delta_id;
-
-                    std::vector<int64_t> refs;
-                    for (const auto& node_ref : way.nodes()) {
-                        refs.push_back(delta_id.update(node_ref.ref()));
-                    }
-                    pbf_way.add_packed_sint64(8 /* refs */, refs.cbegin(), refs.cend());
+                    const auto& nodes = way.nodes();
+                    it_type first { nodes.cbegin(), nodes.cend(), map_node_ref };
+                    it_type last { nodes.cend(), nodes.cend(), map_node_ref };
+                    pbf_way.add_packed_sint64(8 /* refs */, first, last);
                 }
 
                 void relation(const osmium::Relation& relation) {
@@ -629,19 +633,28 @@ namespace osmium {
                     pbf_relation.add_int64(1 /* id */, relation.id());
                     add_meta(relation, pbf_relation);
 
-                    osmium::util::DeltaEncode<int64_t> delta_id;
+                    auto map_member_role = [this](const osmium::RelationMember& member) {
+                        return m_pbf_primitive_block.add_string(member.role());
+                    };
+                    pbf_relation.add_packed_int32(8 /* roles_sid */,
+                        boost::make_transform_iterator(relation.members().begin(), map_member_role),
+                        boost::make_transform_iterator(relation.members().end(), map_member_role));
 
-                    std::vector<int64_t> refs;
-                    std::vector<int32_t> roles_sids;
-                    std::vector<int32_t> types;
-                    for (const auto& member : relation.members()) {
-                        roles_sids.push_back(m_pbf_primitive_block.add_string(member.role()));
-                        refs.push_back(delta_id.update(member.ref()));
-                        types.push_back(int(member.type()) - 1);
-                    }
-                    pbf_relation.add_packed_int32(8 /* roles_sid */, roles_sids.cbegin(), roles_sids.cend());
-                    pbf_relation.add_packed_sint64(9 /* memids */, refs.cbegin(), refs.cend());
-                    pbf_relation.add_packed_int32(10 /* types */, types.cbegin(), types.cend());
+                    static auto map_member_ref = [](osmium::RelationMemberList::const_iterator member) noexcept {
+                        return member->ref();
+                    };
+                    typedef osmium::util::DeltaEncodeIterator<osmium::RelationMemberList::const_iterator, decltype(map_member_ref), osmium::object_id_type> it_type;
+                    const auto& members = relation.members();
+                    it_type first { members.cbegin(), members.cend(), map_member_ref };
+                    it_type last { members.cend(), members.cend(), map_member_ref };
+                    pbf_relation.add_packed_sint64(9 /* memids */, first, last);
+
+                    static auto map_member_type = [](const osmium::RelationMember& member) noexcept {
+                        return osmium::item_type_to_nwr_index(member.type());
+                    };
+                    pbf_relation.add_packed_int32(10 /* types */,
+                        boost::make_transform_iterator(relation.members().begin(), map_member_type),
+                        boost::make_transform_iterator(relation.members().end(), map_member_type));
                 }
 
                 /**
