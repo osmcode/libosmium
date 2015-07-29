@@ -304,7 +304,7 @@ namespace osmium {
                         pbf_dense_info.add_packed_sint32(5 /* repeated sint32 user_sid [packed = true] */, m_user_sids.cbegin(), m_user_sids.cend());
 
                         if (m_add_visible) {
-                            pbf_dense_info.add_packed_int32(6 /* repeated bool visible [packed = true] */, m_visibles.cbegin(), m_visibles.cend()); // XXX bool
+                            pbf_dense_info.add_packed_bool(6 /* repeated bool visible [packed = true] */, m_visibles.cbegin(), m_visibles.cend());
                         }
                     }
 
@@ -383,6 +383,9 @@ namespace osmium {
                     return m_pbf_primitive_group_data.size() + m_stringtable.size() + m_dense_nodes.size();
                 }
 
+                // fill blocks to 90% of max size.
+                constexpr static size_t max_used_blob_size = max_uncompressed_blob_size * 9 / 10;
+
                 bool can_add(int type) const {
                     if (type != m_type) {
                         return false;
@@ -390,7 +393,7 @@ namespace osmium {
                     if (count() >= max_entities_per_block) {
                         return false;
                     }
-                    return size() < static_cast<size_t>(max_uncompressed_blob_size * 9 / 10); // XXX
+                    return size() < max_used_blob_size;
                 }
 
             }; // class PBFPrimitiveBlock
