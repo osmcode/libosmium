@@ -225,10 +225,15 @@ namespace osmium {
                 osmium::util::DeltaEncode<int64_t> m_delta_lat;
                 osmium::util::DeltaEncode<int64_t> m_delta_lon;
 
+                bool m_should_add_metadata;
+                bool m_add_visible;
+
             public:
 
-                DenseNodes(Stringtable& stringtable) :
-                    m_stringtable(stringtable) {
+                DenseNodes(Stringtable& stringtable, bool should_add_metadata, bool add_visible) :
+                    m_stringtable(stringtable),
+                    m_should_add_metadata(should_add_metadata),
+                    m_add_visible(add_visible) {
                 }
 
                 void clear() {
@@ -263,13 +268,13 @@ namespace osmium {
                 void add_node(const osmium::Node& node) {
                     m_ids.push_back(m_delta_id.update(node.id()));
 
-                    if (true) { // XXX
+                    if (m_should_add_metadata) {
                         m_versions.push_back(node.version());
                         m_timestamps.push_back(m_delta_timestamp.update(node.timestamp()));
                         m_changesets.push_back(m_delta_changeset.update(node.changeset()));
                         m_uids.push_back(m_delta_uid.update(node.uid()));
                         m_user_sids.push_back(m_delta_user_sid.update(m_stringtable.add(node.user())));
-                        if (true) { // XXX
+                        if (m_add_visible) {
                             m_visibles.push_back(node.visible());
                         }
                     }
@@ -290,7 +295,7 @@ namespace osmium {
 
                     pbf_dense_nodes.add_packed_sint64(1 /* repeated sint64 id [packed = true] */, m_ids.cbegin(), m_ids.cend());
 
-                    if (true) { // XXX
+                    if (m_should_add_metadata) {
                         protozero::pbf_writer pbf_dense_info(pbf_dense_nodes, 5 /* optional DenseInfo densinfo */);
                         pbf_dense_info.add_packed_int32(1 /* repeated int32 version [packed = true] */, m_versions.cbegin(), m_versions.cend());
                         pbf_dense_info.add_packed_sint64(2 /* repeated sint64 timestamp [packed = true] */, m_timestamps.cbegin(), m_timestamps.cend());
@@ -298,7 +303,7 @@ namespace osmium {
                         pbf_dense_info.add_packed_sint32(4 /* repeated sint32 uid [packed = true] */, m_uids.cbegin(), m_uids.cend());
                         pbf_dense_info.add_packed_sint32(5 /* repeated sint32 user_sid [packed = true] */, m_user_sids.cbegin(), m_user_sids.cend());
 
-                        if (true) { // XXX
+                        if (m_add_visible) {
                             pbf_dense_info.add_packed_int32(6 /* repeated bool visible [packed = true] */, m_visibles.cbegin(), m_visibles.cend()); // XXX bool
                         }
                     }
@@ -324,12 +329,12 @@ namespace osmium {
 
             public:
 
-                PBFPrimitiveBlock(int type = 0) :
+                PBFPrimitiveBlock(bool should_add_metadata, bool add_visible) :
                     m_pbf_primitive_group_data(),
                     m_stringtable(),
-                    m_dense_nodes(m_stringtable),
+                    m_dense_nodes(m_stringtable, should_add_metadata, add_visible),
                     m_pbf_primitive_group(m_pbf_primitive_group_data),
-                    m_type(type),
+                    m_type(0),
                     m_count(0) {
                 }
 
@@ -401,11 +406,6 @@ namespace osmium {
                 static constexpr int64_t buffer_fill_percent = 95;
 
                 /**
-                 * protobuf-struct of a PrimitiveBlock
-                 */
-                PBFPrimitiveBlock m_pbf_primitive_block;
-
-                /**
                  * should nodes be serialized into the dense format?
                  *
                  * nodes can be encoded one of two ways, as a Node
@@ -415,7 +415,7 @@ namespace osmium {
                  * longitudes. Each column is delta-encoded. This reduces
                  * header overheads and allows delta-coding to work very effectively.
                  */
-                bool m_use_dense_nodes {true};
+                bool m_use_dense_nodes;
 
                 /**
                  * should the PBF blobs contain zlib compressed data?
@@ -424,7 +424,7 @@ namespace osmium {
                  * blobs in raw format. Disabling the compression can improve the
                  * writing speed a little but the output will be 2x to 3x bigger.
                  */
-                bool m_use_compression {true};
+                bool m_use_compression;
 
                 /**
                  * Should the string tables in the data blocks be sorted?
@@ -432,18 +432,23 @@ namespace osmium {
                  * Not sorting the string tables makes writing PBF files
                  * slightly faster.
                  */
-                bool m_sort_stringtables { true };
+                bool m_sort_stringtables;
 
                 /**
                  * While the .osm.pbf-format is able to carry all meta information, it is
                  * also able to omit this information to reduce size.
                  */
-                bool m_should_add_metadata {true};
+                bool m_should_add_metadata;
 
                 /**
                  * Should the visible flag be added on objects?
                  */
                 bool m_add_visible;
+
+                /**
+                 * protobuf-struct of a PrimitiveBlock
+                 */
+                PBFPrimitiveBlock m_pbf_primitive_block;
 
                 bool debug;
 
@@ -506,20 +511,13 @@ namespace osmium {
 
                 explicit PBFOutputFormat(const osmium::io::File& file, data_queue_type& output_queue) :
                     OutputFormat(file, output_queue),
+                    m_use_dense_nodes(file.get("pbf_dense_nodes") != "false"),
+                    m_use_compression(file.get("pbf_compression") != "none" && file.get("pbf_compression") != "false"),
+                    m_sort_stringtables(file.get("pbf_sort_stringtables") != "false"),
+                    m_should_add_metadata(file.get("pbf_add_metadata") != "false"),
                     m_add_visible(file.has_multiple_object_versions()),
+                    m_pbf_primitive_block(m_should_add_metadata, m_add_visible),
                     debug(true) {
-                    if (file.get("pbf_dense_nodes") == "false") {
-                        m_use_dense_nodes = false;
-                    }
-                    if (file.get("pbf_compression") == "none" || file.get("pbf_compression") == "false") {
-                        m_use_compression = false;
-                    }
-                    if (file.get("pbf_sort_stringtables") == "false") {
-                        m_sort_stringtables = false;
-                    }
-                    if (file.get("pbf_add_metadata") == "false") {
-                        m_should_add_metadata = false;
-                    }
                 }
 
                 void write_buffer(osmium::memory::Buffer&& buffer) override final {
