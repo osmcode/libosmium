@@ -33,7 +33,7 @@ TEST_CASE("Basic Changeset") {
     REQUIRE(std::string("user") == cs1.user());
 
     crc32.update(cs1);
-    REQUIRE(crc32().checksum() == 0xa594a23e);
+    REQUIRE(crc32().checksum() == 0xf44aff25);
 
     osmium::Changeset& cs2 = buffer_add_changeset(buffer,
         "user",

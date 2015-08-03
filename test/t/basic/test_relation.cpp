@@ -61,5 +61,5 @@ TEST_CASE("Build relation") {
     }
 
     crc32.update(relation);
-    REQUIRE(crc32().checksum() == 0x50143c0f);
+    REQUIRE(crc32().checksum() == 0xebcd836d);
 }
