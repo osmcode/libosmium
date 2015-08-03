@@ -42,6 +42,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/node_ref_list.hpp>
 #include <osmium/osm/relation.hpp>
 #include <osmium/osm/way.hpp>
+#include <osmium/util/endian.hpp>
 
 namespace osmium {
 
@@ -99,11 +100,11 @@ namespace osmium {
         }
 
         void update(uint16_t value) {
-#if __BYTE_ORDER == __BIG_ENDIAN
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+            m_crc.process_bytes(&value, sizeof(uint16_t));
+#else
             uint16_t v = byte_swap_16(value);
             m_crc.process_bytes(&v, sizeof(uint16_t));
-#else
-            m_crc.process_bytes(&value, sizeof(uint16_t));
 #endif
         }
 
@@ -112,11 +113,11 @@ namespace osmium {
         }
 
         void update(uint32_t value) {
-#if __BYTE_ORDER == __BIG_ENDIAN
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+            m_crc.process_bytes(&value, sizeof(uint32_t));
+#else
             uint32_t v = byte_swap_32(value);
             m_crc.process_bytes(&v, sizeof(uint32_t));
-#else
-            m_crc.process_bytes(&value, sizeof(uint32_t));
 #endif
         }
 
@@ -125,11 +126,11 @@ namespace osmium {
         }
 
         void update(uint64_t value) {
-#if __BYTE_ORDER == __BIG_ENDIAN
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+            m_crc.process_bytes(&value, sizeof(uint64_t));
+#else
             uint64_t v = byte_swap_64(value);
             m_crc.process_bytes(&v, sizeof(uint64_t));
-#else
-            m_crc.process_bytes(&value, sizeof(uint64_t));
 #endif
         }
 
