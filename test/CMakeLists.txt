@@ -95,6 +95,7 @@ add_unit_test(area test_node_ref_segment)
 
 add_unit_test(basic test_box)
 add_unit_test(basic test_changeset)
+add_unit_test(basic test_crc)
 add_unit_test(basic test_entity_bits)
 add_unit_test(basic test_location)
 add_unit_test(basic test_node)
