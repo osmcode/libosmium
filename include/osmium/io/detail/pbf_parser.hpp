@@ -293,7 +293,6 @@ namespace osmium {
 
                         if (dense.has_denseinfo()) {
                             auto v = dense.denseinfo().version(i);
-                            assert(v > 0);
                             node.set_version(static_cast<osmium::object_version_type>(v));
                             node.set_changeset(static_cast<osmium::changeset_id_type>(last_dense_changeset));
                             node.set_timestamp(last_dense_timestamp * m_date_factor);
