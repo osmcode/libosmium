@@ -7,6 +7,8 @@ if [ "$TRAVIS_OS_NAME" = "osx" ]; then
 
     brew install protobuf osm-pbf google-sparsehash || true
 
+    brew install --without-python boost || true
+
     # workaround for gdal homebrew problem
     brew remove gdal
     brew install gdal
