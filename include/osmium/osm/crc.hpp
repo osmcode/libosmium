@@ -42,6 +42,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/node_ref_list.hpp>
 #include <osmium/osm/relation.hpp>
 #include <osmium/osm/way.hpp>
+#include <osmium/util/endian.hpp>
 
 namespace osmium {
 
@@ -90,66 +91,54 @@ namespace osmium {
             return m_crc;
         }
 
-        void update(bool value) {
+        void update_bool(bool value) {
             m_crc.process_byte(value);
         }
 
-        void update(uint8_t value) {
+        void update_int8(uint8_t value) {
             m_crc.process_byte(value);
         }
 
-        void update(uint16_t value) {
-#if __BYTE_ORDER == __BIG_ENDIAN
+        void update_int16(uint16_t value) {
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+            m_crc.process_bytes(&value, sizeof(uint16_t));
+#else
             uint16_t v = byte_swap_16(value);
             m_crc.process_bytes(&v, sizeof(uint16_t));
-#else
-            m_crc.process_bytes(&value, sizeof(uint16_t));
 #endif
         }
 
-        void update(int16_t value) {
-            update(static_cast<uint16_t>(value));
-        }
-
-        void update(uint32_t value) {
-#if __BYTE_ORDER == __BIG_ENDIAN
+        void update_int32(uint32_t value) {
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+            m_crc.process_bytes(&value, sizeof(uint32_t));
+#else
             uint32_t v = byte_swap_32(value);
             m_crc.process_bytes(&v, sizeof(uint32_t));
-#else
-            m_crc.process_bytes(&value, sizeof(uint32_t));
 #endif
         }
 
-        void update(int32_t value) {
-            update(static_cast<uint32_t>(value));
-        }
-
-        void update(uint64_t value) {
-#if __BYTE_ORDER == __BIG_ENDIAN
+        void update_int64(uint64_t value) {
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+            m_crc.process_bytes(&value, sizeof(uint64_t));
+#else
             uint64_t v = byte_swap_64(value);
             m_crc.process_bytes(&v, sizeof(uint64_t));
-#else
-            m_crc.process_bytes(&value, sizeof(uint64_t));
 #endif
         }
 
-        void update(int64_t value) {
-            update(static_cast<uint64_t>(value));
-        }
-
-        void update(const char* str) {
+        void update_string(const char* str) {
             while (*str) {
                 m_crc.process_byte(*str++);
             }
         }
 
         void update(const Timestamp& timestamp) {
-            update(timestamp.seconds_since_epoch());
+            update_int32(uint32_t(timestamp));
         }
 
         void update(const osmium::Location& location) {
-            update(location.x());
-            update(location.y());
+            update_int32(location.x());
+            update_int32(location.y());
         }
 
         void update(const osmium::Box& box) {
@@ -158,7 +147,7 @@ namespace osmium {
         }
 
         void update(const NodeRef& node_ref) {
-            update(node_ref.ref());
+            update_int64(node_ref.ref());
         }
 
         void update(const NodeRefList& node_refs) {
@@ -172,9 +161,9 @@ namespace osmium {
         }
 
         void update(const osmium::RelationMember& member) {
-            update(member.ref());
-            update(member.type());
-            update(member.role());
+            update_int64(member.ref());
+            update_int16(uint16_t(member.type()));
+            update_string(member.role());
         }
 
         void update(const osmium::RelationMemberList& members) {
@@ -184,12 +173,12 @@ namespace osmium {
         }
 
         void update(const osmium::OSMObject& object) {
-            update(object.id());
-            update(object.visible());
-            update(object.version());
+            update_int64(object.id());
+            update_bool(object.visible());
+            update_int32(object.version());
             update(object.timestamp());
-            update(object.uid());
-            update(object.user());
+            update_int32(object.uid());
+            update_string(object.user());
             update(object.tags());
         }
 
@@ -219,13 +208,13 @@ namespace osmium {
         }
 
         void update(const osmium::Changeset& changeset) {
-            update(changeset.id());
+            update_int64(changeset.id());
             update(changeset.created_at());
             update(changeset.closed_at());
             update(changeset.bounds());
-            update(changeset.num_changes());
-            update(changeset.uid());
-            update(changeset.user());
+            update_int32(changeset.num_changes());
+            update_int32(changeset.uid());
+            update_string(changeset.user());
         }
 
     }; // class CRC

@@ -11,22 +11,22 @@ TEST_CASE("CRC of basic datatypes") {
     osmium::CRC<boost::crc_32_type> crc32;
 
     SECTION("Bool") {
-        crc32.update(true);
-        crc32.update(false);
+        crc32.update_bool(true);
+        crc32.update_bool(false);
 
         REQUIRE(crc32().checksum() == 0x58c223be);
     }
 
     SECTION("Char") {
-        crc32.update('x');
-        crc32.update('y');
+        crc32.update_int8('x');
+        crc32.update_int8('y');
 
-        REQUIRE(crc32().checksum() == 0xca0ba5a);
+        REQUIRE(crc32().checksum() == 0x8fe62899);
     }
 
     SECTION("String") {
         const char* str = "foobar";
-        crc32.update(str);
+        crc32.update_string(str);
 
         REQUIRE(crc32().checksum() == 0x9ef61f95);
     }
@@ -35,7 +35,7 @@ TEST_CASE("CRC of basic datatypes") {
         osmium::Timestamp t("2015-07-12T13:10:46Z");
         crc32.update(t);
 
-        REQUIRE(crc32().checksum() == 0x1c5da71d);
+        REQUIRE(crc32().checksum() == 0x58a29d7);
     }
 
     SECTION("Location") {
