@@ -72,10 +72,9 @@ namespace osmium {
 # if defined(__GNUC__) || defined(__clang__)
             return __builtin_bswap64(value);
 # else
-            return (value >> 24) |
-                ((value >>  8) & 0x0000FF00) |
-                ((value <<  8) & 0x00FF0000) |
-                (value << 24);
+            uint64_t val1 = byte_swap_32(value & 0xFFFFFFFF);
+            uint64_t val2 = byte_swap_32(value >> 32);
+            return (val1 << 32) & val2;
 # endif
         }
 
