@@ -12,6 +12,10 @@
 #include <osmium/io/gzip_compression.hpp>
 #include <osmium/visitor.hpp>
 
+std::string S_(const char* s) {
+    return std::string(s);
+}
+
 std::string filename(const char* test_id, const char* suffix = "osm") {
     const char* testdir = getenv("TESTDIR");
     if (!testdir) {
@@ -338,25 +342,25 @@ TEST_CASE("Reading OSM XML 140") {
             auto len = atoi(t["unicode_utf8_length"]);
             REQUIRE(len == strlen(uc));
 
-            REQUIRE(!strcmp(uc, t["unicode_xml"]));
+            REQUIRE(S_(uc) == t["unicode_xml"]);
 
 // workaround for missing support for u8 string literals on Windows
 #if !defined(_MSC_VER)
             switch (count) {
                 case 1:
-                    REQUIRE(!strcmp(uc, u8"a"));
+                    REQUIRE(S_(uc) ==  u8"a");
                     break;
                 case 2:
-                    REQUIRE(!strcmp(uc, u8"\u00e4"));
+                    REQUIRE(S_(uc) == u8"\u00e4");
                     break;
                 case 3:
-                    REQUIRE(!strcmp(uc, u8"\u30dc"));
+                    REQUIRE(S_(uc) == u8"\u30dc");
                     break;
                 case 4:
-                    REQUIRE(!strcmp(uc, u8"\U0001d11e"));
+                    REQUIRE(S_(uc) == u8"\U0001d11e");
                     break;
                 case 5:
-                    REQUIRE(!strcmp(uc, u8"\U0001f6eb"));
+                    REQUIRE(S_(uc) == u8"\U0001f6eb");
                     break;
                 default:
                     REQUIRE(false); // should not be here
@@ -383,11 +387,11 @@ TEST_CASE("Reading OSM XML 141") {
         const osmium::Node& node = buffer.get<osmium::Node>(0);
         const osmium::TagList& tags = node.tags();
 
-        REQUIRE(!strcmp(tags["less-than"],    "<"));
-        REQUIRE(!strcmp(tags["greater-than"], ">"));
-        REQUIRE(!strcmp(tags["apostrophe"],   "'"));
-        REQUIRE(!strcmp(tags["ampersand"],    "&"));
-        REQUIRE(!strcmp(tags["quote"],        "\""));
+        REQUIRE(S_(tags["less-than"])    == "<");
+        REQUIRE(S_(tags["greater-than"]) == ">");
+        REQUIRE(S_(tags["apostrophe"])   == "'");
+        REQUIRE(S_(tags["ampersand"])    == "&");
+        REQUIRE(S_(tags["quote"])        == "\"");
     }
 
 }
@@ -411,29 +415,29 @@ TEST_CASE("Reading OSM XML 142") {
 
             switch (count) {
                 case 1:
-                    REQUIRE(std::string(it->user()) == "user name");
-                    REQUIRE(std::string(tag.key()) == "key with space");
-                    REQUIRE(std::string(tag.value()) == "value with space");
+                    REQUIRE(S_(it->user()) == "user name");
+                    REQUIRE(S_(tag.key()) == "key with space");
+                    REQUIRE(S_(tag.value()) == "value with space");
                     break;
                 case 2:
-                    REQUIRE(std::string(it->user()) == "line\nfeed");
-                    REQUIRE(std::string(tag.key()) == "key with\nlinefeed");
-                    REQUIRE(std::string(tag.value()) == "value with\nlinefeed");
+                    REQUIRE(S_(it->user()) == "line\nfeed");
+                    REQUIRE(S_(tag.key()) == "key with\nlinefeed");
+                    REQUIRE(S_(tag.value()) == "value with\nlinefeed");
                     break;
                 case 3:
-                    REQUIRE(std::string(it->user()) == "carriage\rreturn");
-                    REQUIRE(std::string(tag.key()) == "key with\rcarriage\rreturn");
-                    REQUIRE(std::string(tag.value()) == "value with\rcarriage\rreturn");
+                    REQUIRE(S_(it->user()) == "carriage\rreturn");
+                    REQUIRE(S_(tag.key()) == "key with\rcarriage\rreturn");
+                    REQUIRE(S_(tag.value()) == "value with\rcarriage\rreturn");
                     break;
                 case 4:
-                    REQUIRE(std::string(it->user()) == "tab\tulator");
-                    REQUIRE(std::string(tag.key()) == "key with\ttab");
-                    REQUIRE(std::string(tag.value()) == "value with\ttab");
+                    REQUIRE(S_(it->user()) == "tab\tulator");
+                    REQUIRE(S_(tag.key()) == "key with\ttab");
+                    REQUIRE(S_(tag.value()) == "value with\ttab");
                     break;
                 case 5:
-                    REQUIRE(std::string(it->user()) == "unencoded linefeed");
-                    REQUIRE(std::string(tag.key()) == "key with unencoded linefeed");
-                    REQUIRE(std::string(tag.value()) == "value with unencoded linefeed");
+                    REQUIRE(S_(it->user()) == "unencoded linefeed");
+                    REQUIRE(S_(tag.key()) == "key with unencoded linefeed");
+                    REQUIRE(S_(tag.value()) == "value with unencoded linefeed");
                     break;
                 default:
                     REQUIRE(false); // should not be here
@@ -458,19 +462,19 @@ TEST_CASE("Reading OSM XML 142") {
             ++count;
             switch (count) {
                 case 1:
-                    REQUIRE(std::string(member.role()) == "role with whitespace");
+                    REQUIRE(S_(member.role()) == "role with whitespace");
                     break;
                 case 2:
-                    REQUIRE(std::string(member.role()) == "role with\nlinefeed");
+                    REQUIRE(S_(member.role()) == "role with\nlinefeed");
                     break;
                 case 3:
-                    REQUIRE(std::string(member.role()) == "role with\rcarriage\rreturn");
+                    REQUIRE(S_(member.role()) == "role with\rcarriage\rreturn");
                     break;
                 case 4:
-                    REQUIRE(std::string(member.role()) == "role with\ttab");
+                    REQUIRE(S_(member.role()) == "role with\ttab");
                     break;
                 case 5:
-                    REQUIRE(std::string(member.role()) == "role with unencoded linefeed");
+                    REQUIRE(S_(member.role()) == "role with unencoded linefeed");
                     break;
                 default:
                     REQUIRE(false); // should not be here
