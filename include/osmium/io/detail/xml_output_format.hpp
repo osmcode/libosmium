@@ -85,6 +85,9 @@ namespace osmium {
                             case '\'': out += "&apos;"; break;
                             case '<':  out += "&lt;";   break;
                             case '>':  out += "&gt;";   break;
+                            case '\n': out += "&#xA;";  break;
+                            case '\r': out += "&#xD;";  break;
+                            case '\t': out += "&#x9;";  break;
                             default:   out += *in;      break;
                         }
                     }
