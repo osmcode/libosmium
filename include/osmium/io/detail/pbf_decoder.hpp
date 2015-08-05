@@ -38,6 +38,7 @@ DEALINGS IN THE SOFTWARE.
 #include <cstring>
 #include <algorithm>
 #include <iterator>
+#include <limits>
 
 #include <protozero/pbf_reader.hpp>
 
@@ -227,8 +228,8 @@ namespace osmium {
 
                     kv_type keys;
                     kv_type vals;
-                    int64_t lon;
-                    int64_t lat;
+                    int64_t lon = std::numeric_limits<int64_t>::max();
+                    int64_t lat = std::numeric_limits<int64_t>::max();
 
                     ptr_len_type user = { "", 0 };
 
@@ -259,6 +260,10 @@ namespace osmium {
                     }
 
                     if (node.visible()) {
+                        if (lon == std::numeric_limits<int64_t>::max() ||
+                            lat == std::numeric_limits<int64_t>::max()) {
+                            throw osmium::pbf_error("illegal coordinate format");
+                        }
                         node.set_location(osmium::Location(
                                 convert_pbf_coordinate(lon),
                                 convert_pbf_coordinate(lat)
@@ -616,7 +621,10 @@ namespace osmium {
             }
 
             inline osmium::Box decode_header_bbox(const ptr_len_type& data) {
-                    int64_t left, right, top, bottom;
+                    int64_t left   = std::numeric_limits<int64_t>::max();
+                    int64_t right  = std::numeric_limits<int64_t>::max();
+                    int64_t top    = std::numeric_limits<int64_t>::max();
+                    int64_t bottom = std::numeric_limits<int64_t>::max();
 
                     protozero::pbf_reader pbf_header_bbox(data);
                     while (pbf_header_bbox.next()) {
@@ -636,6 +644,13 @@ namespace osmium {
                             default:
                                 pbf_header_bbox.skip();
                         }
+                    }
+
+                    if (left   == std::numeric_limits<int64_t>::max() ||
+                        right  == std::numeric_limits<int64_t>::max() ||
+                        top    == std::numeric_limits<int64_t>::max() ||
+                        bottom == std::numeric_limits<int64_t>::max()) {
+                        throw osmium::pbf_error("invalid bbox");
                     }
 
                     osmium::Box box;
