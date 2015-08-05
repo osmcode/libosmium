@@ -39,7 +39,6 @@ DEALINGS IN THE SOFTWARE.
 #include <cstdint>
 #include <cstdlib>
 #include <future>
-#include <iostream>
 #include <iterator>
 #include <memory>
 #include <ratio>
@@ -453,19 +452,9 @@ namespace osmium {
                  */
                 PBFPrimitiveBlock m_pbf_primitive_block;
 
-                bool debug;
-
-                bool has_debug_level(int) {
-                    return false;
-                }
-
                 void store_primitive_block() {
                     if (m_pbf_primitive_block.type() == 0 || m_pbf_primitive_block.count() == 0) {
                         return;
-                    }
-
-                    if (debug && has_debug_level(1)) {
-                        std::cerr << "storing primitive block with " << m_pbf_primitive_block.count() << " items\n";
                     }
 
                     std::string primitive_block_data;
@@ -527,8 +516,7 @@ namespace osmium {
                     m_sort_stringtables(file.get("pbf_sort_stringtables") != "false"),
                     m_should_add_metadata(file.get("pbf_add_metadata") != "false"),
                     m_add_visible(file.has_multiple_object_versions()),
-                    m_pbf_primitive_block(m_should_add_metadata, m_add_visible),
-                    debug(true) {
+                    m_pbf_primitive_block(m_should_add_metadata, m_add_visible) {
                 }
 
                 void write_buffer(osmium::memory::Buffer&& buffer) override final {
@@ -549,21 +537,16 @@ namespace osmium {
                         pbf_header_bbox.add_sint64(4 /* bottom */, box.bottom_left().lat() * lonlat_resolution);
                     }
 
-                    // add the schema version as required feature to the HeaderBlock
                     pbf_header_block.add_string(4 /* required_features */, "OsmSchema-V0.6");
 
-                    // when the densenodes-feature is used, add DenseNodes as required feature
                     if (m_use_dense_nodes) {
                         pbf_header_block.add_string(4 /* required_features */, "DenseNodes");
                     }
 
-                    // when the resulting file will carry history information, add
-                    // HistoricalInformation as required feature
                     if (m_file.has_multiple_object_versions()) {
                         pbf_header_block.add_string(4 /* required_features */, "HistoricalInformation");
                     }
 
-                    // set the writing program
                     pbf_header_block.add_string(16 /* writingprogram */, header.get("generator"));
 
                     std::string osmosis_replication_timestamp = header.get("osmosis_replication_timestamp");
@@ -580,10 +563,6 @@ namespace osmium {
                     std::string osmosis_replication_base_url = header.get("osmosis_replication_base_url");
                     if (!osmosis_replication_base_url.empty()) {
                         pbf_header_block.add_string(34 /* osmosis_replication_base_url */, osmosis_replication_base_url);
-                    }
-
-                    if (debug && has_debug_level(1)) {
-                        std::cerr << "storing header block" << std::endl;
                     }
 
                     std::promise<std::string> promise;
@@ -671,10 +650,6 @@ namespace osmium {
                  * blocks to the file and close the file.
                  */
                 void close() override final {
-                    if (debug && has_debug_level(1)) {
-                        std::cerr << "finishing" << std::endl;
-                    }
-
                     store_primitive_block();
 
                     std::promise<std::string> promise;
