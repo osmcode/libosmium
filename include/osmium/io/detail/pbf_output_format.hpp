@@ -486,7 +486,7 @@ namespace osmium {
                     OutputFormat(file, output_queue),
                     m_use_dense_nodes(file.get("pbf_dense_nodes") != "false"),
                     m_use_compression(file.get("pbf_compression") != "none" && file.get("pbf_compression") != "false"),
-                    m_add_metadata(file.get("pbf_add_metadata") != "false"),
+                    m_add_metadata(file.get("pbf_add_metadata") != "false" && file.get("add_metadata") != "false"),
                     m_add_visible(file.has_multiple_object_versions()),
                     m_pbf_primitive_block(m_add_metadata, m_add_visible) {
                 }
