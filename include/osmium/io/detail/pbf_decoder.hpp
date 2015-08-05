@@ -33,7 +33,6 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <cassert>
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
@@ -163,13 +162,25 @@ namespace osmium {
                     while (pbf_info.next()) {
                         switch (pbf_info.tag()) {
                             case 1: // optional int32 version
-                                object.set_version(static_cast_with_assert<object_version_type>(pbf_info.get_int32()));
+                                {
+                                    auto version = pbf_info.get_int32();
+                                    if (version < 0) {
+                                        throw osmium::pbf_error("object version must not be negative");
+                                    }
+                                    object.set_version(static_cast_with_assert<object_version_type>(version));
+                                }
                                 break;
                             case 2: // optional int64 timestamp
                                 object.set_timestamp(pbf_info.get_int64() * m_date_factor / 1000);
                                 break;
                             case 3: // optional int64 changeset
-                                object.set_changeset(static_cast_with_assert<changeset_id_type>(pbf_info.get_int64()));
+                                {
+                                    auto changeset_id = pbf_info.get_int64();
+                                    if (changeset_id < 0) {
+                                        throw osmium::pbf_error("object changeset_id must not be negative");
+                                    }
+                                    object.set_changeset(static_cast_with_assert<changeset_id_type>(changeset_id));
+                                }
                                 break;
                             case 4: // optional int32 uid
                                 object.set_uid_from_signed(pbf_info.get_int32());
@@ -356,8 +367,12 @@ namespace osmium {
                         osmium::util::DeltaDecode<int64_t> ref;
                         while (roles.first != roles.second && refs.first != refs.second && types.first != types.second) {
                             const auto& r = m_stringtable.at(*roles.first++);
+                            int type = *types.first++;
+                            if (type < 0 || type > 2) {
+                                throw osmium::pbf_error("unknown relation member type");
+                            }
                             rml_builder.add_member(
-                                osmium::item_type(*types.first++ + 1),
+                                osmium::item_type(type + 1),
                                 ref.update(*refs.first++),
                                 r.first,
                                 r.second
@@ -471,8 +486,19 @@ namespace osmium {
                                 // this is against the spec, must have same number of elements
                                 throw osmium::pbf_error("PBF format error");
                             }
-                            node.set_version(static_cast<osmium::object_version_type>(*versions.first++));
-                            node.set_changeset(static_cast<osmium::changeset_id_type>(dense_changeset.update(*changesets.first++)));
+
+                            auto version = *versions.first++;
+                            if (version < 0) {
+                                throw osmium::pbf_error("object version must not be negative");
+                            }
+                            node.set_version(static_cast<osmium::object_version_type>(version));
+
+                            auto changeset_id = dense_changeset.update(*changesets.first++);
+                            if (changeset_id < 0) {
+                                throw osmium::pbf_error("object changeset_id must not be negative");
+                            }
+                            node.set_changeset(static_cast<osmium::changeset_id_type>(changeset_id));
+
                             node.set_timestamp(dense_timestamp.update(*timestamps.first++) * m_date_factor / 1000);
                             node.set_uid_from_signed(static_cast<osmium::signed_user_id_type>(dense_uid.update(*uids.first++)));
 
@@ -555,9 +581,18 @@ namespace osmium {
                 while (pbf_blob.next()) {
                     switch (pbf_blob.tag()) {
                         case 1: // optional bytes raw
-                            return pbf_blob.get_data();
+                            {
+                                auto data_len = pbf_blob.get_data();
+                                if (data_len.second > max_uncompressed_blob_size) {
+                                    throw osmium::pbf_error("illegal blob size");
+                                }
+                                return data_len;
+                            }
                         case 2: // optional int32 raw_size
                             raw_size = pbf_blob.get_int32();
+                            if (raw_size <= 0 || uint32_t(raw_size) > max_uncompressed_blob_size) {
+                                throw osmium::pbf_error("illegal blob size");
+                            }
                             break;
                         case 3: // optional bytes zlib_data
                             zlib_data = pbf_blob.get_data();
@@ -570,8 +605,6 @@ namespace osmium {
                 }
 
                 if (zlib_data.second != 0) {
-                    assert(raw_size >= 0);
-                    assert(raw_size <= max_uncompressed_blob_size);
                     return osmium::io::detail::zlib_uncompress_string(
                         zlib_data.first,
                         static_cast<unsigned long>(zlib_data.second),

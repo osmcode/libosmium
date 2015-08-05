@@ -71,7 +71,7 @@ namespace osmium {
             const int max_blob_header_size = 64 * 1024; // 64 kB
 
             // the maximum size of an uncompressed blob in bytes
-            const int max_uncompressed_blob_size = 32 * 1024 * 1024; // 32 MB
+            const uint64_t max_uncompressed_blob_size = 32 * 1024 * 1024; // 32 MB
 
             // resolution for longitude/latitude used for conversion
             // between representation as double and as int

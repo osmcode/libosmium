@@ -224,14 +224,14 @@ namespace osmium {
                 osmium::util::DeltaEncode<int64_t> m_delta_lat;
                 osmium::util::DeltaEncode<int64_t> m_delta_lon;
 
-                bool m_should_add_metadata;
+                bool m_add_metadata;
                 bool m_add_visible;
 
             public:
 
-                DenseNodes(Stringtable& stringtable, bool should_add_metadata, bool add_visible) :
+                DenseNodes(Stringtable& stringtable, bool add_metadata, bool add_visible) :
                     m_stringtable(stringtable),
-                    m_should_add_metadata(should_add_metadata),
+                    m_add_metadata(add_metadata),
                     m_add_visible(add_visible) {
                 }
 
@@ -267,7 +267,7 @@ namespace osmium {
                 void add_node(const osmium::Node& node) {
                     m_ids.push_back(m_delta_id.update(node.id()));
 
-                    if (m_should_add_metadata) {
+                    if (m_add_metadata) {
                         m_versions.push_back(node.version());
                         m_timestamps.push_back(m_delta_timestamp.update(node.timestamp()));
                         m_changesets.push_back(m_delta_changeset.update(node.changeset()));
@@ -294,7 +294,7 @@ namespace osmium {
 
                     pbf_dense_nodes.add_packed_sint64(1 /* repeated sint64 id [packed = true] */, m_ids.cbegin(), m_ids.cend());
 
-                    if (m_should_add_metadata) {
+                    if (m_add_metadata) {
                         protozero::pbf_writer pbf_dense_info(pbf_dense_nodes, 5 /* optional DenseInfo densinfo */);
                         pbf_dense_info.add_packed_int32(1 /* repeated int32 version [packed = true] */, m_versions.cbegin(), m_versions.cend());
                         pbf_dense_info.add_packed_sint64(2 /* repeated sint64 timestamp [packed = true] */, m_timestamps.cbegin(), m_timestamps.cend());
@@ -328,10 +328,10 @@ namespace osmium {
 
             public:
 
-                PBFPrimitiveBlock(bool should_add_metadata, bool add_visible) :
+                PBFPrimitiveBlock(bool add_metadata, bool add_visible) :
                     m_pbf_primitive_group_data(),
                     m_stringtable(),
-                    m_dense_nodes(m_stringtable, should_add_metadata, add_visible),
+                    m_dense_nodes(m_stringtable, add_metadata, add_visible),
                     m_pbf_primitive_group(m_pbf_primitive_group_data),
                     m_type(0),
                     m_count(0) {
@@ -382,8 +382,13 @@ namespace osmium {
                     return m_pbf_primitive_group_data.size() + m_stringtable.size() + m_dense_nodes.size();
                 }
 
-                // fill blocks to 90% of max size.
-                constexpr static size_t max_used_blob_size = max_uncompressed_blob_size * 9 / 10;
+                /**
+                 * The output buffer (block) will be filled to about
+                 * 95% and then written to disk. This leaves more than
+                 * enough space for the string table (which typically
+                 * needs about 0.1 to 0.3% of the block size).
+                 */
+                constexpr static size_t max_used_blob_size = max_uncompressed_blob_size * 95 / 100;
 
                 bool can_add(int type) const {
                     if (type != m_type) {
@@ -399,57 +404,25 @@ namespace osmium {
 
             class PBFOutputFormat : public osmium::io::detail::OutputFormat, public osmium::handler::Handler {
 
-                /**
-                 * The output buffer (block) will be filled to about
-                 * 95% and then written to disk. This leaves more than
-                 * enough space for the string table (which typically
-                 * needs about 0.1 to 0.3% of the block size).
-                 */
-                static constexpr int64_t buffer_fill_percent = 95;
-
-                /**
-                 * should nodes be serialized into the dense format?
-                 *
-                 * nodes can be encoded one of two ways, as a Node
-                 * (m_use_dense_nodes = false) and a special dense format.
-                 * In the dense format, all information is stored 'column wise',
-                 * as an array of ID's, array of latitudes, and array of
-                 * longitudes. Each column is delta-encoded. This reduces
-                 * header overheads and allows delta-coding to work very effectively.
-                 */
+                /// Should nodes be encoded in DenseNodes?
                 bool m_use_dense_nodes;
 
                 /**
-                 * should the PBF blobs contain zlib compressed data?
+                 * Should the PBF blobs contain zlib compressed data?
                  *
-                 * the zlib compression is optional, it's possible to store the
-                 * blobs in raw format. Disabling the compression can improve the
-                 * writing speed a little but the output will be 2x to 3x bigger.
+                 * The zlib compression is optional, it's possible to store the
+                 * blobs in raw format. Disabling the compression can improve
+                 * the writing speed a little but the output will be 2x to 3x
+                 * bigger.
                  */
                 bool m_use_compression;
 
-                /**
-                 * Should the string tables in the data blocks be sorted?
-                 *
-                 * Not sorting the string tables makes writing PBF files
-                 * slightly faster.
-                 */
-                bool m_sort_stringtables;
+                /// Should metadata of objects be written?
+                bool m_add_metadata;
 
-                /**
-                 * While the .osm.pbf-format is able to carry all meta information, it is
-                 * also able to omit this information to reduce size.
-                 */
-                bool m_should_add_metadata;
-
-                /**
-                 * Should the visible flag be added on objects?
-                 */
+                /// Should the visible flag be added to objects?
                 bool m_add_visible;
 
-                /**
-                 * protobuf-struct of a PrimitiveBlock
-                 */
                 PBFPrimitiveBlock m_pbf_primitive_block;
 
                 void store_primitive_block() {
@@ -490,7 +463,7 @@ namespace osmium {
                         boost::make_transform_iterator(tags.begin(), map_tag_value),
                         boost::make_transform_iterator(tags.end(), map_tag_value));
 
-                    if (m_should_add_metadata) {
+                    if (m_add_metadata) {
                         protozero::pbf_writer pbf_info(pbf_object, 4 /* info */);
 
                         pbf_info.add_int32(1 /* version */, object.version());
@@ -513,10 +486,9 @@ namespace osmium {
                     OutputFormat(file, output_queue),
                     m_use_dense_nodes(file.get("pbf_dense_nodes") != "false"),
                     m_use_compression(file.get("pbf_compression") != "none" && file.get("pbf_compression") != "false"),
-                    m_sort_stringtables(file.get("pbf_sort_stringtables") != "false"),
-                    m_should_add_metadata(file.get("pbf_add_metadata") != "false"),
+                    m_add_metadata(file.get("pbf_add_metadata") != "false"),
                     m_add_visible(file.has_multiple_object_versions()),
-                    m_pbf_primitive_block(m_should_add_metadata, m_add_visible) {
+                    m_pbf_primitive_block(m_add_metadata, m_add_visible) {
                 }
 
                 void write_buffer(osmium::memory::Buffer&& buffer) override final {
