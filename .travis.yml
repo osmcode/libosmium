@@ -42,9 +42,7 @@ addons:
             - libgdal-dev
             - libgeos++-dev
             - libproj-dev
-            - libprotobuf-dev
             - libsparsehash-dev
-            - protobuf-compiler
             - spatialite-bin
 
 install:

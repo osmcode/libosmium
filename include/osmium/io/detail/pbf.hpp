@@ -43,6 +43,7 @@ DEALINGS IN THE SOFTWARE.
 #endif
 
 #include <osmium/io/error.hpp>
+#include <osmium/osm/location.hpp>
 
 namespace osmium {
 
@@ -61,6 +62,26 @@ namespace osmium {
         }
 
     }; // struct pbf_error
+
+    namespace io {
+
+        namespace detail {
+
+            // the maximum size of a blob header in bytes
+            const int max_blob_header_size = 64 * 1024; // 64 kB
+
+            // the maximum size of an uncompressed blob in bytes
+            const uint64_t max_uncompressed_blob_size = 32 * 1024 * 1024; // 32 MB
+
+            // resolution for longitude/latitude used for conversion
+            // between representation as double and as int
+            const int64_t lonlat_resolution = 1000 * 1000 * 1000;
+
+            const int64_t resolution_convert = lonlat_resolution / osmium::Location::coordinate_precision;
+
+        }
+
+    }
 
 } // namespace osmium
 
