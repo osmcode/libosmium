@@ -114,14 +114,11 @@ namespace osmium {
                 std::string blob_data;
                 protozero::pbf_writer pbf_blob(blob_data);
 
-                if (!use_compression) {
-                    pbf_blob.add_bytes(1 /* optional bytes raw */, msg);
-                }
-
-                pbf_blob.add_int32(2 /* optional int32 raw_size */, msg.size());
-
                 if (use_compression) {
+                    pbf_blob.add_int32(2 /* optional int32 raw_size */, msg.size());
                     pbf_blob.add_bytes(3 /* optional bytes zlib_data */, osmium::io::detail::zlib_compress(msg));
+                } else {
+                    pbf_blob.add_bytes(1 /* optional bytes raw */, msg);
                 }
 
                 std::string blob_header_data;
