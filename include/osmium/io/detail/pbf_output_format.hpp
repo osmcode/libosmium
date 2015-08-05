@@ -54,6 +54,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/handler.hpp>
 #include <osmium/io/detail/output_format.hpp>
 #include <osmium/io/detail/pbf.hpp> // IWYU pragma: export
+#include <osmium/io/detail/string_table.hpp>
 #include <osmium/io/detail/zlib.hpp>
 #include <osmium/io/file.hpp>
 #include <osmium/io/file_format.hpp>
@@ -139,64 +140,9 @@ namespace osmium {
                 return output;
             }
 
-            struct StrComp {
-
-                bool operator()(const char* lhs, const char* rhs) const {
-                    return strcmp(lhs, rhs) < 0;
-                }
-
-            }; // struct StrComp
-
-            class Stringtable {
-
-                std::map<const char*, size_t, StrComp> m_index;
-                std::vector<std::string> m_strings;
-                size_t m_size;
-
-            public:
-
-                Stringtable() :
-                    m_index(),
-                    m_strings(),
-                    m_size(2) {
-                    m_strings.push_back("");
-                }
-
-                void clear() {
-                    m_strings.clear();
-                    m_strings.push_back("");
-                    m_index.clear();
-                    m_size = 2;
-                }
-
-                size_t size() const {
-                    return m_size;
-                }
-
-                size_t add(const char* s) {
-                    auto f = m_index.find(s);
-                    if (f != m_index.end()) {
-                        return f->second;
-                    }
-
-                    size_t n = m_strings.size();
-                    m_strings.emplace_back(s);
-                    m_index[m_strings[n].c_str()] = n;
-                    m_size += strlen(s) + 2;
-                    return n;
-                }
-
-                void write(protozero::pbf_writer& pbf_string_table) {
-                    for (const auto& s : m_strings) {
-                        pbf_string_table.add_bytes(1 /* repeated bytes s */, s);
-                    }
-                }
-
-            }; // class Stringtable
-
             class DenseNodes {
 
-                Stringtable& m_stringtable;
+                StringTable& m_stringtable;
 
                 std::vector<int64_t> m_ids;
 
@@ -226,7 +172,7 @@ namespace osmium {
 
             public:
 
-                DenseNodes(Stringtable& stringtable, bool add_metadata, bool add_visible) :
+                DenseNodes(StringTable& stringtable, bool add_metadata, bool add_visible) :
                     m_stringtable(stringtable),
                     m_add_metadata(add_metadata),
                     m_add_visible(add_visible) {
@@ -318,7 +264,7 @@ namespace osmium {
 
                 std::string m_pbf_primitive_group_data;
                 protozero::pbf_writer m_pbf_primitive_group;
-                Stringtable m_stringtable;
+                StringTable m_stringtable;
                 DenseNodes m_dense_nodes;
                 int m_type;
                 int m_count;
@@ -349,8 +295,10 @@ namespace osmium {
                     m_count = 0;
                 }
 
-                void write_stringtable(protozero::pbf_writer& pbf) {
-                    m_stringtable.write(pbf);
+                void write_stringtable(protozero::pbf_writer& pbf_string_table) {
+                    for (const char* s : m_stringtable) {
+                        pbf_string_table.add_bytes(1 /* repeated bytes s */, s);
+                    }
                 }
 
                 protozero::pbf_writer& group() {
