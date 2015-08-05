@@ -156,7 +156,7 @@ namespace osmium {
                 }
 
                 ptr_len_type decode_info(const ptr_len_type& data, osmium::OSMObject& object) {
-                    auto user = std::make_pair<const char*, size_t>("", 0);
+                    ptr_len_type user = std::make_pair("", 0);
 
                     protozero::pbf_reader pbf_info(data);
                     while (pbf_info.next()) {
