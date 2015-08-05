@@ -393,10 +393,10 @@ namespace osmium {
                 void add_meta(const osmium::OSMObject& object, protozero::pbf_writer& pbf_object) {
                     const osmium::TagList& tags = object.tags();
 
-                    auto map_tag_key = [this](const osmium::Tag& tag) {
+                    auto map_tag_key = [this](const osmium::Tag& tag) -> size_t {
                         return m_primitive_block.add_string(tag.key());
                     };
-                    auto map_tag_value = [this](const osmium::Tag& tag) {
+                    auto map_tag_value = [this](const osmium::Tag& tag) -> size_t {
                         return m_primitive_block.add_string(tag.value());
                     };
 
@@ -516,7 +516,7 @@ namespace osmium {
                 }
 
                 void way(const osmium::Way& way) {
-                    static auto map_node_ref = [](osmium::NodeRefList::const_iterator node_ref) noexcept {
+                    static auto map_node_ref = [](osmium::NodeRefList::const_iterator node_ref) noexcept -> osmium::object_id_type {
                         return node_ref->ref();
                     };
                     typedef osmium::util::DeltaEncodeIterator<osmium::NodeRefList::const_iterator, decltype(map_node_ref), osmium::object_id_type> it_type;
@@ -538,14 +538,14 @@ namespace osmium {
                     pbf_relation.add_int64(1 /* id */, relation.id());
                     add_meta(relation, pbf_relation);
 
-                    auto map_member_role = [this](const osmium::RelationMember& member) {
+                    auto map_member_role = [this](const osmium::RelationMember& member) -> size_t {
                         return m_primitive_block.add_string(member.role());
                     };
                     pbf_relation.add_packed_int32(8 /* roles_sid */,
                         boost::make_transform_iterator(relation.members().begin(), map_member_role),
                         boost::make_transform_iterator(relation.members().end(), map_member_role));
 
-                    static auto map_member_ref = [](osmium::RelationMemberList::const_iterator member) noexcept {
+                    static auto map_member_ref = [](osmium::RelationMemberList::const_iterator member) noexcept -> osmium::object_id_type {
                         return member->ref();
                     };
                     typedef osmium::util::DeltaEncodeIterator<osmium::RelationMemberList::const_iterator, decltype(map_member_ref), osmium::object_id_type> it_type;
@@ -554,7 +554,7 @@ namespace osmium {
                     it_type last { members.cend(), members.cend(), map_member_ref };
                     pbf_relation.add_packed_sint64(9 /* memids */, first, last);
 
-                    static auto map_member_type = [](const osmium::RelationMember& member) noexcept {
+                    static auto map_member_type = [](const osmium::RelationMember& member) noexcept -> int {
                         return osmium::item_type_to_nwr_index(member.type());
                     };
                     pbf_relation.add_packed_int32(10 /* types */,
