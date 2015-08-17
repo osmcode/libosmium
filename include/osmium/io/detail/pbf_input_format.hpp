@@ -49,11 +49,12 @@ DEALINGS IN THE SOFTWARE.
 #include <thread>
 #include <type_traits>
 
-#include <protozero/pbf_reader.hpp>
+#include <protozero/pbf_message.hpp>
 
 #include <osmium/io/detail/input_format.hpp>
 #include <osmium/io/detail/pbf.hpp> // IWYU pragma: export
 #include <osmium/io/detail/pbf_decoder.hpp>
+#include <osmium/io/detail/protobuf_tags.hpp>
 #include <osmium/io/error.hpp>
 #include <osmium/io/file.hpp>
 #include <osmium/io/file_format.hpp>
@@ -142,16 +143,16 @@ namespace osmium {
                  * Decode the BlobHeader. Make sure it contains the expected
                  * type. Return the size of the following Blob.
                  */
-                size_t decode_blob_header(protozero::pbf_reader&& pbf_blob_header, const char* expected_type) {
+                size_t decode_blob_header(protozero::pbf_message<FileFormat::BlobHeader>&& pbf_blob_header, const char* expected_type) {
                     std::pair<const char*, size_t> blob_header_type;
                     size_t blob_header_datasize = 0;
 
                     while (pbf_blob_header.next()) {
                         switch (pbf_blob_header.tag()) {
-                            case 1: // required string type
+                            case FileFormat::BlobHeader::required_string_type:
                                 blob_header_type = pbf_blob_header.get_data();
                                 break;
-                            case 3: // required int32 datasize
+                            case FileFormat::BlobHeader::required_int32_datasize:
                                 blob_header_datasize = pbf_blob_header.get_int32();
                                 break;
                             default:
@@ -180,7 +181,7 @@ namespace osmium {
 
                     std::string blob_header = read_from_input_queue(size);
 
-                    return decode_blob_header(protozero::pbf_reader(blob_header), expected_type);
+                    return decode_blob_header(protozero::pbf_message<FileFormat::BlobHeader>(blob_header), expected_type);
                 }
 
                 void parse_osm_data(osmium::osm_entity_bits::type read_types) {

@@ -40,10 +40,11 @@ DEALINGS IN THE SOFTWARE.
 #include <iterator>
 #include <limits>
 
-#include <protozero/pbf_reader.hpp>
+#include <protozero/pbf_message.hpp>
 
 #include <osmium/builder/osm_object_builder.hpp>
 #include <osmium/io/detail/pbf.hpp> // IWYU pragma: export
+#include <osmium/io/detail/protobuf_tags.hpp>
 #include <osmium/io/detail/zlib.hpp>
 #include <osmium/io/header.hpp>
 #include <osmium/osm/location.hpp>
@@ -83,29 +84,29 @@ namespace osmium {
                         throw osmium::pbf_error("more than one stringtable in pbf file");
                     }
 
-                    protozero::pbf_reader pbf_string_table(data);
-                    while (pbf_string_table.next(1 /* repeated bytes s*/)) {
+                    protozero::pbf_message<OSMFormat::StringTable> pbf_string_table(data);
+                    while (pbf_string_table.next(OSMFormat::StringTable::repeated_bytes_s)) {
                         m_stringtable.push_back(pbf_string_table.get_data());
                     }
                 }
 
                 void decode_primitive_block_metadata() {
-                    protozero::pbf_reader pbf_primitive_block(m_data);
+                    protozero::pbf_message<OSMFormat::PrimitiveBlock> pbf_primitive_block(m_data);
                     while (pbf_primitive_block.next()) {
                         switch (pbf_primitive_block.tag()) {
-                            case 1: // required StringTable stringtable
+                            case OSMFormat::PrimitiveBlock::required_StringTable_stringtable:
                                 decode_stringtable(pbf_primitive_block.get_data());
                                 break;
-                            case 17: // optional int32 granularity
+                            case OSMFormat::PrimitiveBlock::optional_int32_granularity:
                                 m_granularity = pbf_primitive_block.get_int32();
                                 break;
-                            case 18: // optional int32 date_granularity
+                            case OSMFormat::PrimitiveBlock::optional_int32_date_granularity:
                                 m_date_factor = pbf_primitive_block.get_int32();
                                 break;
-                            case 19: // optional int64 lat_offset
+                            case OSMFormat::PrimitiveBlock::optional_int64_lat_offset:
                                 m_lat_offset = pbf_primitive_block.get_int64();
                                 break;
-                            case 20: // optional int64 lon_offset
+                            case OSMFormat::PrimitiveBlock::optional_int64_lon_offset:
                                 m_lon_offset = pbf_primitive_block.get_int64();
                                 break;
                             default:
@@ -115,33 +116,33 @@ namespace osmium {
                 }
 
                 void decode_primitive_block_data() {
-                    protozero::pbf_reader pbf_primitive_block(m_data);
-                    while (pbf_primitive_block.next(2 /* repeated PrimitiveGroup primitivegroup */)) {
-                        auto pbf_primitive_group = pbf_primitive_block.get_message();
+                    protozero::pbf_message<OSMFormat::PrimitiveBlock> pbf_primitive_block(m_data);
+                    while (pbf_primitive_block.next(OSMFormat::PrimitiveBlock::repeated_PrimitiveGroup_primitivegroup)) {
+                        protozero::pbf_message<OSMFormat::PrimitiveGroup> pbf_primitive_group = pbf_primitive_block.get_message();
                         while (pbf_primitive_group.next()) {
                             switch (pbf_primitive_group.tag()) {
-                                case 1: // repeated Node nodes
+                                case OSMFormat::PrimitiveGroup::repeated_Node_nodes:
                                     if (m_read_types & osmium::osm_entity_bits::node) {
                                         decode_node(pbf_primitive_group.get_data());
                                     } else {
                                         pbf_primitive_group.skip();
                                     }
                                     break;
-                                case 2: // optional DenseNodes dense
+                                case OSMFormat::PrimitiveGroup::optional_DenseNodes_dense:
                                     if (m_read_types & osmium::osm_entity_bits::node) {
                                         decode_dense_nodes(pbf_primitive_group.get_data());
                                     } else {
                                         pbf_primitive_group.skip();
                                     }
                                     break;
-                                case 3: // repeated Way ways
+                                case OSMFormat::PrimitiveGroup::repeated_Way_ways:
                                     if (m_read_types & osmium::osm_entity_bits::way) {
                                         decode_way(pbf_primitive_group.get_data());
                                     } else {
                                         pbf_primitive_group.skip();
                                     }
                                     break;
-                                case 4: // repeated Relation relations
+                                case OSMFormat::PrimitiveGroup::repeated_Relation_relations:
                                     if (m_read_types & osmium::osm_entity_bits::relation) {
                                         decode_relation(pbf_primitive_group.get_data());
                                     } else {
@@ -158,10 +159,10 @@ namespace osmium {
                 ptr_len_type decode_info(const ptr_len_type& data, osmium::OSMObject& object) {
                     ptr_len_type user = std::make_pair("", 0);
 
-                    protozero::pbf_reader pbf_info(data);
+                    protozero::pbf_message<OSMFormat::Info> pbf_info(data);
                     while (pbf_info.next()) {
                         switch (pbf_info.tag()) {
-                            case 1: // optional int32 version
+                            case OSMFormat::Info::optional_int32_version:
                                 {
                                     auto version = pbf_info.get_int32();
                                     if (version < 0) {
@@ -170,10 +171,10 @@ namespace osmium {
                                     object.set_version(static_cast_with_assert<object_version_type>(version));
                                 }
                                 break;
-                            case 2: // optional int64 timestamp
+                            case OSMFormat::Info::optional_int64_timestamp:
                                 object.set_timestamp(pbf_info.get_int64() * m_date_factor / 1000);
                                 break;
-                            case 3: // optional int64 changeset
+                            case OSMFormat::Info::optional_int64_changeset:
                                 {
                                     auto changeset_id = pbf_info.get_int64();
                                     if (changeset_id < 0) {
@@ -182,13 +183,13 @@ namespace osmium {
                                     object.set_changeset(static_cast_with_assert<changeset_id_type>(changeset_id));
                                 }
                                 break;
-                            case 4: // optional int32 uid
+                            case OSMFormat::Info::optional_int32_uid:
                                 object.set_uid_from_signed(pbf_info.get_int32());
                                 break;
-                            case 5: // optional uint32 user_sid
+                            case OSMFormat::Info::optional_uint32_user_sid:
                                 user = m_stringtable.at(pbf_info.get_uint32());
                                 break;
-                            case 6: // optional bool visible
+                            case OSMFormat::Info::optional_bool_visible:
                                 object.set_visible(pbf_info.get_bool());
                                 break;
                             default:
@@ -233,25 +234,25 @@ namespace osmium {
 
                     ptr_len_type user = { "", 0 };
 
-                    protozero::pbf_reader pbf_node(data);
+                    protozero::pbf_message<OSMFormat::Node> pbf_node(data);
                     while (pbf_node.next()) {
                         switch (pbf_node.tag()) {
-                            case 1: // required sint64 id
+                            case OSMFormat::Node::required_sint64_id:
                                 node.set_id(pbf_node.get_sint64());
                                 break;
-                            case 2: // repeated uint32 keys [packed = true]
+                            case OSMFormat::Node::packed_uint32_keys:
                                 keys = pbf_node.get_packed_uint32();
                                 break;
-                            case 3: // repeated uint32 vals [packed = true]
+                            case OSMFormat::Node::packed_uint32_vals:
                                 vals = pbf_node.get_packed_uint32();
                                 break;
-                            case 4: // Optional Info info
+                            case OSMFormat::Node::optional_Info_info:
                                 user = decode_info(pbf_node.get_data(), builder.object());
                                 break;
-                            case 8: // required sint64 lat
+                            case OSMFormat::Node::required_sint64_lat:
                                 lat = pbf_node.get_sint64();
                                 break;
-                            case 9: // required sint64 lon
+                            case OSMFormat::Node::required_sint64_lon:
                                 lon = pbf_node.get_sint64();
                                 break;
                             default:
@@ -286,22 +287,22 @@ namespace osmium {
 
                     ptr_len_type user = { "", 0 };
 
-                    protozero::pbf_reader pbf_way(data);
+                    protozero::pbf_message<OSMFormat::Way> pbf_way(data);
                     while (pbf_way.next()) {
                         switch (pbf_way.tag()) {
-                            case 1: // required int64 id
+                            case OSMFormat::Way::required_int64_id:
                                 builder.object().set_id(pbf_way.get_int64());
                                 break;
-                            case 2: // repeated uint32 keys [packed = true]
+                            case OSMFormat::Way::packed_uint32_keys:
                                 keys = pbf_way.get_packed_uint32();
                                 break;
-                            case 3: // repeated uint32 vals [packed = true]
+                            case OSMFormat::Way::packed_uint32_vals:
                                 vals = pbf_way.get_packed_uint32();
                                 break;
-                            case 4: // optional Info info
+                            case OSMFormat::Way::optional_Info_info:
                                 user = decode_info(pbf_way.get_data(), builder.object());
                                 break;
-                            case 8: // repeated sint64 refs [packed = true] DELTA encoded
+                            case OSMFormat::Way::packed_sint64_refs:
                                 refs = pbf_way.get_packed_sint64();
                                 break;
                             default:
@@ -335,28 +336,28 @@ namespace osmium {
 
                     ptr_len_type user = { "", 0 };
 
-                    protozero::pbf_reader pbf_relation(data);
+                    protozero::pbf_message<OSMFormat::Relation> pbf_relation(data);
                     while (pbf_relation.next()) {
                         switch (pbf_relation.tag()) {
-                            case 1: // required int64 id
+                            case OSMFormat::Relation::required_int64_id:
                                 builder.object().set_id(pbf_relation.get_int64());
                                 break;
-                            case 2: // repeated uint32 keys [packed = true]
+                            case OSMFormat::Relation::packed_uint32_keys:
                                 keys = pbf_relation.get_packed_uint32();
                                 break;
-                            case 3: // repeated uint32 vals [packed = true]
+                            case OSMFormat::Relation::packed_uint32_vals:
                                 vals = pbf_relation.get_packed_uint32();
                                 break;
-                            case 4: // optional Info info
+                            case OSMFormat::Relation::optional_Info_info:
                                 user = decode_info(pbf_relation.get_data(), builder.object());
                                 break;
-                            case 8: // repeated int32 roles_sid [packed = true]
+                            case OSMFormat::Relation::packed_int32_roles_sid:
                                 roles = pbf_relation.get_packed_int32();
                                 break;
-                            case 9: // repeated sint64 memids [packed = true] DELTA encoded
+                            case OSMFormat::Relation::packed_sint64_memids:
                                 refs = pbf_relation.get_packed_sint64();
                                 break;
-                            case 10: // repeated MemberType types [packed = true]
+                            case OSMFormat::Relation::packed_MemberType_types:
                                 types = pbf_relation.get_packed_enum();
                                 break;
                             default:
@@ -406,34 +407,34 @@ namespace osmium {
                     std::pair<protozero::pbf_reader::const_sint32_iterator, protozero::pbf_reader::const_sint32_iterator> user_sids;
                     std::pair<protozero::pbf_reader::const_int32_iterator,  protozero::pbf_reader::const_int32_iterator>  visibles;
 
-                    protozero::pbf_reader pbf_dense_nodes(data);
+                    protozero::pbf_message<OSMFormat::DenseNodes> pbf_dense_nodes(data);
                     while (pbf_dense_nodes.next()) {
                         switch (pbf_dense_nodes.tag()) {
-                            case 1: // repeated sint64 id [packed = true] DELTA encoded
+                            case OSMFormat::DenseNodes::packed_sint64_id:
                                 ids = pbf_dense_nodes.get_packed_sint64();
                                 break;
-                            case 5: // optional DenseInfo denseinfo
+                            case OSMFormat::DenseNodes::optional_DenseInfo_denseinfo:
                                 {
                                     has_info = true;
-                                    auto pbf_dense_info = pbf_dense_nodes.get_message();
+                                    protozero::pbf_message<OSMFormat::DenseInfo> pbf_dense_info = pbf_dense_nodes.get_message();
                                     while (pbf_dense_info.next()) {
                                         switch (pbf_dense_info.tag()) {
-                                            case 1: // repeated int32 version [packed = true]
+                                            case OSMFormat::DenseInfo::packed_int32_version:
                                                 versions = pbf_dense_info.get_packed_int32();
                                                 break;
-                                            case 2: // repeated sint64 timestamp [packed = true] DELTA encoded
+                                            case OSMFormat::DenseInfo::packed_sint64_timestamp:
                                                 timestamps = pbf_dense_info.get_packed_sint64();
                                                 break;
-                                            case 3: // repeated sint64 changeset [packed = true] DELTA encoded
+                                            case OSMFormat::DenseInfo::packed_sint64_changeset:
                                                 changesets = pbf_dense_info.get_packed_sint64();
                                                 break;
-                                            case 4: // repeated sint32 uid [packed = true] DELTA encoded
+                                            case OSMFormat::DenseInfo::packed_sint32_uid:
                                                 uids = pbf_dense_info.get_packed_sint32();
                                                 break;
-                                            case 5: // repeated sint32 user_sid [packed = true] DELTA encoded
+                                            case OSMFormat::DenseInfo::packed_sint32_user_sid:
                                                 user_sids = pbf_dense_info.get_packed_sint32();
                                                 break;
-                                            case 6: // repeated bool visible [packed = true]
+                                            case OSMFormat::DenseInfo::packed_bool_visible:
                                                 has_visibles = true;
                                                 visibles = pbf_dense_info.get_packed_bool();
                                                 break;
@@ -443,13 +444,13 @@ namespace osmium {
                                     }
                                 }
                                 break;
-                            case 8: // repeated sint64 lat [packed = true] DELTA encoded
+                            case OSMFormat::DenseNodes::packed_sint64_lat:
                                 lats = pbf_dense_nodes.get_packed_sint64();
                                 break;
-                            case 9: // repeated sint64 lon [packed = true] DELTA coded
+                            case OSMFormat::DenseNodes::packed_sint64_lon:
                                 lons = pbf_dense_nodes.get_packed_sint64();
                                 break;
-                            case 10: // repeated int32 keys_vals [packed = true]
+                            case OSMFormat::DenseNodes::packed_int32_keys_vals:
                                 tags = pbf_dense_nodes.get_packed_int32();
                                 break;
                             default:
@@ -581,10 +582,10 @@ namespace osmium {
                 int32_t raw_size;
                 std::pair<const char*, protozero::pbf_length_type> zlib_data;
 
-                protozero::pbf_reader pbf_blob(blob_data);
+                protozero::pbf_message<FileFormat::Blob> pbf_blob(blob_data);
                 while (pbf_blob.next()) {
                     switch (pbf_blob.tag()) {
-                        case 1: // optional bytes raw
+                        case FileFormat::Blob::optional_bytes_raw:
                             {
                                 auto data_len = pbf_blob.get_data();
                                 if (data_len.second > max_uncompressed_blob_size) {
@@ -592,16 +593,16 @@ namespace osmium {
                                 }
                                 return data_len;
                             }
-                        case 2: // optional int32 raw_size
+                        case FileFormat::Blob::optional_int32_raw_size:
                             raw_size = pbf_blob.get_int32();
                             if (raw_size <= 0 || uint32_t(raw_size) > max_uncompressed_blob_size) {
                                 throw osmium::pbf_error("illegal blob size");
                             }
                             break;
-                        case 3: // optional bytes zlib_data
+                        case FileFormat::Blob::optional_bytes_zlib_data:
                             zlib_data = pbf_blob.get_data();
                             break;
-                        case 4: // optional bytes lzma_data
+                        case FileFormat::Blob::optional_bytes_lzma_data:
                             throw osmium::pbf_error("lzma blobs not implemented");
                         default:
                             throw osmium::pbf_error("unknown compression");
@@ -626,19 +627,19 @@ namespace osmium {
                     int64_t top    = std::numeric_limits<int64_t>::max();
                     int64_t bottom = std::numeric_limits<int64_t>::max();
 
-                    protozero::pbf_reader pbf_header_bbox(data);
+                    protozero::pbf_message<OSMFormat::HeaderBBox> pbf_header_bbox(data);
                     while (pbf_header_bbox.next()) {
                         switch (pbf_header_bbox.tag()) {
-                            case 1: // required sint64 left
+                            case OSMFormat::HeaderBBox::required_sint64_left:
                                 left = pbf_header_bbox.get_sint64();
                                 break;
-                            case 2: // required sint64 right
+                            case OSMFormat::HeaderBBox::required_sint64_right:
                                 right = pbf_header_bbox.get_sint64();
                                 break;
-                            case 3: // required sint64 top
+                            case OSMFormat::HeaderBBox::required_sint64_top:
                                 top = pbf_header_bbox.get_sint64();
                                 break;
-                            case 4: // required sint64 bottom
+                            case OSMFormat::HeaderBBox::required_sint64_bottom:
                                 bottom = pbf_header_bbox.get_sint64();
                                 break;
                             default:
@@ -664,13 +665,13 @@ namespace osmium {
                 osmium::io::Header header;
                 int i = 0;
 
-                protozero::pbf_reader pbf_header_block(data);
+                protozero::pbf_message<OSMFormat::HeaderBlock> pbf_header_block(data);
                 while (pbf_header_block.next()) {
                     switch (pbf_header_block.tag()) {
-                        case 1: // optional HeaderBBox bbox
+                        case OSMFormat::HeaderBlock::optional_HeaderBBox_bbox:
                             header.add_box(decode_header_bbox(pbf_header_block.get_data()));
                             break;
-                        case 4: // repeated string required_features
+                        case OSMFormat::HeaderBlock::repeated_string_required_features:
                             {
                                 auto feature = pbf_header_block.get_data();
                                 if (!strncmp("OsmSchema-V0.6", feature.first, feature.second)) {
@@ -686,19 +687,19 @@ namespace osmium {
                                 }
                             }
                             break;
-                        case 5: // repeated string optional_features
+                        case OSMFormat::HeaderBlock::repeated_string_optional_features:
                             header.set("pbf_optional_feature_" + std::to_string(i++), pbf_header_block.get_string());
                             break;
-                        case 16: // optional string writingprogram
+                        case OSMFormat::HeaderBlock::optional_string_writingprogram:
                             header.set("generator", pbf_header_block.get_string());
                             break;
-                        case 32: // optional int64 osmosis_replication_timestamp
+                        case OSMFormat::HeaderBlock::optional_int64_osmosis_replication_timestamp:
                             header.set("osmosis_replication_timestamp", osmium::Timestamp(pbf_header_block.get_int64()).to_iso());
                             break;
-                        case 33: // optional int64 osmosis_replication_sequence_number
+                        case OSMFormat::HeaderBlock::optional_int64_osmosis_replication_sequence_number:
                             header.set("osmosis_replication_sequence_number", std::to_string(pbf_header_block.get_int64()));
                             break;
-                        case 34: // optional string osmosis_replication_base_url
+                        case OSMFormat::HeaderBlock::optional_string_osmosis_replication_base_url:
                             header.set("osmosis_replication_base_url", pbf_header_block.get_string());
                             break;
                         default:
