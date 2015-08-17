@@ -87,6 +87,8 @@ namespace osmium {
 
                 char m_tmp_buffer[tmp_buffer_size+1];
 
+                bool m_add_metadata;
+
                 template <typename... TArgs>
                 void output_formatted(const char* format, TArgs&&... args) {
 #ifndef NDEBUG
@@ -130,12 +132,15 @@ namespace osmium {
                 }
 
                 void write_meta(const osmium::OSMObject& object) {
-                    output_formatted("%" PRId64 " v%d d", object.id(), object.version());
-                    *m_out += (object.visible() ? 'V' : 'D');
-                    output_formatted(" c%d t", object.changeset());
-                    *m_out += object.timestamp().to_iso();
-                    output_formatted(" i%d u", object.uid());
-                    append_encoded_string(object.user());
+                    output_formatted("%" PRId64, object.id());
+                    if (m_add_metadata) {
+                        output_formatted(" v%d d", object.version());
+                        *m_out += (object.visible() ? 'V' : 'D');
+                        output_formatted(" c%d t", object.changeset());
+                        *m_out += object.timestamp().to_iso();
+                        output_formatted(" i%d u", object.uid());
+                        append_encoded_string(object.user());
+                    }
                     *m_out += " T";
                     bool first = true;
                     for (const auto& tag : object.tags()) {
@@ -163,10 +168,11 @@ namespace osmium {
 
             public:
 
-                explicit OPLOutputBlock(osmium::memory::Buffer&& buffer) :
+                explicit OPLOutputBlock(osmium::memory::Buffer&& buffer, bool add_metadata) :
                     m_input_buffer(std::make_shared<osmium::memory::Buffer>(std::move(buffer))),
                     m_out(std::make_shared<std::string>()),
-                    m_tmp_buffer() {
+                    m_tmp_buffer(),
+                    m_add_metadata(add_metadata) {
                 }
 
                 OPLOutputBlock(const OPLOutputBlock&) = default;
@@ -257,17 +263,20 @@ namespace osmium {
 
             class OPLOutputFormat : public osmium::io::detail::OutputFormat {
 
-                OPLOutputFormat(const OPLOutputFormat&) = delete;
-                OPLOutputFormat& operator=(const OPLOutputFormat&) = delete;
+                bool m_add_metadata;
 
             public:
 
                 OPLOutputFormat(const osmium::io::File& file, data_queue_type& output_queue) :
-                    OutputFormat(file, output_queue) {
+                    OutputFormat(file, output_queue),
+                    m_add_metadata(file.get("add_metadata") != "false") {
                 }
 
+                OPLOutputFormat(const OPLOutputFormat&) = delete;
+                OPLOutputFormat& operator=(const OPLOutputFormat&) = delete;
+
                 void write_buffer(osmium::memory::Buffer&& buffer) override final {
-                    m_output_queue.push(osmium::thread::Pool::instance().submit(OPLOutputBlock{std::move(buffer)}));
+                    m_output_queue.push(osmium::thread::Pool::instance().submit(OPLOutputBlock{std::move(buffer), m_add_metadata}));
                 }
 
                 void close() override final {
