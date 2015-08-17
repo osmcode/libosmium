@@ -19,21 +19,16 @@ int main(int argc, char* argv[]) {
     std::string input_filename = argv[1];
     std::string output_filename = argv[2];
 
-    std::vector<osmium::memory::Buffer> buffers;
-
     osmium::io::Reader reader(input_filename);
-    while (osmium::memory::Buffer buffer = reader.read()) {
-        buffers.push_back(std::move(buffer));
-    }
-    reader.close();
-
     osmium::io::File output_file(output_filename, "pbf");
     osmium::io::Header header;
     osmium::io::Writer writer(output_file, header, osmium::io::overwrite::allow);
-    for (auto&& buffer : buffers) {
+
+    while (osmium::memory::Buffer buffer = reader.read()) {
         writer(std::move(buffer));
     }
-    writer.close();
 
+    writer.close();
+    reader.close();
 }
 
