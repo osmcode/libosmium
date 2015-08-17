@@ -218,6 +218,20 @@ namespace osmium {
                 } else if (suffixes.back() == "opl") {
                     m_file_format = file_format::opl;
                     suffixes.pop_back();
+                } else if (suffixes.back() == "json") {
+                    m_file_format = file_format::json;
+                    suffixes.pop_back();
+                } else if (suffixes.back() == "o5m") {
+                    m_file_format = file_format::o5m;
+                    suffixes.pop_back();
+                } else if (suffixes.back() == "o5c") {
+                    m_file_format = file_format::o5m;
+                    m_has_multiple_object_versions = true;
+                    set("o5c_change_format", true);
+                    suffixes.pop_back();
+                } else if (suffixes.back() == "debug") {
+                    m_file_format = file_format::debug;
+                    suffixes.pop_back();
                 }
 
                 if (suffixes.empty()) return;

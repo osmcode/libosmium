@@ -1,5 +1,5 @@
-#ifndef OSMIUM_IO_ANY_OUTPUT_HPP
-#define OSMIUM_IO_ANY_OUTPUT_HPP
+#ifndef OSMIUM_IO_DEBUG_OUTPUT_HPP
+#define OSMIUM_IO_DEBUG_OUTPUT_HPP
 
 /*
 
@@ -33,21 +33,7 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-/**
- * @file
- *
- * Include this file if you want to write all kinds of OSM files.
- *
- * @attention If you include this file, you'll need to link with
- *            `ws2_32` (Windows only), `libz`, `libbz2`, and enable
- *            multithreading.
- */
+#include <osmium/io/writer.hpp> // IWYU pragma: export
+#include <osmium/io/detail/debug_output_format.hpp> // IWYU pragma: export
 
-#include <osmium/io/any_compression.hpp> // IWYU pragma: export
-
-#include <osmium/io/debug_output.hpp> // IWYU pragma: export
-#include <osmium/io/opl_output.hpp> // IWYU pragma: export
-#include <osmium/io/pbf_output.hpp> // IWYU pragma: export
-#include <osmium/io/xml_output.hpp> // IWYU pragma: export
-
-#endif // OSMIUM_IO_ANY_OUTPUT_HPP
+#endif // OSMIUM_IO_DEBUG_OUTPUT_HPP
