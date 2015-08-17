@@ -46,19 +46,7 @@ DEALINGS IN THE SOFTWARE.
 #include <thread>
 #include <utility>
 
-#include <boost/version.hpp>
-
-#ifdef __clang__
-# pragma clang diagnostic push
-# pragma clang diagnostic ignored "-Wmissing-noreturn"
-# pragma clang diagnostic ignored "-Wsign-conversion"
-#endif
-
 #include <utf8.h>
-
-#ifdef __clang__
-# pragma clang diagnostic pop
-#endif
 
 #include <osmium/handler.hpp>
 #include <osmium/io/detail/output_format.hpp>
