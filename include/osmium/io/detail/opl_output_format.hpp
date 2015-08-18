@@ -126,7 +126,12 @@ namespace osmium {
                             m_out->append(last, data);
                         } else {
                             *m_out += '%';
-                            output_formatted("%04x", c);
+                            if (c <= 0xff) {
+                                output_formatted("%02x", c);
+                            } else {
+                                output_formatted("%04x", c);
+                            }
+                            *m_out += '%';
                         }
                     }
                 }
