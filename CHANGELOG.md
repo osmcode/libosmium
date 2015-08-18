@@ -8,6 +8,14 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+### Changed
+
+### Fixed
+
+## [2.3.0] - 2015-08-18
+
+### Added
+
 - Allow instantiating osmium::geom::GEOSFactory with existing GEOS factory.
 - Low-level functions to support generating a architecture- and endian-
   independant CRC from OSM data. This is intended to be uses with boost::crc.
@@ -100,7 +108,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   Doxygen (up to version 1.8.8). This version contains a workaround to fix
   this.
 
-[unreleased]: https://github.com/osmcode/libosmium/compare/v2.2.0...HEAD
+[unreleased]: https://github.com/osmcode/libosmium/compare/v2.3.0...HEAD
+[2.3.0]: https://github.com/osmcode/libosmium/compare/v2.3.0...v2.3.0
 [2.2.0]: https://github.com/osmcode/libosmium/compare/v2.1.0...v2.2.0
 [2.1.0]: https://github.com/osmcode/libosmium/compare/v2.0.0...v2.1.0
 
