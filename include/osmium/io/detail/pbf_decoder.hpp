@@ -512,7 +512,7 @@ namespace osmium {
                                     // this is against the spec, must have same number of elements
                                     throw osmium::pbf_error("PBF format error");
                                 }
-                                visible = *visibles.first++;
+                                visible = (*visibles.first++) != 0;
                             }
                             node.set_visible(visible);
 
