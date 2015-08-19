@@ -18,7 +18,7 @@ branches:
 shallow_clone: true
 
 # Operating system (build VM template)
-os: Visual Studio 2014 CTP4
+os: Visual Studio 2015 RC
 
 # scripts that are called at very beginning, before repo cloning
 init:
