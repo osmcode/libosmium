@@ -57,6 +57,9 @@ namespace osmium {
      */
     typedef uint16_t string_size_type;
 
+    // maximum of 256 characters of max 4 bytes each (in UTF-8 encoding)
+    constexpr const int max_osm_string_length = 256 * 4;
+
 } // namespace osmium
 
 #endif // OSMIUM_OSM_TYPES_HPP

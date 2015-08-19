@@ -62,13 +62,14 @@ namespace osmium {
         namespace detail {
 
             using ptr_len_type = std::pair<const char*, size_t>;
+            using osm_string_len_type = std::pair<const char*, osmium::string_size_type>;
 
             class PBFPrimitiveBlockDecoder {
 
                 static constexpr size_t initial_buffer_size = 2 * 1024 * 1024;
 
                 ptr_len_type m_data;
-                std::vector<ptr_len_type> m_stringtable;
+                std::vector<osm_string_len_type> m_stringtable;
 
                 int64_t m_lon_offset = 0;
                 int64_t m_lat_offset = 0;
@@ -86,7 +87,11 @@ namespace osmium {
 
                     protozero::pbf_message<OSMFormat::StringTable> pbf_string_table(data);
                     while (pbf_string_table.next(OSMFormat::StringTable::repeated_bytes_s)) {
-                        m_stringtable.push_back(pbf_string_table.get_data());
+                        auto data = pbf_string_table.get_data();
+                        if (data.second > osmium::max_osm_string_length) {
+                            throw osmium::pbf_error("overlong string in string table");
+                        }
+                        m_stringtable.emplace_back(data.first, osmium::string_size_type(data.second));
                     }
                 }
 
@@ -156,8 +161,8 @@ namespace osmium {
                     }
                 }
 
-                ptr_len_type decode_info(const ptr_len_type& data, osmium::OSMObject& object) {
-                    ptr_len_type user = std::make_pair("", 0);
+                osm_string_len_type decode_info(const ptr_len_type& data, osmium::OSMObject& object) {
+                    osm_string_len_type user = std::make_pair("", 0);
 
                     protozero::pbf_message<OSMFormat::Info> pbf_info(data);
                     while (pbf_info.next()) {
@@ -232,7 +237,7 @@ namespace osmium {
                     int64_t lon = std::numeric_limits<int64_t>::max();
                     int64_t lat = std::numeric_limits<int64_t>::max();
 
-                    ptr_len_type user = { "", 0 };
+                    osm_string_len_type user = { "", 0 };
 
                     protozero::pbf_message<OSMFormat::Node> pbf_node(data);
                     while (pbf_node.next()) {
@@ -285,7 +290,7 @@ namespace osmium {
                     kv_type vals;
                     std::pair<protozero::pbf_reader::const_sint64_iterator, protozero::pbf_reader::const_sint64_iterator> refs;
 
-                    ptr_len_type user = { "", 0 };
+                    osm_string_len_type user = { "", 0 };
 
                     protozero::pbf_message<OSMFormat::Way> pbf_way(data);
                     while (pbf_way.next()) {
@@ -334,7 +339,7 @@ namespace osmium {
                     std::pair<protozero::pbf_reader::const_sint64_iterator, protozero::pbf_reader::const_sint64_iterator> refs;
                     std::pair<protozero::pbf_reader::const_int32_iterator,  protozero::pbf_reader::const_int32_iterator> types;
 
-                    ptr_len_type user = { "", 0 };
+                    osm_string_len_type user = { "", 0 };
 
                     protozero::pbf_message<OSMFormat::Relation> pbf_relation(data);
                     while (pbf_relation.next()) {
