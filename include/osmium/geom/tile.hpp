@@ -69,8 +69,8 @@ namespace osmium {
                 osmium::geom::Coordinates c = lonlat_to_mercator(location);
                 const int32_t n = 1LL << zoom;
                 const double scale = detail::max_coordinate_epsg3857 * 2 / n;
-                x = detail::restrict_to_range<int32_t>((c.x + detail::max_coordinate_epsg3857) / scale, 0, n-1);
-                y = detail::restrict_to_range<int32_t>((detail::max_coordinate_epsg3857 - c.y) / scale, 0, n-1);
+                x = detail::restrict_to_range<int32_t>(int32_t((c.x + detail::max_coordinate_epsg3857) / scale), 0, n-1);
+                y = detail::restrict_to_range<int32_t>(int32_t((detail::max_coordinate_epsg3857 - c.y) / scale), 0, n-1);
             }
 
         }; // struct Tile
