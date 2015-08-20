@@ -141,33 +141,15 @@ namespace osmium {
              *               will be set.
              * @param role The role.
              * @param length Length of role (without \0 termination).
+             * @throws std:length_error If role is longer than osmium::max_osm_string_length
              */
-            void add_role(osmium::RelationMember& member, const char* role, const string_size_type length) {
-                member.set_role_size(length + 1);
-                add_size(append(role, length) + append_zero());
+            void add_role(osmium::RelationMember& member, const char* role, const size_t length) {
+                if (length > osmium::max_osm_string_length) {
+                    throw std::length_error("OSM relation member role is too long");
+                }
+                member.set_role_size(osmium::string_size_type(length) + 1);
+                add_size(append(role, osmium::memory::item_size_type(length)) + append_zero());
                 add_padding(true);
-            }
-
-            /**
-             * Add role to buffer.
-             *
-             * @param member Relation member object where the length of the role
-             *               will be set.
-             * @param role \0-terminated role.
-             */
-            void add_role(osmium::RelationMember& member, const char* role) {
-                add_role(member, role, static_cast_with_assert<string_size_type>(std::strlen(role)));
-            }
-
-            /**
-             * Add role to buffer.
-             *
-             * @param member Relation member object where the length of the role
-             *               will be set.
-             * @param role Role.
-             */
-            void add_role(osmium::RelationMember& member, const std::string& role) {
-                add_role(member, role.data(), static_cast_with_assert<string_size_type>(role.size()));
             }
 
         public:
@@ -190,8 +172,10 @@ namespace osmium {
              * @param full_member Optional pointer to the member object. If it
              *                    is available a copy will be added to the
              *                    relation.
+             * @throws std:length_error If role_length is greater than
+             *         osmium::max_osm_string_length
              */
-            void add_member(osmium::item_type type, object_id_type ref, const char* role, const string_size_type role_length, const osmium::OSMObject* full_member = nullptr) {
+            void add_member(osmium::item_type type, object_id_type ref, const char* role, const size_t role_length, const osmium::OSMObject* full_member = nullptr) {
                 osmium::RelationMember* member = reserve_space_for<osmium::RelationMember>();
                 new (member) osmium::RelationMember(ref, type, full_member != nullptr);
                 add_size(sizeof(RelationMember));
@@ -210,9 +194,10 @@ namespace osmium {
              * @param full_member Optional pointer to the member object. If it
              *                    is available a copy will be added to the
              *                    relation.
+             * @throws std:length_error If role is longer than osmium::max_osm_string_length
              */
             void add_member(osmium::item_type type, object_id_type ref, const char* role, const osmium::OSMObject* full_member = nullptr) {
-                add_member(type, ref, role, strlen(role), full_member);
+                add_member(type, ref, role, std::strlen(role), full_member);
             }
 
             /**
@@ -224,6 +209,7 @@ namespace osmium {
              * @param full_member Optional pointer to the member object. If it
              *                    is available a copy will be added to the
              *                    relation.
+             * @throws std:length_error If role is longer than osmium::max_osm_string_length
              */
             void add_member(osmium::item_type type, object_id_type ref, const std::string& role, const osmium::OSMObject* full_member = nullptr) {
                 add_member(type, ref, role.data(), role.size(), full_member);

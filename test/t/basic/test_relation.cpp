@@ -63,3 +63,14 @@ TEST_CASE("Build relation") {
     crc32.update(relation);
     REQUIRE(crc32().checksum() == 0xebcd836d);
 }
+
+TEST_CASE("Member role too long") {
+    osmium::memory::Buffer buffer(10000);
+
+    osmium::builder::RelationMemberListBuilder builder(buffer);
+
+    const char role[2000] = "";
+    builder.add_member(osmium::item_type::node, 1, role, 1024);
+    REQUIRE_THROWS(builder.add_member(osmium::item_type::node, 1, role, 1025));
+}
+
