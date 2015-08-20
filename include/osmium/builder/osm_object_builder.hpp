@@ -76,6 +76,12 @@ namespace osmium {
              * @param value Tag value (0-terminated string).
              */
             void add_tag(const char* key, const char* value) {
+                if (std::strlen(key) > osmium::max_osm_string_length) {
+                    throw std::length_error("OSM tag key is too long");
+                }
+                if (std::strlen(value) > osmium::max_osm_string_length) {
+                    throw std::length_error("OSM tag value is too long");
+                }
                 add_size(append(key) + append(value));
             }
 
@@ -87,8 +93,15 @@ namespace osmium {
              * @param value Pointer to tag value.
              * @param value_length Length of value (not including the \0 byte).
              */
-            void add_tag(const char* key, const string_size_type key_length, const char* value, const string_size_type value_length) {
-                add_size(append(key, key_length) + append_zero() + append(value, value_length) + append_zero());
+            void add_tag(const char* key, const size_t key_length, const char* value, const size_t value_length) {
+                if (key_length > osmium::max_osm_string_length) {
+                    throw std::length_error("OSM tag key is too long");
+                }
+                if (value_length > osmium::max_osm_string_length) {
+                    throw std::length_error("OSM tag value is too long");
+                }
+                add_size(append(key,   osmium::memory::item_size_type(key_length))   + append_zero() +
+                         append(value, osmium::memory::item_size_type(value_length)) + append_zero());
             }
 
             /**
@@ -98,8 +111,8 @@ namespace osmium {
              * @param value Tag value.
              */
             void add_tag(const std::string& key, const std::string& value) {
-                add_size(append(key.data(),   static_cast_with_assert<string_size_type>(key.size()   + 1)) +
-                         append(value.data(), static_cast_with_assert<string_size_type>(value.size() + 1)));
+                add_size(append(key.data(),   key.size()   + 1) +
+                         append(value.data(), value.size() + 1));
             }
 
         }; // class TagListBuilder
