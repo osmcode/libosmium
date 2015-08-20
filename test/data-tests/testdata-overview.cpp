@@ -10,12 +10,14 @@
 #include <osmium/io/xml_input.hpp>
 #include <osmium/visitor.hpp>
 
+#include "gdal_support.hpp"
+
 typedef osmium::index::map::SparseMemArray<osmium::unsigned_object_id_type, osmium::Location> index_type;
 typedef osmium::handler::NodeLocationsForWays<index_type> location_handler_type;
 
 class TestOverviewHandler : public osmium::handler::Handler {
 
-    OGRDataSource* m_data_source;
+    DataSource* m_data_source;
 
     OGRSpatialReference* m_spatial_reference;
 
@@ -31,7 +33,7 @@ public:
 
         OGRRegisterAll();
 
-        OGRSFDriver* driver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(driver_name.c_str());
+        Driver* driver = GET_DRIVER_BY_NAME(driver_name.c_str());
         if (!driver) {
             std::cerr << driver_name << " driver not available.\n";
             exit(1);
@@ -39,7 +41,7 @@ public:
 
         CPLSetConfigOption("OGR_SQLITE_SYNCHRONOUS", "FALSE");
         const char* options[] = { "SPATIALITE=TRUE", nullptr };
-        m_data_source = driver->CreateDataSource(filename.c_str(), const_cast<char**>(options));
+        m_data_source = CREATE_DATA_SOURCE(driver, filename.c_str(), const_cast<char**>(options));
         if (!m_data_source) {
             std::cerr << "Creation of output file failed.\n";
             exit(1);
@@ -114,7 +116,7 @@ public:
     }
 
     ~TestOverviewHandler() {
-        OGRDataSource::DestroyDataSource(m_data_source);
+        DESTROY_DATA_SOURCE(m_data_source);
         delete m_spatial_reference;
         OGRCleanupAll();
     }

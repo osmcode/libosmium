@@ -70,6 +70,7 @@ DEALINGS IN THE SOFTWARE.
 //#include <ogr_geometry.h>
 #include <ogr_api.h>
 #include <ogrsf_frmts.h>
+#include <gdal_priv.h>
 
 #ifdef _MSC_VER
 # pragma warning(pop)
