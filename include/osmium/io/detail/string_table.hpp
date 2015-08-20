@@ -41,6 +41,8 @@ DEALINGS IN THE SOFTWARE.
 #include <map>
 #include <string>
 
+#include <osmium/io/detail/pbf.hpp>
+
 namespace osmium {
 
     namespace io {
@@ -196,9 +198,16 @@ namespace osmium {
 
             class StringTable {
 
+                // This is the maximum number of entries in a string table.
+                // This should never be reached in practice but we better
+                // make sure it doesn't. If we had max_uncompressed_blob_size
+                // many entries, we are sure they would never fit into a PBF
+                // Blob.
+                static constexpr const uint32_t max_entries = max_uncompressed_blob_size;
+
                 StringStore m_strings;
                 std::map<const char*, size_t, StrComp> m_index;
-                size_t m_size;
+                uint32_t m_size;
 
             public:
 
@@ -216,11 +225,11 @@ namespace osmium {
                     m_strings.add("");
                 }
 
-                size_t size() const noexcept {
+                uint32_t size() const noexcept {
                     return m_size + 1;
                 }
 
-                size_t add(const char* s) {
+                uint32_t add(const char* s) {
                     auto f = m_index.find(s);
                     if (f != m_index.end()) {
                         return f->second;
@@ -228,6 +237,11 @@ namespace osmium {
 
                     const char* cs = m_strings.add(s);
                     m_index[cs] = ++m_size;
+
+                    if (m_size > max_entries) {
+                        throw osmium::pbf_error("string table has too many entries");
+                    }
+
                     return m_size;
                 }
 
