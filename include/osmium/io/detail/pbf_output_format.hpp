@@ -113,11 +113,13 @@ namespace osmium {
              * @param use_compression Should the output be compressed using zlib?
              */
             inline std::string serialize_blob(const std::string& type, const std::string& msg, bool use_compression) {
+                assert(msg.size() <= max_uncompressed_blob_size);
+
                 std::string blob_data;
                 protozero::pbf_builder<FileFormat::Blob> pbf_blob(blob_data);
 
                 if (use_compression) {
-                    pbf_blob.add_int32(FileFormat::Blob::optional_int32_raw_size, msg.size());
+                    pbf_blob.add_int32(FileFormat::Blob::optional_int32_raw_size, int32_t(msg.size()));
                     pbf_blob.add_bytes(FileFormat::Blob::optional_bytes_zlib_data, osmium::io::detail::zlib_compress(msg));
                 } else {
                     pbf_blob.add_bytes(FileFormat::Blob::optional_bytes_raw, msg);
@@ -127,7 +129,7 @@ namespace osmium {
                 protozero::pbf_builder<FileFormat::BlobHeader> pbf_blob_header(blob_header_data);
 
                 pbf_blob_header.add_string(FileFormat::BlobHeader::required_string_type, type);
-                pbf_blob_header.add_int32(FileFormat::BlobHeader::required_int32_datasize, blob_data.size());
+                pbf_blob_header.add_int32(FileFormat::BlobHeader::required_int32_datasize, static_cast_with_assert<int32_t>(blob_data.size()));
 
                 uint32_t sz = htonl(static_cast_with_assert<uint32_t>(blob_header_data.size()));
 
@@ -450,10 +452,10 @@ namespace osmium {
                         protozero::pbf_builder<OSMFormat::HeaderBBox> pbf_header_bbox(pbf_header_block, OSMFormat::HeaderBlock::optional_HeaderBBox_bbox);
 
                         osmium::Box box = header.joined_boxes();
-                        pbf_header_bbox.add_sint64(OSMFormat::HeaderBBox::required_sint64_left,   box.bottom_left().lon() * lonlat_resolution);
-                        pbf_header_bbox.add_sint64(OSMFormat::HeaderBBox::required_sint64_right,  box.top_right().lon()   * lonlat_resolution);
-                        pbf_header_bbox.add_sint64(OSMFormat::HeaderBBox::required_sint64_top,    box.top_right().lat()   * lonlat_resolution);
-                        pbf_header_bbox.add_sint64(OSMFormat::HeaderBBox::required_sint64_bottom, box.bottom_left().lat() * lonlat_resolution);
+                        pbf_header_bbox.add_sint64(OSMFormat::HeaderBBox::required_sint64_left,   int64_t(box.bottom_left().lon() * lonlat_resolution));
+                        pbf_header_bbox.add_sint64(OSMFormat::HeaderBBox::required_sint64_right,  int64_t(box.top_right().lon()   * lonlat_resolution));
+                        pbf_header_bbox.add_sint64(OSMFormat::HeaderBBox::required_sint64_top,    int64_t(box.top_right().lat()   * lonlat_resolution));
+                        pbf_header_bbox.add_sint64(OSMFormat::HeaderBBox::required_sint64_bottom, int64_t(box.bottom_left().lat() * lonlat_resolution));
                     }
 
                     pbf_header_block.add_string(OSMFormat::HeaderBlock::repeated_string_required_features, "OsmSchema-V0.6");
