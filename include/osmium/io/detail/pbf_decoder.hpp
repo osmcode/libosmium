@@ -87,11 +87,11 @@ namespace osmium {
 
                     protozero::pbf_message<OSMFormat::StringTable> pbf_string_table(data);
                     while (pbf_string_table.next(OSMFormat::StringTable::repeated_bytes_s)) {
-                        auto data = pbf_string_table.get_data();
-                        if (data.second > osmium::max_osm_string_length) {
+                        auto str_len = pbf_string_table.get_data();
+                        if (str_len.second > osmium::max_osm_string_length) {
                             throw osmium::pbf_error("overlong string in string table");
                         }
-                        m_stringtable.emplace_back(data.first, osmium::string_size_type(data.second));
+                        m_stringtable.emplace_back(str_len.first, osmium::string_size_type(str_len.second));
                     }
                 }
 
