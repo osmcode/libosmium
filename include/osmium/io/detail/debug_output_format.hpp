@@ -211,14 +211,14 @@ namespace osmium {
                         *m_out += padding;
                         output_formatted("     %d\n", tags.size());
 
-                        osmium::max_op<int> max;
+                        osmium::max_op<size_t> max;
                         for (const auto& tag : tags) {
                             max.update(std::strlen(tag.key()));
                         }
                         for (const auto& tag : tags) {
                             *m_out += "    ";
                             write_string(tag.key());
-                            int spacing = max() - std::strlen(tag.key());
+                            auto spacing = max() - std::strlen(tag.key());
                             while (spacing--) {
                                 *m_out += " ";
                             }
