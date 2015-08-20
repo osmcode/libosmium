@@ -127,13 +127,10 @@ namespace osmium {
 
         public:
 
-            explicit ProblemReporterOGR(OGRDataSource* data_source) :
+            explicit ProblemReporterOGR(OGRDataSource* data_source, OGRSpatialReference* spatial_reference = NULL) :
                 m_data_source(data_source) {
 
-                OGRSpatialReference sparef;
-                sparef.SetWellKnownGeogCS("WGS84");
-
-                m_layer_perror = m_data_source->CreateLayer("perrors", &sparef, wkbPoint, nullptr);
+                m_layer_perror = m_data_source->CreateLayer("perrors", spatial_reference, wkbPoint, nullptr);
                 if (!m_layer_perror) {
                     std::runtime_error("Layer creation failed for layer 'perrors'");
                 }
@@ -161,7 +158,7 @@ namespace osmium {
 
                 /**************/
 
-                m_layer_lerror = m_data_source->CreateLayer("lerrors", &sparef, wkbLineString, nullptr);
+                m_layer_lerror = m_data_source->CreateLayer("lerrors", spatial_reference, wkbLineString, nullptr);
                 if (!m_layer_lerror) {
                     std::runtime_error("Layer creation failed for layer 'lerrors'");
                 }

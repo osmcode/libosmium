@@ -17,6 +17,8 @@ class TestOverviewHandler : public osmium::handler::Handler {
 
     OGRDataSource* m_data_source;
 
+    OGRSpatialReference* m_spatial_reference;
+
     OGRLayer* m_layer_nodes;
     OGRLayer* m_layer_labels;
     OGRLayer* m_layer_ways;
@@ -43,12 +45,12 @@ public:
             exit(1);
         }
 
-        OGRSpatialReference sparef;
-        sparef.SetWellKnownGeogCS("WGS84");
+        m_spatial_reference = new OGRSpatialReference;
+        m_spatial_reference->SetWellKnownGeogCS("WGS84");
 
         // nodes layer
 
-        m_layer_nodes = m_data_source->CreateLayer("nodes", &sparef, wkbPoint, nullptr);
+        m_layer_nodes = m_data_source->CreateLayer("nodes", m_spatial_reference, wkbPoint, nullptr);
         if (!m_layer_nodes) {
             std::cerr << "Layer creation failed.\n";
             exit(1);
@@ -64,7 +66,7 @@ public:
 
         // labels layer
 
-        m_layer_labels = m_data_source->CreateLayer("labels", &sparef, wkbPoint, nullptr);
+        m_layer_labels = m_data_source->CreateLayer("labels", m_spatial_reference, wkbPoint, nullptr);
         if (!m_layer_labels) {
             std::cerr << "Layer creation failed.\n";
             exit(1);
@@ -88,7 +90,7 @@ public:
 
         // ways layer
 
-        m_layer_ways = m_data_source->CreateLayer("ways", &sparef, wkbLineString, nullptr);
+        m_layer_ways = m_data_source->CreateLayer("ways", m_spatial_reference, wkbLineString, nullptr);
         if (!m_layer_ways) {
             std::cerr << "Layer creation failed.\n";
             exit(1);
@@ -113,6 +115,7 @@ public:
 
     ~TestOverviewHandler() {
         OGRDataSource::DestroyDataSource(m_data_source);
+        delete m_spatial_reference;
         OGRCleanupAll();
     }
 
