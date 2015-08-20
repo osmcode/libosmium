@@ -172,15 +172,15 @@ namespace osmium {
 
                 // These functions get you some idea how much memory was
                 // used.
-                int get_chunk_size() const noexcept {
+                size_t get_chunk_size() const noexcept {
                     return m_chunk_size;
                 }
 
-                int get_chunk_count() const noexcept {
+                size_t get_chunk_count() const noexcept {
                     return m_chunks.size();
                 }
 
-                int get_used_bytes_in_last_chunk() const noexcept {
+                size_t get_used_bytes_in_last_chunk() const noexcept {
                     return m_chunks.front().size();
                 }
 
