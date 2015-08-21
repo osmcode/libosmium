@@ -59,6 +59,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <ogr_api.h>
 #include <ogrsf_frmts.h>
+#include <gdal_priv.h>
 
 #ifdef _MSC_VER
 # pragma warning(pop)
@@ -85,8 +86,6 @@ namespace osmium {
         class ProblemReporterOGR : public ProblemReporter {
 
             osmium::geom::OGRFactory<> m_ogr_factory;
-
-            OGRDataSource* m_data_source;
 
             OGRLayer* m_layer_perror;
             OGRLayer* m_layer_lerror;
@@ -127,10 +126,12 @@ namespace osmium {
 
         public:
 
-            explicit ProblemReporterOGR(OGRDataSource* data_source, OGRSpatialReference* spatial_reference = NULL) :
-                m_data_source(data_source) {
-
-                m_layer_perror = m_data_source->CreateLayer("perrors", spatial_reference, wkbPoint, nullptr);
+#if GDAL_VERSION_MAJOR < 2
+            explicit ProblemReporterOGR(OGRDataSource* data_source, OGRSpatialReference* spatial_reference = NULL) {
+#else
+            explicit ProblemReporterOGR(GDALDataset* data_source, OGRSpatialReference* spatial_reference = NULL) {
+#endif
+                m_layer_perror = data_source->CreateLayer("perrors", spatial_reference, wkbPoint, nullptr);
                 if (!m_layer_perror) {
                     std::runtime_error("Layer creation failed for layer 'perrors'");
                 }
@@ -158,7 +159,7 @@ namespace osmium {
 
                 /**************/
 
-                m_layer_lerror = m_data_source->CreateLayer("lerrors", spatial_reference, wkbLineString, nullptr);
+                m_layer_lerror = data_source->CreateLayer("lerrors", spatial_reference, wkbLineString, nullptr);
                 if (!m_layer_lerror) {
                     std::runtime_error("Layer creation failed for layer 'lerrors'");
                 }
