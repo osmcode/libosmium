@@ -111,8 +111,14 @@ namespace osmium {
              * @param value Tag value.
              */
             void add_tag(const std::string& key, const std::string& value) {
-                add_size(append(key.data(),   key.size()   + 1) +
-                         append(value.data(), value.size() + 1));
+                if (key.size() > osmium::max_osm_string_length) {
+                    throw std::length_error("OSM tag key is too long");
+                }
+                if (value.size() > osmium::max_osm_string_length) {
+                    throw std::length_error("OSM tag value is too long");
+                }
+                add_size(append(key.data(),   osmium::memory::item_size_type(key.size())   + 1) +
+                         append(value.data(), osmium::memory::item_size_type(value.size()) + 1));
             }
 
         }; // class TagListBuilder
