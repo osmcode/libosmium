@@ -135,14 +135,12 @@ namespace osmium {
                 }
 
                 std::unique_ptr<osmium::io::detail::OutputFormat> create_output(const osmium::io::File& file, data_queue_type& output_queue) {
-                    file.check();
-
                     auto it = m_callbacks.find(file.format());
                     if (it != m_callbacks.end()) {
                         return std::unique_ptr<osmium::io::detail::OutputFormat>((it->second)(file, output_queue));
                     }
 
-                    throw std::runtime_error(std::string("Support for output format '") + as_string(file.format()) + "' not compiled into this binary.");
+                    throw std::runtime_error(std::string("Can not open file '") + file.filename() + "' with type '" + as_string(file.format()) + "'. No support for writing this format in this program.");
                 }
 
             }; // class OutputFormatFactory

@@ -75,6 +75,7 @@ namespace osmium {
         class Reader {
 
             osmium::io::File m_file;
+            osmium::io::detail::InputFormatFactory::create_input_type* m_input_format_creator;
             osmium::osm_entity_bits::type m_read_which_entities;
             std::atomic<bool> m_input_done;
             int m_childpid;
@@ -168,7 +169,8 @@ namespace osmium {
              *                            parsed.
              */
             explicit Reader(const osmium::io::File& file, osmium::osm_entity_bits::type read_which_entities = osmium::osm_entity_bits::all) :
-                m_file(file),
+                m_file(file.check()),
+                m_input_format_creator(osmium::io::detail::InputFormatFactory::instance().get_creator_function(m_file)),
                 m_read_which_entities(read_which_entities),
                 m_input_done(false),
                 m_childpid(0),
@@ -177,7 +179,7 @@ namespace osmium {
                     osmium::io::CompressionFactory::instance().create_decompressor(file.compression(), m_file.buffer(), m_file.buffer_size()) :
                     osmium::io::CompressionFactory::instance().create_decompressor(file.compression(), open_input_file_or_url(m_file.filename(), &m_childpid))),
                 m_read_future(std::async(std::launch::async, detail::ReadThread(m_input_queue, m_decompressor.get(), m_input_done))),
-                m_input(osmium::io::detail::InputFormatFactory::instance().create_input(m_file, m_read_which_entities, m_input_queue)) {
+                m_input((*m_input_format_creator)(m_file, m_read_which_entities, m_input_queue)) {
             }
 
             explicit Reader(const std::string& filename, osmium::osm_entity_bits::type read_types = osmium::osm_entity_bits::all) :

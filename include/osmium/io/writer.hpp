@@ -87,7 +87,7 @@ namespace osmium {
              * @throws std::system_error If the file could not be opened.
              */
             explicit Writer(const osmium::io::File& file, const osmium::io::Header& header = osmium::io::Header(), overwrite allow_overwrite = overwrite::no) :
-                m_file(file),
+                m_file(file.check()),
                 m_output_queue(20, "raw_output"), // XXX
                 m_output(osmium::io::detail::OutputFormatFactory::instance().create_output(m_file, m_output_queue)),
                 m_compressor(osmium::io::CompressionFactory::instance().create_compressor(file.compression(), osmium::io::detail::open_for_writing(m_file.filename(), allow_overwrite))),

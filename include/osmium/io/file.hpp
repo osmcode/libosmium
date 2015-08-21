@@ -257,7 +257,7 @@ namespace osmium {
              *
              * @throws std::runtime_error
              */
-            void check() const {
+            const File& check() const {
                 if (m_file_format == file_format::unknown) {
                     std::string msg = "Could not detect file format";
                     if (!m_format_string.empty())  {
@@ -275,6 +275,7 @@ namespace osmium {
                     msg += ".";
                     throw std::runtime_error(msg);
                 }
+                return *this;
             }
 
             file_format format() const noexcept {

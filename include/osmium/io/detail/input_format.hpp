@@ -136,15 +136,12 @@ namespace osmium {
                     return true;
                 }
 
-                std::unique_ptr<osmium::io::detail::InputFormat> create_input(const osmium::io::File& file, osmium::osm_entity_bits::type read_which_entities, osmium::thread::Queue<std::string>& input_queue) {
-                    file.check();
-
+                create_input_type* get_creator_function(const osmium::io::File& file) {
                     auto it = m_callbacks.find(file.format());
-                    if (it != m_callbacks.end()) {
-                        return std::unique_ptr<osmium::io::detail::InputFormat>((it->second)(file, read_which_entities, input_queue));
+                    if (it == m_callbacks.end()) {
+                        throw std::runtime_error(std::string("Can not open file '") + file.filename() + "' with type '" + as_string(file.format()) + "'. No support for reading this format in this program.");
                     }
-
-                    throw std::runtime_error(std::string("Support for input format '") + as_string(file.format()) + "' not compiled into this binary.");
+                    return &(it->second);
                 }
 
             }; // class InputFormatFactory
