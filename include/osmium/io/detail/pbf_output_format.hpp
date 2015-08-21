@@ -314,7 +314,7 @@ namespace osmium {
                     ++m_count;
                 }
 
-                size_t add_string(const char* s) {
+                uint32_t store_in_stringtable(const char* s) {
                     return m_stringtable.add(s);
                 }
 
@@ -397,11 +397,11 @@ namespace osmium {
                 void add_meta(const osmium::OSMObject& object, T& pbf_object) {
                     const osmium::TagList& tags = object.tags();
 
-                    auto map_tag_key = [this](const osmium::Tag& tag) -> size_t {
-                        return m_primitive_block.add_string(tag.key());
+                    auto map_tag_key = [this](const osmium::Tag& tag) -> uint32_t {
+                        return m_primitive_block.store_in_stringtable(tag.key());
                     };
-                    auto map_tag_value = [this](const osmium::Tag& tag) -> size_t {
-                        return m_primitive_block.add_string(tag.value());
+                    auto map_tag_value = [this](const osmium::Tag& tag) -> uint32_t {
+                        return m_primitive_block.store_in_stringtable(tag.value());
                     };
 
                     pbf_object.add_packed_uint32(T::enum_type::packed_uint32_keys,
@@ -419,7 +419,7 @@ namespace osmium {
                         pbf_info.add_int64(OSMFormat::Info::optional_int64_timestamp, object.timestamp());
                         pbf_info.add_int64(OSMFormat::Info::optional_int64_changeset, object.changeset());
                         pbf_info.add_int32(OSMFormat::Info::optional_int32_uid, object.uid());
-                        pbf_info.add_uint32(OSMFormat::Info::optional_uint32_user_sid, m_primitive_block.add_string(object.user()));
+                        pbf_info.add_uint32(OSMFormat::Info::optional_uint32_user_sid, m_primitive_block.store_in_stringtable(object.user()));
                         if (m_add_visible) {
                             pbf_info.add_bool(OSMFormat::Info::optional_bool_visible, object.visible());
                         }
@@ -540,8 +540,8 @@ namespace osmium {
                     pbf_relation.add_int64(OSMFormat::Relation::required_int64_id, relation.id());
                     add_meta(relation, pbf_relation);
 
-                    auto map_member_role = [this](const osmium::RelationMember& member) -> size_t {
-                        return m_primitive_block.add_string(member.role());
+                    auto map_member_role = [this](const osmium::RelationMember& member) -> uint32_t {
+                        return m_primitive_block.store_in_stringtable(member.role());
                     };
                     pbf_relation.add_packed_int32(OSMFormat::Relation::packed_int32_roles_sid,
                         boost::make_transform_iterator(relation.members().begin(), map_member_role),
