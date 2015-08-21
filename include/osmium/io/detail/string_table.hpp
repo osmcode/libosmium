@@ -232,7 +232,7 @@ namespace osmium {
                 uint32_t add(const char* s) {
                     auto f = m_index.find(s);
                     if (f != m_index.end()) {
-                        return f->second;
+                        return uint32_t(f->second);
                     }
 
                     const char* cs = m_strings.add(s);
