@@ -64,17 +64,13 @@ find_path(OSMIUM_INCLUDE_DIR osmium/osm.hpp
 # Handle the QUIETLY and REQUIRED arguments and set OSMIUM_FOUND to TRUE if
 # all listed variables are TRUE.
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(OSMIUM REQUIRED_VARS OSMIUM_INCLUDE_DIR)
+find_package_handle_standard_args(Osmium REQUIRED_VARS OSMIUM_INCLUDE_DIR)
 
 # Copy the results to the output variables.
 if(OSMIUM_FOUND)
     set(OSMIUM_INCLUDE_DIRS ${OSMIUM_INCLUDE_DIR})
 else()
     set(OSMIUM_INCLUDE_DIRS "")
-endif()
-
-if(Osmium_FIND_REQUIRED AND NOT OSMIUM_FOUND)
-    message(FATAL_ERROR "Can not find libosmium headers, please install them or configure the paths")
 endif()
 
 #----------------------------------------------------------------------
