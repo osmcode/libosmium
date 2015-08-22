@@ -15,6 +15,8 @@
 #include <osmium/io/xml_input.hpp>
 #include <osmium/visitor.hpp>
 
+#include "gdal_support.hpp"
+
 typedef osmium::index::map::SparseMemArray<osmium::unsigned_object_id_type, osmium::Location> index_type;
 
 typedef osmium::handler::NodeLocationsForWays<index_type> location_handler_type;
@@ -41,7 +43,7 @@ inline tagmap_type create_map(const osmium::TagList& taglist) {
 
 class TestHandler : public osmium::handler::Handler {
 
-    OGRDataSource* m_data_source;
+    DataSource* m_data_source;
     OGRLayer* m_layer_point;
     OGRLayer* m_layer_linestring;
     OGRLayer* m_layer_polygon;
@@ -55,16 +57,13 @@ class TestHandler : public osmium::handler::Handler {
 
 public:
 
-    TestHandler(OGRDataSource* data_source) :
+    TestHandler(DataSource* data_source, OGRSpatialReference* spatial_reference) :
         m_data_source(data_source),
         m_out("multipolygon-tests.json") {
 
-        OGRSpatialReference sparef;
-        sparef.SetWellKnownGeogCS("WGS84");
-
         /**************/
 
-        m_layer_point = m_data_source->CreateLayer("points", &sparef, wkbPoint, nullptr);
+        m_layer_point = m_data_source->CreateLayer("points", spatial_reference, wkbPoint, nullptr);
         if (!m_layer_point) {
             std::cerr << "Layer creation failed.\n";
             exit(1);
@@ -88,7 +87,7 @@ public:
 
         /**************/
 
-        m_layer_linestring = m_data_source->CreateLayer("lines", &sparef, wkbLineString, nullptr);
+        m_layer_linestring = m_data_source->CreateLayer("lines", spatial_reference, wkbLineString, nullptr);
         if (!m_layer_linestring) {
             std::cerr << "Layer creation failed.\n";
             exit(1);
@@ -112,7 +111,7 @@ public:
 
         /**************/
 
-        m_layer_polygon = m_data_source->CreateLayer("multipolygons", &sparef, wkbMultiPolygon, nullptr);
+        m_layer_polygon = m_data_source->CreateLayer("multipolygons", spatial_reference, wkbMultiPolygon, nullptr);
         if (!m_layer_polygon) {
             std::cerr << "Layer creation failed.\n";
             exit(1);
@@ -228,10 +227,10 @@ public:
 
 /* ================================================== */
 
-OGRDataSource* initialize_database(const std::string& output_format, const std::string& output_filename) {
+DataSource* initialize_database(const std::string& output_format, const std::string& output_filename) {
     OGRRegisterAll();
 
-    OGRSFDriver* driver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(output_format.c_str());
+    Driver* driver = GET_DRIVER_BY_NAME(output_format.c_str());
     if (!driver) {
         std::cerr << output_format << " driver not available.\n";
         exit(1);
@@ -239,7 +238,7 @@ OGRDataSource* initialize_database(const std::string& output_format, const std::
 
     CPLSetConfigOption("OGR_SQLITE_SYNCHRONOUS", "FALSE");
     const char* options[] = { "SPATIALITE=TRUE", nullptr };
-    OGRDataSource* data_source = driver->CreateDataSource(output_filename.c_str(), const_cast<char**>(options));
+    DataSource* data_source = CREATE_DATA_SOURCE(driver, output_filename.c_str(), const_cast<char**>(options));
     if (!data_source) {
         std::cerr << "Creation of output file failed.\n";
         exit(1);
@@ -258,9 +257,12 @@ int main(int argc, char* argv[]) {
     std::string input_filename(argv[1]);
     std::string output_filename("multipolygon.db");
 
-    OGRDataSource* data_source = initialize_database(output_format, output_filename);
+    DataSource* data_source = initialize_database(output_format, output_filename);
 
-    osmium::area::ProblemReporterOGR problem_reporter(data_source);
+    OGRSpatialReference* spatial_reference = new OGRSpatialReference;
+    spatial_reference->SetWellKnownGeogCS("WGS84");
+
+    osmium::area::ProblemReporterOGR problem_reporter(data_source, spatial_reference);
     osmium::area::Assembler::config_type assembler_config(&problem_reporter);
     assembler_config.enable_debug_output();
     osmium::area::MultipolygonCollector<osmium::area::Assembler> collector(assembler_config);
@@ -275,7 +277,7 @@ int main(int argc, char* argv[]) {
     location_handler_type location_handler(index);
     location_handler.ignore_errors();
 
-    TestHandler test_handler(data_source);
+    TestHandler test_handler(data_source, spatial_reference);
 
     std::cerr << "Pass 2...\n";
     osmium::io::Reader reader2(input_filename);
@@ -285,7 +287,8 @@ int main(int argc, char* argv[]) {
     reader2.close();
     std::cerr << "Pass 2 done\n";
 
-    OGRDataSource::DestroyDataSource(data_source);
+    DESTROY_DATA_SOURCE(data_source);
+    delete spatial_reference;
     OGRCleanupAll();
 }
 
