@@ -42,29 +42,7 @@ DEALINGS IN THE SOFTWARE.
  * @attention If you include this file, you'll need to link with `libgdal`.
  */
 
-#ifdef _MSC_VER
-# pragma warning(push)
-# pragma warning(disable : 4458)
-#else
-# pragma GCC diagnostic push
-# ifdef __clang__
-#  pragma GCC diagnostic ignored "-Wdocumentation-unknown-command"
-# endif
-# pragma GCC diagnostic ignored "-Wfloat-equal"
-# pragma GCC diagnostic ignored "-Wold-style-cast"
-# pragma GCC diagnostic ignored "-Wpadded"
-# pragma GCC diagnostic ignored "-Wredundant-decls"
-# pragma GCC diagnostic ignored "-Wshadow"
-#endif
-
-#include <ogr_api.h>
 #include <ogrsf_frmts.h>
-
-#ifdef _MSC_VER
-# pragma warning(pop)
-#else
-# pragma GCC diagnostic pop
-#endif
 
 #include <memory>
 #include <stdexcept>
