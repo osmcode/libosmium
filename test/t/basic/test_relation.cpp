@@ -7,6 +7,8 @@
 
 #include "helper.hpp"
 
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+
 TEST_CASE("Build relation") {
 
     osmium::CRC<boost::crc_32_type> crc32;
@@ -63,6 +65,8 @@ TEST_CASE("Build relation") {
     crc32.update(relation);
     REQUIRE(crc32().checksum() == 0xebcd836d);
 }
+
+#endif
 
 TEST_CASE("Member role too long") {
     osmium::memory::Buffer buffer(10000);
