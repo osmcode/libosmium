@@ -118,28 +118,33 @@ find_package(Boost 1.38)
 mark_as_advanced(CLEAR BOOST_ROOT)
 
 if(Boost_FOUND)
-    include_directories(${Boost_INCLUDE_DIRS})
+    include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 else()
     set(BOOST_ROOT "NOT FOUND: please choose" CACHE PATH "")
     message(FATAL_ERROR "PLEASE, specify the directory where the Boost library is installed in BOOST_ROOT")
 endif()
 
-set(OSMIUM_INCLUDE_DIR include)
+include_directories(include)
+
 find_package(Osmium COMPONENTS io gdal geos proj sparsehash)
-include_directories(${OSMIUM_INCLUDE_DIRS})
+
+# The find_package put the directory where it found the libosmium includes as
+# the first item in OSMIUM_INCLUDE_DIRS. We remove it again, because we want
+# to make sure to use our own include directory already set up above.
+list(REMOVE_AT OSMIUM_INCLUDE_DIRS 0)
+
+include_directories(SYSTEM ${OSMIUM_INCLUDE_DIRS})
 
 if(MSVC)
     find_path(GETOPT_INCLUDE_DIR getopt.h)
     find_library(GETOPT_LIBRARY NAMES wingetopt)
     if(GETOPT_INCLUDE_DIR AND GETOPT_LIBRARY)
-        include_directories(${GETOPT_INCLUDE_DIR})
+        include_directories(SYSTEM ${GETOPT_INCLUDE_DIR})
         list(APPEND OSMIUM_LIBRARIES ${GETOPT_LIBRARY})
     else()
         set(GETOPT_MISSING 1)
     endif()
 endif()
-
-include_directories(include)
 
 
 #-----------------------------------------------------------------------------
