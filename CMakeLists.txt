@@ -122,7 +122,10 @@ else()
     message(FATAL_ERROR "PLEASE, specify the directory where the Boost library is installed in BOOST_ROOT")
 endif()
 
-include_directories(include)
+# set OSMIUM_INCLUDE_DIR so FindOsmium will not set anything different
+set(OSMIUM_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
+
+include_directories(${OSMIUM_INCLUDE_DIR})
 
 find_package(Osmium COMPONENTS io gdal geos proj sparsehash)
 
