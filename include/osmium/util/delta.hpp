@@ -99,18 +99,18 @@ namespace osmium {
 
             TBaseIterator m_it;
             TBaseIterator m_end;
+            TTransform m_trans;
             value_type m_delta;
             DeltaEncode<value_type> m_value;
-            TTransform m_trans;
 
         public:
 
             DeltaEncodeIterator(TBaseIterator first, TBaseIterator last, TTransform& trans) :
                 m_it(first),
                 m_end(last),
+                m_trans(trans),
                 m_delta(m_trans(m_it)),
-                m_value(m_delta),
-                m_trans(trans) {
+                m_value(m_delta) {
             }
 
             DeltaEncodeIterator& operator++() {
