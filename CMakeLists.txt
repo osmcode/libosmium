@@ -131,10 +131,12 @@ include_directories(${OSMIUM_INCLUDE_DIR})
 
 find_package(Osmium COMPONENTS io gdal geos proj sparsehash)
 
-# The find_package put the directory where it found the libosmium includes as
-# the first item in OSMIUM_INCLUDE_DIRS. We remove it again, because we want
-# to make sure to use our own include directory already set up above.
-list(REMOVE_AT OSMIUM_INCLUDE_DIRS 0)
+# The find_package put the directory where it found the libosmium includes
+# into OSMIUM_INCLUDE_DIRS. We remove it again, because we want to make
+# sure to use our own include directory already set up above.
+list(FIND OSMIUM_INCLUDE_DIRS "${OSMIUM_INCLUDE_DIR}" _own_index)
+list(REMOVE_AT OSMIUM_INCLUDE_DIRS ${_own_index})
+set(_own_index)
 
 include_directories(SYSTEM ${OSMIUM_INCLUDE_DIRS})
 
