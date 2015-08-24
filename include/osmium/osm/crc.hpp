@@ -74,7 +74,7 @@ namespace osmium {
 # else
             uint64_t val1 = byte_swap_32(value & 0xFFFFFFFF);
             uint64_t val2 = byte_swap_32(value >> 32);
-            return (val1 << 32) & val2;
+            return (val1 << 32) | val2;
 # endif
         }
 
@@ -90,15 +90,15 @@ namespace osmium {
             return m_crc;
         }
 
-        void update_bool(bool value) {
+        void update_bool(const bool value) {
             m_crc.process_byte(value);
         }
 
-        void update_int8(uint8_t value) {
+        void update_int8(const uint8_t value) {
             m_crc.process_byte(value);
         }
 
-        void update_int16(uint16_t value) {
+        void update_int16(const uint16_t value) {
 #if __BYTE_ORDER == __LITTLE_ENDIAN
             m_crc.process_bytes(&value, sizeof(uint16_t));
 #else
@@ -107,7 +107,7 @@ namespace osmium {
 #endif
         }
 
-        void update_int32(uint32_t value) {
+        void update_int32(const uint32_t value) {
 #if __BYTE_ORDER == __LITTLE_ENDIAN
             m_crc.process_bytes(&value, sizeof(uint32_t));
 #else
@@ -116,7 +116,7 @@ namespace osmium {
 #endif
         }
 
-        void update_int64(uint64_t value) {
+        void update_int64(const uint64_t value) {
 #if __BYTE_ORDER == __LITTLE_ENDIAN
             m_crc.process_bytes(&value, sizeof(uint64_t));
 #else
