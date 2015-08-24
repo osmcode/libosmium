@@ -8,6 +8,8 @@
 
 #include "helper.hpp"
 
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+
 TEST_CASE("Build way") {
 
     osmium::CRC<boost::crc_32_type> crc32;
@@ -88,3 +90,5 @@ SECTION("way_builder_with_helpers") {
 }
 
 }
+
+#endif

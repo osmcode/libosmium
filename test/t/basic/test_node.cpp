@@ -7,6 +7,8 @@
 
 #include "helper.hpp"
 
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+
 TEST_CASE("Basic_Node") {
 
     osmium::CRC<boost::crc_32_type> crc32;
@@ -123,3 +125,5 @@ SECTION("tags") {
 
 
 }
+
+#endif
