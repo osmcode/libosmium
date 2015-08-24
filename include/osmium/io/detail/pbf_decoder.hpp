@@ -584,8 +584,8 @@ namespace osmium {
             }; // class PBFPrimitiveBlockDecoder
 
             inline ptr_len_type decode_blob(const std::string& blob_data, std::string& output) {
-                int32_t raw_size;
-                std::pair<const char*, protozero::pbf_length_type> zlib_data;
+                int32_t raw_size = 0;
+                std::pair<const char*, protozero::pbf_length_type> zlib_data = {nullptr, 0};
 
                 protozero::pbf_message<FileFormat::Blob> pbf_blob(blob_data);
                 while (pbf_blob.next()) {
@@ -614,7 +614,7 @@ namespace osmium {
                     }
                 }
 
-                if (zlib_data.second != 0) {
+                if (zlib_data.second != 0 && raw_size != 0) {
                     return osmium::io::detail::zlib_uncompress_string(
                         zlib_data.first,
                         static_cast<unsigned long>(zlib_data.second),
