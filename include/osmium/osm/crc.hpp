@@ -46,10 +46,9 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
-    template <class TCRC>
-    class CRC {
+    namespace util {
 
-        static inline uint16_t byte_swap_16(uint16_t value) noexcept {
+        inline uint16_t byte_swap_16(uint16_t value) noexcept {
 # if defined(__GNUC__) || defined(__clang__)
             return __builtin_bswap16(value);
 # else
@@ -57,18 +56,18 @@ namespace osmium {
 # endif
         }
 
-        static inline uint32_t byte_swap_32(uint32_t value) noexcept {
+        inline uint32_t byte_swap_32(uint32_t value) noexcept {
 # if defined(__GNUC__) || defined(__clang__)
             return __builtin_bswap32(value);
 # else
             return  (value >> 24) |
-                    ((value >>  8) & 0x0000FF00) |
-                    ((value <<  8) & 0x00FF0000) |
+                   ((value >>  8) & 0x0000FF00) |
+                   ((value <<  8) & 0x00FF0000) |
                     (value << 24);
 # endif
         }
 
-        static inline uint64_t byte_swap_64(uint64_t value) noexcept {
+        inline uint64_t byte_swap_64(uint64_t value) noexcept {
 # if defined(__GNUC__) || defined(__clang__)
             return __builtin_bswap64(value);
 # else
@@ -77,6 +76,11 @@ namespace osmium {
             return (val1 << 32) | val2;
 # endif
         }
+
+    }
+
+    template <class TCRC>
+    class CRC {
 
         TCRC m_crc;
 
@@ -102,7 +106,7 @@ namespace osmium {
 #if __BYTE_ORDER == __LITTLE_ENDIAN
             m_crc.process_bytes(&value, sizeof(uint16_t));
 #else
-            uint16_t v = byte_swap_16(value);
+            uint16_t v = osmium::util::byte_swap_16(value);
             m_crc.process_bytes(&v, sizeof(uint16_t));
 #endif
         }
@@ -111,7 +115,7 @@ namespace osmium {
 #if __BYTE_ORDER == __LITTLE_ENDIAN
             m_crc.process_bytes(&value, sizeof(uint32_t));
 #else
-            uint32_t v = byte_swap_32(value);
+            uint32_t v = osmium::util::byte_swap_32(value);
             m_crc.process_bytes(&v, sizeof(uint32_t));
 #endif
         }
@@ -120,7 +124,7 @@ namespace osmium {
 #if __BYTE_ORDER == __LITTLE_ENDIAN
             m_crc.process_bytes(&value, sizeof(uint64_t));
 #else
-            uint64_t v = byte_swap_64(value);
+            uint64_t v = osmium::util::byte_swap_64(value);
             m_crc.process_bytes(&v, sizeof(uint64_t));
 #endif
         }
