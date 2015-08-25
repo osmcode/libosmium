@@ -182,6 +182,7 @@ namespace osmium {
                 m_impl(std::forward<TArgs>(args)...) {
             }
 
+            typedef TProjection projection_type;
             typedef typename TGeomImpl::point_type        point_type;
             typedef typename TGeomImpl::linestring_type   linestring_type;
             typedef typename TGeomImpl::polygon_type      polygon_type;
