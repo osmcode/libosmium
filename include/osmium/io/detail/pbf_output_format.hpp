@@ -47,6 +47,8 @@ DEALINGS IN THE SOFTWARE.
 #include <time.h>
 #include <utility>
 
+// needed for older boost libraries
+#define BOOST_RESULT_OF_USE_DECLTYPE
 #include <boost/iterator/transform_iterator.hpp>
 
 #include <protozero/pbf_builder.hpp>
