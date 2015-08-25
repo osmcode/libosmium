@@ -56,12 +56,8 @@ find_path(OSMIUM_INCLUDE_DIR osmium/osm.hpp
     PATH_SUFFIXES include
     PATHS
         ../libosmium
-        ../../libosmium
-        libosmium
         ~/Library/Frameworks
         /Library/Frameworks
-        /usr/local
-        /usr/
         /opt/local # DarwinPorts
         /opt
 )
