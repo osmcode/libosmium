@@ -43,6 +43,7 @@ DEALINGS IN THE SOFTWARE.
 #ifndef _WIN32
 # include <sys/mman.h>
 #else
+# include <fcntl.h>
 # include <io.h>
 # include <windows.h>
 # include <sys/types.h>
@@ -85,6 +86,9 @@ namespace osmium {
          * On Unix systems this wraps the mmap(), munmap(), and the mremap()
          * system calls. On Windows it wraps the CreateFileMapping(),
          * CloseHandle(), MapViewOfFile(), and UnmapViewOfFile() functions.
+         *
+         * On Windows the file will be set to binary mode before the memory
+         * mapping.
          */
         class MemoryMapping {
 
@@ -655,6 +659,7 @@ inline HANDLE osmium::util::MemoryMapping::get_handle() const noexcept {
 }
 
 inline HANDLE osmium::util::MemoryMapping::create_file_mapping() const noexcept {
+    _setmode(fd, _O_BINARY);
     return CreateFileMapping(get_handle(), nullptr, get_protection(), osmium::util::dword_hi(static_cast<uint64_t>(m_size) + m_offset), osmium::util::dword_lo(static_cast<uint64_t>(m_size) + m_offset), nullptr);
 }
 
