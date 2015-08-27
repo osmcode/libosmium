@@ -109,7 +109,7 @@ namespace osmium {
                 m_it(first),
                 m_end(last),
                 m_trans(trans),
-                m_delta(m_trans(m_it)),
+                m_delta(m_it != m_end ? m_trans(m_it) : 0),
                 m_value(m_delta) {
             }
 
