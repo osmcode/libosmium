@@ -8,15 +8,24 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
-- Checks now that user names, member roles and tag keys and values are not
-  longer than 256 * 4 bytes. That is the maximum length 256 Unicode characters
+- Checks that user names, member roles and tag keys and values are not longer
+  than 256 * 4 bytes. That is the maximum length 256 Unicode characters
   can have in UTF-8 encoding.
+- Support for GDAL 2. GDAL 1 stil works.
 
 ### Changed
+
+- Improved CMake build scripts.
+- Updated internal version of Protozero to 1.1.0.
+- Removed toogr* examples. They are in their own repository now.
+  See https://github.com/osmcode/osm-gis-export.
 
 ### Fixed
 
 - Hanging program when trying to open file with an unknown file format.
+- Building problems with old boost versions.
+- Initialization errors in PBF writer.
+- Bug in byte swap code.
 
 
 ## [2.3.0] - 2015-08-18
