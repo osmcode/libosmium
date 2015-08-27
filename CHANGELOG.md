@@ -19,6 +19,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Updated internal version of Protozero to 1.1.0.
 - Removed toogr* examples. They are in their own repository now.
   See https://github.com/osmcode/osm-gis-export.
+- Files about to be memory mapped (for instance index files) are now set
+  to binary mode on Windows so the application doesn't have to do this.
 
 ### Fixed
 
@@ -26,6 +28,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Building problems with old boost versions.
 - Initialization errors in PBF writer.
 - Bug in byte swap code.
+- Output on Windows now always uses binary mode, even when writing to
+  stdout, so OSM xml and opl files always use LF line endings.
 
 
 ## [2.3.0] - 2015-08-18

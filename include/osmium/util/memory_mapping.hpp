@@ -659,7 +659,9 @@ inline HANDLE osmium::util::MemoryMapping::get_handle() const noexcept {
 }
 
 inline HANDLE osmium::util::MemoryMapping::create_file_mapping() const noexcept {
-    _setmode(fd, _O_BINARY);
+    if (m_fd != -1) {
+        _setmode(m_fd, _O_BINARY);
+    }
     return CreateFileMapping(get_handle(), nullptr, get_protection(), osmium::util::dword_hi(static_cast<uint64_t>(m_size) + m_offset), osmium::util::dword_lo(static_cast<uint64_t>(m_size) + m_offset), nullptr);
 }
 
