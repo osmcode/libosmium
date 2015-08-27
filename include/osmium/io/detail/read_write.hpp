@@ -68,6 +68,9 @@ namespace osmium {
              */
             inline int open_for_writing(const std::string& filename, osmium::io::overwrite allow_overwrite = osmium::io::overwrite::no) {
                 if (filename == "" || filename == "-") {
+#ifdef _WIN32
+                    _setmode(1, _O_BINARY);
+#endif
                     return 1; // stdout
                 } else {
                     int flags = O_WRONLY | O_CREAT;
