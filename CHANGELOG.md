@@ -12,6 +12,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+
+## [2.4.1] - 2015-08-29
+
+### Fixed
+
 - CRC calculation of tags and changesets.
 
 
@@ -139,7 +144,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   Doxygen (up to version 1.8.8). This version contains a workaround to fix
   this.
 
-[unreleased]: https://github.com/osmcode/libosmium/compare/v2.4.0...HEAD
+[unreleased]: https://github.com/osmcode/libosmium/compare/v2.4.1...HEAD
+[2.4.1]: https://github.com/osmcode/libosmium/compare/v2.4.0...v2.4.1
 [2.4.0]: https://github.com/osmcode/libosmium/compare/v2.3.0...v2.4.0
 [2.3.0]: https://github.com/osmcode/libosmium/compare/v2.2.0...v2.3.0
 [2.2.0]: https://github.com/osmcode/libosmium/compare/v2.1.0...v2.2.0
