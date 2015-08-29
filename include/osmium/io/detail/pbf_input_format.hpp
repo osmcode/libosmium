@@ -266,7 +266,7 @@ namespace osmium {
                     m_queue.wait_and_pop(buffer_future);
 
                     try {
-                        buffer = std::move(buffer_future.get());
+                        buffer = buffer_future.get();
                         if (!buffer) {
                             m_eof = true;
                         }
