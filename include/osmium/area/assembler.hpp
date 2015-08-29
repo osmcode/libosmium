@@ -34,9 +34,12 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <algorithm>
+#include <cassert>
 #include <iostream>
 #include <iterator>
 #include <list>
+#include <set>
+#include <string>
 #include <map>
 #include <vector>
 

@@ -33,10 +33,18 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <osmium/handler/node_locations_for_ways.hpp>
-#include <osmium/visitor.hpp>
-#include <osmium/area/multipolygon_collector.hpp>
+#include <string>
+#include <vector>
+
 #include <osmium/area/assembler.hpp>
+#include <osmium/area/multipolygon_collector.hpp>
+#include <osmium/handler/node_locations_for_ways.hpp>
+#include <osmium/io/file.hpp>
+#include <osmium/io/header.hpp>
+#include <osmium/io/reader.hpp>
+#include <osmium/memory/buffer.hpp>
+#include <osmium/osm/entity_bits.hpp>
+#include <osmium/visitor.hpp>
 
 namespace osmium {
 

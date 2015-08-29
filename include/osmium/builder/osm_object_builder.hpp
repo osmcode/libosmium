@@ -36,6 +36,7 @@ DEALINGS IN THE SOFTWARE.
 #include <cstring>
 #include <initializer_list>
 #include <new>
+#include <stdexcept>
 #include <string>
 #include <utility>
 

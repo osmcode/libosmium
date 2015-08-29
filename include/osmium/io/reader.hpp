@@ -37,6 +37,7 @@ DEALINGS IN THE SOFTWARE.
 #include <cerrno>
 #include <cstdlib>
 #include <fcntl.h>
+#include <future>
 #include <memory>
 #include <string>
 #include <system_error>

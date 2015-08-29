@@ -48,6 +48,7 @@ DEALINGS IN THE SOFTWARE.
 #include <gdalcpp.hpp>
 
 #include <osmium/area/problem_reporter.hpp>
+#include <osmium/geom/factory.hpp>
 #include <osmium/geom/ogr.hpp>
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/types.hpp>
