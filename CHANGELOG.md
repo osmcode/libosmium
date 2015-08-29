@@ -12,6 +12,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+- CRC calculation of tags and changesets.
+
 
 ## [2.4.0] - 2015-08-29
 

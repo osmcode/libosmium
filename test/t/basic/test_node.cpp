@@ -42,7 +42,7 @@ SECTION("node_builder") {
     REQUIRE(2 == node.tags().size());
 
     crc32.update(node);
-    REQUIRE(crc32().checksum() == 0xc696802f);
+    REQUIRE(crc32().checksum() == 0x7dc553f9);
 
     node.set_visible(false);
     REQUIRE(false == node.visible());

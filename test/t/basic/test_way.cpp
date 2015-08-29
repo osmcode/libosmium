@@ -45,7 +45,7 @@ SECTION("way_builder") {
     REQUIRE(! way.is_closed());
 
     crc32.update(way);
-    REQUIRE(crc32().checksum() == 0x20fe7a30);
+    REQUIRE(crc32().checksum() == 0x7676d0c2);
 }
 
 SECTION("closed_way") {

@@ -160,7 +160,10 @@ namespace osmium {
         }
 
         void update(const TagList& tags) {
-            m_crc.process_bytes(tags.data(), tags.byte_size());
+            for (const Tag& tag : tags) {
+                update_string(tag.key());
+                update_string(tag.value());
+            }
         }
 
         void update(const osmium::RelationMember& member) {
@@ -218,6 +221,7 @@ namespace osmium {
             update_int32(changeset.num_changes());
             update_int32(changeset.uid());
             update_string(changeset.user());
+            update(changeset.tags());
         }
 
     }; // class CRC
