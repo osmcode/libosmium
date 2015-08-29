@@ -8,18 +8,27 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+### Changed
+
+### Fixed
+
+
+## [2.4.0] - 2015-08-29
+
+### Added
+
 - Checks that user names, member roles and tag keys and values are not longer
   than 256 * 4 bytes. That is the maximum length 256 Unicode characters
   can have in UTF-8 encoding.
-- Support for GDAL 2. GDAL 1 stil works.
+- Support for GDAL 2. GDAL 1 still works.
 
 ### Changed
 
 - Improved CMake build scripts.
 - Updated internal version of Protozero to 1.1.0.
-- Removed toogr* examples. They are in their own repository now.
+- Removed `toogr*` examples. They are in their own repository now.
   See https://github.com/osmcode/osm-gis-export.
-- Files about to be memory mapped (for instance index files) are now set
+- Files about to be memory-mapped (for instance index files) are now set
   to binary mode on Windows so the application doesn't have to do this.
 
 ### Fixed
@@ -128,8 +137,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   Doxygen (up to version 1.8.8). This version contains a workaround to fix
   this.
 
-[unreleased]: https://github.com/osmcode/libosmium/compare/v2.3.0...HEAD
-[2.3.0]: https://github.com/osmcode/libosmium/compare/v2.3.0...v2.3.0
+[unreleased]: https://github.com/osmcode/libosmium/compare/v2.4.0...HEAD
+[2.4.0]: https://github.com/osmcode/libosmium/compare/v2.3.0...v2.4.0
+[2.3.0]: https://github.com/osmcode/libosmium/compare/v2.2.0...v2.3.0
 [2.2.0]: https://github.com/osmcode/libosmium/compare/v2.1.0...v2.2.0
 [2.1.0]: https://github.com/osmcode/libosmium/compare/v2.0.0...v2.1.0
 
