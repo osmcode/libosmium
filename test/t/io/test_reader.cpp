@@ -4,6 +4,7 @@
 #include <osmium/handler.hpp>
 #include <osmium/io/any_compression.hpp>
 #include <osmium/io/xml_input.hpp>
+#include <osmium/io/pbf_input.hpp>
 #include <osmium/visitor.hpp>
 #include <osmium/memory/buffer.hpp>
 
@@ -16,6 +17,27 @@ struct CountHandler : public osmium::handler::Handler {
     }
 
 }; // class CountHandler
+
+struct ZeroPositionNodeCountHandler : public osmium::handler::Handler {
+
+    // number of nodes seen at zero position, or visible with undefined
+    // location.
+    int count = 0;
+    int total_count = 0; // total number of nodes seen
+    const osmium::Location zero = osmium::Location(int32_t(0), int32_t(0));
+
+    void node(osmium::Node &n) {
+        // no nodes in the history file have a zero location, and
+        // no visible nodes should have an undefined location.
+        if ((n.location() == zero) ||
+            (n.visible() && !n.location())) {
+            ++count;
+        }
+        ++total_count;
+    }
+
+}; // class ZeroPositionNodeCountHandler
+
 
 TEST_CASE("Reader") {
 
@@ -111,6 +133,34 @@ TEST_CASE("Reader") {
         REQUIRE(handler.count == 0);
         osmium::apply(reader, handler);
         REQUIRE(handler.count == 1);
+    }
+
+    SECTION("should decode zero node positions in history (XML)") {
+        osmium::io::Reader reader(with_data_dir("t/io/deleted_nodes.osh"),
+                                  osmium::osm_entity_bits::node);
+        ZeroPositionNodeCountHandler handler;
+
+        REQUIRE(handler.count == 0);
+        REQUIRE(handler.total_count == 0);
+
+        osmium::apply(reader, handler);
+
+        REQUIRE(handler.count == 0);
+        REQUIRE(handler.total_count == 2);
+    }
+
+    SECTION("should decode zero node positions in history (PBF)") {
+        osmium::io::Reader reader(with_data_dir("t/io/deleted_nodes.osh.pbf"),
+                                  osmium::osm_entity_bits::node);
+        ZeroPositionNodeCountHandler handler;
+
+        REQUIRE(handler.count == 0);
+        REQUIRE(handler.total_count == 0);
+
+        osmium::apply(reader, handler);
+
+        REQUIRE(handler.count == 0);
+        REQUIRE(handler.total_count == 2);
     }
 
 }
