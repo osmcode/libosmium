@@ -353,7 +353,7 @@ if(BUILD_HEADERS)
     endforeach()
 endif()
 
-install(DIRECTORY include/osmium DESTINATION include)
+install(DIRECTORY include/osmium include/protozero DESTINATION include)
 
 # We only have a copy of this file so we can use older boost versions which
 # don't have it. We probably don't want to install it.
