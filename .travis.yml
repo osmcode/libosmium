@@ -18,6 +18,7 @@ env:
 matrix:
   include:
 
+    # 1/ Linux Clang Builds
     - os: linux
       compiler: clang
       addons: &clang35
@@ -60,6 +61,7 @@ matrix:
       env: COMPILER='clang++-3.7' BUILD_TYPE='Dev'
 
 
+    # 2/ Linux GCC Builds
     - os: linux
       compiler: gcc
       addons: &gcc48
@@ -102,6 +104,7 @@ matrix:
       env: COMPILER='g++-5' BUILD_TYPE='Dev'
 
 
+    # 3/ OSX Clang Builds
     - os: osx
       osx_image: xcode6.4
       compiler: clang
