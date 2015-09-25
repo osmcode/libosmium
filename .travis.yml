@@ -141,5 +141,4 @@ before_script:
 
 script:
   - make --jobs=2
-  - ccache --show-stats
   - ctest --output-on-failure
