@@ -527,10 +527,14 @@ namespace osmium {
                             builder.add_user("");
                         }
 
+                        // even if the node isn't visible, there's still a record
+                        // of its lat/lon in the dense arrays.
+                        const auto lon = dense_longitude.update(*lons.first++);
+                        const auto lat = dense_latitude.update(*lats.first++);
                         if (visible) {
                             builder.object().set_location(osmium::Location(
-                                    convert_pbf_coordinate(dense_longitude.update(*lons.first++)),
-                                    convert_pbf_coordinate(dense_latitude.update(*lats.first++))
+                                    convert_pbf_coordinate(lon),
+                                    convert_pbf_coordinate(lat)
                             ));
                         }
 
