@@ -114,8 +114,8 @@ namespace osmium {
             }
 
             DeltaEncodeIterator& operator++() {
-                if (m_it != m_end) {
-                    m_delta = m_value.update(m_trans(++m_it));
+                if (++m_it != m_end) {
+                    m_delta = m_value.update(m_trans(m_it));
                 }
                 return *this;
             }
