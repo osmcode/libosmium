@@ -10,7 +10,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
+- Updated included protozero library to version 1.2.0.
+
 ### Fixed
+
+- PBF reader now decodes locations of invisible nodes properly.
+- Invalid Delta encode iterator dereference.
+- Lots of includes fixed to include (only) what's used.
 
 
 ## [2.4.1] - 2015-08-29
