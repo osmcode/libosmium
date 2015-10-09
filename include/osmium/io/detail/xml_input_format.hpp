@@ -584,20 +584,25 @@ namespace osmium {
                                     m_rml_builder = std::unique_ptr<osmium::builder::RelationMemberListBuilder>(new osmium::builder::RelationMemberListBuilder(m_buffer, m_relation_builder.get()));
                                 }
 
-                                char type = 'x';
+                                item_type type = item_type::undefined;
                                 object_id_type ref = 0;
                                 const char* role = "";
                                 check_attributes(attrs, [&type, &ref, &role](const XML_Char* name, const XML_Char* value) {
                                     if (!strcmp(name, "type")) {
-                                        type = static_cast<char>(value[0]);
+                                        type = char_to_item_type(value[0]);
                                     } else if (!strcmp(name, "ref")) {
                                         ref = osmium::string_to_object_id(value);
                                     } else if (!strcmp(name, "role")) {
                                         role = static_cast<const char*>(value);
                                     }
                                 });
-                                // XXX assert type, ref, role are set
-                                m_rml_builder->add_member(char_to_item_type(type), ref, role);
+                                if (type != item_type::node && type != item_type::way && type != item_type::relation) {
+                                    throw osmium::xml_error("Unknown type on relation member");
+                                }
+                                if (ref == 0) {
+                                    throw osmium::xml_error("Missing ref on relation member");
+                                }
+                                m_rml_builder->add_member(type, ref, role);
                             } else if (!strcmp(element, "tag")) {
                                 m_rml_builder.reset();
                                 get_tag(m_relation_builder.get(), attrs);
