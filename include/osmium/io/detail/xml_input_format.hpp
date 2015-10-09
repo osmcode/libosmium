@@ -374,6 +374,14 @@ namespace osmium {
                     return true;
                 }
 
+                template <typename T>
+                static void check_attributes(const XML_Char** attrs, T check) {
+                    while (*attrs) {
+                        check(attrs[0], attrs[1]);
+                        attrs += 2;
+                    }
+                }
+
             private:
 
                 const char* init_object(osmium::OSMObject& object, const XML_Char** attrs) {
@@ -384,17 +392,18 @@ namespace osmium {
                     }
 
                     osmium::Location location;
-                    for (int count = 0; attrs[count]; count += 2) {
-                        if (!strcmp(attrs[count], "lon")) {
-                            location.set_lon(std::atof(attrs[count+1])); // XXX doesn't detect garbage after the number
-                        } else if (!strcmp(attrs[count], "lat")) {
-                            location.set_lat(std::atof(attrs[count+1])); // XXX doesn't detect garbage after the number
-                        } else if (!strcmp(attrs[count], "user")) {
-                            user = attrs[count+1];
+
+                    check_attributes(attrs, [&location, &user, &object](const XML_Char* name, const XML_Char* value) {
+                        if (!strcmp(name, "lon")) {
+                            location.set_lon(std::atof(value)); // XXX doesn't detect garbage after the number
+                        } else if (!strcmp(name, "lat")) {
+                            location.set_lat(std::atof(value)); // XXX doesn't detect garbage after the number
+                        } else if (!strcmp(name, "user")) {
+                            user = value;
                         } else {
-                            object.set_attribute(attrs[count], attrs[count+1]);
+                            object.set_attribute(name, value);
                         }
-                    }
+                    });
 
                     if (location && object.type() == osmium::item_type::node) {
                         static_cast<osmium::Node&>(object).set_location(location);
@@ -409,21 +418,21 @@ namespace osmium {
 
                     osmium::Location min;
                     osmium::Location max;
-                    for (int count = 0; attrs[count]; count += 2) {
-                        if (!strcmp(attrs[count], "min_lon")) {
-                            min.set_lon(atof(attrs[count+1]));
-                        } else if (!strcmp(attrs[count], "min_lat")) {
-                            min.set_lat(atof(attrs[count+1]));
-                        } else if (!strcmp(attrs[count], "max_lon")) {
-                            max.set_lon(atof(attrs[count+1]));
-                        } else if (!strcmp(attrs[count], "max_lat")) {
-                            max.set_lat(atof(attrs[count+1]));
-                        } else if (!strcmp(attrs[count], "user")) {
-                            user = attrs[count+1];
+                    check_attributes(attrs, [&min, &max, &user, &new_changeset](const XML_Char* name, const XML_Char* value) {
+                        if (!strcmp(name, "min_lon")) {
+                            min.set_lon(atof(value));
+                        } else if (!strcmp(name, "min_lat")) {
+                            min.set_lat(atof(value));
+                        } else if (!strcmp(name, "max_lon")) {
+                            max.set_lon(atof(value));
+                        } else if (!strcmp(name, "max_lat")) {
+                            max.set_lat(atof(value));
+                        } else if (!strcmp(name, "user")) {
+                            user = value;
                         } else {
-                            new_changeset.set_attribute(attrs[count], attrs[count+1]);
+                            new_changeset.set_attribute(name, value);
                         }
-                    }
+                    });
 
                     new_changeset.bounds().extend(min);
                     new_changeset.bounds().extend(max);
@@ -432,19 +441,19 @@ namespace osmium {
                 }
 
                 void get_tag(osmium::builder::Builder* builder, const XML_Char** attrs) {
-                    const char* key = "";
-                    const char* value = "";
-                    for (int count = 0; attrs[count]; count += 2) {
-                        if (attrs[count][0] == 'k' && attrs[count][1] == 0) {
-                            key = attrs[count+1];
-                        } else if (attrs[count][0] == 'v' && attrs[count][1] == 0) {
-                            value = attrs[count+1];
+                    const char* k = "";
+                    const char* v = "";
+                    check_attributes(attrs, [&k, &v](const XML_Char* name, const XML_Char* value) {
+                        if (name[0] == 'k' && name[1] == 0) {
+                            k = value;
+                        } else if (name[0] == 'v' && name[1] == 0) {
+                            v = value;
                         }
-                    }
+                    });
                     if (!m_tl_builder) {
                         m_tl_builder = std::unique_ptr<osmium::builder::TagListBuilder>(new osmium::builder::TagListBuilder(m_buffer, builder));
                     }
-                    m_tl_builder->add_tag(key, value);
+                    m_tl_builder->add_tag(k, v);
                 }
 
                 void header_is_done() {
@@ -461,16 +470,16 @@ namespace osmium {
                                 if (!strcmp(element, "osmChange")) {
                                     m_header.set_has_multiple_object_versions(true);
                                 }
-                                for (int count = 0; attrs[count]; count += 2) {
-                                    if (!strcmp(attrs[count], "version")) {
-                                        m_header.set("version", attrs[count+1]);
-                                        if (strcmp(attrs[count+1], "0.6")) {
-                                            throw osmium::format_version_error(attrs[count+1]);
+                                check_attributes(attrs, [this](const XML_Char* name, const XML_Char* value) {
+                                    if (!strcmp(name, "version")) {
+                                        m_header.set("version", value);
+                                        if (strcmp(value, "0.6")) {
+                                            throw osmium::format_version_error(value);
                                         }
-                                    } else if (!strcmp(attrs[count], "generator")) {
-                                        m_header.set("generator", attrs[count+1]);
+                                    } else if (!strcmp(name, "generator")) {
+                                        m_header.set("generator", value);
                                     }
-                                }
+                                });
                                 if (m_header.get("version") == "") {
                                     throw osmium::format_version_error();
                                 }
@@ -520,17 +529,17 @@ namespace osmium {
                             } else if (!strcmp(element, "bounds")) {
                                 osmium::Location min;
                                 osmium::Location max;
-                                for (int count = 0; attrs[count]; count += 2) {
-                                    if (!strcmp(attrs[count], "minlon")) {
-                                        min.set_lon(atof(attrs[count+1]));
-                                    } else if (!strcmp(attrs[count], "minlat")) {
-                                        min.set_lat(atof(attrs[count+1]));
-                                    } else if (!strcmp(attrs[count], "maxlon")) {
-                                        max.set_lon(atof(attrs[count+1]));
-                                    } else if (!strcmp(attrs[count], "maxlat")) {
-                                        max.set_lat(atof(attrs[count+1]));
+                                check_attributes(attrs, [&min, &max](const XML_Char* name, const XML_Char* value) {
+                                    if (!strcmp(name, "minlon")) {
+                                        min.set_lon(atof(value));
+                                    } else if (!strcmp(name, "minlat")) {
+                                        min.set_lat(atof(value));
+                                    } else if (!strcmp(name, "maxlon")) {
+                                        max.set_lon(atof(value));
+                                    } else if (!strcmp(name, "maxlat")) {
+                                        max.set_lat(atof(value));
                                     }
-                                }
+                                });
                                 osmium::Box box;
                                 box.extend(min).extend(max);
                                 m_header.add_box(box);
@@ -555,11 +564,11 @@ namespace osmium {
                                     m_wnl_builder = std::unique_ptr<osmium::builder::WayNodeListBuilder>(new osmium::builder::WayNodeListBuilder(m_buffer, m_way_builder.get()));
                                 }
 
-                                for (int count = 0; attrs[count]; count += 2) {
-                                    if (!strcmp(attrs[count], "ref")) {
-                                        m_wnl_builder->add_node_ref(osmium::string_to_object_id(attrs[count+1]));
+                                check_attributes(attrs, [this](const XML_Char* name, const XML_Char* value) {
+                                    if (!strcmp(name, "ref")) {
+                                        m_wnl_builder->add_node_ref(osmium::string_to_object_id(value));
                                     }
-                                }
+                                });
                             } else if (!strcmp(element, "tag")) {
                                 m_wnl_builder.reset();
                                 get_tag(m_way_builder.get(), attrs);
@@ -576,17 +585,17 @@ namespace osmium {
                                 }
 
                                 char type = 'x';
-                                object_id_type ref  = 0;
+                                object_id_type ref = 0;
                                 const char* role = "";
-                                for (int count = 0; attrs[count]; count += 2) {
-                                    if (!strcmp(attrs[count], "type")) {
-                                        type = static_cast<char>(attrs[count+1][0]);
-                                    } else if (!strcmp(attrs[count], "ref")) {
-                                        ref = osmium::string_to_object_id(attrs[count+1]);
-                                    } else if (!strcmp(attrs[count], "role")) {
-                                        role = static_cast<const char*>(attrs[count+1]);
+                                check_attributes(attrs, [&type, &ref, &role](const XML_Char* name, const XML_Char* value) {
+                                    if (!strcmp(name, "type")) {
+                                        type = static_cast<char>(value[0]);
+                                    } else if (!strcmp(name, "ref")) {
+                                        ref = osmium::string_to_object_id(value);
+                                    } else if (!strcmp(name, "role")) {
+                                        role = static_cast<const char*>(value);
                                     }
-                                }
+                                });
                                 // XXX assert type, ref, role are set
                                 m_rml_builder->add_member(char_to_item_type(type), ref, role);
                             } else if (!strcmp(element, "tag")) {
@@ -614,15 +623,15 @@ namespace osmium {
                                 osmium::Timestamp date;
                                 osmium::user_id_type uid = 0;
                                 const char* user = "";
-                                for (int count = 0; attrs[count]; count += 2) {
-                                    if (!strcmp(attrs[count], "date")) {
-                                        date = osmium::Timestamp(attrs[count+1]);
-                                    } else if (!strcmp(attrs[count], "uid")) {
-                                        uid = osmium::string_to_user_id(attrs[count+1]);
-                                    } else if (!strcmp(attrs[count], "user")) {
-                                        user = static_cast<const char*>(attrs[count+1]);
+                                check_attributes(attrs, [&date, &uid, &user](const XML_Char* name, const XML_Char* value) {
+                                    if (!strcmp(name, "date")) {
+                                        date = osmium::Timestamp(value);
+                                    } else if (!strcmp(name, "uid")) {
+                                        uid = osmium::string_to_user_id(value);
+                                    } else if (!strcmp(name, "user")) {
+                                        user = static_cast<const char*>(value);
                                     }
-                                }
+                                });
                                 m_changeset_discussion_builder->add_comment(date, uid, user);
                             }
                             break;
