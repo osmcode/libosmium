@@ -348,16 +348,19 @@ namespace osmium {
                 void changeset(const osmium::Changeset& changeset) {
                     write_object_type("changeset");
                     output_formatted("%d\n", changeset.id());
+
                     write_fieldname("num changes");
                     output_formatted("%d", changeset.num_changes());
                     if (changeset.num_changes() == 0) {
                         write_error(" NO CHANGES!");
                     }
                     *m_out += '\n';
+
                     write_fieldname("created at");
                     *m_out += ' ';
                     *m_out += changeset.created_at().to_iso();
                     output_formatted(" (%d)\n", changeset.created_at());
+
                     write_fieldname("closed at");
                     *m_out += "  ";
                     if (changeset.closed()) {
@@ -366,6 +369,7 @@ namespace osmium {
                     } else {
                         write_error("OPEN!\n");
                     }
+
                     write_fieldname("user");
                     output_formatted("       %d ", changeset.uid());
                     write_string(changeset.user());
@@ -373,6 +377,30 @@ namespace osmium {
 
                     write_box(changeset.bounds());
                     write_tags(changeset.tags(), "  ");
+
+                    if (changeset.num_comments() > 0) {
+                        write_fieldname("comments");
+                        output_formatted("%d\n", changeset.num_comments());
+
+                        int n = 0;
+                        for (const auto& comment : changeset.discussion()) {
+                            write_fieldname("  comment");
+                            output_formatted("%d\n", n++);
+
+                            write_fieldname("    date");
+                            *m_out += comment.date().to_iso();
+                            output_formatted(" (%d)\n", comment.date());
+
+                            write_fieldname("    user");
+                            output_formatted("%d ", comment.uid());
+                            write_string(comment.user());
+                            *m_out += '\n';
+
+                            write_fieldname("    text");
+                            write_string(comment.text());
+                            *m_out += '\n';
+                        }
+                    }
 
                     *m_out += '\n';
                 }

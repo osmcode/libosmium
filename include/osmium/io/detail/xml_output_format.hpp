@@ -139,12 +139,12 @@ namespace osmium {
                     }
                 }
 
+                int prefix_spaces() {
+                    return m_write_change_ops ? 4 : 2;
+                }
+
                 void write_prefix() {
-                    if (m_write_change_ops) {
-                        write_spaces(4);
-                    } else {
-                        write_spaces(2);
-                    }
+                    write_spaces(prefix_spaces());
                 }
 
                 void write_meta(const osmium::OSMObject& object) {
@@ -181,15 +181,29 @@ namespace osmium {
                     }
                 }
 
-                void write_tags(const osmium::TagList& tags) {
+                void write_tags(const osmium::TagList& tags, int spaces) {
                     for (const auto& tag : tags) {
-                        write_prefix();
+                        write_spaces(spaces);
                         *m_out += "  <tag k=\"";
                         xml_string(*m_out, tag.key());
                         *m_out += "\" v=\"";
                         xml_string(*m_out, tag.value());
                         *m_out += "\"/>\n";
                     }
+                }
+
+                void write_discussion(const osmium::ChangesetDiscussion& comments) {
+                    for (const auto& comment : comments) {
+                        oprintf(*m_out, "   <comment uid=\"%d\" user=\"", comment.uid());
+                        xml_string(*m_out, comment.user());
+                        *m_out += "\" date=\"";
+                        *m_out += comment.date().to_iso();
+                        *m_out += "\">\n";
+                        *m_out += "    <text>";
+                        xml_string(*m_out, comment.text());
+                        *m_out += "</text>\n   </comment>\n";
+                    }
+                    *m_out += "  </discussion>\n";
                 }
 
                 void open_close_op_tag(const operation op = operation::op_none) {
@@ -283,7 +297,7 @@ namespace osmium {
 
                     *m_out += ">\n";
 
-                    write_tags(node.tags());
+                    write_tags(node.tags(), prefix_spaces());
 
                     write_prefix();
                     *m_out += "</node>\n";
@@ -310,7 +324,7 @@ namespace osmium {
                         oprintf(*m_out, "  <nd ref=\"%" PRId64 "\"/>\n", node_ref.ref());
                     }
 
-                    write_tags(way.tags());
+                    write_tags(way.tags(), prefix_spaces());
 
                     write_prefix();
                     *m_out += "</way>\n";
@@ -341,15 +355,14 @@ namespace osmium {
                         *m_out += "\"/>\n";
                     }
 
-                    write_tags(relation.tags());
+                    write_tags(relation.tags(), prefix_spaces());
 
                     write_prefix();
                     *m_out += "</relation>\n";
                 }
 
                 void changeset(const osmium::Changeset& changeset) {
-                    write_prefix();
-                    *m_out += "<changeset";
+                    *m_out += " <changeset";
 
                     oprintf(*m_out, " id=\"%" PRId32 "\"", changeset.id());
 
@@ -359,8 +372,6 @@ namespace osmium {
                         *m_out += "\"";
                     }
 
-                    oprintf(*m_out, " num_changes=\"%" PRId32 "\"", changeset.num_changes());
-
                     if (changeset.closed_at()) {
                         *m_out += " closed_at=\"";
                         *m_out += changeset.closed_at().to_iso();
@@ -369,30 +380,39 @@ namespace osmium {
                         *m_out += " open=\"true\"";
                     }
 
-                    if (changeset.bounds()) {
-                        oprintf(*m_out, " min_lon=\"%.7f\"", changeset.bounds().bottom_left().lon_without_check());
-                        oprintf(*m_out, " min_lat=\"%.7f\"", changeset.bounds().bottom_left().lat_without_check());
-                        oprintf(*m_out, " max_lon=\"%.7f\"", changeset.bounds().top_right().lon_without_check());
-                        oprintf(*m_out, " max_lat=\"%.7f\"", changeset.bounds().top_right().lat_without_check());
-                    }
-
                     if (!changeset.user_is_anonymous()) {
                         *m_out += " user=\"";
                         xml_string(*m_out, changeset.user());
                         oprintf(*m_out, "\" uid=\"%d\"", changeset.uid());
                     }
 
-                    if (changeset.tags().empty()) {
+                    if (changeset.bounds()) {
+                        oprintf(*m_out, " min_lat=\"%.7f\"", changeset.bounds().bottom_left().lat_without_check());
+                        oprintf(*m_out, " min_lon=\"%.7f\"", changeset.bounds().bottom_left().lon_without_check());
+                        oprintf(*m_out, " max_lat=\"%.7f\"", changeset.bounds().top_right().lat_without_check());
+                        oprintf(*m_out, " max_lon=\"%.7f\"", changeset.bounds().top_right().lon_without_check());
+                    }
+
+                    oprintf(*m_out, " num_changes=\"%" PRId32 "\"", changeset.num_changes());
+                    oprintf(*m_out, " comments_count=\"%" PRId32 "\"", changeset.num_comments());
+
+                    // If there are no tags and no comments, we can close the
+                    // tag right here and are done.
+                    if (changeset.tags().empty() && changeset.num_comments() == 0) {
                         *m_out += "/>\n";
                         return;
                     }
 
                     *m_out += ">\n";
 
-                    write_tags(changeset.tags());
+                    write_tags(changeset.tags(), 0);
 
-                    write_prefix();
-                    *m_out += "</changeset>\n";
+                    if (changeset.num_comments() > 0) {
+                        *m_out += "  <discussion>\n";
+                        write_discussion(changeset.discussion());
+                    }
+
+                    *m_out += " </changeset>\n";
                 }
 
             }; // class XMLOutputBlock

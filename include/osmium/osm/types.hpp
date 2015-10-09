@@ -49,6 +49,7 @@ namespace osmium {
     typedef uint32_t user_id_type;            ///< Type for OSM user IDs.
     typedef int32_t  signed_user_id_type;     ///< Type for signed OSM user IDs.
     typedef uint32_t num_changes_type;        ///< Type for changeset num_changes.
+    typedef uint32_t num_comments_type;       ///< Type for changeset num_comments.
 
     /**
      * Size for strings in OSM data such as user names, tag keys, roles, etc.

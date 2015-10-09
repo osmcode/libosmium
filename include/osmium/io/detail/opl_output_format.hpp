@@ -244,7 +244,7 @@ namespace osmium {
                     *m_out += changeset.created_at().to_iso();
                     *m_out += " e";
                     *m_out += changeset.closed_at().to_iso();
-                    output_formatted(" i%d u", changeset.uid());
+                    output_formatted(" d%d i%d u", changeset.num_comments(), changeset.uid());
                     append_encoded_string(changeset.user());
                     write_location(changeset.bounds().bottom_left(), 'x', 'y');
                     write_location(changeset.bounds().top_right(), 'X', 'Y');

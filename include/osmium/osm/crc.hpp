@@ -213,15 +213,26 @@ namespace osmium {
             }
         }
 
+        void update(const osmium::ChangesetDiscussion& discussion) {
+            for (const auto& comment : discussion) {
+                update(comment.date());
+                update_int32(comment.uid());
+                update_string(comment.user());
+                update_string(comment.text());
+            }
+        }
+
         void update(const osmium::Changeset& changeset) {
             update_int64(changeset.id());
             update(changeset.created_at());
             update(changeset.closed_at());
             update(changeset.bounds());
             update_int32(changeset.num_changes());
+            update_int32(changeset.num_comments());
             update_int32(changeset.uid());
             update_string(changeset.user());
             update(changeset.tags());
+            update(changeset.discussion());
         }
 
     }; // class CRC

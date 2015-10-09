@@ -98,6 +98,9 @@ namespace osmium {
                 case osmium::item_type::inner_ring:
                     handler.inner_ring(static_cast<ConstIfConst<TItem, osmium::InnerRing>&>(item));
                     break;
+                case osmium::item_type::changeset_discussion:
+                    handler.changeset_discussion(static_cast<ConstIfConst<TItem, osmium::ChangesetDiscussion>&>(item));
+                    break;
             }
         }
 

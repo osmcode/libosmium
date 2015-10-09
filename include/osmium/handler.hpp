@@ -41,6 +41,7 @@ namespace osmium {
     class Relation;
     class Area;
     class Changeset;
+    class ChangesetDiscussion;
     class TagList;
     class WayNodeList;
     class RelationMemberList;
@@ -87,6 +88,9 @@ namespace osmium {
             }
 
             void inner_ring(const osmium::InnerRing&) const {
+            }
+
+            void changeset_discussion(const osmium::ChangesetDiscussion&) const {
             }
 
             void flush() const {

@@ -14,6 +14,7 @@ set(EXAMPLES
     count
     create_node_cache
     debug
+    filter_discussions
     index
     read
     serdump

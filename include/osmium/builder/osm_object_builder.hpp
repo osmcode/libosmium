@@ -33,6 +33,7 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <cassert>
 #include <cstring>
 #include <initializer_list>
 #include <new>
@@ -236,6 +237,64 @@ namespace osmium {
             }
 
         }; // class RelationMemberListBuilder
+
+        class ChangesetDiscussionBuilder : public ObjectBuilder<ChangesetDiscussion> {
+
+            osmium::ChangesetComment* m_comment = nullptr;
+
+            void add_user(osmium::ChangesetComment& comment, const char* user, const size_t length) {
+                if (length > osmium::max_osm_string_length) {
+                    throw std::length_error("OSM user name is too long");
+                }
+                comment.set_user_size(osmium::string_size_type(length) + 1);
+                add_size(append(user, osmium::memory::item_size_type(length)) + append_zero());
+            }
+
+            void add_text(osmium::ChangesetComment& comment, const char* text, const size_t length) {
+                // XXX There is no limit on the length of a comment text. We
+                // limit it here to 2^16-2 characters, because that's all that
+                // will fit into our internal data structure. This is not ideal,
+                // and will have to be discussed and cleared up.
+                if (length > std::numeric_limits<osmium::string_size_type>::max() - 1) {
+                    throw std::length_error("OSM changeset comment is too long");
+                }
+                comment.set_text_size(osmium::string_size_type(length) + 1);
+                add_size(append(text, osmium::memory::item_size_type(length)) + append_zero());
+                add_padding(true);
+            }
+
+        public:
+
+            explicit ChangesetDiscussionBuilder(osmium::memory::Buffer& buffer, Builder* parent = nullptr) :
+                ObjectBuilder<ChangesetDiscussion>(buffer, parent) {
+            }
+
+            ~ChangesetDiscussionBuilder() {
+                assert(!m_comment && "You have to always call both add_comment() and then add_comment_text() in that order for each comment!");
+                add_padding();
+            }
+
+            void add_comment(osmium::Timestamp date, osmium::user_id_type uid, const char* user) {
+                assert(!m_comment && "You have to always call both add_comment() and then add_comment_text() in that order for each comment!");
+                m_comment = reserve_space_for<osmium::ChangesetComment>();
+                new (m_comment) osmium::ChangesetComment(date, uid);
+                add_size(sizeof(ChangesetComment));
+                add_user(*m_comment, user, std::strlen(user));
+            }
+
+            void add_comment_text(const char* text) {
+                assert(m_comment && "You have to always call both add_comment() and then add_comment_text() in that order for each comment!");
+                add_text(*m_comment, text, std::strlen(text));
+                m_comment = nullptr;
+            }
+
+            void add_comment_text(const std::string& text) {
+                assert(m_comment && "You have to always call both add_comment() and then add_comment_text() in that order for each comment!");
+                add_text(*m_comment, text.c_str(), text.size());
+                m_comment = nullptr;
+            }
+
+        }; // class ChangesetDiscussionBuilder
 
         template <class T>
         class OSMObjectBuilder : public ObjectBuilder<T> {

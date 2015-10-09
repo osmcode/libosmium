@@ -155,6 +155,9 @@ namespace osmium {
                     way,
                     relation,
                     changeset,
+                    discussion,
+                    comment,
+                    comment_text,
                     ignored_node,
                     ignored_way,
                     ignored_relation,
@@ -175,14 +178,15 @@ namespace osmium {
 
                 osmium::memory::Buffer m_buffer;
 
-                std::unique_ptr<osmium::builder::NodeBuilder>               m_node_builder;
-                std::unique_ptr<osmium::builder::WayBuilder>                m_way_builder;
-                std::unique_ptr<osmium::builder::RelationBuilder>           m_relation_builder;
-                std::unique_ptr<osmium::builder::ChangesetBuilder>          m_changeset_builder;
+                std::unique_ptr<osmium::builder::NodeBuilder>                m_node_builder;
+                std::unique_ptr<osmium::builder::WayBuilder>                 m_way_builder;
+                std::unique_ptr<osmium::builder::RelationBuilder>            m_relation_builder;
+                std::unique_ptr<osmium::builder::ChangesetBuilder>           m_changeset_builder;
+                std::unique_ptr<osmium::builder::ChangesetDiscussionBuilder> m_changeset_discussion_builder;
 
-                std::unique_ptr<osmium::builder::TagListBuilder>            m_tl_builder;
-                std::unique_ptr<osmium::builder::WayNodeListBuilder>        m_wnl_builder;
-                std::unique_ptr<osmium::builder::RelationMemberListBuilder> m_rml_builder;
+                std::unique_ptr<osmium::builder::TagListBuilder>             m_tl_builder;
+                std::unique_ptr<osmium::builder::WayNodeListBuilder>         m_wnl_builder;
+                std::unique_ptr<osmium::builder::RelationMemberListBuilder>  m_rml_builder;
 
                 osmium::thread::Queue<std::string>& m_input_queue;
                 osmium::thread::Queue<osmium::memory::Buffer>& m_queue;
@@ -193,6 +197,8 @@ namespace osmium {
                 std::atomic<bool>& m_done;
 
                 bool m_header_is_done;
+
+                std::string m_comment_text;
 
                 /**
                  * A C++ wrapper for the Expat parser that makes sure no memory is leaked.
@@ -210,6 +216,10 @@ namespace osmium {
                         static_cast<XMLParser*>(data)->end_element(element);
                     }
 
+                    static void XMLCALL character_data_wrapper(void* data, const XML_Char* text, int len) {
+                        static_cast<XMLParser*>(data)->characters(text, len);
+                    }
+
                 public:
 
                     ExpatXMLParser(T* callback_object) :
@@ -219,6 +229,7 @@ namespace osmium {
                         }
                         XML_SetUserData(m_parser, callback_object);
                         XML_SetElementHandler(m_parser, start_element_wrapper, end_element_wrapper);
+                        XML_SetCharacterDataHandler(m_parser, character_data_wrapper);
                     }
 
                     ExpatXMLParser(const ExpatXMLParser&) = delete;
@@ -274,7 +285,11 @@ namespace osmium {
 
             public:
 
-                explicit XMLParser(osmium::thread::Queue<std::string>& input_queue, osmium::thread::Queue<osmium::memory::Buffer>& queue, std::promise<osmium::io::Header>& header_promise, osmium::osm_entity_bits::type read_types, std::atomic<bool>& done) :
+                explicit XMLParser(osmium::thread::Queue<std::string>& input_queue,
+                                   osmium::thread::Queue<osmium::memory::Buffer>& queue,
+                                   std::promise<osmium::io::Header>& header_promise,
+                                   osmium::osm_entity_bits::type read_types,
+                                   std::atomic<bool>& done) :
                     m_context(context::root),
                     m_last_context(context::root),
                     m_in_delete_section(false),
@@ -284,6 +299,7 @@ namespace osmium {
                     m_way_builder(),
                     m_relation_builder(),
                     m_changeset_builder(),
+                    m_changeset_discussion_builder(),
                     m_tl_builder(),
                     m_wnl_builder(),
                     m_rml_builder(),
@@ -311,6 +327,7 @@ namespace osmium {
                     m_way_builder(),
                     m_relation_builder(),
                     m_changeset_builder(),
+                    m_changeset_discussion_builder(),
                     m_tl_builder(),
                     m_wnl_builder(),
                     m_rml_builder(),
@@ -414,25 +431,20 @@ namespace osmium {
                     builder->add_user(user);
                 }
 
-                void check_tag(osmium::builder::Builder* builder, const XML_Char* element, const XML_Char** attrs) {
-                    if (!strcmp(element, "tag")) {
-                        m_wnl_builder.reset();
-                        m_rml_builder.reset();
-
-                        const char* key = "";
-                        const char* value = "";
-                        for (int count = 0; attrs[count]; count += 2) {
-                            if (attrs[count][0] == 'k' && attrs[count][1] == 0) {
-                                key = attrs[count+1];
-                            } else if (attrs[count][0] == 'v' && attrs[count][1] == 0) {
-                                value = attrs[count+1];
-                            }
+                void get_tag(osmium::builder::Builder* builder, const XML_Char** attrs) {
+                    const char* key = "";
+                    const char* value = "";
+                    for (int count = 0; attrs[count]; count += 2) {
+                        if (attrs[count][0] == 'k' && attrs[count][1] == 0) {
+                            key = attrs[count+1];
+                        } else if (attrs[count][0] == 'v' && attrs[count][1] == 0) {
+                            value = attrs[count+1];
                         }
-                        if (!m_tl_builder) {
-                            m_tl_builder = std::unique_ptr<osmium::builder::TagListBuilder>(new osmium::builder::TagListBuilder(m_buffer, builder));
-                        }
-                        m_tl_builder->add_tag(key, value);
                     }
+                    if (!m_tl_builder) {
+                        m_tl_builder = std::unique_ptr<osmium::builder::TagListBuilder>(new osmium::builder::TagListBuilder(m_buffer, builder));
+                    }
+                    m_tl_builder->add_tag(key, value);
                 }
 
                 void header_is_done() {
@@ -529,7 +541,9 @@ namespace osmium {
                         case context::node:
                             m_last_context = context::node;
                             m_context = context::in_object;
-                            check_tag(m_node_builder.get(), element, attrs);
+                            if (!strcmp(element, "tag")) {
+                                get_tag(m_node_builder.get(), attrs);
+                            }
                             break;
                         case context::way:
                             m_last_context = context::way;
@@ -546,8 +560,9 @@ namespace osmium {
                                         m_wnl_builder->add_node_ref(osmium::string_to_object_id(attrs[count+1]));
                                     }
                                 }
-                            } else {
-                                check_tag(m_way_builder.get(), element, attrs);
+                            } else if (!strcmp(element, "tag")) {
+                                m_wnl_builder.reset();
+                                get_tag(m_way_builder.get(), attrs);
                             }
                             break;
                         case context::relation:
@@ -574,14 +589,49 @@ namespace osmium {
                                 }
                                 // XXX assert type, ref, role are set
                                 m_rml_builder->add_member(char_to_item_type(type), ref, role);
-                            } else {
-                                check_tag(m_relation_builder.get(), element, attrs);
+                            } else if (!strcmp(element, "tag")) {
+                                m_rml_builder.reset();
+                                get_tag(m_relation_builder.get(), attrs);
                             }
                             break;
                         case context::changeset:
                             m_last_context = context::changeset;
-                            m_context = context::in_object;
-                            check_tag(m_changeset_builder.get(), element, attrs);
+                            if (!strcmp(element, "discussion")) {
+                                m_context = context::discussion;
+                                m_tl_builder.reset();
+                                if (!m_changeset_discussion_builder) {
+                                    m_changeset_discussion_builder = std::unique_ptr<osmium::builder::ChangesetDiscussionBuilder>(new osmium::builder::ChangesetDiscussionBuilder(m_buffer, m_changeset_builder.get()));
+                                }
+                            } else if (!strcmp(element, "tag")) {
+                                m_context = context::in_object;
+                                m_changeset_discussion_builder.reset();
+                                get_tag(m_changeset_builder.get(), attrs);
+                            }
+                            break;
+                        case context::discussion:
+                            if (!strcmp(element, "comment")) {
+                                m_context = context::comment;
+                                osmium::Timestamp date;
+                                osmium::user_id_type uid = 0;
+                                const char* user = "";
+                                for (int count = 0; attrs[count]; count += 2) {
+                                    if (!strcmp(attrs[count], "date")) {
+                                        date = osmium::Timestamp(attrs[count+1]);
+                                    } else if (!strcmp(attrs[count], "uid")) {
+                                        uid = osmium::string_to_user_id(attrs[count+1]);
+                                    } else if (!strcmp(attrs[count], "user")) {
+                                        user = static_cast<const char*>(attrs[count+1]);
+                                    }
+                                }
+                                m_changeset_discussion_builder->add_comment(date, uid, user);
+                            }
+                            break;
+                        case context::comment:
+                            if (!strcmp(element, "text")) {
+                                m_context = context::comment_text;
+                            }
+                            break;
+                        case context::comment_text:
                             break;
                         case context::ignored_node:
                             break;
@@ -639,10 +689,24 @@ namespace osmium {
                         case context::changeset:
                             assert(!strcmp(element, "changeset"));
                             m_tl_builder.reset();
+                            m_changeset_discussion_builder.reset();
                             m_changeset_builder.reset();
                             m_buffer.commit();
                             m_context = context::top;
                             flush_buffer();
+                            break;
+                        case context::discussion:
+                            assert(!strcmp(element, "discussion"));
+                            m_context = context::changeset;
+                            break;
+                        case context::comment:
+                            assert(!strcmp(element, "comment"));
+                            m_context = context::discussion;
+                            break;
+                        case context::comment_text:
+                            assert(!strcmp(element, "text"));
+                            m_context = context::comment;
+                            m_changeset_discussion_builder->add_comment_text(m_comment_text);
                             break;
                         case context::in_object:
                             m_context = m_last_context;
@@ -667,6 +731,14 @@ namespace osmium {
                                 m_context = context::top;
                             }
                             break;
+                    }
+                }
+
+                void characters(const XML_Char* text, int len) {
+                    if (m_context == context::comment_text) {
+                        m_comment_text.append(text, len);
+                    } else {
+                        m_comment_text.resize(0);
                     }
                 }
 

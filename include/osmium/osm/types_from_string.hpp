@@ -111,6 +111,11 @@ namespace osmium {
         return static_cast<num_changes_type>(detail::string_to_ulong(input, "value for num changes"));
     }
 
+    inline num_comments_type string_to_num_comments(const char* input) {
+        assert(input);
+        return static_cast<num_comments_type>(detail::string_to_ulong(input, "value for num comments"));
+    }
+
 } // namespace osmium
 
 #endif // OSMIUM_OSM_TYPES_FROM_STRING_HPP
