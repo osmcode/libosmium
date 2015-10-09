@@ -133,6 +133,44 @@ namespace osmium {
 
         }; // class InputIterator
 
+        template <class TSource, class TItem = osmium::memory::Item>
+        class InputIteratorRange {
+
+            InputIterator<TSource, TItem> m_begin;
+            InputIterator<TSource, TItem> m_end;
+
+        public:
+
+            InputIteratorRange(InputIterator<TSource, TItem>&& begin,
+                               InputIterator<TSource, TItem>&& end) :
+                m_begin(std::move(begin)),
+                m_end(std::move(end)) {
+            }
+
+            InputIterator<TSource, TItem> begin() const noexcept {
+                return m_begin;
+            };
+
+            InputIterator<TSource, TItem> end() const noexcept {
+                return m_end;
+            };
+
+            const InputIterator<TSource, TItem> cbegin() const noexcept {
+                return m_begin;
+            };
+
+            const InputIterator<TSource, TItem> cend() const noexcept {
+                return m_end;
+            };
+
+        }; // class InputIteratorRange
+
+        template <class TItem, class TSource>
+        InputIteratorRange<TSource, TItem> make_input_iterator_range(TSource& source) {
+            using it_type = InputIterator<TSource, TItem>;
+            return InputIteratorRange<TSource, TItem>(it_type{source}, it_type{});
+        }
+
     } // namespace io
 
 } // namespace osmium

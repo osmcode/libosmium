@@ -117,6 +117,11 @@ namespace osmium {
 
         }; // class OutputIterator
 
+        template <class TDest>
+        OutputIterator<TDest> make_output_iterator(TDest& destination) {
+            return OutputIterator<TDest>{destination};
+        }
+
     } // namespace io
 
 } // namespace osmium

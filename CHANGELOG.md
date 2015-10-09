@@ -8,6 +8,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+- Helper functions to make input iterator ranges and output iterators.
+
 ### Changed
 
 - Updated included protozero library to version 1.2.0.
