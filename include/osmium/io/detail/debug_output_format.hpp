@@ -177,6 +177,19 @@ namespace osmium {
                     *m_out += ": ";
                 }
 
+                void write_comment_field(const char* name) {
+                    write_color(color_cyan);
+                    *m_out += name;
+                    write_color(color_reset);
+                    *m_out += ": ";
+                }
+
+                void write_counter(int width, int n) {
+                    write_color(color_white);
+                    output_formatted("    %0*d: ", width, n++);
+                    write_color(color_reset);
+                }
+
                 void write_error(const char* msg) {
                     write_color(color_red);
                     *m_out += msg;
@@ -313,7 +326,8 @@ namespace osmium {
                     int width = int(log10(way.nodes().size())) + 1;
                     int n = 0;
                     for (const auto& node_ref : way.nodes()) {
-                        output_formatted("    %0*d: %10" PRId64, width, n++, node_ref.ref());
+                        write_counter(width, n++);
+                        output_formatted("%10" PRId64, node_ref.ref());
                         if (node_ref.location().valid()) {
                             output_formatted(" (%.7f,%.7f)", node_ref.location().lon_without_check(), node_ref.location().lat_without_check());
                         }
@@ -335,7 +349,7 @@ namespace osmium {
                     int width = int(log10(relation.members().size())) + 1;
                     int n = 0;
                     for (const auto& member : relation.members()) {
-                        output_formatted("    %0*d: ", width, n++);
+                        write_counter(width, n++);
                         *m_out += short_typename[item_type_to_nwr_index(member.type())];
                         output_formatted(" %10" PRId64 " ", member.ref());
                         write_string(member.role());
@@ -380,23 +394,23 @@ namespace osmium {
 
                     if (changeset.num_comments() > 0) {
                         write_fieldname("comments");
-                        output_formatted("%d\n", changeset.num_comments());
+                        output_formatted("   %d\n", changeset.num_comments());
 
+                        int width = int(log10(changeset.num_comments())) + 1;
                         int n = 0;
                         for (const auto& comment : changeset.discussion()) {
-                            write_fieldname("  comment");
-                            output_formatted("%d\n", n++);
+                            write_counter(width, n++);
 
-                            write_fieldname("    date");
+                            write_comment_field("date");
                             *m_out += comment.date().to_iso();
-                            output_formatted(" (%d)\n", comment.date());
+                            output_formatted(" (%d)\n      %*s", comment.date(), width, "");
 
-                            write_fieldname("    user");
+                            write_comment_field("user");
                             output_formatted("%d ", comment.uid());
                             write_string(comment.user());
-                            *m_out += '\n';
+                            output_formatted("\n      %*s", width, "");
 
-                            write_fieldname("    text");
+                            write_comment_field("text");
                             write_string(comment.text());
                             *m_out += '\n';
                         }
