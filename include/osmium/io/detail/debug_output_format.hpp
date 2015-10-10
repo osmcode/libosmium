@@ -87,6 +87,11 @@ namespace osmium {
             constexpr const char* color_white   = "\x1b[37m";
             constexpr const char* color_reset   = "\x1b[0m";
 
+            struct debug_output_options {
+                bool add_metadata;
+                bool use_color;
+            };
+
             /**
              * Writes out one buffer with OSM data in Debug format.
              */
@@ -100,8 +105,7 @@ namespace osmium {
 
                 char m_tmp_buffer[tmp_buffer_size+1];
 
-                bool m_add_metadata;
-                bool m_use_color;
+                debug_output_options m_options;
 
                 template <typename... TArgs>
                 void output_formatted(const char* format, TArgs&&... args) {
@@ -145,7 +149,7 @@ namespace osmium {
                 }
 
                 void write_color(const char* color) {
-                    if (m_use_color) {
+                    if (m_options.use_color) {
                         *m_out += color;
                     }
                 }
@@ -198,7 +202,7 @@ namespace osmium {
 
                 void write_meta(const osmium::OSMObject& object) {
                     output_formatted("%" PRId64 "\n", object.id());
-                    if (m_add_metadata) {
+                    if (m_options.add_metadata) {
                         write_fieldname("version");
                         output_formatted("  %d", object.version());
                         if (object.visible()) {
@@ -268,12 +272,11 @@ namespace osmium {
 
             public:
 
-                explicit DebugOutputBlock(osmium::memory::Buffer&& buffer, bool add_metadata, bool use_color) :
+                explicit DebugOutputBlock(osmium::memory::Buffer&& buffer, const debug_output_options& options) :
                     m_input_buffer(std::make_shared<osmium::memory::Buffer>(std::move(buffer))),
                     m_out(std::make_shared<std::string>()),
                     m_tmp_buffer(),
-                    m_add_metadata(add_metadata),
-                    m_use_color(use_color) {
+                    m_options(options) {
                 }
 
                 DebugOutputBlock(const DebugOutputBlock&) = default;
@@ -423,31 +426,32 @@ namespace osmium {
 
             class DebugOutputFormat : public osmium::io::detail::OutputFormat {
 
-                bool m_add_metadata;
-                bool m_use_color;
+                debug_output_options m_options;
 
             public:
 
                 DebugOutputFormat(const osmium::io::File& file, data_queue_type& output_queue) :
                     OutputFormat(file, output_queue),
-                    m_add_metadata(file.get("add_metadata") != "false"),
-                    m_use_color(file.get("color") == "true") {
+                    m_options({
+                        file.get("add_metadata") != "false",
+                        file.get("color") == "true"
+                    }) {
                 }
 
                 DebugOutputFormat(const DebugOutputFormat&) = delete;
                 DebugOutputFormat& operator=(const DebugOutputFormat&) = delete;
 
                 void write_buffer(osmium::memory::Buffer&& buffer) override final {
-                    m_output_queue.push(osmium::thread::Pool::instance().submit(DebugOutputBlock{std::move(buffer), m_add_metadata, m_use_color}));
+                    m_output_queue.push(osmium::thread::Pool::instance().submit(DebugOutputBlock{std::move(buffer), m_options}));
                 }
 
                 void write_fieldname(std::string& out, const char* name) {
                     out += "  ";
-                    if (m_use_color) {
+                    if (m_options.use_color) {
                         out += color_cyan;
                     }
                     out += name;
-                    if (m_use_color) {
+                    if (m_options.use_color) {
                         out += color_reset;
                     }
                     out += ": ";
@@ -456,11 +460,11 @@ namespace osmium {
                 void write_header(const osmium::io::Header& header) override final {
                     std::string out;
 
-                    if (m_use_color) {
+                    if (m_options.use_color) {
                         out += color_bold;
                     }
                     out += "header\n";
-                    if (m_use_color) {
+                    if (m_options.use_color) {
                         out += color_reset;
                     }
 
