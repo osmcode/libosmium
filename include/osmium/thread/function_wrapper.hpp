@@ -50,7 +50,9 @@ namespace osmium {
             struct impl_base {
 
                 virtual ~impl_base() = default;
-                virtual void call() = 0;
+                virtual bool call() {
+                    return true;
+                }
 
             }; // struct impl_base
 
@@ -58,15 +60,18 @@ namespace osmium {
 
             template <typename F>
             struct impl_type : impl_base {
+
                 F m_functor;
 
                 impl_type(F&& functor) :
                     m_functor(std::move(functor)) {
                 }
 
-                void call() override {
+                bool call() override {
                     m_functor();
+                    return false;
                 }
+
             }; // struct impl_type
 
         public:
@@ -78,8 +83,15 @@ namespace osmium {
                 impl(new impl_type<F>(std::move(f))) {
             }
 
-            void operator()() {
-                impl->call();
+            // The integer parameter is only used to signal that we want
+            // the special function wrapper that makes the worker thread
+            // shut down.
+            function_wrapper(int) :
+                impl(new impl_base()) {
+            }
+
+            bool operator()() {
+                return impl->call();
             }
 
             function_wrapper() = default;
