@@ -68,30 +68,29 @@ namespace osmium {
                 }
 
                 bool operator()() {
-                    osmium::thread::set_thread_name("_osmium_input");
+                    osmium::thread::set_thread_name("_osmium_read");
 
                     try {
                         while (!m_done) {
                             std::string data {m_decompressor->read()};
-                            if (data.empty()) {
-                                m_queue.push(std::move(data));
+                            if (data.empty()) { // end of file
                                 break;
                             }
                             m_queue.push(std::move(data));
-                            while (m_queue.size() > 10 && !m_done) {
-                                std::this_thread::sleep_for(std::chrono::milliseconds(10));
-                            }
                         }
 
                         m_decompressor->close();
+
+                        m_queue.push(std::string());
                     } catch (...) {
-                        // If there is an exception in this thread, we make sure
-                        // to push an empty string onto the queue to signal the
-                        // end-of-data to the reading thread so that it will not
-                        // hang. Then we re-throw the exception.
+                        // If there is an exception in this thread, we make
+                        // sure to push an empty string onto the queue to
+                        // signal the end-of-data to the reading thread so that
+                        // it will not hang. Then we re-throw the exception.
                         m_queue.push(std::string());
                         throw;
                     }
+
                     return true;
                 }
 

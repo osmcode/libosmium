@@ -89,7 +89,6 @@ namespace osmium {
                 bool m_use_thread_pool;
                 bool m_eof { false };
                 queue_type m_queue;
-                std::atomic<bool> m_quit_input_thread;
                 std::thread m_reader;
                 osmium::thread::Queue<std::string>& m_input_queue;
                 std::string m_input_buffer;
@@ -204,10 +203,6 @@ namespace osmium {
                             PBFDataBlobDecoder data_blob_parser{ std::move(input_buffer), read_types };
                             promise.set_value(data_blob_parser());
                         }
-
-                        if (m_quit_input_thread) {
-                            return;
-                        }
                     }
 
                     // Send an empty buffer to signal the reader that we are
@@ -215,10 +210,6 @@ namespace osmium {
                     std::promise<osmium::memory::Buffer> promise;
                     m_queue.push(promise.get_future());
                     promise.set_value(osmium::memory::Buffer{});
-                }
-
-                void signal_input_thread_to_quit() {
-                    m_quit_input_thread = true;
                 }
 
             public:
@@ -234,7 +225,6 @@ namespace osmium {
                     osmium::io::detail::InputFormat(file, read_which_entities),
                     m_use_thread_pool(osmium::config::use_pool_threads_for_pbf_parsing()),
                     m_queue(20, "pbf_parser_results"), // XXX
-                    m_quit_input_thread(false),
                     m_input_queue(input_queue),
                     m_input_buffer() {
 
@@ -248,7 +238,6 @@ namespace osmium {
                 }
 
                 ~PBFInputFormat() {
-                    signal_input_thread_to_quit();
                     if (m_reader.joinable()) {
                         m_reader.join();
                     }
@@ -276,9 +265,13 @@ namespace osmium {
                         return buffer;
                     } catch (...) {
                         m_eof = true;
-                        signal_input_thread_to_quit();
                         throw;
                     }
+                }
+
+                void close() override {
+                    std::future<osmium::memory::Buffer> buffer_future;
+                    while (m_queue.try_pop(buffer_future)); // drain queue
                 }
 
             }; // class PBFInputFormat
