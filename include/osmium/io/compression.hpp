@@ -90,8 +90,7 @@ namespace osmium {
 
             virtual std::string read() = 0;
 
-            virtual void close() {
-            }
+            virtual void close() = 0;
 
         }; // class Decompressor
 
@@ -192,7 +191,11 @@ namespace osmium {
             }
 
             ~NoCompressor() override final {
-                close();
+                try {
+                    close();
+                } catch (...) {
+                    // ignore exceptions
+                }
             }
 
             void write(const std::string& data) override final {
@@ -234,7 +237,11 @@ namespace osmium {
             }
 
             ~NoDecompressor() override final {
-                close();
+                try {
+                    close();
+                } catch (...) {
+                    // ignore exceptions
+                }
             }
 
             std::string read() override final {

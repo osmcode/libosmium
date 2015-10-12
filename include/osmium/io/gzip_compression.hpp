@@ -106,7 +106,11 @@ namespace osmium {
             }
 
             ~GzipCompressor() override final {
-                close();
+                try {
+                    close();
+                } catch (...) {
+                    // ignore exceptions
+                }
             }
 
             void write(const std::string& data) override final {
@@ -145,7 +149,11 @@ namespace osmium {
             }
 
             ~GzipDecompressor() override final {
-                close();
+                try {
+                    close();
+                } catch (...) {
+                    // ignore exceptions
+                }
             }
 
             std::string read() override final {
@@ -195,7 +203,11 @@ namespace osmium {
             }
 
             ~GzipBufferDecompressor() override final {
-                inflateEnd(&m_zstream);
+                try {
+                    close();
+                } catch (...) {
+                    // ignore exceptions
+                }
             }
 
             std::string read() override final {
@@ -225,6 +237,10 @@ namespace osmium {
                 }
 
                 return output;
+            }
+
+            void close() override final {
+                inflateEnd(&m_zstream);
             }
 
         }; // class GzipBufferDecompressor

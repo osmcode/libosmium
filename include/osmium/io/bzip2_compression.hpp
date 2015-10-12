@@ -116,7 +116,11 @@ namespace osmium {
             }
 
             ~Bzip2Compressor() override final {
-                close();
+                try {
+                    close();
+                } catch (...) {
+                    // ignore exceptions
+                }
             }
 
             void write(const std::string& data) override final {
@@ -163,7 +167,11 @@ namespace osmium {
             }
 
             ~Bzip2Decompressor() override final {
-                close();
+                try {
+                    close();
+                } catch (...) {
+                    // ignore exceptions
+                }
             }
 
             std::string read() override final {
@@ -241,7 +249,11 @@ namespace osmium {
             }
 
             ~Bzip2BufferDecompressor() override final {
-                BZ2_bzDecompressEnd(&m_bzstream);
+                try {
+                    close();
+                } catch (...) {
+                    // ignore exceptions
+                }
             }
 
             std::string read() override final {
@@ -268,6 +280,10 @@ namespace osmium {
                 }
 
                 return output;
+            }
+
+            void close() override final {
+                BZ2_bzDecompressEnd(&m_bzstream);
             }
 
         }; // class Bzip2BufferDecompressor
