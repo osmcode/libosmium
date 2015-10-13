@@ -57,8 +57,8 @@ namespace osmium {
         namespace detail {
 
             /**
-             * Virtual base class for all classes reading OSM files in different
-             * formats.
+             * Virtual base class for all classes decoding OSM files in
+             * different formats.
              *
              * Do not use this class or derived classes directly. Use the
              * osmium::io::Reader class instead.
@@ -69,14 +69,7 @@ namespace osmium {
 
                 static constexpr size_t max_queue_size = 20; // XXX
 
-                osmium::io::File m_file;
-                osmium::osm_entity_bits::type m_read_which_entities;
-                osmium::io::Header m_header;
-
-                explicit InputFormat(const osmium::io::File& file, osmium::osm_entity_bits::type read_which_entities) :
-                    m_file(file),
-                    m_read_which_entities(read_which_entities) {
-                    m_header.set_has_multiple_object_versions(m_file.has_multiple_object_versions());
+                explicit InputFormat(const osmium::io::File&, osmium::osm_entity_bits::type) {
                 }
 
                 InputFormat(const InputFormat&) = delete;
@@ -90,14 +83,11 @@ namespace osmium {
                 virtual ~InputFormat() {
                 }
 
+                virtual osmium::io::Header header() = 0;
+
                 virtual osmium::memory::Buffer read() = 0;
 
-                virtual void close() {
-                }
-
-                virtual osmium::io::Header header() {
-                    return m_header;
-                }
+                virtual void close() = 0;
 
             }; // class InputFormat
 
