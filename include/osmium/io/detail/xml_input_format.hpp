@@ -186,7 +186,7 @@ namespace osmium {
                 std::unique_ptr<osmium::builder::RelationMemberListBuilder>  m_rml_builder;
 
                 osmium::thread::Queue<std::string>& m_input_queue;
-                osmium::thread::Queue<osmium::memory::Buffer>& m_queue;
+                osmium::thread::Queue<osmium::memory::Buffer>& m_output_queue;
                 std::promise<osmium::io::Header>& m_header_promise;
 
                 osmium::osm_entity_bits::type m_read_types;
@@ -627,7 +627,7 @@ namespace osmium {
 
                 void flush_buffer() {
                     if (m_buffer.capacity() - m_buffer.committed() < 1000 * 1000) {
-                        m_queue.push(std::move(m_buffer));
+                        m_output_queue.push(std::move(m_buffer));
                         osmium::memory::Buffer buffer(buffer_size);
                         using std::swap;
                         swap(m_buffer, buffer);
@@ -637,7 +637,7 @@ namespace osmium {
             public:
 
                 XMLParser(osmium::thread::Queue<std::string>& input_queue,
-                          osmium::thread::Queue<osmium::memory::Buffer>& queue,
+                          osmium::thread::Queue<osmium::memory::Buffer>& output_queue,
                           std::promise<osmium::io::Header>& header_promise,
                           osmium::osm_entity_bits::type read_types) :
                     m_context(context::root),
@@ -654,7 +654,7 @@ namespace osmium {
                     m_wnl_builder(),
                     m_rml_builder(),
                     m_input_queue(input_queue),
-                    m_queue(queue),
+                    m_output_queue(output_queue),
                     m_header_promise(header_promise),
                     m_read_types(read_types),
                     m_header_is_done(false) {
@@ -682,7 +682,7 @@ namespace osmium {
                     m_wnl_builder(),
                     m_rml_builder(),
                     m_input_queue(other.m_input_queue),
-                    m_queue(other.m_queue),
+                    m_output_queue(other.m_output_queue),
                     m_header_promise(other.m_header_promise),
                     m_read_types(other.m_read_types),
                     m_header_is_done(other.m_header_is_done) {
@@ -714,14 +714,14 @@ namespace osmium {
                         } catch (ParserIsDone&) {
                             return true;
                         } catch (...) {
-                            m_queue.push(osmium::memory::Buffer()); // empty buffer to signify eof
+                            m_output_queue.push(osmium::memory::Buffer()); // empty buffer to signify eof
                             throw;
                         }
                     } while (!last);
                     if (m_buffer.committed() > 0) {
-                        m_queue.push(std::move(m_buffer));
+                        m_output_queue.push(std::move(m_buffer));
                     }
-                    m_queue.push(osmium::memory::Buffer()); // empty buffer to signify eof
+                    m_output_queue.push(osmium::memory::Buffer()); // empty buffer to signify eof
                     return true;
                 }
 
@@ -732,7 +732,7 @@ namespace osmium {
              */
             class XMLInputFormat : public osmium::io::detail::InputFormat {
 
-                osmium::thread::Queue<osmium::memory::Buffer> m_queue;
+                osmium::thread::Queue<osmium::memory::Buffer> m_output_queue;
                 std::promise<osmium::io::Header> m_header_promise;
                 std::future<bool> m_parser_thread;
 
@@ -748,9 +748,9 @@ namespace osmium {
                  */
                 XMLInputFormat(osmium::osm_entity_bits::type read_which_entities, osmium::thread::Queue<std::string>& input_queue) :
                     osmium::io::detail::InputFormat(),
-                    m_queue(max_queue_size, "xml_parser_results"),
+                    m_output_queue(max_queue_size, "xml_parser_results"),
                     m_header_promise(),
-                    m_parser_thread(std::async(std::launch::async, XMLParser(input_queue, m_queue, m_header_promise, read_which_entities))) {
+                    m_parser_thread(std::async(std::launch::async, XMLParser(input_queue, m_output_queue, m_header_promise, read_which_entities))) {
                 }
 
                 ~XMLInputFormat() noexcept {
@@ -769,7 +769,7 @@ namespace osmium {
 
                 osmium::memory::Buffer read() override final {
                     osmium::memory::Buffer buffer;
-                    m_queue.wait_and_pop(buffer);
+                    m_output_queue.wait_and_pop(buffer);
 
                     osmium::thread::check_for_exception(m_parser_thread);
                     return buffer;
@@ -777,7 +777,7 @@ namespace osmium {
 
                 void close() override final {
                     osmium::memory::Buffer buffer;
-                    while (m_queue.try_pop(buffer)); // drain queue
+                    while (m_output_queue.try_pop(buffer)); // drain queue
                     osmium::thread::wait_until_done(m_parser_thread);
                 }
 
