@@ -247,10 +247,10 @@ namespace osmium {
 
             public:
 
-                explicit XMLParser(osmium::thread::Queue<std::string>& input_queue,
-                                   osmium::thread::Queue<osmium::memory::Buffer>& queue,
-                                   std::promise<osmium::io::Header>& header_promise,
-                                   osmium::osm_entity_bits::type read_types) :
+                XMLParser(osmium::thread::Queue<std::string>& input_queue,
+                          osmium::thread::Queue<osmium::memory::Buffer>& queue,
+                          std::promise<osmium::io::Header>& header_promise,
+                          osmium::osm_entity_bits::type read_types) :
                     m_context(context::root),
                     m_last_context(context::root),
                     m_in_delete_section(false),
@@ -728,16 +728,19 @@ namespace osmium {
 
             }; // class XMLParser
 
+            /**
+             * Class for decoding OSM XML files.
+             */
             class XMLInputFormat : public osmium::io::detail::InputFormat {
 
                 osmium::thread::Queue<osmium::memory::Buffer> m_queue;
                 std::promise<osmium::io::Header> m_header_promise;
-                std::future<bool> m_parser_future;
+                std::future<bool> m_parser_thread;
 
             public:
 
                 /**
-                 * Instantiate XML Parser
+                 * Instantiate XML file decoder.
                  *
                  * @param read_which_entities Which types of OSM entities
                  *        (nodes, ways, relations, changesets) should be
@@ -748,7 +751,7 @@ namespace osmium {
                     osmium::io::detail::InputFormat(),
                     m_queue(max_queue_size, "xml_parser_results"),
                     m_header_promise(),
-                    m_parser_future(std::async(std::launch::async, XMLParser(input_queue, m_queue, m_header_promise, read_which_entities))) {
+                    m_parser_thread(std::async(std::launch::async, XMLParser(input_queue, m_queue, m_header_promise, read_which_entities))) {
                 }
 
                 ~XMLInputFormat() noexcept {
@@ -761,7 +764,7 @@ namespace osmium {
                 }
 
                 virtual osmium::io::Header header() override final {
-                    osmium::thread::check_for_exception(m_parser_future);
+                    osmium::thread::check_for_exception(m_parser_thread);
                     return m_header_promise.get_future().get();
                 }
 
@@ -769,14 +772,14 @@ namespace osmium {
                     osmium::memory::Buffer buffer;
                     m_queue.wait_and_pop(buffer);
 
-                    osmium::thread::check_for_exception(m_parser_future);
+                    osmium::thread::check_for_exception(m_parser_thread);
                     return buffer;
                 }
 
                 void close() override final {
                     osmium::memory::Buffer buffer;
                     while (m_queue.try_pop(buffer)); // drain queue
-                    osmium::thread::wait_until_done(m_parser_future);
+                    osmium::thread::wait_until_done(m_parser_thread);
                 }
 
             }; // class XMLInputFormat

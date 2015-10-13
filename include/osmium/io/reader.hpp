@@ -75,6 +75,8 @@ namespace osmium {
          */
         class Reader {
 
+            static constexpr size_t max_input_queue_size = 20; // XXX
+
             osmium::io::File m_file;
             osmium::osm_entity_bits::type m_read_which_entities;
 
@@ -94,9 +96,9 @@ namespace osmium {
             std::unique_ptr<osmium::io::Decompressor> m_decompressor;
 
             std::atomic<bool> m_read_done;
-            std::future<bool> m_read_future;
+            std::future<bool> m_read_thread;
 
-            std::unique_ptr<osmium::io::detail::InputFormat> m_input;
+            std::unique_ptr<osmium::io::detail::InputFormat> m_input_format;
 
 #ifndef _WIN32
             /**
@@ -185,13 +187,13 @@ namespace osmium {
                 m_input_format_creator(osmium::io::detail::InputFormatFactory::instance().get_creator_function(m_file)),
                 m_status(status::reading),
                 m_childpid(0),
-                m_input_queue(20, "raw_input"), // XXX
+                m_input_queue(max_input_queue_size, "raw_input"),
                 m_decompressor(m_file.buffer() ?
                     osmium::io::CompressionFactory::instance().create_decompressor(file.compression(), m_file.buffer(), m_file.buffer_size()) :
                     osmium::io::CompressionFactory::instance().create_decompressor(file.compression(), open_input_file_or_url(m_file.filename(), &m_childpid))),
                 m_read_done(false),
-                m_read_future(std::async(std::launch::async, detail::ReadThread(m_input_queue, m_decompressor.get(), m_read_done))),
-                m_input((*m_input_format_creator)(m_read_which_entities, m_input_queue)) {
+                m_read_thread(std::async(std::launch::async, detail::ReadThread(m_input_queue, m_decompressor.get(), m_read_done))),
+                m_input_format((*m_input_format_creator)(m_read_which_entities, m_input_queue)) {
             }
 
             explicit Reader(const std::string& filename, osmium::osm_entity_bits::type read_types = osmium::osm_entity_bits::all) :
@@ -226,7 +228,7 @@ namespace osmium {
                 m_read_done = true;
 
                 // Signal the input format parser that it should wrap up.
-                m_input->close();
+                m_input_format->close();
 
 #ifndef _WIN32
                 if (m_childpid) {
@@ -246,7 +248,7 @@ namespace osmium {
                     m_status = status::closed;
                 }
 
-                osmium::thread::wait_until_done(m_read_future);
+                osmium::thread::wait_until_done(m_read_thread);
             }
 
             /**
@@ -256,7 +258,7 @@ namespace osmium {
              * @throws Some form of std::runtime_error if there is an error.
              */
             osmium::io::Header header() const {
-                return m_input->header();
+                return m_input_format->header();
             }
 
             /**
@@ -280,14 +282,14 @@ namespace osmium {
                 try {
                     // If an exception happened in the read thread, re-throw
                     // the exception in this (the main) thread.
-                    osmium::thread::check_for_exception(m_read_future);
+                    osmium::thread::check_for_exception(m_read_thread);
 
-                    // m_input->read() can return an invalid buffer to signal EOF,
+                    // m_input_format->read() can return an invalid buffer to signal EOF,
                     // or a valid buffer with or without data. A valid buffer
                     // without data is not an error, it just means we have to
                     // keep getting the next buffer until there is one with data.
                     while (true) {
-                        osmium::memory::Buffer buffer = m_input->read();
+                        osmium::memory::Buffer buffer = m_input_format->read();
                         if (!buffer) {
                             m_status = status::eof;
                             return buffer;
@@ -299,7 +301,7 @@ namespace osmium {
                 } catch (...) {
                     m_read_done = true;
                     m_status = status::exception;
-                    m_input->close();
+                    m_input_format->close();
                     throw;
                 }
             }

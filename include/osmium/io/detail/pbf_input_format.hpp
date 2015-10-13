@@ -245,18 +245,18 @@ namespace osmium {
             }; // class PBFParser
 
             /**
-             * Class for parsing PBF files.
+             * Class for decoding OSM PBF files.
              */
             class PBFInputFormat : public osmium::io::detail::InputFormat {
 
                 osmium::thread::Queue<std::future<osmium::memory::Buffer>> m_queue;
                 std::promise<osmium::io::Header> m_header_promise;
-                std::future<bool> m_parser_future;
+                std::future<bool> m_parser_thread;
 
             public:
 
                 /**
-                 * Instantiate PBF Parser
+                 * Instantiate PBF file decoder.
                  *
                  * @param read_which_entities Which types of OSM entities
                  *        (nodes, ways, relations, changesets) should be
@@ -267,7 +267,7 @@ namespace osmium {
                     osmium::io::detail::InputFormat(),
                     m_queue(max_queue_size, "pbf_parser_results"),
                     m_header_promise(),
-                    m_parser_future(std::async(std::launch::async, PBFParser(input_queue, m_queue, m_header_promise, read_which_entities, osmium::config::use_pool_threads_for_pbf_parsing()))) {
+                    m_parser_thread(std::async(std::launch::async, PBFParser(input_queue, m_queue, m_header_promise, read_which_entities, osmium::config::use_pool_threads_for_pbf_parsing()))) {
                 }
 
                 ~PBFInputFormat() noexcept {
@@ -280,7 +280,7 @@ namespace osmium {
                 }
 
                 virtual osmium::io::Header header() override final {
-                    osmium::thread::check_for_exception(m_parser_future);
+                    osmium::thread::check_for_exception(m_parser_thread);
                     return m_header_promise.get_future().get();
                 }
 
@@ -293,14 +293,14 @@ namespace osmium {
                     std::future<osmium::memory::Buffer> buffer_future;
                     m_queue.wait_and_pop(buffer_future);
 
-                    osmium::thread::check_for_exception(m_parser_future);
+                    osmium::thread::check_for_exception(m_parser_thread);
                     return buffer_future.get();
                 }
 
                 void close() override final {
                     std::future<osmium::memory::Buffer> buffer_future;
                     while (m_queue.try_pop(buffer_future)); // drain queue
-                    osmium::thread::wait_until_done(m_parser_future);
+                    osmium::thread::wait_until_done(m_parser_thread);
                 }
 
             }; // class PBFInputFormat
