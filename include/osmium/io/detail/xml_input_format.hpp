@@ -245,97 +245,6 @@ namespace osmium {
 
                 }; // class ExpatXMLParser
 
-            public:
-
-                XMLParser(osmium::thread::Queue<std::string>& input_queue,
-                          osmium::thread::Queue<osmium::memory::Buffer>& queue,
-                          std::promise<osmium::io::Header>& header_promise,
-                          osmium::osm_entity_bits::type read_types) :
-                    m_context(context::root),
-                    m_last_context(context::root),
-                    m_in_delete_section(false),
-                    m_header(),
-                    m_buffer(buffer_size),
-                    m_node_builder(),
-                    m_way_builder(),
-                    m_relation_builder(),
-                    m_changeset_builder(),
-                    m_changeset_discussion_builder(),
-                    m_tl_builder(),
-                    m_wnl_builder(),
-                    m_rml_builder(),
-                    m_input_queue(input_queue),
-                    m_queue(queue),
-                    m_header_promise(header_promise),
-                    m_read_types(read_types),
-                    m_header_is_done(false) {
-                }
-
-                /**
-                 * The copy constructor is needed for storing XMLParser in a
-                 * std::function. The copy will look the same as if it has been
-                 * initialized with the same parameters as the original. Any
-                 * state changes in the original will not be reflected in the
-                 * copy.
-                 */
-                XMLParser(const XMLParser& other) :
-                    m_context(context::root),
-                    m_last_context(context::root),
-                    m_in_delete_section(false),
-                    m_header(),
-                    m_buffer(buffer_size),
-                    m_node_builder(),
-                    m_way_builder(),
-                    m_relation_builder(),
-                    m_changeset_builder(),
-                    m_changeset_discussion_builder(),
-                    m_tl_builder(),
-                    m_wnl_builder(),
-                    m_rml_builder(),
-                    m_input_queue(other.m_input_queue),
-                    m_queue(other.m_queue),
-                    m_header_promise(other.m_header_promise),
-                    m_read_types(other.m_read_types),
-                    m_header_is_done(other.m_header_is_done) {
-                }
-
-                XMLParser(XMLParser&&) = default;
-
-                XMLParser& operator=(const XMLParser&) = delete;
-
-                XMLParser& operator=(XMLParser&&) = default;
-
-                ~XMLParser() = default;
-
-                bool operator()() {
-                    osmium::thread::set_thread_name("_osmium_xml_in");
-
-                    ExpatXMLParser<XMLParser> parser(this);
-                    osmium::thread::promise_keeper<osmium::io::Header> promise_keeper(m_header, m_header_promise);
-                    bool last;
-                    do {
-                        std::string data;
-                        m_input_queue.wait_and_pop(data);
-                        last = data.empty();
-                        try {
-                            parser(data, last);
-                            if (m_header_is_done) {
-                                promise_keeper.fullfill_promise();
-                            }
-                        } catch (ParserIsDone&) {
-                            return true;
-                        } catch (...) {
-                            m_queue.push(osmium::memory::Buffer()); // empty buffer to signify eof
-                            throw;
-                        }
-                    } while (!last);
-                    if (m_buffer.committed() > 0) {
-                        m_queue.push(std::move(m_buffer));
-                    }
-                    m_queue.push(osmium::memory::Buffer()); // empty buffer to signify eof
-                    return true;
-                }
-
                 template <typename T>
                 static void check_attributes(const XML_Char** attrs, T check) {
                     while (*attrs) {
@@ -343,8 +252,6 @@ namespace osmium {
                         attrs += 2;
                     }
                 }
-
-            private:
 
                 const char* init_object(osmium::OSMObject& object, const XML_Char** attrs) {
                     const char* user = "";
@@ -725,6 +632,97 @@ namespace osmium {
                         using std::swap;
                         swap(m_buffer, buffer);
                     }
+                }
+
+            public:
+
+                XMLParser(osmium::thread::Queue<std::string>& input_queue,
+                          osmium::thread::Queue<osmium::memory::Buffer>& queue,
+                          std::promise<osmium::io::Header>& header_promise,
+                          osmium::osm_entity_bits::type read_types) :
+                    m_context(context::root),
+                    m_last_context(context::root),
+                    m_in_delete_section(false),
+                    m_header(),
+                    m_buffer(buffer_size),
+                    m_node_builder(),
+                    m_way_builder(),
+                    m_relation_builder(),
+                    m_changeset_builder(),
+                    m_changeset_discussion_builder(),
+                    m_tl_builder(),
+                    m_wnl_builder(),
+                    m_rml_builder(),
+                    m_input_queue(input_queue),
+                    m_queue(queue),
+                    m_header_promise(header_promise),
+                    m_read_types(read_types),
+                    m_header_is_done(false) {
+                }
+
+                /**
+                 * The copy constructor is needed for storing XMLParser in a
+                 * std::function. The copy will look the same as if it has been
+                 * initialized with the same parameters as the original. Any
+                 * state changes in the original will not be reflected in the
+                 * copy.
+                 */
+                XMLParser(const XMLParser& other) :
+                    m_context(context::root),
+                    m_last_context(context::root),
+                    m_in_delete_section(false),
+                    m_header(),
+                    m_buffer(buffer_size),
+                    m_node_builder(),
+                    m_way_builder(),
+                    m_relation_builder(),
+                    m_changeset_builder(),
+                    m_changeset_discussion_builder(),
+                    m_tl_builder(),
+                    m_wnl_builder(),
+                    m_rml_builder(),
+                    m_input_queue(other.m_input_queue),
+                    m_queue(other.m_queue),
+                    m_header_promise(other.m_header_promise),
+                    m_read_types(other.m_read_types),
+                    m_header_is_done(other.m_header_is_done) {
+                }
+
+                XMLParser(XMLParser&&) = default;
+
+                XMLParser& operator=(const XMLParser&) = delete;
+
+                XMLParser& operator=(XMLParser&&) = default;
+
+                ~XMLParser() = default;
+
+                bool operator()() {
+                    osmium::thread::set_thread_name("_osmium_xml_in");
+
+                    ExpatXMLParser<XMLParser> parser(this);
+                    osmium::thread::promise_keeper<osmium::io::Header> promise_keeper(m_header, m_header_promise);
+                    bool last;
+                    do {
+                        std::string data;
+                        m_input_queue.wait_and_pop(data);
+                        last = data.empty();
+                        try {
+                            parser(data, last);
+                            if (m_header_is_done) {
+                                promise_keeper.fullfill_promise();
+                            }
+                        } catch (ParserIsDone&) {
+                            return true;
+                        } catch (...) {
+                            m_queue.push(osmium::memory::Buffer()); // empty buffer to signify eof
+                            throw;
+                        }
+                    } while (!last);
+                    if (m_buffer.committed() > 0) {
+                        m_queue.push(std::move(m_buffer));
+                    }
+                    m_queue.push(osmium::memory::Buffer()); // empty buffer to signify eof
+                    return true;
                 }
 
             }; // class XMLParser
