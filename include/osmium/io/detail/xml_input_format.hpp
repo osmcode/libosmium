@@ -247,39 +247,6 @@ namespace osmium {
 
                 }; // class ExpatXMLParser
 
-                /**
-                 * A helper class that makes sure a promise is kept. It stores
-                 * a reference to some piece of data and to a promise and, on
-                 * destruction, sets the value of the promise from the data.
-                 */
-                template <class T>
-                class PromiseKeeper {
-
-                    T& m_data;
-                    std::promise<T>& m_promise;
-                    bool m_done;
-
-                public:
-
-                    PromiseKeeper(T& data, std::promise<T>& promise) :
-                        m_data(data),
-                        m_promise(promise),
-                        m_done(false) {
-                    }
-
-                    void fullfill_promise() {
-                        if (!m_done) {
-                            m_promise.set_value(m_data);
-                            m_done = true;
-                        }
-                    }
-
-                    ~PromiseKeeper() {
-                        fullfill_promise();
-                    }
-
-                }; // class PromiseKeeper
-
             public:
 
                 explicit XMLParser(osmium::thread::Queue<std::string>& input_queue,
@@ -345,7 +312,7 @@ namespace osmium {
                     osmium::thread::set_thread_name("_osmium_xml_in");
 
                     ExpatXMLParser<XMLParser> parser(this);
-                    PromiseKeeper<osmium::io::Header> promise_keeper(m_header, m_header_promise);
+                    osmium::thread::promise_keeper<osmium::io::Header> promise_keeper(m_header, m_header_promise);
                     bool last;
                     do {
                         std::string data;

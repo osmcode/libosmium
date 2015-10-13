@@ -80,6 +80,39 @@ namespace osmium {
         }
 #endif
 
+        /**
+         * A helper class that makes sure a promise is kept. It stores
+         * a reference to some piece of data and to a promise and, on
+         * destruction, sets the value of the promise from the data.
+         */
+        template <class T>
+        class promise_keeper {
+
+            T& m_data;
+            std::promise<T>& m_promise;
+            bool m_done;
+
+        public:
+
+            promise_keeper(T& data, std::promise<T>& promise) :
+                m_data(data),
+                m_promise(promise),
+                m_done(false) {
+            }
+
+            void fullfill_promise() {
+                if (!m_done) {
+                    m_promise.set_value(m_data);
+                    m_done = true;
+                }
+            }
+
+            ~promise_keeper() {
+                fullfill_promise();
+            }
+
+        }; // class promise_keeper
+
     } // namespace thread
 
 } // namespace osmium
