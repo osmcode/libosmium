@@ -79,19 +79,38 @@ namespace osmium {
 
         namespace detail {
 
-            /**
-             * Class for parsing PBF files.
-             */
-            class PBFInputFormat : public osmium::io::detail::InputFormat {
+            class PBFParser {
 
-                typedef osmium::thread::Queue<std::future<osmium::memory::Buffer>> queue_type;
-
-                bool m_use_thread_pool;
-                bool m_eof { false };
-                queue_type m_queue;
-                std::thread m_reader;
                 osmium::thread::Queue<std::string>& m_input_queue;
+                osmium::thread::Queue<std::future<osmium::memory::Buffer>>& m_queue;
+                std::promise<osmium::io::Header>& m_header_promise;
+                osmium::osm_entity_bits::type m_read_types;
+                bool m_use_thread_pool;
+
                 std::string m_input_buffer;
+
+            public:
+
+                PBFParser(osmium::thread::Queue<std::string>& input_queue,
+                          osmium::thread::Queue<std::future<osmium::memory::Buffer>>& queue,
+                          std::promise<osmium::io::Header>& header_promise,
+                          osmium::osm_entity_bits::type read_types,
+                          bool use_thread_pool) :
+                    m_input_queue(input_queue),
+                    m_queue(queue),
+                    m_header_promise(header_promise),
+                    m_read_types(read_types),
+                    m_use_thread_pool(use_thread_pool),
+                    m_input_buffer() {
+                }
+
+                PBFParser(PBFParser&&) = default;
+
+                PBFParser& operator=(const PBFParser&) = delete;
+
+                PBFParser& operator=(PBFParser&&) = default;
+
+                ~PBFParser() = default;
 
                 /**
                  * Read the given number of bytes from the input queue.
@@ -186,8 +205,19 @@ namespace osmium {
                     return decode_blob_header(protozero::pbf_message<FileFormat::BlobHeader>(blob_header), expected_type);
                 }
 
-                void parse_osm_data(osmium::osm_entity_bits::type read_types) {
+                bool operator()() {
                     osmium::thread::set_thread_name("_osmium_pbf_in");
+
+                    osmium::io::Header header;
+                    osmium::thread::promise_keeper<osmium::io::Header> promise_keeper(header, m_header_promise);
+                    // handle OSMHeader
+                    const auto size = check_type_and_get_blob_size("OSMHeader");
+                    header = decode_header(read_from_input_queue(size));
+                    promise_keeper.fullfill_promise();
+
+                    if (m_read_types == osmium::osm_entity_bits::nothing) {
+                        return true;
+                    }
 
                     while (auto size = check_type_and_get_blob_size("OSMData")) {
                         std::string input_buffer = read_from_input_queue(size);
@@ -196,11 +226,11 @@ namespace osmium {
                         }
 
                         if (m_use_thread_pool) {
-                            m_queue.push(osmium::thread::Pool::instance().submit(PBFDataBlobDecoder{ std::move(input_buffer), read_types }));
+                            m_queue.push(osmium::thread::Pool::instance().submit(PBFDataBlobDecoder{ std::move(input_buffer), m_read_types }));
                         } else {
                             std::promise<osmium::memory::Buffer> promise;
                             m_queue.push(promise.get_future());
-                            PBFDataBlobDecoder data_blob_parser{ std::move(input_buffer), read_types };
+                            PBFDataBlobDecoder data_blob_parser{ std::move(input_buffer), m_read_types };
                             promise.set_value(data_blob_parser());
                         }
                     }
@@ -210,7 +240,22 @@ namespace osmium {
                     std::promise<osmium::memory::Buffer> promise;
                     m_queue.push(promise.get_future());
                     promise.set_value(osmium::memory::Buffer{});
+
+                    return true;
                 }
+
+            }; // class PBFParser
+
+            /**
+             * Class for parsing PBF files.
+             */
+            class PBFInputFormat : public osmium::io::detail::InputFormat {
+
+                static constexpr size_t max_queue_size = 20; // XXX
+
+                osmium::thread::Queue<std::future<osmium::memory::Buffer>> m_queue;
+                std::promise<osmium::io::Header> m_header_promise;
+                std::future<bool> m_parser_future;
 
             public:
 
@@ -223,24 +268,23 @@ namespace osmium {
                  */
                 PBFInputFormat(const osmium::io::File& file, osmium::osm_entity_bits::type read_which_entities, osmium::thread::Queue<std::string>& input_queue) :
                     osmium::io::detail::InputFormat(file, read_which_entities),
-                    m_use_thread_pool(osmium::config::use_pool_threads_for_pbf_parsing()),
-                    m_queue(20, "pbf_parser_results"), // XXX
-                    m_input_queue(input_queue),
-                    m_input_buffer() {
+                    m_queue(max_queue_size, "pbf_parser_results"),
+                    m_header_promise(),
+                    m_parser_future(std::async(std::launch::async, PBFParser(input_queue, m_queue, m_header_promise, read_which_entities, osmium::config::use_pool_threads_for_pbf_parsing()))) {
 
-                    // handle OSMHeader
-                    const auto size = check_type_and_get_blob_size("OSMHeader");
-                    m_header = decode_header(read_from_input_queue(size));
-
-                    if (m_read_which_entities != osmium::osm_entity_bits::nothing) {
-                        m_reader = std::thread(&PBFInputFormat::parse_osm_data, this, m_read_which_entities);
-                    }
                 }
 
                 ~PBFInputFormat() {
-                    if (m_reader.joinable()) {
-                        m_reader.join();
+                    try {
+                        close();
+                    } catch (...) {
+                        // ignore any exceptions at this point because destructor should not throw
                     }
+                }
+
+                virtual osmium::io::Header header() override final {
+                    osmium::thread::check_for_exception(m_parser_future);
+                    return m_header_promise.get_future().get();
                 }
 
                 /**
@@ -249,29 +293,17 @@ namespace osmium {
                  * Returns an empty buffer at end of input.
                  */
                 osmium::memory::Buffer read() override {
-                    osmium::memory::Buffer buffer;
-                    if (m_eof) {
-                        return buffer;
-                    }
-
                     std::future<osmium::memory::Buffer> buffer_future;
                     m_queue.wait_and_pop(buffer_future);
 
-                    try {
-                        buffer = buffer_future.get();
-                        if (!buffer) {
-                            m_eof = true;
-                        }
-                        return buffer;
-                    } catch (...) {
-                        m_eof = true;
-                        throw;
-                    }
+                    osmium::thread::check_for_exception(m_parser_future);
+                    return buffer_future.get();
                 }
 
                 void close() override {
                     std::future<osmium::memory::Buffer> buffer_future;
                     while (m_queue.try_pop(buffer_future)); // drain queue
+                    osmium::thread::wait_until_done(m_parser_future);
                 }
 
             }; // class PBFInputFormat
