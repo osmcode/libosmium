@@ -342,6 +342,8 @@ namespace osmium {
                 ~XMLParser() = default;
 
                 bool operator()() {
+                    osmium::thread::set_thread_name("_osmium_xml_in");
+
                     ExpatXMLParser<XMLParser> parser(this);
                     PromiseKeeper<osmium::io::Header> promise_keeper(m_header, m_header_promise);
                     bool last;
