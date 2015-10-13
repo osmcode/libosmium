@@ -110,7 +110,13 @@ namespace osmium {
 
             public:
 
-                typedef std::function<osmium::io::detail::InputFormat*(const osmium::io::File&, osmium::osm_entity_bits::type read_which_entities, osmium::thread::Queue<std::string>&)> create_input_type;
+                typedef std::function<
+                            osmium::io::detail::InputFormat*(
+                                const osmium::io::File&,
+                                osmium::osm_entity_bits::type read_which_entities,
+                                osmium::thread::Queue<std::string>&
+                            )
+                        > create_input_type;
 
             private:
 
@@ -139,7 +145,12 @@ namespace osmium {
                 create_input_type* get_creator_function(const osmium::io::File& file) {
                     auto it = m_callbacks.find(file.format());
                     if (it == m_callbacks.end()) {
-                        throw std::runtime_error(std::string("Can not open file '") + file.filename() + "' with type '" + as_string(file.format()) + "'. No support for reading this format in this program.");
+                        throw std::runtime_error(
+                                std::string("Can not open file '") +
+                                file.filename() +
+                                "' with type '" +
+                                as_string(file.format()) +
+                                "'. No support for reading this format in this program.");
                     }
                     return &(it->second);
                 }
