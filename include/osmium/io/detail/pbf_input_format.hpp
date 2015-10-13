@@ -287,8 +287,6 @@ namespace osmium {
              */
             class PBFInputFormat : public osmium::io::detail::InputFormat {
 
-                osmium::thread::Queue<std::future<osmium::memory::Buffer>> m_output_queue;
-                std::promise<osmium::io::Header> m_header_promise;
                 std::future<bool> m_parser_thread;
 
             public:
@@ -302,9 +300,7 @@ namespace osmium {
                  * @param input_queue String queue where data is read from.
                  */
                 PBFInputFormat(osmium::osm_entity_bits::type read_which_entities, osmium::thread::Queue<std::string>& input_queue) :
-                    osmium::io::detail::InputFormat(),
-                    m_output_queue(max_queue_size, "pbf_parser_results"),
-                    m_header_promise(),
+                    osmium::io::detail::InputFormat("pbf_parser_results"),
                     m_parser_thread(std::async(std::launch::async, PBFParser(input_queue, m_output_queue, m_header_promise, read_which_entities, osmium::config::use_pool_threads_for_pbf_parsing()))) {
                 }
 
@@ -321,21 +317,6 @@ namespace osmium {
                         // Ignore any exceptions at this point, because
                         // a destructor should not throw.
                     }
-                }
-
-                virtual osmium::io::Header header() override final {
-                    return m_header_promise.get_future().get();
-                }
-
-                /**
-                 * Returns the next buffer with OSM data read from the PBF
-                 * file. Blocks if data is not available yet.
-                 * Returns an empty buffer at end of input.
-                 */
-                osmium::memory::Buffer read() override final {
-                    std::future<osmium::memory::Buffer> buffer_future;
-                    m_output_queue.wait_and_pop(buffer_future);
-                    return buffer_future.get();
                 }
 
                 void close() override final {

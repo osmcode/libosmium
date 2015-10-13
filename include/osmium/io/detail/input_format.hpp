@@ -34,6 +34,7 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <functional>
+#include <future>
 #include <map>
 #include <memory>
 #include <stdexcept>
@@ -45,6 +46,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/io/header.hpp>
 #include <osmium/memory/buffer.hpp>
 #include <osmium/osm/entity_bits.hpp>
+#include <osmium/thread/queue.hpp>
 
 namespace osmium {
 
@@ -69,7 +71,13 @@ namespace osmium {
 
                 static constexpr size_t max_queue_size = 20; // XXX
 
-                InputFormat() = default;
+                osmium::thread::Queue<std::future<osmium::memory::Buffer>> m_output_queue;
+                std::promise<osmium::io::Header> m_header_promise;
+
+                InputFormat(const char* queue_name) :
+                    m_output_queue(max_queue_size, queue_name),
+                    m_header_promise() {
+                }
 
                 InputFormat(const InputFormat&) = delete;
                 InputFormat(InputFormat&&) = delete;
@@ -82,9 +90,20 @@ namespace osmium {
                 virtual ~InputFormat() {
                 }
 
-                virtual osmium::io::Header header() = 0;
+                osmium::io::Header header() {
+                    return m_header_promise.get_future().get();
+                }
 
-                virtual osmium::memory::Buffer read() = 0;
+                /**
+                 * Returns the next buffer with OSM data read from the
+                 * file. Blocks if data is not available yet.
+                 * Returns an empty buffer at end of input.
+                 */
+                osmium::memory::Buffer read() {
+                    std::future<osmium::memory::Buffer> buffer_future;
+                    m_output_queue.wait_and_pop(buffer_future);
+                    return buffer_future.get();
+                }
 
                 virtual void close() = 0;
 
