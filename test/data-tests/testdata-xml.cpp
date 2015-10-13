@@ -73,7 +73,7 @@ std::string read_gz_file(const char* test_id, const char* suffix) {
 
 header_buffer_type parse_xml(std::string input) {
     osmium::thread::Queue<std::string> input_queue;
-    osmium::thread::Queue<osmium::memory::Buffer> output_queue;
+    osmium::thread::Queue<std::future<osmium::memory::Buffer>> output_queue;
     std::promise<osmium::io::Header> header_promise;
 
     input_queue.push(input);
@@ -84,12 +84,14 @@ header_buffer_type parse_xml(std::string input) {
 
     header_buffer_type result;
     result.header = header_promise.get_future().get();
-    output_queue.wait_and_pop(result.buffer);
+    std::future<osmium::memory::Buffer> future_buffer;
+    output_queue.wait_and_pop(future_buffer);
+    result.buffer = future_buffer.get();
 
     if (result.buffer) {
-        osmium::memory::Buffer buffer;
-        output_queue.wait_and_pop(buffer);
-        assert(!buffer);
+        std::future<osmium::memory::Buffer> future_buffer2;
+        output_queue.wait_and_pop(future_buffer2);
+        assert(!future_buffer2.get());
     }
 
     return result;

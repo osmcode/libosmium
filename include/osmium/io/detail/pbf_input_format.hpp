@@ -79,8 +79,10 @@ namespace osmium {
 
             class PBFParser {
 
+                using output_queue_type = osmium::thread::Queue<std::future<osmium::memory::Buffer>>;
+
                 osmium::thread::Queue<std::string>& m_input_queue;
-                osmium::thread::Queue<std::future<osmium::memory::Buffer>>& m_output_queue;
+                output_queue_type& m_output_queue;
                 std::promise<osmium::io::Header>& m_header_promise;
                 osmium::osm_entity_bits::type m_read_types;
                 bool m_use_thread_pool;
@@ -225,7 +227,7 @@ namespace osmium {
             public:
 
                 PBFParser(osmium::thread::Queue<std::string>& input_queue,
-                          osmium::thread::Queue<std::future<osmium::memory::Buffer>>& output_queue,
+                          output_queue_type& output_queue,
                           std::promise<osmium::io::Header>& header_promise,
                           osmium::osm_entity_bits::type read_types,
                           bool use_thread_pool) :
@@ -253,10 +255,9 @@ namespace osmium {
                     m_input_buffer() {
                 }
 
-                PBFParser(PBFParser&&) = default;
-
                 PBFParser& operator=(const PBFParser&) = delete;
 
+                PBFParser(PBFParser&&) = default;
                 PBFParser& operator=(PBFParser&&) = default;
 
                 ~PBFParser() = default;
@@ -266,16 +267,15 @@ namespace osmium {
 
                     try {
                         parse_header_blob();
-
                         if (m_read_types != osmium::osm_entity_bits::nothing) {
                             parse_data_blobs();
                         }
-                    } catch (...) {
                         send_end_of_file();
-                        throw;
+                    } catch (...) {
+                        std::promise<osmium::memory::Buffer> promise;
+                        m_output_queue.push(promise.get_future());
+                        promise.set_exception(std::current_exception()); // set_exception_at_thread_exit() ?
                     }
-
-                    send_end_of_file();
 
                     return true;
                 }
@@ -308,6 +308,12 @@ namespace osmium {
                     m_parser_thread(std::async(std::launch::async, PBFParser(input_queue, m_output_queue, m_header_promise, read_which_entities, osmium::config::use_pool_threads_for_pbf_parsing()))) {
                 }
 
+                PBFInputFormat(const PBFInputFormat&) = delete;
+                PBFInputFormat& operator=(const PBFInputFormat&) = delete;
+
+                PBFInputFormat(PBFInputFormat&&) = delete;
+                PBFInputFormat& operator=(PBFInputFormat&&) = delete;
+
                 ~PBFInputFormat() noexcept {
                     try {
                         close();
@@ -318,7 +324,6 @@ namespace osmium {
                 }
 
                 virtual osmium::io::Header header() override final {
-                    osmium::thread::check_for_exception(m_parser_thread);
                     return m_header_promise.get_future().get();
                 }
 
@@ -330,14 +335,10 @@ namespace osmium {
                 osmium::memory::Buffer read() override final {
                     std::future<osmium::memory::Buffer> buffer_future;
                     m_output_queue.wait_and_pop(buffer_future);
-
-                    osmium::thread::check_for_exception(m_parser_thread);
                     return buffer_future.get();
                 }
 
                 void close() override final {
-                    std::future<osmium::memory::Buffer> buffer_future;
-                    while (m_output_queue.try_pop(buffer_future)); // drain queue
                     osmium::thread::wait_until_done(m_parser_thread);
                 }
 

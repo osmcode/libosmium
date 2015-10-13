@@ -170,6 +170,16 @@ namespace osmium {
                 }
             }
 
+            void shutdown() {
+                m_read_done = true;
+                try {
+                    m_input_format->close();
+                    osmium::thread::wait_until_done(m_read_thread);
+                } catch (...) {
+                    // Ignore any exceptions.
+                }
+            }
+
         public:
 
             /**
@@ -224,11 +234,10 @@ namespace osmium {
              * @throws Some form of std::runtime_error when there is a problem.
              */
             void close() {
-                // Signal the read thread that it should wrap up.
-                m_read_done = true;
-
-                // Signal the input format parser that it should wrap up.
-                m_input_format->close();
+                if (m_status == status::reading) {
+                    m_status = status::closed;
+                    shutdown();
+                }
 
 #ifndef _WIN32
                 if (m_childpid) {
@@ -243,12 +252,6 @@ namespace osmium {
                     m_childpid = 0;
                 }
 #endif
-
-                if (m_status != status::exception) {
-                    m_status = status::closed;
-                }
-
-                osmium::thread::wait_until_done(m_read_thread);
             }
 
             /**
@@ -257,8 +260,14 @@ namespace osmium {
              * @returns Header.
              * @throws Some form of std::runtime_error if there is an error.
              */
-            osmium::io::Header header() const {
-                return m_input_format->header();
+            osmium::io::Header header() {
+                try {
+                    return m_input_format->header();
+                } catch (...) {
+                    m_status = status::exception;
+                    shutdown();
+                    throw;
+                }
             }
 
             /**
@@ -272,11 +281,13 @@ namespace osmium {
              * @throws Some form of std::runtime_error if there is an error.
              */
             osmium::memory::Buffer read() {
+                osmium::memory::Buffer buffer;
+
                 if (m_status != status::reading ||
                     m_read_which_entities == osmium::osm_entity_bits::nothing) {
                     // If the caller didn't want anything but the header, it
                     // will always get an empty buffer here.
-                    return osmium::memory::Buffer();
+                    return buffer;
                 }
 
                 try {
@@ -289,9 +300,11 @@ namespace osmium {
                     // without data is not an error, it just means we have to
                     // keep getting the next buffer until there is one with data.
                     while (true) {
-                        osmium::memory::Buffer buffer = m_input_format->read();
+                        buffer = std::move(m_input_format->read());
                         if (!buffer) {
                             m_status = status::eof;
+                            osmium::thread::wait_until_done(m_read_thread);
+                            m_input_format->close();
                             return buffer;
                         }
                         if (buffer.committed() > 0) {
@@ -299,9 +312,8 @@ namespace osmium {
                         }
                     }
                 } catch (...) {
-                    m_read_done = true;
                     m_status = status::exception;
-                    m_input_format->close();
+                    shutdown();
                     throw;
                 }
             }

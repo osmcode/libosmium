@@ -112,7 +112,7 @@ namespace osmium {
                 return buffer;
             }
 
-            osmium::io::Header header() const {
+            osmium::io::Header header() {
                 return m_reader.header();
             }
 
