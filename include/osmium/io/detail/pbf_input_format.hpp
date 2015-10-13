@@ -180,6 +180,14 @@ namespace osmium {
                     return decode_blob_header(protozero::pbf_message<FileFormat::BlobHeader>(blob_header), expected_type);
                 }
 
+                std::string read_from_input_queue_with_check(size_t size) {
+                    if (size > max_uncompressed_blob_size) {
+                        throw osmium::pbf_error(std::string("invalid blob size: " +
+                                                std::to_string(size)));
+                    }
+                    return read_from_input_queue(size);
+                }
+
                 // Parse the header in the PBF OSMHeader blob. The
                 // promise_keeper makes sure that, whatever happens, the
                 // promise is fullfilled with the header. This will be either
@@ -189,15 +197,12 @@ namespace osmium {
                     osmium::io::Header header;
                     osmium::thread::promise_keeper<osmium::io::Header> promise_keeper(header, m_header_promise);
                     const auto size = check_type_and_get_blob_size("OSMHeader");
-                    header = decode_header(read_from_input_queue(size));
+                    header = decode_header(read_from_input_queue_with_check(size));
                 }
 
                 void parse_data_blobs() {
                     while (const auto size = check_type_and_get_blob_size("OSMData")) {
-                        std::string input_buffer = read_from_input_queue(size);
-                        if (input_buffer.size() > max_uncompressed_blob_size) {
-                            throw osmium::pbf_error(std::string("invalid blob size: " + std::to_string(input_buffer.size())));
-                        }
+                        std::string input_buffer = read_from_input_queue_with_check(size);
 
                         if (m_use_thread_pool) {
                             m_queue.push(osmium::thread::Pool::instance().submit(PBFDataBlobDecoder{ std::move(input_buffer), m_read_types }));
