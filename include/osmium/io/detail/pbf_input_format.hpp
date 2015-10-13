@@ -192,6 +192,30 @@ namespace osmium {
                     header = decode_header(read_from_input_queue(size));
                 }
 
+                void parse_data_blobs() {
+                    while (const auto size = check_type_and_get_blob_size("OSMData")) {
+                        std::string input_buffer = read_from_input_queue(size);
+                        if (input_buffer.size() > max_uncompressed_blob_size) {
+                            throw osmium::pbf_error(std::string("invalid blob size: " + std::to_string(input_buffer.size())));
+                        }
+
+                        if (m_use_thread_pool) {
+                            m_queue.push(osmium::thread::Pool::instance().submit(PBFDataBlobDecoder{ std::move(input_buffer), m_read_types }));
+                        } else {
+                            std::promise<osmium::memory::Buffer> promise;
+                            m_queue.push(promise.get_future());
+                            PBFDataBlobDecoder data_blob_parser{ std::move(input_buffer), m_read_types };
+                            promise.set_value(data_blob_parser());
+                        }
+                    }
+
+                    // Send an empty buffer to signal the reader that we are
+                    // done.
+                    std::promise<osmium::memory::Buffer> promise;
+                    m_queue.push(promise.get_future());
+                    promise.set_value(osmium::memory::Buffer{});
+                }
+
             public:
 
                 PBFParser(osmium::thread::Queue<std::string>& input_queue,
@@ -236,31 +260,9 @@ namespace osmium {
 
                     parse_header_blob();
 
-                    if (m_read_types == osmium::osm_entity_bits::nothing) {
-                        return true;
+                    if (m_read_types != osmium::osm_entity_bits::nothing) {
+                        parse_data_blobs();
                     }
-
-                    while (const auto size = check_type_and_get_blob_size("OSMData")) {
-                        std::string input_buffer = read_from_input_queue(size);
-                        if (input_buffer.size() > max_uncompressed_blob_size) {
-                            throw osmium::pbf_error(std::string("invalid blob size: " + std::to_string(input_buffer.size())));
-                        }
-
-                        if (m_use_thread_pool) {
-                            m_queue.push(osmium::thread::Pool::instance().submit(PBFDataBlobDecoder{ std::move(input_buffer), m_read_types }));
-                        } else {
-                            std::promise<osmium::memory::Buffer> promise;
-                            m_queue.push(promise.get_future());
-                            PBFDataBlobDecoder data_blob_parser{ std::move(input_buffer), m_read_types };
-                            promise.set_value(data_blob_parser());
-                        }
-                    }
-
-                    // Send an empty buffer to signal the reader that we are
-                    // done.
-                    std::promise<osmium::memory::Buffer> promise;
-                    m_queue.push(promise.get_future());
-                    promise.set_value(osmium::memory::Buffer{});
 
                     return true;
                 }
