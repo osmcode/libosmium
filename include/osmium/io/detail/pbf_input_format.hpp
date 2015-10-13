@@ -121,7 +121,7 @@ namespace osmium {
                     uint32_t size_in_network_byte_order;
 
                     try {
-                        std::string input_data = read_from_input_queue(sizeof(size_in_network_byte_order));
+                        const std::string input_data = read_from_input_queue(sizeof(size_in_network_byte_order));
                         size_in_network_byte_order = *reinterpret_cast<const uint32_t*>(input_data.data());
                     } catch (osmium::pbf_error&) {
                         return 0; // EOF
@@ -170,12 +170,12 @@ namespace osmium {
                 size_t check_type_and_get_blob_size(const char* expected_type) {
                     assert(expected_type);
 
-                    auto size = read_blob_header_size_from_file();
+                    const auto size = read_blob_header_size_from_file();
                     if (size == 0) { // EOF
                         return 0;
                     }
 
-                    std::string blob_header = read_from_input_queue(size);
+                    const std::string blob_header = read_from_input_queue(size);
 
                     return decode_blob_header(protozero::pbf_message<FileFormat::BlobHeader>(blob_header), expected_type);
                 }
@@ -240,7 +240,7 @@ namespace osmium {
                         return true;
                     }
 
-                    while (auto size = check_type_and_get_blob_size("OSMData")) {
+                    while (const auto size = check_type_and_get_blob_size("OSMData")) {
                         std::string input_buffer = read_from_input_queue(size);
                         if (input_buffer.size() > max_uncompressed_blob_size) {
                             throw osmium::pbf_error(std::string("invalid blob size: " + std::to_string(input_buffer.size())));
