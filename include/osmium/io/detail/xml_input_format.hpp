@@ -272,10 +272,11 @@ namespace osmium {
                 }
 
                 /**
-                 * The copy constructor is needed for storing XMLParser in a std::function.
-                 * The copy will look the same as if it has been initialized with the
-                 * same parameters as the original. Any state changes in the original will
-                 * not be reflected in the copy.
+                 * The copy constructor is needed for storing XMLParser in a
+                 * std::function. The copy will look the same as if it has been
+                 * initialized with the same parameters as the original. Any
+                 * state changes in the original will not be reflected in the
+                 * copy.
                  */
                 XMLParser(const XMLParser& other) :
                     m_context(context::root),
