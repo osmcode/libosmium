@@ -71,11 +71,11 @@ namespace osmium {
          * Set name of current thread for debugging. This only works on Linux.
          */
 #ifdef __linux__
-        inline void set_thread_name(const char* name) {
+        inline void set_thread_name(const char* name) noexcept {
             prctl(PR_SET_NAME, name, 0, 0, 0);
         }
 #else
-        inline void set_thread_name(const char*) {
+        inline void set_thread_name(const char*) noexcept {
             // intentionally left blank
         }
 #endif

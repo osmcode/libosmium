@@ -214,9 +214,9 @@ namespace osmium {
                             promise.set_value(data_blob_parser());
                         }
                     }
+                }
 
-                    // Send an empty buffer to signal the reader that we are
-                    // done.
+                void send_end_of_file() {
                     std::promise<osmium::memory::Buffer> promise;
                     m_queue.push(promise.get_future());
                     promise.set_value(osmium::memory::Buffer{});
@@ -264,11 +264,18 @@ namespace osmium {
                 bool operator()() {
                     osmium::thread::set_thread_name("_osmium_pbf_in");
 
-                    parse_header_blob();
+                    try {
+                        parse_header_blob();
 
-                    if (m_read_types != osmium::osm_entity_bits::nothing) {
-                        parse_data_blobs();
+                        if (m_read_types != osmium::osm_entity_bits::nothing) {
+                            parse_data_blobs();
+                        }
+                    } catch (...) {
+                        send_end_of_file();
+                        throw;
                     }
+
+                    send_end_of_file();
 
                     return true;
                 }
