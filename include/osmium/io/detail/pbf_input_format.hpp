@@ -87,45 +87,6 @@ namespace osmium {
 
                 std::string m_input_buffer;
 
-            public:
-
-                PBFParser(osmium::thread::Queue<std::string>& input_queue,
-                          osmium::thread::Queue<std::future<osmium::memory::Buffer>>& queue,
-                          std::promise<osmium::io::Header>& header_promise,
-                          osmium::osm_entity_bits::type read_types,
-                          bool use_thread_pool) :
-                    m_input_queue(input_queue),
-                    m_queue(queue),
-                    m_header_promise(header_promise),
-                    m_read_types(read_types),
-                    m_use_thread_pool(use_thread_pool),
-                    m_input_buffer() {
-                }
-
-                /**
-                 * The copy constructor is needed for storing PBFParser in a
-                 * std::function. The copy will look the same as if it has been
-                 * initialized with the same parameters as the original. Any
-                 * state changes in the original will not be reflected in the
-                 * copy.
-                 */
-                PBFParser(const PBFParser& other) :
-                    m_input_queue(other.m_input_queue),
-                    m_queue(other.m_queue),
-                    m_header_promise(other.m_header_promise),
-                    m_read_types(other.m_read_types),
-                    m_use_thread_pool(other.m_use_thread_pool),
-                    m_input_buffer() {
-                }
-
-                PBFParser(PBFParser&&) = default;
-
-                PBFParser& operator=(const PBFParser&) = delete;
-
-                PBFParser& operator=(PBFParser&&) = default;
-
-                ~PBFParser() = default;
-
                 /**
                  * Read the given number of bytes from the input queue.
                  *
@@ -230,6 +191,45 @@ namespace osmium {
                     const auto size = check_type_and_get_blob_size("OSMHeader");
                     header = decode_header(read_from_input_queue(size));
                 }
+
+            public:
+
+                PBFParser(osmium::thread::Queue<std::string>& input_queue,
+                          osmium::thread::Queue<std::future<osmium::memory::Buffer>>& queue,
+                          std::promise<osmium::io::Header>& header_promise,
+                          osmium::osm_entity_bits::type read_types,
+                          bool use_thread_pool) :
+                    m_input_queue(input_queue),
+                    m_queue(queue),
+                    m_header_promise(header_promise),
+                    m_read_types(read_types),
+                    m_use_thread_pool(use_thread_pool),
+                    m_input_buffer() {
+                }
+
+                /**
+                 * The copy constructor is needed for storing PBFParser in a
+                 * std::function. The copy will look the same as if it has been
+                 * initialized with the same parameters as the original. Any
+                 * state changes in the original will not be reflected in the
+                 * copy.
+                 */
+                PBFParser(const PBFParser& other) :
+                    m_input_queue(other.m_input_queue),
+                    m_queue(other.m_queue),
+                    m_header_promise(other.m_header_promise),
+                    m_read_types(other.m_read_types),
+                    m_use_thread_pool(other.m_use_thread_pool),
+                    m_input_buffer() {
+                }
+
+                PBFParser(PBFParser&&) = default;
+
+                PBFParser& operator=(const PBFParser&) = delete;
+
+                PBFParser& operator=(PBFParser&&) = default;
+
+                ~PBFParser() = default;
 
                 bool operator()() {
                     osmium::thread::set_thread_name("_osmium_pbf_in");
