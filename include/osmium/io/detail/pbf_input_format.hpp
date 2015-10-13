@@ -219,15 +219,22 @@ namespace osmium {
                     return decode_blob_header(protozero::pbf_message<FileFormat::BlobHeader>(blob_header), expected_type);
                 }
 
+                // Parse the header in the PBF OSMHeader blob. The
+                // promise_keeper makes sure that, whatever happens, the
+                // promise is fullfilled with the header. This will be either
+                // the default constructed header or the header as returned
+                // from the decode_header function.
+                void parse_header_blob() {
+                    osmium::io::Header header;
+                    osmium::thread::promise_keeper<osmium::io::Header> promise_keeper(header, m_header_promise);
+                    const auto size = check_type_and_get_blob_size("OSMHeader");
+                    header = decode_header(read_from_input_queue(size));
+                }
+
                 bool operator()() {
                     osmium::thread::set_thread_name("_osmium_pbf_in");
 
-                    osmium::io::Header header;
-                    osmium::thread::promise_keeper<osmium::io::Header> promise_keeper(header, m_header_promise);
-                    // handle OSMHeader
-                    const auto size = check_type_and_get_blob_size("OSMHeader");
-                    header = decode_header(read_from_input_queue(size));
-                    promise_keeper.fullfill_promise();
+                    parse_header_blob();
 
                     if (m_read_types == osmium::osm_entity_bits::nothing) {
                         return true;
