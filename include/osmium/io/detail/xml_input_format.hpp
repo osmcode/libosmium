@@ -129,8 +129,6 @@ namespace osmium {
 
     namespace io {
 
-        class File;
-
         namespace detail {
 
             /**
@@ -741,22 +739,24 @@ namespace osmium {
                 /**
                  * Instantiate XML Parser
                  *
-                 * @param file osmium::io::File instance describing file to be read from.
-                 * @param read_which_entities Which types of OSM entities (nodes, ways, relations, changesets) should be parsed?
+                 * @param read_which_entities Which types of OSM entities
+                 *        (nodes, ways, relations, changesets) should be
+                 *        parsed?
                  * @param input_queue String queue where data is read from.
                  */
-                explicit XMLInputFormat(const osmium::io::File& file, osmium::osm_entity_bits::type read_which_entities, osmium::thread::Queue<std::string>& input_queue) :
-                    osmium::io::detail::InputFormat(file, read_which_entities),
+                XMLInputFormat(osmium::osm_entity_bits::type read_which_entities, osmium::thread::Queue<std::string>& input_queue) :
+                    osmium::io::detail::InputFormat(),
                     m_queue(max_queue_size, "xml_parser_results"),
                     m_header_promise(),
                     m_parser_future(std::async(std::launch::async, XMLParser(input_queue, m_queue, m_header_promise, read_which_entities))) {
                 }
 
-                ~XMLInputFormat() {
+                ~XMLInputFormat() noexcept {
                     try {
                         close();
                     } catch (...) {
-                        // ignore any exceptions at this point because destructor should not throw
+                        // Ignore any exceptions at this point, because
+                        // a destructor should not throw.
                     }
                 }
 
@@ -765,7 +765,7 @@ namespace osmium {
                     return m_header_promise.get_future().get();
                 }
 
-                osmium::memory::Buffer read() override {
+                osmium::memory::Buffer read() override final {
                     osmium::memory::Buffer buffer;
                     m_queue.wait_and_pop(buffer);
 
@@ -773,7 +773,7 @@ namespace osmium {
                     return buffer;
                 }
 
-                void close() override {
+                void close() override final {
                     osmium::memory::Buffer buffer;
                     while (m_queue.try_pop(buffer)); // drain queue
                     osmium::thread::wait_until_done(m_parser_future);
@@ -788,8 +788,8 @@ namespace osmium {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-variable"
                 const bool registered_xml_input = osmium::io::detail::InputFormatFactory::instance().register_input_format(osmium::io::file_format::xml,
-                    [](const osmium::io::File& file, osmium::osm_entity_bits::type read_which_entities, osmium::thread::Queue<std::string>& input_queue) {
-                        return new osmium::io::detail::XMLInputFormat(file, read_which_entities, input_queue);
+                    [](osmium::osm_entity_bits::type read_which_entities, osmium::thread::Queue<std::string>& input_queue) {
+                        return new osmium::io::detail::XMLInputFormat(read_which_entities, input_queue);
                 });
 #pragma GCC diagnostic pop
 

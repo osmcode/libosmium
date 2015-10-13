@@ -69,8 +69,7 @@ namespace osmium {
 
                 static constexpr size_t max_queue_size = 20; // XXX
 
-                explicit InputFormat(const osmium::io::File&, osmium::osm_entity_bits::type) {
-                }
+                InputFormat() = default;
 
                 InputFormat(const InputFormat&) = delete;
                 InputFormat(InputFormat&&) = delete;
@@ -92,11 +91,11 @@ namespace osmium {
             }; // class InputFormat
 
             /**
-             * This factory class is used to create objects that read OSM data
-             * written in a specified format.
+             * This factory class is used to create objects that decode OSM
+             * data written in a specified format.
              *
-             * Do not use this class directly. Instead use the osmium::io::Reader
-             * class.
+             * Do not use this class directly. Use the osmium::io::Reader
+             * class instead.
              */
             class InputFormatFactory {
 
@@ -104,7 +103,6 @@ namespace osmium {
 
                 typedef std::function<
                             osmium::io::detail::InputFormat*(
-                                const osmium::io::File&,
                                 osmium::osm_entity_bits::type read_which_entities,
                                 osmium::thread::Queue<std::string>&
                             )

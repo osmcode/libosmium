@@ -75,8 +75,6 @@ namespace osmium {
 
     namespace io {
 
-        class File;
-
         namespace detail {
 
             class PBFParser {
@@ -260,23 +258,24 @@ namespace osmium {
                 /**
                  * Instantiate PBF Parser
                  *
-                 * @param file osmium::io::File instance describing file to be read from.
-                 * @param read_which_entities Which types of OSM entities (nodes, ways, relations, changesets) should be parsed?
+                 * @param read_which_entities Which types of OSM entities
+                 *        (nodes, ways, relations, changesets) should be
+                 *        parsed?
                  * @param input_queue String queue where data is read from.
                  */
-                PBFInputFormat(const osmium::io::File& file, osmium::osm_entity_bits::type read_which_entities, osmium::thread::Queue<std::string>& input_queue) :
-                    osmium::io::detail::InputFormat(file, read_which_entities),
+                PBFInputFormat(osmium::osm_entity_bits::type read_which_entities, osmium::thread::Queue<std::string>& input_queue) :
+                    osmium::io::detail::InputFormat(),
                     m_queue(max_queue_size, "pbf_parser_results"),
                     m_header_promise(),
                     m_parser_future(std::async(std::launch::async, PBFParser(input_queue, m_queue, m_header_promise, read_which_entities, osmium::config::use_pool_threads_for_pbf_parsing()))) {
-
                 }
 
-                ~PBFInputFormat() {
+                ~PBFInputFormat() noexcept {
                     try {
                         close();
                     } catch (...) {
-                        // ignore any exceptions at this point because destructor should not throw
+                        // Ignore any exceptions at this point, because
+                        // a destructor should not throw.
                     }
                 }
 
@@ -290,7 +289,7 @@ namespace osmium {
                  * file. Blocks if data is not available yet.
                  * Returns an empty buffer at end of input.
                  */
-                osmium::memory::Buffer read() override {
+                osmium::memory::Buffer read() override final {
                     std::future<osmium::memory::Buffer> buffer_future;
                     m_queue.wait_and_pop(buffer_future);
 
@@ -298,7 +297,7 @@ namespace osmium {
                     return buffer_future.get();
                 }
 
-                void close() override {
+                void close() override final {
                     std::future<osmium::memory::Buffer> buffer_future;
                     while (m_queue.try_pop(buffer_future)); // drain queue
                     osmium::thread::wait_until_done(m_parser_future);
@@ -313,8 +312,8 @@ namespace osmium {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-variable"
                 const bool registered_pbf_input = osmium::io::detail::InputFormatFactory::instance().register_input_format(osmium::io::file_format::pbf,
-                    [](const osmium::io::File& file, osmium::osm_entity_bits::type read_which_entities, osmium::thread::Queue<std::string>& input_queue) {
-                        return new osmium::io::detail::PBFInputFormat(file, read_which_entities, input_queue);
+                    [](osmium::osm_entity_bits::type read_which_entities, osmium::thread::Queue<std::string>& input_queue) {
+                        return new osmium::io::detail::PBFInputFormat(read_which_entities, input_queue);
                 });
 #pragma GCC diagnostic pop
 

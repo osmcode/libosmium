@@ -191,7 +191,7 @@ namespace osmium {
                     osmium::io::CompressionFactory::instance().create_decompressor(file.compression(), open_input_file_or_url(m_file.filename(), &m_childpid))),
                 m_read_done(false),
                 m_read_future(std::async(std::launch::async, detail::ReadThread(m_input_queue, m_decompressor.get(), m_read_done))),
-                m_input((*m_input_format_creator)(m_file, m_read_which_entities, m_input_queue)) {
+                m_input((*m_input_format_creator)(m_read_which_entities, m_input_queue)) {
             }
 
             explicit Reader(const std::string& filename, osmium::osm_entity_bits::type read_types = osmium::osm_entity_bits::all) :
@@ -251,6 +251,9 @@ namespace osmium {
 
             /**
              * Get the header data from the file.
+             *
+             * @returns Header.
+             * @throws Some form of std::runtime_error if there is an error.
              */
             osmium::io::Header header() const {
                 return m_input->header();
