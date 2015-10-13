@@ -732,8 +732,6 @@ namespace osmium {
 
             class XMLInputFormat : public osmium::io::detail::InputFormat {
 
-                static constexpr size_t max_queue_size = 100;
-
                 osmium::thread::Queue<osmium::memory::Buffer> m_queue;
                 std::promise<osmium::io::Header> m_header_promise;
                 std::future<bool> m_parser_future;

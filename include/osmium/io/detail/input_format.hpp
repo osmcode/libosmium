@@ -67,6 +67,8 @@ namespace osmium {
 
             protected:
 
+                static constexpr size_t max_queue_size = 20; // XXX
+
                 osmium::io::File m_file;
                 osmium::osm_entity_bits::type m_read_which_entities;
                 osmium::io::Header m_header;
