@@ -75,11 +75,11 @@ header_buffer_type parse_xml(std::string input) {
     osmium::thread::Queue<std::string> input_queue;
     osmium::thread::Queue<osmium::memory::Buffer> output_queue;
     std::promise<osmium::io::Header> header_promise;
-    std::atomic<bool> done {false};
+
     input_queue.push(input);
     input_queue.push(std::string()); // EOF marker
 
-    osmium::io::detail::XMLParser parser(input_queue, output_queue, header_promise, osmium::osm_entity_bits::all, done);
+    osmium::io::detail::XMLParser parser(input_queue, output_queue, header_promise, osmium::osm_entity_bits::all);
     parser();
 
     header_buffer_type result;
