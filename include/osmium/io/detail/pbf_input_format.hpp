@@ -204,12 +204,13 @@ namespace osmium {
                     while (const auto size = check_type_and_get_blob_size("OSMData")) {
                         std::string input_buffer = read_from_input_queue_with_check(size);
 
+                        PBFDataBlobDecoder data_blob_parser{ std::move(input_buffer), m_read_types };
+
                         if (m_use_thread_pool) {
-                            m_queue.push(osmium::thread::Pool::instance().submit(PBFDataBlobDecoder{ std::move(input_buffer), m_read_types }));
+                            m_queue.push(osmium::thread::Pool::instance().submit(std::move(data_blob_parser)));
                         } else {
                             std::promise<osmium::memory::Buffer> promise;
                             m_queue.push(promise.get_future());
-                            PBFDataBlobDecoder data_blob_parser{ std::move(input_buffer), m_read_types };
                             promise.set_value(data_blob_parser());
                         }
                     }
