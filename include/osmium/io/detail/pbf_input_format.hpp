@@ -79,10 +79,8 @@ namespace osmium {
 
             class PBFParser {
 
-                using output_queue_type = osmium::thread::Queue<std::future<osmium::memory::Buffer>>;
-
                 osmium::thread::Queue<std::string>& m_input_queue;
-                output_queue_type& m_output_queue;
+                osmdata_queue_type& m_output_queue;
                 std::promise<osmium::io::Header>& m_header_promise;
                 osmium::osm_entity_bits::type m_read_types;
                 bool m_use_thread_pool;
@@ -218,16 +216,10 @@ namespace osmium {
                     }
                 }
 
-                void send_end_of_file() {
-                    std::promise<osmium::memory::Buffer> promise;
-                    m_output_queue.push(promise.get_future());
-                    promise.set_value(osmium::memory::Buffer{});
-                }
-
             public:
 
-                PBFParser(osmium::thread::Queue<std::string>& input_queue,
-                          output_queue_type& output_queue,
+                PBFParser(string_queue_type& input_queue,
+                          osmdata_queue_type& output_queue,
                           std::promise<osmium::io::Header>& header_promise,
                           osmium::osm_entity_bits::type read_types,
                           bool use_thread_pool) :
@@ -270,22 +262,11 @@ namespace osmium {
                         if (m_read_types != osmium::osm_entity_bits::nothing) {
                             parse_data_blobs();
                         }
-                        send_end_of_file();
+                        send_end_of_file(m_output_queue);
                     } catch (...) {
-                        std::promise<osmium::memory::Buffer> promise;
-                        m_output_queue.push(promise.get_future());
-                        promise.set_exception(std::current_exception()); // set_exception_at_thread_exit() ?
-
-                        send_end_of_file();
-
-                        // keep reading from input to drain input queue
-                        try {
-                            while (true) {
-                                read_from_input_queue(1024 * 1024);
-                            }
-                        } catch (pbf_error&) {
-                            // done
-                        }
+                        send_exception(m_output_queue);
+                        send_end_of_file(m_output_queue);
+                        drain_queue(m_input_queue);
                     }
 
                     return true;
@@ -308,7 +289,7 @@ namespace osmium {
                  *        parsed?
                  * @param input_queue String queue where data is read from.
                  */
-                PBFInputFormat(osmium::osm_entity_bits::type read_which_entities, osmium::thread::Queue<std::string>& input_queue) :
+                PBFInputFormat(osmium::osm_entity_bits::type read_which_entities, string_queue_type& input_queue) :
                     osmium::io::detail::InputFormat("pbf_parser_results") {
                     m_thread = std::thread(&PBFParser::operator(), PBFParser{input_queue, m_output_queue, m_header_promise, read_which_entities, osmium::config::use_pool_threads_for_pbf_parsing()});
                 }
@@ -330,7 +311,7 @@ namespace osmium {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-variable"
                 const bool registered_pbf_input = osmium::io::detail::InputFormatFactory::instance().register_input_format(osmium::io::file_format::pbf,
-                    [](osmium::osm_entity_bits::type read_which_entities, osmium::thread::Queue<std::string>& input_queue) {
+                    [](osmium::osm_entity_bits::type read_which_entities, string_queue_type& input_queue) {
                         return new osmium::io::detail::PBFInputFormat(read_which_entities, input_queue);
                 });
 #pragma GCC diagnostic pop

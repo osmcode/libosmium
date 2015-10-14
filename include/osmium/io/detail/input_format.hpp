@@ -55,6 +55,9 @@ namespace osmium {
 
         namespace detail {
 
+            using osmdata_queue_type = osmium::thread::Queue<std::future<osmium::memory::Buffer>>;
+            using string_queue_type = osmium::thread::Queue<std::string>;
+
             /**
              * Virtual base class for all classes decoding OSM files in
              * different formats.
@@ -68,7 +71,7 @@ namespace osmium {
 
                 static constexpr size_t max_queue_size = 20; // XXX
 
-                osmium::thread::Queue<std::future<osmium::memory::Buffer>> m_output_queue;
+                osmdata_queue_type m_output_queue;
                 std::promise<osmium::io::Header> m_header_promise;
                 std::thread m_thread;
 
@@ -131,7 +134,7 @@ namespace osmium {
                 typedef std::function<
                             osmium::io::detail::InputFormat*(
                                 osmium::osm_entity_bits::type read_which_entities,
-                                osmium::thread::Queue<std::string>&
+                                string_queue_type&
                             )
                         > create_input_type;
 
@@ -173,6 +176,25 @@ namespace osmium {
                 }
 
             }; // class InputFormatFactory
+
+            inline void send_end_of_file(osmdata_queue_type& queue) {
+                std::promise<osmium::memory::Buffer> promise;
+                queue.push(promise.get_future());
+                promise.set_value(osmium::memory::Buffer{});
+            }
+
+            inline void send_exception(osmdata_queue_type& queue) {
+                std::promise<osmium::memory::Buffer> promise;
+                queue.push(promise.get_future());
+                promise.set_exception(std::current_exception());
+            }
+
+            inline void drain_queue(string_queue_type& queue) {
+                std::string s;
+                do {
+                    queue.wait_and_pop(s);
+                } while (!s.empty());
+            }
 
         } // namespace detail
 

@@ -185,10 +185,8 @@ namespace osmium {
                 std::unique_ptr<osmium::builder::WayNodeListBuilder>         m_wnl_builder;
                 std::unique_ptr<osmium::builder::RelationMemberListBuilder>  m_rml_builder;
 
-                using output_queue_type = osmium::thread::Queue<std::future<osmium::memory::Buffer>>;
-
-                osmium::thread::Queue<std::string>& m_input_queue;
-                output_queue_type& m_output_queue;
+                string_queue_type& m_input_queue;
+                osmdata_queue_type& m_output_queue;
                 std::promise<osmium::io::Header>& m_header_promise;
 
                 osmium::osm_entity_bits::type m_read_types;
@@ -640,8 +638,8 @@ namespace osmium {
 
             public:
 
-                XMLParser(osmium::thread::Queue<std::string>& input_queue,
-                          output_queue_type& output_queue,
+                XMLParser(string_queue_type& input_queue,
+                          osmdata_queue_type& output_queue,
                           std::promise<osmium::io::Header>& header_promise,
                           osmium::osm_entity_bits::type read_types) :
                     m_context(context::root),
@@ -727,13 +725,11 @@ namespace osmium {
                             promise.set_value(std::move(m_buffer));
                         }
 
-                        std::promise<osmium::memory::Buffer> promise;
-                        m_output_queue.push(promise.get_future());
-                        promise.set_value(osmium::memory::Buffer());
+                        send_end_of_file(m_output_queue);
                     } catch (...) {
-                        std::promise<osmium::memory::Buffer> promise;
-                        m_output_queue.push(promise.get_future());
-                        promise.set_exception(std::current_exception());
+                        send_exception(m_output_queue);
+                        send_end_of_file(m_output_queue);
+                        drain_queue(m_input_queue);
                     }
 
                     return true;
@@ -756,7 +752,7 @@ namespace osmium {
                  *        parsed?
                  * @param input_queue String queue where data is read from.
                  */
-                XMLInputFormat(osmium::osm_entity_bits::type read_which_entities, osmium::thread::Queue<std::string>& input_queue) :
+                XMLInputFormat(osmium::osm_entity_bits::type read_which_entities, string_queue_type& input_queue) :
                     osmium::io::detail::InputFormat("xml_parser_results") {
                     m_thread = std::thread(&XMLParser::operator(), XMLParser{input_queue, m_output_queue, m_header_promise, read_which_entities});
                 }
@@ -778,7 +774,7 @@ namespace osmium {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-variable"
                 const bool registered_xml_input = osmium::io::detail::InputFormatFactory::instance().register_input_format(osmium::io::file_format::xml,
-                    [](osmium::osm_entity_bits::type read_which_entities, osmium::thread::Queue<std::string>& input_queue) {
+                    [](osmium::osm_entity_bits::type read_which_entities, string_queue_type& input_queue) {
                         return new osmium::io::detail::XMLInputFormat(read_which_entities, input_queue);
                 });
 #pragma GCC diagnostic pop
