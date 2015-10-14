@@ -84,6 +84,7 @@ namespace osmium {
                 std::promise<osmium::io::Header>& m_header_promise;
                 osmium::osm_entity_bits::type m_read_types;
                 bool m_use_thread_pool;
+                bool m_input_queue_done = false;
 
                 std::string m_input_buffer;
 
@@ -99,6 +100,7 @@ namespace osmium {
                         std::string new_data;
                         m_input_queue.wait_and_pop(new_data);
                         if (new_data.empty()) {
+                            m_input_queue_done = true;
                             throw osmium::pbf_error("truncated data (EOF encountered)");
                         }
                         m_input_buffer += new_data;
@@ -266,7 +268,9 @@ namespace osmium {
                     } catch (...) {
                         send_exception(m_output_queue);
                         send_end_of_file(m_output_queue);
-                        drain_queue(m_input_queue);
+                        if (!m_input_queue_done) {
+                            drain_queue(m_input_queue);
+                        }
                     }
                 }
 

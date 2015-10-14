@@ -192,6 +192,7 @@ namespace osmium {
                 osmium::osm_entity_bits::type m_read_types;
 
                 bool m_header_is_done;
+                bool m_input_queue_done = false;
 
                 std::string m_comment_text;
 
@@ -704,17 +705,17 @@ namespace osmium {
                         ExpatXMLParser<XMLParser> parser(this);
                         osmium::thread::promise_keeper<osmium::io::Header> promise_keeper(m_header, m_header_promise);
 
-                        bool last = false;
-                        while (!last) {
+                        while (!m_input_queue_done) {
                             std::string data;
                             m_input_queue.wait_and_pop(data);
-                            last = data.empty();
+                            m_input_queue_done = data.empty();
                             try {
-                                parser(data, last);
+                                parser(data, m_input_queue_done);
                                 if (m_header_is_done) {
                                     promise_keeper.fullfill_promise();
                                 }
                             } catch (ParserIsDone&) {
+                                send_end_of_file(m_output_queue);
                                 return;
                             }
                         }
@@ -729,7 +730,9 @@ namespace osmium {
                     } catch (...) {
                         send_exception(m_output_queue);
                         send_end_of_file(m_output_queue);
-                        drain_queue(m_input_queue);
+                        if (!m_input_queue_done) {
+                            drain_queue(m_input_queue);
+                        }
                     }
                 }
 
