@@ -697,7 +697,7 @@ namespace osmium {
 
                 ~XMLParser() = default;
 
-                bool operator()() {
+                void operator()() {
                     osmium::thread::set_thread_name("_osmium_xml_in");
 
                     try {
@@ -715,7 +715,7 @@ namespace osmium {
                                     promise_keeper.fullfill_promise();
                                 }
                             } catch (ParserIsDone&) {
-                                return true;
+                                return;
                             }
                         }
 
@@ -731,8 +731,6 @@ namespace osmium {
                         send_end_of_file(m_output_queue);
                         drain_queue(m_input_queue);
                     }
-
-                    return true;
                 }
 
             }; // class XMLParser
