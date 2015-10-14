@@ -275,6 +275,17 @@ namespace osmium {
                         std::promise<osmium::memory::Buffer> promise;
                         m_output_queue.push(promise.get_future());
                         promise.set_exception(std::current_exception()); // set_exception_at_thread_exit() ?
+
+                        send_end_of_file();
+
+                        // keep reading from input to drain input queue
+                        try {
+                            while (true) {
+                                read_from_input_queue(1024 * 1024);
+                            }
+                        } catch (pbf_error&) {
+                            // done
+                        }
                     }
 
                     return true;
@@ -287,8 +298,6 @@ namespace osmium {
              */
             class PBFInputFormat : public osmium::io::detail::InputFormat {
 
-                std::future<bool> m_parser_thread;
-
             public:
 
                 /**
@@ -300,8 +309,8 @@ namespace osmium {
                  * @param input_queue String queue where data is read from.
                  */
                 PBFInputFormat(osmium::osm_entity_bits::type read_which_entities, osmium::thread::Queue<std::string>& input_queue) :
-                    osmium::io::detail::InputFormat("pbf_parser_results"),
-                    m_parser_thread(std::async(std::launch::async, PBFParser(input_queue, m_output_queue, m_header_promise, read_which_entities, osmium::config::use_pool_threads_for_pbf_parsing()))) {
+                    osmium::io::detail::InputFormat("pbf_parser_results") {
+                    m_thread = std::thread(&PBFParser::operator(), PBFParser{input_queue, m_output_queue, m_header_promise, read_which_entities, osmium::config::use_pool_threads_for_pbf_parsing()});
                 }
 
                 PBFInputFormat(const PBFInputFormat&) = delete;
@@ -310,18 +319,7 @@ namespace osmium {
                 PBFInputFormat(PBFInputFormat&&) = delete;
                 PBFInputFormat& operator=(PBFInputFormat&&) = delete;
 
-                ~PBFInputFormat() noexcept {
-                    try {
-                        close();
-                    } catch (...) {
-                        // Ignore any exceptions at this point, because
-                        // a destructor should not throw.
-                    }
-                }
-
-                void close() override final {
-                    osmium::thread::wait_until_done(m_parser_thread);
-                }
+                virtual ~PBFInputFormat() = default;
 
             }; // class PBFInputFormat
 

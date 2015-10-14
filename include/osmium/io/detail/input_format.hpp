@@ -39,6 +39,7 @@ DEALINGS IN THE SOFTWARE.
 #include <memory>
 #include <stdexcept>
 #include <string>
+#include <thread>
 #include <utility>
 
 #include <osmium/io/file.hpp>
@@ -49,10 +50,6 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/thread/queue.hpp>
 
 namespace osmium {
-
-    namespace thread {
-        template <typename T> class Queue;
-    } // namespace thread
 
     namespace io {
 
@@ -73,6 +70,7 @@ namespace osmium {
 
                 osmium::thread::Queue<std::future<osmium::memory::Buffer>> m_output_queue;
                 std::promise<osmium::io::Header> m_header_promise;
+                std::thread m_thread;
 
                 InputFormat(const char* queue_name) :
                     m_output_queue(max_queue_size, queue_name),
@@ -88,6 +86,12 @@ namespace osmium {
             public:
 
                 virtual ~InputFormat() {
+                    try {
+                        close();
+                    } catch (...) {
+                        // Ignore any exceptions at this point, because
+                        // a destructor should not throw.
+                    }
                 }
 
                 osmium::io::Header header() {
@@ -105,7 +109,11 @@ namespace osmium {
                     return buffer_future.get();
                 }
 
-                virtual void close() = 0;
+                void close() {
+                    if (m_thread.joinable()) {
+                        m_thread.join();
+                    }
+                }
 
             }; // class InputFormat
 

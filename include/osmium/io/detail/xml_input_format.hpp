@@ -746,8 +746,6 @@ namespace osmium {
              */
             class XMLInputFormat : public osmium::io::detail::InputFormat {
 
-                std::future<bool> m_parser_thread;
-
             public:
 
                 /**
@@ -759,8 +757,8 @@ namespace osmium {
                  * @param input_queue String queue where data is read from.
                  */
                 XMLInputFormat(osmium::osm_entity_bits::type read_which_entities, osmium::thread::Queue<std::string>& input_queue) :
-                    osmium::io::detail::InputFormat("xml_parser_results"),
-                    m_parser_thread(std::async(std::launch::async, XMLParser(input_queue, m_output_queue, m_header_promise, read_which_entities))) {
+                    osmium::io::detail::InputFormat("xml_parser_results") {
+                    m_thread = std::thread(&XMLParser::operator(), XMLParser{input_queue, m_output_queue, m_header_promise, read_which_entities});
                 }
 
                 XMLInputFormat(const XMLInputFormat&) = delete;
@@ -769,18 +767,7 @@ namespace osmium {
                 XMLInputFormat(XMLInputFormat&&) = delete;
                 XMLInputFormat& operator=(XMLInputFormat&&) = delete;
 
-                ~XMLInputFormat() noexcept {
-                    try {
-                        close();
-                    } catch (...) {
-                        // Ignore any exceptions at this point, because
-                        // a destructor should not throw.
-                    }
-                }
-
-                void close() override final {
-                    osmium::thread::wait_until_done(m_parser_thread);
-                }
+                virtual ~XMLInputFormat() = default;
 
             }; // class XMLInputFormat
 
