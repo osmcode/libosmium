@@ -143,7 +143,7 @@ namespace osmium {
 
             class XMLParser {
 
-                static constexpr int buffer_size = 10 * 1000 * 1000;
+                static constexpr int buffer_size = 2 * 1000 * 1000;
 
                 enum class context {
                     root,
@@ -627,7 +627,7 @@ namespace osmium {
                 }
 
                 void flush_buffer() {
-                    if (m_buffer.capacity() - m_buffer.committed() < 1000 * 1000) {
+                    if (m_buffer.committed() > buffer_size / 10 * 9) {
                         std::promise<osmium::memory::Buffer> promise;
                         m_output_queue.push(promise.get_future());
                         promise.set_value(std::move(m_buffer));
