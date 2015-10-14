@@ -97,6 +97,7 @@ namespace osmium {
 
             std::atomic<bool> m_read_done;
             std::future<bool> m_read_thread;
+            bool m_osmdata_queue_done = false;
 
             std::unique_ptr<osmium::io::detail::InputFormat> m_input_format;
 
@@ -170,14 +171,15 @@ namespace osmium {
                 }
             }
 
-            void shutdown() {
-                m_read_done = true;
-                try {
-                    m_input_format->close();
-                    osmium::thread::wait_until_done(m_read_thread);
-                } catch (...) {
-                    // Ignore any exceptions.
-                }
+            void drain_osmdata_queue() {
+                osmium::memory::Buffer buffer;
+                do {
+                    try {
+                        buffer = std::move(m_input_format->read());
+                    } catch (...) {
+                        // ignore errors
+                    }
+                } while (buffer);
             }
 
         public:
@@ -220,23 +222,33 @@ namespace osmium {
             ~Reader() {
                 try {
                     close();
-                }
-                catch (...) {
+                } catch (...) {
+                    // Ignore any exceptions because destructor must not throw
                 }
             }
 
             /**
              * Close down the Reader. A call to this is optional, because the
              * destructor of Reader will also call this. But if you don't call
-             * this function first, the destructor might throw an exception
-             * which is not good.
+             * this function first, you might miss an exception, because the
+             * destructor is not allowed to throw.
              *
              * @throws Some form of std::runtime_error when there is a problem.
              */
             void close() {
-                if (m_status == status::reading) {
-                    m_status = status::closed;
-                    shutdown();
+                m_read_done = true;
+
+                if (!m_osmdata_queue_done) {
+                    drain_osmdata_queue();
+                    m_osmdata_queue_done = true;
+                }
+
+                m_input_format->close();
+
+                try {
+                    osmium::thread::wait_until_done(m_read_thread);
+                } catch (...) {
+                    // Ignore any exceptions.
                 }
 
 #ifndef _WIN32
@@ -265,7 +277,7 @@ namespace osmium {
                     return m_input_format->header();
                 } catch (...) {
                     m_status = status::exception;
-                    shutdown();
+                    close();
                     throw;
                 }
             }
@@ -302,9 +314,11 @@ namespace osmium {
                     while (true) {
                         buffer = std::move(m_input_format->read());
                         if (!buffer) {
+                            m_read_done = true;
                             m_status = status::eof;
-                            osmium::thread::wait_until_done(m_read_thread);
+                            m_osmdata_queue_done = true;
                             m_input_format->close();
+                            osmium::thread::wait_until_done(m_read_thread);
                             return buffer;
                         }
                         if (buffer.committed() > 0) {
@@ -313,7 +327,7 @@ namespace osmium {
                     }
                 } catch (...) {
                     m_status = status::exception;
-                    shutdown();
+                    close();
                     throw;
                 }
             }
