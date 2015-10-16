@@ -185,10 +185,17 @@ namespace osmium {
 
             }; // class InputFormatFactory
 
-            inline void send_end_of_file(osmdata_queue_type& queue) {
+            /**
+             * Wrap the buffer into a future and add it to the given queue.
+             */
+            inline void send_to_queue(osmdata_queue_type& queue, osmium::memory::Buffer&& buffer) {
                 std::promise<osmium::memory::Buffer> promise;
                 queue.push(promise.get_future());
-                promise.set_value(osmium::memory::Buffer{});
+                promise.set_value(std::move(buffer));
+            }
+
+            inline void send_end_of_file(osmdata_queue_type& queue) {
+                send_to_queue(queue, osmium::memory::Buffer{});
             }
 
             inline void send_exception(osmdata_queue_type& queue) {
@@ -197,6 +204,9 @@ namespace osmium {
                 promise.set_exception(std::current_exception());
             }
 
+            /**
+             * Drain the given queue, ie pop and discard all values.
+             */
             inline void drain_queue(string_queue_type& queue) {
                 std::string s;
                 do {

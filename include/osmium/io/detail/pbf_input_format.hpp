@@ -211,9 +211,7 @@ namespace osmium {
                         if (m_use_thread_pool) {
                             m_output_queue.push(osmium::thread::Pool::instance().submit(std::move(data_blob_parser)));
                         } else {
-                            std::promise<osmium::memory::Buffer> promise;
-                            m_output_queue.push(promise.get_future());
-                            promise.set_value(data_blob_parser());
+                            send_to_queue(m_output_queue, data_blob_parser());
                         }
                     }
                 }

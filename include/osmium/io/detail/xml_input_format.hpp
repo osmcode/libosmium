@@ -628,9 +628,7 @@ namespace osmium {
 
                 void flush_buffer() {
                     if (m_buffer.committed() > buffer_size / 10 * 9) {
-                        std::promise<osmium::memory::Buffer> promise;
-                        m_output_queue.push(promise.get_future());
-                        promise.set_value(std::move(m_buffer));
+                        send_to_queue(m_output_queue, std::move(m_buffer));
                         osmium::memory::Buffer buffer(buffer_size);
                         using std::swap;
                         swap(m_buffer, buffer);
@@ -721,9 +719,7 @@ namespace osmium {
                         }
 
                         if (m_buffer.committed() > 0) {
-                            std::promise<osmium::memory::Buffer> promise;
-                            m_output_queue.push(promise.get_future());
-                            promise.set_value(std::move(m_buffer));
+                            send_to_queue(m_output_queue, std::move(m_buffer));
                         }
 
                         send_end_of_file(m_output_queue);
