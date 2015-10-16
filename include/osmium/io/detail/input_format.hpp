@@ -74,10 +74,15 @@ namespace osmium {
                 osmdata_queue_type m_output_queue;
                 std::promise<osmium::io::Header> m_header_promise;
                 std::thread m_thread;
+                osmium::io::Header m_header;
+                bool m_header_is_initialized;
 
                 InputFormat(const char* queue_name) :
                     m_output_queue(max_queue_size, queue_name),
-                    m_header_promise() {
+                    m_header_promise(),
+                    m_thread(),
+                    m_header(),
+                    m_header_is_initialized(false) {
                 }
 
                 InputFormat(const InputFormat&) = delete;
@@ -98,7 +103,10 @@ namespace osmium {
                 }
 
                 osmium::io::Header header() {
-                    return m_header_promise.get_future().get();
+                    if (!m_header_is_initialized) {
+                        m_header = m_header_promise.get_future().get();
+                    }
+                    return m_header;
                 }
 
                 /**
