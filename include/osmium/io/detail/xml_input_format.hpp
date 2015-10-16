@@ -39,7 +39,6 @@ DEALINGS IN THE SOFTWARE.
 #include <cstdlib>
 #include <cstring>
 #include <exception>
-#include <future>
 #include <iostream>
 #include <memory>
 #include <ratio>
