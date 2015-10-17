@@ -155,5 +155,7 @@ before_script:
 
 script:
   - make --jobs=1 VERBOSE=1
+
+after_script:
   - ctest --output-on-failure
 
