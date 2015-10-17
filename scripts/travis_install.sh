@@ -3,6 +3,8 @@
 #  travis_install.sh
 #
 
+set -e
+
 if [ "$TRAVIS_OS_NAME" = "osx" ]; then
 
     brew install google-sparsehash || true
