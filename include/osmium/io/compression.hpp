@@ -201,8 +201,11 @@ namespace osmium {
 
             void close() override final {
                 if (m_fd >= 0) {
-                    ::close(m_fd);
+                    int fd = m_fd;
                     m_fd = -1;
+                    if (::close(fd) != 0) {
+                        throw std::system_error(errno, std::system_category(), "Close failed");
+                    }
                 }
             }
 
@@ -257,8 +260,11 @@ namespace osmium {
 
             void close() override final {
                 if (m_fd >= 0) {
-                    ::close(m_fd);
+                    int fd = m_fd;
                     m_fd = -1;
+                    if (::close(fd) != 0) {
+                        throw std::system_error(errno, std::system_category(), "Close failed");
+                    }
                 }
             }
 
