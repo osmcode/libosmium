@@ -27,15 +27,7 @@ namespace protozero {
  */
 template <int N>
 inline void byteswap(const char* /*data*/, char* /*result*/) {
-    static_assert(N == 1, "Can only swap 1, 4, or 8 byte values");
-}
-
-/**
- * Swap 1 byte value between endianness formats. (Basically just a copy).
- */
-template <>
-inline void byteswap<1>(const char* data, char* result) {
-    result[0] = data[0];
+    static_assert(N == 1, "Can only swap 4 or 8 byte values");
 }
 
 /**
