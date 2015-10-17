@@ -14,7 +14,7 @@ matrix:
     # 1/ Linux Clang Builds
     - os: linux
       compiler: clang
-      addons: &clang35
+      addons:
         apt:
           sources: ['llvm-toolchain-precise-3.5', 'ubuntu-toolchain-r-test', 'boost-latest']
           packages: ['clang-3.5', 'libboost1.55-all-dev', 'libgdal-dev', 'libgeos++-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin']
@@ -22,13 +22,16 @@ matrix:
 
     - os: linux
       compiler: clang
-      addons: *clang35
+      addons:
+        apt:
+          sources: ['llvm-toolchain-precise-3.5', 'ubuntu-toolchain-r-test', 'boost-latest']
+          packages: ['clang-3.5', 'libboost1.55-all-dev', 'libgdal-dev', 'libgeos++-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin']
       env: COMPILER='clang++-3.5' BUILD_TYPE='Dev'
 
 
     - os: linux
       compiler: clang
-      addons: &clang36
+      addons:
         apt:
           sources: ['llvm-toolchain-precise-3.6', 'ubuntu-toolchain-r-test', 'boost-latest']
           packages: ['clang-3.6', 'libboost1.55-all-dev', 'libgdal-dev', 'libgeos++-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin']
@@ -36,13 +39,16 @@ matrix:
 
     - os: linux
       compiler: clang
-      addons: *clang36
+      addons:
+        apt:
+          sources: ['llvm-toolchain-precise-3.6', 'ubuntu-toolchain-r-test', 'boost-latest']
+          packages: ['clang-3.6', 'libboost1.55-all-dev', 'libgdal-dev', 'libgeos++-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin']
       env: COMPILER='clang++-3.6' BUILD_TYPE='Dev'
 
 
     - os: linux
       compiler: clang
-      addons: &clang37
+      addons:
         apt:
           sources: ['llvm-toolchain-precise-3.7', 'ubuntu-toolchain-r-test', 'boost-latest']
           packages: ['clang-3.7', 'libboost1.55-all-dev', 'libgdal-dev', 'libgeos++-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin']
@@ -50,14 +56,17 @@ matrix:
 
     - os: linux
       compiler: clang
-      addons: *clang37
+      addons:
+        apt:
+          sources: ['llvm-toolchain-precise-3.7', 'ubuntu-toolchain-r-test', 'boost-latest']
+          packages: ['clang-3.7', 'libboost1.55-all-dev', 'libgdal-dev', 'libgeos++-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin']
       env: COMPILER='clang++-3.7' BUILD_TYPE='Dev'
 
 
     # 2/ Linux GCC Builds
     - os: linux
       compiler: gcc
-      addons: &gcc48
+      addons:
         apt:
           sources: ['ubuntu-toolchain-r-test', 'boost-latest']
           packages: ['g++-4.8', 'libboost1.55-all-dev', 'libgdal-dev', 'libgeos++-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin']
@@ -65,13 +74,16 @@ matrix:
 
     - os: linux
       compiler: gcc
-      addons: *gcc48
+      addons:
+        apt:
+          sources: ['ubuntu-toolchain-r-test', 'boost-latest']
+          packages: ['g++-4.8', 'libboost1.55-all-dev', 'libgdal-dev', 'libgeos++-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin']
       env: COMPILER='g++-4.8' COMPILER_FLAGS='-Wno-return-type' BUILD_TYPE='Dev'
 
 
     - os: linux
       compiler: gcc
-      addons: &gcc49
+      addons:
         apt:
           sources: ['ubuntu-toolchain-r-test', 'boost-latest']
           packages: ['g++-4.9', 'libboost1.55-all-dev', 'libgdal-dev', 'libgeos++-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin']
@@ -79,13 +91,16 @@ matrix:
 
     - os: linux
       compiler: gcc
-      addons: *gcc49
+      addons:
+        apt:
+          sources: ['ubuntu-toolchain-r-test', 'boost-latest']
+          packages: ['g++-4.9', 'libboost1.55-all-dev', 'libgdal-dev', 'libgeos++-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin']
       env: COMPILER='g++-4.9' BUILD_TYPE='Dev'
 
 
     - os: linux
       compiler: gcc
-      addons: &gcc5
+      addons:
         apt:
           sources: ['ubuntu-toolchain-r-test', 'boost-latest']
           packages: ['g++-5', 'libboost1.55-all-dev', 'libgdal-dev', 'libgeos++-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin']
@@ -93,7 +108,10 @@ matrix:
 
     - os: linux
       compiler: gcc
-      addons: *gcc5
+      addons:
+        apt:
+          sources: ['ubuntu-toolchain-r-test', 'boost-latest']
+          packages: ['g++-5', 'libboost1.55-all-dev', 'libgdal-dev', 'libgeos++-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin']
       env: COMPILER='g++-5' BUILD_TYPE='Dev'
 
 
