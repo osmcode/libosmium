@@ -155,9 +155,9 @@ before_script:
 
 script:
   - |
-    echo "travis_fold:start:make\nRunning make..."
+    echo -en "travis_fold:start:make\nRunning make...\r"
     make VERBOSE=1
-    echo "travis_fold:end:make"
+    echo -en "travis_fold:end:make\r"
 
 after_script:
   - ctest --output-on-failure
