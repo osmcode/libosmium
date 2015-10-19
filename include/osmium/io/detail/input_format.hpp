@@ -48,6 +48,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/memory/buffer.hpp>
 #include <osmium/osm/entity_bits.hpp>
 #include <osmium/thread/queue.hpp>
+#include <osmium/thread/util.hpp>
 
 namespace osmium {
 
@@ -57,6 +58,93 @@ namespace osmium {
 
             using osmdata_queue_type = osmium::thread::Queue<std::future<osmium::memory::Buffer>>;
             using string_queue_type = osmium::thread::Queue<std::string>;
+
+            class Parser {
+
+            protected:
+
+                string_queue_type& m_input_queue;
+                osmdata_queue_type& m_output_queue;
+                std::promise<osmium::io::Header>& m_header_promise;
+                osmium::osm_entity_bits::type m_read_types;
+                bool m_header_is_done;
+                bool m_input_queue_done;
+
+            private:
+
+                /**
+                 * Drain the given queue, ie pop and discard all values
+                 * until an empty string (marking the end of file) is read.
+                 */
+                inline void drain_queue() {
+                    std::string s;
+                    do {
+                        m_input_queue.wait_and_pop(s);
+                    } while (!s.empty());
+                }
+
+                void send_exception(std::exception_ptr exception) {
+                    std::promise<osmium::memory::Buffer> promise;
+                    m_output_queue.push(promise.get_future());
+                    promise.set_exception(exception);
+                }
+
+            protected:
+
+                /**
+                * Wrap the buffer into a future and add it to the output queue.
+                */
+                void send_to_output_queue(osmium::memory::Buffer&& buffer) {
+                    std::promise<osmium::memory::Buffer> promise;
+                    m_output_queue.push(promise.get_future());
+                    promise.set_value(std::move(buffer));
+                }
+
+            public:
+
+                Parser(string_queue_type& input_queue,
+                       osmdata_queue_type& output_queue,
+                       std::promise<osmium::io::Header>& header_promise,
+                       osmium::osm_entity_bits::type read_types) :
+                    m_input_queue(input_queue),
+                    m_output_queue(output_queue),
+                    m_header_promise(header_promise),
+                    m_read_types(read_types),
+                    m_header_is_done(false),
+                    m_input_queue_done(false) {
+                }
+
+                Parser(const Parser&) = default;
+                Parser& operator=(const Parser&) = default;
+
+                Parser(Parser&&) = default;
+                Parser& operator=(Parser&&) = default;
+
+                virtual ~Parser() = default;
+
+                virtual void run() = 0;
+
+                void operator()() {
+                    try {
+                        run();
+                    } catch (...) {
+                        std::exception_ptr exception = std::current_exception();
+                        if (!m_header_is_done) {
+                            m_header_is_done = true;
+                            m_header_promise.set_exception(exception);
+                        }
+                        send_exception(exception);
+                    }
+
+                    // end of file marker
+                    send_to_output_queue(osmium::memory::Buffer{});
+
+                    if (!m_input_queue_done) {
+                        drain_queue();
+                    }
+                }
+
+            }; // class Parser
 
             /**
              * Virtual base class for all classes decoding OSM files in
@@ -185,35 +273,6 @@ namespace osmium {
                 }
 
             }; // class InputFormatFactory
-
-            /**
-             * Wrap the buffer into a future and add it to the given queue.
-             */
-            inline void send_to_queue(osmdata_queue_type& queue, osmium::memory::Buffer&& buffer) {
-                std::promise<osmium::memory::Buffer> promise;
-                queue.push(promise.get_future());
-                promise.set_value(std::move(buffer));
-            }
-
-            inline void send_end_of_file(osmdata_queue_type& queue) {
-                send_to_queue(queue, osmium::memory::Buffer{});
-            }
-
-            inline void send_exception(osmdata_queue_type& queue, std::exception_ptr exception) {
-                std::promise<osmium::memory::Buffer> promise;
-                queue.push(promise.get_future());
-                promise.set_exception(exception);
-            }
-
-            /**
-             * Drain the given queue, ie pop and discard all values.
-             */
-            inline void drain_queue(string_queue_type& queue) {
-                std::string s;
-                do {
-                    queue.wait_and_pop(s);
-                } while (!s.empty());
-            }
 
         } // namespace detail
 

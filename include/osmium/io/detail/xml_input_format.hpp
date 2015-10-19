@@ -130,7 +130,7 @@ namespace osmium {
 
         namespace detail {
 
-            class XMLParser {
+            class XMLParser : public Parser {
 
                 static constexpr int buffer_size = 2 * 1000 * 1000;
 
@@ -173,15 +173,6 @@ namespace osmium {
                 std::unique_ptr<osmium::builder::TagListBuilder>             m_tl_builder;
                 std::unique_ptr<osmium::builder::WayNodeListBuilder>         m_wnl_builder;
                 std::unique_ptr<osmium::builder::RelationMemberListBuilder>  m_rml_builder;
-
-                string_queue_type& m_input_queue;
-                osmdata_queue_type& m_output_queue;
-                std::promise<osmium::io::Header>& m_header_promise;
-
-                osmium::osm_entity_bits::type m_read_types;
-
-                bool m_header_is_done;
-                bool m_input_queue_done = false;
 
                 std::string m_comment_text;
 
@@ -617,7 +608,7 @@ namespace osmium {
 
                 void flush_buffer() {
                     if (m_buffer.committed() > buffer_size / 10 * 9) {
-                        send_to_queue(m_output_queue, std::move(m_buffer));
+                        send_to_output_queue(std::move(m_buffer));
                         osmium::memory::Buffer buffer(buffer_size);
                         using std::swap;
                         swap(m_buffer, buffer);
@@ -630,6 +621,7 @@ namespace osmium {
                           osmdata_queue_type& output_queue,
                           std::promise<osmium::io::Header>& header_promise,
                           osmium::osm_entity_bits::type read_types) :
+                    Parser(input_queue, output_queue, header_promise, read_types),
                     m_context(context::root),
                     m_last_context(context::root),
                     m_in_delete_section(false),
@@ -642,12 +634,7 @@ namespace osmium {
                     m_changeset_discussion_builder(),
                     m_tl_builder(),
                     m_wnl_builder(),
-                    m_rml_builder(),
-                    m_input_queue(input_queue),
-                    m_output_queue(output_queue),
-                    m_header_promise(header_promise),
-                    m_read_types(read_types),
-                    m_header_is_done(false) {
+                    m_rml_builder() {
                 }
 
                 /**
@@ -658,6 +645,7 @@ namespace osmium {
                  * copy.
                  */
                 XMLParser(const XMLParser& other) :
+                    Parser(other),
                     m_context(context::root),
                     m_last_context(context::root),
                     m_in_delete_section(false),
@@ -670,12 +658,7 @@ namespace osmium {
                     m_changeset_discussion_builder(),
                     m_tl_builder(),
                     m_wnl_builder(),
-                    m_rml_builder(),
-                    m_input_queue(other.m_input_queue),
-                    m_output_queue(other.m_output_queue),
-                    m_header_promise(other.m_header_promise),
-                    m_read_types(other.m_read_types),
-                    m_header_is_done(other.m_header_is_done) {
+                    m_rml_builder() {
                 }
 
                 XMLParser& operator=(const XMLParser&) = delete;
@@ -685,39 +668,25 @@ namespace osmium {
 
                 ~XMLParser() = default;
 
-                void operator()() {
+                void run() override final {
                     osmium::thread::set_thread_name("_osmium_xml_in");
 
-                    try {
-                        ExpatXMLParser<XMLParser> parser(this);
+                    ExpatXMLParser<XMLParser> parser(this);
 
-                        while (!m_input_queue_done) {
-                            std::string data;
-                            m_input_queue.wait_and_pop(data);
-                            m_input_queue_done = data.empty();
-                            parser(data, m_input_queue_done);
-                            if (m_read_types == osmium::osm_entity_bits::nothing && m_header_is_done) {
-                                break;
-                            }
+                    while (!m_input_queue_done) {
+                        std::string data;
+                        m_input_queue.wait_and_pop(data);
+                        m_input_queue_done = data.empty();
+                        parser(data, m_input_queue_done);
+                        if (m_read_types == osmium::osm_entity_bits::nothing && m_header_is_done) {
+                            break;
                         }
-
-                        header_is_done();
-
-                        if (m_buffer.committed() > 0) {
-                            send_to_queue(m_output_queue, std::move(m_buffer));
-                        }
-                    } catch (...) {
-                        std::exception_ptr exception = std::current_exception();
-                        if (!m_header_is_done) {
-                            m_header_is_done = true;
-                            m_header_promise.set_exception(exception);
-                        }
-                        send_exception(m_output_queue, exception);
                     }
 
-                    send_end_of_file(m_output_queue);
-                    if (!m_input_queue_done) {
-                        drain_queue(m_input_queue);
+                    header_is_done();
+
+                    if (m_buffer.committed() > 0) {
+                        send_to_output_queue(std::move(m_buffer));
                     }
                 }
 
@@ -740,7 +709,7 @@ namespace osmium {
                  */
                 XMLInputFormat(osmium::osm_entity_bits::type read_which_entities, string_queue_type& input_queue) :
                     osmium::io::detail::InputFormat("xml_parser_results") {
-                    m_thread = std::thread(&XMLParser::operator(), XMLParser{input_queue, m_output_queue, m_header_promise, read_which_entities});
+                    m_thread = std::thread(&Parser::operator(), XMLParser{input_queue, m_output_queue, m_header_promise, read_which_entities});
                 }
 
                 XMLInputFormat(const XMLInputFormat&) = delete;
