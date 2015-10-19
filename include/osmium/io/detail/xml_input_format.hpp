@@ -130,16 +130,6 @@ namespace osmium {
 
         namespace detail {
 
-            /**
-             * Once the header is fully parsed this exception will be thrown if
-             * the caller is not interested in anything else except the header.
-             * It will break off the parsing at this point.
-             *
-             * This exception is never seen by user code, it is caught internally.
-             */
-            class ParserIsDone : std::exception {
-            };
-
             class XMLParser {
 
                 static constexpr int buffer_size = 2 * 1000 * 1000;
@@ -326,9 +316,9 @@ namespace osmium {
                 }
 
                 void header_is_done() {
-                    m_header_is_done = true;
-                    if (m_read_types == osmium::osm_entity_bits::nothing) {
-                        throw ParserIsDone();
+                    if (!m_header_is_done) {
+                        m_header_is_done = true;
+                        m_header_promise.set_value(m_header);
                     }
                 }
 
@@ -700,34 +690,34 @@ namespace osmium {
 
                     try {
                         ExpatXMLParser<XMLParser> parser(this);
-                        osmium::thread::promise_keeper<osmium::io::Header> promise_keeper(m_header, m_header_promise);
 
                         while (!m_input_queue_done) {
                             std::string data;
                             m_input_queue.wait_and_pop(data);
                             m_input_queue_done = data.empty();
-                            try {
-                                parser(data, m_input_queue_done);
-                                if (m_header_is_done) {
-                                    promise_keeper.fullfill_promise();
-                                }
-                            } catch (ParserIsDone&) {
-                                send_end_of_file(m_output_queue);
-                                return;
+                            parser(data, m_input_queue_done);
+                            if (m_read_types == osmium::osm_entity_bits::nothing && m_header_is_done) {
+                                break;
                             }
                         }
+
+                        header_is_done();
 
                         if (m_buffer.committed() > 0) {
                             send_to_queue(m_output_queue, std::move(m_buffer));
                         }
-
-                        send_end_of_file(m_output_queue);
                     } catch (...) {
-                        send_exception(m_output_queue);
-                        send_end_of_file(m_output_queue);
-                        if (!m_input_queue_done) {
-                            drain_queue(m_input_queue);
+                        std::exception_ptr exception = std::current_exception();
+                        if (!m_header_is_done) {
+                            m_header_is_done = true;
+                            m_header_promise.set_exception(exception);
                         }
+                        send_exception(m_output_queue, exception);
+                    }
+
+                    send_end_of_file(m_output_queue);
+                    if (!m_input_queue_done) {
+                        drain_queue(m_input_queue);
                     }
                 }
 

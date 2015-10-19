@@ -105,6 +105,7 @@ namespace osmium {
                 osmium::io::Header header() {
                     if (!m_header_is_initialized) {
                         m_header = m_header_promise.get_future().get();
+                        m_header_is_initialized = true;
                     }
                     return m_header;
                 }
@@ -198,10 +199,10 @@ namespace osmium {
                 send_to_queue(queue, osmium::memory::Buffer{});
             }
 
-            inline void send_exception(osmdata_queue_type& queue) {
+            inline void send_exception(osmdata_queue_type& queue, std::exception_ptr exception) {
                 std::promise<osmium::memory::Buffer> promise;
                 queue.push(promise.get_future());
-                promise.set_exception(std::current_exception());
+                promise.set_exception(exception);
             }
 
             /**
