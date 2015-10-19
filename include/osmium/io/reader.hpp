@@ -80,8 +80,6 @@ namespace osmium {
             osmium::io::File m_file;
             osmium::osm_entity_bits::type m_read_which_entities;
 
-            osmium::io::detail::InputFormatFactory::create_input_type* m_input_format_creator;
-
             enum class status {
                 reading   = 0, // normal reading
                 eof       = 1, // eof of file was reached without error
@@ -99,7 +97,7 @@ namespace osmium {
             std::future<bool> m_read_thread;
             bool m_osmdata_queue_done = false;
 
-            std::unique_ptr<osmium::io::detail::InputFormat> m_input_format;
+            osmium::io::detail::InputFormat m_input_format;
 
 #ifndef _WIN32
             /**
@@ -175,7 +173,7 @@ namespace osmium {
                 osmium::memory::Buffer buffer;
                 do {
                     try {
-                        buffer = std::move(m_input_format->read());
+                        buffer = std::move(m_input_format.read());
                     } catch (...) {
                         // ignore errors
                     }
@@ -196,7 +194,6 @@ namespace osmium {
             explicit Reader(const osmium::io::File& file, osmium::osm_entity_bits::type read_which_entities = osmium::osm_entity_bits::all) :
                 m_file(file.check()),
                 m_read_which_entities(read_which_entities),
-                m_input_format_creator(osmium::io::detail::InputFormatFactory::instance().get_creator_function(m_file)),
                 m_status(status::reading),
                 m_childpid(0),
                 m_input_queue(max_input_queue_size, "raw_input"),
@@ -205,7 +202,7 @@ namespace osmium {
                     osmium::io::CompressionFactory::instance().create_decompressor(file.compression(), open_input_file_or_url(m_file.filename(), &m_childpid))),
                 m_read_done(false),
                 m_read_thread(std::async(std::launch::async, detail::ReadThread(m_input_queue, m_decompressor.get(), m_read_done))),
-                m_input_format((*m_input_format_creator)(m_read_which_entities, m_input_queue)) {
+                m_input_format(m_file, m_read_which_entities, m_input_queue) {
             }
 
             explicit Reader(const std::string& filename, osmium::osm_entity_bits::type read_types = osmium::osm_entity_bits::all) :
@@ -243,7 +240,7 @@ namespace osmium {
                     m_osmdata_queue_done = true;
                 }
 
-                m_input_format->close();
+                m_input_format.close();
 
                 try {
                     osmium::thread::wait_until_done(m_read_thread);
@@ -274,7 +271,7 @@ namespace osmium {
              */
             osmium::io::Header header() {
                 try {
-                    return m_input_format->header();
+                    return m_input_format.header();
                 } catch (...) {
                     m_status = status::exception;
                     close();
@@ -307,17 +304,17 @@ namespace osmium {
                     // the exception in this (the main) thread.
                     osmium::thread::check_for_exception(m_read_thread);
 
-                    // m_input_format->read() can return an invalid buffer to signal EOF,
+                    // m_input_format.read() can return an invalid buffer to signal EOF,
                     // or a valid buffer with or without data. A valid buffer
                     // without data is not an error, it just means we have to
                     // keep getting the next buffer until there is one with data.
                     while (true) {
-                        buffer = std::move(m_input_format->read());
+                        buffer = std::move(m_input_format.read());
                         if (!buffer) {
                             m_read_done = true;
                             m_status = status::eof;
                             m_osmdata_queue_done = true;
-                            m_input_format->close();
+                            m_input_format.close();
                             osmium::thread::wait_until_done(m_read_thread);
                             return buffer;
                         }

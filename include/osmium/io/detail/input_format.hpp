@@ -147,15 +147,65 @@ namespace osmium {
             }; // class Parser
 
             /**
-             * Virtual base class for all classes decoding OSM files in
-             * different formats.
+             * This factory class is used to create objects that decode OSM
+             * data written in a specified format.
              *
-             * Do not use this class or derived classes directly. Use the
-             * osmium::io::Reader class instead.
+             * Do not use this class directly. Use the osmium::io::Reader
+             * class instead.
              */
-            class InputFormat {
+            class ParserFactory {
 
-            protected:
+            public:
+
+                typedef std::function<
+                            std::unique_ptr<Parser>(
+                                string_queue_type&,
+                                osmdata_queue_type&,
+                                std::promise<osmium::io::Header>& header_promise,
+                                osmium::osm_entity_bits::type read_which_entities
+                            )
+                        > create_parser_type;
+
+            private:
+
+                typedef std::map<osmium::io::file_format, create_parser_type> map_type;
+
+                map_type m_callbacks;
+
+                ParserFactory() :
+                    m_callbacks() {
+                }
+
+            public:
+
+                static ParserFactory& instance() {
+                    static ParserFactory factory;
+                    return factory;
+                }
+
+                bool register_parser(osmium::io::file_format format, create_parser_type create_function) {
+                    if (! m_callbacks.insert(map_type::value_type(format, create_function)).second) {
+                        return false;
+                    }
+                    return true;
+                }
+
+                create_parser_type get_creator_function(const osmium::io::File& file) {
+                    auto it = m_callbacks.find(file.format());
+                    if (it == m_callbacks.end()) {
+                        throw std::runtime_error(
+                                std::string("Can not open file '") +
+                                file.filename() +
+                                "' with type '" +
+                                as_string(file.format()) +
+                                "'. No support for reading this format in this program.");
+                    }
+                    return it->second;
+                }
+
+            }; // class ParserFactory
+
+            class InputFormat {
 
                 static constexpr size_t max_queue_size = 20; // XXX
 
@@ -165,12 +215,16 @@ namespace osmium {
                 osmium::io::Header m_header;
                 bool m_header_is_initialized;
 
-                InputFormat(const char* queue_name) :
-                    m_output_queue(max_queue_size, queue_name),
+            public:
+
+                InputFormat(const osmium::io::File& file, osmium::osm_entity_bits::type read_which_entities, string_queue_type& input_queue) :
+                    m_output_queue(max_queue_size, "parser_results"),
                     m_header_promise(),
                     m_thread(),
                     m_header(),
                     m_header_is_initialized(false) {
+                    auto creator = ParserFactory::instance().get_creator_function(file);
+                    m_thread = std::thread(&Parser::operator(), creator(input_queue, m_output_queue, m_header_promise, read_which_entities));
                 }
 
                 InputFormat(const InputFormat&) = delete;
@@ -179,9 +233,7 @@ namespace osmium {
                 InputFormat& operator=(const InputFormat&) = delete;
                 InputFormat& operator=(InputFormat&&) = delete;
 
-            public:
-
-                virtual ~InputFormat() {
+                ~InputFormat() {
                     try {
                         close();
                     } catch (...) {
@@ -216,63 +268,6 @@ namespace osmium {
                 }
 
             }; // class InputFormat
-
-            /**
-             * This factory class is used to create objects that decode OSM
-             * data written in a specified format.
-             *
-             * Do not use this class directly. Use the osmium::io::Reader
-             * class instead.
-             */
-            class InputFormatFactory {
-
-            public:
-
-                typedef std::function<
-                            osmium::io::detail::InputFormat*(
-                                osmium::osm_entity_bits::type read_which_entities,
-                                string_queue_type&
-                            )
-                        > create_input_type;
-
-            private:
-
-                typedef std::map<osmium::io::file_format, create_input_type> map_type;
-
-                map_type m_callbacks;
-
-                InputFormatFactory() :
-                    m_callbacks() {
-                }
-
-            public:
-
-                static InputFormatFactory& instance() {
-                    static InputFormatFactory factory;
-                    return factory;
-                }
-
-                bool register_input_format(osmium::io::file_format format, create_input_type create_function) {
-                    if (! m_callbacks.insert(map_type::value_type(format, create_function)).second) {
-                        return false;
-                    }
-                    return true;
-                }
-
-                create_input_type* get_creator_function(const osmium::io::File& file) {
-                    auto it = m_callbacks.find(file.format());
-                    if (it == m_callbacks.end()) {
-                        throw std::runtime_error(
-                                std::string("Can not open file '") +
-                                file.filename() +
-                                "' with type '" +
-                                as_string(file.format()) +
-                                "'. No support for reading this format in this program.");
-                    }
-                    return &(it->second);
-                }
-
-            }; // class InputFormatFactory
 
         } // namespace detail
 

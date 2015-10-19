@@ -692,45 +692,19 @@ namespace osmium {
 
             }; // class XMLParser
 
-            /**
-             * Class for decoding OSM XML files.
-             */
-            class XMLInputFormat : public osmium::io::detail::InputFormat {
-
-            public:
-
-                /**
-                 * Instantiate XML file decoder.
-                 *
-                 * @param read_which_entities Which types of OSM entities
-                 *        (nodes, ways, relations, changesets) should be
-                 *        parsed?
-                 * @param input_queue String queue where data is read from.
-                 */
-                XMLInputFormat(osmium::osm_entity_bits::type read_which_entities, string_queue_type& input_queue) :
-                    osmium::io::detail::InputFormat("xml_parser_results") {
-                    m_thread = std::thread(&Parser::operator(), XMLParser{input_queue, m_output_queue, m_header_promise, read_which_entities});
-                }
-
-                XMLInputFormat(const XMLInputFormat&) = delete;
-                XMLInputFormat& operator=(const XMLInputFormat&) = delete;
-
-                XMLInputFormat(XMLInputFormat&&) = delete;
-                XMLInputFormat& operator=(XMLInputFormat&&) = delete;
-
-                virtual ~XMLInputFormat() = default;
-
-            }; // class XMLInputFormat
-
             namespace {
 
-// we want the register_input_format() function to run, setting the variable
+// we want the register_parser() function to run, setting the variable
 // is only a side-effect, it will never be used
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-variable"
-                const bool registered_xml_input = osmium::io::detail::InputFormatFactory::instance().register_input_format(osmium::io::file_format::xml,
-                    [](osmium::osm_entity_bits::type read_which_entities, string_queue_type& input_queue) {
-                        return new osmium::io::detail::XMLInputFormat(read_which_entities, input_queue);
+                const bool registered_xml_parser = ParserFactory::instance().register_parser(
+                    file_format::xml,
+                    [](string_queue_type& input_queue,
+                       osmdata_queue_type& output_queue,
+                       std::promise<osmium::io::Header>& header_promise,
+                       osmium::osm_entity_bits::type read_which_entities) {
+                        return std::unique_ptr<Parser>(new XMLParser(input_queue, output_queue, header_promise, read_which_entities));
                 });
 #pragma GCC diagnostic pop
 

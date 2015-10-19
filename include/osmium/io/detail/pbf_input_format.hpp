@@ -246,45 +246,19 @@ namespace osmium {
 
             }; // class PBFParser
 
-            /**
-             * Class for decoding OSM PBF files.
-             */
-            class PBFInputFormat : public osmium::io::detail::InputFormat {
-
-            public:
-
-                /**
-                 * Instantiate PBF file decoder.
-                 *
-                 * @param read_which_entities Which types of OSM entities
-                 *        (nodes, ways, relations, changesets) should be
-                 *        parsed?
-                 * @param input_queue String queue where data is read from.
-                 */
-                PBFInputFormat(osmium::osm_entity_bits::type read_which_entities, string_queue_type& input_queue) :
-                    osmium::io::detail::InputFormat("pbf_parser_results") {
-                    m_thread = std::thread(&Parser::operator(), PBFParser{input_queue, m_output_queue, m_header_promise, read_which_entities});
-                }
-
-                PBFInputFormat(const PBFInputFormat&) = delete;
-                PBFInputFormat& operator=(const PBFInputFormat&) = delete;
-
-                PBFInputFormat(PBFInputFormat&&) = delete;
-                PBFInputFormat& operator=(PBFInputFormat&&) = delete;
-
-                virtual ~PBFInputFormat() = default;
-
-            }; // class PBFInputFormat
-
             namespace {
 
-// we want the register_input_format() function to run, setting the variable
+// we want the register_parser() function to run, setting the variable
 // is only a side-effect, it will never be used
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-variable"
-                const bool registered_pbf_input = osmium::io::detail::InputFormatFactory::instance().register_input_format(osmium::io::file_format::pbf,
-                    [](osmium::osm_entity_bits::type read_which_entities, string_queue_type& input_queue) {
-                        return new osmium::io::detail::PBFInputFormat(read_which_entities, input_queue);
+                const bool registered_pbf_parser = ParserFactory::instance().register_parser(
+                    file_format::pbf,
+                    [](string_queue_type& input_queue,
+                       osmdata_queue_type& output_queue,
+                       std::promise<osmium::io::Header>& header_promise,
+                       osmium::osm_entity_bits::type read_which_entities) {
+                        return std::unique_ptr<Parser>(new PBFParser(input_queue, output_queue, header_promise, read_which_entities));
                 });
 #pragma GCC diagnostic pop
 
