@@ -39,7 +39,6 @@ DEALINGS IN THE SOFTWARE.
 #include <memory>
 #include <stdexcept>
 #include <string>
-#include <thread>
 #include <utility>
 
 #include <osmium/io/file.hpp>
@@ -48,7 +47,6 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/memory/buffer.hpp>
 #include <osmium/osm/entity_bits.hpp>
 #include <osmium/thread/queue.hpp>
-#include <osmium/thread/util.hpp>
 
 namespace osmium {
 
@@ -204,70 +202,6 @@ namespace osmium {
                 }
 
             }; // class ParserFactory
-
-            class InputFormat {
-
-                static constexpr size_t max_queue_size = 20; // XXX
-
-                osmdata_queue_type m_output_queue;
-                std::promise<osmium::io::Header> m_header_promise;
-                std::thread m_thread;
-                osmium::io::Header m_header;
-                bool m_header_is_initialized;
-
-            public:
-
-                InputFormat(const osmium::io::File& file, osmium::osm_entity_bits::type read_which_entities, string_queue_type& input_queue) :
-                    m_output_queue(max_queue_size, "parser_results"),
-                    m_header_promise(),
-                    m_thread(),
-                    m_header(),
-                    m_header_is_initialized(false) {
-                    auto creator = ParserFactory::instance().get_creator_function(file);
-                    m_thread = std::thread(&Parser::operator(), creator(input_queue, m_output_queue, m_header_promise, read_which_entities));
-                }
-
-                InputFormat(const InputFormat&) = delete;
-                InputFormat(InputFormat&&) = delete;
-
-                InputFormat& operator=(const InputFormat&) = delete;
-                InputFormat& operator=(InputFormat&&) = delete;
-
-                ~InputFormat() {
-                    try {
-                        close();
-                    } catch (...) {
-                        // Ignore any exceptions at this point, because
-                        // a destructor should not throw.
-                    }
-                }
-
-                osmium::io::Header header() {
-                    if (!m_header_is_initialized) {
-                        m_header = m_header_promise.get_future().get();
-                        m_header_is_initialized = true;
-                    }
-                    return m_header;
-                }
-
-                /**
-                 * Returns the next buffer with OSM data read from the
-                 * file. Blocks if data is not available yet.
-                 * Returns an empty buffer at end of input.
-                 */
-                osmium::memory::Buffer read() {
-                    std::future<osmium::memory::Buffer> buffer_future;
-                    m_output_queue.wait_and_pop(buffer_future);
-                    return buffer_future.get();
-                }
-
-                void close() {
-                    if (m_thread.joinable()) {
-                        m_thread.join();
-                    }
-                }
-
-            }; // class InputFormat
 
         } // namespace detail
 

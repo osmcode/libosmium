@@ -60,8 +60,8 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/io/header.hpp>
 #include <osmium/memory/buffer.hpp>
 #include <osmium/osm/entity_bits.hpp>
-#include <osmium/thread/util.hpp>
 #include <osmium/thread/queue.hpp>
+#include <osmium/thread/util.hpp>
 
 namespace osmium {
 
@@ -76,6 +76,7 @@ namespace osmium {
         class Reader {
 
             static constexpr size_t max_input_queue_size = 20; // XXX
+            static constexpr size_t max_osmdata_queue_size = 20; // XXX
 
             osmium::io::File m_file;
             osmium::osm_entity_bits::type m_read_which_entities;
@@ -97,7 +98,11 @@ namespace osmium {
             std::future<bool> m_read_thread;
             bool m_osmdata_queue_done = false;
 
-            osmium::io::detail::InputFormat m_input_format;
+            detail::osmdata_queue_type m_osmdata_queue;
+            std::promise<osmium::io::Header> m_header_promise;
+            std::thread m_thread;
+            osmium::io::Header m_header;
+            bool m_header_is_initialized;
 
 #ifndef _WIN32
             /**
@@ -173,7 +178,9 @@ namespace osmium {
                 osmium::memory::Buffer buffer;
                 do {
                     try {
-                        buffer = std::move(m_input_format.read());
+                        std::future<osmium::memory::Buffer> buffer_future;
+                        m_osmdata_queue.wait_and_pop(buffer_future);
+                        buffer = std::move(buffer_future.get());
                     } catch (...) {
                         // ignore errors
                     }
@@ -202,7 +209,13 @@ namespace osmium {
                     osmium::io::CompressionFactory::instance().create_decompressor(file.compression(), open_input_file_or_url(m_file.filename(), &m_childpid))),
                 m_read_done(false),
                 m_read_thread(std::async(std::launch::async, detail::ReadThread(m_input_queue, m_decompressor.get(), m_read_done))),
-                m_input_format(m_file, m_read_which_entities, m_input_queue) {
+                m_osmdata_queue(max_osmdata_queue_size, "parser_results"),
+                m_header_promise(),
+                m_thread(),
+                m_header(),
+                m_header_is_initialized(false) {
+                auto creator = detail::ParserFactory::instance().get_creator_function(file);
+                m_thread = std::thread(&detail::Parser::operator(), creator(m_input_queue, m_osmdata_queue, m_header_promise, read_which_entities));
             }
 
             explicit Reader(const std::string& filename, osmium::osm_entity_bits::type read_types = osmium::osm_entity_bits::all) :
@@ -215,6 +228,9 @@ namespace osmium {
 
             Reader(const Reader&) = delete;
             Reader& operator=(const Reader&) = delete;
+
+            Reader(Reader&&) = default;
+            Reader& operator=(Reader&&) = default;
 
             ~Reader() {
                 try {
@@ -240,7 +256,9 @@ namespace osmium {
                     m_osmdata_queue_done = true;
                 }
 
-                m_input_format.close();
+                if (m_thread.joinable()) {
+                    m_thread.join();
+                }
 
                 try {
                     osmium::thread::wait_until_done(m_read_thread);
@@ -271,7 +289,11 @@ namespace osmium {
              */
             osmium::io::Header header() {
                 try {
-                    return m_input_format.header();
+                    if (!m_header_is_initialized) {
+                        m_header = m_header_promise.get_future().get();
+                        m_header_is_initialized = true;
+                    }
+                    return m_header;
                 } catch (...) {
                     m_status = status::exception;
                     close();
@@ -309,12 +331,13 @@ namespace osmium {
                     // without data is not an error, it just means we have to
                     // keep getting the next buffer until there is one with data.
                     while (true) {
-                        buffer = std::move(m_input_format.read());
+                        std::future<osmium::memory::Buffer> buffer_future;
+                        m_osmdata_queue.wait_and_pop(buffer_future);
+                        buffer = buffer_future.get();
                         if (!buffer) {
                             m_read_done = true;
                             m_status = status::eof;
                             m_osmdata_queue_done = true;
-                            m_input_format.close();
                             osmium::thread::wait_until_done(m_read_thread);
                             return buffer;
                         }
