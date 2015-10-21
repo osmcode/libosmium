@@ -100,7 +100,8 @@ namespace osmium {
                 void dump_as_list(const int fd) override final {
                     typedef typename std::map<TId, TValue>::value_type t;
                     std::vector<t> v;
-                    std::copy(m_elements.begin(), m_elements.end(), std::back_inserter(v));
+                    v.reserve(m_elements.size());
+                    std::copy(m_elements.cbegin(), m_elements.cend(), std::back_inserter(v));
                     osmium::io::detail::reliable_write(fd, reinterpret_cast<const char*>(v.data()), sizeof(t) * v.size());
                 }
 
