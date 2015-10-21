@@ -78,11 +78,11 @@ namespace osmium {
                 }
 
                 const TValue get(const TId id) const override final {
-                    try {
-                        return m_elements.at(id);
-                    } catch (std::out_of_range&) {
+                    auto it = m_elements.find(id);
+                    if (it == m_elements.end()) {
                         not_found_error(id);
                     }
+                    return it->second;
                 }
 
                 size_t size() const override final {
