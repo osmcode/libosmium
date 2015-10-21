@@ -68,7 +68,7 @@ namespace osmium {
                     m_vector(fd) {
                 }
 
-                ~VectorBasedDenseMap() = default;
+                ~VectorBasedDenseMap() noexcept = default;
 
                 void reserve(const size_t size) override final {
                     m_vector.reserve(size);

@@ -88,7 +88,7 @@ namespace osmium {
                     m_elements(grow_size) {
                 }
 
-                ~SparseMemTable() override final = default;
+                ~SparseMemTable() noexcept override final = default;
 
                 void set(const TId id, const TValue value) override final {
                     if (id >= m_elements.size()) {

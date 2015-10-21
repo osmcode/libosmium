@@ -71,7 +71,7 @@ namespace osmium {
 
                 SparseMemMap() = default;
 
-                ~SparseMemMap() override final = default;
+                ~SparseMemMap() noexcept override final = default;
 
                 void set(const TId id, const TValue value) override final {
                     m_elements[id] = value;
@@ -85,11 +85,11 @@ namespace osmium {
                     return it->second;
                 }
 
-                size_t size() const override final {
+                size_t size() const noexcept override final {
                     return m_elements.size();
                 }
 
-                size_t used_memory() const override final {
+                size_t used_memory() const noexcept override final {
                     return element_size * m_elements.size();
                 }
 
