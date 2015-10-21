@@ -94,13 +94,13 @@ namespace osmium {
 
             std::unique_ptr<osmium::io::Decompressor> m_decompressor;
 
-            std::atomic<bool> m_read_done;
-            std::future<bool> m_read_thread;
+            osmium::io::detail::ReadThreadManager m_read_thread_manager;
             bool m_osmdata_queue_done = false;
 
             detail::osmdata_queue_type m_osmdata_queue;
-            std::promise<osmium::io::Header> m_header_promise;
             std::thread m_thread;
+
+            std::promise<osmium::io::Header> m_header_promise;
             osmium::io::Header m_header;
             bool m_header_is_initialized;
 
@@ -207,11 +207,10 @@ namespace osmium {
                 m_decompressor(m_file.buffer() ?
                     osmium::io::CompressionFactory::instance().create_decompressor(file.compression(), m_file.buffer(), m_file.buffer_size()) :
                     osmium::io::CompressionFactory::instance().create_decompressor(file.compression(), open_input_file_or_url(m_file.filename(), &m_childpid))),
-                m_read_done(false),
-                m_read_thread(std::async(std::launch::async, detail::ReadThread(m_input_queue, m_decompressor.get(), m_read_done))),
+                m_read_thread_manager(m_decompressor.get(), m_input_queue),
                 m_osmdata_queue(max_osmdata_queue_size, "parser_results"),
-                m_header_promise(),
                 m_thread(),
+                m_header_promise(),
                 m_header(),
                 m_header_is_initialized(false) {
                 auto creator = detail::ParserFactory::instance().get_creator_function(file);
@@ -249,7 +248,7 @@ namespace osmium {
              * @throws Some form of std::runtime_error when there is a problem.
              */
             void close() {
-                m_read_done = true;
+                m_read_thread_manager.cancel();
 
                 if (!m_osmdata_queue_done) {
                     drain_osmdata_queue();
@@ -261,7 +260,7 @@ namespace osmium {
                 }
 
                 try {
-                    osmium::thread::wait_until_done(m_read_thread);
+                    m_read_thread_manager.wait_until_done();
                 } catch (...) {
                     // Ignore any exceptions.
                 }
@@ -289,6 +288,7 @@ namespace osmium {
              */
             osmium::io::Header header() {
                 try {
+                    m_read_thread_manager.check_for_exception();
                     if (!m_header_is_initialized) {
                         m_header = m_header_promise.get_future().get();
                         m_header_is_initialized = true;
@@ -324,7 +324,7 @@ namespace osmium {
                 try {
                     // If an exception happened in the read thread, re-throw
                     // the exception in this (the main) thread.
-                    osmium::thread::check_for_exception(m_read_thread);
+                    m_read_thread_manager.check_for_exception();
 
                     // m_input_format.read() can return an invalid buffer to signal EOF,
                     // or a valid buffer with or without data. A valid buffer
@@ -335,10 +335,10 @@ namespace osmium {
                         m_osmdata_queue.wait_and_pop(buffer_future);
                         buffer = buffer_future.get();
                         if (!buffer) {
-                            m_read_done = true;
                             m_status = status::eof;
                             m_osmdata_queue_done = true;
-                            osmium::thread::wait_until_done(m_read_thread);
+                            m_read_thread_manager.cancel();
+                            m_read_thread_manager.wait_until_done();
                             return buffer;
                         }
                         if (buffer.committed() > 0) {
