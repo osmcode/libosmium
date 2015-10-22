@@ -192,7 +192,9 @@ namespace osmium {
                     osmium::apply(m_input_buffer->cbegin(), m_input_buffer->cend(), *this);
 
                     std::string out;
-                    std::swap(out, *m_out);
+                    using std::swap;
+                    swap(out, *m_out);
+
                     return out;
                 }
 

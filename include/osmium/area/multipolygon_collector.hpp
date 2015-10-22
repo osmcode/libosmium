@@ -87,7 +87,8 @@ namespace osmium {
             void flush_output_buffer() {
                 if (this->callback()) {
                     osmium::memory::Buffer buffer(initial_output_buffer_size);
-                    std::swap(buffer, m_output_buffer);
+                    using std::swap;
+                    swap(buffer, m_output_buffer);
                     this->callback()(std::move(buffer));
                 }
             }
@@ -206,7 +207,10 @@ namespace osmium {
 
             osmium::memory::Buffer read() {
                 osmium::memory::Buffer buffer(initial_output_buffer_size, osmium::memory::Buffer::auto_grow::yes);
-                std::swap(buffer, m_output_buffer);
+
+                using std::swap;
+                swap(buffer, m_output_buffer);
+
                 return buffer;
             }
 

@@ -113,7 +113,10 @@ namespace osmium {
 
                     std::string output { m_input_buffer.substr(size) };
                     m_input_buffer.resize(size);
-                    std::swap(output, m_input_buffer);
+
+                    using std::swap;
+                    swap(output, m_input_buffer);
+
                     return output;
                 }
 

@@ -150,7 +150,8 @@ namespace osmium {
                 }
 
                 void swap_segments(ProtoRing& other) {
-                    std::swap(m_segments, other.m_segments);
+                    using std::swap;
+                    swap(m_segments, other.m_segments);
                 }
 
                 void add_inner_ring(ProtoRing* ring) {

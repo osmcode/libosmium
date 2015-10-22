@@ -86,7 +86,10 @@ namespace osmium {
                 linestring_type linestring_finish(size_t /* num_points */) {
                     assert(!m_str.empty());
                     std::string str;
-                    std::swap(str, m_str);
+
+                    using std::swap;
+                    swap(str, m_str);
+
                     str.back() = ')';
                     return str;
                 }
@@ -131,7 +134,10 @@ namespace osmium {
                 multipolygon_type multipolygon_finish() {
                     assert(!m_str.empty());
                     std::string str;
-                    std::swap(str, m_str);
+
+                    using std::swap;
+                    swap(str, m_str);
+
                     str.back() = ')';
                     return str;
                 }

@@ -268,7 +268,9 @@ namespace osmium {
                     }
 
                     std::string out;
-                    std::swap(out, *m_out);
+                    using std::swap;
+                    swap(out, *m_out);
+
                     return out;
                 }
 

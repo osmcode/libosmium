@@ -188,7 +188,9 @@ namespace osmium {
                 linestring_type linestring_finish(size_t num_points) {
                     set_size(m_linestring_size_offset, num_points);
                     std::string data;
-                    std::swap(data, m_data);
+
+                    using std::swap;
+                    swap(data, m_data);
 
                     if (m_out_type == out_type::hex) {
                         return convert_to_hex(data);
@@ -246,7 +248,9 @@ namespace osmium {
                 multipolygon_type multipolygon_finish() {
                     set_size(m_multipolygon_size_offset, m_polygons);
                     std::string data;
-                    std::swap(data, m_data);
+
+                    using std::swap;
+                    swap(data, m_data);
 
                     if (m_out_type == out_type::hex) {
                         return convert_to_hex(data);

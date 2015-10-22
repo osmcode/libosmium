@@ -85,7 +85,10 @@ namespace osmium {
 
             void flush() {
                 osmium::memory::Buffer buffer(m_buffer_wrapper->buffer.capacity(), osmium::memory::Buffer::auto_grow::no);
-                std::swap(m_buffer_wrapper->buffer, buffer);
+
+                using std::swap;
+                swap(m_buffer_wrapper->buffer, buffer);
+
                 (*m_destination)(std::move(buffer));
             }
 

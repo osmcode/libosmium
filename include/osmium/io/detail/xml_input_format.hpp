@@ -760,7 +760,8 @@ namespace osmium {
                     if (m_buffer.capacity() - m_buffer.committed() < 1000 * 1000) {
                         m_queue.push(std::move(m_buffer));
                         osmium::memory::Buffer buffer(buffer_size);
-                        std::swap(m_buffer, buffer);
+                        using std::swap;
+                        swap(m_buffer, buffer);
                     }
                 }
 
