@@ -96,25 +96,7 @@ namespace osmium {
              */
             class DebugOutputBlock : public OutputBlock {
 
-                static constexpr size_t tmp_buffer_size = 50;
-
-                char m_tmp_buffer[tmp_buffer_size+1];
-
                 debug_output_options m_options;
-
-                template <typename... TArgs>
-                void output_formatted(const char* format, TArgs&&... args) {
-#ifndef NDEBUG
-                    int len =
-#endif
-#ifndef _MSC_VER
-                    snprintf(m_tmp_buffer, tmp_buffer_size, format, std::forward<TArgs>(args)...);
-#else
-                    _snprintf(m_tmp_buffer, tmp_buffer_size, format, std::forward<TArgs>(args)...);
-#endif
-                    assert(len > 0 && static_cast<size_t>(len) < tmp_buffer_size);
-                    *m_out += m_tmp_buffer;
-                }
 
                 void append_encoded_string(const char* data) {
                     const char* end = data + std::strlen(data);
@@ -269,7 +251,6 @@ namespace osmium {
 
                 DebugOutputBlock(osmium::memory::Buffer&& buffer, const debug_output_options& options) :
                     OutputBlock(std::move(buffer)),
-                    m_tmp_buffer(),
                     m_options(options) {
                 }
 

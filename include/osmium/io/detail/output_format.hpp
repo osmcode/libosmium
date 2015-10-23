@@ -58,6 +58,23 @@ namespace osmium {
 
         namespace detail {
 
+            constexpr const size_t tmp_buffer_size = 100;
+
+            template <typename... TArgs>
+            static void output_formatted_to_string(std::string& out, const char* format, TArgs&&... args) {
+                char tmp_buffer[tmp_buffer_size+1];
+#ifndef NDEBUG
+                int len =
+#endif
+#ifndef _MSC_VER
+                snprintf(tmp_buffer, tmp_buffer_size, format, std::forward<TArgs>(args)...);
+#else
+                _snprintf(tmp_buffer, tmp_buffer_size, format, std::forward<TArgs>(args)...);
+#endif
+                assert(len > 0 && static_cast<size_t>(len) < tmp_buffer_size);
+                out += tmp_buffer;
+            }
+
             class OutputBlock : public osmium::handler::Handler {
 
             protected:
@@ -78,6 +95,11 @@ namespace osmium {
                 OutputBlock& operator=(OutputBlock&&) = default;
 
                 ~OutputBlock() = default;
+
+                template <typename... TArgs>
+                void output_formatted(const char* format, TArgs&&... args) {
+                    output_formatted_to_string(*m_out, format, std::forward<TArgs>(args)...);
+                }
 
             }; // class OutputBlock;
 

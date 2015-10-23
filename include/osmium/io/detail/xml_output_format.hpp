@@ -92,24 +92,6 @@ namespace osmium {
                     }
                 }
 
-                const size_t tmp_buffer_size = 100;
-
-                template <typename T>
-                void oprintf(std::string& out, const char* format, T value) {
-                    char buffer[tmp_buffer_size+1];
-                    size_t max_size = sizeof(buffer)/sizeof(char);
-#ifndef NDEBUG
-                    int len =
-#endif
-#ifndef _MSC_VER
-                    snprintf(buffer, max_size, format, value);
-#else
-                    _snprintf(buffer, max_size, format, value);
-#endif
-                    assert(len > 0 && static_cast<size_t>(len) < max_size);
-                    out += buffer;
-                }
-
             } // anonymous namespace
 
             class XMLOutputBlock : public OutputBlock {
@@ -143,11 +125,11 @@ namespace osmium {
                 }
 
                 void write_meta(const osmium::OSMObject& object) {
-                    oprintf(*m_out, " id=\"%" PRId64 "\"", object.id());
+                    output_formatted(" id=\"%" PRId64 "\"", object.id());
 
                     if (m_add_metadata) {
                         if (object.version()) {
-                            oprintf(*m_out, " version=\"%d\"", object.version());
+                            output_formatted(" version=\"%d\"", object.version());
                         }
 
                         if (object.timestamp()) {
@@ -157,13 +139,13 @@ namespace osmium {
                         }
 
                         if (!object.user_is_anonymous()) {
-                            oprintf(*m_out, " uid=\"%d\" user=\"", object.uid());
+                            output_formatted(" uid=\"%d\" user=\"", object.uid());
                             xml_string(*m_out, object.user());
                             *m_out += "\"";
                         }
 
                         if (object.changeset()) {
-                            oprintf(*m_out, " changeset=\"%d\"", object.changeset());
+                            output_formatted(" changeset=\"%d\"", object.changeset());
                         }
 
                         if (m_write_visible_flag) {
@@ -189,7 +171,7 @@ namespace osmium {
 
                 void write_discussion(const osmium::ChangesetDiscussion& comments) {
                     for (const auto& comment : comments) {
-                        oprintf(*m_out, "   <comment uid=\"%d\" user=\"", comment.uid());
+                        output_formatted("   <comment uid=\"%d\" user=\"", comment.uid());
                         xml_string(*m_out, comment.user());
                         *m_out += "\" date=\"";
                         *m_out += comment.date().to_iso();
@@ -317,7 +299,7 @@ namespace osmium {
 
                     for (const auto& node_ref : way.nodes()) {
                         write_prefix();
-                        oprintf(*m_out, "  <nd ref=\"%" PRId64 "\"/>\n", node_ref.ref());
+                        output_formatted("  <nd ref=\"%" PRId64 "\"/>\n", node_ref.ref());
                     }
 
                     write_tags(way.tags(), prefix_spaces());
@@ -346,7 +328,7 @@ namespace osmium {
                         write_prefix();
                         *m_out += "  <member type=\"";
                         *m_out += item_type_to_name(member.type());
-                        oprintf(*m_out, "\" ref=\"%" PRId64 "\" role=\"", member.ref());
+                        output_formatted("\" ref=\"%" PRId64 "\" role=\"", member.ref());
                         xml_string(*m_out, member.role());
                         *m_out += "\"/>\n";
                     }
@@ -360,7 +342,7 @@ namespace osmium {
                 void changeset(const osmium::Changeset& changeset) {
                     *m_out += " <changeset";
 
-                    oprintf(*m_out, " id=\"%" PRId32 "\"", changeset.id());
+                    output_formatted(" id=\"%" PRId32 "\"", changeset.id());
 
                     if (changeset.created_at()) {
                         *m_out += " created_at=\"";
@@ -379,18 +361,18 @@ namespace osmium {
                     if (!changeset.user_is_anonymous()) {
                         *m_out += " user=\"";
                         xml_string(*m_out, changeset.user());
-                        oprintf(*m_out, "\" uid=\"%d\"", changeset.uid());
+                        output_formatted("\" uid=\"%d\"", changeset.uid());
                     }
 
                     if (changeset.bounds()) {
-                        oprintf(*m_out, " min_lat=\"%.7f\"", changeset.bounds().bottom_left().lat_without_check());
-                        oprintf(*m_out, " min_lon=\"%.7f\"", changeset.bounds().bottom_left().lon_without_check());
-                        oprintf(*m_out, " max_lat=\"%.7f\"", changeset.bounds().top_right().lat_without_check());
-                        oprintf(*m_out, " max_lon=\"%.7f\"", changeset.bounds().top_right().lon_without_check());
+                        output_formatted(" min_lat=\"%.7f\"", changeset.bounds().bottom_left().lat_without_check());
+                        output_formatted(" min_lon=\"%.7f\"", changeset.bounds().bottom_left().lon_without_check());
+                        output_formatted(" max_lat=\"%.7f\"", changeset.bounds().top_right().lat_without_check());
+                        output_formatted(" max_lon=\"%.7f\"", changeset.bounds().top_right().lon_without_check());
                     }
 
-                    oprintf(*m_out, " num_changes=\"%" PRId32 "\"", changeset.num_changes());
-                    oprintf(*m_out, " comments_count=\"%" PRId32 "\"", changeset.num_comments());
+                    output_formatted(" num_changes=\"%" PRId32 "\"", changeset.num_changes());
+                    output_formatted(" comments_count=\"%" PRId32 "\"", changeset.num_comments());
 
                     // If there are no tags and no comments, we can close the
                     // tag right here and are done.
@@ -459,10 +441,10 @@ namespace osmium {
 
                     for (const auto& box : header.boxes()) {
                         out += "  <bounds";
-                        oprintf(out, " minlon=\"%.7f\"", box.bottom_left().lon());
-                        oprintf(out, " minlat=\"%.7f\"", box.bottom_left().lat());
-                        oprintf(out, " maxlon=\"%.7f\"", box.top_right().lon());
-                        oprintf(out, " maxlat=\"%.7f\"/>\n", box.top_right().lat());
+                        output_formatted_to_string(out, " minlon=\"%.7f\"", box.bottom_left().lon());
+                        output_formatted_to_string(out, " minlat=\"%.7f\"", box.bottom_left().lat());
+                        output_formatted_to_string(out, " maxlon=\"%.7f\"", box.top_right().lon());
+                        output_formatted_to_string(out, " maxlat=\"%.7f\"/>\n", box.top_right().lat());
                     }
 
                     std::promise<std::string> promise;
