@@ -444,7 +444,7 @@ namespace osmium {
             public:
 
                 PBFOutputFormat(const osmium::io::File& file, future_string_queue_type& output_queue) :
-                    OutputFormat(file, output_queue),
+                    OutputFormat(output_queue),
                     m_options(),
                     m_primitive_block(m_options) {
                     m_options.use_dense_nodes = file.get("pbf_dense_nodes") != "false";

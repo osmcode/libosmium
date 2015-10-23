@@ -152,7 +152,6 @@ namespace osmium {
 
             protected:
 
-                osmium::io::File m_file;
                 future_string_queue_type& m_output_queue;
 
                 /**
@@ -167,8 +166,7 @@ namespace osmium {
 
             public:
 
-                OutputFormat(const osmium::io::File& file, future_string_queue_type& output_queue) :
-                    m_file(file),
+                OutputFormat(future_string_queue_type& output_queue) :
                     m_output_queue(output_queue) {
                 }
 

@@ -254,7 +254,7 @@ namespace osmium {
             public:
 
                 OPLOutputFormat(const osmium::io::File& file, future_string_queue_type& output_queue) :
-                    OutputFormat(file, output_queue),
+                    OutputFormat(output_queue),
                     m_options() {
                     m_options.add_metadata = file.get("add_metadata") != "false";
                 }
