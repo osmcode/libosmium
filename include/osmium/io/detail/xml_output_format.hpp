@@ -449,28 +449,21 @@ namespace osmium {
                         output_formatted_to_string(out, " maxlat=\"%.7f\"/>\n", box.top_right().lat());
                     }
 
-                    std::promise<std::string> promise;
-                    m_output_queue.push(promise.get_future());
-                    promise.set_value(std::move(out));
+                    send_to_output_queue(std::move(out));
                 }
 
                 void close() override final {
-                    {
-                        std::string out;
-                        if (m_file.is_true("xml_change_format")) {
-                            out += "</osmChange>\n";
-                        } else {
-                            out += "</osm>\n";
-                        }
+                    std::string out;
 
-                        std::promise<std::string> promise;
-                        m_output_queue.push(promise.get_future());
-                        promise.set_value(std::move(out));
+                    if (m_file.is_true("xml_change_format")) {
+                        out += "</osmChange>\n";
+                    } else {
+                        out += "</osm>\n";
                     }
 
-                    std::promise<std::string> promise;
-                    m_output_queue.push(promise.get_future());
-                    promise.set_value(std::string());
+                    send_to_output_queue(std::move(out));
+
+                    send_to_output_queue(std::string{});
                 }
 
             }; // class XMLOutputFormat

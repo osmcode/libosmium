@@ -155,6 +155,16 @@ namespace osmium {
                 osmium::io::File m_file;
                 future_string_queue_type& m_output_queue;
 
+                /**
+                 * Wrap the string into a future and add it to the output
+                 * queue.
+                 */
+                void send_to_output_queue(std::string&& data) {
+                    std::promise<std::string> promise;
+                    m_output_queue.push(promise.get_future());
+                    promise.set_value(std::move(data));
+                }
+
             public:
 
                 OutputFormat(const osmium::io::File& file, future_string_queue_type& output_queue) :
@@ -175,7 +185,9 @@ namespace osmium {
 
                 virtual void write_buffer(osmium::memory::Buffer&&) = 0;
 
-                virtual void close() = 0;
+                virtual void close() {
+                    send_to_output_queue(std::string{});
+                }
 
             }; // class OutputFormat
 

@@ -394,9 +394,7 @@ namespace osmium {
 
                     primitive_block.add_message(OSMFormat::PrimitiveBlock::repeated_PrimitiveGroup_primitivegroup, m_primitive_block.group_data());
 
-                    std::promise<std::string> promise;
-                    m_output_queue.push(promise.get_future());
-                    promise.set_value(serialize_blob("OSMData", primitive_block_data, m_options.use_compression));
+                    send_to_output_queue(serialize_blob("OSMData", primitive_block_data, m_options.use_compression));
                 }
 
                 template <typename T>
@@ -495,9 +493,7 @@ namespace osmium {
                         pbf_header_block.add_string(OSMFormat::HeaderBlock::optional_string_osmosis_replication_base_url, osmosis_replication_base_url);
                     }
 
-                    std::promise<std::string> promise;
-                    m_output_queue.push(promise.get_future());
-                    promise.set_value(serialize_blob("OSMHeader", data, m_options.use_compression));
+                    send_to_output_queue(serialize_blob("OSMHeader", data, m_options.use_compression));
                 }
 
                 void switch_primitive_block_type(OSMFormat::PrimitiveGroup type) {
@@ -580,9 +576,7 @@ namespace osmium {
                 void close() override final {
                     store_primitive_block();
 
-                    std::promise<std::string> promise;
-                    m_output_queue.push(promise.get_future());
-                    promise.set_value(std::string());
+                    send_to_output_queue(std::string{});
                 }
 
             }; // class PBFOutputFormat

@@ -469,16 +469,7 @@ namespace osmium {
                     }
                     out += "\n=============================================\n\n";
 
-                    std::promise<std::string> promise;
-                    m_output_queue.push(promise.get_future());
-                    promise.set_value(std::move(out));
-                }
-
-                void close() override final {
-                    std::string out;
-                    std::promise<std::string> promise;
-                    m_output_queue.push(promise.get_future());
-                    promise.set_value(out);
+                    send_to_output_queue(std::move(out));
                 }
 
             }; // class DebugOutputFormat
