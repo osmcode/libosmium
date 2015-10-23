@@ -58,21 +58,59 @@ namespace osmium {
 
         namespace detail {
 
-            constexpr const size_t tmp_buffer_size = 100;
+#ifndef _MSC_VER
+# define SNPRINTF std::snprintf
+#else
+# define SNPRINTF _snprintf
+#endif
 
             template <typename... TArgs>
-            static void output_formatted_to_string(std::string& out, const char* format, TArgs&&... args) {
-                char tmp_buffer[tmp_buffer_size+1];
-#ifndef NDEBUG
-                int len =
-#endif
-#ifndef _MSC_VER
-                snprintf(tmp_buffer, tmp_buffer_size, format, std::forward<TArgs>(args)...);
-#else
-                _snprintf(tmp_buffer, tmp_buffer_size, format, std::forward<TArgs>(args)...);
-#endif
-                assert(len > 0 && static_cast<size_t>(len) < tmp_buffer_size);
-                out += tmp_buffer;
+            inline int string_snprintf(std::string& out,
+                                       size_t old_size,
+                                       size_t max_size,
+                                       const char* format,
+                                       TArgs&&... args) {
+                out.resize(old_size + max_size);
+
+                return SNPRINTF(const_cast<char*>(out.c_str()) + old_size,
+                                max_size,
+                                format,
+                                std::forward<TArgs>(args)...);
+            }
+
+#undef SNPRINTF
+
+            template <typename... TArgs>
+            inline void output_formatted_to_string(std::string& out,
+                                                   const char* format,
+                                                   TArgs&&... args) {
+
+                // First try to write string with the max_size, if that doesn't
+                // work snprintf will tell us how much space it needs. We
+                // reserve that much space and try again. So this will always
+                // work, even if the output is larger than the given max_size.
+
+                static const size_t max_size = 100;
+
+                size_t old_size = out.size();
+
+                int len = string_snprintf(out,
+                                          old_size,
+                                          max_size,
+                                          format,
+                                          std::forward<TArgs>(args)...);
+                assert(len > 0);
+
+                if (size_t(len) >= max_size) {
+                    int len2 = string_snprintf(out,
+                                               old_size,
+                                               len + 1,
+                                               format,
+                                               std::forward<TArgs>(args)...);
+                    assert(len2 == len);
+                }
+
+                out.resize(old_size + len);
             }
 
             class OutputBlock : public osmium::handler::Handler {
