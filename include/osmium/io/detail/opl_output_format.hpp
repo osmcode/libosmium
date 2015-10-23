@@ -73,12 +73,16 @@ namespace osmium {
 
         namespace detail {
 
+            struct opl_output_options {
+                bool add_metadata;
+            };
+
             /**
              * Writes out one buffer with OSM data in OPL format.
              */
             class OPLOutputBlock : public OutputBlock {
 
-                bool m_add_metadata;
+                opl_output_options m_options;
 
                 void append_encoded_string(const char* data) {
                     const char* end = data + std::strlen(data);
@@ -115,7 +119,7 @@ namespace osmium {
 
                 void write_meta(const osmium::OSMObject& object) {
                     output_formatted("%" PRId64, object.id());
-                    if (m_add_metadata) {
+                    if (m_options.add_metadata) {
                         output_formatted(" v%d d", object.version());
                         *m_out += (object.visible() ? 'V' : 'D');
                         output_formatted(" c%d t", object.changeset());
@@ -150,9 +154,9 @@ namespace osmium {
 
             public:
 
-                OPLOutputBlock(osmium::memory::Buffer&& buffer, bool add_metadata) :
+                OPLOutputBlock(osmium::memory::Buffer&& buffer, const opl_output_options& options) :
                     OutputBlock(std::move(buffer)),
-                    m_add_metadata(add_metadata) {
+                    m_options(options) {
                 }
 
                 OPLOutputBlock(const OPLOutputBlock&) = default;
@@ -245,20 +249,21 @@ namespace osmium {
 
             class OPLOutputFormat : public osmium::io::detail::OutputFormat {
 
-                bool m_add_metadata;
+                opl_output_options m_options;
 
             public:
 
                 OPLOutputFormat(const osmium::io::File& file, future_string_queue_type& output_queue) :
                     OutputFormat(file, output_queue),
-                    m_add_metadata(file.get("add_metadata") != "false") {
+                    m_options() {
+                    m_options.add_metadata = file.get("add_metadata") != "false";
                 }
 
                 OPLOutputFormat(const OPLOutputFormat&) = delete;
                 OPLOutputFormat& operator=(const OPLOutputFormat&) = delete;
 
                 void write_buffer(osmium::memory::Buffer&& buffer) override final {
-                    m_output_queue.push(osmium::thread::Pool::instance().submit(OPLOutputBlock{std::move(buffer), m_add_metadata}));
+                    m_output_queue.push(osmium::thread::Pool::instance().submit(OPLOutputBlock{std::move(buffer), m_options}));
                 }
 
                 void close() override final {

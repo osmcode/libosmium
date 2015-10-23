@@ -409,10 +409,9 @@ namespace osmium {
 
                 DebugOutputFormat(const osmium::io::File& file, future_string_queue_type& output_queue) :
                     OutputFormat(file, output_queue),
-                    m_options({
-                        file.get("add_metadata") != "false",
-                        file.get("color") == "true"
-                    }) {
+                    m_options() {
+                    m_options.add_metadata = file.get("add_metadata") != "false";
+                    m_options.use_color    = file.get("color") == "true";
                 }
 
                 DebugOutputFormat(const DebugOutputFormat&) = delete;

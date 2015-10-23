@@ -83,6 +83,29 @@ namespace osmium {
 
         namespace detail {
 
+            struct pbf_output_options {
+
+                /// Should nodes be encoded in DenseNodes?
+                bool use_dense_nodes;
+
+                /**
+                 * Should the PBF blobs contain zlib compressed data?
+                 *
+                 * The zlib compression is optional, it's possible to store the
+                 * blobs in raw format. Disabling the compression can improve
+                 * the writing speed a little but the output will be 2x to 3x
+                 * bigger.
+                 */
+                bool use_compression;
+
+                /// Should metadata of objects be written?
+                bool add_metadata;
+
+                /// Should the visible flag be added to objects?
+                bool add_visible;
+
+            };
+
             /**
              * Maximum number of items in a primitive block.
              *
@@ -172,15 +195,13 @@ namespace osmium {
                 osmium::util::DeltaEncode<int64_t> m_delta_lat;
                 osmium::util::DeltaEncode<int64_t> m_delta_lon;
 
-                bool m_add_metadata;
-                bool m_add_visible;
+                const pbf_output_options& m_options;
 
             public:
 
-                DenseNodes(StringTable& stringtable, bool add_metadata, bool add_visible) :
+                DenseNodes(StringTable& stringtable, const pbf_output_options& options) :
                     m_stringtable(stringtable),
-                    m_add_metadata(add_metadata),
-                    m_add_visible(add_visible) {
+                    m_options(options) {
                 }
 
                 void clear() {
@@ -215,13 +236,13 @@ namespace osmium {
                 void add_node(const osmium::Node& node) {
                     m_ids.push_back(m_delta_id.update(node.id()));
 
-                    if (m_add_metadata) {
+                    if (m_options.add_metadata) {
                         m_versions.push_back(node.version());
                         m_timestamps.push_back(m_delta_timestamp.update(node.timestamp()));
                         m_changesets.push_back(m_delta_changeset.update(node.changeset()));
                         m_uids.push_back(m_delta_uid.update(node.uid()));
                         m_user_sids.push_back(m_delta_user_sid.update(m_stringtable.add(node.user())));
-                        if (m_add_visible) {
+                        if (m_options.add_visible) {
                             m_visibles.push_back(node.visible());
                         }
                     }
@@ -242,7 +263,7 @@ namespace osmium {
 
                     pbf_dense_nodes.add_packed_sint64(OSMFormat::DenseNodes::packed_sint64_id, m_ids.cbegin(), m_ids.cend());
 
-                    if (m_add_metadata) {
+                    if (m_options.add_metadata) {
                         protozero::pbf_builder<OSMFormat::DenseInfo> pbf_dense_info(pbf_dense_nodes, OSMFormat::DenseNodes::optional_DenseInfo_denseinfo);
                         pbf_dense_info.add_packed_int32(OSMFormat::DenseInfo::packed_int32_version, m_versions.cbegin(), m_versions.cend());
                         pbf_dense_info.add_packed_sint64(OSMFormat::DenseInfo::packed_sint64_timestamp, m_timestamps.cbegin(), m_timestamps.cend());
@@ -250,7 +271,7 @@ namespace osmium {
                         pbf_dense_info.add_packed_sint32(OSMFormat::DenseInfo::packed_sint32_uid, m_uids.cbegin(), m_uids.cend());
                         pbf_dense_info.add_packed_sint32(OSMFormat::DenseInfo::packed_sint32_user_sid, m_user_sids.cbegin(), m_user_sids.cend());
 
-                        if (m_add_visible) {
+                        if (m_options.add_visible) {
                             pbf_dense_info.add_packed_bool(OSMFormat::DenseInfo::packed_bool_visible, m_visibles.cbegin(), m_visibles.cend());
                         }
                     }
@@ -276,11 +297,11 @@ namespace osmium {
 
             public:
 
-                PrimitiveBlock(bool add_metadata, bool add_visible) :
+                PrimitiveBlock(const pbf_output_options& options) :
                     m_pbf_primitive_group_data(),
                     m_pbf_primitive_group(m_pbf_primitive_group_data),
                     m_stringtable(),
-                    m_dense_nodes(m_stringtable, add_metadata, add_visible),
+                    m_dense_nodes(m_stringtable, options),
                     m_type(OSMFormat::PrimitiveGroup::unknown),
                     m_count(0) {
                 }
@@ -354,24 +375,7 @@ namespace osmium {
 
             class PBFOutputFormat : public osmium::io::detail::OutputFormat, public osmium::handler::Handler {
 
-                /// Should nodes be encoded in DenseNodes?
-                bool m_use_dense_nodes;
-
-                /**
-                 * Should the PBF blobs contain zlib compressed data?
-                 *
-                 * The zlib compression is optional, it's possible to store the
-                 * blobs in raw format. Disabling the compression can improve
-                 * the writing speed a little but the output will be 2x to 3x
-                 * bigger.
-                 */
-                bool m_use_compression;
-
-                /// Should metadata of objects be written?
-                bool m_add_metadata;
-
-                /// Should the visible flag be added to objects?
-                bool m_add_visible;
+                pbf_output_options m_options;
 
                 PrimitiveBlock m_primitive_block;
 
@@ -392,7 +396,7 @@ namespace osmium {
 
                     std::promise<std::string> promise;
                     m_output_queue.push(promise.get_future());
-                    promise.set_value(serialize_blob("OSMData", primitive_block_data, m_use_compression));
+                    promise.set_value(serialize_blob("OSMData", primitive_block_data, m_options.use_compression));
                 }
 
                 template <typename T>
@@ -414,7 +418,7 @@ namespace osmium {
                         boost::make_transform_iterator(tags.begin(), map_tag_value),
                         boost::make_transform_iterator(tags.end(), map_tag_value));
 
-                    if (m_add_metadata) {
+                    if (m_options.add_metadata) {
                         protozero::pbf_builder<OSMFormat::Info> pbf_info(pbf_object, T::enum_type::optional_Info_info);
 
                         pbf_info.add_int32(OSMFormat::Info::optional_int32_version, object.version());
@@ -422,7 +426,7 @@ namespace osmium {
                         pbf_info.add_int64(OSMFormat::Info::optional_int64_changeset, object.changeset());
                         pbf_info.add_int32(OSMFormat::Info::optional_int32_uid, object.uid());
                         pbf_info.add_uint32(OSMFormat::Info::optional_uint32_user_sid, m_primitive_block.store_in_stringtable(object.user()));
-                        if (m_add_visible) {
+                        if (m_options.add_visible) {
                             pbf_info.add_bool(OSMFormat::Info::optional_bool_visible, object.visible());
                         }
                     }
@@ -433,13 +437,14 @@ namespace osmium {
 
             public:
 
-                explicit PBFOutputFormat(const osmium::io::File& file, future_string_queue_type& output_queue) :
+                PBFOutputFormat(const osmium::io::File& file, future_string_queue_type& output_queue) :
                     OutputFormat(file, output_queue),
-                    m_use_dense_nodes(file.get("pbf_dense_nodes") != "false"),
-                    m_use_compression(file.get("pbf_compression") != "none" && file.get("pbf_compression") != "false"),
-                    m_add_metadata(file.get("pbf_add_metadata") != "false" && file.get("add_metadata") != "false"),
-                    m_add_visible(file.has_multiple_object_versions()),
-                    m_primitive_block(m_add_metadata, m_add_visible) {
+                    m_options(),
+                    m_primitive_block(m_options) {
+                    m_options.use_dense_nodes = file.get("pbf_dense_nodes") != "false";
+                    m_options.use_compression = file.get("pbf_compression") != "none" && file.get("pbf_compression") != "false";
+                    m_options.add_metadata = file.get("pbf_add_metadata") != "false" && file.get("add_metadata") != "false";
+                    m_options.add_visible = file.has_multiple_object_versions();
                 }
 
                 void write_buffer(osmium::memory::Buffer&& buffer) override final {
@@ -462,7 +467,7 @@ namespace osmium {
 
                     pbf_header_block.add_string(OSMFormat::HeaderBlock::repeated_string_required_features, "OsmSchema-V0.6");
 
-                    if (m_use_dense_nodes) {
+                    if (m_options.use_dense_nodes) {
                         pbf_header_block.add_string(OSMFormat::HeaderBlock::repeated_string_required_features, "DenseNodes");
                     }
 
@@ -490,7 +495,7 @@ namespace osmium {
 
                     std::promise<std::string> promise;
                     m_output_queue.push(promise.get_future());
-                    promise.set_value(serialize_blob("OSMHeader", data, m_use_compression));
+                    promise.set_value(serialize_blob("OSMHeader", data, m_options.use_compression));
                 }
 
                 void switch_primitive_block_type(OSMFormat::PrimitiveGroup type) {
@@ -501,7 +506,7 @@ namespace osmium {
                 }
 
                 void node(const osmium::Node& node) {
-                    if (m_use_dense_nodes) {
+                    if (m_options.use_dense_nodes) {
                         switch_primitive_block_type(OSMFormat::PrimitiveGroup::optional_DenseNodes_dense);
                         m_primitive_block.add_dense_node(node);
                         return;

@@ -94,6 +94,12 @@ namespace osmium {
 
             } // anonymous namespace
 
+            struct xml_output_options {
+                bool add_metadata;
+                bool write_visible_flag;
+                bool write_change_ops;
+            };
+
             class XMLOutputBlock : public OutputBlock {
 
                 // operation (create, modify, delete) for osc files
@@ -106,9 +112,7 @@ namespace osmium {
 
                 operation m_last_op {operation::op_none};
 
-                const bool m_add_metadata;
-                const bool m_write_visible_flag;
-                const bool m_write_change_ops;
+                xml_output_options m_options;
 
                 void write_spaces(int num) {
                     for (; num != 0; --num) {
@@ -117,7 +121,7 @@ namespace osmium {
                 }
 
                 int prefix_spaces() {
-                    return m_write_change_ops ? 4 : 2;
+                    return m_options.write_change_ops ? 4 : 2;
                 }
 
                 void write_prefix() {
@@ -127,7 +131,7 @@ namespace osmium {
                 void write_meta(const osmium::OSMObject& object) {
                     output_formatted(" id=\"%" PRId64 "\"", object.id());
 
-                    if (m_add_metadata) {
+                    if (m_options.add_metadata) {
                         if (object.version()) {
                             output_formatted(" version=\"%d\"", object.version());
                         }
@@ -148,7 +152,7 @@ namespace osmium {
                             output_formatted(" changeset=\"%d\"", object.changeset());
                         }
 
-                        if (m_write_visible_flag) {
+                        if (m_options.write_visible_flag) {
                             if (object.visible()) {
                                 *m_out += " visible=\"true\"";
                             } else {
@@ -221,11 +225,9 @@ namespace osmium {
 
             public:
 
-                XMLOutputBlock(osmium::memory::Buffer&& buffer, bool add_metadata, bool write_visible_flag, bool write_change_ops) :
+                XMLOutputBlock(osmium::memory::Buffer&& buffer, const xml_output_options& options) :
                     OutputBlock(std::move(buffer)),
-                    m_add_metadata(add_metadata),
-                    m_write_visible_flag(write_visible_flag && !write_change_ops),
-                    m_write_change_ops(write_change_ops) {
+                    m_options(options) {
                 }
 
                 XMLOutputBlock(const XMLOutputBlock&) = default;
@@ -239,7 +241,7 @@ namespace osmium {
                 std::string operator()() {
                     osmium::apply(m_input_buffer->cbegin(), m_input_buffer->cend(), *this);
 
-                    if (m_write_change_ops) {
+                    if (m_options.write_change_ops) {
                         open_close_op_tag();
                     }
 
@@ -251,7 +253,7 @@ namespace osmium {
                 }
 
                 void node(const osmium::Node& node) {
-                    if (m_write_change_ops) {
+                    if (m_options.write_change_ops) {
                         open_close_op_tag(node.visible() ? (node.version() == 1 ? operation::op_create : operation::op_modify) : operation::op_delete);
                     }
 
@@ -282,7 +284,7 @@ namespace osmium {
                 }
 
                 void way(const osmium::Way& way) {
-                    if (m_write_change_ops) {
+                    if (m_options.write_change_ops) {
                         open_close_op_tag(way.visible() ? (way.version() == 1 ? operation::op_create : operation::op_modify) : operation::op_delete);
                     }
 
@@ -309,7 +311,7 @@ namespace osmium {
                 }
 
                 void relation(const osmium::Relation& relation) {
-                    if (m_write_change_ops) {
+                    if (m_options.write_change_ops) {
                         open_close_op_tag(relation.visible() ? (relation.version() == 1 ? operation::op_create : operation::op_modify) : operation::op_delete);
                     }
 
@@ -397,15 +399,16 @@ namespace osmium {
 
             class XMLOutputFormat : public osmium::io::detail::OutputFormat, public osmium::handler::Handler {
 
-                bool m_add_metadata;
-                bool m_write_visible_flag;
+                xml_output_options m_options;
 
             public:
 
                 XMLOutputFormat(const osmium::io::File& file, future_string_queue_type& output_queue) :
                     OutputFormat(file, output_queue),
-                    m_add_metadata(file.get("add_metadata") != "false"),
-                    m_write_visible_flag(file.has_multiple_object_versions() || m_file.is_true("force_visible_flag")) {
+                    m_options() {
+                    m_options.add_metadata       = file.get("add_metadata") != "false";
+                    m_options.write_change_ops   = file.is_true("xml_change_format");
+                    m_options.write_visible_flag = (file.has_multiple_object_versions() || m_file.is_true("force_visible_flag")) && !m_options.write_change_ops;
                 }
 
                 XMLOutputFormat(const XMLOutputFormat&) = delete;
@@ -415,7 +418,7 @@ namespace osmium {
                 }
 
                 void write_buffer(osmium::memory::Buffer&& buffer) override final {
-                    m_output_queue.push(osmium::thread::Pool::instance().submit(XMLOutputBlock{std::move(buffer), m_add_metadata, m_write_visible_flag, m_file.is_true("xml_change_format")}));
+                    m_output_queue.push(osmium::thread::Pool::instance().submit(XMLOutputBlock{std::move(buffer), m_options}));
                 }
 
                 void write_header(const osmium::io::Header& header) override final {
