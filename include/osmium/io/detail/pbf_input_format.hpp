@@ -208,7 +208,7 @@ namespace osmium {
             public:
 
                 PBFParser(string_queue_type& input_queue,
-                          osmdata_queue_type& output_queue,
+                          future_buffer_queue_type& output_queue,
                           std::promise<osmium::io::Header>& header_promise,
                           osmium::osm_entity_bits::type read_types) :
                     Parser(input_queue, output_queue, header_promise, read_types),
@@ -255,7 +255,7 @@ namespace osmium {
                 const bool registered_pbf_parser = ParserFactory::instance().register_parser(
                     file_format::pbf,
                     [](string_queue_type& input_queue,
-                       osmdata_queue_type& output_queue,
+                       future_buffer_queue_type& output_queue,
                        std::promise<osmium::io::Header>& header_promise,
                        osmium::osm_entity_bits::type read_which_entities) {
                         return std::unique_ptr<Parser>(new PBFParser(input_queue, output_queue, header_promise, read_which_entities));

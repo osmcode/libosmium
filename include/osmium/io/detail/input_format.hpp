@@ -41,6 +41,7 @@ DEALINGS IN THE SOFTWARE.
 #include <string>
 #include <utility>
 
+#include <osmium/io/detail/util.hpp>
 #include <osmium/io/file.hpp>
 #include <osmium/io/file_format.hpp>
 #include <osmium/io/header.hpp>
@@ -54,15 +55,12 @@ namespace osmium {
 
         namespace detail {
 
-            using osmdata_queue_type = osmium::thread::Queue<std::future<osmium::memory::Buffer>>;
-            using string_queue_type = osmium::thread::Queue<std::string>;
-
             class Parser {
 
             protected:
 
                 string_queue_type& m_input_queue;
-                osmdata_queue_type& m_output_queue;
+                future_buffer_queue_type& m_output_queue;
                 std::promise<osmium::io::Header>& m_header_promise;
                 osmium::osm_entity_bits::type m_read_types;
                 bool m_header_is_done;
@@ -101,7 +99,7 @@ namespace osmium {
             public:
 
                 Parser(string_queue_type& input_queue,
-                       osmdata_queue_type& output_queue,
+                       future_buffer_queue_type& output_queue,
                        std::promise<osmium::io::Header>& header_promise,
                        osmium::osm_entity_bits::type read_types) :
                     m_input_queue(input_queue),
@@ -158,7 +156,7 @@ namespace osmium {
                 typedef std::function<
                             std::unique_ptr<Parser>(
                                 string_queue_type&,
-                                osmdata_queue_type&,
+                                future_buffer_queue_type&,
                                 std::promise<osmium::io::Header>& header_promise,
                                 osmium::osm_entity_bits::type read_which_entities
                             )

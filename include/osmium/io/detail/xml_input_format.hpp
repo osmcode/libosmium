@@ -618,7 +618,7 @@ namespace osmium {
             public:
 
                 XMLParser(string_queue_type& input_queue,
-                          osmdata_queue_type& output_queue,
+                          future_buffer_queue_type& output_queue,
                           std::promise<osmium::io::Header>& header_promise,
                           osmium::osm_entity_bits::type read_types) :
                     Parser(input_queue, output_queue, header_promise, read_types),
@@ -701,7 +701,7 @@ namespace osmium {
                 const bool registered_xml_parser = ParserFactory::instance().register_parser(
                     file_format::xml,
                     [](string_queue_type& input_queue,
-                       osmdata_queue_type& output_queue,
+                       future_buffer_queue_type& output_queue,
                        std::promise<osmium::io::Header>& header_promise,
                        osmium::osm_entity_bits::type read_which_entities) {
                         return std::unique_ptr<Parser>(new XMLParser(input_queue, output_queue, header_promise, read_which_entities));

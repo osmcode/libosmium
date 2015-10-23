@@ -433,7 +433,7 @@ namespace osmium {
 
             public:
 
-                explicit PBFOutputFormat(const osmium::io::File& file, data_queue_type& output_queue) :
+                explicit PBFOutputFormat(const osmium::io::File& file, future_string_queue_type& output_queue) :
                     OutputFormat(file, output_queue),
                     m_use_dense_nodes(file.get("pbf_dense_nodes") != "false"),
                     m_use_compression(file.get("pbf_compression") != "none" && file.get("pbf_compression") != "false"),
@@ -587,7 +587,7 @@ namespace osmium {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-variable"
                 const bool registered_pbf_output = osmium::io::detail::OutputFormatFactory::instance().register_output_format(osmium::io::file_format::pbf,
-                    [](const osmium::io::File& file, data_queue_type& output_queue) {
+                    [](const osmium::io::File& file, future_string_queue_type& output_queue) {
                         return new osmium::io::detail::PBFOutputFormat(file, output_queue);
                 });
 #pragma GCC diagnostic pop

@@ -1,5 +1,5 @@
-#ifndef OSMIUM_IO_DETAIL_WRITE_THREAD_HPP
-#define OSMIUM_IO_DETAIL_WRITE_THREAD_HPP
+#ifndef OSMIUM_IO_DETAIL_UTIL_HPP
+#define OSMIUM_IO_DETAIL_UTIL_HPP
 
 /*
 
@@ -36,9 +36,8 @@ DEALINGS IN THE SOFTWARE.
 #include <future>
 #include <string>
 
-#include <osmium/io/compression.hpp>
-#include <osmium/io/detail/output_format.hpp>
-#include <osmium/thread/util.hpp>
+#include <osmium/memory/buffer.hpp>
+#include <osmium/thread/queue.hpp>
 
 namespace osmium {
 
@@ -46,34 +45,31 @@ namespace osmium {
 
         namespace detail {
 
-            class WriteThread {
+            /**
+             * This type of queue contains buffers with OSM data in them.
+             * The "end of file" is marked by an invalid Buffer.
+             * The buffers are wrapped in a std::future so that they can also
+             * transport exceptions. The future also helps with keeping the
+             * data in order.
+             */
+            using future_buffer_queue_type = osmium::thread::Queue<std::future<osmium::memory::Buffer>>;
 
-                future_string_queue_type& m_input_queue;
-                osmium::io::Compressor* m_compressor;
+            /**
+             * This type of queue contains OSM file data in the form it is
+             * stored on disk, ie encoded as XML, PBF, etc.
+             * The "end of file" is marked by an empty string.
+             */
+            using string_queue_type = osmium::thread::Queue<std::string>;
 
-            public:
-
-                explicit WriteThread(future_string_queue_type& input_queue, osmium::io::Compressor* compressor) :
-                    m_input_queue(input_queue),
-                    m_compressor(compressor) {
-                }
-
-                bool operator()() {
-                    osmium::thread::set_thread_name("_osmium_output");
-
-                    std::future<std::string> data_future;
-                    std::string data;
-                    do {
-                        m_input_queue.wait_and_pop(data_future);
-                        data = data_future.get();
-                        m_compressor->write(data);
-                    } while (!data.empty());
-
-                    m_compressor->close();
-                    return true;
-                }
-
-            }; // class WriteThread
+            /**
+             * This type of queue contains OSM file data in the form it is
+             * stored on disk, ie encoded as XML, PBF, etc.
+             * The "end of file" is marked by an empty string.
+             * The strings are wrapped in a std::future so that they can also
+             * transport exceptions. The future also helps with keeping the
+             * data in order.
+             */
+            using future_string_queue_type = osmium::thread::Queue<std::future<std::string>>;
 
         } // namespace detail
 
@@ -81,4 +77,4 @@ namespace osmium {
 
 } // namespace osmium
 
-#endif // OSMIUM_IO_DETAIL_WRITE_THREAD_HPP
+#endif // OSMIUM_IO_DETAIL_UTIL_HPP

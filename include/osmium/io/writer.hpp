@@ -61,7 +61,7 @@ namespace osmium {
 
             osmium::io::File m_file;
 
-            osmium::io::detail::data_queue_type m_output_queue;
+            detail::future_string_queue_type m_output_queue;
 
             std::unique_ptr<osmium::io::detail::OutputFormat> m_output;
 

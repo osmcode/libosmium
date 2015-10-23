@@ -274,7 +274,7 @@ namespace osmium {
 
             public:
 
-                OPLOutputFormat(const osmium::io::File& file, data_queue_type& output_queue) :
+                OPLOutputFormat(const osmium::io::File& file, future_string_queue_type& output_queue) :
                     OutputFormat(file, output_queue),
                     m_add_metadata(file.get("add_metadata") != "false") {
                 }
@@ -302,7 +302,7 @@ namespace osmium {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-variable"
                 const bool registered_opl_output = osmium::io::detail::OutputFormatFactory::instance().register_output_format(osmium::io::file_format::opl,
-                    [](const osmium::io::File& file, data_queue_type& output_queue) {
+                    [](const osmium::io::File& file, future_string_queue_type& output_queue) {
                         return new osmium::io::detail::OPLOutputFormat(file, output_queue);
                 });
 #pragma GCC diagnostic pop

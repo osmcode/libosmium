@@ -97,7 +97,7 @@ namespace osmium {
             osmium::io::detail::ReadThreadManager m_read_thread_manager;
             bool m_osmdata_queue_done = false;
 
-            detail::osmdata_queue_type m_osmdata_queue;
+            detail::future_buffer_queue_type m_osmdata_queue;
             std::thread m_thread;
 
             std::promise<osmium::io::Header> m_header_promise;

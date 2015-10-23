@@ -432,7 +432,7 @@ namespace osmium {
 
             public:
 
-                DebugOutputFormat(const osmium::io::File& file, data_queue_type& output_queue) :
+                DebugOutputFormat(const osmium::io::File& file, future_string_queue_type& output_queue) :
                     OutputFormat(file, output_queue),
                     m_options({
                         file.get("add_metadata") != "false",
@@ -514,7 +514,7 @@ namespace osmium {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-variable"
                 const bool registered_debug_output = osmium::io::detail::OutputFormatFactory::instance().register_output_format(osmium::io::file_format::debug,
-                    [](const osmium::io::File& file, data_queue_type& output_queue) {
+                    [](const osmium::io::File& file, future_string_queue_type& output_queue) {
                         return new osmium::io::detail::DebugOutputFormat(file, output_queue);
                 });
 #pragma GCC diagnostic pop

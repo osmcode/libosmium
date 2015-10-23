@@ -41,6 +41,7 @@ DEALINGS IN THE SOFTWARE.
 #include <string>
 #include <utility>
 
+#include <osmium/io/detail/util.hpp>
 #include <osmium/io/file.hpp>
 #include <osmium/io/file_format.hpp>
 #include <osmium/io/header.hpp>
@@ -56,8 +57,6 @@ namespace osmium {
 
         namespace detail {
 
-            typedef osmium::thread::Queue<std::future<std::string>> data_queue_type;
-
             /**
              * Virtual base class for all classes writing OSM files in different
              * formats.
@@ -70,11 +69,11 @@ namespace osmium {
             protected:
 
                 osmium::io::File m_file;
-                data_queue_type& m_output_queue;
+                future_string_queue_type& m_output_queue;
 
             public:
 
-                explicit OutputFormat(const osmium::io::File& file, data_queue_type& output_queue) :
+                explicit OutputFormat(const osmium::io::File& file, future_string_queue_type& output_queue) :
                     m_file(file),
                     m_output_queue(output_queue) {
                 }
@@ -108,7 +107,7 @@ namespace osmium {
 
             public:
 
-                typedef std::function<osmium::io::detail::OutputFormat*(const osmium::io::File&, data_queue_type&)> create_output_type;
+                typedef std::function<osmium::io::detail::OutputFormat*(const osmium::io::File&, future_string_queue_type&)> create_output_type;
 
             private:
 
@@ -134,7 +133,7 @@ namespace osmium {
                     return true;
                 }
 
-                std::unique_ptr<osmium::io::detail::OutputFormat> create_output(const osmium::io::File& file, data_queue_type& output_queue) {
+                std::unique_ptr<osmium::io::detail::OutputFormat> create_output(const osmium::io::File& file, future_string_queue_type& output_queue) {
                     auto it = m_callbacks.find(file.format());
                     if (it != m_callbacks.end()) {
                         return std::unique_ptr<osmium::io::detail::OutputFormat>((it->second)(file, output_queue));
