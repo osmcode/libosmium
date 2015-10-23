@@ -132,7 +132,7 @@ namespace osmium {
                 OutputBlock(OutputBlock&&) = default;
                 OutputBlock& operator=(OutputBlock&&) = default;
 
-                ~OutputBlock() = default;
+                ~OutputBlock() noexcept = default;
 
                 template <typename... TArgs>
                 void output_formatted(const char* format, TArgs&&... args) {
@@ -168,8 +168,7 @@ namespace osmium {
                 OutputFormat& operator=(const OutputFormat&) = delete;
                 OutputFormat& operator=(OutputFormat&&) = delete;
 
-                virtual ~OutputFormat() {
-                }
+                virtual ~OutputFormat() noexcept = default;
 
                 virtual void write_header(const osmium::io::Header&) {
                 }

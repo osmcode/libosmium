@@ -232,7 +232,7 @@ namespace osmium {
                 PBFParser(PBFParser&&) = default;
                 PBFParser& operator=(PBFParser&&) = default;
 
-                ~PBFParser() = default;
+                ~PBFParser() noexcept = default;
 
                 void run() override final {
                     osmium::thread::set_thread_name("_osmium_pbf_in");

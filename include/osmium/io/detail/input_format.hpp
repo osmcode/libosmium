@@ -116,7 +116,7 @@ namespace osmium {
                 Parser(Parser&&) = default;
                 Parser& operator=(Parser&&) = default;
 
-                virtual ~Parser() = default;
+                virtual ~Parser() noexcept = default;
 
                 virtual void run() = 0;
 

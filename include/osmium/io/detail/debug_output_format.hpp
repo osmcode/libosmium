@@ -260,7 +260,7 @@ namespace osmium {
                 DebugOutputBlock(DebugOutputBlock&&) = default;
                 DebugOutputBlock& operator=(DebugOutputBlock&&) = default;
 
-                ~DebugOutputBlock() = default;
+                ~DebugOutputBlock() noexcept = default;
 
                 std::string operator()() {
                     osmium::apply(m_input_buffer->cbegin(), m_input_buffer->cend(), *this);
@@ -399,7 +399,7 @@ namespace osmium {
                     *m_out += '\n';
                 }
 
-            }; // DebugOutputBlock
+            }; // class DebugOutputBlock
 
             class DebugOutputFormat : public osmium::io::detail::OutputFormat {
 
@@ -416,6 +416,8 @@ namespace osmium {
 
                 DebugOutputFormat(const DebugOutputFormat&) = delete;
                 DebugOutputFormat& operator=(const DebugOutputFormat&) = delete;
+
+                ~DebugOutputFormat() noexcept = default;
 
                 void write_buffer(osmium::memory::Buffer&& buffer) override final {
                     m_output_queue.push(osmium::thread::Pool::instance().submit(DebugOutputBlock{std::move(buffer), m_options}));

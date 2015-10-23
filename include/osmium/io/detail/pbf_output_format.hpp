@@ -432,9 +432,6 @@ namespace osmium {
                     }
                 }
 
-                PBFOutputFormat(const PBFOutputFormat&) = delete;
-                PBFOutputFormat& operator=(const PBFOutputFormat&) = delete;
-
             public:
 
                 PBFOutputFormat(const osmium::io::File& file, future_string_queue_type& output_queue) :
@@ -446,6 +443,11 @@ namespace osmium {
                     m_options.add_metadata = file.get("pbf_add_metadata") != "false" && file.get("add_metadata") != "false";
                     m_options.add_visible = file.has_multiple_object_versions();
                 }
+
+                PBFOutputFormat(const PBFOutputFormat&) = delete;
+                PBFOutputFormat& operator=(const PBFOutputFormat&) = delete;
+
+                ~PBFOutputFormat() noexcept = default;
 
                 void write_buffer(osmium::memory::Buffer&& buffer) override final {
                     osmium::apply(buffer.cbegin(), buffer.cend(), *this);

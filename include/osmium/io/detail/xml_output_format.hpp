@@ -236,7 +236,7 @@ namespace osmium {
                 XMLOutputBlock(XMLOutputBlock&&) = default;
                 XMLOutputBlock& operator=(XMLOutputBlock&&) = default;
 
-                ~XMLOutputBlock() = default;
+                ~XMLOutputBlock() noexcept = default;
 
                 std::string operator()() {
                     osmium::apply(m_input_buffer->cbegin(), m_input_buffer->cend(), *this);
@@ -414,8 +414,7 @@ namespace osmium {
                 XMLOutputFormat(const XMLOutputFormat&) = delete;
                 XMLOutputFormat& operator=(const XMLOutputFormat&) = delete;
 
-                ~XMLOutputFormat() override final {
-                }
+                ~XMLOutputFormat() noexcept = default;
 
                 void write_buffer(osmium::memory::Buffer&& buffer) override final {
                     m_output_queue.push(osmium::thread::Pool::instance().submit(XMLOutputBlock{std::move(buffer), m_options}));

@@ -573,7 +573,7 @@ namespace osmium {
                 PBFPrimitiveBlockDecoder(PBFPrimitiveBlockDecoder&&) = delete;
                 PBFPrimitiveBlockDecoder& operator=(PBFPrimitiveBlockDecoder&&) = delete;
 
-                ~PBFPrimitiveBlockDecoder() = default;
+                ~PBFPrimitiveBlockDecoder() noexcept = default;
 
                 osmium::memory::Buffer operator()() {
                     try {
@@ -751,7 +751,7 @@ namespace osmium {
                 PBFDataBlobDecoder(PBFDataBlobDecoder&&) = default;
                 PBFDataBlobDecoder& operator=(PBFDataBlobDecoder&&) = default;
 
-                ~PBFDataBlobDecoder() = default;
+                ~PBFDataBlobDecoder() noexcept = default;
 
                 osmium::memory::Buffer operator()() {
                     std::string output;

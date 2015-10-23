@@ -214,7 +214,7 @@ namespace osmium {
                     ExpatXMLParser& operator=(const ExpatXMLParser&) = delete;
                     ExpatXMLParser& operator=(ExpatXMLParser&&) = delete;
 
-                    ~ExpatXMLParser() {
+                    ~ExpatXMLParser() noexcept {
                         XML_ParserFree(m_parser);
                     }
 
@@ -666,7 +666,7 @@ namespace osmium {
                 XMLParser(XMLParser&&) = default;
                 XMLParser& operator=(XMLParser&&) = default;
 
-                ~XMLParser() = default;
+                ~XMLParser() noexcept = default;
 
                 void run() override final {
                     osmium::thread::set_thread_name("_osmium_xml_in");

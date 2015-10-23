@@ -165,7 +165,7 @@ namespace osmium {
                 OPLOutputBlock(OPLOutputBlock&&) = default;
                 OPLOutputBlock& operator=(OPLOutputBlock&&) = default;
 
-                ~OPLOutputBlock() = default;
+                ~OPLOutputBlock() noexcept = default;
 
                 std::string operator()() {
                     osmium::apply(m_input_buffer->cbegin(), m_input_buffer->cend(), *this);
@@ -245,7 +245,7 @@ namespace osmium {
                     *m_out += '\n';
                 }
 
-            }; // OPLOutputBlock
+            }; // class OPLOutputBlock
 
             class OPLOutputFormat : public osmium::io::detail::OutputFormat {
 
@@ -261,6 +261,8 @@ namespace osmium {
 
                 OPLOutputFormat(const OPLOutputFormat&) = delete;
                 OPLOutputFormat& operator=(const OPLOutputFormat&) = delete;
+
+                ~OPLOutputFormat() noexcept = default;
 
                 void write_buffer(osmium::memory::Buffer&& buffer) override final {
                     m_output_queue.push(osmium::thread::Pool::instance().submit(OPLOutputBlock{std::move(buffer), m_options}));
