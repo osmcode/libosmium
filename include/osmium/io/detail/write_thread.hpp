@@ -46,25 +46,39 @@ namespace osmium {
 
         namespace detail {
 
+            /**
+             * This codes runs in its own thread, getting data from the given
+             * queue, (optionally) compressing it, and writing it to the output
+             * file.
+             */
             class WriteThread {
 
-                future_string_queue_type& m_input_queue;
+                future_string_queue_type& m_queue;
                 osmium::io::Compressor* m_compressor;
 
             public:
 
-                explicit WriteThread(future_string_queue_type& input_queue, osmium::io::Compressor* compressor) :
-                    m_input_queue(input_queue),
+                WriteThread(future_string_queue_type& input_queue,
+                            osmium::io::Compressor* compressor) :
+                    m_queue(input_queue),
                     m_compressor(compressor) {
                 }
 
+                WriteThread(const WriteThread&) = default;
+                WriteThread& operator=(const WriteThread&) = default;
+
+                WriteThread(WriteThread&&) = default;
+                WriteThread& operator=(WriteThread&&) = default;
+
+                ~WriteThread() noexcept = default;
+
                 bool operator()() {
-                    osmium::thread::set_thread_name("_osmium_output");
+                    osmium::thread::set_thread_name("_osmium_write");
 
                     std::future<std::string> data_future;
                     std::string data;
                     do {
-                        m_input_queue.wait_and_pop(data_future);
+                        m_queue.wait_and_pop(data_future);
                         data = data_future.get();
                         m_compressor->write(data);
                     } while (!data.empty());
