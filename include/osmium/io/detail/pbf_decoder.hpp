@@ -39,6 +39,7 @@ DEALINGS IN THE SOFTWARE.
 #include <algorithm>
 #include <iterator>
 #include <limits>
+#include <string>
 
 #include <protozero/pbf_message.hpp>
 
