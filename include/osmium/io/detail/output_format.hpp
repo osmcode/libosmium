@@ -157,7 +157,7 @@ namespace osmium {
 
             public:
 
-                explicit OutputFormat(const osmium::io::File& file, future_string_queue_type& output_queue) :
+                OutputFormat(const osmium::io::File& file, future_string_queue_type& output_queue) :
                     m_file(file),
                     m_output_queue(output_queue) {
                 }

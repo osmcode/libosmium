@@ -562,7 +562,7 @@ namespace osmium {
 
             public:
 
-                explicit PBFPrimitiveBlockDecoder(const ptr_len_type& data, osmium::osm_entity_bits::type read_types) :
+                PBFPrimitiveBlockDecoder(const ptr_len_type& data, osmium::osm_entity_bits::type read_types) :
                     m_data(data),
                     m_read_types(read_types) {
                 }
