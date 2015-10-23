@@ -41,6 +41,7 @@ DEALINGS IN THE SOFTWARE.
 #include <string>
 #include <utility>
 
+#include <osmium/handler.hpp>
 #include <osmium/io/detail/util.hpp>
 #include <osmium/io/file.hpp>
 #include <osmium/io/file_format.hpp>
@@ -56,6 +57,29 @@ namespace osmium {
     namespace io {
 
         namespace detail {
+
+            class OutputBlock : public osmium::handler::Handler {
+
+            protected:
+
+                std::shared_ptr<osmium::memory::Buffer> m_input_buffer;
+
+                std::shared_ptr<std::string> m_out;
+
+                OutputBlock(osmium::memory::Buffer&& buffer) :
+                    m_input_buffer(std::make_shared<osmium::memory::Buffer>(std::move(buffer))),
+                    m_out(std::make_shared<std::string>()) {
+                }
+
+                OutputBlock(const OutputBlock&) = default;
+                OutputBlock& operator=(const OutputBlock&) = default;
+
+                OutputBlock(OutputBlock&&) = default;
+                OutputBlock& operator=(OutputBlock&&) = default;
+
+                ~OutputBlock() = default;
+
+            }; // class OutputBlock;
 
             /**
              * Virtual base class for all classes writing OSM files in different

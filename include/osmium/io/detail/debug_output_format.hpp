@@ -48,7 +48,6 @@ DEALINGS IN THE SOFTWARE.
 
 #include <utf8.h>
 
-#include <osmium/handler.hpp>
 #include <osmium/io/detail/output_format.hpp>
 #include <osmium/io/file_format.hpp>
 #include <osmium/memory/buffer.hpp>
@@ -95,13 +94,9 @@ namespace osmium {
             /**
              * Writes out one buffer with OSM data in Debug format.
              */
-            class DebugOutputBlock : public osmium::handler::Handler {
+            class DebugOutputBlock : public OutputBlock {
 
                 static constexpr size_t tmp_buffer_size = 50;
-
-                std::shared_ptr<osmium::memory::Buffer> m_input_buffer;
-
-                std::shared_ptr<std::string> m_out;
 
                 char m_tmp_buffer[tmp_buffer_size+1];
 
@@ -272,9 +267,8 @@ namespace osmium {
 
             public:
 
-                explicit DebugOutputBlock(osmium::memory::Buffer&& buffer, const debug_output_options& options) :
-                    m_input_buffer(std::make_shared<osmium::memory::Buffer>(std::move(buffer))),
-                    m_out(std::make_shared<std::string>()),
+                DebugOutputBlock(osmium::memory::Buffer&& buffer, const debug_output_options& options) :
+                    OutputBlock(std::move(buffer)),
                     m_tmp_buffer(),
                     m_options(options) {
                 }

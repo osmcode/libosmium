@@ -46,7 +46,6 @@ DEALINGS IN THE SOFTWARE.
 #include <thread>
 #include <utility>
 
-#include <osmium/handler.hpp>
 #include <osmium/io/detail/output_format.hpp>
 #include <osmium/io/file.hpp>
 #include <osmium/io/file_format.hpp>
@@ -113,7 +112,7 @@ namespace osmium {
 
             } // anonymous namespace
 
-            class XMLOutputBlock : public osmium::handler::Handler {
+            class XMLOutputBlock : public OutputBlock {
 
                 // operation (create, modify, delete) for osc files
                 enum class operation {
@@ -122,10 +121,6 @@ namespace osmium {
                     op_modify = 2,
                     op_delete = 3
                 }; // enum class operation
-
-                std::shared_ptr<osmium::memory::Buffer> m_input_buffer;
-
-                std::shared_ptr<std::string> m_out;
 
                 operation m_last_op {operation::op_none};
 
@@ -244,9 +239,8 @@ namespace osmium {
 
             public:
 
-                explicit XMLOutputBlock(osmium::memory::Buffer&& buffer, bool add_metadata, bool write_visible_flag, bool write_change_ops) :
-                    m_input_buffer(std::make_shared<osmium::memory::Buffer>(std::move(buffer))),
-                    m_out(std::make_shared<std::string>()),
+                XMLOutputBlock(osmium::memory::Buffer&& buffer, bool add_metadata, bool write_visible_flag, bool write_change_ops) :
+                    OutputBlock(std::move(buffer)),
                     m_add_metadata(add_metadata),
                     m_write_visible_flag(write_visible_flag && !write_change_ops),
                     m_write_change_ops(write_change_ops) {
