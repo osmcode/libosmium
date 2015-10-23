@@ -408,7 +408,7 @@ namespace osmium {
                     m_options() {
                     m_options.add_metadata       = file.get("add_metadata") != "false";
                     m_options.write_change_ops   = file.is_true("xml_change_format");
-                    m_options.write_visible_flag = (file.has_multiple_object_versions() || m_file.is_true("force_visible_flag")) && !m_options.write_change_ops;
+                    m_options.write_visible_flag = (file.has_multiple_object_versions() || file.is_true("force_visible_flag")) && !m_options.write_change_ops;
                 }
 
                 XMLOutputFormat(const XMLOutputFormat&) = delete;
@@ -419,10 +419,8 @@ namespace osmium {
                 void write_header(const osmium::io::Header& header) override final {
                     std::string out = "<?xml version='1.0' encoding='UTF-8'?>\n";
 
-                    if (m_file.is_true("xml_change_format")) {
+                    if (m_options.write_change_ops) {
                         out += "<osmChange version=\"0.6\" generator=\"";
-                        xml_string(out, header.get("generator").c_str());
-                        out += "\">\n";
                     } else {
                         out += "<osm version=\"0.6\"";
 
@@ -433,9 +431,9 @@ namespace osmium {
                             out += "\"";
                         }
                         out += " generator=\"";
-                        xml_string(out, header.get("generator").c_str());
-                        out += "\">\n";
                     }
+                    xml_string(out, header.get("generator").c_str());
+                    out += "\">\n";
 
                     for (const auto& box : header.boxes()) {
                         out += "  <bounds";
@@ -455,7 +453,7 @@ namespace osmium {
                 void close() override final {
                     std::string out;
 
-                    if (m_file.is_true("xml_change_format")) {
+                    if (m_options.write_change_ops) {
                         out += "</osmChange>\n";
                     } else {
                         out += "</osm>\n";
