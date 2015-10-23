@@ -430,6 +430,13 @@ namespace osmium {
                     }
                 }
 
+                void switch_primitive_block_type(OSMFormat::PrimitiveGroup type) {
+                    if (!m_primitive_block.can_add(type)) {
+                        store_primitive_block();
+                        m_primitive_block.reset(type);
+                    }
+                }
+
             public:
 
                 PBFOutputFormat(const osmium::io::File& file, future_string_queue_type& output_queue) :
@@ -446,10 +453,6 @@ namespace osmium {
                 PBFOutputFormat& operator=(const PBFOutputFormat&) = delete;
 
                 ~PBFOutputFormat() noexcept = default;
-
-                void write_buffer(osmium::memory::Buffer&& buffer) override final {
-                    osmium::apply(buffer.cbegin(), buffer.cend(), *this);
-                }
 
                 void write_header(const osmium::io::Header& header) override final {
                     std::string data;
@@ -496,11 +499,18 @@ namespace osmium {
                     send_to_output_queue(serialize_blob("OSMHeader", data, m_options.use_compression));
                 }
 
-                void switch_primitive_block_type(OSMFormat::PrimitiveGroup type) {
-                    if (!m_primitive_block.can_add(type)) {
-                        store_primitive_block();
-                        m_primitive_block.reset(type);
-                    }
+                void write_buffer(osmium::memory::Buffer&& buffer) override final {
+                    osmium::apply(buffer.cbegin(), buffer.cend(), *this);
+                }
+
+                /**
+                 * Finalize the writing process, flush any open primitive
+                 * blocks to the file and close the file.
+                 */
+                void close() override final {
+                    store_primitive_block();
+
+                    send_to_output_queue(std::string{});
                 }
 
                 void node(const osmium::Node& node) {
@@ -567,16 +577,6 @@ namespace osmium {
                     pbf_relation.add_packed_int32(OSMFormat::Relation::packed_MemberType_types,
                         boost::make_transform_iterator(relation.members().begin(), map_member_type),
                         boost::make_transform_iterator(relation.members().end(), map_member_type));
-                }
-
-                /**
-                 * Finalize the writing process, flush any open primitive
-                 * blocks to the file and close the file.
-                 */
-                void close() override final {
-                    store_primitive_block();
-
-                    send_to_output_queue(std::string{});
                 }
 
             }; // class PBFOutputFormat

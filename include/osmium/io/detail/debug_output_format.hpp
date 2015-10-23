@@ -405,6 +405,18 @@ namespace osmium {
 
                 debug_output_options m_options;
 
+                void write_fieldname(std::string& out, const char* name) {
+                    out += "  ";
+                    if (m_options.use_color) {
+                        out += color_cyan;
+                    }
+                    out += name;
+                    if (m_options.use_color) {
+                        out += color_reset;
+                    }
+                    out += ": ";
+                }
+
             public:
 
                 DebugOutputFormat(const osmium::io::File& file, future_string_queue_type& output_queue) :
@@ -418,22 +430,6 @@ namespace osmium {
                 DebugOutputFormat& operator=(const DebugOutputFormat&) = delete;
 
                 ~DebugOutputFormat() noexcept = default;
-
-                void write_buffer(osmium::memory::Buffer&& buffer) override final {
-                    m_output_queue.push(osmium::thread::Pool::instance().submit(DebugOutputBlock{std::move(buffer), m_options}));
-                }
-
-                void write_fieldname(std::string& out, const char* name) {
-                    out += "  ";
-                    if (m_options.use_color) {
-                        out += color_cyan;
-                    }
-                    out += name;
-                    if (m_options.use_color) {
-                        out += color_reset;
-                    }
-                    out += ": ";
-                }
 
                 void write_header(const osmium::io::Header& header) override final {
                     std::string out;
@@ -470,6 +466,10 @@ namespace osmium {
                     out += "\n=============================================\n\n";
 
                     send_to_output_queue(std::move(out));
+                }
+
+                void write_buffer(osmium::memory::Buffer&& buffer) override final {
+                    m_output_queue.push(osmium::thread::Pool::instance().submit(DebugOutputBlock{std::move(buffer), m_options}));
                 }
 
             }; // class DebugOutputFormat

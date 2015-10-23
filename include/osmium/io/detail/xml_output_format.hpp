@@ -416,10 +416,6 @@ namespace osmium {
 
                 ~XMLOutputFormat() noexcept = default;
 
-                void write_buffer(osmium::memory::Buffer&& buffer) override final {
-                    m_output_queue.push(osmium::thread::Pool::instance().submit(XMLOutputBlock{std::move(buffer), m_options}));
-                }
-
                 void write_header(const osmium::io::Header& header) override final {
                     std::string out = "<?xml version='1.0' encoding='UTF-8'?>\n";
 
@@ -450,6 +446,10 @@ namespace osmium {
                     }
 
                     send_to_output_queue(std::move(out));
+                }
+
+                void write_buffer(osmium::memory::Buffer&& buffer) override final {
+                    m_output_queue.push(osmium::thread::Pool::instance().submit(XMLOutputBlock{std::move(buffer), m_options}));
                 }
 
                 void close() override final {
