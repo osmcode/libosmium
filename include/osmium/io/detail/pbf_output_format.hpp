@@ -73,6 +73,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/tag.hpp>
 #include <osmium/osm/timestamp.hpp>
 #include <osmium/osm/way.hpp>
+#include <osmium/thread/pool.hpp>
 #include <osmium/util/cast.hpp>
 #include <osmium/util/delta.hpp>
 #include <osmium/visitor.hpp>
@@ -133,44 +134,67 @@ namespace osmium {
                 return static_cast<int64_t>(std::round(lonlat * lonlat_resolution / location_granularity));
             }
 
-            /**
-             * Serialize a protobuf message into a Blob, optionally apply compression
-             * and return it together with a BlobHeader ready to be written to a file.
-             *
-             * @param type Type-string used in the BlobHeader.
-             * @param msg Protobuf-message.
-             * @param use_compression Should the output be compressed using zlib?
-             */
-            inline std::string serialize_blob(const std::string& type, const std::string& msg, bool use_compression) {
-                assert(msg.size() <= max_uncompressed_blob_size);
+            enum class pbf_blob_type {
+                header = 0,
+                data = 1
+            };
 
-                std::string blob_data;
-                protozero::pbf_builder<FileFormat::Blob> pbf_blob(blob_data);
+            class SerializeBlob {
 
-                if (use_compression) {
-                    pbf_blob.add_int32(FileFormat::Blob::optional_int32_raw_size, int32_t(msg.size()));
-                    pbf_blob.add_bytes(FileFormat::Blob::optional_bytes_zlib_data, osmium::io::detail::zlib_compress(msg));
-                } else {
-                    pbf_blob.add_bytes(FileFormat::Blob::optional_bytes_raw, msg);
+                std::string m_msg;
+
+                pbf_blob_type m_blob_type;
+
+                bool m_use_compression;
+
+            public:
+
+                SerializeBlob(std::string&& msg, pbf_blob_type type, bool use_compression) :
+                    m_msg(std::move(msg)),
+                    m_blob_type(type),
+                    m_use_compression(use_compression) {
                 }
 
-                std::string blob_header_data;
-                protozero::pbf_builder<FileFormat::BlobHeader> pbf_blob_header(blob_header_data);
+                /**
+                * Serialize a protobuf message into a Blob, optionally apply compression
+                * and return it together with a BlobHeader ready to be written to a file.
+                *
+                * @param type Type-string used in the BlobHeader.
+                * @param msg Protobuf-message.
+                * @param use_compression Should the output be compressed using zlib?
+                */
+                std::string operator()() {
+                    assert(m_msg.size() <= max_uncompressed_blob_size);
 
-                pbf_blob_header.add_string(FileFormat::BlobHeader::required_string_type, type);
-                pbf_blob_header.add_int32(FileFormat::BlobHeader::required_int32_datasize, static_cast_with_assert<int32_t>(blob_data.size()));
+                    std::string blob_data;
+                    protozero::pbf_builder<FileFormat::Blob> pbf_blob(blob_data);
 
-                uint32_t sz = htonl(static_cast_with_assert<uint32_t>(blob_header_data.size()));
+                    if (m_use_compression) {
+                        pbf_blob.add_int32(FileFormat::Blob::optional_int32_raw_size, int32_t(m_msg.size()));
+                        pbf_blob.add_bytes(FileFormat::Blob::optional_bytes_zlib_data, osmium::io::detail::zlib_compress(m_msg));
+                    } else {
+                        pbf_blob.add_bytes(FileFormat::Blob::optional_bytes_raw, m_msg);
+                    }
 
-                // write to output: the 4-byte BlobHeader-Size followed by the BlobHeader followed by the Blob
-                std::string output;
-                output.reserve(sizeof(sz) + blob_header_data.size() + blob_data.size());
-                output.append(reinterpret_cast<const char*>(&sz), sizeof(sz));
-                output.append(blob_header_data);
-                output.append(blob_data);
+                    std::string blob_header_data;
+                    protozero::pbf_builder<FileFormat::BlobHeader> pbf_blob_header(blob_header_data);
 
-                return output;
-            }
+                    pbf_blob_header.add_string(FileFormat::BlobHeader::required_string_type, m_blob_type == pbf_blob_type::data ? "OSMData" : "OSMHeader");
+                    pbf_blob_header.add_int32(FileFormat::BlobHeader::required_int32_datasize, static_cast_with_assert<int32_t>(blob_data.size()));
+
+                    uint32_t sz = htonl(static_cast_with_assert<uint32_t>(blob_header_data.size()));
+
+                    // write to output: the 4-byte BlobHeader-Size followed by the BlobHeader followed by the Blob
+                    std::string output;
+                    output.reserve(sizeof(sz) + blob_header_data.size() + blob_data.size());
+                    output.append(reinterpret_cast<const char*>(&sz), sizeof(sz));
+                    output.append(blob_header_data);
+                    output.append(blob_data);
+
+                    return output;
+                }
+
+            }; // class SerializeBlob
 
             class DenseNodes {
 
@@ -398,7 +422,11 @@ namespace osmium {
 
                     primitive_block.add_message(OSMFormat::PrimitiveBlock::repeated_PrimitiveGroup_primitivegroup, m_primitive_block.group_data());
 
-                    send_to_output_queue(serialize_blob("OSMData", primitive_block_data, m_options.use_compression));
+                    m_output_queue.push(osmium::thread::Pool::instance().submit(
+                        SerializeBlob{std::move(primitive_block_data),
+                                      pbf_blob_type::data,
+                                      m_options.use_compression}
+                    ));
                 }
 
                 template <typename T>
@@ -500,7 +528,11 @@ namespace osmium {
                         pbf_header_block.add_string(OSMFormat::HeaderBlock::optional_string_osmosis_replication_base_url, osmosis_replication_base_url);
                     }
 
-                    send_to_output_queue(serialize_blob("OSMHeader", data, m_options.use_compression));
+                    m_output_queue.push(osmium::thread::Pool::instance().submit(
+                        SerializeBlob{std::move(data),
+                                      pbf_blob_type::header,
+                                      m_options.use_compression}
+                        ));
                 }
 
                 void write_buffer(osmium::memory::Buffer&& buffer) override final {
