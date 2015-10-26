@@ -115,11 +115,11 @@ namespace osmium {
                 }
             }
 
-            ~Bzip2Compressor() override final {
+            ~Bzip2Compressor() noexcept override final {
                 try {
                     close();
                 } catch (...) {
-                    // ignore exceptions
+                    // Ignore any exceptions because destructor must not throw.
                 }
             }
 
@@ -166,11 +166,11 @@ namespace osmium {
                 }
             }
 
-            ~Bzip2Decompressor() override final {
+            ~Bzip2Decompressor() noexcept override final {
                 try {
                     close();
                 } catch (...) {
-                    // ignore exceptions
+                    // Ignore any exceptions because destructor must not throw.
                 }
             }
 
@@ -248,11 +248,11 @@ namespace osmium {
                 }
             }
 
-            ~Bzip2BufferDecompressor() override final {
+            ~Bzip2BufferDecompressor() noexcept override final {
                 try {
                     close();
                 } catch (...) {
-                    // ignore exceptions
+                    // Ignore any exceptions because destructor must not throw.
                 }
             }
 

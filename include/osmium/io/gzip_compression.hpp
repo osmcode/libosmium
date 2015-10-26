@@ -105,11 +105,11 @@ namespace osmium {
                 }
             }
 
-            ~GzipCompressor() override final {
+            ~GzipCompressor() noexcept override final {
                 try {
                     close();
                 } catch (...) {
-                    // ignore exceptions
+                    // Ignore any exceptions because destructor must not throw.
                 }
             }
 
@@ -148,11 +148,11 @@ namespace osmium {
                 }
             }
 
-            ~GzipDecompressor() override final {
+            ~GzipDecompressor() noexcept override final {
                 try {
                     close();
                 } catch (...) {
-                    // ignore exceptions
+                    // Ignore any exceptions because destructor must not throw.
                 }
             }
 
@@ -202,11 +202,11 @@ namespace osmium {
                 }
             }
 
-            ~GzipBufferDecompressor() override final {
+            ~GzipBufferDecompressor() noexcept override final {
                 try {
                     close();
                 } catch (...) {
-                    // ignore exceptions
+                    // Ignore any exceptions because destructor must not throw.
                 }
             }
 

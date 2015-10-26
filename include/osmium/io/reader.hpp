@@ -231,11 +231,11 @@ namespace osmium {
             Reader(Reader&&) = default;
             Reader& operator=(Reader&&) = default;
 
-            ~Reader() {
+            ~Reader() noexcept {
                 try {
                     close();
                 } catch (...) {
-                    // Ignore any exceptions because destructor must not throw
+                    // Ignore any exceptions because destructor must not throw.
                 }
             }
 

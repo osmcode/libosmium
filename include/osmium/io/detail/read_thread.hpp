@@ -141,7 +141,7 @@ namespace osmium {
                         cancel();
                         osmium::thread::wait_until_done(m_future);
                     } catch (...) {
-                        // Ignore exceptions
+                        // Ignore any exceptions because destructor must not throw.
                     }
                 }
 

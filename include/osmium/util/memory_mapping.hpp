@@ -213,7 +213,7 @@ private:
                 try {
                     unmap();
                 } catch (std::system_error&) {
-                    // ignore
+                    // Ignore any exceptions because destructor must not throw.
                 }
             }
 
@@ -379,7 +379,7 @@ private:
              * Releases the mapping by calling unmap(). Will never throw.
              * Call unmap() instead if you want to be notified of any error.
              */
-            ~TypedMemoryMapping() = default;
+            ~TypedMemoryMapping() noexcept = default;
 
             /**
              * Unmap a mapping. If the mapping is not valid, it will do

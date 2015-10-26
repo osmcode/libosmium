@@ -107,8 +107,12 @@ namespace osmium {
             Writer(const Writer&) = delete;
             Writer& operator=(const Writer&) = delete;
 
-            ~Writer() {
-                close();
+            ~Writer() noexcept {
+                try {
+                    close();
+                } catch (...) {
+                    // Ignore any exceptions because destructor must not throw.
+                }
             }
 
             /**

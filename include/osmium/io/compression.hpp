@@ -62,7 +62,7 @@ namespace osmium {
 
             Compressor() = default;
 
-            virtual ~Compressor() {
+            virtual ~Compressor() noexcept {
             }
 
             virtual void write(const std::string& data) = 0;
@@ -85,7 +85,7 @@ namespace osmium {
             Decompressor(Decompressor&&) = delete;
             Decompressor& operator=(Decompressor&&) = delete;
 
-            virtual ~Decompressor() {
+            virtual ~Decompressor() noexcept {
             }
 
             virtual std::string read() = 0;
@@ -190,11 +190,11 @@ namespace osmium {
                 m_fd(fd) {
             }
 
-            ~NoCompressor() override final {
+            ~NoCompressor() noexcept override final {
                 try {
                     close();
                 } catch (...) {
-                    // ignore exceptions
+                    // Ignore any exceptions because destructor must not throw.
                 }
             }
 
@@ -236,11 +236,11 @@ namespace osmium {
                 m_buffer_size(size) {
             }
 
-            ~NoDecompressor() override final {
+            ~NoDecompressor() noexcept override final {
                 try {
                     close();
                 } catch (...) {
-                    // ignore exceptions
+                    // Ignore any exceptions because destructor must not throw.
                 }
             }
 
