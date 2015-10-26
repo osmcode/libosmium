@@ -148,6 +148,14 @@ namespace osmium {
 
             public:
 
+                /**
+                 * Initialize a blob serializer.
+                 *
+                 * @param msg Protobuf-message containing the blob data
+                 * @param type Type of blob.
+                 * @param use_compression Should the output be compressed using
+                 *        zlib?
+                 */
                 SerializeBlob(std::string&& msg, pbf_blob_type type, bool use_compression) :
                     m_msg(std::move(msg)),
                     m_blob_type(type),
@@ -155,13 +163,10 @@ namespace osmium {
                 }
 
                 /**
-                * Serialize a protobuf message into a Blob, optionally apply compression
-                * and return it together with a BlobHeader ready to be written to a file.
-                *
-                * @param type Type-string used in the BlobHeader.
-                * @param msg Protobuf-message.
-                * @param use_compression Should the output be compressed using zlib?
-                */
+                 * Serialize a protobuf message into a Blob, optionally apply
+                 * compression and return it together with a BlobHeader ready
+                 * to be written to a file.
+                 */
                 std::string operator()() {
                     assert(m_msg.size() <= max_uncompressed_blob_size);
 
@@ -195,6 +200,14 @@ namespace osmium {
 
             }; // class SerializeBlob
 
+            /**
+             * Contains the code to pack any number of nodes into a DenseNode
+             * structure.
+             *
+             * Because this needs to allocate a lot of memory on the heap,
+             * only one object of this class will be created and then re-used
+             * after calling clear() on it.
+             */
             class DenseNodes {
 
                 StringTable& m_stringtable;
@@ -231,6 +244,7 @@ namespace osmium {
                     m_options(options) {
                 }
 
+                /// Clear object for re-use. Keep the allocated memory.
                 void clear() {
                     m_ids.clear();
 

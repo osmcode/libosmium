@@ -80,6 +80,16 @@ namespace osmium {
 
 #undef SNPRINTF
 
+            /**
+             * This is a helper function for writing printf-like formatted
+             * data into a std::string.
+             *
+             * @param out The data will be appended to this string.
+             * @param format A string with formatting instructions a la printf.
+             * @param args Any further arguments like in printf.
+             * @throws std::bad_alloc If the string needed to grow and there
+             *         wasn't enough memory.
+             */
             template <typename... TArgs>
             inline void output_formatted_to_string(std::string& out,
                                                    const char* format,
