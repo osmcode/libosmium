@@ -180,7 +180,7 @@ namespace osmium {
                     try {
                         std::future<osmium::memory::Buffer> buffer_future;
                         m_osmdata_queue.wait_and_pop(buffer_future);
-                        buffer = std::move(buffer_future.get());
+                        buffer = buffer_future.get();
                     } catch (...) {
                         // ignore errors
                     }
