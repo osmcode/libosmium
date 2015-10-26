@@ -43,6 +43,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/handler.hpp>
 #include <osmium/io/detail/util.hpp>
+#include <osmium/io/detail/string_util.hpp>
 #include <osmium/io/file.hpp>
 #include <osmium/io/file_format.hpp>
 #include <osmium/io/header.hpp>
@@ -57,71 +58,6 @@ namespace osmium {
     namespace io {
 
         namespace detail {
-
-#ifndef _MSC_VER
-# define SNPRINTF std::snprintf
-#else
-# define SNPRINTF _snprintf
-#endif
-
-            template <typename... TArgs>
-            inline int string_snprintf(std::string& out,
-                                       size_t old_size,
-                                       size_t max_size,
-                                       const char* format,
-                                       TArgs&&... args) {
-                out.resize(old_size + max_size);
-
-                return SNPRINTF(const_cast<char*>(out.c_str()) + old_size,
-                                max_size,
-                                format,
-                                std::forward<TArgs>(args)...);
-            }
-
-#undef SNPRINTF
-
-            /**
-             * This is a helper function for writing printf-like formatted
-             * data into a std::string.
-             *
-             * @param out The data will be appended to this string.
-             * @param format A string with formatting instructions a la printf.
-             * @param args Any further arguments like in printf.
-             * @throws std::bad_alloc If the string needed to grow and there
-             *         wasn't enough memory.
-             */
-            template <typename... TArgs>
-            inline void output_formatted_to_string(std::string& out,
-                                                   const char* format,
-                                                   TArgs&&... args) {
-
-                // First try to write string with the max_size, if that doesn't
-                // work snprintf will tell us how much space it needs. We
-                // reserve that much space and try again. So this will always
-                // work, even if the output is larger than the given max_size.
-
-                static const size_t max_size = 100;
-
-                size_t old_size = out.size();
-
-                int len = string_snprintf(out,
-                                          old_size,
-                                          max_size,
-                                          format,
-                                          std::forward<TArgs>(args)...);
-                assert(len > 0);
-
-                if (size_t(len) >= max_size) {
-                    int len2 = string_snprintf(out,
-                                               old_size,
-                                               len + 1,
-                                               format,
-                                               std::forward<TArgs>(args)...);
-                    assert(len2 == len);
-                }
-
-                out.resize(old_size + len);
-            }
 
             class OutputBlock : public osmium::handler::Handler {
 
@@ -146,7 +82,7 @@ namespace osmium {
 
                 template <typename... TArgs>
                 void output_formatted(const char* format, TArgs&&... args) {
-                    output_formatted_to_string(*m_out, format, std::forward<TArgs>(args)...);
+                    append_printf_formatted_string(*m_out, format, std::forward<TArgs>(args)...);
                 }
 
             }; // class OutputBlock;

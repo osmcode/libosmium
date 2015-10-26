@@ -46,8 +46,6 @@ DEALINGS IN THE SOFTWARE.
 #include <thread>
 #include <utility>
 
-#include <utf8.h>
-
 #include <osmium/io/detail/output_format.hpp>
 #include <osmium/io/file_format.hpp>
 #include <osmium/memory/buffer.hpp>
@@ -88,36 +86,7 @@ namespace osmium {
                 opl_output_options m_options;
 
                 void append_encoded_string(const char* data) {
-                    const char* end = data + std::strlen(data);
-
-                    while (data != end) {
-                        const char* last = data;
-                        uint32_t c = utf8::next(data, end);
-
-                        // This is a list of Unicode code points that we let
-                        // through instead of escaping them. It is incomplete
-                        // and can be extended later.
-                        // Generally we don't want to let through any character
-                        // that has special meaning in the OPL format such as
-                        // space, comma, @, etc. and any non-printing characters.
-                        if ((0x0021 <= c && c <= 0x0024) ||
-                            (0x0026 <= c && c <= 0x002b) ||
-                            (0x002d <= c && c <= 0x003c) ||
-                            (0x003e <= c && c <= 0x003f) ||
-                            (0x0041 <= c && c <= 0x007e) ||
-                            (0x00a1 <= c && c <= 0x00ac) ||
-                            (0x00ae <= c && c <= 0x05ff)) {
-                            m_out->append(last, data);
-                        } else {
-                            *m_out += '%';
-                            if (c <= 0xff) {
-                                output_formatted("%02x", c);
-                            } else {
-                                output_formatted("%04x", c);
-                            }
-                            *m_out += '%';
-                        }
-                    }
+                    osmium::io::detail::append_utf8_encoded_string(*m_out, data);
                 }
 
                 void write_meta(const osmium::OSMObject& object) {

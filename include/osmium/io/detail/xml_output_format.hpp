@@ -74,26 +74,6 @@ namespace osmium {
 
             struct XMLWriteError {};
 
-            namespace {
-
-                void xml_string(std::string& out, const char* in) {
-                    for (; *in != '\0'; ++in) {
-                        switch(*in) {
-                            case '&':  out += "&amp;";  break;
-                            case '\"': out += "&quot;"; break;
-                            case '\'': out += "&apos;"; break;
-                            case '<':  out += "&lt;";   break;
-                            case '>':  out += "&gt;";   break;
-                            case '\n': out += "&#xA;";  break;
-                            case '\r': out += "&#xD;";  break;
-                            case '\t': out += "&#x9;";  break;
-                            default:   out += *in;      break;
-                        }
-                    }
-                }
-
-            } // anonymous namespace
-
             struct xml_output_options {
 
                 /// Should metadata of objects be added?
@@ -154,7 +134,7 @@ namespace osmium {
 
                         if (!object.user_is_anonymous()) {
                             output_formatted(" uid=\"%d\" user=\"", object.uid());
-                            xml_string(*m_out, object.user());
+                            append_xml_encoded_string(*m_out, object.user());
                             *m_out += "\"";
                         }
 
@@ -176,9 +156,9 @@ namespace osmium {
                     for (const auto& tag : tags) {
                         write_spaces(spaces);
                         *m_out += "  <tag k=\"";
-                        xml_string(*m_out, tag.key());
+                        append_xml_encoded_string(*m_out, tag.key());
                         *m_out += "\" v=\"";
-                        xml_string(*m_out, tag.value());
+                        append_xml_encoded_string(*m_out, tag.value());
                         *m_out += "\"/>\n";
                     }
                 }
@@ -186,12 +166,12 @@ namespace osmium {
                 void write_discussion(const osmium::ChangesetDiscussion& comments) {
                     for (const auto& comment : comments) {
                         output_formatted("   <comment uid=\"%d\" user=\"", comment.uid());
-                        xml_string(*m_out, comment.user());
+                        append_xml_encoded_string(*m_out, comment.user());
                         *m_out += "\" date=\"";
                         *m_out += comment.date().to_iso();
                         *m_out += "\">\n";
                         *m_out += "    <text>";
-                        xml_string(*m_out, comment.text());
+                        append_xml_encoded_string(*m_out, comment.text());
                         *m_out += "</text>\n   </comment>\n";
                     }
                     *m_out += "  </discussion>\n";
@@ -341,7 +321,7 @@ namespace osmium {
                         *m_out += "  <member type=\"";
                         *m_out += item_type_to_name(member.type());
                         output_formatted("\" ref=\"%" PRId64 "\" role=\"", member.ref());
-                        xml_string(*m_out, member.role());
+                        append_xml_encoded_string(*m_out, member.role());
                         *m_out += "\"/>\n";
                     }
 
@@ -372,7 +352,7 @@ namespace osmium {
 
                     if (!changeset.user_is_anonymous()) {
                         *m_out += " user=\"";
-                        xml_string(*m_out, changeset.user());
+                        append_xml_encoded_string(*m_out, changeset.user());
                         output_formatted("\" uid=\"%d\"", changeset.uid());
                     }
 
@@ -442,15 +422,15 @@ namespace osmium {
                         }
                         out += " generator=\"";
                     }
-                    xml_string(out, header.get("generator").c_str());
+                    append_xml_encoded_string(out, header.get("generator").c_str());
                     out += "\">\n";
 
                     for (const auto& box : header.boxes()) {
                         out += "  <bounds";
-                        output_formatted_to_string(out, " minlon=\"%.7f\"", box.bottom_left().lon());
-                        output_formatted_to_string(out, " minlat=\"%.7f\"", box.bottom_left().lat());
-                        output_formatted_to_string(out, " maxlon=\"%.7f\"", box.top_right().lon());
-                        output_formatted_to_string(out, " maxlat=\"%.7f\"/>\n", box.top_right().lat());
+                        append_printf_formatted_string(out, " minlon=\"%.7f\"", box.bottom_left().lon());
+                        append_printf_formatted_string(out, " minlat=\"%.7f\"", box.bottom_left().lat());
+                        append_printf_formatted_string(out, " maxlon=\"%.7f\"", box.top_right().lon());
+                        append_printf_formatted_string(out, " maxlat=\"%.7f\"/>\n", box.top_right().lat());
                     }
 
                     send_to_output_queue(std::move(out));
