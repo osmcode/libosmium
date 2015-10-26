@@ -416,7 +416,7 @@ namespace osmium {
                 XMLOutputFormat(const osmium::io::File& file, future_string_queue_type& output_queue) :
                     OutputFormat(output_queue),
                     m_options() {
-                    m_options.add_metadata     = file.get("add_metadata") != "false";
+                    m_options.add_metadata     = file.is_not_false("add_metadata");
                     m_options.use_change_ops   = file.is_true("xml_change_format");
                     m_options.add_visible_flag = (file.has_multiple_object_versions() || file.is_true("force_visible_flag")) && !m_options.use_change_ops;
                 }

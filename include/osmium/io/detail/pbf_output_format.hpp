@@ -488,9 +488,9 @@ namespace osmium {
                     OutputFormat(output_queue),
                     m_options(),
                     m_primitive_block(m_options) {
-                    m_options.use_dense_nodes = file.get("pbf_dense_nodes") != "false";
-                    m_options.use_compression = file.get("pbf_compression") != "none" && file.get("pbf_compression") != "false";
-                    m_options.add_metadata = file.get("pbf_add_metadata") != "false" && file.get("add_metadata") != "false";
+                    m_options.use_dense_nodes = file.is_not_false("pbf_dense_nodes");
+                    m_options.use_compression = file.get("pbf_compression") != "none" && file.is_not_false("pbf_compression");
+                    m_options.add_metadata = file.is_not_false("pbf_add_metadata") && file.is_not_false("add_metadata");
                     m_options.add_historical_information_flag = file.has_multiple_object_versions();
                     m_options.add_visible_flag = file.has_multiple_object_versions();
                 }
