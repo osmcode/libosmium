@@ -102,12 +102,11 @@ namespace osmium {
                 /// Should metadata of objects be written?
                 bool add_metadata;
 
-                /**
-                 * File (potentially) contains multiple object versions. Will
-                 * add the "HistoricalInformation" header and add the "visible"
-                 * flag to all objects.
-                 */
-                bool has_multiple_object_versions;
+                /// Add the "HistoricalInformation" header flag.
+                bool add_historical_information_flag;
+
+                /// Should the visible flag be added to all OSM objects?
+                bool add_visible_flag;
 
             };
 
@@ -270,7 +269,7 @@ namespace osmium {
                         m_changesets.push_back(m_delta_changeset.update(node.changeset()));
                         m_uids.push_back(m_delta_uid.update(node.uid()));
                         m_user_sids.push_back(m_delta_user_sid.update(m_stringtable.add(node.user())));
-                        if (m_options.has_multiple_object_versions) {
+                        if (m_options.add_visible_flag) {
                             m_visibles.push_back(node.visible());
                         }
                     }
@@ -299,7 +298,7 @@ namespace osmium {
                         pbf_dense_info.add_packed_sint32(OSMFormat::DenseInfo::packed_sint32_uid, m_uids.cbegin(), m_uids.cend());
                         pbf_dense_info.add_packed_sint32(OSMFormat::DenseInfo::packed_sint32_user_sid, m_user_sids.cbegin(), m_user_sids.cend());
 
-                        if (m_options.has_multiple_object_versions) {
+                        if (m_options.add_visible_flag) {
                             pbf_dense_info.add_packed_bool(OSMFormat::DenseInfo::packed_bool_visible, m_visibles.cbegin(), m_visibles.cend());
                         }
                     }
@@ -456,7 +455,7 @@ namespace osmium {
                         pbf_info.add_int64(OSMFormat::Info::optional_int64_changeset, object.changeset());
                         pbf_info.add_int32(OSMFormat::Info::optional_int32_uid, object.uid());
                         pbf_info.add_uint32(OSMFormat::Info::optional_uint32_user_sid, m_primitive_block.store_in_stringtable(object.user()));
-                        if (m_options.has_multiple_object_versions) {
+                        if (m_options.add_visible_flag) {
                             pbf_info.add_bool(OSMFormat::Info::optional_bool_visible, object.visible());
                         }
                     }
@@ -478,7 +477,8 @@ namespace osmium {
                     m_options.use_dense_nodes = file.get("pbf_dense_nodes") != "false";
                     m_options.use_compression = file.get("pbf_compression") != "none" && file.get("pbf_compression") != "false";
                     m_options.add_metadata = file.get("pbf_add_metadata") != "false" && file.get("add_metadata") != "false";
-                    m_options.has_multiple_object_versions = file.has_multiple_object_versions();
+                    m_options.add_historical_information_flag = file.has_multiple_object_versions();
+                    m_options.add_visible_flag = file.has_multiple_object_versions();
                 }
 
                 PBFOutputFormat(const PBFOutputFormat&) = delete;
@@ -506,7 +506,7 @@ namespace osmium {
                         pbf_header_block.add_string(OSMFormat::HeaderBlock::repeated_string_required_features, "DenseNodes");
                     }
 
-                    if (m_options.has_multiple_object_versions) {
+                    if (m_options.add_historical_information_flag) {
                         pbf_header_block.add_string(OSMFormat::HeaderBlock::repeated_string_required_features, "HistoricalInformation");
                     }
 

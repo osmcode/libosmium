@@ -95,9 +95,19 @@ namespace osmium {
             } // anonymous namespace
 
             struct xml_output_options {
+
+                /// Should metadata of objects be added?
                 bool add_metadata;
-                bool write_visible_flag;
-                bool write_change_ops;
+
+                /// Should the visible flag be added to all OSM objects?
+                bool add_visible_flag;
+
+                /**
+                 * Should <create>, <modify>, <delete> "operations" be added?
+                 * (This is used for .osc files.)
+                 */
+                bool use_change_ops;
+
             };
 
             class XMLOutputBlock : public OutputBlock {
@@ -121,7 +131,7 @@ namespace osmium {
                 }
 
                 int prefix_spaces() {
-                    return m_options.write_change_ops ? 4 : 2;
+                    return m_options.use_change_ops ? 4 : 2;
                 }
 
                 void write_prefix() {
@@ -152,7 +162,7 @@ namespace osmium {
                             output_formatted(" changeset=\"%d\"", object.changeset());
                         }
 
-                        if (m_options.write_visible_flag) {
+                        if (m_options.add_visible_flag) {
                             if (object.visible()) {
                                 *m_out += " visible=\"true\"";
                             } else {
@@ -241,7 +251,7 @@ namespace osmium {
                 std::string operator()() {
                     osmium::apply(m_input_buffer->cbegin(), m_input_buffer->cend(), *this);
 
-                    if (m_options.write_change_ops) {
+                    if (m_options.use_change_ops) {
                         open_close_op_tag();
                     }
 
@@ -253,7 +263,7 @@ namespace osmium {
                 }
 
                 void node(const osmium::Node& node) {
-                    if (m_options.write_change_ops) {
+                    if (m_options.use_change_ops) {
                         open_close_op_tag(node.visible() ? (node.version() == 1 ? operation::op_create : operation::op_modify) : operation::op_delete);
                     }
 
@@ -284,7 +294,7 @@ namespace osmium {
                 }
 
                 void way(const osmium::Way& way) {
-                    if (m_options.write_change_ops) {
+                    if (m_options.use_change_ops) {
                         open_close_op_tag(way.visible() ? (way.version() == 1 ? operation::op_create : operation::op_modify) : operation::op_delete);
                     }
 
@@ -311,7 +321,7 @@ namespace osmium {
                 }
 
                 void relation(const osmium::Relation& relation) {
-                    if (m_options.write_change_ops) {
+                    if (m_options.use_change_ops) {
                         open_close_op_tag(relation.visible() ? (relation.version() == 1 ? operation::op_create : operation::op_modify) : operation::op_delete);
                     }
 
@@ -406,9 +416,9 @@ namespace osmium {
                 XMLOutputFormat(const osmium::io::File& file, future_string_queue_type& output_queue) :
                     OutputFormat(output_queue),
                     m_options() {
-                    m_options.add_metadata       = file.get("add_metadata") != "false";
-                    m_options.write_change_ops   = file.is_true("xml_change_format");
-                    m_options.write_visible_flag = (file.has_multiple_object_versions() || file.is_true("force_visible_flag")) && !m_options.write_change_ops;
+                    m_options.add_metadata     = file.get("add_metadata") != "false";
+                    m_options.use_change_ops   = file.is_true("xml_change_format");
+                    m_options.add_visible_flag = (file.has_multiple_object_versions() || file.is_true("force_visible_flag")) && !m_options.use_change_ops;
                 }
 
                 XMLOutputFormat(const XMLOutputFormat&) = delete;
@@ -419,7 +429,7 @@ namespace osmium {
                 void write_header(const osmium::io::Header& header) override final {
                     std::string out = "<?xml version='1.0' encoding='UTF-8'?>\n";
 
-                    if (m_options.write_change_ops) {
+                    if (m_options.use_change_ops) {
                         out += "<osmChange version=\"0.6\" generator=\"";
                     } else {
                         out += "<osm version=\"0.6\"";
@@ -453,7 +463,7 @@ namespace osmium {
                 void close() override final {
                     std::string out;
 
-                    if (m_options.write_change_ops) {
+                    if (m_options.use_change_ops) {
                         out += "</osmChange>\n";
                     } else {
                         out += "</osm>\n";

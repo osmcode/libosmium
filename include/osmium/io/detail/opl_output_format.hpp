@@ -74,7 +74,10 @@ namespace osmium {
         namespace detail {
 
             struct opl_output_options {
+
+                /// Should metadata of objects be added?
                 bool add_metadata;
+
             };
 
             /**

@@ -87,8 +87,13 @@ namespace osmium {
             constexpr const char* color_reset   = "\x1b[0m";
 
             struct debug_output_options {
+
+                /// Should metadata of objects be added?
                 bool add_metadata;
+
+                /// Output with ANSI colors?
                 bool use_color;
+
             };
 
             /**
