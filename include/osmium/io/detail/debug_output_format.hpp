@@ -46,8 +46,6 @@ DEALINGS IN THE SOFTWARE.
 #include <thread>
 #include <utility>
 
-#include <utf8.h>
-
 #include <osmium/io/detail/output_format.hpp>
 #include <osmium/io/file_format.hpp>
 #include <osmium/memory/buffer.hpp>
@@ -103,31 +101,11 @@ namespace osmium {
 
                 debug_output_options m_options;
 
+                const char* m_utf8_prefix = "";
+                const char* m_utf8_suffix = "";
+
                 void append_encoded_string(const char* data) {
-                    const char* end = data + std::strlen(data);
-
-                    while (data != end) {
-                        const char* last = data;
-                        uint32_t c = utf8::next(data, end);
-
-                        // This is a list of Unicode code points that we let
-                        // through instead of escaping them. It is incomplete
-                        // and can be extended later.
-                        // Generally we don't want to let through any
-                        // non-printing characters.
-                        if ((0x0020 <= c && c <= 0x0021) ||
-                            (0x0023 <= c && c <= 0x003b) ||
-                            (0x003d == c) ||
-                            (0x003f <= c && c <= 0x007e) ||
-                            (0x00a1 <= c && c <= 0x00ac) ||
-                            (0x00ae <= c && c <= 0x05ff)) {
-                            m_out->append(last, data);
-                        } else {
-                            write_color(color_red);
-                            output_formatted("<U+%04X>", c);
-                            write_color(color_blue);
-                        }
-                    }
+                    append_debug_encoded_string(*m_out, data, m_utf8_prefix, m_utf8_suffix);
                 }
 
                 void write_color(const char* color) {
@@ -256,7 +234,9 @@ namespace osmium {
 
                 DebugOutputBlock(osmium::memory::Buffer&& buffer, const debug_output_options& options) :
                     OutputBlock(std::move(buffer)),
-                    m_options(options) {
+                    m_options(options),
+                    m_utf8_prefix(options.use_color ? color_red  : ""),
+                    m_utf8_suffix(options.use_color ? color_blue : "") {
                 }
 
                 DebugOutputBlock(const DebugOutputBlock&) = default;

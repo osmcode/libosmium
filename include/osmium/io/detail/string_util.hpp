@@ -160,6 +160,33 @@ namespace osmium {
                 }
             }
 
+            inline void append_debug_encoded_string(std::string& out, const char* data, const char* prefix, const char* suffix) {
+                const char* end = data + std::strlen(data);
+
+                while (data != end) {
+                    const char* last = data;
+                    uint32_t c = utf8::next(data, end);
+
+                    // This is a list of Unicode code points that we let
+                    // through instead of escaping them. It is incomplete
+                    // and can be extended later.
+                    // Generally we don't want to let through any
+                    // non-printing characters.
+                    if ((0x0020 <= c && c <= 0x0021) ||
+                        (0x0023 <= c && c <= 0x003b) ||
+                        (0x003d == c) ||
+                        (0x003f <= c && c <= 0x007e) ||
+                        (0x00a1 <= c && c <= 0x00ac) ||
+                        (0x00ae <= c && c <= 0x05ff)) {
+                        out.append(last, data);
+                    } else {
+                        out.append(prefix);
+                        append_printf_formatted_string(out, "<U+%04X>", c);
+                        out.append(suffix);
+                    }
+                }
+            }
+
         } // namespace detail
 
     } // namespace io

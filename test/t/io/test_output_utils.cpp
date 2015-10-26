@@ -86,23 +86,6 @@ TEST_CASE("UTF8 encoding") {
 
 }
 
-TEST_CASE("encoding of first 127 characters") {
-
-    std::locale cloc("C");
-    char s[] = "a\0";
-
-    for (char c = 1; c < 0x7f; ++c) {
-        std::string out;
-        s[0] = c;
-        osmium::io::detail::append_utf8_encoded_string(out, s);
-
-        if (!std::isprint(c, cloc)) {
-            REQUIRE(out[0] == '%');
-        }
-    }
-
-}
-
 TEST_CASE("html encoding") {
 
     std::string out;
@@ -117,6 +100,53 @@ TEST_CASE("html encoding") {
         const char* s = "& \" \' < > \n \r \t";
         osmium::io::detail::append_xml_encoded_string(out, s);
         REQUIRE(out == "&amp; &quot; &apos; &lt; &gt; &#xA; &#xD; &#x9;");
+    }
+
+}
+
+TEST_CASE("debug encoding") {
+
+    std::string out;
+
+    SECTION("do not encode normal characters") {
+        const char* s = "abc123,.-";
+        osmium::io::detail::append_debug_encoded_string(out, s, "[", "]");
+        REQUIRE(out == s);
+    }
+
+    SECTION("encode some unicode characters") {
+        const char* s = u8"\n_\u30dc_\U0001d11e_\U0001f6eb";
+        osmium::io::detail::append_debug_encoded_string(out, s, "[", "]");
+        REQUIRE(out == "[<U+000A>]_[<U+30DC>]_[<U+1D11E>]_[<U+1F6EB>]");
+    }
+
+}
+
+TEST_CASE("encoding of non-printable characters in the first 127 characters") {
+
+    std::locale cloc("C");
+    char s[] = "a\0";
+
+    for (char c = 1; c < 0x7f; ++c) {
+        std::string out;
+        s[0] = c;
+
+        SECTION("utf8 encode") {
+            osmium::io::detail::append_utf8_encoded_string(out, s);
+
+            if (!std::isprint(c, cloc)) {
+                REQUIRE(out[0] == '%');
+            }
+        }
+
+        SECTION("debug encode") {
+            osmium::io::detail::append_debug_encoded_string(out, s, "", "");
+
+            if (!std::isprint(c, cloc)) {
+                REQUIRE(out[0] == '<');
+            }
+        }
+
     }
 
 }
