@@ -69,10 +69,10 @@ namespace osmium {
             private:
 
                 /**
-                 * Drain the given queue, ie pop and discard all values
+                 * Drain the input queue, ie pop and discard all values
                  * until an empty string (marking the end of file) is read.
                  */
-                inline void drain_queue() {
+                void drain_queue() {
                     std::string s;
                     do {
                         m_input_queue.wait_and_pop(s);
