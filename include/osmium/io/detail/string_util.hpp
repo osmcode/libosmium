@@ -60,7 +60,7 @@ namespace osmium {
                                        TArgs&&... args) {
                 out.resize(old_size + max_size);
 
-                return SNPRINTF(const_cast<char*>(out.c_str()) + old_size,
+                return SNPRINTF(max_size ? const_cast<char*>(out.c_str()) + old_size : nullptr,
                                 max_size,
                                 format,
                                 std::forward<TArgs>(args)...);
@@ -87,8 +87,17 @@ namespace osmium {
                 // work snprintf will tell us how much space it needs. We
                 // reserve that much space and try again. So this will always
                 // work, even if the output is larger than the given max_size.
+                //
+                // Unfortunately this trick doesn't work on Windows, because
+                // the _snprintf() function there only returns the length it
+                // needs if max_size==0 and the buffer pointer is the null
+                // pointer. So we have to take this into account.
 
+#ifndef _MSC_VER
                 static const size_t max_size = 100;
+#else
+                static const size_t max_size = 0;
+#endif
 
                 size_t old_size = out.size();
 
