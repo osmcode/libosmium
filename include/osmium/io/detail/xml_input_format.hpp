@@ -340,7 +340,7 @@ namespace osmium {
                             assert(!m_tl_builder);
                             if (!strcmp(element, "node")) {
                                 mark_header_as_done();
-                                if (m_read_types & osmium::osm_entity_bits::node) {
+                                if (read_types() & osmium::osm_entity_bits::node) {
                                     m_node_builder = std::unique_ptr<osmium::builder::NodeBuilder>(new osmium::builder::NodeBuilder(m_buffer));
                                     m_node_builder->add_user(init_object(m_node_builder->object(), attrs));
                                     m_context = context::node;
@@ -349,7 +349,7 @@ namespace osmium {
                                 }
                             } else if (!strcmp(element, "way")) {
                                 mark_header_as_done();
-                                if (m_read_types & osmium::osm_entity_bits::way) {
+                                if (read_types() & osmium::osm_entity_bits::way) {
                                     m_way_builder = std::unique_ptr<osmium::builder::WayBuilder>(new osmium::builder::WayBuilder(m_buffer));
                                     m_way_builder->add_user(init_object(m_way_builder->object(), attrs));
                                     m_context = context::way;
@@ -358,7 +358,7 @@ namespace osmium {
                                 }
                             } else if (!strcmp(element, "relation")) {
                                 mark_header_as_done();
-                                if (m_read_types & osmium::osm_entity_bits::relation) {
+                                if (read_types() & osmium::osm_entity_bits::relation) {
                                     m_relation_builder = std::unique_ptr<osmium::builder::RelationBuilder>(new osmium::builder::RelationBuilder(m_buffer));
                                     m_relation_builder->add_user(init_object(m_relation_builder->object(), attrs));
                                     m_context = context::relation;
@@ -367,7 +367,7 @@ namespace osmium {
                                 }
                             } else if (!strcmp(element, "changeset")) {
                                 mark_header_as_done();
-                                if (m_read_types & osmium::osm_entity_bits::changeset) {
+                                if (read_types() & osmium::osm_entity_bits::changeset) {
                                     m_changeset_builder = std::unique_ptr<osmium::builder::ChangesetBuilder>(new osmium::builder::ChangesetBuilder(m_buffer));
                                     init_changeset(m_changeset_builder.get(), attrs);
                                     m_context = context::changeset;
@@ -676,7 +676,7 @@ namespace osmium {
                         m_input_queue.wait_and_pop(data);
                         m_input_queue_done = data.empty();
                         parser(data, m_input_queue_done);
-                        if (m_read_types == osmium::osm_entity_bits::nothing && header_is_done()) {
+                        if (read_types() == osmium::osm_entity_bits::nothing && header_is_done()) {
                             break;
                         }
                     }

@@ -194,7 +194,7 @@ namespace osmium {
                     while (const auto size = check_type_and_get_blob_size("OSMData")) {
                         std::string input_buffer = read_from_input_queue_with_check(size);
 
-                        PBFDataBlobDecoder data_blob_parser{ std::move(input_buffer), m_read_types };
+                        PBFDataBlobDecoder data_blob_parser{ std::move(input_buffer), read_types() };
 
                         if (osmium::config::use_pool_threads_for_pbf_parsing()) {
                             send_to_output_queue(osmium::thread::Pool::instance().submit(std::move(data_blob_parser)));
@@ -238,7 +238,7 @@ namespace osmium {
 
                     parse_header_blob();
 
-                    if (m_read_types != osmium::osm_entity_bits::nothing) {
+                    if (read_types() != osmium::osm_entity_bits::nothing) {
                         parse_data_blobs();
                     }
                 }
