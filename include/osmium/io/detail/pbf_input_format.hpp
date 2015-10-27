@@ -187,8 +187,7 @@ namespace osmium {
                     osmium::io::Header header;
                     const auto size = check_type_and_get_blob_size("OSMHeader");
                     header = decode_header(read_from_input_queue_with_check(size));
-                    m_header_is_done = true;
-                    m_header_promise.set_value(header);
+                    set_header_value(header);
                 }
 
                 void parse_data_blobs() {

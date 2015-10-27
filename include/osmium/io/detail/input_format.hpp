@@ -57,13 +57,14 @@ namespace osmium {
 
             class Parser {
 
+                std::promise<osmium::io::Header>& m_header_promise;
+                bool m_header_is_done;
+
             protected:
 
                 string_queue_type& m_input_queue;
                 future_buffer_queue_type& m_output_queue;
-                std::promise<osmium::io::Header>& m_header_promise;
                 osmium::osm_entity_bits::type m_read_types;
-                bool m_header_is_done;
                 bool m_input_queue_done;
 
             private:
@@ -87,6 +88,24 @@ namespace osmium {
 
             protected:
 
+                bool header_is_done() const {
+                    return m_header_is_done;
+                }
+
+                void set_header_value(const osmium::io::Header& header) {
+                    if (!m_header_is_done) {
+                        m_header_is_done = true;
+                        m_header_promise.set_value(header);
+                    }
+                }
+
+                void set_header_exception(const std::exception_ptr& exception) {
+                    if (!m_header_is_done) {
+                        m_header_is_done = true;
+                        m_header_promise.set_exception(exception);
+                    }
+                }
+
                 /**
                 * Wrap the buffer into a future and add it to the output queue.
                 */
@@ -102,11 +121,11 @@ namespace osmium {
                        future_buffer_queue_type& output_queue,
                        std::promise<osmium::io::Header>& header_promise,
                        osmium::osm_entity_bits::type read_types) :
+                    m_header_promise(header_promise),
+                    m_header_is_done(false),
                     m_input_queue(input_queue),
                     m_output_queue(output_queue),
-                    m_header_promise(header_promise),
                     m_read_types(read_types),
-                    m_header_is_done(false),
                     m_input_queue_done(false) {
                 }
 
@@ -125,10 +144,7 @@ namespace osmium {
                         run();
                     } catch (...) {
                         std::exception_ptr exception = std::current_exception();
-                        if (!m_header_is_done) {
-                            m_header_is_done = true;
-                            m_header_promise.set_exception(exception);
-                        }
+                        set_header_exception(exception);
                         send_exception(exception);
                     }
 

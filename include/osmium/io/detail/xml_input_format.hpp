@@ -53,6 +53,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/builder/builder.hpp>
 #include <osmium/builder/osm_object_builder.hpp>
 #include <osmium/io/detail/input_format.hpp>
+#include <osmium/io/detail/util.hpp>
 #include <osmium/io/error.hpp>
 #include <osmium/io/file_format.hpp>
 #include <osmium/io/header.hpp>
@@ -306,11 +307,8 @@ namespace osmium {
                     m_tl_builder->add_tag(k, v);
                 }
 
-                void header_is_done() {
-                    if (!m_header_is_done) {
-                        m_header_is_done = true;
-                        m_header_promise.set_value(m_header);
-                    }
+                void mark_header_as_done() {
+                    set_header_value(m_header);
                 }
 
                 void start_element(const XML_Char* element, const XML_Char** attrs) {
@@ -341,7 +339,7 @@ namespace osmium {
                         case context::top:
                             assert(!m_tl_builder);
                             if (!strcmp(element, "node")) {
-                                header_is_done();
+                                mark_header_as_done();
                                 if (m_read_types & osmium::osm_entity_bits::node) {
                                     m_node_builder = std::unique_ptr<osmium::builder::NodeBuilder>(new osmium::builder::NodeBuilder(m_buffer));
                                     m_node_builder->add_user(init_object(m_node_builder->object(), attrs));
@@ -350,7 +348,7 @@ namespace osmium {
                                     m_context = context::ignored_node;
                                 }
                             } else if (!strcmp(element, "way")) {
-                                header_is_done();
+                                mark_header_as_done();
                                 if (m_read_types & osmium::osm_entity_bits::way) {
                                     m_way_builder = std::unique_ptr<osmium::builder::WayBuilder>(new osmium::builder::WayBuilder(m_buffer));
                                     m_way_builder->add_user(init_object(m_way_builder->object(), attrs));
@@ -359,7 +357,7 @@ namespace osmium {
                                     m_context = context::ignored_way;
                                 }
                             } else if (!strcmp(element, "relation")) {
-                                header_is_done();
+                                mark_header_as_done();
                                 if (m_read_types & osmium::osm_entity_bits::relation) {
                                     m_relation_builder = std::unique_ptr<osmium::builder::RelationBuilder>(new osmium::builder::RelationBuilder(m_buffer));
                                     m_relation_builder->add_user(init_object(m_relation_builder->object(), attrs));
@@ -368,7 +366,7 @@ namespace osmium {
                                     m_context = context::ignored_relation;
                                 }
                             } else if (!strcmp(element, "changeset")) {
-                                header_is_done();
+                                mark_header_as_done();
                                 if (m_read_types & osmium::osm_entity_bits::changeset) {
                                     m_changeset_builder = std::unique_ptr<osmium::builder::ChangesetBuilder>(new osmium::builder::ChangesetBuilder(m_buffer));
                                     init_changeset(m_changeset_builder.get(), attrs);
@@ -518,7 +516,7 @@ namespace osmium {
                             break;
                         case context::top:
                             if (!strcmp(element, "osm") || !strcmp(element, "osmChange")) {
-                                header_is_done();
+                                mark_header_as_done();
                                 m_context = context::root;
                             } else if (!strcmp(element, "delete")) {
                                 m_in_delete_section = false;
@@ -678,12 +676,12 @@ namespace osmium {
                         m_input_queue.wait_and_pop(data);
                         m_input_queue_done = data.empty();
                         parser(data, m_input_queue_done);
-                        if (m_read_types == osmium::osm_entity_bits::nothing && m_header_is_done) {
+                        if (m_read_types == osmium::osm_entity_bits::nothing && header_is_done()) {
                             break;
                         }
                     }
 
-                    header_is_done();
+                    mark_header_as_done();
 
                     if (m_buffer.committed() > 0) {
                         send_to_output_queue(std::move(m_buffer));
