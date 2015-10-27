@@ -59,13 +59,10 @@ namespace osmium {
 
                 future_buffer_queue_type& m_output_queue;
                 std::promise<osmium::io::Header>& m_header_promise;
-                bool m_header_is_done;
-                osmium::osm_entity_bits::type m_read_types;
-
-            protected:
-
                 string_queue_type& m_input_queue;
+                osmium::osm_entity_bits::type m_read_types;
                 bool m_input_queue_done;
+                bool m_header_is_done;
 
             private:
 
@@ -87,6 +84,19 @@ namespace osmium {
                 }
 
             protected:
+
+                std::string get_input() {
+                    std::string data;
+
+                    m_input_queue.wait_and_pop(data);
+                    m_input_queue_done = data.empty();
+
+                    return data;
+                }
+
+                bool input_done() const {
+                    return m_input_queue_done;
+                }
 
                 osmium::osm_entity_bits::type read_types() const {
                     return m_read_types;
@@ -131,10 +141,10 @@ namespace osmium {
                        osmium::osm_entity_bits::type read_types) :
                     m_output_queue(output_queue),
                     m_header_promise(header_promise),
-                    m_header_is_done(false),
-                    m_read_types(read_types),
                     m_input_queue(input_queue),
-                    m_input_queue_done(false) {
+                    m_read_types(read_types),
+                    m_input_queue_done(false),
+                    m_header_is_done(false) {
                 }
 
                 Parser(const Parser&) = default;

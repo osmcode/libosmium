@@ -671,11 +671,9 @@ namespace osmium {
 
                     ExpatXMLParser<XMLParser> parser(this);
 
-                    while (!m_input_queue_done) {
-                        std::string data;
-                        m_input_queue.wait_and_pop(data);
-                        m_input_queue_done = data.empty();
-                        parser(data, m_input_queue_done);
+                    while (!input_done()) {
+                        std::string data = get_input();
+                        parser(data, input_done());
                         if (read_types() == osmium::osm_entity_bits::nothing && header_is_done()) {
                             break;
                         }

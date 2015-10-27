@@ -89,10 +89,8 @@ namespace osmium {
                  */
                 std::string read_from_input_queue(size_t size) {
                     while (m_input_buffer.size() < size) {
-                        std::string new_data;
-                        m_input_queue.wait_and_pop(new_data);
-                        if (new_data.empty()) {
-                            m_input_queue_done = true;
+                        std::string new_data = get_input();
+                        if (input_done()) {
                             throw osmium::pbf_error("truncated data (EOF encountered)");
                         }
                         m_input_buffer += new_data;
