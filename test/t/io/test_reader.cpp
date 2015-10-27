@@ -165,3 +165,46 @@ TEST_CASE("Reader") {
 
 }
 
+TEST_CASE("Reader failure modes") {
+
+    SECTION("should fail with nonexistent file") {
+        REQUIRE_THROWS({
+            osmium::io::Reader reader(with_data_dir("t/io/nonexistent-file.osm"));
+        });
+    }
+
+    SECTION("should fail with nonexistent file (gz)") {
+        REQUIRE_THROWS({
+            osmium::io::Reader reader(with_data_dir("t/io/nonexistent-file.osm.gz"));
+        });
+    }
+
+    SECTION("should fail with nonexistent file (pbf)") {
+        REQUIRE_THROWS({
+            osmium::io::Reader reader(with_data_dir("t/io/nonexistent-file.osm.pbf"));
+        });
+    }
+
+    SECTION("should work when there is an exception in main thread before getting header") {
+        try {
+            osmium::io::Reader reader(with_data_dir("t/io/data.osm"));
+            REQUIRE(!reader.eof());
+            throw std::runtime_error("foo");
+        } catch (...) {
+        }
+
+    }
+
+    SECTION("should work when there is an exception in main thread while reading") {
+        try {
+            osmium::io::Reader reader(with_data_dir("t/io/data.osm"));
+            REQUIRE(!reader.eof());
+            auto header = reader.header();
+            throw std::runtime_error("foo");
+        } catch (...) {
+        }
+
+    }
+
+}
+
