@@ -197,7 +197,7 @@ namespace osmium {
                         PBFDataBlobDecoder data_blob_parser{ std::move(input_buffer), m_read_types };
 
                         if (osmium::config::use_pool_threads_for_pbf_parsing()) {
-                            m_output_queue.push(osmium::thread::Pool::instance().submit(std::move(data_blob_parser)));
+                            send_to_output_queue(osmium::thread::Pool::instance().submit(std::move(data_blob_parser)));
                         } else {
                             send_to_output_queue(data_blob_parser());
                         }
