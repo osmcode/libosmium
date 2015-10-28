@@ -8,6 +8,7 @@
 #include <iostream>
 #include <string>
 
+#include <osmium/io/detail/util.hpp>
 #include <osmium/io/xml_input.hpp>
 #include <osmium/io/gzip_compression.hpp>
 #include <osmium/visitor.hpp>
@@ -72,12 +73,20 @@ std::string read_gz_file(const char* test_id, const char* suffix) {
 
 
 header_buffer_type parse_xml(std::string input) {
-    osmium::thread::Queue<std::string> input_queue;
-    osmium::thread::Queue<std::future<osmium::memory::Buffer>> output_queue;
+    osmium::io::detail::future_string_queue_type input_queue;
+    osmium::io::detail::future_buffer_queue_type output_queue;
     std::promise<osmium::io::Header> header_promise;
 
-    input_queue.push(input);
-    input_queue.push(std::string()); // EOF marker
+    {
+        std::promise<std::string> string_promise;
+        input_queue.push(string_promise.get_future());
+        string_promise.set_value(std::move(input));
+    }
+    {
+        std::promise<std::string> string_promise;
+        input_queue.push(string_promise.get_future());
+        string_promise.set_value(std::string{});
+    }
 
     osmium::io::detail::XMLParser parser(input_queue, output_queue, header_promise, osmium::osm_entity_bits::all);
     parser();

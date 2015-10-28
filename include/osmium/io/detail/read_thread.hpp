@@ -59,16 +59,22 @@ namespace osmium {
             class ReadThread {
 
                 osmium::io::Decompressor* m_decompressor;
-                string_queue_type& m_queue;
+                future_string_queue_type& m_queue;
 
                 // If this is set in the main thread, we have to wrap up at the
                 // next possible moment.
                 std::atomic<bool>& m_done;
 
+                void send_to_queue(std::string&& data) {
+                    std::promise<std::string> promise;
+                    m_queue.push(promise.get_future());
+                    promise.set_value(std::move(data));
+                }
+
             public:
 
                 ReadThread(osmium::io::Decompressor* decompressor,
-                           string_queue_type& queue,
+                           future_string_queue_type& queue,
                            std::atomic<bool>& done) :
                     m_decompressor(decompressor),
                     m_queue(queue),
@@ -92,20 +98,17 @@ namespace osmium {
                             if (data.empty()) { // end of file
                                 break;
                             }
-                            m_queue.push(std::move(data));
+                            send_to_queue(std::move(data));
                         }
 
                         m_decompressor->close();
-
-                        m_queue.push(std::string());
                     } catch (...) {
-                        // If there is an exception in this thread, we make
-                        // sure to push an empty string onto the queue to
-                        // signal the end-of-data to the reading thread so that
-                        // it will not hang. Then we re-throw the exception.
-                        m_queue.push(std::string());
-                        throw;
+                        std::promise<std::string> promise;
+                        m_queue.push(promise.get_future());
+                        promise.set_exception(std::current_exception());
                     }
+
+                    send_to_queue(std::string{});
 
                     return true;
                 }
@@ -119,15 +122,14 @@ namespace osmium {
             class ReadThreadManager {
 
                 std::atomic<bool> m_done;
-                std::future<bool> m_future;
+                std::thread m_thread;
 
             public:
 
                 ReadThreadManager(osmium::io::Decompressor* decompressor,
-                                  string_queue_type& input_queue) :
+                                  future_string_queue_type& input_queue) :
                     m_done(false),
-                    m_future(std::async(std::launch::async,
-                                        detail::ReadThread(decompressor, input_queue, m_done))) {
+                    m_thread(&ReadThread::operator(), ReadThread{decompressor, input_queue, m_done}) {
                 }
 
                 ReadThreadManager(const ReadThreadManager&) = delete;
@@ -138,8 +140,7 @@ namespace osmium {
 
                 ~ReadThreadManager() noexcept {
                     try {
-                        cancel();
-                        osmium::thread::wait_until_done(m_future);
+                        close();
                     } catch (...) {
                         // Ignore any exceptions because destructor must not throw.
                     }
@@ -149,12 +150,11 @@ namespace osmium {
                     m_done = true;
                 }
 
-                void wait_until_done() {
-                    osmium::thread::wait_until_done(m_future);
-                }
-
-                void check_for_exception() {
-                    osmium::thread::check_for_exception(m_future);
+                void close() {
+                    m_done = true;
+                    if (m_thread.joinable()) {
+                        m_thread.join();
+                    }
                 }
 
             }; // class ReadThreadManager

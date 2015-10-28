@@ -59,7 +59,7 @@ namespace osmium {
 
                 future_buffer_queue_type& m_output_queue;
                 std::promise<osmium::io::Header>& m_header_promise;
-                string_queue_type& m_input_queue;
+                future_string_queue_type& m_input_queue;
                 osmium::osm_entity_bits::type m_read_types;
                 bool m_input_queue_done;
                 bool m_header_is_done;
@@ -71,10 +71,13 @@ namespace osmium {
                  * until an empty string (marking the end of file) is read.
                  */
                 void drain_queue() {
-                    std::string s;
-                    do {
-                        m_input_queue.wait_and_pop(s);
-                    } while (!s.empty());
+                    while (!m_input_queue_done) {
+                        try {
+                            get_input();
+                        } catch (...) {
+                            // ignore any exceptions
+                        }
+                    }
                 }
 
                 void send_exception(std::exception_ptr exception) {
@@ -86,11 +89,11 @@ namespace osmium {
             protected:
 
                 std::string get_input() {
-                    std::string data;
+                    std::future<std::string> data_future;
+                    m_input_queue.wait_and_pop(data_future);
 
-                    m_input_queue.wait_and_pop(data);
+                    std::string data = data_future.get();
                     m_input_queue_done = data.empty();
-
                     return data;
                 }
 
@@ -135,7 +138,7 @@ namespace osmium {
 
             public:
 
-                Parser(string_queue_type& input_queue,
+                Parser(future_string_queue_type& input_queue,
                        future_buffer_queue_type& output_queue,
                        std::promise<osmium::io::Header>& header_promise,
                        osmium::osm_entity_bits::type read_types) :
@@ -189,7 +192,7 @@ namespace osmium {
 
                 typedef std::function<
                             std::unique_ptr<Parser>(
-                                string_queue_type&,
+                                future_string_queue_type&,
                                 future_buffer_queue_type&,
                                 std::promise<osmium::io::Header>& header_promise,
                                 osmium::osm_entity_bits::type read_which_entities

@@ -90,7 +90,7 @@ namespace osmium {
 
             int m_childpid;
 
-            osmium::thread::Queue<std::string> m_input_queue;
+            detail::future_string_queue_type m_input_queue;
 
             std::unique_ptr<osmium::io::Decompressor> m_decompressor;
 
@@ -260,7 +260,7 @@ namespace osmium {
                 }
 
                 try {
-                    m_read_thread_manager.wait_until_done();
+                    m_read_thread_manager.close();
                 } catch (...) {
                     // Ignore any exceptions.
                 }
@@ -288,7 +288,6 @@ namespace osmium {
              */
             osmium::io::Header header() {
                 try {
-                    m_read_thread_manager.check_for_exception();
                     if (!m_header_is_initialized) {
                         m_header = m_header_promise.get_future().get();
                         m_header_is_initialized = true;
@@ -322,10 +321,6 @@ namespace osmium {
                 }
 
                 try {
-                    // If an exception happened in the read thread, re-throw
-                    // the exception in this (the main) thread.
-                    m_read_thread_manager.check_for_exception();
-
                     // m_input_format.read() can return an invalid buffer to signal EOF,
                     // or a valid buffer with or without data. A valid buffer
                     // without data is not an error, it just means we have to
@@ -337,8 +332,7 @@ namespace osmium {
                         if (!buffer) {
                             m_status = status::eof;
                             m_osmdata_queue_done = true;
-                            m_read_thread_manager.cancel();
-                            m_read_thread_manager.wait_until_done();
+                            m_read_thread_manager.close();
                             return buffer;
                         }
                         if (buffer.committed() > 0) {

@@ -204,7 +204,7 @@ namespace osmium {
 
             public:
 
-                PBFParser(string_queue_type& input_queue,
+                PBFParser(future_string_queue_type& input_queue,
                           future_buffer_queue_type& output_queue,
                           std::promise<osmium::io::Header>& header_promise,
                           osmium::osm_entity_bits::type read_types) :
@@ -251,7 +251,7 @@ namespace osmium {
 #pragma GCC diagnostic ignored "-Wunused-variable"
                 const bool registered_pbf_parser = ParserFactory::instance().register_parser(
                     file_format::pbf,
-                    [](string_queue_type& input_queue,
+                    [](future_string_queue_type& input_queue,
                        future_buffer_queue_type& output_queue,
                        std::promise<osmium::io::Header>& header_promise,
                        osmium::osm_entity_bits::type read_which_entities) {
