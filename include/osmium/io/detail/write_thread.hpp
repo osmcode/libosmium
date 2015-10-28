@@ -80,7 +80,7 @@ namespace osmium {
 
                     try {
                         while (true) {
-                            std::string data = std::move(m_queue.pop());
+                            std::string data = m_queue.pop();
                             if (data.empty()) {
                                 break;
                             }
