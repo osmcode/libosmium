@@ -140,7 +140,6 @@ namespace osmium {
 
                     // end of file marker
                     send_to_output_queue(osmium::memory::Buffer{});
-                    m_input_queue.drain();
                 }
 
             }; // class Parser

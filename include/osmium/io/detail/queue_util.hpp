@@ -101,9 +101,11 @@ namespace osmium {
                     m_done(false) {
                 }
 
-                ~queue_wrapper() noexcept = default;
+                ~queue_wrapper() noexcept {
+                    drain();
+                }
 
-                void drain() noexcept {
+                void drain() {
                     while (!m_done) {
                         try {
                             pop();
@@ -132,9 +134,9 @@ namespace osmium {
 
             }; // class queue_wrapper
 
-            template<class T>
-            inline void queue_wrapper<T>::check_is_done(const T& data) noexcept {
-                m_done = data;
+            template<>
+            inline void queue_wrapper<osmium::memory::Buffer>::check_is_done(const osmium::memory::Buffer& data) noexcept {
+                m_done = !data;
             }
 
             template<>

@@ -95,10 +95,10 @@ namespace osmium {
             std::unique_ptr<osmium::io::Decompressor> m_decompressor;
 
             osmium::io::detail::ReadThreadManager m_read_thread_manager;
-            bool m_osmdata_queue_done = false;
 
             detail::future_buffer_queue_type m_osmdata_queue;
             std::thread m_thread;
+            detail::queue_wrapper<osmium::memory::Buffer> m_osmdata_queue_wrapper;
 
             std::promise<osmium::io::Header> m_header_promise;
             std::future<osmium::io::Header> m_header_future;
@@ -175,19 +175,6 @@ namespace osmium {
                 }
             }
 
-            void drain_osmdata_queue() {
-                osmium::memory::Buffer buffer;
-                do {
-                    try {
-                        std::future<osmium::memory::Buffer> buffer_future;
-                        m_osmdata_queue.wait_and_pop(buffer_future);
-                        buffer = buffer_future.get();
-                    } catch (...) {
-                        // ignore errors
-                    }
-                } while (buffer);
-            }
-
         public:
 
             /**
@@ -211,6 +198,7 @@ namespace osmium {
                 m_read_thread_manager(m_decompressor.get(), m_input_queue),
                 m_osmdata_queue(max_osmdata_queue_size, "parser_results"),
                 m_thread(),
+                m_osmdata_queue_wrapper(m_osmdata_queue),
                 m_header_promise(),
                 m_header_future(m_header_promise.get_future()),
                 m_header(),
@@ -257,10 +245,7 @@ namespace osmium {
             void close() {
                 m_read_thread_manager.stop();
 
-                if (!m_osmdata_queue_done) {
-                    drain_osmdata_queue();
-                    m_osmdata_queue_done = true;
-                }
+                m_osmdata_queue_wrapper.drain();
 
                 if (m_thread.joinable()) {
                     m_thread.join();
@@ -333,12 +318,9 @@ namespace osmium {
                     // without data is not an error, it just means we have to
                     // keep getting the next buffer until there is one with data.
                     while (true) {
-                        std::future<osmium::memory::Buffer> buffer_future;
-                        m_osmdata_queue.wait_and_pop(buffer_future);
-                        buffer = buffer_future.get();
+                        buffer = m_osmdata_queue_wrapper.pop();
                         if (!buffer) {
                             m_status = status::eof;
-                            m_osmdata_queue_done = true;
                             m_read_thread_manager.close();
                             return buffer;
                         }

@@ -89,7 +89,6 @@ namespace osmium {
                         m_compressor->close();
                     } catch (...) {
                         m_promise.set_exception(std::current_exception());
-                        m_queue.drain();
                     }
                 }
 
