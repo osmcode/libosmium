@@ -68,6 +68,7 @@ namespace osmium {
 
             std::unique_ptr<osmium::io::Compressor> m_compressor;
 
+            std::promise<bool> m_write_promise;
             std::future<bool> m_write_future;
 
             std::thread m_thread;
@@ -100,16 +101,18 @@ namespace osmium {
                 m_output_queue(20, "raw_output"), // XXX
                 m_output(osmium::io::detail::OutputFormatFactory::instance().create_output(m_file, m_output_queue)),
                 m_compressor(osmium::io::CompressionFactory::instance().create_compressor(file.compression(), osmium::io::detail::open_for_writing(m_file.filename(), allow_overwrite))),
-                m_write_future(),
+                m_write_promise(),
+                m_write_future(m_write_promise.get_future()),
                 m_thread(),
                 m_status(status::writing) {
-
-                std::promise<bool> promise;
-                m_write_future = promise.get_future();
-                m_thread = std::thread(&detail::WriteThread::operator(), detail::WriteThread{m_output_queue, m_compressor.get(), std::move(promise)});
-
                 assert(!m_file.buffer()); // XXX can't handle pseudo-files
+                m_thread = std::thread(&Writer::write_thread, this);
                 m_output->write_header(header);
+            }
+
+            void write_thread() {
+                detail::WriteThread writer{m_output_queue, m_compressor.get(), std::move(m_write_promise)};
+                writer();
             }
 
             explicit Writer(const std::string& filename, const osmium::io::Header& header = osmium::io::Header(), overwrite allow_overwrite = overwrite::no) :

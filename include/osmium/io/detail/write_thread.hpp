@@ -67,11 +67,11 @@ namespace osmium {
                     m_promise(std::move(promise)) {
                 }
 
-                WriteThread(const WriteThread&) = default;
-                WriteThread& operator=(const WriteThread&) = default;
+                WriteThread(const WriteThread&) = delete;
+                WriteThread& operator=(const WriteThread&) = delete;
 
-                WriteThread(WriteThread&&) = default;
-                WriteThread& operator=(WriteThread&&) = default;
+                WriteThread(WriteThread&&) = delete;
+                WriteThread& operator=(WriteThread&&) = delete;
 
                 ~WriteThread() noexcept = default;
 
