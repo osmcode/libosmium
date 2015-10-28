@@ -76,23 +76,16 @@ header_buffer_type parse_xml(std::string input) {
     osmium::io::detail::future_string_queue_type input_queue;
     osmium::io::detail::future_buffer_queue_type output_queue;
     std::promise<osmium::io::Header> header_promise;
+    std::future<osmium::io::Header> header_future = header_promise.get_future();
 
-    {
-        std::promise<std::string> string_promise;
-        input_queue.push(string_promise.get_future());
-        string_promise.set_value(std::move(input));
-    }
-    {
-        std::promise<std::string> string_promise;
-        input_queue.push(string_promise.get_future());
-        string_promise.set_value(std::string{});
-    }
+    osmium::io::detail::add_to_queue(input_queue, std::move(input));
+    osmium::io::detail::add_to_queue(input_queue, std::string{});
 
     osmium::io::detail::XMLParser parser(input_queue, output_queue, header_promise, osmium::osm_entity_bits::all);
-    parser();
+    parser.parse();
 
     header_buffer_type result;
-    result.header = header_promise.get_future().get();
+    result.header = header_future.get();
     std::future<osmium::memory::Buffer> future_buffer;
     output_queue.wait_and_pop(future_buffer);
     result.buffer = future_buffer.get();
