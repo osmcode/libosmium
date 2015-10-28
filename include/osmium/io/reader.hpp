@@ -101,6 +101,7 @@ namespace osmium {
             std::thread m_thread;
 
             std::promise<osmium::io::Header> m_header_promise;
+            std::future<osmium::io::Header> m_header_future;
             osmium::io::Header m_header;
             bool m_header_is_initialized;
 
@@ -211,6 +212,7 @@ namespace osmium {
                 m_osmdata_queue(max_osmdata_queue_size, "parser_results"),
                 m_thread(),
                 m_header_promise(),
+                m_header_future(m_header_promise.get_future()),
                 m_header(),
                 m_header_is_initialized(false) {
                 m_thread = std::thread(&Reader::parse, this);
@@ -294,7 +296,7 @@ namespace osmium {
             osmium::io::Header header() {
                 try {
                     if (!m_header_is_initialized) {
-                        m_header = m_header_promise.get_future().get();
+                        m_header = m_header_future.get();
                         m_header_is_initialized = true;
                     }
                     return m_header;
