@@ -86,6 +86,62 @@ namespace osmium {
                 promise.set_exception(std::move(exception));
             }
 
+            template <class T>
+            class queue_wrapper {
+
+                using queue_type = osmium::thread::Queue<std::future<T>>;
+
+                queue_type& m_queue;
+                bool m_done;
+
+            public:
+
+                queue_wrapper(queue_type& queue) :
+                    m_queue(queue),
+                    m_done(false) {
+                }
+
+                ~queue_wrapper() noexcept = default;
+
+                void drain() noexcept {
+                    while (!m_done) {
+                        try {
+                            pop();
+                        } catch (...) {
+                            // Ignore any exceptions.
+                        }
+                    }
+                }
+
+                bool is_done() const noexcept {
+                    return m_done;
+                }
+
+                void check_is_done(const T& data) noexcept;
+
+                T pop() {
+                    if (m_done) {
+                        return T{};
+                    }
+                    std::future<T> data_future;
+                    m_queue.wait_and_pop(data_future);
+                    T data = data_future.get();
+                    check_is_done(data);
+                    return data;
+                }
+
+            }; // class queue_wrapper
+
+            template<class T>
+            inline void queue_wrapper<T>::check_is_done(const T& data) noexcept {
+                m_done = data;
+            }
+
+            template<>
+            inline void queue_wrapper<std::string>::check_is_done(const std::string& data) noexcept {
+                m_done = data.empty();
+            }
+
         } // namespace detail
 
     } // namespace io

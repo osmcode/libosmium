@@ -59,38 +59,18 @@ namespace osmium {
 
                 future_buffer_queue_type& m_output_queue;
                 std::promise<osmium::io::Header>& m_header_promise;
-                future_string_queue_type& m_input_queue;
+                queue_wrapper<std::string> m_input_queue;
                 osmium::osm_entity_bits::type m_read_types;
-                bool m_input_queue_done;
                 bool m_header_is_done;
-
-                /**
-                 * Drain the input queue, ie pop and discard all values
-                 * until an empty string (marking the end of file) is read.
-                 */
-                void drain_queue() {
-                    while (!m_input_queue_done) {
-                        try {
-                            get_input();
-                        } catch (...) {
-                            // ignore any exceptions
-                        }
-                    }
-                }
 
             protected:
 
                 std::string get_input() {
-                    std::future<std::string> data_future;
-                    m_input_queue.wait_and_pop(data_future);
-
-                    std::string data = data_future.get();
-                    m_input_queue_done = data.empty();
-                    return data;
+                    return m_input_queue.pop();
                 }
 
                 bool input_done() const {
-                    return m_input_queue_done;
+                    return m_input_queue.is_done();
                 }
 
                 osmium::osm_entity_bits::type read_types() const {
@@ -136,7 +116,6 @@ namespace osmium {
                     m_header_promise(header_promise),
                     m_input_queue(input_queue),
                     m_read_types(read_types),
-                    m_input_queue_done(false),
                     m_header_is_done(false) {
                 }
 
@@ -161,10 +140,7 @@ namespace osmium {
 
                     // end of file marker
                     send_to_output_queue(osmium::memory::Buffer{});
-
-                    if (!m_input_queue_done) {
-                        drain_queue();
-                    }
+                    m_input_queue.drain();
                 }
 
             }; // class Parser
