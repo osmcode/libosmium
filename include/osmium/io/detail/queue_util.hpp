@@ -1,5 +1,5 @@
-#ifndef OSMIUM_IO_DETAIL_UTIL_HPP
-#define OSMIUM_IO_DETAIL_UTIL_HPP
+#ifndef OSMIUM_IO_DETAIL_QUEUE_UTIL_HPP
+#define OSMIUM_IO_DETAIL_QUEUE_UTIL_HPP
 
 /*
 
@@ -92,4 +92,4 @@ namespace osmium {
 
 } // namespace osmium
 
-#endif // OSMIUM_IO_DETAIL_UTIL_HPP
+#endif // OSMIUM_IO_DETAIL_QUEUE_UTIL_HPP

@@ -42,7 +42,7 @@ DEALINGS IN THE SOFTWARE.
 #include <utility>
 
 #include <osmium/handler.hpp>
-#include <osmium/io/detail/util.hpp>
+#include <osmium/io/detail/queue_util.hpp>
 #include <osmium/io/detail/string_util.hpp>
 #include <osmium/io/file.hpp>
 #include <osmium/io/file_format.hpp>

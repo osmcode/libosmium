@@ -53,7 +53,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/builder/builder.hpp>
 #include <osmium/builder/osm_object_builder.hpp>
 #include <osmium/io/detail/input_format.hpp>
-#include <osmium/io/detail/util.hpp>
+#include <osmium/io/detail/queue_util.hpp>
 #include <osmium/io/error.hpp>
 #include <osmium/io/file_format.hpp>
 #include <osmium/io/header.hpp>

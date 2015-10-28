@@ -41,7 +41,7 @@ DEALINGS IN THE SOFTWARE.
 #include <string>
 #include <utility>
 
-#include <osmium/io/detail/util.hpp>
+#include <osmium/io/detail/queue_util.hpp>
 #include <osmium/io/file.hpp>
 #include <osmium/io/file_format.hpp>
 #include <osmium/io/header.hpp>

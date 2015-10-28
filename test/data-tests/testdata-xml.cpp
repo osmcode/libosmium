@@ -8,7 +8,7 @@
 #include <iostream>
 #include <string>
 
-#include <osmium/io/detail/util.hpp>
+#include <osmium/io/detail/queue_util.hpp>
 #include <osmium/io/xml_input.hpp>
 #include <osmium/io/gzip_compression.hpp>
 #include <osmium/visitor.hpp>

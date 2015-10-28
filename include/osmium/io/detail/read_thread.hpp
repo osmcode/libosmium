@@ -42,6 +42,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/io/compression.hpp>
 #include <osmium/io/detail/input_format.hpp>
+#include <osmium/io/detail/queue_util.hpp>
 #include <osmium/thread/queue.hpp>
 #include <osmium/thread/util.hpp>
 
