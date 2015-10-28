@@ -707,7 +707,11 @@ namespace osmium {
                             header.set("generator", pbf_header_block.get_string());
                             break;
                         case OSMFormat::HeaderBlock::optional_int64_osmosis_replication_timestamp:
-                            header.set("osmosis_replication_timestamp", osmium::Timestamp(pbf_header_block.get_int64()).to_iso());
+                            {
+                                auto timestamp = osmium::Timestamp(pbf_header_block.get_int64()).to_iso();
+                                header.set("osmosis_replication_timestamp", timestamp);
+                                header.set("timestamp", timestamp);
+                            }
                             break;
                         case OSMFormat::HeaderBlock::optional_int64_osmosis_replication_sequence_number:
                             header.set("osmosis_replication_sequence_number", std::to_string(pbf_header_block.get_int64()));
