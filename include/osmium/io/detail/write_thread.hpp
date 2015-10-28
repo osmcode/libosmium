@@ -53,15 +53,18 @@ namespace osmium {
              */
             class WriteThread {
 
-                future_string_queue_type& m_queue;
+                queue_wrapper<std::string> m_queue;
                 osmium::io::Compressor* m_compressor;
+                std::promise<bool> m_promise;
 
             public:
 
                 WriteThread(future_string_queue_type& input_queue,
-                            osmium::io::Compressor* compressor) :
+                            osmium::io::Compressor* compressor,
+                            std::promise<bool>&& promise) :
                     m_queue(input_queue),
-                    m_compressor(compressor) {
+                    m_compressor(compressor),
+                    m_promise(std::move(promise)) {
                 }
 
                 WriteThread(const WriteThread&) = default;
@@ -72,19 +75,22 @@ namespace osmium {
 
                 ~WriteThread() noexcept = default;
 
-                bool operator()() {
+                void operator()() {
                     osmium::thread::set_thread_name("_osmium_write");
 
-                    std::future<std::string> data_future;
-                    std::string data;
-                    do {
-                        m_queue.wait_and_pop(data_future);
-                        data = data_future.get();
-                        m_compressor->write(data);
-                    } while (!data.empty());
-
-                    m_compressor->close();
-                    return true;
+                    try {
+                        while (true) {
+                            std::string data = std::move(m_queue.pop());
+                            if (data.empty()) {
+                                break;
+                            }
+                            m_compressor->write(data);
+                        }
+                        m_compressor->close();
+                    } catch (...) {
+                        m_promise.set_exception(std::current_exception());
+                        m_queue.drain();
+                    }
                 }
 
             }; // class WriteThread

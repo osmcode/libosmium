@@ -39,6 +39,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/io/compression.hpp>
 #include <osmium/io/detail/output_format.hpp>
+#include <osmium/io/detail/queue_util.hpp>
 #include <osmium/io/detail/read_write.hpp>
 #include <osmium/io/detail/write_thread.hpp>
 #include <osmium/io/file.hpp>
@@ -69,6 +70,14 @@ namespace osmium {
 
             std::future<bool> m_write_future;
 
+            std::thread m_thread;
+
+            enum class status {
+                writing   = 0, // normal writing
+                exception = 2, // some error occurred while writing
+                closed    = 3  // close() called
+            } m_status;
+
         public:
 
             /**
@@ -91,8 +100,15 @@ namespace osmium {
                 m_output_queue(20, "raw_output"), // XXX
                 m_output(osmium::io::detail::OutputFormatFactory::instance().create_output(m_file, m_output_queue)),
                 m_compressor(osmium::io::CompressionFactory::instance().create_compressor(file.compression(), osmium::io::detail::open_for_writing(m_file.filename(), allow_overwrite))),
-                m_write_future(std::async(std::launch::async, detail::WriteThread(m_output_queue, m_compressor.get()))) {
-                assert(!m_file.buffer());
+                m_write_future(),
+                m_thread(),
+                m_status(status::writing) {
+
+                std::promise<bool> promise;
+                m_write_future = promise.get_future();
+                m_thread = std::thread(&detail::WriteThread::operator(), detail::WriteThread{m_output_queue, m_compressor.get(), std::move(promise)});
+
+                assert(!m_file.buffer()); // XXX can't handle pseudo-files
                 m_output->write_header(header);
             }
 
@@ -121,9 +137,19 @@ namespace osmium {
              * @throws Some form of std::runtime_error when there is a problem.
              */
             void operator()(osmium::memory::Buffer&& buffer) {
-                osmium::thread::check_for_exception(m_write_future);
-                if (buffer.committed() > 0) {
-                    m_output->write_buffer(std::move(buffer));
+                if (m_status != status::writing) {
+                    throw std::runtime_error("Writing to file that had exception");
+                }
+                try {
+                    osmium::thread::check_for_exception(m_write_future);
+                    if (buffer.committed() > 0) {
+                        m_output->write_buffer(std::move(buffer));
+                    }
+                } catch (...) {
+                    m_status = status::exception;
+                    detail::add_to_queue(m_output_queue, std::current_exception());
+                    m_output->close();
+                    throw;
                 }
             }
 
@@ -136,8 +162,14 @@ namespace osmium {
              * @throws Some form of std::runtime_error when there is a problem.
              */
             void close() {
-                m_output->close();
-                osmium::thread::wait_until_done(m_write_future);
+                if (m_status == status::writing) {
+                    m_status = status::closed;
+                    m_output->close();
+                }
+
+                if (m_thread.joinable()) {
+                    m_thread.join();
+                }
             }
 
         }; // class Writer
