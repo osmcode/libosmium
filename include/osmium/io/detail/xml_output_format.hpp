@@ -33,15 +33,13 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <cassert>
-#include <chrono>
+#include <algorithm>
 #include <cinttypes>
 #include <cstddef>
 #include <cstdio>
 #include <future>
 #include <iterator>
 #include <memory>
-#include <ratio>
 #include <string>
 #include <thread>
 #include <utility>

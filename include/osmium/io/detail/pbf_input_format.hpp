@@ -34,16 +34,12 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <algorithm>
-#include <atomic>
 #include <cassert>
-#include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
 #include <memory>
-#include <ratio>
 #include <sstream>
-#include <stdexcept>
 #include <string>
 #include <thread>
 #include <type_traits>
@@ -57,17 +53,12 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/io/error.hpp>
 #include <osmium/io/file.hpp>
 #include <osmium/io/file_format.hpp>
-#include <osmium/memory/buffer.hpp>
 #include <osmium/osm.hpp>
-#include <osmium/osm/box.hpp>
 #include <osmium/osm/entity_bits.hpp>
-#include <osmium/osm/location.hpp>
 #include <osmium/osm/object.hpp>
 #include <osmium/osm/timestamp.hpp>
 #include <osmium/thread/pool.hpp>
-#include <osmium/thread/queue.hpp>
 #include <osmium/thread/util.hpp>
-#include <osmium/util/cast.hpp>
 #include <osmium/util/config.hpp>
 
 namespace osmium {

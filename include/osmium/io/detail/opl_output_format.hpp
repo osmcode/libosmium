@@ -33,7 +33,6 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <chrono>
 #include <cinttypes>
 #include <cstddef>
 #include <cstdint>
@@ -41,7 +40,6 @@ DEALINGS IN THE SOFTWARE.
 #include <future>
 #include <iterator>
 #include <memory>
-#include <ratio>
 #include <string>
 #include <thread>
 #include <utility>

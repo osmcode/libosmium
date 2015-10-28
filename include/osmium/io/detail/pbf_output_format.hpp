@@ -34,16 +34,13 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <algorithm>
-#include <chrono>
+#include <cassert>
 #include <cmath>
 #include <cstdint>
 #include <cstdlib>
-#include <future>
 #include <iterator>
 #include <memory>
-#include <ratio>
 #include <string>
-#include <thread>
 #include <time.h>
 #include <utility>
 

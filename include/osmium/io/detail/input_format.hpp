@@ -33,6 +33,7 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <exception>
 #include <functional>
 #include <future>
 #include <map>
@@ -47,7 +48,6 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/io/header.hpp>
 #include <osmium/memory/buffer.hpp>
 #include <osmium/osm/entity_bits.hpp>
-#include <osmium/thread/queue.hpp>
 
 namespace osmium {
 

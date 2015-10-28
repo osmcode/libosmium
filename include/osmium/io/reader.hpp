@@ -33,7 +33,6 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <atomic>
 #include <cerrno>
 #include <cstdlib>
 #include <fcntl.h>
@@ -56,12 +55,11 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/io/detail/input_format.hpp>
 #include <osmium/io/detail/read_thread.hpp>
 #include <osmium/io/detail/read_write.hpp>
+#include <osmium/io/detail/queue_util.hpp>
 #include <osmium/io/file.hpp>
 #include <osmium/io/header.hpp>
 #include <osmium/memory/buffer.hpp>
 #include <osmium/osm/entity_bits.hpp>
-#include <osmium/thread/queue.hpp>
-#include <osmium/thread/util.hpp>
 
 namespace osmium {
 

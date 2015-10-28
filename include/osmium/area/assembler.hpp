@@ -35,6 +35,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <algorithm>
 #include <cassert>
+#include <cstring>
 #include <iostream>
 #include <iterator>
 #include <list>

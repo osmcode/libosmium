@@ -33,8 +33,12 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <cassert>
+#include <future>
 #include <memory>
+#include <stdexcept>
 #include <string>
+#include <thread>
 #include <utility>
 
 #include <osmium/io/compression.hpp>

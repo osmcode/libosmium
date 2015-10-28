@@ -43,7 +43,6 @@ DEALINGS IN THE SOFTWARE.
  */
 
 #include <memory>
-#include <stdexcept>
 
 #include <gdalcpp.hpp>
 

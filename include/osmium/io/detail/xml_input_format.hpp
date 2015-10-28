@@ -34,18 +34,13 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <cassert>
-#include <chrono>
 #include <cstddef>
 #include <cstdlib>
 #include <cstring>
 #include <exception>
-#include <iostream>
+#include <future>
 #include <memory>
-#include <ratio>
-#include <sstream>
-#include <stdexcept>
 #include <string>
-#include <thread>
 #include <utility>
 
 #include <expat.h>

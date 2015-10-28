@@ -37,9 +37,12 @@ DEALINGS IN THE SOFTWARE.
 #include <cstdint>
 #include <cstring>
 #include <algorithm>
-#include <iterator>
 #include <limits>
+#include <memory>
+#include <stdexcept>
 #include <string>
+#include <utility>
+#include <vector>
 
 #include <protozero/pbf_message.hpp>
 

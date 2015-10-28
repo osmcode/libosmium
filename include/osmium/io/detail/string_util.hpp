@@ -34,6 +34,7 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <cassert>
+#include <cstdint>
 #include <cstring>
 #include <string>
 #include <utility>

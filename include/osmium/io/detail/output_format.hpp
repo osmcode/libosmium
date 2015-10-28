@@ -34,7 +34,6 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <functional>
-#include <future>
 #include <map>
 #include <memory>
 #include <stdexcept>
@@ -46,13 +45,12 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/io/detail/string_util.hpp>
 #include <osmium/io/file.hpp>
 #include <osmium/io/file_format.hpp>
-#include <osmium/io/header.hpp>
-#include <osmium/thread/queue.hpp>
+#include <osmium/memory/buffer.hpp>
 
 namespace osmium {
 
-    namespace memory {
-        class Buffer;
+    namespace io {
+        class Header;
     }
 
     namespace io {
