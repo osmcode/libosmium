@@ -635,35 +635,6 @@ namespace osmium {
                     m_rml_builder() {
                 }
 
-                /**
-                 * The copy constructor is needed for storing XMLParser in a
-                 * std::function. The copy will look the same as if it has been
-                 * initialized with the same parameters as the original. Any
-                 * state changes in the original will not be reflected in the
-                 * copy.
-                 */
-                XMLParser(const XMLParser& other) :
-                    Parser(other),
-                    m_context(context::root),
-                    m_last_context(context::root),
-                    m_in_delete_section(false),
-                    m_header(),
-                    m_buffer(buffer_size),
-                    m_node_builder(),
-                    m_way_builder(),
-                    m_relation_builder(),
-                    m_changeset_builder(),
-                    m_changeset_discussion_builder(),
-                    m_tl_builder(),
-                    m_wnl_builder(),
-                    m_rml_builder() {
-                }
-
-                XMLParser& operator=(const XMLParser&) = delete;
-
-                XMLParser(XMLParser&&) = default;
-                XMLParser& operator=(XMLParser&&) = default;
-
                 ~XMLParser() noexcept = default;
 
                 void run() override final {

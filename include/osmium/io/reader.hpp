@@ -213,8 +213,13 @@ namespace osmium {
                 m_header_promise(),
                 m_header(),
                 m_header_is_initialized(false) {
-                auto creator = detail::ParserFactory::instance().get_creator_function(file);
-                m_thread = std::thread(&detail::Parser::operator(), creator(m_input_queue, m_osmdata_queue, m_header_promise, read_which_entities));
+                m_thread = std::thread(&Reader::parse, this);
+            }
+
+            void parse() {
+                auto creator = detail::ParserFactory::instance().get_creator_function(m_file);
+                auto parser = creator(m_input_queue, m_osmdata_queue, m_header_promise, m_read_which_entities);
+                parser->parse();
             }
 
             explicit Reader(const std::string& filename, osmium::osm_entity_bits::type read_types = osmium::osm_entity_bits::all) :

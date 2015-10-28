@@ -119,17 +119,17 @@ namespace osmium {
                     m_header_is_done(false) {
                 }
 
-                Parser(const Parser&) = default;
-                Parser& operator=(const Parser&) = default;
+                Parser(const Parser&) = delete;
+                Parser& operator=(const Parser&) = delete;
 
-                Parser(Parser&&) = default;
-                Parser& operator=(Parser&&) = default;
+                Parser(Parser&&) = delete;
+                Parser& operator=(Parser&&) = delete;
 
                 virtual ~Parser() noexcept = default;
 
                 virtual void run() = 0;
 
-                void operator()() {
+                void parse() {
                     try {
                         run();
                     } catch (...) {

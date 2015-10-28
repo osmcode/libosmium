@@ -212,23 +212,6 @@ namespace osmium {
                     m_input_buffer() {
                 }
 
-                /**
-                 * The copy constructor is needed for storing PBFParser in a
-                 * std::function. The copy will look the same as if it has been
-                 * initialized with the same parameters as the original. Any
-                 * state changes in the original will not be reflected in the
-                 * copy.
-                 */
-                PBFParser(const PBFParser& other) :
-                    Parser(other),
-                    m_input_buffer() {
-                }
-
-                PBFParser& operator=(const PBFParser&) = delete;
-
-                PBFParser(PBFParser&&) = default;
-                PBFParser& operator=(PBFParser&&) = default;
-
                 ~PBFParser() noexcept = default;
 
                 void run() override final {
