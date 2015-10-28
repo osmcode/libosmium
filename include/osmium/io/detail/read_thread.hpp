@@ -69,12 +69,6 @@ namespace osmium {
                 // only used in the main thread
                 std::thread m_thread;
 
-                static void send_to_queue(future_string_queue_type& queue, std::string&& data) {
-                    std::promise<std::string> promise;
-                    queue.push(promise.get_future());
-                    promise.set_value(std::move(data));
-                }
-
                 void run_in_thread() {
                     osmium::thread::set_thread_name("_osmium_read");
 
@@ -84,17 +78,15 @@ namespace osmium {
                             if (data.empty()) { // end of file
                                 break;
                             }
-                            send_to_queue(m_queue, std::move(data));
+                            add_to_queue(m_queue, std::move(data));
                         }
 
                         m_decompressor->close();
                     } catch (...) {
-                        std::promise<std::string> promise;
-                        m_queue.push(promise.get_future());
-                        promise.set_exception(std::current_exception());
+                        add_to_queue(m_queue, std::current_exception());
                     }
 
-                    send_to_queue(m_queue, std::string{});
+                    add_to_queue(m_queue, std::string{});
                 }
 
             public:

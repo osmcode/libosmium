@@ -105,9 +105,7 @@ namespace osmium {
                  * queue.
                  */
                 void send_to_output_queue(std::string&& data) {
-                    std::promise<std::string> promise;
-                    m_output_queue.push(promise.get_future());
-                    promise.set_value(std::move(data));
+                    add_to_queue(m_output_queue, std::move(data));
                 }
 
             public:

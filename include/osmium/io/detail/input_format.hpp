@@ -64,8 +64,6 @@ namespace osmium {
                 bool m_input_queue_done;
                 bool m_header_is_done;
 
-            private:
-
                 /**
                  * Drain the input queue, ie pop and discard all values
                  * until an empty string (marking the end of file) is read.
@@ -78,12 +76,6 @@ namespace osmium {
                             // ignore any exceptions
                         }
                     }
-                }
-
-                void send_exception(std::exception_ptr exception) {
-                    std::promise<osmium::memory::Buffer> promise;
-                    m_output_queue.push(promise.get_future());
-                    promise.set_exception(exception);
                 }
 
             protected:
@@ -127,9 +119,7 @@ namespace osmium {
                 * Wrap the buffer into a future and add it to the output queue.
                 */
                 void send_to_output_queue(osmium::memory::Buffer&& buffer) {
-                    std::promise<osmium::memory::Buffer> promise;
-                    m_output_queue.push(promise.get_future());
-                    promise.set_value(std::move(buffer));
+                    add_to_queue(m_output_queue, std::move(buffer));
                 }
 
                 void send_to_output_queue(std::future<osmium::memory::Buffer>&& future) {
@@ -166,7 +156,7 @@ namespace osmium {
                     } catch (...) {
                         std::exception_ptr exception = std::current_exception();
                         set_header_exception(exception);
-                        send_exception(exception);
+                        add_to_queue(m_output_queue, std::move(exception));
                     }
 
                     // end of file marker

@@ -33,6 +33,7 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <exception>
 #include <future>
 #include <string>
 
@@ -70,6 +71,20 @@ namespace osmium {
              * data in order.
              */
             using future_string_queue_type = osmium::thread::Queue<std::future<std::string>>;
+
+            template <class T>
+            inline void add_to_queue(osmium::thread::Queue<std::future<T>>& queue, T&& data) {
+                std::promise<T> promise;
+                queue.push(promise.get_future());
+                promise.set_value(std::forward<T>(data));
+            }
+
+            template <class T>
+            inline void add_to_queue(osmium::thread::Queue<std::future<T>>& queue, std::exception_ptr&& exception) {
+                std::promise<T> promise;
+                queue.push(promise.get_future());
+                promise.set_exception(std::move(exception));
+            }
 
         } // namespace detail
 
