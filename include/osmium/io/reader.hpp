@@ -248,7 +248,7 @@ namespace osmium {
              * @throws Some form of std::runtime_error when there is a problem.
              */
             void close() {
-                m_read_thread_manager.cancel();
+                m_read_thread_manager.stop();
 
                 if (!m_osmdata_queue_done) {
                     drain_osmdata_queue();

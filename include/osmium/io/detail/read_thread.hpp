@@ -52,44 +52,30 @@ namespace osmium {
         namespace detail {
 
             /**
-             * This code runs in its own thread reading data from the input
-             * file and (optionally) decompressing it. The result is sent to
-             * the given queue.
+             * This code uses an internally managed thread to read data from
+             * the input file and (optionally) decompress it. The result is
+             * sent to the given queue. Any exceptions will also be send to
+             * the queue.
              */
-            class ReadThread {
+            class ReadThreadManager {
 
+                // only used in the sub-thread
                 osmium::io::Decompressor* m_decompressor;
                 future_string_queue_type& m_queue;
 
-                // If this is set in the main thread, we have to wrap up at the
-                // next possible moment.
-                std::atomic<bool>& m_done;
+                // used in both threads
+                std::atomic<bool> m_done;
 
-                void send_to_queue(std::string&& data) {
+                // only used in the main thread
+                std::thread m_thread;
+
+                static void send_to_queue(future_string_queue_type& queue, std::string&& data) {
                     std::promise<std::string> promise;
-                    m_queue.push(promise.get_future());
+                    queue.push(promise.get_future());
                     promise.set_value(std::move(data));
                 }
 
-            public:
-
-                ReadThread(osmium::io::Decompressor* decompressor,
-                           future_string_queue_type& queue,
-                           std::atomic<bool>& done) :
-                    m_decompressor(decompressor),
-                    m_queue(queue),
-                    m_done(done) {
-                }
-
-                ReadThread(const ReadThread&) = default;
-                ReadThread& operator=(const ReadThread&) = default;
-
-                ReadThread(ReadThread&&) = default;
-                ReadThread& operator=(ReadThread&&) = default;
-
-                ~ReadThread() noexcept = default;
-
-                bool operator()() {
+                void run_in_thread() {
                     osmium::thread::set_thread_name("_osmium_read");
 
                     try {
@@ -98,7 +84,7 @@ namespace osmium {
                             if (data.empty()) { // end of file
                                 break;
                             }
-                            send_to_queue(std::move(data));
+                            send_to_queue(m_queue, std::move(data));
                         }
 
                         m_decompressor->close();
@@ -108,28 +94,18 @@ namespace osmium {
                         promise.set_exception(std::current_exception());
                     }
 
-                    send_to_queue(std::string{});
-
-                    return true;
+                    send_to_queue(m_queue, std::string{});
                 }
-
-            }; // class ReadThread
-
-            /**
-             * Manages the read thread from the main thread, ie it starts it
-             * and makes sure it is removed on destruction of the manager.
-             */
-            class ReadThreadManager {
-
-                std::atomic<bool> m_done;
-                std::thread m_thread;
 
             public:
 
                 ReadThreadManager(osmium::io::Decompressor* decompressor,
-                                  future_string_queue_type& input_queue) :
+                                  future_string_queue_type& queue) :
+                    m_decompressor(decompressor),
+                    m_queue(queue),
                     m_done(false),
-                    m_thread(&ReadThread::operator(), ReadThread{decompressor, input_queue, m_done}) {
+                    m_thread() {
+                    m_thread = std::thread(&ReadThreadManager::run_in_thread, this);
                 }
 
                 ReadThreadManager(const ReadThreadManager&) = delete;
@@ -146,12 +122,12 @@ namespace osmium {
                     }
                 }
 
-                void cancel() noexcept {
+                void stop() noexcept {
                     m_done = true;
                 }
 
                 void close() {
-                    m_done = true;
+                    stop();
                     if (m_thread.joinable()) {
                         m_thread.join();
                     }
