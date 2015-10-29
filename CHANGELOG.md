@@ -9,16 +9,21 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 
 - Helper functions to make input iterator ranges and output iterators.
+- Add support for reading o5m and o5c files.
 
 ### Changed
 
 - Updated included protozero library to version 1.2.0.
+- Complete overhaul of the I/O system making it much more robust against
+  wrong data and failures during I/O operations.
+- Speed up PBF writing by running parts of it in parallel.
 
 ### Fixed
 
 - PBF reader now decodes locations of invisible nodes properly.
 - Invalid Delta encode iterator dereference.
 - Lots of includes fixed to include (only) what's used.
+- Dangling reference in area assembly code.
 
 
 ## [2.4.1] - 2015-08-29
