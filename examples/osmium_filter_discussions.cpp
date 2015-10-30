@@ -54,23 +54,18 @@ int main(int argc, char* argv[]) {
     auto input_range = osmium::io::make_input_iterator_range<osmium::Changeset>(reader);
 
     // Create an output iterator writing through the "writer" object to the
-    // output file. Use an internal buffer of 100 kbytes.
-    auto output_iterator = osmium::io::make_output_iterator(writer, 100 * 1024);
+    // output file.
+    auto output_iterator = osmium::io::make_output_iterator(writer);
 
     // Copy all changesets from input to output that have at least one comment.
     std::copy_if(input_range.begin(), input_range.end(), output_iterator, [](const osmium::Changeset& changeset) {
         return changeset.num_comments() > 0;
     });
 
-    // It is important to flush the output iterator once we are finished,
-    // because it contains a buffer that will otherwise not make it to the
-    // writer.
-    output_iterator.flush();
-
     // Explicitly close the writer and reader. Will throw an exception if
     // there is a problem. If you wait for the destructor to close the writer
-    // and reader, you will not notice the problem, because they can not
-    // throw.
+    // and reader, you will not notice the problem, because destructors must
+    // not throw.
     writer.close();
     reader.close();
 }

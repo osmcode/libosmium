@@ -17,6 +17,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Complete overhaul of the I/O system making it much more robust against
   wrong data and failures during I/O operations.
 - Speed up PBF writing by running parts of it in parallel.
+- OutputIterator doesn't hold an internal buffer any more, but it uses
+  one in Writer. Calling flush() on the OutputIterator isn't needed any
+  more.
 
 ### Fixed
 

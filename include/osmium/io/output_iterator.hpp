@@ -41,6 +41,14 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/memory/buffer.hpp>
 #include <osmium/osm/diff_object.hpp>
 
+#ifdef __GNUC__
+# define DEPRECATED __attribute__((deprecated))
+#elif defined(_MSC_VER)
+# define DEPRECATED __declspec(deprecated)
+#else
+# define DEPRECATED
+#endif
+
 namespace osmium {
 
     namespace memory {
@@ -52,27 +60,22 @@ namespace osmium {
         template <class TDest>
         class OutputIterator : public std::iterator<std::output_iterator_tag, osmium::memory::Item> {
 
-            struct buffer_wrapper {
-
-                osmium::memory::Buffer buffer;
-
-                buffer_wrapper(size_t buffer_size) :
-                    buffer(buffer_size, osmium::memory::Buffer::auto_grow::no) {
-                }
-
-            }; // struct buffer_wrapper
-
-            static constexpr size_t default_buffer_size = 10 * 1024 * 1024;
-
             TDest* m_destination;
-
-            std::shared_ptr<buffer_wrapper> m_buffer_wrapper;
 
         public:
 
-            explicit OutputIterator(TDest& destination, const size_t buffer_size = default_buffer_size) :
-                m_destination(&destination),
-                m_buffer_wrapper(std::make_shared<buffer_wrapper>(buffer_size)) {
+            explicit OutputIterator(TDest& destination) :
+                m_destination(&destination) {
+            }
+
+            /**
+             * Warning! Use of buffer size argument on OutputIterator
+             * constructor is deprecated. Call Writer::set_buffer_size()
+             * instead if you want to change the default.
+             */
+            DEPRECATED OutputIterator(TDest& destination, const size_t buffer_size) :
+                m_destination(&destination) {
+                destination.set_buffer_size(buffer_size);
             }
 
             OutputIterator(const OutputIterator&) = default;
@@ -83,22 +86,16 @@ namespace osmium {
 
             ~OutputIterator() = default;
 
-            void flush() {
-                osmium::memory::Buffer buffer(m_buffer_wrapper->buffer.capacity(), osmium::memory::Buffer::auto_grow::no);
-
-                using std::swap;
-                swap(m_buffer_wrapper->buffer, buffer);
-
-                (*m_destination)(std::move(buffer));
+            /**
+             * Warning! Calling OutputIterator<Writer>::flush() is usually not
+             * needed any more. Call flush() on the Writer instead if needed.
+             */
+            DEPRECATED void flush() {
+                m_destination->flush();
             }
 
             OutputIterator& operator=(const osmium::memory::Item& item) {
-                try {
-                    m_buffer_wrapper->buffer.push_back(item);
-                } catch (osmium::buffer_is_full&) {
-                    flush();
-                    m_buffer_wrapper->buffer.push_back(item);
-                }
+                (*m_destination)(item);
                 return *this;
             }
 
@@ -125,13 +122,21 @@ namespace osmium {
             return OutputIterator<TDest>{destination};
         }
 
+        /**
+         * Warning! Use of buffer size argument on make_output_iterator is
+         * deprecated. Call Writer::set_buffer_size() instead if you want to
+         * change the default.
+         */
         template <class TDest>
-        OutputIterator<TDest> make_output_iterator(TDest& destination, const size_t buffer_size) {
-            return OutputIterator<TDest>{destination, buffer_size};
+        DEPRECATED OutputIterator<TDest> make_output_iterator(TDest& destination, const size_t buffer_size) {
+            destination.set_buffer_size(buffer_size);
+            return OutputIterator<TDest>{destination};
         }
 
     } // namespace io
 
 } // namespace osmium
+
+#undef DEPRECATED
 
 #endif // OSMIUM_IO_OUTPUT_ITERATOR_HPP

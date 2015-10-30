@@ -59,10 +59,29 @@ namespace osmium {
         /**
          * This is the user-facing interface for writing OSM files. Instantiate
          * an object of this class with a file name or osmium::io::File object
-         * and optionally the data for the header and then call operator() on it
-         * to write Buffers. Call close() to finish up.
+         * and optionally the data for the header and then call operator() on
+         * it to write Buffers or Items.
+         *
+         * The writer uses multithreading internally to do the actual encoding
+         * of the data into the intended format, possible compress the data and
+         * then write it out. But this is intentionally hidden from the user
+         * of this class who can use it without knowing those details.
+         *
+         * If you are done call the close() method to finish up. Only if you
+         * don't get an exception from the close() method, you can be sure
+         * the data is written correctly (modulo operating system buffering).
+         * The destructor of this class will also do the right thing if you
+         * forget to call close(), but because the destructor can't throw you
+         * will not get informed about any problems.
+         *
+         * The writer is usually used to write complete blocks of data stored
+         * in osmium::memory::Buffers. But you can also write single
+         * osmium::memory::Items. In this case the Writer uses an internal
+         * Buffer.
          */
         class Writer {
+
+            static constexpr size_t default_buffer_size = 10 * 1024 * 1024;
 
             osmium::io::File m_file;
 
@@ -71,6 +90,10 @@ namespace osmium {
             std::unique_ptr<osmium::io::detail::OutputFormat> m_output;
 
             std::unique_ptr<osmium::io::Compressor> m_compressor;
+
+            osmium::memory::Buffer m_buffer;
+
+            size_t m_buffer_size;
 
             std::promise<bool> m_write_promise;
             std::future<bool> m_write_future;
@@ -82,6 +105,31 @@ namespace osmium {
                 exception = 2, // some error occurred while writing
                 closed    = 3  // close() called
             } m_status;
+
+            // This function will run in a separate thread.
+            void write_thread() {
+                detail::WriteThread write_thread{m_output_queue,
+                                                 m_compressor.get(),
+                                                 std::move(m_write_promise)};
+                write_thread();
+            }
+
+            void write(osmium::memory::Buffer&& buffer) {
+                if (m_status != status::writing) {
+                    throw std::runtime_error("Writing to file that had exception");
+                }
+                try {
+                    osmium::thread::check_for_exception(m_write_future);
+                    if (buffer.committed() > 0) {
+                        m_output->write_buffer(std::move(buffer));
+                    }
+                } catch (...) {
+                    m_status = status::exception;
+                    detail::add_to_queue(m_output_queue, std::current_exception());
+                    m_output->close();
+                    throw;
+                }
+            }
 
         public:
 
@@ -105,6 +153,8 @@ namespace osmium {
                 m_output_queue(20, "raw_output"), // XXX
                 m_output(osmium::io::detail::OutputFormatFactory::instance().create_output(m_file, m_output_queue)),
                 m_compressor(osmium::io::CompressionFactory::instance().create_compressor(file.compression(), osmium::io::detail::open_for_writing(m_file.filename(), allow_overwrite))),
+                m_buffer(),
+                m_buffer_size(default_buffer_size),
                 m_write_promise(),
                 m_write_future(m_write_promise.get_future()),
                 m_thread(),
@@ -112,11 +162,6 @@ namespace osmium {
                 assert(!m_file.buffer()); // XXX can't handle pseudo-files
                 m_thread = std::thread(&Writer::write_thread, this);
                 m_output->write_header(header);
-            }
-
-            void write_thread() {
-                detail::WriteThread writer{m_output_queue, m_compressor.get(), std::move(m_write_promise)};
-                writer();
             }
 
             explicit Writer(const std::string& filename, const osmium::io::Header& header = osmium::io::Header(), overwrite allow_overwrite = overwrite::no) :
@@ -130,6 +175,9 @@ namespace osmium {
             Writer(const Writer&) = delete;
             Writer& operator=(const Writer&) = delete;
 
+            Writer(Writer&&) = default;
+            Writer& operator=(Writer&&) = default;
+
             ~Writer() noexcept {
                 try {
                     close();
@@ -139,36 +187,80 @@ namespace osmium {
             }
 
             /**
+             * Get the currently configured size of the internal buffer.
+             */
+            size_t buffer_size() const noexcept {
+                return m_buffer_size;
+            }
+
+            /**
+             * Set the size of the internal buffer. This will only take effect
+             * if you have not yet written anything or after the next flush().
+             */
+            void set_buffer_size(size_t size) noexcept {
+                m_buffer_size = size;
+            }
+
+            /**
+             * Flush the internal buffer if it contains any data. This is also
+             * called by close(), so usually you don't have to call this.
+             *
+             * @throws Some form of std::runtime_error when there is a problem.
+             */
+            void flush() {
+                if (m_buffer && m_buffer.committed() > 0) {
+                    osmium::memory::Buffer buffer{m_buffer_size,
+                                                  osmium::memory::Buffer::auto_grow::no};
+                    using std::swap;
+                    swap(m_buffer, buffer);
+
+                    write(std::move(buffer));
+                }
+            }
+
+            /**
              * Write contents of a buffer to the output file.
              *
              * @throws Some form of std::runtime_error when there is a problem.
              */
             void operator()(osmium::memory::Buffer&& buffer) {
-                if (m_status != status::writing) {
-                    throw std::runtime_error("Writing to file that had exception");
+                flush();
+                write(std::move(buffer));
+            }
+
+            /**
+             * Add item to the internal buffer for eventual writing to the
+             * output file.
+             *
+             * @throws Some form of std::runtime_error when there is a problem.
+             */
+            void operator()(const osmium::memory::Item& item) {
+                if (!m_buffer) {
+                    m_buffer = osmium::memory::Buffer{m_buffer_size,
+                                                      osmium::memory::Buffer::auto_grow::no};
                 }
                 try {
-                    osmium::thread::check_for_exception(m_write_future);
-                    if (buffer.committed() > 0) {
-                        m_output->write_buffer(std::move(buffer));
-                    }
-                } catch (...) {
-                    m_status = status::exception;
-                    detail::add_to_queue(m_output_queue, std::current_exception());
-                    m_output->close();
-                    throw;
+                    m_buffer.push_back(item);
+                } catch (osmium::buffer_is_full&) {
+                    flush();
+                    m_buffer.push_back(item);
                 }
             }
 
             /**
-             * Flush writes to output file and closes it. If you do not
+             * Flushes internal buffer and closes output file. If you do not
              * call this, the destructor of Writer will also do the same
-             * thing. But because this call might thrown an exception,
-             * it is better to call close() explicitly.
+             * thing. But because this call might throw an exception, which
+             * the destructor will ignore, it is better to call close()
+             * explicitly.
              *
              * @throws Some form of std::runtime_error when there is a problem.
              */
             void close() {
+                if (m_buffer && m_buffer.committed() > 0) {
+                    (*this)(std::move(m_buffer));
+                }
+
                 if (m_status == status::writing) {
                     m_status = status::closed;
                     m_output->close();
