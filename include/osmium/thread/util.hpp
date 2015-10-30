@@ -80,6 +80,31 @@ namespace osmium {
         }
 #endif
 
+        class thread_handler {
+
+            std::thread m_thread;
+
+        public:
+
+            template <class Function, class... Args>
+            thread_handler(Function&& f, Args&&... args) :
+                m_thread(std::move(f), std::forward<Args>(args)...) {
+            }
+
+            thread_handler(const thread_handler&) = delete;
+            thread_handler& operator=(const thread_handler&) = delete;
+
+            thread_handler(thread_handler&&) = delete;
+            thread_handler& operator=(thread_handler&&) = delete;
+
+            ~thread_handler() {
+                if (m_thread.joinable()) {
+                    m_thread.join();
+                }
+            }
+
+        }; // class thread_handler
+
     } // namespace thread
 
 } // namespace osmium

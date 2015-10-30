@@ -126,7 +126,6 @@ namespace osmium {
                 virtual void write_buffer(osmium::memory::Buffer&&) = 0;
 
                 virtual void close() {
-                    send_to_output_queue(std::string{});
                 }
 
             }; // class OutputFormat

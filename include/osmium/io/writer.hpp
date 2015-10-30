@@ -98,7 +98,7 @@ namespace osmium {
             std::promise<bool> m_write_promise;
             std::future<bool> m_write_future;
 
-            std::thread m_thread;
+            osmium::thread::thread_handler m_thread;
 
             enum class status {
                 writing   = 0, // normal writing
@@ -107,10 +107,12 @@ namespace osmium {
             } m_status;
 
             // This function will run in a separate thread.
-            void write_thread() {
-                detail::WriteThread write_thread{m_output_queue,
-                                                 m_compressor.get(),
-                                                 std::move(m_write_promise)};
+            static void write_thread(detail::future_string_queue_type& output_queue,
+                                     osmium::io::Compressor* compressor,
+                                     std::promise<bool>&& write_promise) {
+                detail::WriteThread write_thread{output_queue,
+                                                 compressor,
+                                                 std::move(write_promise)};
                 write_thread();
             }
 
@@ -157,11 +159,15 @@ namespace osmium {
                 m_buffer_size(default_buffer_size),
                 m_write_promise(),
                 m_write_future(m_write_promise.get_future()),
-                m_thread(),
+                m_thread(write_thread, std::ref(m_output_queue), m_compressor.get(), std::move(m_write_promise)),
                 m_status(status::writing) {
                 assert(!m_file.buffer()); // XXX can't handle pseudo-files
-                m_thread = std::thread(&Writer::write_thread, this);
-                m_output->write_header(header);
+                try {
+                    m_output->write_header(header);
+                } catch (...) {
+                    detail::add_to_queue(m_output_queue, std::string{});
+                    throw;
+                }
             }
 
             explicit Writer(const std::string& filename, const osmium::io::Header& header = osmium::io::Header(), overwrite allow_overwrite = overwrite::no) :
@@ -257,18 +263,14 @@ namespace osmium {
              * @throws Some form of std::runtime_error when there is a problem.
              */
             void close() {
-                if (m_buffer && m_buffer.committed() > 0) {
-                    (*this)(std::move(m_buffer));
-                }
-
                 if (m_status == status::writing) {
+                    if (m_buffer && m_buffer.committed() > 0) {
+                        write(std::move(m_buffer));
+                    }
                     m_status = status::closed;
                     m_output->close();
                 }
-
-                if (m_thread.joinable()) {
-                    m_thread.join();
-                }
+                detail::add_to_queue(m_output_queue, std::string{});
             }
 
         }; // class Writer

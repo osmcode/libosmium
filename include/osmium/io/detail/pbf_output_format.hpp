@@ -556,8 +556,6 @@ namespace osmium {
                  */
                 void close() override final {
                     store_primitive_block();
-
-                    send_to_output_queue(std::string{});
                 }
 
                 void node(const osmium::Node& node) {

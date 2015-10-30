@@ -448,8 +448,6 @@ namespace osmium {
                     }
 
                     send_to_output_queue(std::move(out));
-
-                    send_to_output_queue(std::string{});
                 }
 
             }; // class XMLOutputFormat

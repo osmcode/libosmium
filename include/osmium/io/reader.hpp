@@ -60,6 +60,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/io/header.hpp>
 #include <osmium/memory/buffer.hpp>
 #include <osmium/osm/entity_bits.hpp>
+#include <osmium/thread/util.hpp>
 
 namespace osmium {
 
@@ -95,13 +96,26 @@ namespace osmium {
             osmium::io::detail::ReadThreadManager m_read_thread_manager;
 
             detail::future_buffer_queue_type m_osmdata_queue;
-            std::thread m_thread;
             detail::queue_wrapper<osmium::memory::Buffer> m_osmdata_queue_wrapper;
 
             std::promise<osmium::io::Header> m_header_promise;
             std::future<osmium::io::Header> m_header_future;
             osmium::io::Header m_header;
             bool m_header_is_initialized;
+
+            osmium::thread::thread_handler m_thread;
+
+            // This function will run in a separate thread.
+            static void parser_thread(osmium::io::File& file,
+                                      detail::future_string_queue_type& input_queue,
+                                      detail::future_buffer_queue_type& osmdata_queue,
+                                      std::promise<osmium::io::Header>&& header_promise,
+                                      osmium::osm_entity_bits::type read_which_entities) {
+                std::promise<osmium::io::Header> promise = std::move(header_promise);
+                auto creator = detail::ParserFactory::instance().get_creator_function(file);
+                auto parser = creator(input_queue, osmdata_queue, promise, read_which_entities);
+                parser->parse();
+            }
 
 #ifndef _WIN32
             /**
@@ -195,19 +209,12 @@ namespace osmium {
                     osmium::io::CompressionFactory::instance().create_decompressor(file.compression(), open_input_file_or_url(m_file.filename(), &m_childpid))),
                 m_read_thread_manager(m_decompressor.get(), m_input_queue),
                 m_osmdata_queue(max_osmdata_queue_size, "parser_results"),
-                m_thread(),
                 m_osmdata_queue_wrapper(m_osmdata_queue),
                 m_header_promise(),
                 m_header_future(m_header_promise.get_future()),
                 m_header(),
-                m_header_is_initialized(false) {
-                m_thread = std::thread(&Reader::parse, this);
-            }
-
-            void parse() {
-                auto creator = detail::ParserFactory::instance().get_creator_function(m_file);
-                auto parser = creator(m_input_queue, m_osmdata_queue, m_header_promise, m_read_which_entities);
-                parser->parse();
+                m_header_is_initialized(false),
+                m_thread(parser_thread, std::ref(m_file), std::ref(m_input_queue), std::ref(m_osmdata_queue), std::move(m_header_promise), read_which_entities) {
             }
 
             explicit Reader(const std::string& filename, osmium::osm_entity_bits::type read_types = osmium::osm_entity_bits::all) :
@@ -244,10 +251,6 @@ namespace osmium {
                 m_read_thread_manager.stop();
 
                 m_osmdata_queue_wrapper.drain();
-
-                if (m_thread.joinable()) {
-                    m_thread.join();
-                }
 
                 try {
                     m_read_thread_manager.close();

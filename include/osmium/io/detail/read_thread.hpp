@@ -94,8 +94,7 @@ namespace osmium {
                     m_decompressor(decompressor),
                     m_queue(queue),
                     m_done(false),
-                    m_thread() {
-                    m_thread = std::thread(&ReadThreadManager::run_in_thread, this);
+                    m_thread(std::thread(&ReadThreadManager::run_in_thread, this)) {
                 }
 
                 ReadThreadManager(const ReadThreadManager&) = delete;
