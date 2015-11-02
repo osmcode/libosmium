@@ -457,19 +457,17 @@ namespace osmium {
 
             }; // class DebugOutputFormat
 
-            namespace {
+            // we want the register_output_format() function to run, setting
+            // the variable is only a side-effect, it will never be used
+            const bool registered_debug_output = osmium::io::detail::OutputFormatFactory::instance().register_output_format(osmium::io::file_format::debug,
+                [](const osmium::io::File& file, future_string_queue_type& output_queue) {
+                    return new osmium::io::detail::DebugOutputFormat(file, output_queue);
+            });
 
-// we want the register_output_format() function to run, setting the variable
-// is only a side-effect, it will never be used
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-variable"
-                const bool registered_debug_output = osmium::io::detail::OutputFormatFactory::instance().register_output_format(osmium::io::file_format::debug,
-                    [](const osmium::io::File& file, future_string_queue_type& output_queue) {
-                        return new osmium::io::detail::DebugOutputFormat(file, output_queue);
-                });
-#pragma GCC diagnostic pop
-
-            } // anonymous namespace
+            // dummy function to silence the unused variable warning from above
+            inline bool get_registered_debug_output() noexcept {
+                return registered_debug_output;
+            }
 
         } // namespace detail
 

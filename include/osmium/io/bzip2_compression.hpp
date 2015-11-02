@@ -288,20 +288,22 @@ namespace osmium {
 
         }; // class Bzip2BufferDecompressor
 
-        namespace {
+        namespace detail {
 
-// we want the register_compression() function to run, setting the variable
-// is only a side-effect, it will never be used
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-variable"
+            // we want the register_compression() function to run, setting
+            // the variable is only a side-effect, it will never be used
             const bool registered_bzip2_compression = osmium::io::CompressionFactory::instance().register_compression(osmium::io::file_compression::bzip2,
                 [](int fd) { return new osmium::io::Bzip2Compressor(fd); },
                 [](int fd) { return new osmium::io::Bzip2Decompressor(fd); },
                 [](const char* buffer, size_t size) { return new osmium::io::Bzip2BufferDecompressor(buffer, size); }
             );
-#pragma GCC diagnostic pop
 
-        } // anonymous namespace
+            // dummy function to silence the unused variable warning from above
+            inline bool get_registered_bzip2_compression() noexcept {
+                return registered_bzip2_compression;
+            }
+
+        } // namespace detail
 
     } // namespace io
 

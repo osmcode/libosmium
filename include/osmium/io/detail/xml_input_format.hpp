@@ -654,23 +654,21 @@ namespace osmium {
 
             }; // class XMLParser
 
-            namespace {
+            // we want the register_parser() function to run, setting
+            // the variable is only a side-effect, it will never be used
+            const bool registered_xml_parser = ParserFactory::instance().register_parser(
+                file_format::xml,
+                [](future_string_queue_type& input_queue,
+                    future_buffer_queue_type& output_queue,
+                    std::promise<osmium::io::Header>& header_promise,
+                    osmium::osm_entity_bits::type read_which_entities) {
+                    return std::unique_ptr<Parser>(new XMLParser(input_queue, output_queue, header_promise, read_which_entities));
+            });
 
-// we want the register_parser() function to run, setting the variable
-// is only a side-effect, it will never be used
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-variable"
-                const bool registered_xml_parser = ParserFactory::instance().register_parser(
-                    file_format::xml,
-                    [](future_string_queue_type& input_queue,
-                       future_buffer_queue_type& output_queue,
-                       std::promise<osmium::io::Header>& header_promise,
-                       osmium::osm_entity_bits::type read_which_entities) {
-                        return std::unique_ptr<Parser>(new XMLParser(input_queue, output_queue, header_promise, read_which_entities));
-                });
-#pragma GCC diagnostic pop
-
-            } // anonymous namespace
+            // dummy function to silence the unused variable warning from above
+            inline bool get_registered_xml_parser() noexcept {
+                return registered_xml_parser;
+            }
 
         } // namespace detail
 

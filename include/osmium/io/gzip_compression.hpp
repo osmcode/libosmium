@@ -245,20 +245,22 @@ namespace osmium {
 
         }; // class GzipBufferDecompressor
 
-        namespace {
+        namespace detail {
 
-// we want the register_compression() function to run, setting the variable
-// is only a side-effect, it will never be used
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-variable"
+            // we want the register_compression() function to run, setting
+            // the variable is only a side-effect, it will never be used
             const bool registered_gzip_compression = osmium::io::CompressionFactory::instance().register_compression(osmium::io::file_compression::gzip,
                 [](int fd) { return new osmium::io::GzipCompressor(fd); },
                 [](int fd) { return new osmium::io::GzipDecompressor(fd); },
                 [](const char* buffer, size_t size) { return new osmium::io::GzipBufferDecompressor(buffer, size); }
             );
-#pragma GCC diagnostic pop
 
-        } // anonymous namespace
+            // dummy function to silence the unused variable warning from above
+            inline bool get_registered_gzip_compression() noexcept {
+                return registered_gzip_compression;
+            }
+
+        } // namespace detail
 
     } // namespace io
 
