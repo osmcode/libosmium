@@ -35,7 +35,7 @@ TEST_CASE("delta encode unsigned int") {
     SECTION("int") {
         REQUIRE(x.update(17) == 17);
         REQUIRE(x.update(10) == -7);
-        REQUIRE(x.update(-10) == -20);
+        REQUIRE(x.update(0) == -10);
     }
 
 }
@@ -47,7 +47,7 @@ TEST_CASE("delta decode unsigned int") {
     SECTION("int") {
         REQUIRE(x.update(17) == 17);
         REQUIRE(x.update(10) == 27);
-        REQUIRE(x.update(-40) == -13);
+        REQUIRE(x.update(-15) == 12);
     }
 
 }
