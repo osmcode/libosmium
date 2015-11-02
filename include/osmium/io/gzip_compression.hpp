@@ -49,6 +49,7 @@ DEALINGS IN THE SOFTWARE.
 #include <zlib.h>
 
 #include <osmium/io/compression.hpp>
+#include <osmium/io/error.hpp>
 #include <osmium/io/file_compression.hpp>
 #include <osmium/util/cast.hpp>
 #include <osmium/util/compatibility.hpp>
@@ -59,13 +60,13 @@ namespace osmium {
      * Exception thrown when there are problems compressing or
      * decompressing gzip files.
      */
-    struct gzip_error : public std::runtime_error {
+    struct gzip_error : public io_error {
 
         int gzip_error_code;
         int system_errno;
 
         gzip_error(const std::string& what, int error_code) :
-            std::runtime_error(what),
+            io_error(what),
             gzip_error_code(error_code),
             system_errno(error_code == Z_ERRNO ? errno : 0) {
         }

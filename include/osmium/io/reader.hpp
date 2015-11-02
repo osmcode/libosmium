@@ -56,6 +56,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/io/detail/read_thread.hpp>
 #include <osmium/io/detail/read_write.hpp>
 #include <osmium/io/detail/queue_util.hpp>
+#include <osmium/io/error.hpp>
 #include <osmium/io/file.hpp>
 #include <osmium/io/header.hpp>
 #include <osmium/memory/buffer.hpp>
@@ -178,7 +179,7 @@ namespace osmium {
 #ifndef _WIN32
                     return execute("curl", filename, childpid);
 #else
-                    throw std::runtime_error("Reading OSM files from the network currently not supported on Windows.");
+                    throw io_error("Reading OSM files from the network currently not supported on Windows.");
 #endif
                 } else {
                     return osmium::io::detail::open_for_reading(filename);
@@ -244,7 +245,7 @@ namespace osmium {
              * this function first, you might miss an exception, because the
              * destructor is not allowed to throw.
              *
-             * @throws Some form of std::runtime_error when there is a problem.
+             * @throws Some form of osmium::io_error when there is a problem.
              */
             void close() {
                 m_status = status::closed;
@@ -278,12 +279,19 @@ namespace osmium {
              * Get the header data from the file.
              *
              * @returns Header.
-             * @throws Some form of std::runtime_error if there is an error.
+             * @throws Some form of osmium::io_error if there is an error.
              */
             osmium::io::Header header() {
+                if (m_status == status::error) {
+                    throw io_error("Can not get header from reader when in status 'error'");
+                }
+
                 try {
                     if (m_header_future.valid()) {
                         m_header = m_header_future.get();
+                        if (m_read_which_entities == osmium::osm_entity_bits::nothing) {
+                            m_status = status::eof;
+                        }
                     }
                 } catch (...) {
                     close();
@@ -301,16 +309,14 @@ namespace osmium {
              * constructed.
              *
              * @returns Buffer.
-             * @throws Some form of std::runtime_error if there is an error.
+             * @throws Some form of osmium::io_error if there is an error.
              */
             osmium::memory::Buffer read() {
                 osmium::memory::Buffer buffer;
 
                 if (m_status != status::okay ||
                     m_read_which_entities == osmium::osm_entity_bits::nothing) {
-                    // If the caller didn't want anything but the header, it
-                    // will always get an empty buffer here.
-                    return buffer;
+                    throw io_error("Can not read from reader when in status 'closed', 'eof', or 'error'");
                 }
 
                 try {

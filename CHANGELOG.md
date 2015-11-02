@@ -20,6 +20,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - OutputIterator doesn't hold an internal buffer any more, but it uses
   one in Writer. Calling flush() on the OutputIterator isn't needed any
   more.
+- Reader now throws when trying to read after eof or an error.
+- I/O functions that used to throw std::runtime_error now throw
+  osmium::io_error or derived.
 
 ### Fixed
 

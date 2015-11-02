@@ -55,6 +55,7 @@ DEALINGS IN THE SOFTWARE.
 #endif
 
 #include <osmium/io/compression.hpp>
+#include <osmium/io/error.hpp>
 #include <osmium/io/file_compression.hpp>
 #include <osmium/util/cast.hpp>
 #include <osmium/util/compatibility.hpp>
@@ -65,13 +66,13 @@ namespace osmium {
      * Exception thrown when there are problems compressing or
      * decompressing bzip2 files.
      */
-    struct bzip2_error : public std::runtime_error {
+    struct bzip2_error : public io_error {
 
         int bzip2_error_code;
         int system_errno;
 
         bzip2_error(const std::string& what, int error_code) :
-            std::runtime_error(what),
+            io_error(what),
             bzip2_error_code(error_code),
             system_errno(error_code == BZ_IO_ERROR ? errno : 0) {
         }

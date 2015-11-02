@@ -538,9 +538,10 @@ TEST_CASE("Reading OSM XML 200") {
         osmium::io::Header header = reader.header();
         REQUIRE(header.get("generator") == "testdata");
 
-        osmium::memory::Buffer buffer = reader.read();
-        REQUIRE(0 == buffer.committed());
-        REQUIRE(! buffer);
+        REQUIRE_THROWS({
+            reader.read();
+        });
+
         reader.close();
     }
 

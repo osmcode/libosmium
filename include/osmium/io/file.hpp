@@ -39,6 +39,7 @@ DEALINGS IN THE SOFTWARE.
 #include <string>
 #include <vector>
 
+#include <osmium/io/error.hpp>
 #include <osmium/io/file_format.hpp>
 #include <osmium/io/file_compression.hpp>
 #include <osmium/util/options.hpp>
@@ -255,7 +256,7 @@ namespace osmium {
              * Check file format etc. for consistency and throw exception if
              * there is a problem.
              *
-             * @throws std::runtime_error
+             * @throws osmium::io_error
              */
             const File& check() const {
                 if (m_file_format == file_format::unknown) {
@@ -273,7 +274,7 @@ namespace osmium {
                         msg += "'";
                     }
                     msg += ".";
-                    throw std::runtime_error(msg);
+                    throw io_error(msg);
                 }
                 return *this;
             }

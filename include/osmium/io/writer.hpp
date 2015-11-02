@@ -46,6 +46,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/io/detail/queue_util.hpp>
 #include <osmium/io/detail/read_write.hpp>
 #include <osmium/io/detail/write_thread.hpp>
+#include <osmium/io/error.hpp>
 #include <osmium/io/file.hpp>
 #include <osmium/io/header.hpp>
 #include <osmium/io/overwrite.hpp>
@@ -115,7 +116,7 @@ namespace osmium {
 
             void write(osmium::memory::Buffer&& buffer) {
                 if (m_status != status::okay) {
-                    throw std::runtime_error("Can not write to file in error state");
+                    throw io_error("Can not write to writer when in status 'closed' or 'error'");
                 }
                 try {
                     osmium::thread::check_for_exception(m_write_future);
@@ -144,7 +145,7 @@ namespace osmium {
              *               osmium::io::overwrite::allow or osmium::io::overwrite::no
              *               (default).
              *
-             * @throws std::runtime_error If the file could not be opened.
+             * @throws osmium::io_error If there was an error.
              * @throws std::system_error If the file could not be opened.
              */
             explicit Writer(const osmium::io::File& file, const osmium::io::Header& header = osmium::io::Header(), overwrite allow_overwrite = overwrite::no) :
@@ -214,7 +215,7 @@ namespace osmium {
              * Flush the internal buffer if it contains any data. This is also
              * called by close(), so usually you don't have to call this.
              *
-             * @throws Some form of std::runtime_error when there is a problem.
+             * @throws Some form of osmium::io_error when there is a problem.
              */
             void flush() {
                 if (m_status == status::okay && m_buffer && m_buffer.committed() > 0) {
@@ -230,7 +231,7 @@ namespace osmium {
             /**
              * Write contents of a buffer to the output file.
              *
-             * @throws Some form of std::runtime_error when there is a problem.
+             * @throws Some form of osmium::io_error when there is a problem.
              */
             void operator()(osmium::memory::Buffer&& buffer) {
                 flush();
@@ -241,7 +242,7 @@ namespace osmium {
              * Add item to the internal buffer for eventual writing to the
              * output file.
              *
-             * @throws Some form of std::runtime_error when there is a problem.
+             * @throws Some form of osmium::io_error when there is a problem.
              */
             void operator()(const osmium::memory::Item& item) {
                 if (!m_buffer) {
@@ -263,7 +264,7 @@ namespace osmium {
              * the destructor will ignore, it is better to call close()
              * explicitly.
              *
-             * @throws Some form of std::runtime_error when there is a problem.
+             * @throws Some form of osmium::io_error when there is a problem.
              */
             void close() {
                 if (m_status == status::okay) {

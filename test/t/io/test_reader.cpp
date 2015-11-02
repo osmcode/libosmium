@@ -56,7 +56,7 @@ TEST_CASE("Reader") {
         osmium::apply(reader, handler);
     }
 
-    SECTION("should return invalid buffer after eof") {
+    SECTION("should throw after eof") {
         osmium::io::File file(with_data_dir("t/io/data.osm"));
         osmium::io::Reader reader(file);
 
@@ -67,9 +67,9 @@ TEST_CASE("Reader") {
 
         REQUIRE(reader.eof());
 
-        // extra read always returns invalid buffer
-        osmium::memory::Buffer buffer = reader.read();
-        REQUIRE(!buffer);
+        REQUIRE_THROWS_AS({
+            reader.read();
+        }, osmium::io_error);
     }
 
     SECTION("should not hang when apply() is called twice on reader") {
@@ -78,7 +78,9 @@ TEST_CASE("Reader") {
         osmium::handler::Handler handler;
 
         osmium::apply(reader, handler);
-        osmium::apply(reader, handler);
+        REQUIRE_THROWS_AS({
+            osmium::apply(reader, handler);
+        }, osmium::io_error);
     }
 
     SECTION("should work with a buffer with uncompressed data") {

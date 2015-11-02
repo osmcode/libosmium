@@ -190,7 +190,7 @@ namespace osmium {
                 create_parser_type get_creator_function(const osmium::io::File& file) {
                     auto it = m_callbacks.find(file.format());
                     if (it == m_callbacks.end()) {
-                        throw std::runtime_error(
+                        throw unsupported_file_format_error(
                                 std::string("Can not open file '") +
                                 file.filename() +
                                 "' with type '" +

@@ -50,6 +50,7 @@ DEALINGS IN THE SOFTWARE.
 #endif
 
 #include <osmium/io/detail/read_write.hpp>
+#include <osmium/io/error.hpp>
 #include <osmium/io/file_compression.hpp>
 #include <osmium/util/compatibility.hpp>
 
@@ -128,7 +129,7 @@ namespace osmium {
                 std::string error_message {"Support for compression '"};
                 error_message += as_string(compression);
                 error_message += "' not compiled into this binary.";
-                throw std::runtime_error(error_message);
+                throw unsupported_file_format_error(error_message);
             }
 
         public:
