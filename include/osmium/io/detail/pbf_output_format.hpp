@@ -550,11 +550,7 @@ namespace osmium {
                     osmium::apply(buffer.cbegin(), buffer.cend(), *this);
                 }
 
-                /**
-                 * Finalize the writing process, flush any open primitive
-                 * blocks to the file and close the file.
-                 */
-                void close() override final {
+                void write_end() override final {
                     store_primitive_block();
                 }
 

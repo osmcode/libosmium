@@ -125,7 +125,7 @@ namespace osmium {
 
                 virtual void write_buffer(osmium::memory::Buffer&&) = 0;
 
-                virtual void close() {
+                virtual void write_end() {
                 }
 
             }; // class OutputFormat

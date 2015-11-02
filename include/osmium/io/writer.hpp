@@ -124,7 +124,7 @@ namespace osmium {
                     }
                 } catch (...) {
                     detail::add_to_queue(m_output_queue, std::current_exception());
-                    m_output->close();
+                    m_output->write_end();
                     m_status = status::error;
                     throw;
                 }
@@ -271,7 +271,7 @@ namespace osmium {
                         write(std::move(m_buffer));
                     }
                     m_status = status::closed;
-                    m_output->close();
+                    m_output->write_end();
                 }
                 detail::add_end_of_data_to_queue(m_output_queue);
             }

@@ -438,7 +438,7 @@ namespace osmium {
                     m_output_queue.push(osmium::thread::Pool::instance().submit(XMLOutputBlock{std::move(buffer), m_options}));
                 }
 
-                void close() override final {
+                void write_end() override final {
                     std::string out;
 
                     if (m_options.use_change_ops) {
