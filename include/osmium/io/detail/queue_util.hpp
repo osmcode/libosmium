@@ -123,13 +123,13 @@ namespace osmium {
                 void check_is_done(const T& data) noexcept;
 
                 T pop() {
-                    if (m_done) {
-                        return T{};
+                    T data;
+                    if (!m_done) {
+                        std::future<T> data_future;
+                        m_queue.wait_and_pop(data_future);
+                        data = std::move(data_future.get());
+                        check_is_done(data);
                     }
-                    std::future<T> data_future;
-                    m_queue.wait_and_pop(data_future);
-                    T data = data_future.get();
-                    check_is_done(data);
                     return data;
                 }
 
