@@ -101,9 +101,9 @@ namespace osmium {
             osmium::thread::thread_handler m_thread;
 
             enum class status {
-                writing   = 0, // normal writing
-                exception = 2, // some error occurred while writing
-                closed    = 3  // close() called
+                okay   = 0, // normal writing
+                error  = 1, // some error occurred while writing
+                closed = 2  // close() called successfully
             } m_status;
 
             // This function will run in a separate thread.
@@ -117,8 +117,8 @@ namespace osmium {
             }
 
             void write(osmium::memory::Buffer&& buffer) {
-                if (m_status != status::writing) {
-                    throw std::runtime_error("Writing to file that had exception");
+                if (m_status != status::okay) {
+                    throw std::runtime_error("Can not write to file in error state");
                 }
                 try {
                     osmium::thread::check_for_exception(m_write_future);
@@ -126,9 +126,9 @@ namespace osmium {
                         m_output->write_buffer(std::move(buffer));
                     }
                 } catch (...) {
-                    m_status = status::exception;
                     detail::add_to_queue(m_output_queue, std::current_exception());
                     m_output->close();
+                    m_status = status::error;
                     throw;
                 }
             }
@@ -160,7 +160,7 @@ namespace osmium {
                 m_write_promise(),
                 m_write_future(m_write_promise.get_future()),
                 m_thread(write_thread, std::ref(m_output_queue), m_compressor.get(), std::move(m_write_promise)),
-                m_status(status::writing) {
+                m_status(status::okay) {
                 assert(!m_file.buffer()); // XXX can't handle pseudo-files
                 try {
                     m_output->write_header(header);
@@ -214,7 +214,7 @@ namespace osmium {
              * @throws Some form of std::runtime_error when there is a problem.
              */
             void flush() {
-                if (m_buffer && m_buffer.committed() > 0) {
+                if (m_status == status::okay && m_buffer && m_buffer.committed() > 0) {
                     osmium::memory::Buffer buffer{m_buffer_size,
                                                   osmium::memory::Buffer::auto_grow::no};
                     using std::swap;
@@ -263,7 +263,7 @@ namespace osmium {
              * @throws Some form of std::runtime_error when there is a problem.
              */
             void close() {
-                if (m_status == status::writing) {
+                if (m_status == status::okay) {
                     if (m_buffer && m_buffer.committed() > 0) {
                         write(std::move(m_buffer));
                     }

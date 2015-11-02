@@ -81,10 +81,10 @@ namespace osmium {
             osmium::osm_entity_bits::type m_read_which_entities;
 
             enum class status {
-                reading   = 0, // normal reading
-                eof       = 1, // eof of file was reached without error
-                exception = 2, // some error occurred while reading
-                closed    = 3  // close() called after eof
+                okay   = 0, // normal reading
+                error  = 1, // some error occurred while reading
+                closed = 2, // close() called successfully after eof
+                eof    = 3  // eof of file was reached without error
             } m_status;
 
             int m_childpid;
@@ -200,7 +200,7 @@ namespace osmium {
             explicit Reader(const osmium::io::File& file, osmium::osm_entity_bits::type read_which_entities = osmium::osm_entity_bits::all) :
                 m_file(file.check()),
                 m_read_which_entities(read_which_entities),
-                m_status(status::reading),
+                m_status(status::okay),
                 m_childpid(0),
                 m_input_queue(max_input_queue_size, "raw_input"),
                 m_decompressor(m_file.buffer() ?
@@ -246,6 +246,8 @@ namespace osmium {
              * @throws Some form of std::runtime_error when there is a problem.
              */
             void close() {
+                m_status = status::closed;
+
                 m_read_thread_manager.stop();
 
                 m_osmdata_queue_wrapper.drain();
@@ -282,12 +284,12 @@ namespace osmium {
                     if (m_header_future.valid()) {
                         m_header = m_header_future.get();
                     }
-                    return m_header;
                 } catch (...) {
-                    m_status = status::exception;
                     close();
+                    m_status = status::error;
                     throw;
                 }
+                return m_header;
             }
 
             /**
@@ -303,7 +305,7 @@ namespace osmium {
             osmium::memory::Buffer read() {
                 osmium::memory::Buffer buffer;
 
-                if (m_status != status::reading ||
+                if (m_status != status::okay ||
                     m_read_which_entities == osmium::osm_entity_bits::nothing) {
                     // If the caller didn't want anything but the header, it
                     // will always get an empty buffer here.
@@ -327,8 +329,8 @@ namespace osmium {
                         }
                     }
                 } catch (...) {
-                    m_status = status::exception;
                     close();
+                    m_status = status::error;
                     throw;
                 }
             }
