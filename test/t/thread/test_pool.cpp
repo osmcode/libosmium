@@ -5,6 +5,7 @@
 #include <thread>
 
 #include <osmium/thread/pool.hpp>
+#include <osmium/util/compatibility.hpp>
 
 struct test_job_with_result {
     int operator()() const {
@@ -13,7 +14,7 @@ struct test_job_with_result {
 };
 
 struct test_job_throw {
-    void operator()() const {
+    OSMIUM_NORETURN void operator()() const {
         throw std::runtime_error("exception in pool thread");
     }
 };
