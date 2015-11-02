@@ -88,6 +88,11 @@ namespace osmium {
             }
 
             template <class T>
+            inline void add_end_of_data_to_queue(osmium::thread::Queue<std::future<T>>& queue) {
+                add_to_queue<T>(queue, T{});
+            }
+
+            template <class T>
             class queue_wrapper {
 
                 using queue_type = osmium::thread::Queue<std::future<T>>;

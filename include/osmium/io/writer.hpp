@@ -165,7 +165,7 @@ namespace osmium {
                 try {
                     m_output->write_header(header);
                 } catch (...) {
-                    detail::add_to_queue(m_output_queue, std::string{});
+                    detail::add_end_of_data_to_queue(m_output_queue);
                     throw;
                 }
             }
@@ -270,7 +270,7 @@ namespace osmium {
                     m_status = status::closed;
                     m_output->close();
                 }
-                detail::add_to_queue(m_output_queue, std::string{});
+                detail::add_end_of_data_to_queue(m_output_queue);
             }
 
         }; // class Writer

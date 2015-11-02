@@ -84,7 +84,7 @@ namespace osmium {
                         add_to_queue(m_queue, std::current_exception());
                     }
 
-                    add_to_queue(m_queue, std::string{});
+                    add_end_of_data_to_queue(m_queue);
                 }
 
             public:

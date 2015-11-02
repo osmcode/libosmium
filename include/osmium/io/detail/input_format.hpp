@@ -96,8 +96,8 @@ namespace osmium {
                 }
 
                 /**
-                * Wrap the buffer into a future and add it to the output queue.
-                */
+                 * Wrap the buffer into a future and add it to the output queue.
+                 */
                 void send_to_output_queue(osmium::memory::Buffer&& buffer) {
                     add_to_queue(m_output_queue, std::move(buffer));
                 }
@@ -138,8 +138,7 @@ namespace osmium {
                         add_to_queue(m_output_queue, std::move(exception));
                     }
 
-                    // end of file marker
-                    send_to_output_queue(osmium::memory::Buffer{});
+                    add_end_of_data_to_queue(m_output_queue);
                 }
 
             }; // class Parser
