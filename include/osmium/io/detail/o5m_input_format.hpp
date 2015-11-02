@@ -59,6 +59,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/object.hpp>
 #include <osmium/osm/types.hpp>
+#include <osmium/util/cast.hpp>
 #include <osmium/util/delta.hpp>
 
 namespace osmium {
@@ -290,7 +291,7 @@ namespace osmium {
                         *dataptr = data;
                     }
 
-                    return std::make_pair(uid, user);
+                    return std::make_pair(static_cast_with_assert<osmium::user_id_type>(uid), user);
                 }
 
                 void decode_tags(osmium::builder::Builder* builder, const char** dataptr, const char* const end) {
@@ -329,7 +330,7 @@ namespace osmium {
                     if (**dataptr == 0x00) { // no info section
                         ++*dataptr;
                     } else { // has info section
-                        object.set_version(protozero::decode_varint(dataptr, end));
+                        object.set_version(static_cast_with_assert<object_version_type>(protozero::decode_varint(dataptr, end)));
                         auto timestamp = m_delta_timestamp.update(zvarint(dataptr, end));
                         if (timestamp != 0) { // has timestamp
                             object.set_timestamp(timestamp);
