@@ -37,6 +37,8 @@ DEALINGS IN THE SOFTWARE.
 #include <type_traits>
 #include <utility>
 
+#include <osmium/util/cast.hpp>
+
 namespace osmium {
 
     namespace util {
@@ -46,6 +48,9 @@ namespace osmium {
          */
         template <typename T>
         class DeltaEncode {
+
+            static_assert(std::is_integral<T>::value,
+                          "DeltaEncode only works with integers");
 
             T m_value;
 
@@ -59,10 +64,10 @@ namespace osmium {
                 m_value = 0;
             }
 
-            T update(T new_value) {
+            int64_t update(T new_value) {
                 using std::swap;
                 swap(m_value, new_value);
-                return m_value - new_value;
+                return int64_t(m_value) - int64_t(new_value);
             }
 
         }; // class DeltaEncode
@@ -72,6 +77,9 @@ namespace osmium {
          */
         template <typename T>
         class DeltaDecode {
+
+            static_assert(std::is_integral<T>::value,
+                          "DeltaDecode only works with integers");
 
             T m_value;
 
@@ -85,8 +93,8 @@ namespace osmium {
                 m_value = 0;
             }
 
-            T update(T delta) {
-                m_value += delta;
+            T update(int64_t delta) {
+                m_value = static_cast_with_assert<T>(m_value + delta);
                 return m_value;
             }
 

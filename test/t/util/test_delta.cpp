@@ -4,24 +4,50 @@
 
 #include <osmium/util/delta.hpp>
 
-TEST_CASE("delta encode") {
+TEST_CASE("delta encode int") {
 
     osmium::util::DeltaEncode<int> x;
 
     SECTION("int") {
         REQUIRE(x.update(17) == 17);
         REQUIRE(x.update(10) == -7);
+        REQUIRE(x.update(-10) == -20);
     }
 
 }
 
-TEST_CASE("delta decode") {
+TEST_CASE("delta decode int") {
 
     osmium::util::DeltaDecode<int> x;
 
     SECTION("int") {
         REQUIRE(x.update(17) == 17);
         REQUIRE(x.update(10) == 27);
+        REQUIRE(x.update(-40) == -13);
+    }
+
+}
+
+TEST_CASE("delta encode unsigned int") {
+
+    osmium::util::DeltaEncode<unsigned int> x;
+
+    SECTION("int") {
+        REQUIRE(x.update(17) == 17);
+        REQUIRE(x.update(10) == -7);
+        REQUIRE(x.update(-10) == -20);
+    }
+
+}
+
+TEST_CASE("delta decode unsigned int") {
+
+    osmium::util::DeltaDecode<unsigned int> x;
+
+    SECTION("int") {
+        REQUIRE(x.update(17) == 17);
+        REQUIRE(x.update(10) == 27);
+        REQUIRE(x.update(-40) == -13);
     }
 
 }
