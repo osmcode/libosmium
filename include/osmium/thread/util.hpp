@@ -86,6 +86,10 @@ namespace osmium {
 
         public:
 
+            thread_handler() :
+                m_thread() {
+            }
+
             template <class Function, class... Args>
             thread_handler(Function&& f, Args&&... args) :
                 m_thread(std::move(f), std::forward<Args>(args)...) {
@@ -94,8 +98,8 @@ namespace osmium {
             thread_handler(const thread_handler&) = delete;
             thread_handler& operator=(const thread_handler&) = delete;
 
-            thread_handler(thread_handler&&) = delete;
-            thread_handler& operator=(thread_handler&&) = delete;
+            thread_handler(thread_handler&&) = default;
+            thread_handler& operator=(thread_handler&&) = default;
 
             ~thread_handler() {
                 if (m_thread.joinable()) {
