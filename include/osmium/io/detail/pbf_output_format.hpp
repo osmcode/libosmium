@@ -222,15 +222,15 @@ namespace osmium {
                 std::vector<int64_t> m_lons;
                 std::vector<int32_t> m_tags;
 
-                osmium::util::DeltaEncode<int64_t> m_delta_id;
+                osmium::util::DeltaEncode<object_id_type, int64_t> m_delta_id;
 
-                osmium::util::DeltaEncode<int64_t> m_delta_timestamp;
-                osmium::util::DeltaEncode<int64_t> m_delta_changeset;
-                osmium::util::DeltaEncode<int32_t> m_delta_uid;
-                osmium::util::DeltaEncode<int32_t> m_delta_user_sid;
+                osmium::util::DeltaEncode<time_t, int64_t> m_delta_timestamp;
+                osmium::util::DeltaEncode<changeset_id_type, int64_t> m_delta_changeset;
+                osmium::util::DeltaEncode<user_id_type, int32_t> m_delta_uid;
+                osmium::util::DeltaEncode<uint32_t, int32_t> m_delta_user_sid;
 
-                osmium::util::DeltaEncode<int64_t> m_delta_lat;
-                osmium::util::DeltaEncode<int64_t> m_delta_lon;
+                osmium::util::DeltaEncode<int64_t, int64_t> m_delta_lat;
+                osmium::util::DeltaEncode<int64_t, int64_t> m_delta_lon;
 
                 const pbf_output_options& m_options;
 
@@ -275,7 +275,7 @@ namespace osmium {
                     m_ids.push_back(m_delta_id.update(node.id()));
 
                     if (m_options.add_metadata) {
-                        m_versions.push_back(node.version());
+                        m_versions.push_back(static_cast_with_assert<int32_t>(node.version()));
                         m_timestamps.push_back(m_delta_timestamp.update(node.timestamp()));
                         m_changesets.push_back(m_delta_changeset.update(node.changeset()));
                         m_uids.push_back(m_delta_uid.update(node.uid()));
@@ -289,8 +289,8 @@ namespace osmium {
                     m_lons.push_back(m_delta_lon.update(lonlat2int(node.location().lon_without_check())));
 
                     for (const auto& tag : node.tags()) {
-                        m_tags.push_back(m_stringtable.add(tag.key()));
-                        m_tags.push_back(m_stringtable.add(tag.value()));
+                        m_tags.push_back(static_cast_with_assert<int32_t>(m_stringtable.add(tag.key())));
+                        m_tags.push_back(static_cast_with_assert<int32_t>(m_stringtable.add(tag.value())));
                     }
                     m_tags.push_back(0);
                 }
@@ -461,10 +461,10 @@ namespace osmium {
                     if (m_options.add_metadata) {
                         protozero::pbf_builder<OSMFormat::Info> pbf_info(pbf_object, T::enum_type::optional_Info_info);
 
-                        pbf_info.add_int32(OSMFormat::Info::optional_int32_version, object.version());
+                        pbf_info.add_int32(OSMFormat::Info::optional_int32_version, static_cast_with_assert<int32_t>(object.version()));
                         pbf_info.add_int64(OSMFormat::Info::optional_int64_timestamp, object.timestamp());
                         pbf_info.add_int64(OSMFormat::Info::optional_int64_changeset, object.changeset());
-                        pbf_info.add_int32(OSMFormat::Info::optional_int32_uid, object.uid());
+                        pbf_info.add_int32(OSMFormat::Info::optional_int32_uid, static_cast_with_assert<int32_t>(object.uid()));
                         pbf_info.add_uint32(OSMFormat::Info::optional_uint32_user_sid, m_primitive_block.store_in_stringtable(object.user()));
                         if (m_options.add_visible_flag) {
                             pbf_info.add_bool(OSMFormat::Info::optional_bool_visible, object.visible());
@@ -616,8 +616,8 @@ namespace osmium {
                     it_type last { members.cend(), members.cend(), map_member_ref };
                     pbf_relation.add_packed_sint64(OSMFormat::Relation::packed_sint64_memids, first, last);
 
-                    static auto map_member_type = [](const osmium::RelationMember& member) noexcept -> int {
-                        return osmium::item_type_to_nwr_index(member.type());
+                    static auto map_member_type = [](const osmium::RelationMember& member) noexcept -> int32_t {
+                        return int32_t(osmium::item_type_to_nwr_index(member.type()));
                     };
                     pbf_relation.add_packed_int32(OSMFormat::Relation::packed_MemberType_types,
                         boost::make_transform_iterator(relation.members().begin(), map_member_type),
