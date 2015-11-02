@@ -55,7 +55,7 @@ TEST_CASE("named file") {
             REQUIRE(file.size() == 6);
 
             char buf[10];
-            int len = ::read(fd, buf, sizeof(buf));
+            auto len = ::read(fd, buf, sizeof(buf));
 
             REQUIRE(len == 6);
             REQUIRE(!strncmp(buf, "foobar", 6));
