@@ -149,19 +149,19 @@ namespace osmium {
 
             InputIterator<TSource, TItem> begin() const noexcept {
                 return m_begin;
-            };
+            }
 
             InputIterator<TSource, TItem> end() const noexcept {
                 return m_end;
-            };
+            }
 
             const InputIterator<TSource, TItem> cbegin() const noexcept {
                 return m_begin;
-            };
+            }
 
             const InputIterator<TSource, TItem> cend() const noexcept {
                 return m_end;
-            };
+            }
 
         }; // class InputIteratorRange
 
