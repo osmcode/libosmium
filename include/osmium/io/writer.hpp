@@ -89,13 +89,10 @@ namespace osmium {
 
             std::unique_ptr<osmium::io::detail::OutputFormat> m_output;
 
-            std::unique_ptr<osmium::io::Compressor> m_compressor;
-
             osmium::memory::Buffer m_buffer;
 
             size_t m_buffer_size;
 
-            std::promise<bool> m_write_promise;
             std::future<bool> m_write_future;
 
             osmium::thread::thread_handler m_thread;
@@ -108,10 +105,10 @@ namespace osmium {
 
             // This function will run in a separate thread.
             static void write_thread(detail::future_string_queue_type& output_queue,
-                                     osmium::io::Compressor* compressor,
+                                     std::unique_ptr<osmium::io::Compressor>&& compressor,
                                      std::promise<bool>&& write_promise) {
                 detail::WriteThread write_thread{output_queue,
-                                                 compressor,
+                                                 std::move(compressor),
                                                  std::move(write_promise)};
                 write_thread();
             }
@@ -154,14 +151,20 @@ namespace osmium {
                 m_file(file.check()),
                 m_output_queue(20, "raw_output"), // XXX
                 m_output(osmium::io::detail::OutputFormatFactory::instance().create_output(m_file, m_output_queue)),
-                m_compressor(osmium::io::CompressionFactory::instance().create_compressor(file.compression(), osmium::io::detail::open_for_writing(m_file.filename(), allow_overwrite))),
                 m_buffer(),
                 m_buffer_size(default_buffer_size),
-                m_write_promise(),
-                m_write_future(m_write_promise.get_future()),
-                m_thread(write_thread, std::ref(m_output_queue), m_compressor.get(), std::move(m_write_promise)),
+                m_write_future(),
+                m_thread(),
                 m_status(status::okay) {
                 assert(!m_file.buffer()); // XXX can't handle pseudo-files
+
+                std::unique_ptr<osmium::io::Compressor> compressor =
+                    osmium::io::CompressionFactory::instance().create_compressor(file.compression(), osmium::io::detail::open_for_writing(m_file.filename(), allow_overwrite));
+
+                std::promise<bool> write_promise;
+                m_write_future = write_promise.get_future();
+                m_thread = osmium::thread::thread_handler{write_thread, std::ref(m_output_queue), std::move(compressor), std::move(write_promise)};
+
                 try {
                     m_output->write_header(header);
                 } catch (...) {

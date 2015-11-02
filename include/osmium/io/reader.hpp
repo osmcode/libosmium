@@ -98,7 +98,6 @@ namespace osmium {
             detail::future_buffer_queue_type m_osmdata_queue;
             detail::queue_wrapper<osmium::memory::Buffer> m_osmdata_queue_wrapper;
 
-            std::promise<osmium::io::Header> m_header_promise;
             std::future<osmium::io::Header> m_header_future;
             osmium::io::Header m_header;
 
@@ -209,10 +208,12 @@ namespace osmium {
                 m_read_thread_manager(m_decompressor.get(), m_input_queue),
                 m_osmdata_queue(max_osmdata_queue_size, "parser_results"),
                 m_osmdata_queue_wrapper(m_osmdata_queue),
-                m_header_promise(),
-                m_header_future(m_header_promise.get_future()),
+                m_header_future(),
                 m_header(),
-                m_thread(parser_thread, std::ref(m_file), std::ref(m_input_queue), std::ref(m_osmdata_queue), std::move(m_header_promise), read_which_entities) {
+                m_thread() {
+                std::promise<osmium::io::Header> header_promise;
+                m_header_future = header_promise.get_future();
+                m_thread = osmium::thread::thread_handler{parser_thread, std::ref(m_file), std::ref(m_input_queue), std::ref(m_osmdata_queue), std::move(header_promise), read_which_entities};
             }
 
             explicit Reader(const std::string& filename, osmium::osm_entity_bits::type read_types = osmium::osm_entity_bits::all) :

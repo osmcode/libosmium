@@ -56,16 +56,16 @@ namespace osmium {
             class WriteThread {
 
                 queue_wrapper<std::string> m_queue;
-                osmium::io::Compressor* m_compressor;
+                std::unique_ptr<osmium::io::Compressor> m_compressor;
                 std::promise<bool> m_promise;
 
             public:
 
                 WriteThread(future_string_queue_type& input_queue,
-                            osmium::io::Compressor* compressor,
+                            std::unique_ptr<osmium::io::Compressor>&& compressor,
                             std::promise<bool>&& promise) :
                     m_queue(input_queue),
-                    m_compressor(compressor),
+                    m_compressor(std::move(compressor)),
                     m_promise(std::move(promise)) {
                 }
 
