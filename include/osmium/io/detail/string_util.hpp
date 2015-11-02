@@ -112,13 +112,13 @@ namespace osmium {
                 if (size_t(len) >= max_size) {
                     int len2 = string_snprintf(out,
                                                old_size,
-                                               len + 1,
+                                               size_t(len) + 1,
                                                format,
                                                std::forward<TArgs>(args)...);
                     assert(len2 == len);
                 }
 
-                out.resize(old_size + len);
+                out.resize(old_size + size_t(len));
             }
 
             inline void append_utf8_encoded_string(std::string& out, const char* data) {
