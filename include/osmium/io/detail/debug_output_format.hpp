@@ -172,7 +172,7 @@ namespace osmium {
                         output_formatted("%d\n", object.changeset());
                         write_fieldname("timestamp");
                         *m_out += object.timestamp().to_iso();
-                        output_formatted(" (%d)\n", object.timestamp());
+                        output_formatted(" (%d)\n", object.timestamp().seconds_since_epoch());
                         write_fieldname("user");
                         output_formatted("     %d ", object.uid());
                         write_string(object.user());
@@ -336,13 +336,13 @@ namespace osmium {
                     write_fieldname("created at");
                     *m_out += ' ';
                     *m_out += changeset.created_at().to_iso();
-                    output_formatted(" (%d)\n", changeset.created_at());
+                    output_formatted(" (%d)\n", changeset.created_at().seconds_since_epoch());
 
                     write_fieldname("closed at");
                     *m_out += "  ";
                     if (changeset.closed()) {
                         *m_out += changeset.closed_at().to_iso();
-                        output_formatted(" (%d)\n", changeset.closed_at());
+                        output_formatted(" (%d)\n", changeset.closed_at().seconds_since_epoch());
                     } else {
                         write_error("OPEN!\n");
                     }
@@ -366,7 +366,7 @@ namespace osmium {
 
                             write_comment_field("date");
                             *m_out += comment.date().to_iso();
-                            output_formatted(" (%d)\n      %*s", comment.date(), width, "");
+                            output_formatted(" (%d)\n      %*s", comment.date().seconds_since_epoch(), width, "");
 
                             write_comment_field("user");
                             output_formatted("%d ", comment.uid());
