@@ -59,9 +59,9 @@ public:
 
 }; // class MockParser
 
-std::string fail_in;
-
 TEST_CASE("Test Reader using MockParser") {
+
+    std::string fail_in;
 
     const bool registered_parser = osmium::io::detail::ParserFactory::instance().register_parser(
             osmium::io::file_format::xml,
