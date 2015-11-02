@@ -75,7 +75,7 @@ namespace osmium {
 
     namespace detail {
 
-        inline long string_to_ulong(const char* input, const char *name) {
+        inline unsigned long string_to_ulong(const char* input, const char *name) {
             if (*input != '\0' && *input != '-' && !std::isspace(*input)) {
                 char* end;
                 auto value = std::strtoul(input, &end, 10);

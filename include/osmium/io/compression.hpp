@@ -260,7 +260,7 @@ namespace osmium {
                     if (nread < 0) {
                         throw std::system_error(errno, std::system_category(), "Read failed");
                     }
-                    buffer.resize(nread);
+                    buffer.resize(std::string::size_type(nread));
                 }
 
                 return buffer;

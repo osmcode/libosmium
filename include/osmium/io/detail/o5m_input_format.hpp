@@ -88,7 +88,7 @@ namespace osmium {
                 // The following settings are from the o5m description:
 
                 // The maximum number of entries in this table.
-                const unsigned int number_of_entries = 15000;
+                const uint64_t number_of_entries = 15000;
 
                 // The size of one entry in the table.
                 const unsigned int entry_size = 256;
@@ -124,7 +124,7 @@ namespace osmium {
                     }
                 }
 
-                const char* get(unsigned int index) const {
+                const char* get(uint64_t index) const {
                     if (m_table.empty() || index == 0 || index > number_of_entries) {
                         throw o5m_error("reference to non-existing string in table");
                     }
