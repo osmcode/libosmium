@@ -73,7 +73,7 @@ namespace osmium {
                     try {
                         while (!m_done) {
                             std::string data {m_decompressor->read()};
-                            if (data.empty()) { // end of file
+                            if (at_end_of_data(data)) {
                                 break;
                             }
                             add_to_queue(m_queue, std::move(data));

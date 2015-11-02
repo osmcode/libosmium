@@ -70,7 +70,7 @@ namespace osmium {
                 }
 
                 bool input_done() const {
-                    return m_input_queue.is_done();
+                    return m_input_queue.has_reached_end_of_data();
                 }
 
                 osmium::osm_entity_bits::type read_types() const {

@@ -317,7 +317,7 @@ namespace osmium {
                     // keep getting the next buffer until there is one with data.
                     while (true) {
                         buffer = m_osmdata_queue_wrapper.pop();
-                        if (!buffer) {
+                        if (detail::at_end_of_data(buffer)) {
                             m_status = status::eof;
                             m_read_thread_manager.close();
                             return buffer;

@@ -83,7 +83,7 @@ namespace osmium {
                     try {
                         while (true) {
                             std::string data = m_queue.pop();
-                            if (data.empty()) {
+                            if (at_end_of_data(data)) {
                                 break;
                             }
                             m_compressor->write(data);

@@ -92,19 +92,27 @@ namespace osmium {
                 add_to_queue<T>(queue, T{});
             }
 
+            inline bool at_end_of_data(const std::string& data) {
+                return data.empty();
+            }
+
+            inline bool at_end_of_data(osmium::memory::Buffer& buffer) {
+                return !buffer;
+            }
+
             template <class T>
             class queue_wrapper {
 
                 using queue_type = osmium::thread::Queue<std::future<T>>;
 
                 queue_type& m_queue;
-                bool m_done;
+                bool m_has_reached_end_of_data;
 
             public:
 
                 queue_wrapper(queue_type& queue) :
                     m_queue(queue),
-                    m_done(false) {
+                    m_has_reached_end_of_data(false) {
                 }
 
                 ~queue_wrapper() noexcept {
@@ -112,7 +120,7 @@ namespace osmium {
                 }
 
                 void drain() {
-                    while (!m_done) {
+                    while (!m_has_reached_end_of_data) {
                         try {
                             pop();
                         } catch (...) {
@@ -121,34 +129,24 @@ namespace osmium {
                     }
                 }
 
-                bool is_done() const noexcept {
-                    return m_done;
+                bool has_reached_end_of_data() const noexcept {
+                    return m_has_reached_end_of_data;
                 }
-
-                void check_is_done(const T& data) noexcept;
 
                 T pop() {
                     T data;
-                    if (!m_done) {
+                    if (!m_has_reached_end_of_data) {
                         std::future<T> data_future;
                         m_queue.wait_and_pop(data_future);
                         data = std::move(data_future.get());
-                        check_is_done(data);
+                        if (at_end_of_data(data)) {
+                            m_has_reached_end_of_data = true;
+                        }
                     }
                     return data;
                 }
 
             }; // class queue_wrapper
-
-            template<>
-            inline void queue_wrapper<osmium::memory::Buffer>::check_is_done(const osmium::memory::Buffer& data) noexcept {
-                m_done = !data;
-            }
-
-            template<>
-            inline void queue_wrapper<std::string>::check_is_done(const std::string& data) noexcept {
-                m_done = data.empty();
-            }
 
         } // namespace detail
 
