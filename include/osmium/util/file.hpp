@@ -110,7 +110,7 @@ namespace osmium {
             return si.dwPageSize;
 #else
             // Unix implementation
-            return ::sysconf(_SC_PAGESIZE);
+            return size_t(::sysconf(_SC_PAGESIZE));
 #endif
         }
 
