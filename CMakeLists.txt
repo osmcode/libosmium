@@ -264,7 +264,7 @@ find_program(CPPCHECK cppcheck)
 if(CPPCHECK)
     message(STATUS "Looking for cppcheck - found")
     set(CPPCHECK_OPTIONS
-        --enable=warning,style,performance,portability,information,missingInclude)
+        --enable=warning,style,performance,portability,information,missingInclude --force -Uassert)
 
     # cpp doesn't find system includes for some reason, suppress that report
     set(CPPCHECK_OPTIONS ${CPPCHECK_OPTIONS} --suppress=missingIncludeSystem)
