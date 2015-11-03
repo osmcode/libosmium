@@ -114,20 +114,25 @@ namespace osmium {
                 write_thread();
             }
 
-            void write(osmium::memory::Buffer&& buffer) {
-                if (m_status != status::okay) {
-                    throw io_error("Can not write to writer when in status 'closed' or 'error'");
+            void on_error() {
+                detail::add_to_queue(m_output_queue, std::current_exception());
+                m_status = status::error;
+            }
+
+            void do_write(osmium::memory::Buffer&& buffer) {
+                if (buffer && buffer.committed() > 0) {
+                    m_output->write_buffer(std::move(buffer));
                 }
-                try {
-                    osmium::thread::check_for_exception(m_write_future);
-                    if (buffer.committed() > 0) {
-                        m_output->write_buffer(std::move(buffer));
-                    }
-                } catch (...) {
-                    detail::add_to_queue(m_output_queue, std::current_exception());
-                    m_output->write_end();
-                    m_status = status::error;
-                    throw;
+            }
+
+            void do_flush() {
+                if (m_buffer && m_buffer.committed() > 0) {
+                    osmium::memory::Buffer buffer{m_buffer_size,
+                                                  osmium::memory::Buffer::auto_grow::no};
+                    using std::swap;
+                    swap(m_buffer, buffer);
+
+                    m_output->write_buffer(std::move(buffer));
                 }
             }
 
@@ -169,7 +174,8 @@ namespace osmium {
                 try {
                     m_output->write_header(header);
                 } catch (...) {
-                    detail::add_end_of_data_to_queue(m_output_queue);
+                    on_error();
+                    close();
                     throw;
                 }
             }
@@ -212,48 +218,76 @@ namespace osmium {
             }
 
             /**
-             * Flush the internal buffer if it contains any data. This is also
-             * called by close(), so usually you don't have to call this.
+             * Flush the internal buffer if it contains any data. This is
+             * usually not needed as the buffer gets flushed on close()
+             * automatically.
              *
              * @throws Some form of osmium::io_error when there is a problem.
              */
             void flush() {
-                if (m_status == status::okay && m_buffer && m_buffer.committed() > 0) {
-                    osmium::memory::Buffer buffer{m_buffer_size,
-                                                  osmium::memory::Buffer::auto_grow::no};
-                    using std::swap;
-                    swap(m_buffer, buffer);
+                if (m_status != status::okay) {
+                    throw io_error("Can not write to writer when in status 'closed' or 'error'");
+                }
 
-                    write(std::move(buffer));
+                try {
+                    osmium::thread::check_for_exception(m_write_future);
+                    do_flush();
+                } catch (...) {
+                    on_error();
+                    throw;
                 }
             }
 
             /**
-             * Write contents of a buffer to the output file.
+             * Write contents of a buffer to the output file. The buffer is
+             * moved into this function and will be in an undefined moved-from
+             * state afterwards.
              *
+             * @param buffer Buffer that is being written out.
              * @throws Some form of osmium::io_error when there is a problem.
              */
             void operator()(osmium::memory::Buffer&& buffer) {
-                flush();
-                write(std::move(buffer));
+                if (m_status != status::okay) {
+                    throw io_error("Can not write to writer when in status 'closed' or 'error'");
+                }
+
+                try {
+                    osmium::thread::check_for_exception(m_write_future);
+                    do_flush();
+                    do_write(std::move(buffer));
+                } catch (...) {
+                    on_error();
+                    throw;
+                }
             }
 
             /**
              * Add item to the internal buffer for eventual writing to the
              * output file.
              *
+             * @param item Item to write (usually an OSM object).
              * @throws Some form of osmium::io_error when there is a problem.
              */
             void operator()(const osmium::memory::Item& item) {
-                if (!m_buffer) {
-                    m_buffer = osmium::memory::Buffer{m_buffer_size,
-                                                      osmium::memory::Buffer::auto_grow::no};
+                if (m_status != status::okay) {
+                    throw io_error("Can not write to writer when in status 'closed' or 'error'");
                 }
+
                 try {
-                    m_buffer.push_back(item);
-                } catch (osmium::buffer_is_full&) {
-                    flush();
-                    m_buffer.push_back(item);
+                    osmium::thread::check_for_exception(m_write_future);
+                    if (!m_buffer) {
+                        m_buffer = osmium::memory::Buffer{m_buffer_size,
+                                                        osmium::memory::Buffer::auto_grow::no};
+                    }
+                    try {
+                        m_buffer.push_back(item);
+                    } catch (osmium::buffer_is_full&) {
+                        do_flush();
+                        m_buffer.push_back(item);
+                    }
+                } catch (...) {
+                    on_error();
+                    throw;
                 }
             }
 
@@ -268,13 +302,21 @@ namespace osmium {
              */
             void close() {
                 if (m_status == status::okay) {
-                    if (m_buffer && m_buffer.committed() > 0) {
-                        write(std::move(m_buffer));
+                    try {
+                        do_write(std::move(m_buffer));
+                        m_output->write_end();
+                        m_status = status::closed;
+                    } catch (...) {
+                        on_error();
+                        throw;
                     }
-                    m_status = status::closed;
-                    m_output->write_end();
                 }
+
                 detail::add_end_of_data_to_queue(m_output_queue);
+
+                if (m_write_future.valid()) {
+                    m_write_future.get();
+                }
             }
 
         }; // class Writer
