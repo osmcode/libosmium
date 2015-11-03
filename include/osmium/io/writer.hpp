@@ -114,11 +114,6 @@ namespace osmium {
                 write_thread();
             }
 
-            void on_error() {
-                detail::add_to_queue(m_output_queue, std::current_exception());
-                m_status = status::error;
-            }
-
             void do_write(osmium::memory::Buffer&& buffer) {
                 if (buffer && buffer.committed() > 0) {
                     m_output->write_buffer(std::move(buffer));
@@ -133,6 +128,23 @@ namespace osmium {
                     swap(m_buffer, buffer);
 
                     m_output->write_buffer(std::move(buffer));
+                }
+            }
+
+            template <typename Function, typename ...Args>
+            void wrap(Function&& func, Args&&... args) {
+                if (m_status != status::okay) {
+                    throw io_error("Can not write to writer when in status 'closed' or 'error'");
+                }
+
+                try {
+                    osmium::thread::check_for_exception(m_write_future);
+                    func(std::forward<Args>(args)...);
+                } catch (...) {
+                    m_status = status::error;
+                    detail::add_to_queue(m_output_queue, std::current_exception());
+                    detail::add_end_of_data_to_queue(m_output_queue);
+                    throw;
                 }
             }
 
@@ -171,13 +183,9 @@ namespace osmium {
                 m_write_future = write_promise.get_future();
                 m_thread = osmium::thread::thread_handler{write_thread, std::ref(m_output_queue), std::move(compressor), std::move(write_promise)};
 
-                try {
+                wrap([&](){
                     m_output->write_header(header);
-                } catch (...) {
-                    on_error();
-                    close();
-                    throw;
-                }
+                });
             }
 
             explicit Writer(const std::string& filename, const osmium::io::Header& header = osmium::io::Header(), overwrite allow_overwrite = overwrite::no) :
@@ -225,17 +233,9 @@ namespace osmium {
              * @throws Some form of osmium::io_error when there is a problem.
              */
             void flush() {
-                if (m_status != status::okay) {
-                    throw io_error("Can not write to writer when in status 'closed' or 'error'");
-                }
-
-                try {
-                    osmium::thread::check_for_exception(m_write_future);
+                wrap([&](){
                     do_flush();
-                } catch (...) {
-                    on_error();
-                    throw;
-                }
+                });
             }
 
             /**
@@ -247,18 +247,10 @@ namespace osmium {
              * @throws Some form of osmium::io_error when there is a problem.
              */
             void operator()(osmium::memory::Buffer&& buffer) {
-                if (m_status != status::okay) {
-                    throw io_error("Can not write to writer when in status 'closed' or 'error'");
-                }
-
-                try {
-                    osmium::thread::check_for_exception(m_write_future);
+                wrap([&](){
                     do_flush();
                     do_write(std::move(buffer));
-                } catch (...) {
-                    on_error();
-                    throw;
-                }
+                });
             }
 
             /**
@@ -269,15 +261,10 @@ namespace osmium {
              * @throws Some form of osmium::io_error when there is a problem.
              */
             void operator()(const osmium::memory::Item& item) {
-                if (m_status != status::okay) {
-                    throw io_error("Can not write to writer when in status 'closed' or 'error'");
-                }
-
-                try {
-                    osmium::thread::check_for_exception(m_write_future);
+                wrap([&](){
                     if (!m_buffer) {
                         m_buffer = osmium::memory::Buffer{m_buffer_size,
-                                                        osmium::memory::Buffer::auto_grow::no};
+                                                          osmium::memory::Buffer::auto_grow::no};
                     }
                     try {
                         m_buffer.push_back(item);
@@ -285,10 +272,7 @@ namespace osmium {
                         do_flush();
                         m_buffer.push_back(item);
                     }
-                } catch (...) {
-                    on_error();
-                    throw;
-                }
+                });
             }
 
             /**
@@ -302,17 +286,13 @@ namespace osmium {
              */
             void close() {
                 if (m_status == status::okay) {
-                    try {
+                    wrap([&](){
                         do_write(std::move(m_buffer));
                         m_output->write_end();
                         m_status = status::closed;
-                    } catch (...) {
-                        on_error();
-                        throw;
-                    }
+                        detail::add_end_of_data_to_queue(m_output_queue);
+                    });
                 }
-
-                detail::add_end_of_data_to_queue(m_output_queue);
 
                 if (m_write_future.valid()) {
                     m_write_future.get();
