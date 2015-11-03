@@ -199,7 +199,7 @@ namespace osmium {
 
             /* Point */
 
-            point_type create_point(const osmium::Location location) const {
+            point_type create_point(const osmium::Location& location) const {
                 return m_impl.make_point(m_projection(location));
             }
 

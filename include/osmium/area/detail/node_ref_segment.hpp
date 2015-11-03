@@ -113,7 +113,7 @@ namespace osmium {
                     return m_second;
                 }
 
-                bool to_left_of(const osmium::Location location) const {
+                bool to_left_of(const osmium::Location& location) const {
     //                std::cerr << "segment " << first() << "--" << second() << " to_left_of(" << location << "\n";
 
                     if (first().location() == location || second().location() == location) {

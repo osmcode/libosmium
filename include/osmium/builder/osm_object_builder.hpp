@@ -143,7 +143,7 @@ namespace osmium {
                 static_cast<Builder*>(this)->add_size(sizeof(osmium::NodeRef));
             }
 
-            void add_node_ref(const object_id_type ref, const osmium::Location location = Location()) {
+            void add_node_ref(const object_id_type ref, const osmium::Location& location = Location{}) {
                 add_node_ref(NodeRef(ref, location));
             }
 

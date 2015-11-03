@@ -39,7 +39,7 @@ DEALINGS IN THE SOFTWARE.
 #include <cstdint>
 #include <functional>
 #include <iomanip>
-#include <iostream>
+//#include <iostream>
 #include <vector>
 
 #include <osmium/osm/item_type.hpp>
@@ -506,13 +506,15 @@ namespace osmium {
             void possibly_purge_removed_members() {
                 ++m_count_complete;
                 if (m_count_complete > 10000) { // XXX
-                    const size_t size_before = m_members_buffer.committed();
+//                    const size_t size_before = m_members_buffer.committed();
                     m_members_buffer.purge_removed(this);
+/*
                     const size_t size_after = m_members_buffer.committed();
                     double percent = static_cast<double>(size_before - size_after);
                     percent /= size_before;
                     percent *= 100;
-//                    std::cerr << "PURGE (size before=" << size_before << " after=" << size_after << " purged=" << (size_before - size_after) << " / " << static_cast<int>(percent) << "%)\n";
+                    std::cerr << "PURGE (size before=" << size_before << " after=" << size_after << " purged=" << (size_before - size_after) << " / " << static_cast<int>(percent) << "%)\n";
+*/
                     m_count_complete = 0;
                 }
             }

@@ -281,7 +281,7 @@ namespace osmium {
          * @param timestamp Timestamp
          * @returns Reference to object to make calls chainable.
          */
-        OSMObject& set_timestamp(const osmium::Timestamp timestamp) noexcept {
+        OSMObject& set_timestamp(const osmium::Timestamp& timestamp) noexcept {
             m_timestamp = timestamp;
             return *this;
         }

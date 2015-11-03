@@ -49,10 +49,10 @@ TEST_CASE("Test Writer with MockOutputFormat") {
 
     std::string fail_in;
 
-    const bool registered_parser = osmium::io::detail::OutputFormatFactory::instance().register_output_format(
-            osmium::io::file_format::xml,
-            [&](const osmium::io::File& file, osmium::io::detail::future_string_queue_type& output_queue) {
-                return new MockOutputFormat(file, output_queue, fail_in);
+    osmium::io::detail::OutputFormatFactory::instance().register_output_format(
+        osmium::io::file_format::xml,
+        [&](const osmium::io::File& file, osmium::io::detail::future_string_queue_type& output_queue) {
+            return new MockOutputFormat(file, output_queue, fail_in);
     });
 
     osmium::io::Header header;

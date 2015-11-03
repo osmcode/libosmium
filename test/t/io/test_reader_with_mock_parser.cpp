@@ -63,13 +63,13 @@ TEST_CASE("Test Reader using MockParser") {
 
     std::string fail_in;
 
-    const bool registered_parser = osmium::io::detail::ParserFactory::instance().register_parser(
-            osmium::io::file_format::xml,
-            [&](osmium::io::detail::future_string_queue_type& input_queue,
-                osmium::io::detail::future_buffer_queue_type& output_queue,
-                std::promise<osmium::io::Header>& header_promise,
-                osmium::osm_entity_bits::type read_which_entities) {
-            return std::unique_ptr<osmium::io::detail::Parser>(new MockParser(input_queue, output_queue, header_promise, read_which_entities, fail_in));
+    osmium::io::detail::ParserFactory::instance().register_parser(
+        osmium::io::file_format::xml,
+        [&](osmium::io::detail::future_string_queue_type& input_queue,
+            osmium::io::detail::future_buffer_queue_type& output_queue,
+            std::promise<osmium::io::Header>& header_promise,
+            osmium::osm_entity_bits::type read_which_entities) {
+        return std::unique_ptr<osmium::io::detail::Parser>(new MockParser(input_queue, output_queue, header_promise, read_which_entities, fail_in));
     });
 
     SECTION("no failure") {

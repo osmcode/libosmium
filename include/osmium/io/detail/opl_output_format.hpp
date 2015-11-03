@@ -111,7 +111,7 @@ namespace osmium {
                     }
                 }
 
-                void write_location(const osmium::Location location, const char x, const char y) {
+                void write_location(const osmium::Location& location, const char x, const char y) {
                     if (location) {
                         output_formatted(" %c%.7f %c%.7f", x, location.lon_without_check(), y, location.lat_without_check());
                     } else {

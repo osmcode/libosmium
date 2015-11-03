@@ -102,7 +102,9 @@ namespace osmium {
 
         ChangesetComment(osmium::Timestamp date, osmium::user_id_type uid) noexcept :
             m_date(date),
-            m_uid(uid) {
+            m_uid(uid),
+            m_user_size(0),
+            m_text_size(0) {
         }
 
         osmium::Timestamp date() const noexcept {
@@ -283,7 +285,7 @@ namespace osmium {
          * @param timestamp Timestamp
          * @returns Reference to changeset to make calls chainable.
          */
-        Changeset& set_created_at(const osmium::Timestamp timestamp) {
+        Changeset& set_created_at(const osmium::Timestamp& timestamp) {
             m_created_at = timestamp;
             return *this;
         }
@@ -294,7 +296,7 @@ namespace osmium {
          * @param timestamp Timestamp
          * @returns Reference to changeset to make calls chainable.
          */
-        Changeset& set_closed_at(const osmium::Timestamp timestamp) {
+        Changeset& set_closed_at(const osmium::Timestamp& timestamp) {
             m_closed_at = timestamp;
             return *this;
         }
@@ -311,7 +313,7 @@ namespace osmium {
         }
 
         /// Set the number of changes in this changeset
-        Changeset& set_num_changes(const char* num_changes) noexcept {
+        Changeset& set_num_changes(const char* num_changes) {
             return set_num_changes(osmium::string_to_num_changes(num_changes));
         }
 
@@ -327,7 +329,7 @@ namespace osmium {
         }
 
         /// Set the number of comments in this changeset
-        Changeset& set_num_comments(const char* num_comments) noexcept {
+        Changeset& set_num_comments(const char* num_comments) {
             return set_num_comments(osmium::string_to_num_comments(num_comments));
         }
 
