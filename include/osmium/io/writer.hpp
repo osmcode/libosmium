@@ -132,7 +132,7 @@ namespace osmium {
             }
 
             template <typename TFunction, typename ...TArgs>
-            void wrap(TFunction func, TArgs&&... args) {
+            void ensure_cleanup(TFunction func, TArgs&&... args) {
                 if (m_status != status::okay) {
                     throw io_error("Can not write to writer when in status 'closed' or 'error'");
                 }
@@ -183,7 +183,7 @@ namespace osmium {
                 m_write_future = write_promise.get_future();
                 m_thread = osmium::thread::thread_handler{write_thread, std::ref(m_output_queue), std::move(compressor), std::move(write_promise)};
 
-                wrap([&](){
+                ensure_cleanup([&](){
                     m_output->write_header(header);
                 });
             }
@@ -233,7 +233,7 @@ namespace osmium {
              * @throws Some form of osmium::io_error when there is a problem.
              */
             void flush() {
-                wrap([&](){
+                ensure_cleanup([&](){
                     do_flush();
                 });
             }
@@ -247,7 +247,7 @@ namespace osmium {
              * @throws Some form of osmium::io_error when there is a problem.
              */
             void operator()(osmium::memory::Buffer&& buffer) {
-                wrap([&](){
+                ensure_cleanup([&](){
                     do_flush();
                     do_write(std::move(buffer));
                 });
@@ -261,7 +261,7 @@ namespace osmium {
              * @throws Some form of osmium::io_error when there is a problem.
              */
             void operator()(const osmium::memory::Item& item) {
-                wrap([&](){
+                ensure_cleanup([&](){
                     if (!m_buffer) {
                         m_buffer = osmium::memory::Buffer{m_buffer_size,
                                                           osmium::memory::Buffer::auto_grow::no};
@@ -286,7 +286,7 @@ namespace osmium {
              */
             void close() {
                 if (m_status == status::okay) {
-                    wrap([&](){
+                    ensure_cleanup([&](){
                         do_write(std::move(m_buffer));
                         m_output->write_end();
                         m_status = status::closed;
