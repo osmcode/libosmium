@@ -57,6 +57,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/io/compression.hpp>
 #include <osmium/io/error.hpp>
 #include <osmium/io/file_compression.hpp>
+#include <osmium/io/overwrite.hpp>
 #include <osmium/util/cast.hpp>
 #include <osmium/util/compatibility.hpp>
 
@@ -106,8 +107,8 @@ namespace osmium {
 
         public:
 
-            explicit Bzip2Compressor(int fd) :
-                Compressor(),
+            explicit Bzip2Compressor(int fd, fsync sync) :
+                Compressor(sync),
                 m_file(fdopen(dup(fd), "wb")),
                 m_bzerror(BZ_OK),
                 m_bzfile(::BZ2_bzWriteOpen(&m_bzerror, m_file, 6, 0, 0)) {
@@ -138,7 +139,12 @@ namespace osmium {
                     ::BZ2_bzWriteClose(&error, m_bzfile, 0, nullptr, nullptr);
                     m_bzfile = nullptr;
                     if (m_file) {
-                        fclose(m_file);
+                        if (do_fsync()) {
+                            osmium::io::detail::reliable_fsync(::fileno(m_file));
+                        }
+                        if (fclose(m_file) != 0) {
+                            throw std::system_error(errno, std::system_category(), "Close failed");
+                        }
                     }
                     if (error != BZ_OK) {
                         detail::throw_bzip2_error(m_bzfile, "write close failed", error);
@@ -218,7 +224,9 @@ namespace osmium {
                     ::BZ2_bzReadClose(&error, m_bzfile);
                     m_bzfile = nullptr;
                     if (m_file) {
-                        fclose(m_file);
+                        if (fclose(m_file) != 0) {
+                            throw std::system_error(errno, std::system_category(), "Close failed");
+                        }
                     }
                     if (error != BZ_OK) {
                         detail::throw_bzip2_error(m_bzfile, "read close failed", error);
@@ -294,7 +302,7 @@ namespace osmium {
             // we want the register_compression() function to run, setting
             // the variable is only a side-effect, it will never be used
             const bool registered_bzip2_compression = osmium::io::CompressionFactory::instance().register_compression(osmium::io::file_compression::bzip2,
-                [](int fd) { return new osmium::io::Bzip2Compressor(fd); },
+                [](int fd, fsync sync) { return new osmium::io::Bzip2Compressor(fd, sync); },
                 [](int fd) { return new osmium::io::Bzip2Decompressor(fd); },
                 [](const char* buffer, size_t size) { return new osmium::io::Bzip2BufferDecompressor(buffer, size); }
             );

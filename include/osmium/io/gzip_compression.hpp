@@ -51,6 +51,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/io/compression.hpp>
 #include <osmium/io/error.hpp>
 #include <osmium/io/file_compression.hpp>
+#include <osmium/io/overwrite.hpp>
 #include <osmium/util/cast.hpp>
 #include <osmium/util/compatibility.hpp>
 
@@ -94,12 +95,14 @@ namespace osmium {
 
         class GzipCompressor : public Compressor {
 
+            int m_fd;
             gzFile m_gzfile;
 
         public:
 
-            explicit GzipCompressor(int fd) :
-                Compressor(),
+            explicit GzipCompressor(int fd, fsync sync) :
+                Compressor(sync),
+                m_fd(dup(fd)),
                 m_gzfile(::gzdopen(fd, "w")) {
                 if (!m_gzfile) {
                     detail::throw_gzip_error(m_gzfile, "write initialization failed");
@@ -130,6 +133,10 @@ namespace osmium {
                     if (result != Z_OK) {
                         detail::throw_gzip_error(m_gzfile, "write close failed", result);
                     }
+                    if (do_fsync()) {
+                        osmium::io::detail::reliable_fsync(m_fd);
+                    }
+                    osmium::io::detail::reliable_close(m_fd);
                 }
             }
 
@@ -251,7 +258,7 @@ namespace osmium {
             // we want the register_compression() function to run, setting
             // the variable is only a side-effect, it will never be used
             const bool registered_gzip_compression = osmium::io::CompressionFactory::instance().register_compression(osmium::io::file_compression::gzip,
-                [](int fd) { return new osmium::io::GzipCompressor(fd); },
+                [](int fd, fsync sync) { return new osmium::io::GzipCompressor(fd, sync); },
                 [](int fd) { return new osmium::io::GzipDecompressor(fd); },
                 [](const char* buffer, size_t size) { return new osmium::io::GzipBufferDecompressor(buffer, size); }
             );

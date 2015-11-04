@@ -151,6 +151,7 @@ namespace osmium {
             struct options_type {
                 osmium::io::Header header;
                 overwrite allow_overwrite = overwrite::no;
+                fsync sync = fsync::no;
             };
 
             static void set_option(options_type& options, const osmium::io::Header& header) {
@@ -159,6 +160,10 @@ namespace osmium {
 
             static void set_option(options_type& options, overwrite value) {
                 options.allow_overwrite = value;
+            }
+
+            static void set_option(options_type& options, fsync value) {
+                options.sync = value;
             }
 
         public:
@@ -176,6 +181,9 @@ namespace osmium {
              * @param allow_overwrite Allow overwriting of existing file? Can be
              *               osmium::io::overwrite::allow or osmium::io::overwrite::no
              *               (default).
+             * @param fsync Should fsync be called on the file before closing it?
+             *              Can be osmium::io::fsync::yes or
+             *              osmium::io::fsync::no (default).
              *
              * @throws osmium::io_error If there was an error.
              * @throws std::system_error If the file could not be opened.
@@ -198,7 +206,9 @@ namespace osmium {
                 };
 
                 std::unique_ptr<osmium::io::Compressor> compressor =
-                    osmium::io::CompressionFactory::instance().create_compressor(file.compression(), osmium::io::detail::open_for_writing(m_file.filename(), options.allow_overwrite));
+                    CompressionFactory::instance().create_compressor(file.compression(),
+                                                                     osmium::io::detail::open_for_writing(m_file.filename(), options.allow_overwrite),
+                                                                     options.sync);
 
                 std::promise<bool> write_promise;
                 m_write_future = write_promise.get_future();

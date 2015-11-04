@@ -38,11 +38,19 @@ namespace osmium {
     namespace io {
 
         /**
-         * Allow overwriting of existing file.
+         * Allow overwriting of existing file?
          */
         enum class overwrite : bool {
             no    = false,
             allow = true
+        };
+
+        /**
+         * Should writer do an fsync before closing the file?
+         */
+        enum class fsync : bool {
+            no  = false,
+            yes = true
         };
 
     } // namespace io
