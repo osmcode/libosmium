@@ -158,6 +158,16 @@ namespace osmium {
                     write_color(color_reset);
                 }
 
+                void write_timestamp(const osmium::Timestamp& timestamp) {
+                    if (timestamp.valid()) {
+                        *m_out += timestamp.to_iso();
+                        output_formatted(" (%d)", timestamp.seconds_since_epoch());
+                    } else {
+                        write_error("NOT SET");
+                    }
+                    *m_out += '\n';
+                }
+
                 void write_meta(const osmium::OSMObject& object) {
                     output_formatted("%" PRId64 "\n", object.id());
                     if (m_options.add_metadata) {
@@ -171,8 +181,7 @@ namespace osmium {
                         write_fieldname("changeset");
                         output_formatted("%d\n", object.changeset());
                         write_fieldname("timestamp");
-                        *m_out += object.timestamp().to_iso();
-                        output_formatted(" (%d)\n", object.timestamp().seconds_since_epoch());
+                        write_timestamp(object.timestamp());
                         write_fieldname("user");
                         output_formatted("     %d ", object.uid());
                         write_string(object.user());
@@ -335,14 +344,12 @@ namespace osmium {
 
                     write_fieldname("created at");
                     *m_out += ' ';
-                    *m_out += changeset.created_at().to_iso();
-                    output_formatted(" (%d)\n", changeset.created_at().seconds_since_epoch());
+                    write_timestamp(changeset.created_at());
 
                     write_fieldname("closed at");
                     *m_out += "  ";
                     if (changeset.closed()) {
-                        *m_out += changeset.closed_at().to_iso();
-                        output_formatted(" (%d)\n", changeset.closed_at().seconds_since_epoch());
+                        write_timestamp(changeset.closed_at());
                     } else {
                         write_error("OPEN!\n");
                     }
@@ -365,8 +372,8 @@ namespace osmium {
                             write_counter(width, n++);
 
                             write_comment_field("date");
-                            *m_out += comment.date().to_iso();
-                            output_formatted(" (%d)\n      %*s", comment.date().seconds_since_epoch(), width, "");
+                            write_timestamp(comment.date());
+                            output_formatted("      %*s", width, "");
 
                             write_comment_field("user");
                             output_formatted("%d ", comment.uid());
