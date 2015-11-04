@@ -148,11 +148,26 @@ namespace osmium {
                 }
             }
 
+            struct options_type {
+                osmium::io::Header header;
+                overwrite allow_overwrite = overwrite::no;
+            };
+
+            static void set_option(options_type& options, const osmium::io::Header& header) {
+                options.header = header;
+            }
+
+            static void set_option(options_type& options, overwrite value) {
+                options.allow_overwrite = value;
+            }
+
         public:
 
             /**
              * The constructor of the Writer object opens a file and writes the
              * header to it.
+             *
+             * All parameters except the first one can be in any order.
              *
              * @param file File (contains name and format info) to open.
              * @param header Optional header data. If this is not given sensible
@@ -165,7 +180,8 @@ namespace osmium {
              * @throws osmium::io_error If there was an error.
              * @throws std::system_error If the file could not be opened.
              */
-            explicit Writer(const osmium::io::File& file, const osmium::io::Header& header = osmium::io::Header(), overwrite allow_overwrite = overwrite::no) :
+            template <typename... TArgs>
+            explicit Writer(const osmium::io::File& file, TArgs&&... args) :
                 m_file(file.check()),
                 m_output_queue(20, "raw_output"), // XXX
                 m_output(osmium::io::detail::OutputFormatFactory::instance().create_output(m_file, m_output_queue)),
@@ -176,24 +192,31 @@ namespace osmium {
                 m_status(status::okay) {
                 assert(!m_file.buffer()); // XXX can't handle pseudo-files
 
+                options_type options;
+                (void)std::initializer_list<int>{
+                    (set_option(options, args), 0)...
+                };
+
                 std::unique_ptr<osmium::io::Compressor> compressor =
-                    osmium::io::CompressionFactory::instance().create_compressor(file.compression(), osmium::io::detail::open_for_writing(m_file.filename(), allow_overwrite));
+                    osmium::io::CompressionFactory::instance().create_compressor(file.compression(), osmium::io::detail::open_for_writing(m_file.filename(), options.allow_overwrite));
 
                 std::promise<bool> write_promise;
                 m_write_future = write_promise.get_future();
                 m_thread = osmium::thread::thread_handler{write_thread, std::ref(m_output_queue), std::move(compressor), std::move(write_promise)};
 
                 ensure_cleanup([&](){
-                    m_output->write_header(header);
+                    m_output->write_header(options.header);
                 });
             }
 
-            explicit Writer(const std::string& filename, const osmium::io::Header& header = osmium::io::Header(), overwrite allow_overwrite = overwrite::no) :
-                Writer(osmium::io::File(filename), header, allow_overwrite) {
+            template <typename... TArgs>
+            explicit Writer(const std::string& filename, TArgs&&... args) :
+                Writer(osmium::io::File(filename), std::forward<TArgs>(args)...) {
             }
 
-            explicit Writer(const char* filename, const osmium::io::Header& header = osmium::io::Header(), overwrite allow_overwrite = overwrite::no) :
-                Writer(osmium::io::File(filename), header, allow_overwrite) {
+            template <typename... TArgs>
+            explicit Writer(const char* filename, TArgs&&... args) :
+                Writer(osmium::io::File(filename), std::forward<TArgs>(args)...) {
             }
 
             Writer(const Writer&) = delete;
