@@ -58,7 +58,7 @@ namespace osmium {
             class ReadThreadManager {
 
                 // only used in the sub-thread
-                osmium::io::Decompressor* m_decompressor;
+                osmium::io::Decompressor& m_decompressor;
                 future_string_queue_type& m_queue;
 
                 // used in both threads
@@ -72,14 +72,14 @@ namespace osmium {
 
                     try {
                         while (!m_done) {
-                            std::string data {m_decompressor->read()};
+                            std::string data {m_decompressor.read()};
                             if (at_end_of_data(data)) {
                                 break;
                             }
                             add_to_queue(m_queue, std::move(data));
                         }
 
-                        m_decompressor->close();
+                        m_decompressor.close();
                     } catch (...) {
                         add_to_queue(m_queue, std::current_exception());
                     }
@@ -89,7 +89,7 @@ namespace osmium {
 
             public:
 
-                ReadThreadManager(osmium::io::Decompressor* decompressor,
+                ReadThreadManager(osmium::io::Decompressor& decompressor,
                                   future_string_queue_type& queue) :
                     m_decompressor(decompressor),
                     m_queue(queue),
