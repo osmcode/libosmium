@@ -65,18 +65,10 @@ namespace osmium {
 
                 std::shared_ptr<std::string> m_out;
 
-                OutputBlock(osmium::memory::Buffer&& buffer) :
+                explicit OutputBlock(osmium::memory::Buffer&& buffer) :
                     m_input_buffer(std::make_shared<osmium::memory::Buffer>(std::move(buffer))),
                     m_out(std::make_shared<std::string>()) {
                 }
-
-                OutputBlock(const OutputBlock&) = default;
-                OutputBlock& operator=(const OutputBlock&) = default;
-
-                OutputBlock(OutputBlock&&) = default;
-                OutputBlock& operator=(OutputBlock&&) = default;
-
-                ~OutputBlock() noexcept = default;
 
                 template <typename... TArgs>
                 void output_formatted(const char* format, TArgs&&... args) {
@@ -108,7 +100,7 @@ namespace osmium {
 
             public:
 
-                OutputFormat(future_string_queue_type& output_queue) :
+                explicit OutputFormat(future_string_queue_type& output_queue) :
                     m_output_queue(output_queue) {
                 }
 
