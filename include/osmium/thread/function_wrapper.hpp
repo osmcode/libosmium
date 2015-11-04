@@ -64,7 +64,7 @@ namespace osmium {
                 F m_functor;
 
                 impl_type(F&& functor) :
-                    m_functor(std::move(functor)) {
+                    m_functor(std::forward<F>(functor)) {
                 }
 
                 bool call() override {
@@ -78,9 +78,9 @@ namespace osmium {
 
             // Constructor must not be "explicit" for wrapper
             // to work seemlessly.
-            template <typename F>
-            function_wrapper(F&& f) :
-                impl(new impl_type<F>(std::move(f))) {
+            template <typename TFunction>
+            function_wrapper(TFunction&& f) :
+                impl(new impl_type<TFunction>(std::forward<TFunction>(f))) {
             }
 
             // The integer parameter is only used to signal that we want

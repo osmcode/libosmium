@@ -90,9 +90,9 @@ namespace osmium {
                 m_thread() {
             }
 
-            template <class Function, class... Args>
-            thread_handler(Function&& f, Args&&... args) :
-                m_thread(std::move(f), std::forward<Args>(args)...) {
+            template <typename TFunction, typename... TArgs>
+            thread_handler(TFunction&& f, TArgs&&... args) :
+                m_thread(std::forward<TFunction>(f), std::forward<TArgs>(args)...) {
             }
 
             thread_handler(const thread_handler&) = delete;

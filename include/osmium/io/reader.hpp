@@ -360,7 +360,7 @@ namespace osmium {
          * unless you are working with small OSM files and/or have lots of
          * RAM.
          */
-        template <class... TArgs>
+        template <typename... TArgs>
         osmium::memory::Buffer read_file(TArgs&&... args) {
             osmium::memory::Buffer buffer(1024*1024, osmium::memory::Buffer::auto_grow::yes);
 

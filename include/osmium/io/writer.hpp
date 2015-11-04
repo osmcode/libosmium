@@ -131,15 +131,15 @@ namespace osmium {
                 }
             }
 
-            template <typename Function, typename ...Args>
-            void wrap(Function&& func, Args&&... args) {
+            template <typename TFunction, typename ...TArgs>
+            void wrap(TFunction func, TArgs&&... args) {
                 if (m_status != status::okay) {
                     throw io_error("Can not write to writer when in status 'closed' or 'error'");
                 }
 
                 try {
                     osmium::thread::check_for_exception(m_write_future);
-                    func(std::forward<Args>(args)...);
+                    func(std::forward<TArgs>(args)...);
                 } catch (...) {
                     m_status = status::error;
                     detail::add_to_queue(m_output_queue, std::current_exception());
