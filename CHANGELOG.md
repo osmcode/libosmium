@@ -10,6 +10,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 - Helper functions to make input iterator ranges and output iterators.
 - Add support for reading o5m and o5c files.
+- Option for osmium::io::Writer to fsync file after writing.
+- Lots of internal asserts() and other robustness checks.
 
 ### Changed
 
@@ -23,6 +25,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Reader now throws when trying to read after eof or an error.
 - I/O functions that used to throw std::runtime_error now throw
   osmium::io_error or derived.
+- Optional parameters on osmium::io::Writer now work in any order.
 
 ### Fixed
 
