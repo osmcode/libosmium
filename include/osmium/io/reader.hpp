@@ -105,7 +105,7 @@ namespace osmium {
             osmium::thread::thread_handler m_thread;
 
             // This function will run in a separate thread.
-            static void parser_thread(osmium::io::File& file,
+            static void parser_thread(const osmium::io::File& file,
                                       detail::future_string_queue_type& input_queue,
                                       detail::future_buffer_queue_type& osmdata_queue,
                                       std::promise<osmium::io::Header>&& header_promise,
