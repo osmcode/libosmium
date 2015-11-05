@@ -8,6 +8,15 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+### Changed
+
+### Fixed
+
+
+## [2.5.1] - 2015-11-05
+
+### Added
+
 - Header `osmium/fwd.hpp` with forward declarations of the most commonly
   used Osmium classes.
 
@@ -15,8 +24,6 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 - Moved `osmium/io/overwrite.hpp` to `osmium/io/writer_options.hpp`
   If you still include the old file, you'll get a warning.
-
-### Fixed
 
 
 ## [2.5.0] - 2015-11-04
@@ -181,7 +188,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   Doxygen (up to version 1.8.8). This version contains a workaround to fix
   this.
 
-[unreleased]: https://github.com/osmcode/libosmium/compare/v2.5.0...HEAD
+[unreleased]: https://github.com/osmcode/libosmium/compare/v2.5.1...HEAD
+[2.5.1]: https://github.com/osmcode/libosmium/compare/v2.5.0...v2.5.1
 [2.5.0]: https://github.com/osmcode/libosmium/compare/v2.4.1...v2.5.0
 [2.4.1]: https://github.com/osmcode/libosmium/compare/v2.4.0...v2.4.1
 [2.4.0]: https://github.com/osmcode/libosmium/compare/v2.3.0...v2.4.0
