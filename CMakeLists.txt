@@ -54,6 +54,10 @@ option(BUILD_HEADERS    "compile every header file on its own" ${dev_build})
 option(BUILD_BENCHMARKS "compile benchmark programs" ${dev_build})
 option(BUILD_DATA_TESTS "compile data tests, please run them with ctest" ${dev_build})
 
+option(INSTALL_GDALCPP   "also install gdalcpp headers" OFF)
+option(INSTALL_PROTOZERO "also install protozero headers" OFF)
+option(INSTALL_UTFCPP    "also install utfcpp headers" OFF)
+
 
 #-----------------------------------------------------------------------------
 #
@@ -353,11 +357,29 @@ if(BUILD_HEADERS)
     endforeach()
 endif()
 
+
+#-----------------------------------------------------------------------------
+#
+#  Installation
+#
+#  External libraries are only installed if the options are set in case they
+#  are installed from somewhere else.
+#
+#-----------------------------------------------------------------------------
 install(DIRECTORY include/osmium DESTINATION include)
 
-# We only have a copy of this file so we can use older boost versions which
-# don't have it. We probably don't want to install it.
-#install(FILES include/boost_unicode_iterator.hpp DESTINATION include)
+if(INSTALL_GDALCPP)
+    install(include/gdalcpp.hpp DESTINATION include)
+endif()
+
+if(INSTALL_PROTOZERO)
+    install(DIRECTORY include/protozero DESTINATION include)
+endif()
+
+if(INSTALL_UTFCPP)
+    install(include/utf8.hpp DESTINATION include)
+    install(DIRECTORY include/utf8 DESTINATION include)
+endif()
 
 
 #-----------------------------------------------------------------------------
