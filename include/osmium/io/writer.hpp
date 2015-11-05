@@ -172,18 +172,21 @@ namespace osmium {
              * The constructor of the Writer object opens a file and writes the
              * header to it.
              *
-             * All parameters except the first one can be in any order.
-             *
              * @param file File (contains name and format info) to open.
-             * @param header Optional header data. If this is not given sensible
-             *               defaults will be used. See the default constructor
-             *               of osmium::io::Header for details.
-             * @param allow_overwrite Allow overwriting of existing file? Can be
-             *               osmium::io::overwrite::allow or osmium::io::overwrite::no
-             *               (default).
-             * @param fsync Should fsync be called on the file before closing it?
-             *              Can be osmium::io::fsync::yes or
-             *              osmium::io::fsync::no (default).
+             * @param args All further arguments are optional and can appear
+             *             in any order:
+             *
+             * * osmium::io::Header: Optional header data. If this is
+             *       not given, a default constructed osmium::io::Header
+             *       object will be used.
+             *
+             * * osmium::io::overwrite: Allow overwriting of existing file?
+             *       Can be osmium::io::overwrite::allow or
+             *       osmium::io::overwrite::no (default).
+             *
+             * * osmium::io::fsync: Should fsync be called on the file
+             *       before closing it? Can be osmium::io::fsync::yes or
+             *       osmium::io::fsync::no (default).
              *
              * @throws osmium::io_error If there was an error.
              * @throws std::system_error If the file could not be opened.
