@@ -1,5 +1,5 @@
-#ifndef OSMIUM_IO_OVERWRITE_HPP
-#define OSMIUM_IO_OVERWRITE_HPP
+#ifndef OSMIUM_IO_WRITER_OPTIONS_HPP
+#define OSMIUM_IO_WRITER_OPTIONS_HPP
 
 /*
 
@@ -33,7 +33,28 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#pragma message("Including overwrite.hpp is deprecated, #include <osmium/io/writer_options.hpp> instead.")
-#include <osmium/io/writer_options.hpp>
+namespace osmium {
 
-#endif // OSMIUM_IO_OVERWRITE_HPP
+    namespace io {
+
+        /**
+         * Allow overwriting of existing file?
+         */
+        enum class overwrite : bool {
+            no    = false,
+            allow = true
+        };
+
+        /**
+         * Should writer do an fsync before closing the file?
+         */
+        enum class fsync : bool {
+            no  = false,
+            yes = true
+        };
+
+    } // namespace io
+
+} // namespace osmium
+
+#endif // OSMIUM_IO_WRITER_OPTIONS_HPP

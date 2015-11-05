@@ -57,7 +57,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/io/compression.hpp>
 #include <osmium/io/error.hpp>
 #include <osmium/io/file_compression.hpp>
-#include <osmium/io/overwrite.hpp>
+#include <osmium/io/writer_options.hpp>
 #include <osmium/util/cast.hpp>
 #include <osmium/util/compatibility.hpp>
 

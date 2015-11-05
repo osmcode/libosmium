@@ -46,7 +46,7 @@ DEALINGS IN THE SOFTWARE.
 # include <io.h>
 #endif
 
-#include <osmium/io/overwrite.hpp>
+#include <osmium/io/writer_options.hpp>
 
 namespace osmium {
 

@@ -49,7 +49,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/io/error.hpp>
 #include <osmium/io/file.hpp>
 #include <osmium/io/header.hpp>
-#include <osmium/io/overwrite.hpp>
+#include <osmium/io/writer_options.hpp>
 #include <osmium/memory/buffer.hpp>
 #include <osmium/thread/util.hpp>
 
