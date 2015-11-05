@@ -36,15 +36,10 @@ DEALINGS IN THE SOFTWARE.
 #include <memory>
 #include <utility>
 
+#include <osmium/fwd.hpp>
 #include <osmium/handler.hpp>
 
 namespace osmium {
-
-    class Node;
-    class Way;
-    class Relation;
-    class Area;
-    class Changeset;
 
     namespace handler {
 

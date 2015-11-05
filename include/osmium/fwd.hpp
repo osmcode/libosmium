@@ -1,5 +1,5 @@
-#ifndef OSMIUM_HANDLER_HPP
-#define OSMIUM_HANDLER_HPP
+#ifndef OSMIUM_FWD_HPP
+#define OSMIUM_FWD_HPP
 
 /*
 
@@ -33,62 +33,38 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <osmium/fwd.hpp>
+/**
+ *
+ * @file
+ *
+ * This file contains forward declarations for commonly used Osmium classes.
+ *
+ */
 
 namespace osmium {
 
-    /**
-     * @brief Osmium handlers provide callbacks for OSM objects
-     */
-    namespace handler {
-
-        class Handler {
-
-        public:
-
-            void osm_object(const osmium::OSMObject&) const {
-            }
-
-            void node(const osmium::Node&) const {
-            }
-
-            void way(const osmium::Way&) const {
-            }
-
-            void relation(const osmium::Relation&) const {
-            }
-
-            void area(const osmium::Area&) const {
-            }
-
-            void changeset(const osmium::Changeset&) const {
-            }
-
-            void tag_list(const osmium::TagList&) const {
-            }
-
-            void way_node_list(const osmium::WayNodeList&) const {
-            }
-
-            void relation_member_list(const osmium::RelationMemberList&) const {
-            }
-
-            void outer_ring(const osmium::OuterRing&) const {
-            }
-
-            void inner_ring(const osmium::InnerRing&) const {
-            }
-
-            void changeset_discussion(const osmium::ChangesetDiscussion&) const {
-            }
-
-            void flush() const {
-            }
-
-        }; // class Handler
-
-    } // namspace handler
+    class Area;
+    class Box;
+    class Changeset;
+    class ChangesetComment;
+    class ChangesetDiscussion;
+    class InnerRing;
+    class Location;
+    class Node;
+    class NodeRef;
+    class NodeRefList;
+    class OSMEntity;
+    class OSMObject;
+    class OuterRing;
+    class Relation;
+    class RelationMemberList;
+    class Segment;
+    class Tag;
+    class TagList;
+    class Timestamp;
+    class Way;
+    class WayNodeList;
 
 } // namespace osmium
 
-#endif // OSMIUM_HANDLER_HPP
+#endif // OSMIUM_FWD_HPP

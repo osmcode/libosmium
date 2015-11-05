@@ -42,6 +42,7 @@ DEALINGS IN THE SOFTWARE.
 //#include <iostream>
 #include <vector>
 
+#include <osmium/fwd.hpp>
 #include <osmium/osm/item_type.hpp>
 #include <osmium/osm/object.hpp>
 #include <osmium/osm/relation.hpp> // IWYU pragma: keep
@@ -54,9 +55,6 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/relations/detail/member_meta.hpp>
 
 namespace osmium {
-
-    class Node;
-    class Way;
 
     /**
      * @brief Code related to the assembly of OSM relations

@@ -8,6 +8,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+- Header `osmium/fwd.hpp` with forward declarations of the most commonly
+  used Osmium classes.
+
 ### Changed
 
 - Moved `osmium/io/overwrite.hpp` to `osmium/io/writer_options.hpp`
