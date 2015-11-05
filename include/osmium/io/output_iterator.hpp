@@ -50,7 +50,7 @@ namespace osmium {
 
     namespace io {
 
-        template <class TDest>
+        template <typename TDest>
         class OutputIterator : public std::iterator<std::output_iterator_tag, osmium::memory::Item> {
 
             TDest* m_destination;
@@ -110,7 +110,7 @@ namespace osmium {
 
         }; // class OutputIterator
 
-        template <class TDest>
+        template <typename TDest>
         OutputIterator<TDest> make_output_iterator(TDest& destination) {
             return OutputIterator<TDest>{destination};
         }
@@ -120,7 +120,7 @@ namespace osmium {
          * deprecated. Call Writer::set_buffer_size() instead if you want to
          * change the default.
          */
-        template <class TDest>
+        template <typename TDest>
         OSMIUM_DEPRECATED OutputIterator<TDest> make_output_iterator(TDest& destination, const size_t buffer_size) {
             destination.set_buffer_size(buffer_size);
             return OutputIterator<TDest>{destination};

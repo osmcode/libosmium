@@ -52,7 +52,7 @@ namespace osmium {
          * source. It hides all the buffer handling and makes the contents of a
          * source accessible as a normal STL input iterator.
          */
-        template <class TSource, class TItem = osmium::memory::Item>
+        template <typename TSource, typename TItem = osmium::memory::Item>
         class InputIterator {
 
             static_assert(std::is_base_of<osmium::memory::Item, TItem>::value, "TItem must derive from osmium::buffer::Item");
@@ -133,7 +133,7 @@ namespace osmium {
 
         }; // class InputIterator
 
-        template <class TSource, class TItem = osmium::memory::Item>
+        template <typename TSource, typename TItem = osmium::memory::Item>
         class InputIteratorRange {
 
             InputIterator<TSource, TItem> m_begin;
@@ -165,7 +165,7 @@ namespace osmium {
 
         }; // class InputIteratorRange
 
-        template <class TItem, class TSource>
+        template <typename TItem, typename TSource>
         InputIteratorRange<TSource, TItem> make_input_iterator_range(TSource& source) {
             using it_type = InputIterator<TSource, TItem>;
             return InputIteratorRange<TSource, TItem>(it_type{source}, it_type{});

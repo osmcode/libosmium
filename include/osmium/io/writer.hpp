@@ -131,7 +131,7 @@ namespace osmium {
                 }
             }
 
-            template <typename TFunction, typename ...TArgs>
+            template <typename TFunction, typename... TArgs>
             void ensure_cleanup(TFunction func, TArgs&&... args) {
                 if (m_status != status::okay) {
                     throw io_error("Can not write to writer when in status 'closed' or 'error'");

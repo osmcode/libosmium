@@ -91,7 +91,7 @@ namespace osmium {
          *
          * @tparam TRelations Are we interested in member relations?
          */
-        template <class TCollector, bool TNodes, bool TWays, bool TRelations>
+        template <typename TCollector, bool TNodes, bool TWays, bool TRelations>
         class Collector {
 
             /**
@@ -474,14 +474,14 @@ namespace osmium {
                 return range.first->buffer_offset();
             }
 
-            template <class TIter>
+            template <typename TIter>
             void read_relations(TIter begin, TIter end) {
                 HandlerPass1 handler(*static_cast<TCollector*>(this));
                 osmium::apply(begin, end, handler);
                 sort_member_meta();
             }
 
-            template <class TSource>
+            template <typename TSource>
             void read_relations(TSource& source) {
                 read_relations(std::begin(source), std::end(source));
                 source.close();

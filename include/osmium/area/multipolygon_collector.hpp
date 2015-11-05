@@ -71,7 +71,7 @@ namespace osmium {
          *
          * @tparam TAssembler Multipolygon Assembler class.
          */
-        template <class TAssembler>
+        template <typename TAssembler>
         class MultipolygonCollector : public osmium::relations::Collector<MultipolygonCollector<TAssembler>, false, true, false> {
 
             typedef typename osmium::relations::Collector<MultipolygonCollector<TAssembler>, false, true, false> collector_type;

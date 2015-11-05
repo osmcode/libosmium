@@ -145,7 +145,7 @@ namespace osmium {
 
     }; // class DiffObject
 
-    template <class T>
+    template <typename T>
     class DiffObjectDerived : public DiffObject {
 
     public:

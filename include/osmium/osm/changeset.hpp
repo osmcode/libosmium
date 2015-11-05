@@ -49,7 +49,7 @@ namespace osmium {
 
     namespace builder {
         class ChangesetDiscussionBuilder;
-        template <class T> class ObjectBuilder;
+        template <typename T> class ObjectBuilder;
     }
 
     class Changeset;
@@ -77,7 +77,7 @@ namespace osmium {
             return data() + osmium::memory::padded_length(sizeof(ChangesetComment) + m_user_size + m_text_size);
         }
 
-        template <class TMember>
+        template <typename TMember>
         friend class osmium::memory::CollectionIterator;
 
         unsigned char* next() {

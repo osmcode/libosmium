@@ -49,7 +49,7 @@ namespace osmium {
          * the exception stored in the future if there was one. Otherwise it
          * will just return.
          */
-        template <class T>
+        template <typename T>
         inline void check_for_exception(std::future<T>& future) {
             if (future.valid() && future.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
                 future.get();
@@ -60,7 +60,7 @@ namespace osmium {
          * Wait until the given future becomes ready. Will block if the future
          * is not ready. Can be called more than once unlike future.get().
          */
-        template <class T>
+        template <typename T>
         inline void wait_until_done(std::future<T>& future) {
             if (future.valid()) {
                 future.get();

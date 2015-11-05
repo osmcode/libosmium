@@ -142,7 +142,7 @@ namespace osmium {
         /**
          * Geometry factory.
          */
-        template <class TGeomImpl, class TProjection = IdentityProjection>
+        template <typename TGeomImpl, typename TProjection = IdentityProjection>
         class GeometryFactory {
 
             /**
@@ -166,7 +166,7 @@ namespace osmium {
             /**
              * Constructor for default initialized projection.
              */
-            template <class... TArgs>
+            template <typename... TArgs>
             GeometryFactory<TGeomImpl, TProjection>(TArgs&&... args) :
                 m_projection(),
                 m_impl(std::forward<TArgs>(args)...) {
@@ -176,7 +176,7 @@ namespace osmium {
              * Constructor for explicitly initialized projection. Note that the
              * projection is moved into the GeometryFactory.
              */
-            template <class... TArgs>
+            template <typename... TArgs>
             GeometryFactory<TGeomImpl, TProjection>(TProjection&& projection, TArgs&&... args) :
                 m_projection(std::move(projection)),
                 m_impl(std::forward<TArgs>(args)...) {
@@ -227,7 +227,7 @@ namespace osmium {
                 m_impl.linestring_start();
             }
 
-            template <class TIter>
+            template <typename TIter>
             size_t fill_linestring(TIter it, TIter end) {
                 size_t num_points = 0;
                 for (; it != end; ++it, ++num_points) {
@@ -236,7 +236,7 @@ namespace osmium {
                 return num_points;
             }
 
-            template <class TIter>
+            template <typename TIter>
             size_t fill_linestring_unique(TIter it, TIter end) {
                 size_t num_points = 0;
                 osmium::Location last_location;
@@ -301,7 +301,7 @@ namespace osmium {
                 m_impl.polygon_start();
             }
 
-            template <class TIter>
+            template <typename TIter>
             size_t fill_polygon(TIter it, TIter end) {
                 size_t num_points = 0;
                 for (; it != end; ++it, ++num_points) {
@@ -310,7 +310,7 @@ namespace osmium {
                 return num_points;
             }
 
-            template <class TIter>
+            template <typename TIter>
             size_t fill_polygon_unique(TIter it, TIter end) {
                 size_t num_points = 0;
                 osmium::Location last_location;

@@ -331,7 +331,7 @@ namespace osmium {
              * @tparam T Type we want to the data to be interpreted as.
              * @returns Reference of given type pointing to the data in the buffer.
              */
-            template <class T>
+            template <typename T>
             T& get(const size_t offset) const {
                 assert(m_data);
                 return *reinterpret_cast<T*>(&m_data[offset]);
@@ -400,7 +400,7 @@ namespace osmium {
              * @param item Reference to the item to be copied.
              * @returns Reference to newly copied data in the buffer.
              */
-            template <class T>
+            template <typename T>
             T& add_item(const T& item) {
                 assert(m_data);
                 unsigned char* target = reserve_space(item.padded_size());
@@ -440,16 +440,16 @@ namespace osmium {
              * These iterators can be used to iterate over all items in
              * a buffer.
              */
-            template <class T>
+            template <typename T>
             using t_iterator = osmium::memory::ItemIterator<T>;
 
-            template <class T>
+            template <typename T>
             using t_const_iterator = osmium::memory::ItemIterator<const T>;
 
             typedef t_iterator<osmium::OSMEntity> iterator;
             typedef t_const_iterator<osmium::OSMEntity> const_iterator;
 
-            template <class T>
+            template <typename T>
             t_iterator<T> begin() {
                 assert(m_data);
                 return t_iterator<T>(m_data, m_data + m_committed);
@@ -460,7 +460,7 @@ namespace osmium {
                 return iterator(m_data, m_data + m_committed);
             }
 
-            template <class T>
+            template <typename T>
             t_iterator<T> get_iterator(size_t offset) {
                 assert(m_data);
                 return t_iterator<T>(m_data + offset, m_data + m_committed);
@@ -471,7 +471,7 @@ namespace osmium {
                 return iterator(m_data + offset, m_data + m_committed);
             }
 
-            template <class T>
+            template <typename T>
             t_iterator<T> end() {
                 assert(m_data);
                 return t_iterator<T>(m_data + m_committed, m_data + m_committed);
@@ -482,7 +482,7 @@ namespace osmium {
                 return iterator(m_data + m_committed, m_data + m_committed);
             }
 
-            template <class T>
+            template <typename T>
             t_const_iterator<T> cbegin() const {
                 assert(m_data);
                 return t_const_iterator<T>(m_data, m_data + m_committed);
@@ -493,7 +493,7 @@ namespace osmium {
                 return const_iterator(m_data, m_data + m_committed);
             }
 
-            template <class T>
+            template <typename T>
             t_const_iterator<T> get_iterator(size_t offset) const {
                 assert(m_data);
                 return t_const_iterator<T>(m_data + offset, m_data + m_committed);
@@ -504,7 +504,7 @@ namespace osmium {
                 return const_iterator(m_data + offset, m_data + m_committed);
             }
 
-            template <class T>
+            template <typename T>
             t_const_iterator<T> cend() const {
                 assert(m_data);
                 return t_const_iterator<T>(m_data + m_committed, m_data + m_committed);
@@ -515,7 +515,7 @@ namespace osmium {
                 return const_iterator(m_data + m_committed, m_data + m_committed);
             }
 
-            template <class T>
+            template <typename T>
             t_const_iterator<T> begin() const {
                 return cbegin<T>();
             }
@@ -524,7 +524,7 @@ namespace osmium {
                 return cbegin();
             }
 
-            template <class T>
+            template <typename T>
             t_const_iterator<T> end() const {
                 return cend<T>();
             }
@@ -567,7 +567,7 @@ namespace osmium {
              * The behaviour is undefined if you call this on an invalid
              * buffer.
              */
-            template <class TCallbackClass>
+            template <typename TCallbackClass>
             void purge_removed(TCallbackClass* callback) {
                 assert(m_data);
                 if (begin() == end()) {

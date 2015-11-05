@@ -79,7 +79,7 @@ namespace osmium {
 
     }
 
-    template <class TCRC>
+    template <typename TCRC>
     class CRC {
 
         TCRC m_crc;

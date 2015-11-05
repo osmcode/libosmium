@@ -73,21 +73,21 @@ namespace osmium {
              */
             using future_string_queue_type = osmium::thread::Queue<std::future<std::string>>;
 
-            template <class T>
+            template <typename T>
             inline void add_to_queue(osmium::thread::Queue<std::future<T>>& queue, T&& data) {
                 std::promise<T> promise;
                 queue.push(promise.get_future());
                 promise.set_value(std::forward<T>(data));
             }
 
-            template <class T>
+            template <typename T>
             inline void add_to_queue(osmium::thread::Queue<std::future<T>>& queue, std::exception_ptr&& exception) {
                 std::promise<T> promise;
                 queue.push(promise.get_future());
                 promise.set_exception(std::move(exception));
             }
 
-            template <class T>
+            template <typename T>
             inline void add_end_of_data_to_queue(osmium::thread::Queue<std::future<T>>& queue) {
                 add_to_queue<T>(queue, T{});
             }
@@ -100,7 +100,7 @@ namespace osmium {
                 return !buffer;
             }
 
-            template <class T>
+            template <typename T>
             class queue_wrapper {
 
                 using queue_type = osmium::thread::Queue<std::future<T>>;

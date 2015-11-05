@@ -48,7 +48,7 @@ namespace osmium {
 
         namespace map {
 
-            template <class TVector, typename TId, typename TValue>
+            template <typename TVector, typename TId, typename TValue>
             class VectorBasedDenseMap : public Map<TId, TValue> {
 
                 TVector m_vector;

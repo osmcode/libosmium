@@ -150,7 +150,7 @@ namespace osmium {
 
         } // namespace detail
 
-        template <class TProjection = IdentityProjection>
+        template <typename TProjection = IdentityProjection>
         using GeoJSONFactory = GeometryFactory<osmium::geom::detail::GeoJSONFactoryImpl, TProjection>;
 
     } // namespace geom

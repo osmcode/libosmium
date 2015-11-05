@@ -125,7 +125,7 @@ namespace osmium {
 
         }; // class TagListBuilder
 
-        template <class T>
+        template <typename T>
         class NodeRefListBuilder : public ObjectBuilder<T> {
 
         public:
@@ -296,7 +296,7 @@ namespace osmium {
 
         }; // class ChangesetDiscussionBuilder
 
-        template <class T>
+        template <typename T>
         class OSMObjectBuilder : public ObjectBuilder<T> {
 
         public:

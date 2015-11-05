@@ -175,7 +175,7 @@ namespace osmium {
                 /**
                  * A C++ wrapper for the Expat parser that makes sure no memory is leaked.
                  */
-                template <class T>
+                template <typename T>
                 class ExpatXMLParser {
 
                     XML_Parser m_parser;

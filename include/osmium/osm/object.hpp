@@ -355,38 +355,38 @@ namespace osmium {
             return cend();
         }
 
-        template <class T>
+        template <typename T>
         using t_iterator = osmium::memory::ItemIterator<T>;
 
-        template <class T>
+        template <typename T>
         using t_const_iterator = osmium::memory::ItemIterator<const T>;
 
-        template <class T>
+        template <typename T>
         t_iterator<T> begin() {
             return t_iterator<T>(subitems_position(), next());
         }
 
-        template <class T>
+        template <typename T>
         t_iterator<T> end() {
             return t_iterator<T>(next(), next());
         }
 
-        template <class T>
+        template <typename T>
         t_const_iterator<T> cbegin() const {
             return t_const_iterator<T>(subitems_position(), next());
         }
 
-        template <class T>
+        template <typename T>
         t_const_iterator<T> cend() const {
             return t_const_iterator<T>(next(), next());
         }
 
-        template <class T>
+        template <typename T>
         t_const_iterator<T> begin() const {
             return cbegin<T>();
         }
 
-        template <class T>
+        template <typename T>
         t_const_iterator<T> end() const {
             return cend<T>();
         }

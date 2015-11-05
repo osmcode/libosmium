@@ -53,7 +53,7 @@ namespace osmium {
      */
     namespace experimental {
 
-        template <class TLocationHandler>
+        template <typename TLocationHandler>
         class FlexReader {
 
             bool m_with_areas;
