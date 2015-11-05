@@ -40,14 +40,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/memory/buffer.hpp>
 #include <osmium/osm/diff_object.hpp>
-
-#ifdef __GNUC__
-# define DEPRECATED __attribute__((deprecated))
-#elif defined(_MSC_VER)
-# define DEPRECATED __declspec(deprecated)
-#else
-# define DEPRECATED
-#endif
+#include <osmium/util/compatibility.hpp>
 
 namespace osmium {
 
@@ -73,7 +66,7 @@ namespace osmium {
              * constructor is deprecated. Call Writer::set_buffer_size()
              * instead if you want to change the default.
              */
-            DEPRECATED OutputIterator(TDest& destination, const size_t buffer_size) :
+            OSMIUM_DEPRECATED OutputIterator(TDest& destination, const size_t buffer_size) :
                 m_destination(&destination) {
                 destination.set_buffer_size(buffer_size);
             }
@@ -90,7 +83,7 @@ namespace osmium {
              * Warning! Calling OutputIterator<Writer>::flush() is usually not
              * needed any more. Call flush() on the Writer instead if needed.
              */
-            DEPRECATED void flush() {
+            OSMIUM_DEPRECATED void flush() {
                 m_destination->flush();
             }
 
@@ -128,7 +121,7 @@ namespace osmium {
          * change the default.
          */
         template <class TDest>
-        DEPRECATED OutputIterator<TDest> make_output_iterator(TDest& destination, const size_t buffer_size) {
+        OSMIUM_DEPRECATED OutputIterator<TDest> make_output_iterator(TDest& destination, const size_t buffer_size) {
             destination.set_buffer_size(buffer_size);
             return OutputIterator<TDest>{destination};
         }
@@ -136,7 +129,5 @@ namespace osmium {
     } // namespace io
 
 } // namespace osmium
-
-#undef DEPRECATED
 
 #endif // OSMIUM_IO_OUTPUT_ITERATOR_HPP
