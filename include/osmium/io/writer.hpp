@@ -121,6 +121,7 @@ namespace osmium {
             }
 
             void do_flush() {
+                osmium::thread::check_for_exception(m_write_future);
                 if (m_buffer && m_buffer.committed() > 0) {
                     osmium::memory::Buffer buffer{m_buffer_size,
                                                   osmium::memory::Buffer::auto_grow::no};
@@ -138,7 +139,6 @@ namespace osmium {
                 }
 
                 try {
-                    osmium::thread::check_for_exception(m_write_future);
                     func(std::forward<TArgs>(args)...);
                 } catch (...) {
                     m_status = status::error;
