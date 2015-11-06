@@ -38,6 +38,7 @@ DEALINGS IN THE SOFTWARE.
 #include <stdexcept>
 #include <system_error>
 
+#include <osmium/util/compatibility.hpp>
 #include <osmium/util/file.hpp>
 
 #ifndef _WIN32
@@ -184,7 +185,7 @@ private:
             MemoryMapping(size_t size, mapping_mode mode, int fd=-1, off_t offset=0);
 
             /// DEPRECATED: For backwards compatibility
-            MemoryMapping(size_t size, bool writable=true, int fd=-1, off_t offset=0) :
+            OSMIUM_DEPRECATED MemoryMapping(size_t size, bool writable=true, int fd=-1, off_t offset=0) :
                 MemoryMapping(size, writable ? mapping_mode::write_shared : mapping_mode::readonly, fd, offset)  {
             }
 
@@ -354,7 +355,7 @@ private:
             }
 
             /// DEPRECATED: For backwards compatibility
-            TypedMemoryMapping(size_t size, bool writable, int fd, off_t offset = 0) :
+            OSMIUM_DEPRECATED TypedMemoryMapping(size_t size, bool writable, int fd, off_t offset = 0) :
                 m_mapping(sizeof(T) * size, writable ? MemoryMapping::mapping_mode::write_shared : MemoryMapping::mapping_mode::readonly, fd, sizeof(T) * offset) {
             }
 
