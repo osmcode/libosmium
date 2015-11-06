@@ -59,17 +59,14 @@ namespace osmium {
         void set_diff() const {
             assert(m_curr != m_end);
 
-            TBasicIterator prev = m_prev;
-            if (prev->type() != m_curr->type() || prev->id() != m_curr->id()) {
-                prev = m_curr;
-            }
+            bool use_curr_for_prev =                    m_prev->type() != m_curr->type() || m_prev->id() != m_curr->id();
+            bool use_curr_for_next = m_next == m_end || m_next->type() != m_curr->type() || m_next->id() != m_curr->id();
 
-            TBasicIterator next = m_next;
-            if (next == m_end || next->type() != m_curr->type() || next->id() != m_curr->id()) {
-                next = m_curr;
-            }
-
-            m_diff = osmium::DiffObject(*prev, *m_curr, *next);
+            m_diff = std::move(osmium::DiffObject{
+                *(use_curr_for_prev ? m_curr : m_prev),
+                *m_curr,
+                *(use_curr_for_next ? m_curr : m_next)
+            });
         }
 
     public:
@@ -78,7 +75,7 @@ namespace osmium {
             m_prev(begin),
             m_curr(begin),
             m_next(begin == end ? begin : ++begin),
-            m_end(end) {
+            m_end(std::move(end)) {
         }
 
         DiffIterator(const DiffIterator&) = default;
