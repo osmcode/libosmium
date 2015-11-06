@@ -27,7 +27,7 @@ project(libosmium)
 
 set(LIBOSMIUM_VERSION_MAJOR 2)
 set(LIBOSMIUM_VERSION_MINOR 5)
-set(LIBOSMIUM_VERSION_PATCH 1)
+set(LIBOSMIUM_VERSION_PATCH 2)
 
 set(LIBOSMIUM_VERSION
     "${LIBOSMIUM_VERSION_MAJOR}.${LIBOSMIUM_VERSION_MINOR}.${LIBOSMIUM_VERSION_PATCH}")
@@ -217,6 +217,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Dev")
         add_definitions(-Werror)
     endif()
     add_definitions(${OSMIUM_WARNING_OPTIONS})
+#    add_definitions(${OSMIUM_WARNING_OPTIONS} ${OSMIUM_DRACONIC_CLANG_OPTIONS} -Wno-documentation -Wno-format-nonliteral -Wno-deprecated -Wno-covered-switch-default -Wno-shadow)
 endif()
 
 # Force RelWithDebInfo build type if none was given

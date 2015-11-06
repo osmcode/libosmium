@@ -13,6 +13,14 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 
 
+## [2.5.2] - 2015-11-06
+
+# Fixed
+
+- Writing data through an OutputIterator was extremly slow due to
+  lock contention.
+
+
 ## [2.5.1] - 2015-11-05
 
 ### Added
@@ -188,7 +196,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   Doxygen (up to version 1.8.8). This version contains a workaround to fix
   this.
 
-[unreleased]: https://github.com/osmcode/libosmium/compare/v2.5.1...HEAD
+[unreleased]: https://github.com/osmcode/libosmium/compare/v2.5.2...HEAD
+[2.5.2]: https://github.com/osmcode/libosmium/compare/v2.5.1...v2.5.2
 [2.5.1]: https://github.com/osmcode/libosmium/compare/v2.5.0...v2.5.1
 [2.5.0]: https://github.com/osmcode/libosmium/compare/v2.4.1...v2.5.0
 [2.4.1]: https://github.com/osmcode/libosmium/compare/v2.4.0...v2.4.1
