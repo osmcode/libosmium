@@ -548,6 +548,8 @@ namespace osmium {
                 swap(lhs.m_capacity, rhs.m_capacity);
                 swap(lhs.m_written, rhs.m_written);
                 swap(lhs.m_committed, rhs.m_committed);
+                swap(lhs.m_auto_grow, rhs.m_auto_grow);
+                swap(lhs.m_full, rhs.m_full);
             }
 
             /**
