@@ -217,7 +217,7 @@ namespace osmium {
             }
 
             explicit operator bool() const {
-                return m_data != nullptr;
+                return bool(m_data) && (m_data != m_end);
             }
 
             template <typename TChar, typename TTraits>
