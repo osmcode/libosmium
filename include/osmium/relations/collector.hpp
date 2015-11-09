@@ -122,59 +122,6 @@ namespace osmium {
 
                 TCollector& m_collector;
 
-                /**
-                 * Find this object in the member vectors and add it to all
-                 * relations that need it.
-                 *
-                 * @returns true if the member was added to at least one
-                 *          relation and false otherwise
-                 */
-                bool find_and_add_object(const osmium::OSMObject& object) {
-                    auto& mmv = m_collector.member_meta(object.type());
-                    auto range = std::equal_range(mmv.begin(), mmv.end(), MemberMeta(object.id()));
-
-                    if (osmium::relations::count_not_removed(range.first, range.second) == 0) {
-                        // nothing found
-                        return false;
-                    }
-
-                    {
-                        m_collector.members_buffer().add_item(object);
-                        const size_t member_offset = m_collector.members_buffer().commit();
-
-                        for (auto it = range.first; it != range.second; ++it) {
-                            it->set_buffer_offset(member_offset);
-                        }
-                    }
-
-                    for (auto it = range.first; it != range.second; ++it) {
-                        MemberMeta& member_meta = *it;
-                        if (member_meta.removed()) {
-                            break;
-                        }
-                        assert(member_meta.member_id() == object.id());
-                        assert(member_meta.relation_pos() < m_collector.m_relations.size());
-                        RelationMeta& relation_meta = m_collector.m_relations[member_meta.relation_pos()];
-//                        std::cerr << "  => " << member_meta.member_pos() << " < " << m_collector.get_relation(relation_meta).members().size() << " (id=" << m_collector.get_relation(relation_meta).id() << ")\n";
-                        assert(member_meta.member_pos() < m_collector.get_relation(relation_meta).members().size());
-//                        std::cerr << "  add way " << member_meta.member_id() << " to rel " << m_collector.get_relation(relation_meta).id() << " at pos " << member_meta.member_pos() << "\n";
-                        relation_meta.got_one_member();
-                        if (relation_meta.has_all_members()) {
-                            const size_t relation_offset = member_meta.relation_pos();
-                            m_collector.complete_relation(relation_meta);
-                            m_collector.m_relations[relation_offset] = RelationMeta();
-                            m_collector.possibly_purge_removed_members();
-                        }
-                    }
-
-                    // Remove MemberMetas that were marked as removed.
-                    mmv.erase(std::remove_if(mmv.begin(), mmv.end(), [](MemberMeta& mm) {
-                        return mm.removed();
-                    }), mmv.end());
-
-                    return true;
-                }
-
             public:
 
                 HandlerPass2(TCollector& collector) noexcept :
@@ -183,7 +130,7 @@ namespace osmium {
 
                 void node(const osmium::Node& node) {
                     if (TNodes) {
-                        if (! find_and_add_object(node)) {
+                        if (! m_collector.find_and_add_object(node)) {
                             m_collector.node_not_in_any_relation(node);
                         }
                     }
@@ -191,7 +138,7 @@ namespace osmium {
 
                 void way(const osmium::Way& way) {
                     if (TWays) {
-                        if (! find_and_add_object(way)) {
+                        if (! m_collector.find_and_add_object(way)) {
                             m_collector.way_not_in_any_relation(way);
                         }
                     }
@@ -199,7 +146,7 @@ namespace osmium {
 
                 void relation(const osmium::Relation& relation) {
                     if (TRelations) {
-                        if (! find_and_add_object(relation)) {
+                        if (! m_collector.find_and_add_object(relation)) {
                             m_collector.relation_not_in_any_relation(relation);
                         }
                     }
@@ -210,6 +157,8 @@ namespace osmium {
                 }
 
             }; // class HandlerPass2
+
+        private:
 
             HandlerPass2 m_handler_pass2;
 
@@ -359,6 +308,8 @@ namespace osmium {
                 return m_members_buffer.get<osmium::OSMObject>(offset);
             }
 
+        private:
+
             /**
              * Tell the Collector that you are interested in this relation
              * and want it kept until all members have been assembled and
@@ -406,6 +357,84 @@ namespace osmium {
                 std::sort(m_member_meta[0].begin(), m_member_meta[0].end());
                 std::sort(m_member_meta[1].begin(), m_member_meta[1].end());
                 std::sort(m_member_meta[2].begin(), m_member_meta[2].end());
+            }
+
+            /**
+             * Find this object in the member vectors and add it to all
+             * relations that need it.
+             *
+             * @returns true if the member was added to at least one
+             *          relation and false otherwise
+             */
+            bool find_and_add_object(const osmium::OSMObject& object) {
+                auto& mmv = member_meta(object.type());
+                auto range = std::equal_range(mmv.begin(), mmv.end(), MemberMeta(object.id()));
+
+                if (osmium::relations::count_not_removed(range.first, range.second) == 0) {
+                    // nothing found
+                    return false;
+                }
+
+                {
+                    members_buffer().add_item(object);
+                    const size_t member_offset = members_buffer().commit();
+
+                    for (auto it = range.first; it != range.second; ++it) {
+                        it->set_buffer_offset(member_offset);
+                    }
+                }
+
+                for (auto it = range.first; it != range.second; ++it) {
+                    MemberMeta& member_meta = *it;
+                    if (member_meta.removed()) {
+                        break;
+                    }
+                    assert(member_meta.member_id() == object.id());
+                    assert(member_meta.relation_pos() < m_relations.size());
+                    RelationMeta& relation_meta = m_relations[member_meta.relation_pos()];
+//                        std::cerr << "  => " << member_meta.member_pos() << " < " << get_relation(relation_meta).members().size() << " (id=" << get_relation(relation_meta).id() << ")\n";
+                    assert(member_meta.member_pos() < get_relation(relation_meta).members().size());
+//                        std::cerr << "  add way " << member_meta.member_id() << " to rel " << get_relation(relation_meta).id() << " at pos " << member_meta.member_pos() << "\n";
+                    relation_meta.got_one_member();
+                    if (relation_meta.has_all_members()) {
+                        const size_t relation_offset = member_meta.relation_pos();
+                        static_cast<TCollector*>(this)->complete_relation(relation_meta);
+                        clear_member_metas(relation_meta);
+                        m_relations[relation_offset] = RelationMeta();
+                        possibly_purge_removed_members();
+                    }
+                }
+
+                // Remove MemberMetas that were marked as removed.
+                mmv.erase(std::remove_if(mmv.begin(), mmv.end(), [](MemberMeta& mm) {
+                    return mm.removed();
+                }), mmv.end());
+
+                return true;
+            }
+
+            void clear_member_metas(const osmium::relations::RelationMeta& relation_meta) {
+                const osmium::Relation& relation = get_relation(relation_meta);
+                for (const auto& member : relation.members()) {
+                    if (member.ref() != 0) {
+                        auto& mmv = member_meta(member.type());
+                        auto range = std::equal_range(mmv.begin(), mmv.end(), MemberMeta(member.ref()));
+                        assert(range.first != range.second);
+
+                        // if this is the last time this object was needed
+                        // then mark it as removed
+                        if (osmium::relations::count_not_removed(range.first, range.second) == 1) {
+                            get_member(range.first->buffer_offset()).set_removed(true);
+                        }
+
+                        for (auto it = range.first; it != range.second; ++it) {
+                            if (!it->removed() && relation.id() == get_relation(it->relation_pos()).id()) {
+                                it->remove();
+                                break;
+                            }
+                        }
+                    }
+                }
             }
 
         public:
@@ -474,7 +503,7 @@ namespace osmium {
             void moving_in_buffer(size_t old_offset, size_t new_offset) {
                 const osmium::OSMObject& object = m_members_buffer.get<osmium::OSMObject>(old_offset);
                 auto& mmv = member_meta(object.type());
-                auto range = std::equal_range(mmv.begin(), mmv.end(), osmium::relations::MemberMeta(object.id()));
+                auto range = std::equal_range(mmv.begin(), mmv.end(), MemberMeta(object.id()));
                 for (auto it = range.first; it != range.second; ++it) {
                     assert(it->buffer_offset() == old_offset);
                     it->set_buffer_offset(new_offset);
