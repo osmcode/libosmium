@@ -367,10 +367,13 @@ namespace osmium {
              */
             unsigned char* reserve_space(const size_t size) {
                 assert(m_data);
+                // try to flush the buffer empty first.
+                if (m_written + size > m_capacity && m_full) {
+                    m_full(*this);
+                }
+                // if there's still not enough space, then try growing the buffer.
                 if (m_written + size > m_capacity) {
-                    if (m_full) {
-                        m_full(*this);
-                    } else if (!m_memory.empty() && (m_auto_grow == auto_grow::yes)) {
+                    if (!m_memory.empty() && (m_auto_grow == auto_grow::yes)) {
                         // double buffer size until there is enough space
                         size_t new_capacity = m_capacity * 2;
                         while (m_written + size > new_capacity) {
