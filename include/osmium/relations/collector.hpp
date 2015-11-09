@@ -123,19 +123,6 @@ namespace osmium {
                 TCollector& m_collector;
 
                 /**
-                 * This variable is initialized with the number of different
-                 * kinds of OSM objects we are interested in. If we only need
-                 * way members (for instance for the multipolygon collector)
-                 * it is intialized with 1 for instance. If node and way
-                 * members are needed, it is initialized with 2.
-                 *
-                 * In the after_* methods of this handler, it is decremented
-                 * and once it reaches 0, we know we have all members available
-                 * that we are ever going to get.
-                 */
-                int m_want_types;
-
-                /**
                  * Find this object in the member vectors and add it to all
                  * relations that need it.
                  *
@@ -191,8 +178,7 @@ namespace osmium {
             public:
 
                 HandlerPass2(TCollector& collector) noexcept :
-                    m_collector(collector),
-                    m_want_types((TNodes?1:0) + (TWays?1:0) + (TRelations?1:0)) {
+                    m_collector(collector) {
                 }
 
                 void node(const osmium::Node& node) {
