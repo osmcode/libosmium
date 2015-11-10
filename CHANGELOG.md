@@ -12,6 +12,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+- Possible overrun in Buffer when using the full-callback.
+- Incorrect swapping of Buffer.
+
 
 ## [2.5.2] - 2015-11-06
 
