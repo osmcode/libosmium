@@ -56,13 +56,14 @@ void check_node_2(osmium::Node& node) {
     REQUIRE(2 == n);
 }
 
-TEST_CASE("Buffer_Node") {
+TEST_CASE("Node in Buffer") {
 
-    SECTION("buffer_node") {
-        constexpr size_t buffer_size = 10000;
-        unsigned char data[buffer_size];
+    constexpr size_t buffer_size = 10000;
+    unsigned char data[buffer_size];
 
-        osmium::memory::Buffer buffer(data, buffer_size, 0);
+    osmium::memory::Buffer buffer(data, buffer_size, 0);
+
+    SECTION("Add node to buffer") {
 
         {
             // add node 1
@@ -132,4 +133,37 @@ TEST_CASE("Buffer_Node") {
 
     }
 
+    SECTION("Add buffer to another one") {
+
+        {
+            // add node 1
+            osmium::builder::NodeBuilder node_builder(buffer);
+            osmium::Node& node = node_builder.object();
+            REQUIRE(osmium::item_type::node == node.type());
+
+            node.set_id(1);
+            node.set_version(3);
+            node.set_visible(true);
+            node.set_changeset(333);
+            node.set_uid(21);
+            node.set_timestamp(123);
+            node.set_location(osmium::Location(3.5, 4.7));
+
+            node_builder.add_user("testuser");
+
+            buffer.commit();
+        }
+
+        osmium::memory::Buffer buffer2(buffer_size, osmium::memory::Buffer::auto_grow::yes);
+
+        buffer2.add_buffer(buffer);
+        buffer2.commit();
+
+        REQUIRE(buffer.committed() == buffer2.committed());
+        const osmium::Node& node = buffer2.get<osmium::Node>(0);
+        REQUIRE(node.id() == 1);
+        REQUIRE(node.timestamp() == 123);
+    }
+
 }
+

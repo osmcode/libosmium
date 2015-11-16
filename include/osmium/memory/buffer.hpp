@@ -469,7 +469,7 @@ namespace osmium {
             void add_buffer(const Buffer& buffer) {
                 assert(m_data && buffer);
                 unsigned char* target = reserve_space(buffer.committed());
-                std::copy_n(reinterpret_cast<const unsigned char*>(buffer.data()), buffer.committed(), target);
+                std::copy_n(buffer.data(), buffer.committed(), target);
             }
 
             /**
