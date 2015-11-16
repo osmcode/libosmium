@@ -115,8 +115,6 @@ namespace osmium {
 
         public:
 
-            typedef Item value_type;
-
             /**
              * The constructor without any parameters creates an invalid,
              * buffer, ie an empty hull of a buffer that has no actual memory
