@@ -35,6 +35,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <type_traits>
 
+#include <osmium/fwd.hpp>
 #include <osmium/io/reader_iterator.hpp> // IWYU pragma: keep
 #include <osmium/memory/buffer.hpp>
 #include <osmium/osm.hpp>
@@ -42,12 +43,6 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/item_type.hpp>
 
 namespace osmium {
-
-    class TagList;
-    class WayNodeList;
-    class RelationMemberList;
-    class OuterRing;
-    class InnerRing;
 
     namespace memory {
         class Item;
