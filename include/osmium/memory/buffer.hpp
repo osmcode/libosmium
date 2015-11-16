@@ -46,6 +46,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/memory/item.hpp>
 #include <osmium/memory/item_iterator.hpp>
 #include <osmium/osm/entity.hpp>
+#include <osmium/util/compatibility.hpp>
 
 namespace osmium {
 
@@ -89,7 +90,9 @@ namespace osmium {
          *
          * By default, if a buffer gets full it will throw a buffer_is_full exception.
          * You can use the set_full_callback() method to set a callback functor
-         * which will be called instead of throwing an exception.
+         * which will be called instead of throwing an exception. The full
+         * callback functionality is deprecated and will be removed in the
+         * future. See the documentation for set_full_callback() for alternatives.
          */
         class Buffer {
 
@@ -248,8 +251,19 @@ namespace osmium {
              *
              * The behaviour is undefined if you call this on an invalid
              * buffer.
+             *
+             * @deprecated
+             * Callback functionality will be removed in the future. Either
+             * detect the buffer_is_full exception or use a buffer with
+             * auto_grow::yes. If you want to avoid growing buffers, check
+             * that the used size of the buffer (committed()) is small enough
+             * compared to the capacity (for instance small than 90% of the
+             * capacity) before adding anything to the Buffer. If the buffer
+             * is initialized with auto_grow::yes, it will still grow in the
+             * rare case that a very large object will be added taking more
+             * than the difference between committed() and capacity().
              */
-            void set_full_callback(std::function<void(Buffer&)> full) {
+            OSMIUM_DEPRECATED void set_full_callback(std::function<void(Buffer&)> full) {
                 assert(m_data);
                 m_full = full;
             }
@@ -350,7 +364,10 @@ namespace osmium {
              *
              * * If you have set a callback with set_full_callback(), it is
              *   called. After the call returns, you must have either grown
-             *   the buffer or cleared it by calling buffer.clear().
+             *   the buffer or cleared it by calling buffer.clear(). (Usage
+             *   of the full callback is deprecated and this functionality
+             *   will be removed in the future. See the documentation for
+             *   set_full_callback() for alternatives.
              * * If no callback is defined and this buffer uses internal
              *   memory management, the buffers capacity is grown, so that
              *   the new data will fit.

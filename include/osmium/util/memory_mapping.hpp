@@ -184,7 +184,11 @@ private:
              */
             MemoryMapping(size_t size, mapping_mode mode, int fd=-1, off_t offset=0);
 
-            /// DEPRECATED: For backwards compatibility
+            /**
+             * @deprecated
+             * For backwards compatibility only. Use the constructor taking
+             * a mapping_mode as second argument instead.
+             */
             OSMIUM_DEPRECATED MemoryMapping(size_t size, bool writable=true, int fd=-1, off_t offset=0) :
                 MemoryMapping(size, writable ? mapping_mode::write_shared : mapping_mode::readonly, fd, offset)  {
             }
@@ -354,7 +358,11 @@ private:
                 m_mapping(sizeof(T) * size, mode, fd, sizeof(T) * offset) {
             }
 
-            /// DEPRECATED: For backwards compatibility
+            /**
+             * @deprecated
+             * For backwards compatibility only. Use the constructor taking
+             * a mapping_mode as second argument instead.
+             */
             OSMIUM_DEPRECATED TypedMemoryMapping(size_t size, bool writable, int fd, off_t offset = 0) :
                 m_mapping(sizeof(T) * size, writable ? MemoryMapping::mapping_mode::write_shared : MemoryMapping::mapping_mode::readonly, fd, sizeof(T) * offset) {
             }
