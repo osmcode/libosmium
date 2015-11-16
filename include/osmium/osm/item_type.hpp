@@ -61,6 +61,10 @@ namespace osmium {
     /**
      * Return item_type for index:
      * 0 -> node, 1 -> way, 2 -> relation
+     *
+     * @param i Index. Must be between 0 and 2.
+     *
+     * @returns Item type.
      */
     inline item_type nwr_index_to_item_type(unsigned int i) noexcept {
         assert(i <= 2);
@@ -70,6 +74,10 @@ namespace osmium {
     /**
      * Return index for item_type:
      * node -> 0, way -> 1, relation -> 2
+     *
+     * @param type Item type. Must be node, way, or relation.
+     *
+     * @returns Index.
      */
     inline unsigned int item_type_to_nwr_index(item_type type) noexcept {
         unsigned int i = static_cast<unsigned int>(type);

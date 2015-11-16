@@ -216,7 +216,7 @@ namespace osmium {
             /**
              * Return a pointer to data inside the buffer.
              *
-             * @pre Buffer must be valid.
+             * @pre The buffer must be valid.
              */
             unsigned char* data() const noexcept {
                 assert(m_data);
@@ -252,7 +252,7 @@ namespace osmium {
              * This tests if the current state of the buffer is aligned
              * properly. Can be used for asserts.
              *
-             * @pre Buffer must be valid.
+             * @pre The buffer must be valid.
              */
             bool is_aligned() const noexcept {
                 assert(m_data);
@@ -266,7 +266,7 @@ namespace osmium {
              * The behaviour is undefined if you call this on an invalid
              * buffer.
              *
-             * @pre Buffer must be valid.
+             * @pre The buffer must be valid.
              *
              * @deprecated
              * Callback functionality will be removed in the future. Either
@@ -291,7 +291,7 @@ namespace osmium {
              * nothing is done.
              * Already written but not committed data is discarded.
              *
-             * @pre Buffer must be valid.
+             * @pre The buffer must be valid.
              *
              * @param size New capacity.
              *
@@ -318,7 +318,7 @@ namespace osmium {
             /**
              * Mark currently written bytes in the buffer as committed.
              *
-             * @pre Buffer must be valid and aligned properly (as indicated
+             * @pre The buffer must be valid and aligned properly (as indicated
              *      by is_aligned().
              *
              * @returns Number of committed bytes before this commit. Can be
@@ -337,7 +337,7 @@ namespace osmium {
             /**
              * Roll back changes in buffer to last committed state.
              *
-             * @pre Buffer must be valid.
+             * @pre The buffer must be valid.
              */
             void rollback() {
                 assert(m_data);
@@ -361,7 +361,7 @@ namespace osmium {
             /**
              * Get the data in the buffer at the given offset.
              *
-             * @pre Buffer must be valid.
+             * @pre The buffer must be valid.
              *
              * @tparam T Type we want to the data to be interpreted as.
              *
@@ -396,7 +396,7 @@ namespace osmium {
              *   the new data will fit.
              * * Else the buffer_is_full exception is thrown.
              *
-             * @pre Buffer must be valid.
+             * @pre The buffer must be valid.
              *
              * @param size Number of bytes to reserve.
              *
@@ -438,7 +438,7 @@ namespace osmium {
              * Note that you have to eventually call commit() to actually
              * commit this data.
              *
-             * @pre Buffer must be valid.
+             * @pre The buffer must be valid.
              *
              * @tparam T Class of the item to be copied.
              *
@@ -457,12 +457,12 @@ namespace osmium {
             /**
              * Add committed contents of the given buffer to this buffer.
              *
-             * @pre Both buffers must be valid.
+             * @pre The buffer must be valid.
              *
              * Note that you have to eventually call commit() to actually
              * commit this data.
              *
-             * @param buffer The source of the copy.
+             * @param buffer The source of the copy. Must be valid.
              */
             void add_buffer(const Buffer& buffer) {
                 assert(m_data && buffer);

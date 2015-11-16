@@ -74,8 +74,9 @@ namespace osmium {
         /**
          * Access specified element.
          *
-         * @param n Get this element of the list.
          * @pre @code n < size() @endcode
+         *
+         * @param n Get this element of the list.
          */
         const NodeRef& operator[](size_t n) const noexcept {
             assert(n < size());

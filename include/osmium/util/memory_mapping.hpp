@@ -174,7 +174,8 @@ private:
              * created, otherwise a mapping based on the file descriptor will
              * be created.
              *
-             * @pre size > 0 or mode == write_shared oder write_private
+             * @pre @code size > 0 @endcode or
+             *      @code mode == write_shared || mode == write_private @endcode
              *
              * @param size Size of the mapping in bytes
              * @param mode Mapping mode: readonly, or writable (shared or private)
@@ -237,8 +238,9 @@ private:
              * systems it will unmap and remap the memory. This can only be
              * done for file-based mappings, not anonymous mappings!
              *
-             * @param new_size Number of bytes to resize to
-             * @throws std::system_error if the remapping fails
+             * @param new_size Number of bytes to resize to (must be > 0).
+             *
+             * @throws std::system_error if the remapping fails.
              */
             void resize(size_t new_size);
 
