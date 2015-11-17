@@ -43,6 +43,11 @@ namespace osmium {
 
     class OSMObject;
 
+    /**
+     * An input iterator wrapping any iterator over OSMObjects. When
+     * dereferenced it will yield DiffObject objects pointing to the
+     * underlying OSMObjects.
+     */
     template <typename TBasicIterator>
     class DiffIterator : public std::iterator<std::input_iterator_tag, const osmium::DiffObject> {
 
@@ -56,7 +61,7 @@ namespace osmium {
 
         mutable osmium::DiffObject m_diff;
 
-        void set_diff() const {
+        void set_diff() const noexcept {
             assert(m_curr != m_end);
 
             bool use_curr_for_prev =                    m_prev->type() != m_curr->type() || m_prev->id() != m_curr->id();
@@ -71,18 +76,13 @@ namespace osmium {
 
     public:
 
-        explicit DiffIterator(TBasicIterator begin, TBasicIterator end) :
+        DiffIterator(TBasicIterator begin, TBasicIterator end) :
             m_prev(begin),
             m_curr(begin),
             m_next(begin == end ? begin : ++begin),
-            m_end(std::move(end)) {
+            m_end(std::move(end)),
+            m_diff() {
         }
-
-        DiffIterator(const DiffIterator&) = default;
-        DiffIterator& operator=(const DiffIterator&) = default;
-
-        DiffIterator(DiffIterator&&) = default;
-        DiffIterator& operator=(DiffIterator&&) = default;
 
         DiffIterator& operator++() {
             m_prev = std::move(m_curr);
@@ -101,25 +101,34 @@ namespace osmium {
             return tmp;
         }
 
-        bool operator==(const DiffIterator& rhs) const {
+        bool operator==(const DiffIterator& rhs) const noexcept {
             return m_curr == rhs.m_curr && m_end == rhs.m_end;
         }
 
-        bool operator!=(const DiffIterator& rhs) const {
+        bool operator!=(const DiffIterator& rhs) const noexcept {
             return !(*this == rhs);
         }
 
-        reference operator*() const {
+        reference operator*() const noexcept {
             set_diff();
             return m_diff;
         }
 
-        pointer operator->() const {
+        pointer operator->() const noexcept {
             set_diff();
             return &m_diff;
         }
 
     }; // class DiffIterator
+
+    /**
+     * Create a DiffIterator based on the given iterators.
+     */
+    template <typename TBasicIterator>
+    inline DiffIterator<TBasicIterator> make_diff_iterator(TBasicIterator begin,
+                                                           TBasicIterator end) {
+        return DiffIterator<TBasicIterator>{begin, end};
+    }
 
 } // namespace osmium
 
