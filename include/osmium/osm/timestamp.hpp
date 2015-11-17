@@ -54,10 +54,8 @@ namespace osmium {
         // length of ISO timestamp string yyyy-mm-ddThh:mm:ssZ\0
         static constexpr int timestamp_length = 20 + 1;
 
-        /**
-         * The timestamp format for OSM timestamps in strftime(3) format.
-         * This is the ISO-Format yyyy-mm-ddThh:mm:ssZ
-         */
+        // The timestamp format for OSM timestamps in strftime(3) format.
+        // This is the ISO-Format "yyyy-mm-ddThh:mm:ssZ".
         static const char* timestamp_format() {
             static const char f[timestamp_length] = "%Y-%m-%dT%H:%M:%SZ";
             return f;
@@ -67,27 +65,29 @@ namespace osmium {
 
     public:
 
+        /**
+         * Default construct an invalid Timestamp.
+         */
         constexpr Timestamp() noexcept :
             m_timestamp(0) {
         }
 
-        // Not "explicit" so that conversions from time_t work
-        // like in node.timestamp(123);
+        /**
+         * Construct a Timestamp from a time_t containing the seconds since
+         * the epoch.
+         *
+         * The constructor is not declared "explicit" so that conversions
+         * like @code node.set_timestamp(123); @endcode work.
+         */
         constexpr Timestamp(time_t timestamp) noexcept :
             m_timestamp(static_cast<uint32_t>(timestamp)) {
         }
 
         /**
-         * Returns true if this timestamp is valid (ie set to something other
-         * than 0).
-         */
-        bool valid() const noexcept {
-            return m_timestamp != 0;
-        }
-
-        /**
-         * Construct timestamp from ISO date/time string.
-         * Throws std::invalid_argument, if the timestamp can not be parsed.
+         * Construct timestamp from ISO date/time string in the format
+         * "yyyy-mm-ddThh:mm:ssZ".
+         *
+         * @throws std::invalid_argument if the timestamp can not be parsed.
          */
         explicit Timestamp(const char* timestamp) {
 #ifndef _WIN32
@@ -113,14 +113,35 @@ namespace osmium {
 #endif
         }
 
+        /**
+         * Construct timestamp from ISO date/time string in the format
+         * "yyyy-mm-ddThh:mm:ssZ".
+         *
+         * @throws std::invalid_argument if the timestamp can not be parsed.
+         */
+        explicit Timestamp(const std::string& timestamp) :
+            Timestamp(timestamp.c_str()) {
+        }
+
+        /**
+         * Returns true if this timestamp is valid (ie set to something other
+         * than 0).
+         */
+        bool valid() const noexcept {
+            return m_timestamp != 0;
+        }
+
+        /// Explicit conversion into time_t.
         constexpr time_t seconds_since_epoch() const noexcept {
             return static_cast<time_t>(m_timestamp);
         }
 
+        /// Implicit conversion into time_t.
         constexpr operator time_t() const noexcept {
             return static_cast<time_t>(m_timestamp);
         }
 
+        /// Explicit conversion into uint32_t.
         explicit constexpr operator uint32_t() const noexcept {
             return m_timestamp;
         }
@@ -136,7 +157,8 @@ namespace osmium {
         }
 
         /**
-         * Return UTC Unix time as string in ISO date/time format.
+         * Return UTC Unix time as string in ISO date/time
+         * ("yyyy-mm-ddThh:mm:ssZ") format.
          */
         std::string to_iso() const {
             std::string s;
@@ -164,12 +186,20 @@ namespace osmium {
 
     }; // class Timestamp
 
+    /**
+     * A special Timestamp guaranteed to be ordered before any other valid
+     * Timestamp.
+     */
     inline OSMIUM_CONSTEXPR Timestamp start_of_time() noexcept {
         return Timestamp(1);
     }
 
+    /**
+     * A special Timestamp guaranteed to be ordered after any other valid
+     * Timestamp.
+     */
     inline OSMIUM_CONSTEXPR Timestamp end_of_time() noexcept {
-        return Timestamp(std::numeric_limits<time_t>::max());
+        return Timestamp(std::numeric_limits<uint32_t>::max());
     }
 
     template <typename TChar, typename TTraits>
