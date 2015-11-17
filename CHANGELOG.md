@@ -8,7 +8,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+- osmium::make_diff_iterator() helper function.
+
 ### Changed
+
+- Deprecated osmium::Buffer::set_full_callback().
+- Removed DataFile class which was never used anywhere.
+- Removed unused and obscure Buffer::value_type typedef.
 
 ### Fixed
 
