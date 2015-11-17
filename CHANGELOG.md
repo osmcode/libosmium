@@ -8,6 +8,15 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+### Changed
+
+### Fixed
+
+
+## [2.5.3] - 2015-11-17
+
+### Added
+
 - osmium::make_diff_iterator() helper function.
 
 ### Changed
@@ -205,7 +214,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   Doxygen (up to version 1.8.8). This version contains a workaround to fix
   this.
 
-[unreleased]: https://github.com/osmcode/libosmium/compare/v2.5.2...HEAD
+[unreleased]: https://github.com/osmcode/libosmium/compare/v2.5.3...HEAD
+[2.5.3]: https://github.com/osmcode/libosmium/compare/v2.5.1...v2.5.3
 [2.5.2]: https://github.com/osmcode/libosmium/compare/v2.5.1...v2.5.2
 [2.5.1]: https://github.com/osmcode/libosmium/compare/v2.5.0...v2.5.1
 [2.5.0]: https://github.com/osmcode/libosmium/compare/v2.4.1...v2.5.0
