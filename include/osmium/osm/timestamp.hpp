@@ -47,7 +47,10 @@ namespace osmium {
 
     /**
      * A timestamp. Internal representation is an unsigned 32bit integer
-     * holding seconds since epoch, so this will overflow in 2038.
+     * holding seconds since epoch (1970-01-01T00:00:00Z), so this will
+     * overflow in 2106. We can use an unsigned integer here, because the
+     * OpenStreetMap project was started long after 1970, so there will
+     * never be dates before that.
      */
     class Timestamp {
 
@@ -73,14 +76,17 @@ namespace osmium {
         }
 
         /**
-         * Construct a Timestamp from a time_t containing the seconds since
-         * the epoch.
+         * Construct a Timestamp from any integer type containing the seconds
+         * since the epoch. This will not check for overruns, you have to
+         * make sure the value fits into a uint32_t which is used internally
+         * in the Timestamp.
          *
          * The constructor is not declared "explicit" so that conversions
          * like @code node.set_timestamp(123); @endcode work.
          */
-        constexpr Timestamp(time_t timestamp) noexcept :
-            m_timestamp(static_cast<uint32_t>(timestamp)) {
+        template <typename T, typename std::enable_if<std::is_integral<T>::value, int>::type = 0>
+        constexpr Timestamp(T timestamp) noexcept :
+            m_timestamp(uint32_t(timestamp)) {
         }
 
         /**
