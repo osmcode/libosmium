@@ -59,6 +59,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/object.hpp>
 #include <osmium/osm/types.hpp>
+#include <osmium/thread/util.hpp>
 #include <osmium/util/cast.hpp>
 #include <osmium/util/delta.hpp>
 
@@ -602,6 +603,8 @@ namespace osmium {
                 ~O5mParser() noexcept = default;
 
                 void run() override final {
+                    osmium::thread::set_thread_name("_osmium_o5m_in");
+
                     decode_header();
                     decode_data();
                 }
