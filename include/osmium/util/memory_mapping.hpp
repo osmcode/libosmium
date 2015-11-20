@@ -248,7 +248,7 @@ private:
              * In a boolean context a MemoryMapping is true when it is a valid
              * existing mapping.
              */
-            operator bool() const noexcept {
+            explicit operator bool() const noexcept {
                 return is_valid();
             }
 
@@ -420,7 +420,7 @@ private:
              * In a boolean context a TypedMemoryMapping is true when it is
              * a valid existing mapping.
              */
-            operator bool() const noexcept {
+            explicit operator bool() const noexcept {
                 return !!m_mapping;
             }
 
