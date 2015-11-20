@@ -647,7 +647,7 @@ namespace osmium {
             /**
              * In a bool context any valid buffer is true.
              */
-            explicit operator bool() const {
+            explicit operator bool() const noexcept {
                 return m_data != nullptr;
             }
 
