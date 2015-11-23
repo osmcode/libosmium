@@ -36,7 +36,7 @@ TEST_CASE("Build relation") {
     REQUIRE(333 == relation.changeset());
     REQUIRE(21 == relation.uid());
     REQUIRE(std::string("foo") == relation.user());
-    REQUIRE(123 == relation.timestamp());
+    REQUIRE(123 == uint32_t(relation.timestamp()));
     REQUIRE(2 == relation.tags().size());
     REQUIRE(3 == relation.members().size());
 

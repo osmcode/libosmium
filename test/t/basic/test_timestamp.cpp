@@ -8,21 +8,21 @@ TEST_CASE("Timestamp") {
 
     SECTION("can be default initialized to invalid value") {
         osmium::Timestamp t;
-        REQUIRE(0 == t);
+        REQUIRE(0 == uint32_t(t));
         REQUIRE("" == t.to_iso());
         REQUIRE_FALSE(t.valid());
     }
 
     SECTION("invalid value is zero") {
         osmium::Timestamp t(static_cast<time_t>(0));
-        REQUIRE(0 == t);
+        REQUIRE(0 == uint32_t(t));
         REQUIRE("" == t.to_iso());
         REQUIRE_FALSE(t.valid());
     }
 
     SECTION("can be initialized from time_t") {
         osmium::Timestamp t(static_cast<time_t>(1));
-        REQUIRE(1 == t);
+        REQUIRE(1 == uint32_t(t));
         REQUIRE("1970-01-01T00:00:01Z" == t.to_iso());
         REQUIRE(t.valid());
     }
@@ -44,9 +44,9 @@ TEST_CASE("Timestamp") {
         REQUIRE_THROWS_AS(osmium::Timestamp("x"), std::invalid_argument);
     }
 
-    SECTION("can be implicitly cast to time_t") {
+    SECTION("can be explicitly cast to time_t") {
         osmium::Timestamp t(4242);
-        time_t x = t;
+        time_t x = t.seconds_since_epoch();
         REQUIRE(x == 4242);
     }
 

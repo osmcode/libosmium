@@ -9,7 +9,7 @@ void check_node_1(osmium::Node& node) {
     REQUIRE(true == node.visible());
     REQUIRE(333 == node.changeset());
     REQUIRE(21 == node.uid());
-    REQUIRE(123 == node.timestamp());
+    REQUIRE(123 == uint32_t(node.timestamp()));
     REQUIRE(osmium::Location(3.5, 4.7) == node.location());
     REQUIRE(std::string("testuser") == node.user());
 
@@ -28,7 +28,7 @@ void check_node_2(osmium::Node& node) {
     REQUIRE(true == node.visible());
     REQUIRE(333 == node.changeset());
     REQUIRE(21 == node.uid());
-    REQUIRE(123 == node.timestamp());
+    REQUIRE(123 == uint32_t(node.timestamp()));
     REQUIRE(osmium::Location(3.5, 4.7) == node.location());
     REQUIRE(std::string("testuser") == node.user());
 
@@ -162,7 +162,7 @@ TEST_CASE("Node in Buffer") {
         REQUIRE(buffer.committed() == buffer2.committed());
         const osmium::Node& node = buffer2.get<osmium::Node>(0);
         REQUIRE(node.id() == 1);
-        REQUIRE(node.timestamp() == 123);
+        REQUIRE(123 == uint32_t(node.timestamp()));
     }
 
 }

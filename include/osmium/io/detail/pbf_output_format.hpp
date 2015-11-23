@@ -224,7 +224,7 @@ namespace osmium {
 
                 osmium::util::DeltaEncode<object_id_type, int64_t> m_delta_id;
 
-                osmium::util::DeltaEncode<time_t, int64_t> m_delta_timestamp;
+                osmium::util::DeltaEncode<uint32_t, int64_t> m_delta_timestamp;
                 osmium::util::DeltaEncode<changeset_id_type, int64_t> m_delta_changeset;
                 osmium::util::DeltaEncode<user_id_type, int32_t> m_delta_uid;
                 osmium::util::DeltaEncode<uint32_t, int32_t> m_delta_user_sid;
@@ -276,7 +276,7 @@ namespace osmium {
 
                     if (m_options.add_metadata) {
                         m_versions.push_back(static_cast_with_assert<int32_t>(node.version()));
-                        m_timestamps.push_back(m_delta_timestamp.update(node.timestamp()));
+                        m_timestamps.push_back(m_delta_timestamp.update(uint32_t(node.timestamp())));
                         m_changesets.push_back(m_delta_changeset.update(node.changeset()));
                         m_uids.push_back(m_delta_uid.update(node.uid()));
                         m_user_sids.push_back(m_delta_user_sid.update(m_stringtable.add(node.user())));
@@ -462,7 +462,7 @@ namespace osmium {
                         protozero::pbf_builder<OSMFormat::Info> pbf_info(pbf_object, T::enum_type::optional_Info_info);
 
                         pbf_info.add_int32(OSMFormat::Info::optional_int32_version, static_cast_with_assert<int32_t>(object.version()));
-                        pbf_info.add_int64(OSMFormat::Info::optional_int64_timestamp, object.timestamp());
+                        pbf_info.add_int64(OSMFormat::Info::optional_int64_timestamp, uint32_t(object.timestamp()));
                         pbf_info.add_int64(OSMFormat::Info::optional_int64_changeset, object.changeset());
                         pbf_info.add_int32(OSMFormat::Info::optional_int32_uid, static_cast_with_assert<int32_t>(object.uid()));
                         pbf_info.add_uint32(OSMFormat::Info::optional_uint32_user_sid, m_primitive_block.store_in_stringtable(object.user()));
@@ -526,7 +526,7 @@ namespace osmium {
                     std::string osmosis_replication_timestamp = header.get("osmosis_replication_timestamp");
                     if (!osmosis_replication_timestamp.empty()) {
                         osmium::Timestamp ts(osmosis_replication_timestamp.c_str());
-                        pbf_header_block.add_int64(OSMFormat::HeaderBlock::optional_int64_osmosis_replication_timestamp, ts);
+                        pbf_header_block.add_int64(OSMFormat::HeaderBlock::optional_int64_osmosis_replication_timestamp, uint32_t(ts));
                     }
 
                     std::string osmosis_replication_sequence_number = header.get("osmosis_replication_sequence_number");

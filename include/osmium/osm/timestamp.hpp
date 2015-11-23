@@ -137,19 +137,33 @@ namespace osmium {
             return m_timestamp != 0;
         }
 
-        /// Explicit conversion into time_t.
-        constexpr time_t seconds_since_epoch() const noexcept {
-            return static_cast<time_t>(m_timestamp);
+        /// Explicit conversion into bool.
+        explicit constexpr operator bool() const noexcept {
+            return m_timestamp != 0;
         }
 
-        /// Implicit conversion into time_t.
-        constexpr operator time_t() const noexcept {
-            return static_cast<time_t>(m_timestamp);
+        /// Explicit conversion into time_t.
+        constexpr time_t seconds_since_epoch() const noexcept {
+            return time_t(m_timestamp);
         }
 
         /// Explicit conversion into uint32_t.
         explicit constexpr operator uint32_t() const noexcept {
-            return m_timestamp;
+            return uint32_t(m_timestamp);
+        }
+
+        /// Explicit conversion into uint64_t.
+        explicit constexpr operator uint64_t() const noexcept {
+            return uint64_t(m_timestamp);
+        }
+
+        /**
+         * Implicit conversion into time_t.
+         *
+         * @deprecated You should call seconds_since_epoch() explicitly instead.
+         */
+        OSMIUM_DEPRECATED constexpr operator time_t() const noexcept {
+            return static_cast<time_t>(m_timestamp);
         }
 
         template <typename T>
@@ -212,6 +226,30 @@ namespace osmium {
     inline std::basic_ostream<TChar, TTraits>& operator<<(std::basic_ostream<TChar, TTraits>& out, Timestamp timestamp) {
         out << timestamp.to_iso();
         return out;
+    }
+
+    inline bool operator==(const Timestamp& lhs, const Timestamp& rhs) noexcept {
+        return uint32_t(lhs) == uint32_t(rhs);
+    }
+
+    inline bool operator!=(const Timestamp& lhs, const Timestamp& rhs) noexcept {
+        return !(lhs == rhs);
+    }
+
+    inline bool operator<(const Timestamp& lhs, const Timestamp& rhs) noexcept {
+        return uint32_t(lhs) < uint32_t(rhs);
+    }
+
+    inline bool operator>(const Timestamp& lhs, const Timestamp& rhs) noexcept {
+        return rhs < lhs;
+    }
+
+    inline bool operator<=(const Timestamp& lhs, const Timestamp& rhs) noexcept {
+        return ! (rhs < lhs);
+    }
+
+    inline bool operator>=(const Timestamp& lhs, const Timestamp& rhs) noexcept {
+        return ! (lhs < rhs);
     }
 
     template <>
