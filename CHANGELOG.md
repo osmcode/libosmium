@@ -10,7 +10,14 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
+- Included gdalcpp.hpp header was updated to 1.1.0.
+
 ### Fixed
+
+- Bugs with Timestamp code on 32 bit platforms. This necessitated
+  some changes in Timestamp which might lead to changes in user
+  code.
+- Bug in segment intersection code (which appeared on i686 platform).
 
 
 ## [2.5.3] - 2015-11-17
