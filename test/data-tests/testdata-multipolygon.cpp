@@ -152,7 +152,7 @@ int main(int argc, char* argv[]) {
     std::string output_filename("multipolygon.db");
 
     CPLSetConfigOption("OGR_SQLITE_SYNCHRONOUS", "FALSE");
-    gdalcpp::Dataset dataset(output_format, output_filename, "", { "SPATIALITE=TRUE" });
+    gdalcpp::Dataset dataset{output_format, output_filename, gdalcpp::SRS{}, { "SPATIALITE=TRUE" }};
 
     osmium::area::ProblemReporterOGR problem_reporter(dataset);
     osmium::area::Assembler::config_type assembler_config(&problem_reporter);

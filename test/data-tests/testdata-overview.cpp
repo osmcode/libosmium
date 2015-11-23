@@ -85,7 +85,7 @@ int main(int argc, char* argv[]) {
     ::unlink(output_filename.c_str());
 
     CPLSetConfigOption("OGR_SQLITE_SYNCHRONOUS", "FALSE");
-    gdalcpp::Dataset dataset(output_format, output_filename, "", { "SPATIALITE=TRUE" });
+    gdalcpp::Dataset dataset(output_format, output_filename, gdalcpp::SRS{}, { "SPATIALITE=TRUE" });
 
     osmium::io::Reader reader(input_filename);
 

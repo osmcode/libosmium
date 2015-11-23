@@ -5,7 +5,7 @@
 
 C++11 wrapper classes for GDAL/OGR.
 
-Version 1.0.0
+Version 1.1.0
 
 https://github.com/joto/gdalcpp
 
@@ -64,10 +64,12 @@ namespace gdalcpp {
         std::string m_dataset;
         std::string m_layer;
         std::string m_field;
+        OGRErr m_error;
 
     public:
 
         gdal_error(const std::string& message,
+                   OGRErr error,
                    const std::string& driver = "",
                    const std::string& dataset = "",
                    const std::string& layer = "",
@@ -76,7 +78,8 @@ namespace gdalcpp {
             m_driver(driver),
             m_dataset(dataset),
             m_layer(layer),
-            m_field(field) {
+            m_field(field),
+            m_error(error) {
         }
 
         const std::string& driver() const {
@@ -93,6 +96,10 @@ namespace gdalcpp {
 
         const std::string& field() const {
             return m_field;
+        }
+
+        OGRErr error() const {
+            return m_error;
         }
 
     }; // class gdal_error
@@ -120,7 +127,7 @@ namespace gdalcpp {
                 init_library(),
                 m_driver(OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(driver_name.c_str())) {
                 if (!m_driver) {
-                    throw gdal_error(std::string("unknown driver: '") + driver_name + "'", driver_name);
+                    throw gdal_error(std::string("unknown driver: '") + driver_name + "'", OGRERR_NONE, driver_name);
                 }
             }
 
@@ -152,6 +159,58 @@ namespace gdalcpp {
 
     } // namespace detail
 
+    class SRS {
+
+        OGRSpatialReference m_spatial_reference;
+
+    public:
+
+        SRS() :
+            m_spatial_reference() {
+            auto result = m_spatial_reference.SetWellKnownGeogCS("WGS84");
+            if (result != OGRERR_NONE) {
+                throw gdal_error(std::string("can not initialize spatial reference system WGS84"), result);
+            }
+        }
+
+        explicit SRS(int epsg) :
+            m_spatial_reference() {
+            auto result = m_spatial_reference.importFromEPSG(epsg);
+            if (result != OGRERR_NONE) {
+                throw gdal_error(std::string("can not initialize spatial reference system for EPSG:") + std::to_string(epsg), result);
+            }
+        }
+
+        explicit SRS(const char* name) :
+            m_spatial_reference() {
+            auto result = m_spatial_reference.importFromProj4(name);
+            if (result != OGRERR_NONE) {
+                throw gdal_error(std::string("can not initialize spatial reference system '") + name + "'", result);
+            }
+        }
+
+        explicit SRS(const std::string& name) :
+            m_spatial_reference() {
+            auto result = m_spatial_reference.importFromProj4(name.c_str());
+            if (result != OGRERR_NONE) {
+                throw gdal_error(std::string("can not initialize spatial reference system '") + name + "'", result);
+            }
+        }
+
+        explicit SRS(const OGRSpatialReference& spatial_reference) :
+            m_spatial_reference(spatial_reference) {
+        }
+
+        OGRSpatialReference& get() {
+            return m_spatial_reference;
+        }
+
+        const OGRSpatialReference& get() const {
+            return m_spatial_reference;
+        }
+
+    }; // class SRS
+
     class Dataset {
 
         struct gdal_dataset_deleter {
@@ -169,27 +228,23 @@ namespace gdalcpp {
         std::string m_driver_name;
         std::string m_dataset_name;
         detail::Options m_options;
+        SRS m_srs;
         std::unique_ptr<gdal_dataset_type, gdal_dataset_deleter> m_dataset;
-        OGRSpatialReference m_spatial_reference;
 
     public:
 
-        Dataset(const std::string& driver_name, const std::string& dataset_name, const std::string& proj = "", const std::vector<std::string>& options = {}) :
+        Dataset(const std::string& driver_name, const std::string& dataset_name, const SRS& srs = SRS{}, const std::vector<std::string>& options = {}) :
             m_driver_name(driver_name),
             m_dataset_name(dataset_name),
             m_options(options),
+            m_srs(srs),
 #if GDAL_VERSION_MAJOR >= 2
             m_dataset(detail::Driver(driver_name).get().Create(dataset_name.c_str(), 0, 0, 0, GDT_Unknown, m_options.get())) {
 #else
             m_dataset(detail::Driver(driver_name).get().CreateDataSource(dataset_name.c_str(), m_options.get())) {
 #endif
             if (!m_dataset) {
-                throw gdal_error(std::string("failed to create dataset '") + dataset_name + "'", driver_name, dataset_name);
-            }
-            if (proj.empty()) {
-                m_spatial_reference.SetWellKnownGeogCS("WGS84");
-            } else {
-                m_spatial_reference.importFromProj4(proj.c_str());
+                throw gdal_error(std::string("failed to create dataset '") + dataset_name + "'", OGRERR_NONE, driver_name, dataset_name);
             }
         }
 
@@ -205,9 +260,21 @@ namespace gdalcpp {
             return *m_dataset;
         }
 
-        OGRSpatialReference* spatial_reference() {
-            return &m_spatial_reference;
+        SRS& srs() {
+            return m_srs;
         }
+
+        void exec(const char* sql) {
+            auto result = m_dataset->ExecuteSQL(sql, nullptr, nullptr);
+            if (result) {
+                m_dataset->ReleaseResultSet(result);
+            }
+        }
+
+        void exec(const std::string& sql) {
+            exec(sql.c_str());
+        }
+
 
         Dataset& start_transaction() {
 #if GDAL_VERSION_MAJOR >= 2
@@ -227,25 +294,35 @@ namespace gdalcpp {
 
     class Layer {
 
+        detail::Options m_options;
         Dataset& m_dataset;
         OGRLayer* m_layer;
 
     public:
 
-        Layer(Dataset& dataset, const std::string& layer_name, OGRwkbGeometryType type) :
+        Layer(Dataset& dataset, const std::string& layer_name, OGRwkbGeometryType type, const std::vector<std::string>& options = {}) :
+            m_options(options),
             m_dataset(dataset),
-            m_layer(dataset.get().CreateLayer(layer_name.c_str(), dataset.spatial_reference(), type)) {
+            m_layer(dataset.get().CreateLayer(layer_name.c_str(), &dataset.srs().get(), type, m_options.get())) {
             if (!m_layer) {
-                throw gdal_error(std::string("failed to create layer '") + layer_name + "'",
+                throw gdal_error(std::string("failed to create layer '") + layer_name + "'", OGRERR_NONE,
                     dataset.driver_name(), dataset.dataset_name(), layer_name);
             }
         }
 
-        OGRLayer* get() const {
-            return m_layer;
+        OGRLayer& get() {
+            return *m_layer;
         }
 
-        const char* name() {
+        const OGRLayer& get() const {
+            return *m_layer;
+        }
+
+        Dataset& dataset() const {
+            return m_dataset;
+        }
+
+        const char* name() const {
             return m_layer->GetName();
         }
 
@@ -255,31 +332,51 @@ namespace gdalcpp {
             field.SetPrecision(precision);
 
             if (m_layer->CreateField(&field) != OGRERR_NONE) {
-                throw gdal_error(std::string("failed to create field '") + field_name + "' in layer '" + name() + "'",
+                throw gdal_error(std::string("failed to create field '") + field_name + "' in layer '" + name() + "'", OGRERR_NONE,
                     m_dataset.driver_name(), m_dataset.dataset_name(), name(), field_name);
             }
 
             return *this;
         }
 
+        Layer& start_transaction() {
+            OGRErr result = m_layer->StartTransaction();
+            if (result != OGRERR_NONE) {
+                throw gdal_error(std::string("starting transaction on layer '") + name() + "' failed", result, m_dataset.driver_name(), m_dataset.dataset_name(), name());
+            }
+            return *this;
+        }
+
+        Layer& commit_transaction() {
+            OGRErr result = m_layer->CommitTransaction();
+            if (result != OGRERR_NONE) {
+                throw gdal_error(std::string("committing transaction on layer '") + name() + "' failed", result, m_dataset.driver_name(), m_dataset.dataset_name(), name());
+            }
+            return *this;
+         }
+
     }; // class Layer
 
     class Feature {
 
-        OGRLayer* m_layer;
+        Layer& m_layer;
         OGRFeature m_feature;
 
     public:
 
         Feature(Layer& layer, std::unique_ptr<OGRGeometry>&& geometry) :
-            m_layer(layer.get()),
-            m_feature(m_layer->GetLayerDefn()) {
-            m_feature.SetGeometry(geometry.get());
+            m_layer(layer),
+            m_feature(m_layer.get().GetLayerDefn()) {
+            OGRErr result = m_feature.SetGeometryDirectly(geometry.release());
+            if (result != OGRERR_NONE) {
+                throw gdal_error(std::string("setting feature geometry in layer '") + m_layer.name() + "' failed", result, m_layer.dataset().driver_name(), m_layer.dataset().dataset_name());
+            }
         }
 
         void add_to_layer() {
-            if (m_layer->CreateFeature(&m_feature) != OGRERR_NONE) {
-                std::runtime_error("feature creation failed");
+            OGRErr result = m_layer.get().CreateFeature(&m_feature);
+            if (result != OGRERR_NONE) {
+                throw gdal_error(std::string("creating feature in layer '") + m_layer.name() + "' failed", result, m_layer.dataset().driver_name(), m_layer.dataset().dataset_name());
             }
         }
 
