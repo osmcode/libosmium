@@ -10,7 +10,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
-- Included gdalcpp.hpp header was updated to 1.1.0.
+- Included gdalcpp.hpp header was updated to 1.1.1.
 
 ### Fixed
 

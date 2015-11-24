@@ -5,7 +5,7 @@
 
 C++11 wrapper classes for GDAL/OGR.
 
-Version 1.1.0
+Version 1.1.1
 
 https://github.com/joto/gdalcpp
 
@@ -51,13 +51,16 @@ DEALINGS IN THE SOFTWARE.
 namespace gdalcpp {
 
 #if GDAL_VERSION_MAJOR >= 2
-    typedef GDALDriver gdal_driver_type;
-    typedef GDALDataset gdal_dataset_type;
+    using gdal_driver_type = GDALDriver;
+    using gdal_dataset_type = GDALDataset;
 #else
-    typedef OGRSFDriver gdal_driver_type;
-    typedef OGRDataSource gdal_dataset_type;
+    using gdal_driver_type = OGRSFDriver;
+    using gdal_dataset_type = OGRDataSource;
 #endif
 
+    /**
+     * Exception thrown for all errors in this class.
+     */
     class gdal_error : public std::runtime_error {
 
         std::string m_driver;
@@ -125,7 +128,11 @@ namespace gdalcpp {
 
             Driver(const std::string& driver_name) :
                 init_library(),
+#if GDAL_VERSION_MAJOR >= 2
+                m_driver(GetGDALDriverManager()->GetDriverByName(driver_name.c_str())) {
+#else
                 m_driver(OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(driver_name.c_str())) {
+#endif
                 if (!m_driver) {
                     throw gdal_error(std::string("unknown driver: '") + driver_name + "'", OGRERR_NONE, driver_name);
                 }
