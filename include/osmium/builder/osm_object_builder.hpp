@@ -123,6 +123,15 @@ namespace osmium {
                          append(value.data(), osmium::memory::item_size_type(value.size()) + 1));
             }
 
+            /**
+             * Add tag to buffer.
+             *
+             * @param tag Tag.
+             */
+            void add_tag(const osmium::Tag& tag) {
+                add_size(append(tag.key()) + append(tag.value()));
+            }
+
         }; // class TagListBuilder
 
         template <typename T>
