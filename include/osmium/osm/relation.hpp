@@ -49,7 +49,7 @@ namespace osmium {
     namespace builder {
         template <typename> class ObjectBuilder;
         class RelationMemberListBuilder;
-    }
+    } // namespace builder
 
     class RelationMember : public osmium::memory::detail::ItemHelper {
 

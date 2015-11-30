@@ -42,7 +42,7 @@ namespace osmium {
 
     namespace builder {
         template <typename T> class ObjectBuilder;
-    }
+    } // namespace builder
 
     class Node : public OSMObject {
 

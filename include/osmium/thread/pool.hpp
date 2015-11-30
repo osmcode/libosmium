@@ -78,7 +78,7 @@ namespace osmium {
                 return num_threads;
             }
 
-        }
+        } // namespace detail
 
         /**
          *  Thread pool.

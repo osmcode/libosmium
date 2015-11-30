@@ -183,7 +183,7 @@ auto _name_##_dispatch(THandler& handler, const osmium::_type_& object, long) ->
 
         }; // class DynamicHandler
 
-    } // namspace handler
+    } // namespace handler
 
 } // namespace osmium
 

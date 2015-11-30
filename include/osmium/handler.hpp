@@ -87,7 +87,7 @@ namespace osmium {
 
         }; // class Handler
 
-    } // namspace handler
+    } // namespace handler
 
 } // namespace osmium
 

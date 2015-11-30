@@ -80,9 +80,9 @@ namespace osmium {
 
             const int64_t resolution_convert = lonlat_resolution / osmium::Location::coordinate_precision;
 
-        }
+        } // namespace detail
 
-    }
+    } // namespace io
 
 } // namespace osmium
 

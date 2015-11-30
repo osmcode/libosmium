@@ -43,7 +43,7 @@ namespace osmium {
 
     namespace builder {
         class Builder;
-    }
+    } // namespace builder
 
     namespace memory {
 

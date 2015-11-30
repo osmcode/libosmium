@@ -55,7 +55,7 @@ namespace osmium {
 
     namespace memory {
         class Buffer;
-    }
+    } // namespace memory
 
     namespace builder {
 

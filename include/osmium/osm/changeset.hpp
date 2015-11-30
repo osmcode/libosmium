@@ -50,7 +50,7 @@ namespace osmium {
     namespace builder {
         class ChangesetDiscussionBuilder;
         template <typename T> class ObjectBuilder;
-    }
+    } // namespace builder
 
     class Changeset;
 

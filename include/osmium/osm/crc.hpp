@@ -77,7 +77,7 @@ namespace osmium {
 # endif
         }
 
-    }
+    } // namespace util
 
     template <typename TCRC>
     class CRC {

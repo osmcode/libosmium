@@ -44,7 +44,7 @@ namespace osmium {
 
     namespace builder {
         template <typename T> class ObjectBuilder;
-    }
+    } // namespace builder
 
     /**
      * List of node references (id and location) in a way.

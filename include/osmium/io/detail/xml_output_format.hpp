@@ -466,7 +466,7 @@ namespace osmium {
 
         } // namespace detail
 
-    } // namespace output
+    } // namespace io
 
 } // namespace osmium
 

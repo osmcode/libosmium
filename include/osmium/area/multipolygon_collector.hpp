@@ -53,7 +53,7 @@ namespace osmium {
 
     namespace relations {
         class RelationMeta;
-    }
+    } // namespace relations
 
     /**
      * @brief Code related to the building of areas (multipolygons) from relations.

@@ -46,7 +46,7 @@ namespace osmium {
 
     namespace memory {
         class Item;
-    }
+    } // namespace memory
 
     namespace detail {
 

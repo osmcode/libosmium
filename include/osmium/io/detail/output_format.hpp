@@ -51,7 +51,7 @@ namespace osmium {
 
     namespace io {
         class Header;
-    }
+    } // namespace io
 
     namespace io {
 

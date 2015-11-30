@@ -48,7 +48,7 @@ namespace osmium {
 
     namespace builder {
         template <class T> class ObjectBuilder;
-    }
+    } // namespace builder
 
     /**
      * An outer ring of an Area.
