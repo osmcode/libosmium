@@ -132,6 +132,24 @@ namespace osmium {
                 add_size(append(tag.key()) + append(tag.value()));
             }
 
+            /**
+             * Add tag to buffer.
+             *
+             * @param tag Pair of key/value 0-terminated strings.
+             */
+            void add_tag(const std::pair<const char*, const char*>& tag) {
+                add_tag(tag.first, tag.second);
+            }
+
+            /**
+             * Add tag to buffer.
+             *
+             * @param tag Pair of std::string references.
+             */
+            void add_tag(const std::pair<const std::string&, const std::string&>& tag) {
+                add_tag(tag.first, tag.second);
+            }
+
         }; // class TagListBuilder
 
         template <typename T>
