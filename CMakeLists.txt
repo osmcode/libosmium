@@ -276,12 +276,14 @@ if(CPPCHECK)
 
     file(GLOB_RECURSE ALL_INCLUDES   include/osmium/*.hpp)
     file(GLOB         ALL_EXAMPLES   examples/*.cpp)
+    file(GLOB         ALL_BENCHMARKS benchmarks/*.cpp)
     file(GLOB         ALL_UNIT_TESTS test/t/*/test_*.cpp)
     file(GLOB         ALL_DATA_TESTS test/data-tests/*.cpp)
 
     if(Osmium_DEBUG)
         message(STATUS "Checking includes      : ${ALL_INCLUDES}")
         message(STATUS "Checking example code  : ${ALL_EXAMPLES}")
+        message(STATUS "Checking benchmarks    : ${ALL_BENCHMARKS}")
         message(STATUS "Checking unit test code: ${ALL_UNIT_TESTS}")
         message(STATUS "Checking data test code: ${ALL_DATA_TESTS}")
     endif()
@@ -289,6 +291,7 @@ if(CPPCHECK)
     set(CPPCHECK_FILES
         ${ALL_INCLUDES}
         ${ALL_EXAMPLES}
+        ${ALL_BENCHMARKS}
         ${ALL_UNIT_TESTS}
         ${ALL_DATA_TESTS})
 
@@ -301,7 +304,7 @@ if(CPPCHECK)
 else()
     message(STATUS "Looking for cppcheck - not found")
     message(STATUS "  Build target 'cppcheck' will not be available.")
-endif(CPPCHECK)
+endif()
 
 
 #-----------------------------------------------------------------------------
