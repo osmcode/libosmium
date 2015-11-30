@@ -27,7 +27,7 @@ public:
         }
     }
 
-    ~MockDecompressor() noexcept override final = default;
+    ~MockDecompressor() noexcept final = default;
 
     void add_node(std::string& s, int i) {
         s += "<node id='";
@@ -35,7 +35,7 @@ public:
         s += "' version='1' timestamp='2014-01-01T00:00:00Z' uid='1' user='test' changeset='1' lon='1.02' lat='1.02'/>\n";
     }
 
-    std::string read() override final {
+    std::string read() final {
         std::string buffer;
         ++m_read_count;
 
@@ -63,7 +63,7 @@ public:
         return buffer;
     }
 
-    void close() override final {
+    void close() final {
         if (m_fail_in == "close") {
             throw std::runtime_error("error close");
         }

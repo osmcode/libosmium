@@ -22,21 +22,21 @@ public:
         m_fail_in(fail_in) {
     }
 
-    void write_header(const osmium::io::Header&) override final {
+    void write_header(const osmium::io::Header&) final {
         if (m_fail_in == "header") {
             throw std::logic_error("header");
         }
         send_to_output_queue(std::string{"header"});
     }
 
-    void write_buffer(osmium::memory::Buffer&&) override final {
+    void write_buffer(osmium::memory::Buffer&&) final {
         if (m_fail_in == "write") {
             throw std::logic_error("write");
         }
         send_to_output_queue(std::string{"write"});
     }
 
-    void write_end() override final {
+    void write_end() final {
         if (m_fail_in == "write_end") {
             throw std::logic_error("write_end");
         }

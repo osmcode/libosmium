@@ -23,15 +23,15 @@ public:
         }
     }
 
-    ~MockCompressor() noexcept override final = default;
+    ~MockCompressor() noexcept final = default;
 
-    void write(const std::string&) override final {
+    void write(const std::string&) final {
         if (m_fail_in == "write") {
             throw std::logic_error("write");
         }
     }
 
-    void close() override final {
+    void close() final {
         if (m_fail_in == "close") {
             throw std::logic_error("close");
         }

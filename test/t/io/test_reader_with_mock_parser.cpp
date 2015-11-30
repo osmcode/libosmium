@@ -41,7 +41,7 @@ public:
         return buffer;
     }
 
-    void run() override final {
+    void run() final {
         osmium::thread::set_thread_name("_osmium_mock_in");
 
         if (m_fail_in == "header") {
