@@ -104,7 +104,7 @@ namespace osmium {
                 m_layer_lerror.add_field("problem_type", OFTString, 30);
             }
 
-            virtual ~ProblemReporterOGR() = default;
+            ~ProblemReporterOGR() override = default;
 
             void report_duplicate_node(osmium::object_id_type node_id1, osmium::object_id_type node_id2, osmium::Location location) override {
                 write_point("duplicate_node", node_id1, node_id2, location);

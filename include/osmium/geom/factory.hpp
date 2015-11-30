@@ -89,7 +89,7 @@ namespace osmium {
             return m_id;
         }
 
-        virtual const char* what() const noexcept override {
+        const char* what() const noexcept override {
             return m_message.c_str();
         }
 
