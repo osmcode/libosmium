@@ -600,9 +600,9 @@ namespace osmium {
                     m_end(m_data) {
                 }
 
-                ~O5mParser() noexcept = default;
+                ~O5mParser() noexcept final = default;
 
-                void run() override final {
+                void run() final {
                     osmium::thread::set_thread_name("_osmium_o5m_in");
 
                     decode_header();

@@ -495,9 +495,9 @@ namespace osmium {
                 PBFOutputFormat(const PBFOutputFormat&) = delete;
                 PBFOutputFormat& operator=(const PBFOutputFormat&) = delete;
 
-                ~PBFOutputFormat() noexcept = default;
+                ~PBFOutputFormat() noexcept final = default;
 
-                void write_header(const osmium::io::Header& header) override final {
+                void write_header(const osmium::io::Header& header) final {
                     std::string data;
                     protozero::pbf_builder<OSMFormat::HeaderBlock> pbf_header_block(data);
 
@@ -546,11 +546,11 @@ namespace osmium {
                         ));
                 }
 
-                void write_buffer(osmium::memory::Buffer&& buffer) override final {
+                void write_buffer(osmium::memory::Buffer&& buffer) final {
                     osmium::apply(buffer.cbegin(), buffer.cend(), *this);
                 }
 
-                void write_end() override final {
+                void write_end() final {
                     store_primitive_block();
                 }
 

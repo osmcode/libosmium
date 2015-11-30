@@ -203,9 +203,9 @@ namespace osmium {
                     m_input_buffer() {
                 }
 
-                ~PBFParser() noexcept = default;
+                ~PBFParser() noexcept final = default;
 
-                void run() override final {
+                void run() final {
                     osmium::thread::set_thread_name("_osmium_pbf_in");
 
                     parse_header_blob();

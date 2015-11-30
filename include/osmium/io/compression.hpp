@@ -211,7 +211,7 @@ namespace osmium {
                 m_fd(fd) {
             }
 
-            ~NoCompressor() noexcept override final {
+            ~NoCompressor() noexcept final {
                 try {
                     close();
                 } catch (...) {
@@ -219,11 +219,11 @@ namespace osmium {
                 }
             }
 
-            void write(const std::string& data) override final {
+            void write(const std::string& data) final {
                 osmium::io::detail::reliable_write(m_fd, data.data(), data.size());
             }
 
-            void close() override final {
+            void close() final {
                 if (m_fd >= 0) {
                     int fd = m_fd;
                     m_fd = -1;
@@ -258,7 +258,7 @@ namespace osmium {
                 m_buffer_size(size) {
             }
 
-            ~NoDecompressor() noexcept override final {
+            ~NoDecompressor() noexcept final {
                 try {
                     close();
                 } catch (...) {
@@ -266,7 +266,7 @@ namespace osmium {
                 }
             }
 
-            std::string read() override final {
+            std::string read() final {
                 std::string buffer;
 
                 if (m_buffer) {
@@ -287,7 +287,7 @@ namespace osmium {
                 return buffer;
             }
 
-            void close() override final {
+            void close() final {
                 if (m_fd >= 0) {
                     int fd = m_fd;
                     m_fd = -1;

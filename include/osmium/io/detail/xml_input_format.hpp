@@ -630,9 +630,9 @@ namespace osmium {
                     m_rml_builder() {
                 }
 
-                ~XMLParser() noexcept = default;
+                ~XMLParser() noexcept final = default;
 
-                void run() override final {
+                void run() final {
                     osmium::thread::set_thread_name("_osmium_xml_in");
 
                     ExpatXMLParser<XMLParser> parser(this);

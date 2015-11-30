@@ -419,9 +419,9 @@ namespace osmium {
                 DebugOutputFormat(const DebugOutputFormat&) = delete;
                 DebugOutputFormat& operator=(const DebugOutputFormat&) = delete;
 
-                ~DebugOutputFormat() noexcept = default;
+                ~DebugOutputFormat() noexcept final = default;
 
-                void write_header(const osmium::io::Header& header) override final {
+                void write_header(const osmium::io::Header& header) final {
                     std::string out;
 
                     if (m_options.use_color) {
@@ -458,7 +458,7 @@ namespace osmium {
                     send_to_output_queue(std::move(out));
                 }
 
-                void write_buffer(osmium::memory::Buffer&& buffer) override final {
+                void write_buffer(osmium::memory::Buffer&& buffer) final {
                     m_output_queue.push(osmium::thread::Pool::instance().submit(DebugOutputBlock{std::move(buffer), m_options}));
                 }
 

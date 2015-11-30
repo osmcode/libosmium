@@ -402,9 +402,9 @@ namespace osmium {
                 XMLOutputFormat(const XMLOutputFormat&) = delete;
                 XMLOutputFormat& operator=(const XMLOutputFormat&) = delete;
 
-                ~XMLOutputFormat() noexcept = default;
+                ~XMLOutputFormat() noexcept final = default;
 
-                void write_header(const osmium::io::Header& header) override final {
+                void write_header(const osmium::io::Header& header) final {
                     std::string out = "<?xml version='1.0' encoding='UTF-8'?>\n";
 
                     if (m_options.use_change_ops) {
@@ -434,11 +434,11 @@ namespace osmium {
                     send_to_output_queue(std::move(out));
                 }
 
-                void write_buffer(osmium::memory::Buffer&& buffer) override final {
+                void write_buffer(osmium::memory::Buffer&& buffer) final {
                     m_output_queue.push(osmium::thread::Pool::instance().submit(XMLOutputBlock{std::move(buffer), m_options}));
                 }
 
-                void write_end() override final {
+                void write_end() final {
                     std::string out;
 
                     if (m_options.use_change_ops) {
