@@ -364,6 +364,77 @@ endif()
 
 #-----------------------------------------------------------------------------
 #
+#  Optional "clang-tidy" target
+#
+#-----------------------------------------------------------------------------
+message(STATUS "Looking for clang-tidy")
+find_program(CLANG_TIDY NAMES clang-tidy clang-tidy-3.7 clang-tidy-3.6 clang-tidy-3.5)
+
+if(CLANG_TIDY)
+    message(STATUS "Looking for clang-tidy - found")
+
+    if(BUILD_HEADERS)
+        file(GLOB_RECURSE ALL_INCLUDES ${CMAKE_BINARY_DIR}/header_check/osmium__*.cpp)
+    endif()
+
+    file(GLOB ALL_EXAMPLES   examples/*.cpp)
+    file(GLOB ALL_BENCHMARKS benchmarks/*.cpp)
+    file(GLOB ALL_UNIT_TESTS test/t/*/test_*.cpp)
+    file(GLOB ALL_DATA_TESTS test/data-tests/*.cpp)
+
+    if(Osmium_DEBUG)
+        message(STATUS "Checking includes      : ${ALL_INCLUDES}")
+        message(STATUS "Checking example code  : ${ALL_EXAMPLES}")
+        message(STATUS "Checking benchmarks    : ${ALL_BENCHMARKS}")
+        message(STATUS "Checking unit test code: ${ALL_UNIT_TESTS}")
+        message(STATUS "Checking data test code: ${ALL_DATA_TESTS}")
+    endif()
+
+    set(CLANG_TIDY_CHECK_FILES
+        ${ALL_INCLUDES}
+        ${ALL_EXAMPLES}
+        ${ALL_BENCHMARKS}
+        ${ALL_UNIT_TESTS}
+        ${ALL_DATA_TESTS})
+
+    # For a list of check options, see:
+    # http://clang.llvm.org/extra/clang-tidy/checks/list.html
+
+    list(APPEND CT_CHECKS "google-*")
+#                          "-google-build-explicit-make-pair"
+#                          "-google-explicit-constructor"
+#                          "-google-readability-braces-around-statements"
+#                          "-google-readability-casting"
+#                          "-google-readability-namespace-comments"
+#                          "-google-readability-function"
+#                          "-google-readability-todo"
+#                          "-google-runtime-int")
+
+    list(APPEND CT_CHECKS "llvm-*"
+                          "-llvm-include-order")
+
+    list(APPEND CT_CHECKS "misc-*"
+                          "-misc-argument-comment")
+
+    list(APPEND CT_CHECKS "readability-*"
+                          "-readability-identifier-naming")
+
+    string(REPLACE ";" "," ALL_CHECKS "${CT_CHECKS}")
+
+    add_custom_target(clang-tidy
+        ${CLANG_TIDY}
+        -p ${CMAKE_BINARY_DIR}
+        -header-filter='include/osmium/.*'
+        -checks="${ALL_CHECKS}"
+        ${CLANG_TIDY_CHECK_FILES}
+    )
+else()
+    message(STATUS "Looking for clang-tidy - not found")
+    message(STATUS "  Build target 'clang-tidy' will not be available.")
+endif()
+
+#-----------------------------------------------------------------------------
+#
 #  Installation
 #
 #  External libraries are only installed if the options are set in case they
