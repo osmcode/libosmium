@@ -98,6 +98,9 @@ namespace osmium {
 
         public:
 
+            // This is needed so we can call std::back_inserter() on a Buffer.
+            using value_type = Item;
+
             enum class auto_grow : bool {
                 yes = true,
                 no  = false

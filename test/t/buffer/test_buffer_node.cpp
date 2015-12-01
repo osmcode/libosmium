@@ -165,5 +165,35 @@ TEST_CASE("Node in Buffer") {
         REQUIRE(123 == uint32_t(node.timestamp()));
     }
 
+    SECTION("Use back_inserter on buffer") {
+
+        {
+            // add node 1
+            osmium::builder::NodeBuilder node_builder(buffer);
+            osmium::Node& node = node_builder.object();
+            REQUIRE(osmium::item_type::node == node.type());
+
+            node.set_id(1);
+            node.set_version(3);
+            node.set_visible(true);
+            node.set_changeset(333);
+            node.set_uid(21);
+            node.set_timestamp(123);
+            node.set_location(osmium::Location(3.5, 4.7));
+
+            node_builder.add_user("testuser");
+
+            buffer.commit();
+        }
+
+        osmium::memory::Buffer buffer2(buffer_size, osmium::memory::Buffer::auto_grow::yes);
+
+        std::copy(buffer.begin(), buffer.end(), std::back_inserter(buffer2));
+
+        REQUIRE(buffer.committed() == buffer2.committed());
+        const osmium::Node& node = buffer2.get<osmium::Node>(0);
+        REQUIRE(node.id() == 1);
+        REQUIRE(123 == uint32_t(node.timestamp()));
+    }
 }
 
