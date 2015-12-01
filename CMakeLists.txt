@@ -411,7 +411,8 @@ if(CLANG_TIDY)
     # For a list of check options, see:
     # http://clang.llvm.org/extra/clang-tidy/checks/list.html
 
-    list(APPEND CT_CHECKS "cert-*")
+    list(APPEND CT_CHECKS "cert-*"
+                         "-cert-err60-cpp") # even the std lib doesn't do this
 
     # disabled, because it is slow
 #    list(APPEND CT_CHECKS "clang-analyzer-*")
@@ -430,7 +431,8 @@ if(CLANG_TIDY)
     list(APPEND CT_CHECKS "modernize-*")
 
     list(APPEND CT_CHECKS "readability-*"
-                         "-readability-identifier-naming")
+                         "-readability-identifier-naming"
+                         "-readability-named-parameter")
 
     string(REPLACE ";" "," ALL_CHECKS "${CT_CHECKS}")
 
