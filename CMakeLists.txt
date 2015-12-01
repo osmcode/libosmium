@@ -373,29 +373,40 @@ find_program(CLANG_TIDY NAMES clang-tidy clang-tidy-3.9 clang-tidy-3.8 clang-tid
 if(CLANG_TIDY)
     message(STATUS "Looking for clang-tidy - found")
 
-    if(BUILD_HEADERS)
-        file(GLOB_RECURSE ALL_INCLUDES ${CMAKE_BINARY_DIR}/header_check/osmium__*.cpp)
+    if(BUILD_EXAMPLES)
+        file(GLOB CT_ALL_EXAMPLES examples/*.cpp)
     endif()
 
-    file(GLOB ALL_EXAMPLES   examples/*.cpp)
-    file(GLOB ALL_BENCHMARKS benchmarks/*.cpp)
-    file(GLOB ALL_UNIT_TESTS test/t/*/test_*.cpp)
-    file(GLOB ALL_DATA_TESTS test/data-tests/*.cpp)
+    if(BUILD_TESTING)
+        file(GLOB CT_ALL_UNIT_TESTS test/t/*/test_*.cpp)
+    endif()
+
+    if(BUILD_HEADERS)
+        file(GLOB_RECURSE CT_ALL_INCLUDES ${CMAKE_BINARY_DIR}/header_check/osmium__*.cpp)
+    endif()
+
+    if(BUILD_BENCHMARKS)
+        file(GLOB CT_ALL_BENCHMARKS benchmarks/*.cpp)
+    endif()
+
+    if(BUILD_DATA_TESTS)
+        file(GLOB CT_ALL_DATA_TESTS test/data-tests/*.cpp)
+    endif()
 
     if(Osmium_DEBUG)
-        message(STATUS "Checking includes      : ${ALL_INCLUDES}")
-        message(STATUS "Checking example code  : ${ALL_EXAMPLES}")
-        message(STATUS "Checking benchmarks    : ${ALL_BENCHMARKS}")
-        message(STATUS "Checking unit test code: ${ALL_UNIT_TESTS}")
-        message(STATUS "Checking data test code: ${ALL_DATA_TESTS}")
+        message(STATUS "Checking example code  : ${CT_ALL_EXAMPLES}")
+        message(STATUS "Checking unit test code: ${CT_ALL_UNIT_TESTS}")
+        message(STATUS "Checking includes      : ${CT_ALL_INCLUDES}")
+        message(STATUS "Checking benchmarks    : ${CT_ALL_BENCHMARKS}")
+        message(STATUS "Checking data test code: ${CT_ALL_DATA_TESTS}")
     endif()
 
-    set(CLANG_TIDY_CHECK_FILES
-        ${ALL_INCLUDES}
-        ${ALL_EXAMPLES}
-        ${ALL_BENCHMARKS}
-        ${ALL_UNIT_TESTS}
-        ${ALL_DATA_TESTS})
+    set(CT_CHECK_FILES
+        ${CT_ALL_EXAMPLES}
+        ${CT_ALL_UNIT_TESTS}
+        ${CT_ALL_INCLUDES}
+        ${CT_ALL_BENCHMARKS}
+        ${CT_ALL_DATA_TESTS})
 
     # For a list of check options, see:
     # http://clang.llvm.org/extra/clang-tidy/checks/list.html
@@ -428,7 +439,7 @@ if(CLANG_TIDY)
         -p ${CMAKE_BINARY_DIR}
         -header-filter='include/osmium/.*'
         -checks="${ALL_CHECKS}"
-        ${CLANG_TIDY_CHECK_FILES}
+        ${CT_CHECK_FILES}
     )
 else()
     message(STATUS "Looking for clang-tidy - not found")
