@@ -244,7 +244,7 @@ namespace osmium {
 
         public:
 
-            NoDecompressor(int fd) :
+            explicit NoDecompressor(int fd) :
                 Decompressor(),
                 m_fd(fd),
                 m_buffer(nullptr),

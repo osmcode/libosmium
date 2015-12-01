@@ -92,7 +92,7 @@ namespace osmium {
              *                 0 for an unlimited size.
              * @param name Optional name for this queue. (Used for debugging.)
              */
-            Queue(size_t max_size = 0, const std::string& name = "") :
+            explicit Queue(size_t max_size = 0, const std::string& name = "") :
                 m_max_size(max_size),
                 m_name(name),
                 m_mutex(),

@@ -61,7 +61,7 @@ namespace osmium {
 
     public:
 
-        geometry_error(const std::string& message, const char* object_type = "", osmium::object_id_type id = 0) :
+        explicit geometry_error(const std::string& message, const char* object_type = "", osmium::object_id_type id = 0) :
             std::runtime_error(message),
             m_message(message),
             m_id(id) {
@@ -167,7 +167,7 @@ namespace osmium {
              * Constructor for default initialized projection.
              */
             template <typename... TArgs>
-            GeometryFactory<TGeomImpl, TProjection>(TArgs&&... args) :
+            explicit GeometryFactory<TGeomImpl, TProjection>(TArgs&&... args) :
                 m_projection(),
                 m_impl(std::forward<TArgs>(args)...) {
             }
@@ -177,7 +177,7 @@ namespace osmium {
              * projection is moved into the GeometryFactory.
              */
             template <typename... TArgs>
-            GeometryFactory<TGeomImpl, TProjection>(TProjection&& projection, TArgs&&... args) :
+            explicit GeometryFactory<TGeomImpl, TProjection>(TProjection&& projection, TArgs&&... args) :
                 m_projection(std::move(projection)),
                 m_impl(std::forward<TArgs>(args)...) {
             }

@@ -75,7 +75,7 @@ namespace osmium {
 
             public:
 
-                StringStore(size_t chunk_size) :
+                explicit StringStore(size_t chunk_size) :
                     m_chunk_size(chunk_size),
                     m_chunks() {
                     add_chunk();

@@ -56,7 +56,7 @@ class TestHandler : public osmium::handler::Handler {
 
 public:
 
-    TestHandler(gdalcpp::Dataset& dataset) :
+    explicit TestHandler(gdalcpp::Dataset& dataset) :
         m_layer_point(dataset, "points", wkbPoint),
         m_layer_lines(dataset, "lines", wkbLineString),
         m_layer_mpoly(dataset, "multipolygons", wkbMultiPolygon),

@@ -194,7 +194,7 @@ namespace osmium {
 
                 public:
 
-                    ExpatXMLParser(T* callback_object) :
+                    explicit ExpatXMLParser(T* callback_object) :
                         m_parser(XML_ParserCreate(nullptr)) {
                         if (!m_parser) {
                             throw osmium::io_error("Internal error: Can not create parser");

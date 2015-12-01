@@ -52,11 +52,11 @@ namespace osmium {
      */
     struct invalid_location : public std::range_error {
 
-        invalid_location(const std::string& what) :
+        explicit invalid_location(const std::string& what) :
             std::range_error(what) {
         }
 
-        invalid_location(const char* what) :
+        explicit invalid_location(const char* what) :
             std::range_error(what) {
         }
 

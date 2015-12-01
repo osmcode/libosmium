@@ -59,7 +59,7 @@ namespace osmium {
                 m_data(nullptr) {
             }
 
-            CollectionIterator(data_type data) noexcept :
+            explicit CollectionIterator(data_type data) noexcept :
                 m_data(data) {
             }
 

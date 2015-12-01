@@ -62,7 +62,7 @@ namespace osmium {
             using value_type = TValue;
             using delta_type = TDelta;
 
-            DeltaEncode(TValue value = 0) :
+            explicit DeltaEncode(TValue value = 0) :
                 m_value(value) {
             }
 

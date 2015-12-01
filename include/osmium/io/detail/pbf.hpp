@@ -54,11 +54,11 @@ namespace osmium {
      */
     struct pbf_error : public io_error {
 
-        pbf_error(const std::string& what) :
+        explicit pbf_error(const std::string& what) :
             io_error(std::string("PBF error: ") + what) {
         }
 
-        pbf_error(const char* what) :
+        explicit pbf_error(const char* what) :
             io_error(std::string("PBF error: ") + what) {
         }
 

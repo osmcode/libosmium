@@ -110,7 +110,7 @@ namespace osmium {
 
             public:
 
-                queue_wrapper(queue_type& queue) :
+                explicit queue_wrapper(queue_type& queue) :
                     m_queue(queue),
                     m_has_reached_end_of_data(false) {
                 }

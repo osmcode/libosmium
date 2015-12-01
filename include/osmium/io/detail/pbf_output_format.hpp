@@ -335,7 +335,7 @@ namespace osmium {
 
             public:
 
-                PrimitiveBlock(const pbf_output_options& options) :
+                explicit PrimitiveBlock(const pbf_output_options& options) :
                     m_pbf_primitive_group_data(),
                     m_pbf_primitive_group(m_pbf_primitive_group_data),
                     m_stringtable(),

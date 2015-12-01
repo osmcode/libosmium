@@ -51,7 +51,7 @@ namespace osmium {
 
     public:
 
-        NodeRefList(osmium::item_type itemtype) noexcept :
+        explicit NodeRefList(osmium::item_type itemtype) noexcept :
             osmium::memory::Item(sizeof(NodeRefList), itemtype) {
         }
 

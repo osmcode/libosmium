@@ -163,7 +163,7 @@ namespace osmium {
 
         public:
 
-            Bzip2Decompressor(int fd) :
+            explicit Bzip2Decompressor(int fd) :
                 Decompressor(),
                 m_file(fdopen(dup(fd), "rb")),
                 m_bzerror(BZ_OK),

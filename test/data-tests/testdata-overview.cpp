@@ -25,7 +25,7 @@ class TestOverviewHandler : public osmium::handler::Handler {
 
 public:
 
-    TestOverviewHandler(gdalcpp::Dataset& dataset) :
+    explicit TestOverviewHandler(gdalcpp::Dataset& dataset) :
         m_layer_nodes(dataset, "nodes", wkbPoint),
         m_layer_labels(dataset, "labels", wkbPoint),
         m_layer_ways(dataset, "ways", wkbLineString) {

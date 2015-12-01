@@ -91,7 +91,7 @@ namespace osmium {
             }
 
             template <typename TFunction, typename... TArgs>
-            thread_handler(TFunction&& f, TArgs&&... args) :
+            explicit thread_handler(TFunction&& f, TArgs&&... args) :
                 m_thread(std::forward<TFunction>(f), std::forward<TArgs>(args)...) {
             }
 

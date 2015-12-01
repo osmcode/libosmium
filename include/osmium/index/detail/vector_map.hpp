@@ -161,7 +161,7 @@ namespace osmium {
                     m_vector() {
                 }
 
-                VectorBasedSparseMap(int fd) :
+                explicit VectorBasedSparseMap(int fd) :
                     m_vector(fd) {
                 }
 

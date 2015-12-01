@@ -72,7 +72,7 @@ namespace osmium {
      */
     struct o5m_error : public io_error {
 
-        o5m_error(const char* what) :
+        explicit o5m_error(const char* what) :
             io_error(std::string("o5m format error: ") + what) {
         }
 

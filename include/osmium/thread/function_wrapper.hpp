@@ -63,7 +63,7 @@ namespace osmium {
 
                 F m_functor;
 
-                impl_type(F&& functor) :
+                explicit impl_type(F&& functor) :
                     m_functor(std::forward<F>(functor)) {
                 }
 
