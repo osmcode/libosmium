@@ -122,9 +122,8 @@ namespace osmium {
             });
             if (result == cend()) {
                 return default_value;
-            } else {
-                return result->value();
             }
+            return result->value();
         }
 
         const char* operator[](const char* key) const noexcept {
