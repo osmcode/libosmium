@@ -368,7 +368,7 @@ endif()
 #
 #-----------------------------------------------------------------------------
 message(STATUS "Looking for clang-tidy")
-find_program(CLANG_TIDY NAMES clang-tidy clang-tidy-3.7 clang-tidy-3.6 clang-tidy-3.5)
+find_program(CLANG_TIDY NAMES clang-tidy clang-tidy-3.9 clang-tidy-3.8 clang-tidy-3.7 clang-tidy-3.6 clang-tidy-3.5)
 
 if(CLANG_TIDY)
     message(STATUS "Looking for clang-tidy - found")
@@ -400,24 +400,26 @@ if(CLANG_TIDY)
     # For a list of check options, see:
     # http://clang.llvm.org/extra/clang-tidy/checks/list.html
 
-    list(APPEND CT_CHECKS "google-*")
-#                          "-google-build-explicit-make-pair"
-#                          "-google-explicit-constructor"
-#                          "-google-readability-braces-around-statements"
-#                          "-google-readability-casting"
-#                          "-google-readability-namespace-comments"
-#                          "-google-readability-function"
-#                          "-google-readability-todo"
-#                          "-google-runtime-int")
+    list(APPEND CT_CHECKS "cert-*")
+
+    # disabled, because it is slow
+#    list(APPEND CT_CHECKS "clang-analyzer-*")
+
+    list(APPEND CT_CHECKS "google-*"
+                         "-google-explicit-constructor"
+                         "-google-readability-casting"
+                         "-google-readability-function")
 
     list(APPEND CT_CHECKS "llvm-*"
-                          "-llvm-include-order")
+                         "-llvm-include-order")
 
     list(APPEND CT_CHECKS "misc-*"
-                          "-misc-argument-comment")
+                         "-misc-argument-comment")
+
+    list(APPEND CT_CHECKS "modernize-*")
 
     list(APPEND CT_CHECKS "readability-*"
-                          "-readability-identifier-naming")
+                         "-readability-identifier-naming")
 
     string(REPLACE ";" "," ALL_CHECKS "${CT_CHECKS}")
 
