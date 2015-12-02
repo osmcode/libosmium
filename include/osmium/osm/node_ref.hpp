@@ -54,7 +54,7 @@ namespace osmium {
 
     public:
 
-        NodeRef(const osmium::object_id_type ref = 0, const osmium::Location& location = Location()) noexcept :
+        constexpr NodeRef(const osmium::object_id_type ref = 0, const osmium::Location& location = Location()) noexcept :
             m_ref(ref),
             m_location(location) {
         }
@@ -62,7 +62,7 @@ namespace osmium {
         /**
          * Get reference ID of this NodeRef.
          */
-        osmium::object_id_type ref() const noexcept {
+        constexpr osmium::object_id_type ref() const noexcept {
             return m_ref;
         }
 
@@ -83,7 +83,7 @@ namespace osmium {
         /**
          * Get location of this NodeRef.
          */
-        osmium::Location location() const noexcept {
+        constexpr osmium::Location location() const noexcept {
             return m_location;
         }
 
@@ -92,7 +92,7 @@ namespace osmium {
          *
          * @throws osmium::invalid_location if the location is not set.
          */
-        double lon() const {
+        constexpr double lon() const {
             return m_location.lon();
         }
 
@@ -101,21 +101,21 @@ namespace osmium {
          *
          * @throws osmium::invalid_location if the location is not set.
          */
-        double lat() const {
+        constexpr double lat() const {
             return m_location.lat();
         }
 
         /**
          * Get internal x value of the location in this NodeRef.
          */
-        int32_t x() const noexcept {
+        constexpr int32_t x() const noexcept {
             return m_location.x();
         }
 
         /**
          * Get internal y value of the location in this NodeRef.
          */
-        int32_t y() const noexcept {
+        constexpr int32_t y() const noexcept {
             return m_location.y();
         }
 
@@ -144,7 +144,7 @@ namespace osmium {
     /**
      * Compare two NodeRefs. They are equal if they reference the same Node ID.
      */
-    inline bool operator==(const NodeRef& lhs, const NodeRef& rhs) noexcept {
+    inline constexpr bool operator==(const NodeRef& lhs, const NodeRef& rhs) noexcept {
         return lhs.ref() == rhs.ref();
     }
 
@@ -152,7 +152,7 @@ namespace osmium {
      * Compare two NodeRefs. They are not equal if they reference different
      * Node IDs.
      */
-    inline bool operator!=(const NodeRef& lhs, const NodeRef& rhs) noexcept {
+    inline constexpr bool operator!=(const NodeRef& lhs, const NodeRef& rhs) noexcept {
         return ! (lhs == rhs);
     }
 
@@ -160,7 +160,7 @@ namespace osmium {
      * Compare two NodeRefs. NodeRefs are ordered according to the Node ID
      * they reference.
      */
-    inline bool operator<(const NodeRef& lhs, const NodeRef& rhs) noexcept {
+    inline constexpr bool operator<(const NodeRef& lhs, const NodeRef& rhs) noexcept {
         return lhs.ref() < rhs.ref();
     }
 
@@ -168,7 +168,7 @@ namespace osmium {
      * Compare two NodeRefs. NodeRefs are ordered according to the Node ID
      * they reference.
      */
-    inline bool operator>(const NodeRef& lhs, const NodeRef& rhs) noexcept {
+    inline constexpr bool operator>(const NodeRef& lhs, const NodeRef& rhs) noexcept {
         return rhs < lhs;
     }
 
@@ -176,7 +176,7 @@ namespace osmium {
      * Compare two NodeRefs. NodeRefs are ordered according to the Node ID
      * they reference.
      */
-    inline bool operator<=(const NodeRef& lhs, const NodeRef& rhs) noexcept {
+    inline constexpr bool operator<=(const NodeRef& lhs, const NodeRef& rhs) noexcept {
         return ! (rhs < lhs);
     }
 
@@ -184,7 +184,7 @@ namespace osmium {
      * Compare two NodeRefs. NodeRefs are ordered according to the Node ID
      * they reference.
      */
-    inline bool operator>=(const NodeRef& lhs, const NodeRef& rhs) noexcept {
+    inline constexpr bool operator>=(const NodeRef& lhs, const NodeRef& rhs) noexcept {
         return ! (lhs < rhs);
     }
 
@@ -201,7 +201,7 @@ namespace osmium {
      */
     struct location_equal {
 
-        bool operator()(const NodeRef& lhs, const NodeRef& rhs) const noexcept {
+        constexpr bool operator()(const NodeRef& lhs, const NodeRef& rhs) const noexcept {
             return lhs.location() == rhs.location();
         }
 
@@ -216,7 +216,7 @@ namespace osmium {
      */
     struct location_less {
 
-        bool operator()(const NodeRef& lhs, const NodeRef& rhs) const noexcept {
+        constexpr bool operator()(const NodeRef& lhs, const NodeRef& rhs) const noexcept {
             return lhs.location() < rhs.location();
         }
 
