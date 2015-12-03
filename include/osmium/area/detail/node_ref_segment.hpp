@@ -255,8 +255,8 @@ namespace osmium {
                         (d < 0 && na <= 0 && na >= d && nb <= 0 && nb >= d)) {
 
                         double ua = double(na) / d;
-                        int32_t ix = s1ax + ua*(s1bx - s1ax);
-                        int32_t iy = s1ay + ua*(s1by - s1ay);
+                        int32_t ix = int32_t(s1ax + ua*(s1bx - s1ax));
+                        int32_t iy = int32_t(s1ay + ua*(s1by - s1ay));
 
                         return osmium::Location(ix, iy);
                     }
