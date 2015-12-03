@@ -34,13 +34,10 @@ DEALINGS IN THE SOFTWARE.
 */
 
 // Workarounds for MSVC which doesn't support
-// * constexpr in all cases yet
 // * [[noreturn]]
 #ifdef _MSC_VER
-# define OSMIUM_CONSTEXPR
 # define OSMIUM_NORETURN __declspec(noreturn)
 #else
-# define OSMIUM_CONSTEXPR constexpr
 # define OSMIUM_NORETURN [[noreturn]]
 #endif
 
