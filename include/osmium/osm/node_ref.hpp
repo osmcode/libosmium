@@ -92,7 +92,7 @@ namespace osmium {
          *
          * @throws osmium::invalid_location if the location is not set.
          */
-        constexpr double lon() const {
+        double lon() const {
             return m_location.lon();
         }
 
@@ -101,7 +101,7 @@ namespace osmium {
          *
          * @throws osmium::invalid_location if the location is not set.
          */
-        constexpr double lat() const {
+        double lat() const {
             return m_location.lat();
         }
 
