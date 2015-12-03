@@ -10,7 +10,20 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
-- Included gdalcpp.hpp header was updated to 1.1.1.
+### Fixed
+
+
+## [2.5.4] - 2015-12-03
+
+### Changed
+
+- Included gdalcpp.hpp header was updated to version 1.1.1.
+- Included protozero library was updated to version 1.2.3.
+- Workarounds for missing constexpr support in Visual Studio removed. All
+  constexpr features we need are supported now.
+- Some code cleanup after running clang-tidy on the code.
+- Re-added `Buffer::value_type` typedef. Turns out it is needed when using
+  `std::back_inserter` on the Buffer.
 
 ### Fixed
 
@@ -24,13 +37,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
-- osmium::make_diff_iterator() helper function.
+- `osmium::make_diff_iterator()` helper function.
 
 ### Changed
 
-- Deprecated osmium::Buffer::set_full_callback().
+- Deprecated `osmium::Buffer::set_full_callback()`.
 - Removed DataFile class which was never used anywhere.
-- Removed unused and obscure Buffer::value_type typedef.
+- Removed unused and obscure `Buffer::value_type` typedef.
 
 ### Fixed
 
@@ -221,7 +234,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   Doxygen (up to version 1.8.8). This version contains a workaround to fix
   this.
 
-[unreleased]: https://github.com/osmcode/libosmium/compare/v2.5.3...HEAD
+[unreleased]: https://github.com/osmcode/libosmium/compare/v2.5.4...HEAD
+[2.5.4]: https://github.com/osmcode/libosmium/compare/v2.5.3...v2.5.4
 [2.5.3]: https://github.com/osmcode/libosmium/compare/v2.5.2...v2.5.3
 [2.5.2]: https://github.com/osmcode/libosmium/compare/v2.5.1...v2.5.2
 [2.5.1]: https://github.com/osmcode/libosmium/compare/v2.5.0...v2.5.1
