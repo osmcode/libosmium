@@ -86,30 +86,31 @@ TEST_CASE("Writer") {
 
     }
 
-    SECTION("Interrupted write") {
-
+    SECTION("Interrupted writer after open") {
         int error = 0;
         try {
-
-            SECTION("fail after open") {
-                filename = "test-writer-out-fail1.osm";
-                osmium::io::Writer writer(filename, header, osmium::io::overwrite::allow);
-                throw 1;
-            }
-
-            SECTION("fail after write") {
-                filename = "test-writer-out-fail2.osm";
-                osmium::io::Writer writer(filename, header, osmium::io::overwrite::allow);
-                writer(std::move(buffer));
-                throw 2;
-            }
-
+            filename = "test-writer-out-fail1.osm";
+            osmium::io::Writer writer(filename, header, osmium::io::overwrite::allow);
+            throw 1;
         } catch (int e) {
             error = e;
         }
 
         REQUIRE(error > 0);
+    }
 
+    SECTION("Interrupted writer after write") {
+        int error = 0;
+        try {
+            filename = "test-writer-out-fail2.osm";
+            osmium::io::Writer writer(filename, header, osmium::io::overwrite::allow);
+            writer(std::move(buffer));
+            throw 2;
+        } catch (int e) {
+            error = e;
+        }
+
+        REQUIRE(error > 0);
     }
 
 }
