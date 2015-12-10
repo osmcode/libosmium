@@ -12,6 +12,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+- osmium::Box::extend() function now ignores invalid locations.
+
 
 ## [2.5.4] - 2015-12-03
 
