@@ -1,6 +1,6 @@
 /*
- *  Catch v1.3.0
- *  Generated: 2015-12-04 10:18:17.055188
+ *  Catch v1.3.2
+ *  Generated: 2015-12-28 15:07:07.166291
  *  ----------------------------------------------------------
  *  This file has been merged from multiple headers. Please don't edit it directly
  *  Copyright (c) 2012 Two Blue Cubes Ltd. All rights reserved.
@@ -2115,7 +2115,7 @@ namespace Catch {
 ///////////////////////////////////////////////////////////////////////////////
 #define INTERNAL_CHECK_THAT( arg, matcher, resultDisposition, macroName ) \
     do { \
-        Catch::ResultBuilder __catchResult( macroName, CATCH_INTERNAL_LINEINFO, #arg " " #matcher, resultDisposition ); \
+        Catch::ResultBuilder __catchResult( macroName, CATCH_INTERNAL_LINEINFO, #arg ", " #matcher, resultDisposition ); \
         try { \
             std::string matcherAsString = (matcher).toString(); \
             __catchResult \
@@ -6248,7 +6248,10 @@ namespace Catch {
 
     class TestRegistry : public ITestCaseRegistry {
     public:
-        TestRegistry() : m_unnamedCount( 0 ) {}
+        TestRegistry()
+        :   m_currentSortOrder( RunTests::InDeclarationOrder ),
+            m_unnamedCount( 0 )
+        {}
         virtual ~TestRegistry();
 
         virtual void registerTest( TestCase const& testCase ) {
@@ -7267,7 +7270,7 @@ namespace Catch {
         return os;
     }
 
-    Version libraryVersion( 1, 3, 0, "", 0 );
+    Version libraryVersion( 1, 3, 2, "", 0 );
 
 }
 
@@ -10020,7 +10023,7 @@ namespace Catch {
 #ifndef __OBJC__
 
 // Standard C/C++ main entry point
-int main (int argc, char * const argv[]) {
+int main (int argc, char * argv[]) {
     return Catch::Session().run( argc, argv );
 }
 
@@ -10164,7 +10167,7 @@ int main (int argc, char * const argv[]) {
     #define TEST_CASE( name, description ) INTERNAL_CATCH_TESTCASE( name, description )
     #define TEST_CASE_METHOD( className, name, description ) INTERNAL_CATCH_TEST_CASE_METHOD( className, name, description )
     #define METHOD_AS_TEST_CASE( method, name, description ) INTERNAL_CATCH_METHOD_AS_TEST_CASE( method, name, description )
-    #define REGISTER_TEST_CASE( ... ) INTERNAL_CATCH_REGISTER_TESTCASE( __VA_ARGS__ )
+    #define REGISTER_TEST_CASE( method, name, description ) INTERNAL_CATCH_REGISTER_TESTCASE( method, name, description )
     #define SECTION( name, description ) INTERNAL_CATCH_SECTION( name, description )
     #define FAIL( msg ) INTERNAL_CATCH_MSG( Catch::ResultWas::ExplicitFailure, Catch::ResultDisposition::Normal, "FAIL", msg )
     #define SUCCEED( msg ) INTERNAL_CATCH_MSG( Catch::ResultWas::Ok, Catch::ResultDisposition::ContinueOnFailure, "SUCCEED", msg )
