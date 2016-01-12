@@ -209,11 +209,17 @@ namespace osmium {
             }
 
             template <typename TChar, typename TTraits>
-            friend std::basic_ostream<TChar, TTraits>& operator<<(std::basic_ostream<TChar, TTraits>& out, const ItemIterator<TMember>& iter) {
-                return out << static_cast<void*>(iter.m_data);
+            void print(std::basic_ostream<TChar, TTraits>& out) const {
+                out << static_cast<void*>(m_data);
             }
 
         }; // class ItemIterator
+
+        template <typename TChar, typename TTraits, typename TMember>
+        std::basic_ostream<TChar, TTraits>& operator<<(std::basic_ostream<TChar, TTraits>& out, const ItemIterator<TMember>& iter) {
+            iter.print(out);
+            return out;
+        }
 
     } // namespace memory
 
