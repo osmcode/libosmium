@@ -115,22 +115,27 @@ namespace osmium {
             }
 
             template<typename T>
-            friend VerboseOutput& operator<<(VerboseOutput& verbose_output, const T& value) {
-                if (verbose_output.m_verbose) {
-                    verbose_output.start_line();
+            void print(const T& value) {
+                if (m_verbose) {
+                    start_line();
                     std::cerr << value;
 
                     // check if there was a newline a the end and remember that
                     std::ostringstream output_buffer;
                     output_buffer << value;
                     if (!output_buffer.str().empty() && output_buffer.str().back() == '\n') {
-                        verbose_output.m_newline = true;
+                        m_newline = true;
                     }
                 }
-                return verbose_output;
             }
 
         }; // class VerboseOutput
+
+        template<typename T>
+        VerboseOutput& operator<<(VerboseOutput& verbose_output, const T& value) {
+            verbose_output.print(value);
+            return verbose_output;
+        }
 
     } // namespace util
 
