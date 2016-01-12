@@ -654,16 +654,16 @@ namespace osmium {
                 return m_data != nullptr;
             }
 
-            friend void swap(Buffer& lhs, Buffer& rhs) {
+            void swap(Buffer& other) {
                 using std::swap;
 
-                swap(lhs.m_memory, rhs.m_memory);
-                swap(lhs.m_data, rhs.m_data);
-                swap(lhs.m_capacity, rhs.m_capacity);
-                swap(lhs.m_written, rhs.m_written);
-                swap(lhs.m_committed, rhs.m_committed);
-                swap(lhs.m_auto_grow, rhs.m_auto_grow);
-                swap(lhs.m_full, rhs.m_full);
+                swap(m_memory, other.m_memory);
+                swap(m_data, other.m_data);
+                swap(m_capacity, other.m_capacity);
+                swap(m_written, other.m_written);
+                swap(m_committed, other.m_committed);
+                swap(m_auto_grow, other.m_auto_grow);
+                swap(m_full, other.m_full);
             }
 
             /**
@@ -713,6 +713,10 @@ namespace osmium {
             }
 
         }; // class Buffer
+
+        inline void swap(Buffer& lhs, Buffer& rhs) {
+            lhs.swap(rhs);
+        }
 
         /**
          * Compare two buffers for equality.
