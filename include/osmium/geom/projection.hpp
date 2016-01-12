@@ -68,10 +68,6 @@ namespace osmium {
 
             std::unique_ptr<void, ProjCRSDeleter> m_crs;
 
-            projPJ get() const {
-                return m_crs.get();
-            }
-
         public:
 
             CRS(const std::string& crs) :
@@ -85,6 +81,13 @@ namespace osmium {
                 CRS(std::string("+init=epsg:") + std::to_string(epsg)) {
             }
 
+            /**
+             * Get underlying projPJ handle from proj library.
+             */
+            projPJ get() const {
+                return m_crs.get();
+            }
+
             bool is_latlong() const {
                 return pj_is_latlong(m_crs.get()) != 0;
             }
@@ -93,23 +96,23 @@ namespace osmium {
                 return pj_is_geocent(m_crs.get()) != 0;
             }
 
-            /**
-             * Transform coordinates from one CRS into another. Wraps the same function
-             * of the proj library.
-             *
-             * Coordinates have to be in radians and are produced in radians.
-             *
-             * @throws osmmium::projection_error if the projection fails
-             */
-            friend Coordinates transform(const CRS& src, const CRS& dest, Coordinates c) {
-                int result = pj_transform(src.get(), dest.get(), 1, 1, &c.x, &c.y, nullptr);
-                if (result != 0) {
-                    throw osmium::projection_error(std::string("projection failed: ") + pj_strerrno(result));
-                }
-                return c;
-            }
-
         }; // class CRS
+
+        /**
+         * Transform coordinates from one CRS into another. Wraps the same
+         * function of the proj library.
+         *
+         * Coordinates have to be in radians and are produced in radians.
+         *
+         * @throws osmmium::projection_error if the projection fails
+         */
+        Coordinates transform(const CRS& src, const CRS& dest, Coordinates c) {
+            int result = pj_transform(src.get(), dest.get(), 1, 1, &c.x, &c.y, nullptr);
+            if (result != 0) {
+                throw osmium::projection_error(std::string("projection failed: ") + pj_strerrno(result));
+            }
+            return c;
+        }
 
         /**
          * Functor that does projection from WGS84 (EPSG:4326) to the given
