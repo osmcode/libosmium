@@ -216,7 +216,7 @@ namespace osmium {
         }; // class ItemIterator
 
         template <typename TChar, typename TTraits, typename TMember>
-        std::basic_ostream<TChar, TTraits>& operator<<(std::basic_ostream<TChar, TTraits>& out, const ItemIterator<TMember>& iter) {
+        inline std::basic_ostream<TChar, TTraits>& operator<<(std::basic_ostream<TChar, TTraits>& out, const ItemIterator<TMember>& iter) {
             iter.print(out);
             return out;
         }

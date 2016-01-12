@@ -132,7 +132,7 @@ namespace osmium {
         }; // class VerboseOutput
 
         template<typename T>
-        VerboseOutput& operator<<(VerboseOutput& verbose_output, const T& value) {
+        inline VerboseOutput& operator<<(VerboseOutput& verbose_output, const T& value) {
             verbose_output.print(value);
             return verbose_output;
         }

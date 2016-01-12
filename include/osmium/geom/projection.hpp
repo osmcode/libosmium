@@ -106,7 +106,7 @@ namespace osmium {
          *
          * @throws osmmium::projection_error if the projection fails
          */
-        Coordinates transform(const CRS& src, const CRS& dest, Coordinates c) {
+        inline Coordinates transform(const CRS& src, const CRS& dest, Coordinates c) {
             int result = pj_transform(src.get(), dest.get(), 1, 1, &c.x, &c.y, nullptr);
             if (result != 0) {
                 throw osmium::projection_error(std::string("projection failed: ") + pj_strerrno(result));

@@ -102,7 +102,7 @@ namespace osmium {
         }; // class CollectionIterator
 
         template <typename TChar, typename TTraits, typename TMember>
-        std::basic_ostream<TChar, TTraits>& operator<<(std::basic_ostream<TChar, TTraits>& out, const CollectionIterator<TMember>& iter) {
+        inline std::basic_ostream<TChar, TTraits>& operator<<(std::basic_ostream<TChar, TTraits>& out, const CollectionIterator<TMember>& iter) {
             iter.print(out);
             return out;
         }
