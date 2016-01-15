@@ -753,7 +753,7 @@ namespace osmium {
                     for (size_t offset : members) {
                         if (!std::strcmp(memit->role(), "inner")) {
                             const osmium::Way& way = in_buffer.get<const osmium::Way>(offset);
-                            if (way.is_closed() && way.tags().size() > 0) {
+                            if (!way.nodes().empty() && way.is_closed() && way.tags().size() > 0) {
                                 auto d = std::count_if(way.tags().begin(), way.tags().end(), filter());
                                 if (d > 0) {
                                     osmium::tags::KeyFilter::iterator way_fi_begin(filter(), way.tags().begin(), way.tags().end());
