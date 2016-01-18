@@ -216,12 +216,12 @@ namespace osmium {
             }
 
             template <typename TContainer>
-            inline constexpr detail::tags_from_iterator_pair<typename TContainer::const_iterator> _tags(const TContainer& container) {
+            inline detail::tags_from_iterator_pair<typename TContainer::const_iterator> _tags(const TContainer& container) {
                 return detail::tags_from_iterator_pair<typename TContainer::const_iterator>(std::begin(container), std::end(container));
             }
 
             using tag_ilist = std::initializer_list<std::pair<const char*, const char*>>;
-            inline constexpr detail::tags_from_iterator_pair<tag_ilist::const_iterator> _tags(const tag_ilist& container) {
+            inline detail::tags_from_iterator_pair<tag_ilist::const_iterator> _tags(const tag_ilist& container) {
                 return detail::tags_from_iterator_pair<tag_ilist::const_iterator>(std::begin(container), std::end(container));
             }
 
@@ -240,17 +240,17 @@ namespace osmium {
             }
 
             template <typename TContainer>
-            inline constexpr detail::nodes_from_iterator_pair<typename TContainer::const_iterator> _nodes(const TContainer& container) {
+            inline detail::nodes_from_iterator_pair<typename TContainer::const_iterator> _nodes(const TContainer& container) {
                 return detail::nodes_from_iterator_pair<typename TContainer::const_iterator>(std::begin(container), std::end(container));
             }
 
             using object_id_ilist = std::initializer_list<osmium::object_id_type>;
-            inline constexpr detail::nodes_from_iterator_pair<object_id_ilist::const_iterator> _nodes(const object_id_ilist& container) {
+            inline detail::nodes_from_iterator_pair<object_id_ilist::const_iterator> _nodes(const object_id_ilist& container) {
                 return detail::nodes_from_iterator_pair<object_id_ilist::const_iterator>(std::begin(container), std::end(container));
             }
 
             using node_ref_ilist = std::initializer_list<osmium::NodeRef>;
-            inline constexpr detail::nodes_from_iterator_pair<node_ref_ilist::const_iterator> _nodes(const node_ref_ilist& container) {
+            inline detail::nodes_from_iterator_pair<node_ref_ilist::const_iterator> _nodes(const node_ref_ilist& container) {
                 return detail::nodes_from_iterator_pair<node_ref_ilist::const_iterator>(std::begin(container), std::end(container));
             }
 
@@ -274,12 +274,12 @@ namespace osmium {
             }
 
             template <typename TContainer>
-            inline constexpr detail::members_from_iterator_pair<typename TContainer::const_iterator> _members(const TContainer& container) {
+            inline detail::members_from_iterator_pair<typename TContainer::const_iterator> _members(const TContainer& container) {
                 return detail::members_from_iterator_pair<typename TContainer::const_iterator>(std::begin(container), std::end(container));
             }
 
             using member_ilist = std::initializer_list<member_type>;
-            inline constexpr detail::members_from_iterator_pair<member_ilist::const_iterator> _members(const member_ilist& container) {
+            inline detail::members_from_iterator_pair<member_ilist::const_iterator> _members(const member_ilist& container) {
                 return detail::members_from_iterator_pair<member_ilist::const_iterator>(std::begin(container), std::end(container));
             }
 
