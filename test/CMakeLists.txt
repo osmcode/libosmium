@@ -110,6 +110,8 @@ add_unit_test(buffer test_buffer_basics)
 add_unit_test(buffer test_buffer_node)
 add_unit_test(buffer test_buffer_purge)
 
+add_unit_test(builder test_attr)
+
 if(GEOS_FOUND AND PROJ_FOUND)
     set(GEOS_AND_PROJ_FOUND TRUE)
 else()
