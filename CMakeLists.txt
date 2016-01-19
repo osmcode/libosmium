@@ -459,7 +459,7 @@ endif()
 install(DIRECTORY include/osmium DESTINATION include)
 
 if(INSTALL_GDALCPP)
-    install(include/gdalcpp.hpp DESTINATION include)
+    install(FILES include/gdalcpp.hpp DESTINATION include)
 endif()
 
 if(INSTALL_PROTOZERO)
@@ -467,7 +467,7 @@ if(INSTALL_PROTOZERO)
 endif()
 
 if(INSTALL_UTFCPP)
-    install(include/utf8.hpp DESTINATION include)
+    install(FILES include/utf8.hpp DESTINATION include)
     install(DIRECTORY include/utf8 DESTINATION include)
 endif()
 
