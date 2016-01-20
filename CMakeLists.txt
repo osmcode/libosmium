@@ -467,7 +467,7 @@ if(INSTALL_PROTOZERO)
 endif()
 
 if(INSTALL_UTFCPP)
-    install(FILES include/utf8.hpp DESTINATION include)
+    install(FILES include/utf8.h DESTINATION include)
     install(DIRECTORY include/utf8 DESTINATION include)
 endif()
 
