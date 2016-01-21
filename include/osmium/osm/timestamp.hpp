@@ -188,10 +188,15 @@ namespace osmium {
             if (m_timestamp != 0) {
                 struct tm tm;
                 time_t sse = seconds_since_epoch();
+#ifndef NDEBUG
+                auto result =
+#endif
 #ifndef _MSC_VER
-                assert(gmtime_r(&sse, &tm) != nullptr);
+                              gmtime_r(&sse, &tm);
+                assert(result != nullptr);
 #else
-                assert(gmtime_s(&tm, &sse) == 0);
+                              gmtime_s(&tm, &sse);
+                assert(result == 0);
 #endif
 
                 s.resize(timestamp_length);
