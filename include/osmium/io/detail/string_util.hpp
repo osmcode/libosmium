@@ -110,7 +110,10 @@ namespace osmium {
                 assert(len > 0);
 
                 if (size_t(len) >= max_size) {
-                    int len2 = string_snprintf(out,
+#ifndef NDEBUG
+                    int len2 =
+#endif
+                               string_snprintf(out,
                                                old_size,
                                                size_t(len) + 1,
                                                format,
