@@ -2,24 +2,29 @@
 
 #include <boost/crc.hpp>
 
+#include <osmium/builder/attr.hpp>
 #include <osmium/osm/changeset.hpp>
 #include <osmium/osm/crc.hpp>
 
 #include "helper.hpp"
 
+using namespace osmium::builder::attr;
+
 TEST_CASE("Build changeset") {
     osmium::memory::Buffer buffer(10 * 1000);
 
-    osmium::Changeset& cs1 = buffer_add_changeset(buffer,
-        "user",
-        {{"comment", "foo"}});
+    osmium::builder::add_changeset(buffer,
+        _id(42),
+       _created_at(time_t(100)),
+       _closed_at(time_t(200)),
+        _num_changes(7),
+        _num_comments(3),
+        _uid(9),
+        _user("user"),
+        _tag("comment", "foo")
+    );
 
-    cs1.set_id(42)
-       .set_created_at(100)
-       .set_closed_at(200)
-       .set_num_changes(7)
-       .set_num_comments(3)
-       .set_uid(9);
+    const osmium::Changeset& cs1 = buffer.get<osmium::Changeset>(0);
 
     REQUIRE(42 == cs1.id());
     REQUIRE(9 == cs1.uid());
@@ -35,15 +40,18 @@ TEST_CASE("Build changeset") {
     crc32.update(cs1);
     REQUIRE(crc32().checksum() == 0x502e8c0e);
 
-    osmium::Changeset& cs2 = buffer_add_changeset(buffer,
-        "user",
-        {{"comment", "foo"}, {"foo", "bar"}});
+    auto pos = osmium::builder::add_changeset(buffer,
+        _id(43),
+       _created_at(time_t(120)),
+        _num_changes(21),
+        _num_comments(0),
+        _uid(9),
+        _user("user"),
+        _tag("comment", "foo"),
+        _tag("foo", "bar")
+    );
 
-    cs2.set_id(43)
-       .set_created_at(120)
-       .set_num_changes(21)
-       .set_num_comments(osmium::num_comments_type(0))
-       .set_uid(9);
+    const osmium::Changeset& cs2 = buffer.get<osmium::Changeset>(pos);
 
     REQUIRE(43 == cs2.id());
     REQUIRE(9 == cs2.uid());
@@ -61,7 +69,6 @@ TEST_CASE("Build changeset") {
     REQUIRE(cs1 <= cs2);
     REQUIRE(false == (cs1 > cs2));
     REQUIRE(false == (cs1 >= cs2));
-
 }
 
 TEST_CASE("Create changeset without helper") {

@@ -117,11 +117,13 @@ namespace osmium {
             }; // struct iterator_wrapper
 
 
+            struct entity_handler {};
             struct object_handler;
             struct node_handler;
             struct tags_handler;
             struct nodes_handler;
             struct members_handler;
+            struct changeset_handler;
 
         } // namespace detail
 
@@ -145,9 +147,9 @@ namespace osmium {
 
         namespace attr {
 
-            OSMIUM_ATTRIBUTE_WITH_CONSTRUCTOR(object_handler, _id, osmium::object_id_type);
+            OSMIUM_ATTRIBUTE_WITH_CONSTRUCTOR(entity_handler, _id, osmium::object_id_type);
             OSMIUM_ATTRIBUTE_WITH_CONSTRUCTOR(object_handler, _version, osmium::object_version_type);
-            OSMIUM_ATTRIBUTE_WITH_CONSTRUCTOR(object_handler, _uid, osmium::user_id_type);
+            OSMIUM_ATTRIBUTE_WITH_CONSTRUCTOR(entity_handler, _uid, osmium::user_id_type);
             OSMIUM_ATTRIBUTE_WITH_CONSTRUCTOR(object_handler, _changeset, osmium::changeset_id_type);
 
             OSMIUM_ATTRIBUTE(object_handler, _deleted, bool)
@@ -180,7 +182,7 @@ namespace osmium {
                     type_wrapper(osmium::Location{lat, lon}) {}
             };
 
-            OSMIUM_ATTRIBUTE(object_handler, _user, const char*)
+            OSMIUM_ATTRIBUTE(entity_handler, _user, const char*)
                 explicit _user(const char* val) :
                     type_wrapper(val) {}
                 explicit _user(const std::string& val) :
@@ -312,6 +314,12 @@ namespace osmium {
                 return detail::members_from_iterator_pair<member_ilist::const_iterator>(std::begin(container), std::end(container));
             }
 
+
+            OSMIUM_ATTRIBUTE_WITH_CONSTRUCTOR(changeset_handler, _num_changes, osmium::num_changes_type);
+            OSMIUM_ATTRIBUTE_WITH_CONSTRUCTOR(changeset_handler, _num_comments, osmium::num_comments_type);
+            OSMIUM_ATTRIBUTE_WITH_CONSTRUCTOR(changeset_handler, _created_at, osmium::Timestamp);
+            OSMIUM_ATTRIBUTE_WITH_CONSTRUCTOR(changeset_handler, _closed_at, osmium::Timestamp);
+
         } // namespace attr
 
 #undef OSMIUM_ATTRIBUTE_ITER
@@ -320,7 +328,39 @@ namespace osmium {
 
         namespace detail {
 
-            struct object_handler {
+            struct changeset_handler : public entity_handler {
+
+                template <typename TDummy>
+                void operator()(osmium::Changeset&, const TDummy&) const noexcept {
+                }
+
+                void operator()(osmium::Changeset& changeset, attr::_id id) const noexcept {
+                    changeset.set_id(id.value);
+                }
+
+                void operator()(osmium::Changeset& changeset, attr::_num_changes num_changes) const noexcept {
+                    changeset.set_num_changes(num_changes.value);
+                }
+
+                void operator()(osmium::Changeset& changeset, attr::_num_comments num_comments) const noexcept {
+                    changeset.set_num_comments(num_comments.value);
+                }
+
+                void operator()(osmium::Changeset& changeset, attr::_created_at created_at) const noexcept {
+                    changeset.set_created_at(created_at.value);
+                }
+
+                void operator()(osmium::Changeset& changeset, attr::_closed_at closed_at) const noexcept {
+                    changeset.set_closed_at(closed_at.value);
+                }
+
+                void operator()(osmium::Changeset& changeset, attr::_uid uid) const noexcept {
+                    changeset.set_uid(uid.value);
+                }
+
+            };
+
+            struct object_handler : public entity_handler {
 
                 template <typename TDummy>
                 void operator()(osmium::OSMObject&, const TDummy&) const noexcept {
@@ -475,6 +515,7 @@ namespace osmium {
             struct any_node_handlers : public node_handler, public tags_handler {};
             struct any_way_handlers : public object_handler, public tags_handler, public nodes_handler {};
             struct any_relation_handlers : public object_handler, public tags_handler, public members_handler {};
+            struct any_changeset_handlers : public changeset_handler, public tags_handler {};
 
         } // namespace detail
 
@@ -518,6 +559,20 @@ namespace osmium {
             detail::add_user(builder, args...);
             detail::add_list<TagListBuilder, detail::tags_handler>(builder, args...);
             detail::add_list<RelationMemberListBuilder, detail::members_handler>(builder, args...);
+
+            return buffer.commit();
+        }
+
+        template <typename... TArgs>
+        inline size_t add_changeset(osmium::memory::Buffer& buffer, const TArgs&... args) {
+            static_assert(sizeof...(args) > 0, "add_changeset() must have buffer and at least one additional argument");
+            static_assert(detail::is_handled_by<detail::any_changeset_handlers, TArgs...>::all, "Type not allowed in add_changeset()");
+
+            ChangesetBuilder builder(buffer);
+
+            detail::add_basic<detail::changeset_handler>(builder, args...);
+            detail::add_user(builder, args...);
+            detail::add_list<TagListBuilder, detail::tags_handler>(builder, args...);
 
             return buffer.commit();
         }
