@@ -210,7 +210,7 @@ namespace osmium {
 
             template <typename TChar, typename TTraits>
             void print(std::basic_ostream<TChar, TTraits>& out) const {
-                out << static_cast<void*>(m_data);
+                out << static_cast<const void*>(m_data);
             }
 
         }; // class ItemIterator
