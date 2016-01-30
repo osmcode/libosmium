@@ -56,6 +56,7 @@ TEST_CASE("create node using builders") {
         REQUIRE(std::string(node.user()) == "foo");
         REQUIRE(node.location() == loc);
         REQUIRE(node.tags().size() == 0);
+        REQUIRE(std::distance(node.cbegin(), node.cend()) == 0);
     }
 
     SECTION("order of attributes doesn't matter") {
@@ -98,6 +99,7 @@ TEST_CASE("create node using builders") {
 
         REQUIRE(node.id() == 2);
         REQUIRE(node.tags().size() == 4);
+        REQUIRE(std::distance(node.cbegin(), node.cend()) == 1);
 
         auto it = node.tags().cbegin();
         REQUIRE(std::string(it->key()) == "amenity");
@@ -131,6 +133,7 @@ TEST_CASE("create node using builders") {
         REQUIRE(std::string(it->value()) == "post_box");
         ++it;
         REQUIRE(it == node.tags().cend());
+        REQUIRE(std::distance(node.cbegin(), node.cend()) == 1);
     }
 
     SECTION("add tags using _tags from TagList") {
@@ -158,6 +161,7 @@ TEST_CASE("create node using builders") {
         REQUIRE(std::string(it++->key()) == "b");
         REQUIRE(std::string(it++->key()) == "c");
         REQUIRE(it == node2.tags().cend());
+        REQUIRE(std::distance(node2.cbegin(), node2.cend()) == 1);
     }
 
     SECTION("add tags using mixed tag sources") {
@@ -193,6 +197,7 @@ TEST_CASE("create node using builders") {
         REQUIRE(std::string(it->key()) == "t6");
         ++it;
         REQUIRE(it == node.tags().cend());
+        REQUIRE(std::distance(node.cbegin(), node.cend()) == 1);
     }
 
 }
@@ -221,6 +226,7 @@ TEST_CASE("create way using builders") {
         REQUIRE(std::string(way.user()) == "foo");
         REQUIRE(way.tags().size() == 0);
         REQUIRE(way.nodes().size() == 0);
+        REQUIRE(std::distance(way.cbegin(), way.cend()) == 0);
     }
 
 }
@@ -321,6 +327,7 @@ TEST_CASE("create way with nodes") {
 
     REQUIRE(way.id() == 1);
     REQUIRE(way.nodes().size() == 4);
+    REQUIRE(std::distance(way.cbegin(), way.cend()) == 1);
 
     auto it = way.nodes().cbegin();
 
@@ -373,6 +380,7 @@ TEST_CASE("create relation using builders") {
 
         REQUIRE(relation.id() == 123);
         REQUIRE(relation.members().size() == 5);
+        REQUIRE(std::distance(relation.cbegin(), relation.cend()) == 1);
 
         auto it = relation.members().begin();
 
@@ -452,6 +460,7 @@ TEST_CASE("create relation using builders") {
 
         REQUIRE(relation.id() == 123);
         REQUIRE(relation.members().size() == 2);
+        REQUIRE(std::distance(relation.cbegin(), relation.cend()) == 1);
 
         auto it = relation.members().begin();
         REQUIRE(it->type() == osmium::item_type::node);
@@ -465,7 +474,7 @@ TEST_CASE("create relation using builders") {
         REQUIRE(it == relation.members().end());
     }
 
-    SECTION("create relation with members from iterators") {
+    SECTION("create relation with members from iterators and some tags") {
         const std::vector<member_type> members = {
             {osmium::item_type::node, 123},
             {osmium::item_type::way, 111, "outer"}
@@ -474,13 +483,17 @@ TEST_CASE("create relation using builders") {
         SECTION("using iterators") {
             osmium::builder::add_relation(buffer,
                 _id(123),
-                _members(members.begin(), members.end())
+                _members(members.begin(), members.end()),
+                _tag("a", "x"),
+                _tag("b", "y")
             );
         }
         SECTION("using container") {
             osmium::builder::add_relation(buffer,
                 _id(123),
-                _members(members)
+                _members(members),
+                _tag("a", "x"),
+                _tag("b", "y")
             );
         }
 
@@ -488,6 +501,8 @@ TEST_CASE("create relation using builders") {
 
         REQUIRE(relation.id() == 123);
         REQUIRE(relation.members().size() == 2);
+        REQUIRE(relation.tags().size() == 2);
+        REQUIRE(std::distance(relation.cbegin(), relation.cend()) == 2);
 
         auto it = relation.members().begin();
         REQUIRE(it->type() == osmium::item_type::node);
