@@ -37,6 +37,7 @@ DEALINGS IN THE SOFTWARE.
 #include <initializer_list>
 #include <iterator>
 #include <string>
+#include <tuple>
 #include <type_traits>
 #include <utility>
 
@@ -56,12 +57,27 @@ namespace osmium {
                                                  std::tuple<typename Predicate<Ts>::type..., std::false_type>>
             {};
 
-            // True if THandler is the handler for at least one of the types in TTypes
+            // True if Predicate matches for all of the types Ts
+            template <template<typename> class Predicate, typename... Ts>
+            struct static_all_of : std::is_same<std::tuple<std::true_type, typename Predicate<Ts>::type...>,
+                                                std::tuple<typename Predicate<Ts>::type..., std::true_type>>
+            {};
+
+            // True if THandler is derived from the handler for at least one of the types in TTypes
             template <typename THandler, typename... TTypes>
             struct is_handled_by {
                 template <typename T>
-                using HasHandler = std::is_same<THandler, typename T::handler>;
-                static constexpr bool value = !static_none_of<HasHandler, TTypes...>::value;
+                using HasHandler = std::is_base_of<typename T::handler, THandler>;
+                static constexpr bool any = !static_none_of<HasHandler, TTypes...>::value;
+                static constexpr bool all = static_all_of<HasHandler, TTypes...>::value;
+            };
+
+            // True if THandler is derived from the handlers of all the types in TTypes
+            template <typename THandler, typename... TTypes>
+            struct are_all_handled_by {
+                template <typename T>
+                using HasHandler = std::is_base_of<typename T::handler, THandler>;
+                static constexpr bool value = static_all_of<HasHandler, TTypes...>::value;
             };
 
 
@@ -102,6 +118,7 @@ namespace osmium {
 
 
             struct basic_handler;
+            struct node_handler;
             struct tags_handler;
             struct nodes_handler;
             struct members_handler;
@@ -156,7 +173,7 @@ namespace osmium {
                     type_wrapper(osmium::Timestamp{value}) {}
             };
 
-            OSMIUM_ATTRIBUTE(basic_handler, _location, osmium::Location)
+            OSMIUM_ATTRIBUTE(node_handler, _location, osmium::Location)
                 constexpr explicit _location(const osmium::Location& value) :
                     type_wrapper(value) {}
                 explicit _location(double lat, double lon) :
@@ -337,15 +354,21 @@ namespace osmium {
                     object.set_uid(uid.value);
                 }
 
-                void operator()(osmium::Node& object, attr::_location location) const noexcept {
-                    object.set_location(location.value);
-                }
-
             }; // basic_handler
 
-            template <typename TBuilder, typename... TArgs>
+            struct node_handler : public basic_handler {
+
+                using basic_handler::operator();
+
+                void operator()(osmium::Node& node, attr::_location location) const noexcept {
+                    node.set_location(location.value);
+                }
+
+            }; // node_handler
+
+            template <typename THandler, typename TBuilder, typename... TArgs>
             inline void add_basic(TBuilder& builder, const TArgs&... args) {
-                basic_handler handler;
+                THandler handler;
                 (void)std::initializer_list<int>{
                     (handler(builder.object(), args), 0)...
                 };
@@ -435,12 +458,12 @@ namespace osmium {
             // ==============================================================
 
             template <typename TBuilder, typename THandler, typename... TArgs>
-            inline typename std::enable_if<!is_handled_by<THandler, TArgs...>::value>::type
+            inline typename std::enable_if<!is_handled_by<THandler, TArgs...>::any>::type
             add_list(osmium::builder::Builder&, const TArgs&...) {
             }
 
             template <typename TBuilder, typename THandler, typename... TArgs>
-            inline typename std::enable_if<is_handled_by<THandler, TArgs...>::value>::type
+            inline typename std::enable_if<is_handled_by<THandler, TArgs...>::any>::type
             add_list(osmium::builder::Builder& parent, const TArgs&... args) {
                 TBuilder builder(parent.buffer(), &parent);
                 THandler handler;
@@ -449,15 +472,20 @@ namespace osmium {
                 };
             }
 
+            struct any_node_handlers : public node_handler, public tags_handler {};
+            struct any_way_handlers : public basic_handler, public tags_handler, public nodes_handler {};
+            struct any_relation_handlers : public basic_handler, public tags_handler, public members_handler {};
+
         } // namespace detail
 
         template <typename... TArgs>
         inline size_t add_node(osmium::memory::Buffer& buffer, const TArgs&... args) {
             static_assert(sizeof...(args) > 0, "add_node() must have buffer and at least one additional argument");
+            static_assert(detail::is_handled_by<detail::any_node_handlers, TArgs...>::all, "Type not allowed in add_node()");
 
             NodeBuilder builder(buffer);
 
-            detail::add_basic(builder, args...);
+            detail::add_basic<detail::node_handler>(builder, args...);
             detail::add_user(builder, args...);
             detail::add_list<TagListBuilder, detail::tags_handler>(builder, args...);
 
@@ -467,10 +495,11 @@ namespace osmium {
         template <typename... TArgs>
         inline size_t add_way(osmium::memory::Buffer& buffer, const TArgs&... args) {
             static_assert(sizeof...(args) > 0, "add_way() must have buffer and at least one additional argument");
+            static_assert(detail::is_handled_by<detail::any_way_handlers, TArgs...>::all, "Type not allowed in add_way()");
 
             WayBuilder builder(buffer);
 
-            detail::add_basic(builder, args...);
+            detail::add_basic<detail::basic_handler>(builder, args...);
             detail::add_user(builder, args...);
             detail::add_list<TagListBuilder, detail::tags_handler>(builder, args...);
             detail::add_list<WayNodeListBuilder, detail::nodes_handler>(builder, args...);
@@ -481,10 +510,11 @@ namespace osmium {
         template <typename... TArgs>
         inline size_t add_relation(osmium::memory::Buffer& buffer, const TArgs&... args) {
             static_assert(sizeof...(args) > 0, "add_relation() must have buffer and at least one additional argument");
+            static_assert(detail::is_handled_by<detail::any_relation_handlers, TArgs...>::all, "Type not allowed in add_relation()");
 
             RelationBuilder builder(buffer);
 
-            detail::add_basic(builder, args...);
+            detail::add_basic<detail::basic_handler>(builder, args...);
             detail::add_user(builder, args...);
             detail::add_list<TagListBuilder, detail::tags_handler>(builder, args...);
             detail::add_list<RelationMemberListBuilder, detail::members_handler>(builder, args...);
