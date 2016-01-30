@@ -117,7 +117,7 @@ namespace osmium {
             }; // struct iterator_wrapper
 
 
-            struct basic_handler;
+            struct object_handler;
             struct node_handler;
             struct tags_handler;
             struct nodes_handler;
@@ -145,22 +145,22 @@ namespace osmium {
 
         namespace attr {
 
-            OSMIUM_ATTRIBUTE_WITH_CONSTRUCTOR(basic_handler, _id, osmium::object_id_type);
-            OSMIUM_ATTRIBUTE_WITH_CONSTRUCTOR(basic_handler, _version, osmium::object_version_type);
-            OSMIUM_ATTRIBUTE_WITH_CONSTRUCTOR(basic_handler, _uid, osmium::user_id_type);
-            OSMIUM_ATTRIBUTE_WITH_CONSTRUCTOR(basic_handler, _changeset, osmium::changeset_id_type);
+            OSMIUM_ATTRIBUTE_WITH_CONSTRUCTOR(object_handler, _id, osmium::object_id_type);
+            OSMIUM_ATTRIBUTE_WITH_CONSTRUCTOR(object_handler, _version, osmium::object_version_type);
+            OSMIUM_ATTRIBUTE_WITH_CONSTRUCTOR(object_handler, _uid, osmium::user_id_type);
+            OSMIUM_ATTRIBUTE_WITH_CONSTRUCTOR(object_handler, _changeset, osmium::changeset_id_type);
 
-            OSMIUM_ATTRIBUTE(basic_handler, _deleted, bool)
+            OSMIUM_ATTRIBUTE(object_handler, _deleted, bool)
                 constexpr explicit _deleted(bool value = true) :
                     type_wrapper(value) {}
             };
 
-            OSMIUM_ATTRIBUTE(basic_handler, _visible, bool)
+            OSMIUM_ATTRIBUTE(object_handler, _visible, bool)
                 constexpr explicit _visible(bool value = true) :
                     type_wrapper(value) {}
             };
 
-            OSMIUM_ATTRIBUTE(basic_handler, _timestamp, osmium::Timestamp)
+            OSMIUM_ATTRIBUTE(object_handler, _timestamp, osmium::Timestamp)
                 constexpr explicit _timestamp(const osmium::Timestamp& value) :
                     type_wrapper(value) {}
                 constexpr explicit _timestamp(time_t value) :
@@ -180,7 +180,7 @@ namespace osmium {
                     type_wrapper(osmium::Location{lat, lon}) {}
             };
 
-            OSMIUM_ATTRIBUTE(basic_handler, _user, const char*)
+            OSMIUM_ATTRIBUTE(object_handler, _user, const char*)
                 explicit _user(const char* val) :
                     type_wrapper(val) {}
                 explicit _user(const std::string& val) :
@@ -320,7 +320,7 @@ namespace osmium {
 
         namespace detail {
 
-            struct basic_handler {
+            struct object_handler {
 
                 template <typename TDummy>
                 void operator()(osmium::OSMObject&, const TDummy&) const noexcept {
@@ -354,11 +354,11 @@ namespace osmium {
                     object.set_uid(uid.value);
                 }
 
-            }; // basic_handler
+            }; // object_handler
 
-            struct node_handler : public basic_handler {
+            struct node_handler : public object_handler {
 
-                using basic_handler::operator();
+                using object_handler::operator();
 
                 void operator()(osmium::Node& node, attr::_location location) const noexcept {
                     node.set_location(location.value);
@@ -473,8 +473,8 @@ namespace osmium {
             }
 
             struct any_node_handlers : public node_handler, public tags_handler {};
-            struct any_way_handlers : public basic_handler, public tags_handler, public nodes_handler {};
-            struct any_relation_handlers : public basic_handler, public tags_handler, public members_handler {};
+            struct any_way_handlers : public object_handler, public tags_handler, public nodes_handler {};
+            struct any_relation_handlers : public object_handler, public tags_handler, public members_handler {};
 
         } // namespace detail
 
@@ -499,7 +499,7 @@ namespace osmium {
 
             WayBuilder builder(buffer);
 
-            detail::add_basic<detail::basic_handler>(builder, args...);
+            detail::add_basic<detail::object_handler>(builder, args...);
             detail::add_user(builder, args...);
             detail::add_list<TagListBuilder, detail::tags_handler>(builder, args...);
             detail::add_list<WayNodeListBuilder, detail::nodes_handler>(builder, args...);
@@ -514,7 +514,7 @@ namespace osmium {
 
             RelationBuilder builder(buffer);
 
-            detail::add_basic<detail::basic_handler>(builder, args...);
+            detail::add_basic<detail::object_handler>(builder, args...);
             detail::add_user(builder, args...);
             detail::add_list<TagListBuilder, detail::tags_handler>(builder, args...);
             detail::add_list<RelationMemberListBuilder, detail::members_handler>(builder, args...);
