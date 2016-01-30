@@ -536,3 +536,32 @@ TEST_CASE("create relation using builders") {
 
 }
 
+TEST_CASE("create area using builders") {
+
+    using namespace osmium::builder::attr;
+
+    osmium::memory::Buffer buffer(1024*10);
+
+    SECTION("add area without rings") {
+        const auto pos = osmium::builder::add_area(buffer,
+            _id(999),
+            _changeset(21),
+            _uid(222),
+            _user("foo"),
+            _tag("landuse", "residential")
+        );
+
+        const auto& area = buffer.get<osmium::Area>(pos);
+
+        REQUIRE(area.id() == 999);
+        REQUIRE(area.version() == 0);
+        REQUIRE(area.timestamp() == osmium::Timestamp{});
+        REQUIRE(area.changeset() == 21);
+        REQUIRE(area.uid() == 222);
+        REQUIRE(std::string(area.user()) == "foo");
+        REQUIRE(area.tags().size() == 1);
+        REQUIRE(std::distance(area.cbegin(), area.cend()) == 1);
+    }
+
+}
+

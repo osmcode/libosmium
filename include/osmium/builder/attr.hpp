@@ -596,6 +596,7 @@ namespace osmium {
             struct any_node_handlers : public node_handler, public tags_handler {};
             struct any_way_handlers : public object_handler, public tags_handler, public nodes_handler {};
             struct any_relation_handlers : public object_handler, public tags_handler, public members_handler {};
+            struct any_area_handlers : public object_handler, public tags_handler {};
             struct any_changeset_handlers : public changeset_handler, public tags_handler, public discussion_handler {};
 
         } // namespace detail
@@ -640,6 +641,20 @@ namespace osmium {
             detail::add_user(builder, args...);
             detail::add_list<TagListBuilder, detail::tags_handler>(builder, args...);
             detail::add_list<RelationMemberListBuilder, detail::members_handler>(builder, args...);
+
+            return buffer.commit();
+        }
+
+        template <typename... TArgs>
+        inline size_t add_area(osmium::memory::Buffer& buffer, const TArgs&... args) {
+            static_assert(sizeof...(args) > 0, "add_area() must have buffer and at least one additional argument");
+            static_assert(detail::is_handled_by<detail::any_area_handlers, TArgs...>::all, "Type not allowed in add_area()");
+
+            AreaBuilder builder(buffer);
+
+            detail::add_basic<detail::object_handler>(builder, args...);
+            detail::add_user(builder, args...);
+            detail::add_list<TagListBuilder, detail::tags_handler>(builder, args...);
 
             return buffer.commit();
         }
