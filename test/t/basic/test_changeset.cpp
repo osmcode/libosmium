@@ -48,7 +48,9 @@ TEST_CASE("Build changeset") {
         _uid(9),
         _user("user"),
         _tag("comment", "foo"),
-        _tag("foo", "bar")
+        _tag("foo", "bar"),
+        _comment({time_t(300), 10, "user2", "foo"}),
+        _comments({{time_t(400), 9, "user", "bar"}})
     );
 
     const osmium::Changeset& cs2 = buffer.get<osmium::Changeset>(pos);
@@ -69,6 +71,22 @@ TEST_CASE("Build changeset") {
     REQUIRE(cs1 <= cs2);
     REQUIRE(false == (cs1 > cs2));
     REQUIRE(false == (cs1 >= cs2));
+
+    auto cit = cs2.discussion().begin();
+
+    REQUIRE(cit != cs2.discussion().end());
+    REQUIRE(cit->date() == osmium::Timestamp(300));
+    REQUIRE(cit->uid() == 10);
+    REQUIRE(std::string("user2") == cit->user());
+    REQUIRE(std::string("foo") == cit->text());
+
+    REQUIRE(++cit != cs2.discussion().end());
+    REQUIRE(cit->date() == osmium::Timestamp(400));
+    REQUIRE(cit->uid() == 9);
+    REQUIRE(std::string("user") == cit->user());
+    REQUIRE(std::string("bar") == cit->text());
+
+    REQUIRE(++cit == cs2.discussion().end());
 }
 
 TEST_CASE("Create changeset without helper") {

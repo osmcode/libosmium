@@ -124,6 +124,7 @@ namespace osmium {
             struct nodes_handler;
             struct members_handler;
             struct changeset_handler;
+            struct discussion_handler;
 
         } // namespace detail
 
@@ -220,6 +221,40 @@ namespace osmium {
 
             }; // class member_type
 
+            class comment_type {
+
+                osmium::Timestamp    m_date;
+                osmium::user_id_type m_uid;
+                const char*          m_user;
+                const char*          m_text;
+
+            public:
+
+                constexpr comment_type(osmium::Timestamp date, osmium::user_id_type uid, const char* user, const char* text) noexcept :
+                    m_date(date),
+                    m_uid(uid),
+                    m_user(user),
+                    m_text(text) {
+                }
+
+                constexpr osmium::Timestamp date() const noexcept {
+                    return m_date;
+                }
+
+                constexpr osmium::user_id_type uid() const noexcept {
+                    return m_uid;
+                }
+
+                constexpr const char* user() const noexcept {
+                    return m_user;
+                }
+
+                constexpr const char* text() const noexcept {
+                    return m_text;
+                }
+
+            }; // class comment_type
+
             namespace detail {
 
                 OSMIUM_ATTRIBUTE_ITER(tags_handler, tags_from_iterator_pair);
@@ -227,6 +262,8 @@ namespace osmium {
                 OSMIUM_ATTRIBUTE_ITER(nodes_handler, nodes_from_iterator_pair);
 
                 OSMIUM_ATTRIBUTE_ITER(members_handler, members_from_iterator_pair);
+
+                OSMIUM_ATTRIBUTE_ITER(discussion_handler, comments_from_iterator_pair);
 
             } // namespace detail
 
@@ -319,6 +356,29 @@ namespace osmium {
             OSMIUM_ATTRIBUTE_WITH_CONSTRUCTOR(changeset_handler, _num_comments, osmium::num_comments_type);
             OSMIUM_ATTRIBUTE_WITH_CONSTRUCTOR(changeset_handler, _created_at, osmium::Timestamp);
             OSMIUM_ATTRIBUTE_WITH_CONSTRUCTOR(changeset_handler, _closed_at, osmium::Timestamp);
+
+            OSMIUM_ATTRIBUTE(discussion_handler, _comment, comment_type)
+                explicit _comment(const comment_type& value) :
+                    type_wrapper(value) {}
+                explicit _comment(const osmium::ChangesetComment& comment) :
+                    type_wrapper({comment.date(), comment.uid(), comment.user(), comment.text()}) {}
+            };
+
+            template <typename TcommentIterator>
+            inline constexpr detail::comments_from_iterator_pair<TcommentIterator> _comments(TcommentIterator first, TcommentIterator last) {
+                return detail::comments_from_iterator_pair<TcommentIterator>(first, last);
+            }
+
+            template <typename TContainer>
+            inline detail::comments_from_iterator_pair<typename TContainer::const_iterator> _comments(const TContainer& container) {
+                return detail::comments_from_iterator_pair<typename TContainer::const_iterator>(std::begin(container), std::end(container));
+            }
+
+            using comment_ilist = std::initializer_list<comment_type>;
+            inline detail::comments_from_iterator_pair<comment_ilist::const_iterator> _comments(const comment_ilist& container) {
+                return detail::comments_from_iterator_pair<comment_ilist::const_iterator>(std::begin(container), std::end(container));
+            }
+
 
         } // namespace attr
 
@@ -495,6 +555,27 @@ namespace osmium {
 
             }; // struct members_handler
 
+            struct discussion_handler {
+
+                template <typename TDummy>
+                void operator()(ChangesetDiscussionBuilder&, const TDummy&) const noexcept {
+                }
+
+                void operator()(ChangesetDiscussionBuilder& builder, const attr::_comment& comment) const {
+                    builder.add_comment(comment.value.date(), comment.value.uid(), comment.value.user());
+                    builder.add_comment_text(comment.value.text());
+                }
+
+                template <typename TIterator>
+                void operator()(ChangesetDiscussionBuilder& builder, const attr::detail::comments_from_iterator_pair<TIterator>& comments) const {
+                    for (const auto& comment : comments) {
+                        builder.add_comment(comment.date(), comment.uid(), comment.user());
+                        builder.add_comment_text(comment.text());
+                    }
+                }
+
+            }; // struct discussion_handler
+
             // ==============================================================
 
             template <typename TBuilder, typename THandler, typename... TArgs>
@@ -515,7 +596,7 @@ namespace osmium {
             struct any_node_handlers : public node_handler, public tags_handler {};
             struct any_way_handlers : public object_handler, public tags_handler, public nodes_handler {};
             struct any_relation_handlers : public object_handler, public tags_handler, public members_handler {};
-            struct any_changeset_handlers : public changeset_handler, public tags_handler {};
+            struct any_changeset_handlers : public changeset_handler, public tags_handler, public discussion_handler {};
 
         } // namespace detail
 
@@ -573,6 +654,7 @@ namespace osmium {
             detail::add_basic<detail::changeset_handler>(builder, args...);
             detail::add_user(builder, args...);
             detail::add_list<TagListBuilder, detail::tags_handler>(builder, args...);
+            detail::add_list<ChangesetDiscussionBuilder, detail::discussion_handler>(builder, args...);
 
             return buffer.commit();
         }
