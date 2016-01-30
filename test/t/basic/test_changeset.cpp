@@ -7,10 +7,7 @@
 
 #include "helper.hpp"
 
-TEST_CASE("Basic Changeset") {
-
-    osmium::CRC<boost::crc_32_type> crc32;
-
+TEST_CASE("Build changeset") {
     osmium::memory::Buffer buffer(10 * 1000);
 
     osmium::Changeset& cs1 = buffer_add_changeset(buffer,
@@ -34,6 +31,7 @@ TEST_CASE("Basic Changeset") {
     REQUIRE(1 == cs1.tags().size());
     REQUIRE(std::string("user") == cs1.user());
 
+    osmium::CRC<boost::crc_32_type> crc32;
     crc32.update(cs1);
     REQUIRE(crc32().checksum() == 0x502e8c0e);
 

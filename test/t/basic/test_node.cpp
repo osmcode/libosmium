@@ -6,13 +6,9 @@
 #include <osmium/osm/crc.hpp>
 #include <osmium/osm/node.hpp>
 
-TEST_CASE("Basic_Node") {
+using namespace osmium::builder::attr;
 
-    using namespace osmium::builder::attr;
-
-    osmium::CRC<boost::crc_32_type> crc32;
-
-SECTION("node_builder") {
+TEST_CASE("Build node") {
     osmium::memory::Buffer buffer(10000);
 
     osmium::builder::add_node(buffer,
@@ -45,6 +41,7 @@ SECTION("node_builder") {
     REQUIRE(osmium::Location(3.5, 4.7) == node.location());
     REQUIRE(2 == node.tags().size());
 
+    osmium::CRC<boost::crc_32_type> crc32;
     crc32.update(node);
     REQUIRE(crc32().checksum() == 0x7dc553f9);
 
@@ -53,7 +50,7 @@ SECTION("node_builder") {
     REQUIRE(true == node.deleted());
 }
 
-SECTION("node_default_attributes") {
+TEST_CASE("default values for node attributes") {
     osmium::memory::Buffer buffer(10000);
 
     osmium::builder::add_node(buffer, _id(0));
@@ -71,7 +68,7 @@ SECTION("node_default_attributes") {
     REQUIRE(0 == node.tags().size());
 }
 
-SECTION("set_node_attributes_from_string") {
+TEST_CASE("set node attributes from strings") {
     osmium::memory::Buffer buffer(10000);
 
     osmium::builder::add_node(buffer, _id(0));
@@ -91,7 +88,7 @@ SECTION("set_node_attributes_from_string") {
     REQUIRE(21 == node.uid());
 }
 
-SECTION("large_id") {
+TEST_CASE("set large id") {
     osmium::memory::Buffer buffer(10000);
 
     int64_t id = 3000000000l;
@@ -106,7 +103,7 @@ SECTION("large_id") {
     REQUIRE(static_cast<osmium::unsigned_object_id_type>(id) == node.positive_id());
 }
 
-SECTION("tags") {
+TEST_CASE("set tags on node") {
     osmium::memory::Buffer buffer(10000);
 
     osmium::builder::add_node(buffer,
@@ -125,5 +122,3 @@ SECTION("tags") {
     REQUIRE(std::string("pub") == node.get_value_by_key("amenity", "default"));
 }
 
-
-}

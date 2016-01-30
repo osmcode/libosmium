@@ -6,12 +6,9 @@
 #include <osmium/osm/crc.hpp>
 #include <osmium/osm/relation.hpp>
 
+using namespace osmium::builder::attr;
+
 TEST_CASE("Build relation") {
-
-    using namespace osmium::builder::attr;
-
-    osmium::CRC<boost::crc_32_type> crc32;
-
     osmium::memory::Buffer buffer(10000);
 
     osmium::builder::add_relation(buffer,
@@ -61,6 +58,7 @@ TEST_CASE("Build relation") {
         ++n;
     }
 
+    osmium::CRC<boost::crc_32_type> crc32;
     crc32.update(relation);
     REQUIRE(crc32().checksum() == 0x2c2352e);
 }

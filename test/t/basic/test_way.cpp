@@ -7,13 +7,9 @@
 #include <osmium/osm/crc.hpp>
 #include <osmium/osm/way.hpp>
 
+using namespace osmium::builder::attr;
+
 TEST_CASE("Build way") {
-
-    using namespace osmium::builder::attr;
-
-    osmium::CRC<boost::crc_32_type> crc32;
-
-SECTION("way_builder") {
     osmium::memory::Buffer buffer(10000);
 
     osmium::builder::add_way(buffer,
@@ -48,11 +44,12 @@ SECTION("way_builder") {
     REQUIRE(2 == way.nodes()[2].ref());
     REQUIRE(! way.is_closed());
 
+    osmium::CRC<boost::crc_32_type> crc32;
     crc32.update(way);
     REQUIRE(crc32().checksum() == 0x7676d0c2);
 }
 
-SECTION("closed_way") {
+TEST_CASE("build closed way") {
     osmium::memory::Buffer buffer(10000);
 
     osmium::builder::add_way(buffer,
@@ -62,11 +59,13 @@ SECTION("closed_way") {
     );
 
     const osmium::Way& way = buffer.get<osmium::Way>(0);
+
     REQUIRE(way.is_closed());
 }
 
-SECTION("way_builder_with_helpers") {
+TEST_CASE("build way with helpers") {
     osmium::memory::Buffer buffer(10000);
+
     {
         osmium::builder::WayBuilder builder(buffer);
         builder.add_user("username");
@@ -81,7 +80,7 @@ SECTION("way_builder_with_helpers") {
     }
     buffer.commit();
 
-    osmium::Way& way = buffer.get<osmium::Way>(0);
+    const osmium::Way& way = buffer.get<osmium::Way>(0);
 
     REQUIRE(std::string("username") == way.user());
 
@@ -94,4 +93,3 @@ SECTION("way_builder_with_helpers") {
     REQUIRE(4.1 == way.nodes()[1].location().lon());
 }
 
-}
