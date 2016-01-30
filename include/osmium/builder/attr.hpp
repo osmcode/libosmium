@@ -125,6 +125,7 @@ namespace osmium {
             struct members_handler;
             struct changeset_handler;
             struct discussion_handler;
+            struct ring_handler;
 
         } // namespace detail
 
@@ -265,6 +266,9 @@ namespace osmium {
 
                 OSMIUM_ATTRIBUTE_ITER(discussion_handler, comments_from_iterator_pair);
 
+                OSMIUM_ATTRIBUTE_ITER(ring_handler, outer_ring_from_iterator_pair);
+                OSMIUM_ATTRIBUTE_ITER(ring_handler, inner_ring_from_iterator_pair);
+
             } // namespace detail
 
             OSMIUM_ATTRIBUTE(tags_handler, _tag, pair_of_cstrings)
@@ -377,6 +381,47 @@ namespace osmium {
             using comment_ilist = std::initializer_list<comment_type>;
             inline detail::comments_from_iterator_pair<comment_ilist::const_iterator> _comments(const comment_ilist& container) {
                 return detail::comments_from_iterator_pair<comment_ilist::const_iterator>(std::begin(container), std::end(container));
+            }
+
+
+            template <typename TIdIterator>
+            inline constexpr detail::outer_ring_from_iterator_pair<TIdIterator> _outer_ring(TIdIterator first, TIdIterator last) {
+                return detail::outer_ring_from_iterator_pair<TIdIterator>(first, last);
+            }
+
+            template <typename TContainer>
+            inline detail::outer_ring_from_iterator_pair<typename TContainer::const_iterator> _outer_ring(const TContainer& container) {
+                return detail::outer_ring_from_iterator_pair<typename TContainer::const_iterator>(std::begin(container), std::end(container));
+            }
+
+            using object_id_ilist = std::initializer_list<osmium::object_id_type>;
+            inline detail::outer_ring_from_iterator_pair<object_id_ilist::const_iterator> _outer_ring(const object_id_ilist& container) {
+                return detail::outer_ring_from_iterator_pair<object_id_ilist::const_iterator>(std::begin(container), std::end(container));
+            }
+
+            using node_ref_ilist = std::initializer_list<osmium::NodeRef>;
+            inline detail::outer_ring_from_iterator_pair<node_ref_ilist::const_iterator> _outer_ring(const node_ref_ilist& container) {
+                return detail::outer_ring_from_iterator_pair<node_ref_ilist::const_iterator>(std::begin(container), std::end(container));
+            }
+
+            template <typename TIdIterator>
+            inline constexpr detail::inner_ring_from_iterator_pair<TIdIterator> _inner_ring(TIdIterator first, TIdIterator last) {
+                return detail::inner_ring_from_iterator_pair<TIdIterator>(first, last);
+            }
+
+            template <typename TContainer>
+            inline detail::inner_ring_from_iterator_pair<typename TContainer::const_iterator> _inner_ring(const TContainer& container) {
+                return detail::inner_ring_from_iterator_pair<typename TContainer::const_iterator>(std::begin(container), std::end(container));
+            }
+
+            using object_id_ilist = std::initializer_list<osmium::object_id_type>;
+            inline detail::inner_ring_from_iterator_pair<object_id_ilist::const_iterator> _inner_ring(const object_id_ilist& container) {
+                return detail::inner_ring_from_iterator_pair<object_id_ilist::const_iterator>(std::begin(container), std::end(container));
+            }
+
+            using node_ref_ilist = std::initializer_list<osmium::NodeRef>;
+            inline detail::inner_ring_from_iterator_pair<node_ref_ilist::const_iterator> _inner_ring(const node_ref_ilist& container) {
+                return detail::inner_ring_from_iterator_pair<node_ref_ilist::const_iterator>(std::begin(container), std::end(container));
             }
 
 
@@ -576,6 +621,30 @@ namespace osmium {
 
             }; // struct discussion_handler
 
+            struct ring_handler {
+
+                template <typename TDummy>
+                void operator()(AreaBuilder&, const TDummy&) const noexcept {
+                }
+
+                template <typename TIterator>
+                void operator()(AreaBuilder& parent, const attr::detail::outer_ring_from_iterator_pair<TIterator>& nodes) const {
+                    OuterRingBuilder builder(parent.buffer(), &parent);
+                    for (const auto& ref : nodes) {
+                        builder.add_node_ref(ref);
+                    }
+                }
+
+                template <typename TIterator>
+                void operator()(AreaBuilder& parent, const attr::detail::inner_ring_from_iterator_pair<TIterator>& nodes) const {
+                    InnerRingBuilder builder(parent.buffer(), &parent);
+                    for (const auto& ref : nodes) {
+                        builder.add_node_ref(ref);
+                    }
+                }
+
+            }; // struct ring_handler
+
             // ==============================================================
 
             template <typename TBuilder, typename THandler, typename... TArgs>
@@ -596,7 +665,7 @@ namespace osmium {
             struct any_node_handlers : public node_handler, public tags_handler {};
             struct any_way_handlers : public object_handler, public tags_handler, public nodes_handler {};
             struct any_relation_handlers : public object_handler, public tags_handler, public members_handler {};
-            struct any_area_handlers : public object_handler, public tags_handler {};
+            struct any_area_handlers : public object_handler, public tags_handler, public ring_handler {};
             struct any_changeset_handlers : public changeset_handler, public tags_handler, public discussion_handler {};
 
         } // namespace detail
@@ -646,20 +715,6 @@ namespace osmium {
         }
 
         template <typename... TArgs>
-        inline size_t add_area(osmium::memory::Buffer& buffer, const TArgs&... args) {
-            static_assert(sizeof...(args) > 0, "add_area() must have buffer and at least one additional argument");
-            static_assert(detail::is_handled_by<detail::any_area_handlers, TArgs...>::all, "Type not allowed in add_area()");
-
-            AreaBuilder builder(buffer);
-
-            detail::add_basic<detail::object_handler>(builder, args...);
-            detail::add_user(builder, args...);
-            detail::add_list<TagListBuilder, detail::tags_handler>(builder, args...);
-
-            return buffer.commit();
-        }
-
-        template <typename... TArgs>
         inline size_t add_changeset(osmium::memory::Buffer& buffer, const TArgs&... args) {
             static_assert(sizeof...(args) > 0, "add_changeset() must have buffer and at least one additional argument");
             static_assert(detail::is_handled_by<detail::any_changeset_handlers, TArgs...>::all, "Type not allowed in add_changeset()");
@@ -670,6 +725,25 @@ namespace osmium {
             detail::add_user(builder, args...);
             detail::add_list<TagListBuilder, detail::tags_handler>(builder, args...);
             detail::add_list<ChangesetDiscussionBuilder, detail::discussion_handler>(builder, args...);
+
+            return buffer.commit();
+        }
+
+        template <typename... TArgs>
+        inline size_t add_area(osmium::memory::Buffer& buffer, const TArgs&... args) {
+            static_assert(sizeof...(args) > 0, "add_area() must have buffer and at least one additional argument");
+            static_assert(detail::is_handled_by<detail::any_area_handlers, TArgs...>::all, "Type not allowed in add_area()");
+
+            AreaBuilder builder(buffer);
+
+            detail::add_basic<detail::object_handler>(builder, args...);
+            detail::add_user(builder, args...);
+            detail::add_list<TagListBuilder, detail::tags_handler>(builder, args...);
+
+            detail::ring_handler handler;
+            (void)std::initializer_list<int>{
+                (handler(builder, args), 0)...
+            };
 
             return buffer.commit();
         }

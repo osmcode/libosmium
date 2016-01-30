@@ -3,8 +3,6 @@
 #include <osmium/builder/builder_helper.hpp>
 #include <osmium/geom/wkb.hpp>
 
-#include "../basic/helper.hpp"
-
 #if __BYTE_ORDER == __LITTLE_ENDIAN
 
 TEST_CASE("WKB_Geometry_byte_order_dependent") {

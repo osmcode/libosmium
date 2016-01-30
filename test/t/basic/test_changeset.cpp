@@ -6,8 +6,6 @@
 #include <osmium/osm/changeset.hpp>
 #include <osmium/osm/crc.hpp>
 
-#include "helper.hpp"
-
 using namespace osmium::builder::attr;
 
 TEST_CASE("Build changeset") {
@@ -102,10 +100,11 @@ TEST_CASE("Create changeset without helper") {
        .set_uid(9);
 
     builder.add_user("user");
-    add_tags(buffer, builder, {
-        {"key1", "val1"},
-        {"key2", "val2"}
-    });
+    {
+        osmium::builder::TagListBuilder tl_builder(buffer, &builder);
+        tl_builder.add_tag("key1", "val1");
+        tl_builder.add_tag("key2", "val2");
+    }
 
     {
         osmium::builder::ChangesetDiscussionBuilder disc_builder(buffer, &builder);
