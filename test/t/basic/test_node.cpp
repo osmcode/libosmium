@@ -2,29 +2,33 @@
 
 #include <boost/crc.hpp>
 
+#include <osmium/builder/attr.hpp>
 #include <osmium/osm/crc.hpp>
 #include <osmium/osm/node.hpp>
 
-#include "helper.hpp"
-
 TEST_CASE("Basic_Node") {
+
+    using namespace osmium::builder::attr;
 
     osmium::CRC<boost::crc_32_type> crc32;
 
 SECTION("node_builder") {
     osmium::memory::Buffer buffer(10000);
 
-    osmium::Node& node = buffer_add_node(buffer,
-        "foo",
-        {{"amenity", "pub"}, {"name", "OSM BAR"}},
-        {3.5, 4.7});
+    osmium::builder::add_node(buffer,
+        _id(17),
+        _version(3),
+        _visible(true),
+        _changeset(333),
+        _uid(21),
+        _timestamp(time_t(123)),
+        _user("foo"),
+        _tag("amenity", "pub"),
+        _tag("name", "OSM BAR"),
+        _location(3.5, 4.7)
+    );
 
-    node.set_id(17)
-        .set_version(3)
-        .set_visible(true)
-        .set_changeset(333)
-        .set_uid(21)
-        .set_timestamp(123);
+    osmium::Node& node = buffer.get<osmium::Node>(0);
 
     REQUIRE(osmium::item_type::node == node.type());
     REQUIRE(node.type_is_in(osmium::osm_entity_bits::node));
@@ -52,8 +56,9 @@ SECTION("node_builder") {
 SECTION("node_default_attributes") {
     osmium::memory::Buffer buffer(10000);
 
-    osmium::Node& node = buffer_add_node(buffer, "", {}, osmium::Location{});
+    osmium::builder::add_node(buffer, _id(0));
 
+    const osmium::Node& node = buffer.get<osmium::Node>(0);
     REQUIRE(0l == node.id());
     REQUIRE(0ul == node.positive_id());
     REQUIRE(0 == node.version());
@@ -69,11 +74,9 @@ SECTION("node_default_attributes") {
 SECTION("set_node_attributes_from_string") {
     osmium::memory::Buffer buffer(10000);
 
-    osmium::Node& node = buffer_add_node(buffer,
-        "foo",
-        {{"amenity", "pub"}, {"name", "OSM BAR"}},
-        {3.5, 4.7});
+    osmium::builder::add_node(buffer, _id(0));
 
+    osmium::Node& node = buffer.get<osmium::Node>(0);
     node.set_id("-17")
         .set_version("3")
         .set_visible(true)
@@ -91,11 +94,10 @@ SECTION("set_node_attributes_from_string") {
 SECTION("large_id") {
     osmium::memory::Buffer buffer(10000);
 
-    osmium::Node& node = buffer_add_node(buffer, "", {}, osmium::Location{});
-
     int64_t id = 3000000000l;
-    node.set_id(id);
+    osmium::builder::add_node(buffer, _id(id));
 
+    osmium::Node& node = buffer.get<osmium::Node>(0);
     REQUIRE(id == node.id());
     REQUIRE(static_cast<osmium::unsigned_object_id_type>(id) == node.positive_id());
 
@@ -107,11 +109,13 @@ SECTION("large_id") {
 SECTION("tags") {
     osmium::memory::Buffer buffer(10000);
 
-    osmium::Node& node = buffer_add_node(buffer,
-        "foo",
-        {{"amenity", "pub"}, {"name", "OSM BAR"}},
-        {3.5, 4.7});
+    osmium::builder::add_node(buffer,
+        _user("foo"),
+        _tag("amenity", "pub"),
+        _tag("name", "OSM BAR")
+    );
 
+    const osmium::Node& node = buffer.get<osmium::Node>(0);
     REQUIRE(nullptr == node.tags().get_value_by_key("fail"));
     REQUIRE(std::string("pub") == node.tags().get_value_by_key("amenity"));
     REQUIRE(std::string("pub") == node.get_value_by_key("amenity"));

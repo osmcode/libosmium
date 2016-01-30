@@ -4,8 +4,6 @@
 
 #include <osmium/osm/crc.hpp>
 
-#include "helper.hpp"
-
 TEST_CASE("CRC of basic datatypes") {
 
     osmium::CRC<boost::crc_32_type> crc32;

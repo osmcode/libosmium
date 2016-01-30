@@ -1,36 +1,24 @@
 #include "catch.hpp"
 
+#include <osmium/builder/attr.hpp>
 #include <osmium/builder/osm_object_builder.hpp>
 #include <osmium/osm.hpp>
 #include <osmium/osm/object_comparisons.hpp>
 
 TEST_CASE("Object_Comparisons") {
 
+    using namespace osmium::builder::attr;
+
     SECTION("order") {
         osmium::memory::Buffer buffer(10 * 1000);
 
-        {
-            // add node 1
-            osmium::builder::NodeBuilder node_builder(buffer);
-            node_builder.add_user("testuser");
-            buffer.commit();
-        }
-
-        {
-            // add node 2
-            osmium::builder::NodeBuilder node_builder(buffer);
-            node_builder.add_user("testuser");
-            buffer.commit();
-        }
+        osmium::builder::add_node(buffer, _id(10), _version(1));
+        osmium::builder::add_node(buffer, _id(15), _version(2));
 
         auto it = buffer.begin();
         osmium::Node& node1 = static_cast<osmium::Node&>(*it);
         osmium::Node& node2 = static_cast<osmium::Node&>(*(++it));
 
-        node1.set_id(10);
-        node1.set_version(1);
-        node2.set_id(15);
-        node2.set_version(2);
         REQUIRE(node1 < node2);
         REQUIRE_FALSE(node1 > node2);
         node1.set_id(20);
@@ -50,70 +38,11 @@ TEST_CASE("Object_Comparisons") {
     SECTION("order_types") {
         osmium::memory::Buffer buffer(10 * 1000);
 
-        {
-            // add node 1
-            osmium::builder::NodeBuilder node_builder(buffer);
-            osmium::Node& node = node_builder.object();
-            REQUIRE(osmium::item_type::node == node.type());
-
-            node.set_id(3);
-            node.set_version(3);
-            node_builder.add_user("testuser");
-
-            buffer.commit();
-        }
-
-        {
-            // add node 2
-            osmium::builder::NodeBuilder node_builder(buffer);
-            osmium::Node& node = node_builder.object();
-            REQUIRE(osmium::item_type::node == node.type());
-
-            node.set_id(3);
-            node.set_version(4);
-            node_builder.add_user("testuser");
-
-            buffer.commit();
-        }
-
-        {
-            // add node 3
-            osmium::builder::NodeBuilder node_builder(buffer);
-            osmium::Node& node = node_builder.object();
-            REQUIRE(osmium::item_type::node == node.type());
-
-            node.set_id(3);
-            node.set_version(4);
-            node_builder.add_user("testuser");
-
-            buffer.commit();
-        }
-
-        {
-            // add way
-            osmium::builder::WayBuilder way_builder(buffer);
-            osmium::Way& way = way_builder.object();
-            REQUIRE(osmium::item_type::way == way.type());
-
-            way.set_id(2);
-            way.set_version(2);
-            way_builder.add_user("testuser");
-
-            buffer.commit();
-        }
-
-        {
-            // add relation
-            osmium::builder::RelationBuilder relation_builder(buffer);
-            osmium::Relation& relation = relation_builder.object();
-            REQUIRE(osmium::item_type::relation == relation.type());
-
-            relation.set_id(1);
-            relation.set_version(1);
-            relation_builder.add_user("testuser");
-
-            buffer.commit();
-        }
+        osmium::builder::add_node(buffer, _id(3), _version(3));
+        osmium::builder::add_node(buffer, _id(3), _version(4));
+        osmium::builder::add_node(buffer, _id(3), _version(4));
+        osmium::builder::add_way(buffer, _id(2), _version(2));
+        osmium::builder::add_relation(buffer, _id(1), _version(1));
 
         auto it = buffer.begin();
         const osmium::Node& node1 = static_cast<const osmium::Node&>(*it);

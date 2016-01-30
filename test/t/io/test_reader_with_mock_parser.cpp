@@ -4,6 +4,7 @@
 
 #include <string>
 
+#include <osmium/builder/attr.hpp>
 #include <osmium/builder/osm_object_builder.hpp>
 #include <osmium/io/compression.hpp>
 #include <osmium/io/detail/input_format.hpp>
@@ -29,18 +30,6 @@ public:
         m_fail_in(fail_in) {
     }
 
-    osmium::memory::Buffer create_testdata() {
-        osmium::memory::Buffer buffer(1000);
-
-        {
-            osmium::builder::NodeBuilder nb(buffer);
-            nb.add_user("foo");
-        }
-        buffer.commit();
-
-        return buffer;
-    }
-
     void run() final {
         osmium::thread::set_thread_name("_osmium_mock_in");
 
@@ -50,7 +39,9 @@ public:
 
         set_header_value(osmium::io::Header{});
 
-        send_to_output_queue(create_testdata());
+        osmium::memory::Buffer buffer(1000);
+        osmium::builder::add_node(buffer, osmium::builder::attr::_user("foo"));
+        send_to_output_queue(std::move(buffer));
 
         if (m_fail_in == "read") {
             throw std::runtime_error("error in read");

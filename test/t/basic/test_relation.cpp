@@ -2,33 +2,34 @@
 
 #include <boost/crc.hpp>
 
+#include <osmium/builder/attr.hpp>
 #include <osmium/osm/crc.hpp>
 #include <osmium/osm/relation.hpp>
 
-#include "helper.hpp"
-
 TEST_CASE("Build relation") {
+
+    using namespace osmium::builder::attr;
 
     osmium::CRC<boost::crc_32_type> crc32;
 
     osmium::memory::Buffer buffer(10000);
 
-    osmium::Relation& relation = buffer_add_relation(buffer,
-        "foo", {
-            {"type", "multipolygon"},
-            {"name", "Sherwood Forest"}
-        }, {
-            std::make_tuple('w', 1, "inner"),
-            std::make_tuple('w', 2, ""),
-            std::make_tuple('w', 3, "outer")
-        });
+    osmium::builder::add_relation(buffer,
+        _id(17),
+        _version(3),
+        _visible(),
+        _changeset(333),
+        _uid(21),
+        _timestamp(time_t(123)),
+        _user("foo"),
+        _tag("type", "multipolygon"),
+        _tag("name", "Sherwood Forest"),
+        _member(osmium::item_type::way, 1, "inner"),
+        _member(osmium::item_type::way, 2, ""),
+        _member(osmium::item_type::way, 3, "outer")
+    );
 
-    relation.set_id(17)
-        .set_version(3)
-        .set_visible(true)
-        .set_changeset(333)
-        .set_uid(21)
-        .set_timestamp(123);
+    const osmium::Relation& relation = buffer.get<osmium::Relation>(0);
 
     REQUIRE(17 == relation.id());
     REQUIRE(3 == relation.version());
