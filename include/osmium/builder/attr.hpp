@@ -50,16 +50,19 @@ namespace osmium {
 
         namespace detail {
 
-            template <typename THandler>
-            inline constexpr bool is_handled_by() noexcept {
-                return false;
-            }
+            // True if Predicate matches for none of the types Ts
+            template <template<typename> class Predicate, typename... Ts>
+            struct static_none_of : std::is_same<std::tuple<std::false_type, typename Predicate<Ts>::type...>,
+                                                 std::tuple<typename Predicate<Ts>::type..., std::false_type>>
+            {};
 
-            template <typename THandler, typename TFirst, typename... TRest>
-            inline constexpr bool is_handled_by(const TFirst&, const TRest&... args) noexcept {
-                return std::is_same<THandler, typename TFirst::handler>::value || is_handled_by<THandler>(args...);
-            }
-
+            // True if THandler is the handler for at least one of the types in TTypes
+            template <typename THandler, typename... TTypes>
+            struct is_handled_by {
+                template <typename T>
+                using HasHandler = std::is_same<THandler, typename T::handler>;
+                static constexpr bool value = !static_none_of<HasHandler, TTypes...>::value;
+            };
 
 
             template <typename TType>
@@ -432,14 +435,18 @@ namespace osmium {
             // ==============================================================
 
             template <typename TBuilder, typename THandler, typename... TArgs>
-            inline void add_list(osmium::builder::Builder& parent, const TArgs&... args) {
-                if (is_handled_by<THandler>(args...)) {
-                    TBuilder builder(parent.buffer(), &parent);
-                    THandler handler;
-                    (void)std::initializer_list<int>{
-                        (handler(builder, args), 0)...
-                    };
-                }
+            inline typename std::enable_if<!is_handled_by<THandler, TArgs...>::value>::type
+            add_list(osmium::builder::Builder&, const TArgs&...) {
+            }
+
+            template <typename TBuilder, typename THandler, typename... TArgs>
+            inline typename std::enable_if<is_handled_by<THandler, TArgs...>::value>::type
+            add_list(osmium::builder::Builder& parent, const TArgs&... args) {
+                TBuilder builder(parent.buffer(), &parent);
+                THandler handler;
+                (void)std::initializer_list<int>{
+                    (handler(builder, args), 0)...
+                };
             }
 
         } // namespace detail
