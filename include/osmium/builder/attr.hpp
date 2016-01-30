@@ -127,9 +127,18 @@ namespace osmium {
 
             OSMIUM_ATTRIBUTE_WITH_CONSTRUCTOR(basic_handler, _id, osmium::object_id_type);
             OSMIUM_ATTRIBUTE_WITH_CONSTRUCTOR(basic_handler, _version, osmium::object_version_type);
-            OSMIUM_ATTRIBUTE_WITH_CONSTRUCTOR(basic_handler, _deleted, bool);
             OSMIUM_ATTRIBUTE_WITH_CONSTRUCTOR(basic_handler, _uid, osmium::user_id_type);
             OSMIUM_ATTRIBUTE_WITH_CONSTRUCTOR(basic_handler, _changeset, osmium::changeset_id_type);
+
+            OSMIUM_ATTRIBUTE(basic_handler, _deleted, bool)
+                constexpr explicit _deleted(bool value = true) :
+                    type_wrapper(value) {}
+            };
+
+            OSMIUM_ATTRIBUTE(basic_handler, _visible, bool)
+                constexpr explicit _visible(bool value = true) :
+                    type_wrapper(value) {}
+            };
 
             OSMIUM_ATTRIBUTE(basic_handler, _timestamp, osmium::Timestamp)
                 constexpr explicit _timestamp(const osmium::Timestamp& value) :
@@ -303,6 +312,10 @@ namespace osmium {
 
                 void operator()(osmium::OSMObject& object, attr::_version version) const noexcept {
                     object.set_version(version.value);
+                }
+
+                void operator()(osmium::OSMObject& object, attr::_visible visible) const noexcept {
+                    object.set_visible(visible.value);
                 }
 
                 void operator()(osmium::OSMObject& object, attr::_deleted deleted) const noexcept {

@@ -59,6 +59,24 @@ TEST_CASE("create node using builders") {
         REQUIRE(std::distance(node.cbegin(), node.cend()) == 0);
     }
 
+    SECTION("visible/deleted flag") {
+        osmium::builder::add_node(buffer, _id(1), _deleted());
+        osmium::builder::add_node(buffer, _id(2), _deleted(true));
+        osmium::builder::add_node(buffer, _id(3), _deleted(false));
+        osmium::builder::add_node(buffer, _id(4), _visible());
+        osmium::builder::add_node(buffer, _id(5), _visible(true));
+        osmium::builder::add_node(buffer, _id(6), _visible(false));
+
+        auto it = buffer.cbegin<osmium::Node>();
+        REQUIRE_FALSE(it++->visible());
+        REQUIRE_FALSE(it++->visible());
+        REQUIRE(it++->visible());
+        REQUIRE(it++->visible());
+        REQUIRE(it++->visible());
+        REQUIRE_FALSE(it++->visible());
+        REQUIRE(it == buffer.cend<osmium::Node>());
+    }
+
     SECTION("order of attributes doesn't matter") {
         const auto loc = osmium::Location(3.14, 1.59);
         const auto pos = osmium::builder::add_node(buffer,
