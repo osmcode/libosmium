@@ -108,7 +108,7 @@ namespace osmium {
 
         private:
 
-            std::unique_ptr<unsigned char> m_memory;
+            std::unique_ptr<unsigned char[]> m_memory;
             unsigned char* m_data;
             size_t m_capacity;
             size_t m_written;
@@ -313,7 +313,7 @@ namespace osmium {
                     if (size % align_bytes != 0) {
                         throw std::invalid_argument("buffer capacity needs to be multiple of alignment");
                     }
-                    std::unique_ptr<unsigned char> memory(new unsigned char[size]);
+                    std::unique_ptr<unsigned char[]> memory(new unsigned char[size]);
                     std::copy_n(m_memory.get(), m_capacity, memory.get());
                     using std::swap;
                     swap(m_memory, memory);
