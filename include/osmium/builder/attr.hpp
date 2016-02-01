@@ -436,30 +436,30 @@ namespace osmium {
             struct changeset_handler : public entity_handler {
 
                 template <typename TDummy>
-                void operator()(osmium::Changeset&, const TDummy&) const noexcept {
+                static void set_value(osmium::Changeset&, const TDummy&) noexcept {
                 }
 
-                void operator()(osmium::Changeset& changeset, attr::_id id) const noexcept {
+                static void set_value(osmium::Changeset& changeset, attr::_id id) noexcept {
                     changeset.set_id(id.value);
                 }
 
-                void operator()(osmium::Changeset& changeset, attr::_num_changes num_changes) const noexcept {
+                static void set_value(osmium::Changeset& changeset, attr::_num_changes num_changes) noexcept {
                     changeset.set_num_changes(num_changes.value);
                 }
 
-                void operator()(osmium::Changeset& changeset, attr::_num_comments num_comments) const noexcept {
+                static void set_value(osmium::Changeset& changeset, attr::_num_comments num_comments) noexcept {
                     changeset.set_num_comments(num_comments.value);
                 }
 
-                void operator()(osmium::Changeset& changeset, attr::_created_at created_at) const noexcept {
+                static void set_value(osmium::Changeset& changeset, attr::_created_at created_at) noexcept {
                     changeset.set_created_at(created_at.value);
                 }
 
-                void operator()(osmium::Changeset& changeset, attr::_closed_at closed_at) const noexcept {
+                static void set_value(osmium::Changeset& changeset, attr::_closed_at closed_at) noexcept {
                     changeset.set_closed_at(closed_at.value);
                 }
 
-                void operator()(osmium::Changeset& changeset, attr::_uid uid) const noexcept {
+                static void set_value(osmium::Changeset& changeset, attr::_uid uid) noexcept {
                     changeset.set_uid(uid.value);
                 }
 
@@ -468,34 +468,34 @@ namespace osmium {
             struct object_handler : public entity_handler {
 
                 template <typename TDummy>
-                void operator()(osmium::OSMObject&, const TDummy&) const noexcept {
+                static void set_value(osmium::OSMObject&, const TDummy&) noexcept {
                 }
 
-                void operator()(osmium::OSMObject& object, attr::_id id) const noexcept {
+                static void set_value(osmium::OSMObject& object, attr::_id id) noexcept {
                     object.set_id(id.value);
                 }
 
-                void operator()(osmium::OSMObject& object, attr::_version version) const noexcept {
+                static void set_value(osmium::OSMObject& object, attr::_version version) noexcept {
                     object.set_version(version.value);
                 }
 
-                void operator()(osmium::OSMObject& object, attr::_visible visible) const noexcept {
+                static void set_value(osmium::OSMObject& object, attr::_visible visible) noexcept {
                     object.set_visible(visible.value);
                 }
 
-                void operator()(osmium::OSMObject& object, attr::_deleted deleted) const noexcept {
+                static void set_value(osmium::OSMObject& object, attr::_deleted deleted) noexcept {
                     object.set_deleted(deleted.value);
                 }
 
-                void operator()(osmium::OSMObject& object, attr::_timestamp timestamp) const noexcept {
+                static void set_value(osmium::OSMObject& object, attr::_timestamp timestamp) noexcept {
                     object.set_timestamp(timestamp.value);
                 }
 
-                void operator()(osmium::OSMObject& object, attr::_changeset changeset) const noexcept {
+                static void set_value(osmium::OSMObject& object, attr::_changeset changeset) noexcept {
                     object.set_changeset(changeset.value);
                 }
 
-                void operator()(osmium::OSMObject& object, attr::_uid uid) const noexcept {
+                static void set_value(osmium::OSMObject& object, attr::_uid uid) noexcept {
                     object.set_uid(uid.value);
                 }
 
@@ -503,9 +503,9 @@ namespace osmium {
 
             struct node_handler : public object_handler {
 
-                using object_handler::operator();
+                using object_handler::set_value;
 
-                void operator()(osmium::Node& node, attr::_location location) const noexcept {
+                static void set_value(osmium::Node& node, attr::_location location) noexcept {
                     node.set_location(location.value);
                 }
 
@@ -513,9 +513,8 @@ namespace osmium {
 
             template <typename THandler, typename TBuilder, typename... TArgs>
             inline void add_basic(TBuilder& builder, const TArgs&... args) {
-                THandler handler;
                 (void)std::initializer_list<int>{
-                    (handler(builder.object(), args), 0)...
+                    (THandler::set_value(builder.object(), args), 0)...
                 };
             }
 
@@ -546,15 +545,15 @@ namespace osmium {
             struct tags_handler {
 
                 template <typename TDummy>
-                void operator()(TagListBuilder&, const TDummy&) const noexcept {
+                static void set_value(TagListBuilder&, const TDummy&) noexcept {
                 }
 
-                void operator()(TagListBuilder& builder, const attr::_tag& tag) const {
+                static void set_value(TagListBuilder& builder, const attr::_tag& tag) {
                     builder.add_tag(tag.value);
                 }
 
                 template <typename TIterator>
-                void operator()(TagListBuilder& builder, const attr::detail::tags_from_iterator_pair<TIterator>& tags) const {
+                static void set_value(TagListBuilder& builder, const attr::detail::tags_from_iterator_pair<TIterator>& tags) {
                     for (const auto& tag : tags) {
                         builder.add_tag(tag);
                     }
@@ -565,15 +564,15 @@ namespace osmium {
             struct nodes_handler {
 
                 template <typename TDummy>
-                void operator()(WayNodeListBuilder&, const TDummy&) const noexcept {
+                static void set_value(WayNodeListBuilder&, const TDummy&) noexcept {
                 }
 
-                void operator()(WayNodeListBuilder& builder, const attr::_node& node_ref) const {
+                static void set_value(WayNodeListBuilder& builder, const attr::_node& node_ref) {
                     builder.add_node_ref(node_ref.value);
                 }
 
                 template <typename TIterator>
-                void operator()(WayNodeListBuilder& builder, const attr::detail::nodes_from_iterator_pair<TIterator>& nodes) const {
+                static void set_value(WayNodeListBuilder& builder, const attr::detail::nodes_from_iterator_pair<TIterator>& nodes) {
                     for (const auto& ref : nodes) {
                         builder.add_node_ref(ref);
                     }
@@ -584,15 +583,15 @@ namespace osmium {
             struct members_handler {
 
                 template <typename TDummy>
-                void operator()(RelationMemberListBuilder&, const TDummy&) const noexcept {
+                static void set_value(RelationMemberListBuilder&, const TDummy&) noexcept {
                 }
 
-                void operator()(RelationMemberListBuilder& builder, const attr::_member& member) const {
+                static void set_value(RelationMemberListBuilder& builder, const attr::_member& member) {
                     builder.add_member(member.value.type(), member.value.ref(), member.value.role());
                 }
 
                 template <typename TIterator>
-                void operator()(RelationMemberListBuilder& builder, const attr::detail::members_from_iterator_pair<TIterator>& members) const {
+                static void set_value(RelationMemberListBuilder& builder, const attr::detail::members_from_iterator_pair<TIterator>& members) {
                     for (const auto& member : members) {
                         builder.add_member(member.type(), member.ref(), member.role());
                     }
@@ -603,16 +602,16 @@ namespace osmium {
             struct discussion_handler {
 
                 template <typename TDummy>
-                void operator()(ChangesetDiscussionBuilder&, const TDummy&) const noexcept {
+                static void set_value(ChangesetDiscussionBuilder&, const TDummy&) noexcept {
                 }
 
-                void operator()(ChangesetDiscussionBuilder& builder, const attr::_comment& comment) const {
+                static void set_value(ChangesetDiscussionBuilder& builder, const attr::_comment& comment) {
                     builder.add_comment(comment.value.date(), comment.value.uid(), comment.value.user());
                     builder.add_comment_text(comment.value.text());
                 }
 
                 template <typename TIterator>
-                void operator()(ChangesetDiscussionBuilder& builder, const attr::detail::comments_from_iterator_pair<TIterator>& comments) const {
+                static void set_value(ChangesetDiscussionBuilder& builder, const attr::detail::comments_from_iterator_pair<TIterator>& comments) {
                     for (const auto& comment : comments) {
                         builder.add_comment(comment.date(), comment.uid(), comment.user());
                         builder.add_comment_text(comment.text());
@@ -624,11 +623,11 @@ namespace osmium {
             struct ring_handler {
 
                 template <typename TDummy>
-                void operator()(AreaBuilder&, const TDummy&) const noexcept {
+                static void set_value(AreaBuilder&, const TDummy&) noexcept {
                 }
 
                 template <typename TIterator>
-                void operator()(AreaBuilder& parent, const attr::detail::outer_ring_from_iterator_pair<TIterator>& nodes) const {
+                static void set_value(AreaBuilder& parent, const attr::detail::outer_ring_from_iterator_pair<TIterator>& nodes) {
                     OuterRingBuilder builder(parent.buffer(), &parent);
                     for (const auto& ref : nodes) {
                         builder.add_node_ref(ref);
@@ -636,7 +635,7 @@ namespace osmium {
                 }
 
                 template <typename TIterator>
-                void operator()(AreaBuilder& parent, const attr::detail::inner_ring_from_iterator_pair<TIterator>& nodes) const {
+                static void set_value(AreaBuilder& parent, const attr::detail::inner_ring_from_iterator_pair<TIterator>& nodes) {
                     InnerRingBuilder builder(parent.buffer(), &parent);
                     for (const auto& ref : nodes) {
                         builder.add_node_ref(ref);
@@ -656,9 +655,8 @@ namespace osmium {
             inline typename std::enable_if<is_handled_by<THandler, TArgs...>::any>::type
             add_list(osmium::builder::Builder& parent, const TArgs&... args) {
                 TBuilder builder(parent.buffer(), &parent);
-                THandler handler;
                 (void)std::initializer_list<int>{
-                    (handler(builder, args), 0)...
+                    (THandler::set_value(builder, args), 0)...
                 };
             }
 
@@ -740,9 +738,8 @@ namespace osmium {
             detail::add_user(builder, args...);
             detail::add_list<TagListBuilder, detail::tags_handler>(builder, args...);
 
-            detail::ring_handler handler;
             (void)std::initializer_list<int>{
-                (handler(builder, args), 0)...
+                (detail::ring_handler::set_value(builder, args), 0)...
             };
 
             return buffer.commit();
