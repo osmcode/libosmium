@@ -51,6 +51,37 @@ namespace osmium {
 
         namespace detail {
 
+#ifdef _MSC_VER
+            // workaround for bug in MSVC
+
+            template <typename THandler, typename... TTypes>
+            struct is_handled_by;
+
+            template <typename THandler>
+            struct is_handled_by<THandler> {
+                static constexpr bool value = false;
+            };
+
+            template <typename THandler, typename T, typename... TRest>
+            struct is_handled_by<THandler, T, TRest...> {
+                static constexpr bool value = std::is_base_of<typename T::handler, THandler>::value ||
+                                              is_handled_by<THandler, TRest...>::value;
+            };
+
+            template <typename THandler, typename... TTypes>
+            struct are_all_handled_by;
+
+            template <typename THandler, typename T>
+            struct are_all_handled_by<THandler, T> {
+                static constexpr bool value = std::is_base_of<typename T::handler, THandler>::value;
+            };
+
+            template <typename THandler, typename T, typename... TRest>
+            struct are_all_handled_by<THandler, T, TRest...> {
+                static constexpr bool value = std::is_base_of<typename T::handler, THandler>::value &&
+                                              are_all_handled_by<THandler, TRest...>::value;
+            };
+#else
             // True if Predicate matches for none of the types Ts
             template <template<typename> class Predicate, typename... Ts>
             struct static_none_of : std::is_same<std::tuple<std::false_type, typename Predicate<Ts>::type...>,
@@ -80,6 +111,7 @@ namespace osmium {
 
                 static constexpr bool value = static_all_of<HasHandler, TTypes...>::value;
             };
+#endif
 
 
             // Wraps any type, so that we can derive from it
