@@ -187,7 +187,7 @@ namespace osmium {
             OSMIUM_ATTRIBUTE(entity_handler, _user, const char*)
                 constexpr explicit _user(const char* val) noexcept :
                     type_wrapper(val) {}
-                constexpr explicit _user(const std::string& val) noexcept :
+                explicit _user(const std::string& val) noexcept :
                     type_wrapper(val.c_str()) {}
             };
 
@@ -334,9 +334,9 @@ namespace osmium {
                     type_wrapper({type, id}) {}
                 constexpr explicit _member(osmium::item_type type, osmium::object_id_type id, const char* role) noexcept :
                     type_wrapper({type, id, role}) {}
-                constexpr explicit _member(osmium::item_type type, osmium::object_id_type id, const std::string& role) noexcept :
+                explicit _member(osmium::item_type type, osmium::object_id_type id, const std::string& role) noexcept :
                     type_wrapper({type, id, role.c_str()}) {}
-                constexpr explicit _member(const osmium::RelationMember& member) noexcept :
+                explicit _member(const osmium::RelationMember& member) noexcept :
                     type_wrapper({member.type(), member.ref(), member.role()}) {}
             };
 
@@ -364,7 +364,7 @@ namespace osmium {
             OSMIUM_ATTRIBUTE(discussion_handler, _comment, comment_type)
                 constexpr explicit _comment(const comment_type& value) noexcept :
                     type_wrapper(value) {}
-                constexpr explicit _comment(const osmium::ChangesetComment& comment) noexcept :
+                explicit _comment(const osmium::ChangesetComment& comment) noexcept :
                     type_wrapper({comment.date(), comment.uid(), comment.user(), comment.text()}) {}
             };
 
