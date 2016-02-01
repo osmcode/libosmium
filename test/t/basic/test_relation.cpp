@@ -15,7 +15,7 @@ TEST_CASE("Build relation") {
         _id(17),
         _version(3),
         _visible(),
-        _changeset(333),
+        _cid(333),
         _uid(21),
         _timestamp(time_t(123)),
         _user("foo"),

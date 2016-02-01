@@ -184,10 +184,10 @@ namespace osmium {
 
         namespace attr {
 
-            OSMIUM_ATTRIBUTE_WITH_CONSTRUCTOR(entity_handler, _id, osmium::object_id_type);
+            OSMIUM_ATTRIBUTE_WITH_CONSTRUCTOR(object_handler, _id, osmium::object_id_type);
             OSMIUM_ATTRIBUTE_WITH_CONSTRUCTOR(object_handler, _version, osmium::object_version_type);
             OSMIUM_ATTRIBUTE_WITH_CONSTRUCTOR(entity_handler, _uid, osmium::user_id_type);
-            OSMIUM_ATTRIBUTE_WITH_CONSTRUCTOR(object_handler, _changeset, osmium::changeset_id_type);
+            OSMIUM_ATTRIBUTE_WITH_CONSTRUCTOR(entity_handler, _cid, osmium::changeset_id_type);
 
             OSMIUM_ATTRIBUTE(object_handler, _deleted, bool)
                 constexpr explicit _deleted(bool value = true) noexcept :
@@ -474,7 +474,7 @@ namespace osmium {
                 static void set_value(osmium::Changeset&, const TDummy&) noexcept {
                 }
 
-                static void set_value(osmium::Changeset& changeset, attr::_id id) noexcept {
+                static void set_value(osmium::Changeset& changeset, attr::_cid id) noexcept {
                     changeset.set_id(id.value);
                 }
 
@@ -526,7 +526,7 @@ namespace osmium {
                     object.set_timestamp(timestamp.value);
                 }
 
-                static void set_value(osmium::OSMObject& object, attr::_changeset changeset) noexcept {
+                static void set_value(osmium::OSMObject& object, attr::_cid changeset) noexcept {
                     object.set_changeset(changeset.value);
                 }
 
@@ -713,7 +713,7 @@ namespace osmium {
         template <typename... TArgs>
         inline size_t add_node(osmium::memory::Buffer& buffer, const TArgs&... args) {
             static_assert(sizeof...(args) > 0, "add_node() must have buffer and at least one additional argument");
-            static_assert(detail::are_all_handled_by<detail::any_node_handlers, TArgs...>::value, "Type not allowed in add_node()");
+            static_assert(detail::are_all_handled_by<detail::any_node_handlers, TArgs...>::value, "Attribute not allowed in add_node()");
 
             NodeBuilder builder(buffer);
 
@@ -733,7 +733,7 @@ namespace osmium {
         template <typename... TArgs>
         inline size_t add_way(osmium::memory::Buffer& buffer, const TArgs&... args) {
             static_assert(sizeof...(args) > 0, "add_way() must have buffer and at least one additional argument");
-            static_assert(detail::are_all_handled_by<detail::any_way_handlers, TArgs...>::value, "Type not allowed in add_way()");
+            static_assert(detail::are_all_handled_by<detail::any_way_handlers, TArgs...>::value, "Attribute not allowed in add_way()");
 
             WayBuilder builder(buffer);
 
@@ -754,7 +754,7 @@ namespace osmium {
         template <typename... TArgs>
         inline size_t add_relation(osmium::memory::Buffer& buffer, const TArgs&... args) {
             static_assert(sizeof...(args) > 0, "add_relation() must have buffer and at least one additional argument");
-            static_assert(detail::are_all_handled_by<detail::any_relation_handlers, TArgs...>::value, "Type not allowed in add_relation()");
+            static_assert(detail::are_all_handled_by<detail::any_relation_handlers, TArgs...>::value, "Attribute not allowed in add_relation()");
 
             RelationBuilder builder(buffer);
 
@@ -775,7 +775,7 @@ namespace osmium {
         template <typename... TArgs>
         inline size_t add_changeset(osmium::memory::Buffer& buffer, const TArgs&... args) {
             static_assert(sizeof...(args) > 0, "add_changeset() must have buffer and at least one additional argument");
-            static_assert(detail::are_all_handled_by<detail::any_changeset_handlers, TArgs...>::value, "Type not allowed in add_changeset()");
+            static_assert(detail::are_all_handled_by<detail::any_changeset_handlers, TArgs...>::value, "Attribute not allowed in add_changeset()");
 
             ChangesetBuilder builder(buffer);
 
@@ -796,7 +796,7 @@ namespace osmium {
         template <typename... TArgs>
         inline size_t add_area(osmium::memory::Buffer& buffer, const TArgs&... args) {
             static_assert(sizeof...(args) > 0, "add_area() must have buffer and at least one additional argument");
-            static_assert(detail::are_all_handled_by<detail::any_area_handlers, TArgs...>::value, "Type not allowed in add_area()");
+            static_assert(detail::are_all_handled_by<detail::any_area_handlers, TArgs...>::value, "Attribute not allowed in add_area()");
 
             AreaBuilder builder(buffer);
 

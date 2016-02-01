@@ -12,9 +12,9 @@ TEST_CASE("Build changeset") {
     osmium::memory::Buffer buffer(10 * 1000);
 
     osmium::builder::add_changeset(buffer,
-        _id(42),
-       _created_at(time_t(100)),
-       _closed_at(time_t(200)),
+        _cid(42),
+        _created_at(time_t(100)),
+        _closed_at(time_t(200)),
         _num_changes(7),
         _num_comments(3),
         _uid(9),
@@ -39,8 +39,8 @@ TEST_CASE("Build changeset") {
     REQUIRE(crc32().checksum() == 0x502e8c0e);
 
     auto pos = osmium::builder::add_changeset(buffer,
-        _id(43),
-       _created_at(time_t(120)),
+        _cid(43),
+        _created_at(time_t(120)),
         _num_changes(21),
         _num_comments(0),
         _uid(9),

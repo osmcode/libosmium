@@ -40,7 +40,7 @@ TEST_CASE("create node using builders") {
             _id(1),
             _version(17),
             _timestamp(osmium::Timestamp("2015-01-01T10:20:30Z")),
-            _changeset(21),
+            _cid(21),
             _uid(222),
             _location(loc),
             _user("foo")
@@ -82,7 +82,7 @@ TEST_CASE("create node using builders") {
         const auto pos = osmium::builder::add_node(buffer,
             _timestamp("2015-01-01T10:20:30Z"),
             _version(17),
-            _changeset(21),
+            _cid(21),
             _uid(222),
             _user(std::string("foo")),
             _id(1),
@@ -229,7 +229,7 @@ TEST_CASE("create way using builders") {
     SECTION("add way without nodes") {
         const auto pos = osmium::builder::add_way(buffer,
             _id(999),
-            _changeset(21),
+            _cid(21),
             _uid(222),
             _user("foo")
         );
@@ -545,7 +545,7 @@ TEST_CASE("create area using builders") {
     SECTION("add area without rings") {
         const auto pos = osmium::builder::add_area(buffer,
             _id(999),
-            _changeset(21),
+            _cid(21),
             _uid(222),
             _user("foo"),
             _tag("landuse", "residential")

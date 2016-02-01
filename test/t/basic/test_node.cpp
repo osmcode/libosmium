@@ -15,7 +15,7 @@ TEST_CASE("Build node") {
         _id(17),
         _version(3),
         _visible(true),
-        _changeset(333),
+        _cid(333),
         _uid(21),
         _timestamp(time_t(123)),
         _user("foo"),
