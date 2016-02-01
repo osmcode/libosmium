@@ -155,21 +155,21 @@ namespace osmium {
             OSMIUM_ATTRIBUTE_WITH_CONSTRUCTOR(object_handler, _changeset, osmium::changeset_id_type);
 
             OSMIUM_ATTRIBUTE(object_handler, _deleted, bool)
-                constexpr explicit _deleted(bool value = true) :
+                constexpr explicit _deleted(bool value = true) noexcept :
                     type_wrapper(value) {}
             };
 
             OSMIUM_ATTRIBUTE(object_handler, _visible, bool)
-                constexpr explicit _visible(bool value = true) :
+                constexpr explicit _visible(bool value = true) noexcept :
                     type_wrapper(value) {}
             };
 
             OSMIUM_ATTRIBUTE(object_handler, _timestamp, osmium::Timestamp)
-                constexpr explicit _timestamp(const osmium::Timestamp& value) :
+                constexpr explicit _timestamp(const osmium::Timestamp& value) noexcept :
                     type_wrapper(value) {}
-                constexpr explicit _timestamp(time_t value) :
+                constexpr explicit _timestamp(time_t value) noexcept :
                     type_wrapper(osmium::Timestamp{value}) {}
-                constexpr explicit _timestamp(uint32_t value) :
+                constexpr explicit _timestamp(uint32_t value) noexcept :
                     type_wrapper(osmium::Timestamp{value}) {}
                 explicit _timestamp(const char* value) :
                     type_wrapper(osmium::Timestamp{value}) {}
@@ -178,16 +178,16 @@ namespace osmium {
             };
 
             OSMIUM_ATTRIBUTE(node_handler, _location, osmium::Location)
-                constexpr explicit _location(const osmium::Location& value) :
+                constexpr explicit _location(const osmium::Location& value) noexcept :
                     type_wrapper(value) {}
                 explicit _location(double lat, double lon) :
                     type_wrapper(osmium::Location{lat, lon}) {}
             };
 
             OSMIUM_ATTRIBUTE(entity_handler, _user, const char*)
-                explicit _user(const char* val) :
+                explicit _user(const char* val) noexcept :
                     type_wrapper(val) {}
-                explicit _user(const std::string& val) :
+                explicit _user(const std::string& val) noexcept :
                     type_wrapper(val.c_str()) {}
             };
 
@@ -272,7 +272,7 @@ namespace osmium {
             } // namespace detail
 
             OSMIUM_ATTRIBUTE(tags_handler, _tag, pair_of_cstrings)
-                explicit _tag(const pair_of_cstrings& value) :
+                explicit _tag(const pair_of_cstrings& value) noexcept :
                     type_wrapper(value) {}
                 explicit _tag(const pair_of_strings& value) :
                     type_wrapper(std::make_pair(value.first.c_str(), value.second.c_str())) {}
@@ -300,9 +300,9 @@ namespace osmium {
 
 
             OSMIUM_ATTRIBUTE(nodes_handler, _node, osmium::NodeRef)
-                constexpr explicit _node(osmium::object_id_type value) :
+                constexpr explicit _node(osmium::object_id_type value) noexcept :
                     type_wrapper(NodeRef{value}) {}
-                constexpr explicit _node(const NodeRef& value) :
+                constexpr explicit _node(const NodeRef& value) noexcept :
                     type_wrapper(value) {}
             };
 
@@ -328,15 +328,15 @@ namespace osmium {
 
 
             OSMIUM_ATTRIBUTE(members_handler, _member, member_type)
-                explicit _member(const member_type& value) :
+                explicit _member(const member_type& value) noexcept :
                     type_wrapper(value) {}
-                explicit _member(osmium::item_type type, osmium::object_id_type id) :
+                explicit _member(osmium::item_type type, osmium::object_id_type id) noexcept :
                     type_wrapper({type, id}) {}
-                explicit _member(osmium::item_type type, osmium::object_id_type id, const char* role) :
+                explicit _member(osmium::item_type type, osmium::object_id_type id, const char* role) noexcept :
                     type_wrapper({type, id, role}) {}
-                explicit _member(osmium::item_type type, osmium::object_id_type id, const std::string& role) :
+                explicit _member(osmium::item_type type, osmium::object_id_type id, const std::string& role) noexcept :
                     type_wrapper({type, id, role.c_str()}) {}
-                explicit _member(const osmium::RelationMember& member) :
+                explicit _member(const osmium::RelationMember& member) noexcept :
                     type_wrapper({member.type(), member.ref(), member.role()}) {}
             };
 
@@ -362,15 +362,15 @@ namespace osmium {
             OSMIUM_ATTRIBUTE_WITH_CONSTRUCTOR(changeset_handler, _closed_at, osmium::Timestamp);
 
             OSMIUM_ATTRIBUTE(discussion_handler, _comment, comment_type)
-                explicit _comment(const comment_type& value) :
+                explicit _comment(const comment_type& value) noexcept :
                     type_wrapper(value) {}
-                explicit _comment(const osmium::ChangesetComment& comment) :
+                explicit _comment(const osmium::ChangesetComment& comment) noexcept :
                     type_wrapper({comment.date(), comment.uid(), comment.user(), comment.text()}) {}
             };
 
-            template <typename TcommentIterator>
-            inline constexpr detail::comments_from_iterator_pair<TcommentIterator> _comments(TcommentIterator first, TcommentIterator last) {
-                return detail::comments_from_iterator_pair<TcommentIterator>(first, last);
+            template <typename TCommentIterator>
+            inline constexpr detail::comments_from_iterator_pair<TCommentIterator> _comments(TCommentIterator first, TCommentIterator last) {
+                return detail::comments_from_iterator_pair<TCommentIterator>(first, last);
             }
 
             template <typename TContainer>
@@ -512,7 +512,7 @@ namespace osmium {
             }; // node_handler
 
             template <typename THandler, typename TBuilder, typename... TArgs>
-            inline void add_basic(TBuilder& builder, const TArgs&... args) {
+            inline void add_basic(TBuilder& builder, const TArgs&... args) noexcept {
                 (void)std::initializer_list<int>{
                     (THandler::set_value(builder.object(), args), 0)...
                 };
@@ -648,7 +648,7 @@ namespace osmium {
 
             template <typename TBuilder, typename THandler, typename... TArgs>
             inline typename std::enable_if<!is_handled_by<THandler, TArgs...>::any>::type
-            add_list(osmium::builder::Builder&, const TArgs&...) {
+            add_list(osmium::builder::Builder&, const TArgs&...) noexcept {
             }
 
             template <typename TBuilder, typename THandler, typename... TArgs>
