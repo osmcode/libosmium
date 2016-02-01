@@ -39,9 +39,9 @@ DEALINGS IN THE SOFTWARE.
 #include <cstring>
 #include <functional>
 #include <iterator>
+#include <memory>
 #include <stdexcept>
 #include <utility>
-#include <vector>
 
 #include <osmium/memory/item.hpp>
 #include <osmium/memory/item_iterator.hpp>
@@ -108,7 +108,7 @@ namespace osmium {
 
         private:
 
-            std::vector<unsigned char> m_memory;
+            std::unique_ptr<unsigned char> m_memory;
             unsigned char* m_data;
             size_t m_capacity;
             size_t m_written;
@@ -195,8 +195,8 @@ namespace osmium {
              *         of the alignment.
              */
             explicit Buffer(size_t capacity, auto_grow auto_grow = auto_grow::yes) :
-                m_memory(capacity),
-                m_data(m_memory.data()),
+                m_memory(new unsigned char[capacity]),
+                m_data(m_memory.get()),
                 m_capacity(capacity),
                 m_written(0),
                 m_committed(0),
@@ -302,18 +302,22 @@ namespace osmium {
              *         memory management.
              * @throws std::invalid_argument if the size isn't a multiple
              *         of the alignment.
+             * @throws std::bad_alloc if there isn't enough memory available.
              */
             void grow(size_t size) {
                 assert(m_data);
-                if (m_memory.empty()) {
+                if (!m_memory) {
                     throw std::logic_error("Can't grow Buffer if it doesn't use internal memory management.");
                 }
                 if (m_capacity < size) {
                     if (size % align_bytes != 0) {
                         throw std::invalid_argument("buffer capacity needs to be multiple of alignment");
                     }
-                    m_memory.resize(size);
-                    m_data = m_memory.data();
+                    std::unique_ptr<unsigned char> memory(new unsigned char[size]);
+                    std::copy_n(m_memory.get(), m_capacity, memory.get());
+                    using std::swap;
+                    swap(m_memory, memory);
+                    m_data = m_memory.get();
                     m_capacity = size;
                 }
             }
@@ -418,7 +422,7 @@ namespace osmium {
                 }
                 // if there's still not enough space, then try growing the buffer.
                 if (m_written + size > m_capacity) {
-                    if (!m_memory.empty() && (m_auto_grow == auto_grow::yes)) {
+                    if (m_memory && (m_auto_grow == auto_grow::yes)) {
                         // double buffer size until there is enough space
                         size_t new_capacity = m_capacity * 2;
                         while (m_written + size > new_capacity) {
