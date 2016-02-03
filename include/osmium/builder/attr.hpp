@@ -705,10 +705,11 @@ namespace osmium {
 
 
         /**
-         * Create a node using the given arguments and it to the given buffer.
+         * Create a node using the given arguments and add it to the given buffer.
          *
          * @param buffer The buffer to which the node will be added.
          * @param args The attributes of the node.
+         * @returns The position in the buffer where this node was added.
          */
         template <typename... TArgs>
         inline size_t add_node(osmium::memory::Buffer& buffer, const TArgs&... args) {
@@ -725,10 +726,11 @@ namespace osmium {
         }
 
         /**
-         * Create a way using the given arguments and it to the given buffer.
+         * Create a way using the given arguments and add it to the given buffer.
          *
          * @param buffer The buffer to which the way will be added.
          * @param args The attributes of the way.
+         * @returns The position in the buffer where this way was added.
          */
         template <typename... TArgs>
         inline size_t add_way(osmium::memory::Buffer& buffer, const TArgs&... args) {
@@ -746,10 +748,11 @@ namespace osmium {
         }
 
         /**
-         * Create a relation using the given arguments and it to the given buffer.
+         * Create a relation using the given arguments and add it to the given buffer.
          *
          * @param buffer The buffer to which the relation will be added.
          * @param args The attributes of the relation.
+         * @returns The position in the buffer where this relation was added.
          */
         template <typename... TArgs>
         inline size_t add_relation(osmium::memory::Buffer& buffer, const TArgs&... args) {
@@ -767,10 +770,11 @@ namespace osmium {
         }
 
         /**
-         * Create a changeset using the given arguments and it to the given buffer.
+         * Create a changeset using the given arguments and add it to the given buffer.
          *
          * @param buffer The buffer to which the changeset will be added.
          * @param args The attributes of the changeset.
+         * @returns The position in the buffer where this changeset was added.
          */
         template <typename... TArgs>
         inline size_t add_changeset(osmium::memory::Buffer& buffer, const TArgs&... args) {
@@ -788,10 +792,11 @@ namespace osmium {
         }
 
         /**
-         * Create a area using the given arguments and it to the given buffer.
+         * Create a area using the given arguments and add it to the given buffer.
          *
          * @param buffer The buffer to which the area will be added.
          * @param args The attributes of the area.
+         * @returns The position in the buffer where this area was added.
          */
         template <typename... TArgs>
         inline size_t add_area(osmium::memory::Buffer& buffer, const TArgs&... args) {
