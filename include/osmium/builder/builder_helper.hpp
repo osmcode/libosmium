@@ -67,6 +67,10 @@ namespace osmium {
             return buffer.get<const osmium::WayNodeList>(pos);
         }
 
+        /**
+         * @deprecated
+         * Use osmium::builder::add_tag_list() instead.
+         */
         inline const osmium::TagList& build_tag_list(osmium::memory::Buffer& buffer, const std::initializer_list<std::pair<const char*, const char*>>& tags) {
             size_t pos = buffer.committed();
             {
@@ -79,6 +83,10 @@ namespace osmium {
             return buffer.get<const osmium::TagList>(pos);
         }
 
+        /**
+         * @deprecated
+         * Use osmium::builder::add_tag_list() instead.
+         */
         inline const osmium::TagList& build_tag_list_from_map(osmium::memory::Buffer& buffer, const std::map<const char*, const char*>& tags) {
             size_t pos = buffer.committed();
             {
@@ -91,6 +99,10 @@ namespace osmium {
             return buffer.get<const osmium::TagList>(pos);
         }
 
+        /**
+         * @deprecated
+         * Use osmium::builder::add_tag_list() instead.
+         */
         inline const osmium::TagList& build_tag_list_from_func(osmium::memory::Buffer& buffer, std::function<void(osmium::builder::TagListBuilder&)> func) {
             size_t pos = buffer.committed();
             {

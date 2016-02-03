@@ -226,7 +226,7 @@ namespace osmium {
                     type_wrapper(val.c_str()) {}
             };
 
-            using pair_of_cstrings = std::pair<const char*, const char*>;
+            using pair_of_cstrings = std::pair<const char* const, const char* const>;
             using pair_of_strings = std::pair<const std::string&, const std::string&>;
 
             class member_type {
@@ -309,6 +309,12 @@ namespace osmium {
             OSMIUM_ATTRIBUTE(tags_handler, _tag, pair_of_cstrings)
                 constexpr explicit _tag(const pair_of_cstrings& value) noexcept :
                     type_wrapper(value) {}
+                constexpr explicit _tag(const std::pair<const char* const, const char*>& value) :
+                    type_wrapper(pair_of_cstrings{value.first, value.second}) {}
+                constexpr explicit _tag(const std::pair<const char*, const char* const>& value) :
+                    type_wrapper(pair_of_cstrings{value.first, value.second}) {}
+                constexpr explicit _tag(const std::pair<const char*, const char*>& value) :
+                    type_wrapper(pair_of_cstrings{value.first, value.second}) {}
                 explicit _tag(const pair_of_strings& value) :
                     type_wrapper(std::make_pair(value.first.c_str(), value.second.c_str())) {}
                 explicit _tag(const char* key, const char* val) :
@@ -832,6 +838,28 @@ namespace osmium {
                 WayNodeListBuilder builder(buffer);
                 (void)std::initializer_list<int>{
                     (detail::nodes_handler::set_value(builder, args), 0)...
+                };
+            }
+
+            return buffer.commit();
+        }
+
+        /**
+         * Create a TagList using the given arguments and add it to the given buffer.
+         *
+         * @param buffer The buffer to which the list will be added.
+         * @param args The contents of the list.
+         * @returns The position in the buffer where this list was added.
+         */
+        template <typename... TArgs>
+        inline size_t add_tag_list(osmium::memory::Buffer& buffer, const TArgs&... args) {
+            static_assert(sizeof...(args) > 0, "add_tag_list() must have buffer and at least one additional argument");
+            static_assert(detail::are_all_handled_by<detail::tags_handler, TArgs...>::value, "Attribute not allowed in add_tag_list()");
+
+            {
+                TagListBuilder builder(buffer);
+                (void)std::initializer_list<int>{
+                    (detail::tags_handler::set_value(builder, args), 0)...
                 };
             }
 

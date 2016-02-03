@@ -137,6 +137,15 @@ namespace osmium {
              *
              * @param tag Pair of key/value 0-terminated strings.
              */
+            void add_tag(const std::pair<const char* const, const char* const>& tag) {
+                add_tag(tag.first, tag.second);
+            }
+            void add_tag(const std::pair<const char* const, const char*>& tag) {
+                add_tag(tag.first, tag.second);
+            }
+            void add_tag(const std::pair<const char*, const char* const>& tag) {
+                add_tag(tag.first, tag.second);
+            }
             void add_tag(const std::pair<const char*, const char*>& tag) {
                 add_tag(tag.first, tag.second);
             }
