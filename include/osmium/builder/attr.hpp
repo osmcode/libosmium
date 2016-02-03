@@ -307,13 +307,13 @@ namespace osmium {
             } // namespace detail
 
             OSMIUM_ATTRIBUTE(tags_handler, _tag, pair_of_cstrings)
-                constexpr explicit _tag(const pair_of_cstrings& value) noexcept :
+                explicit _tag(const pair_of_cstrings& value) noexcept :
                     type_wrapper(value) {}
-                constexpr explicit _tag(const std::pair<const char* const, const char*>& value) :
+                explicit _tag(const std::pair<const char* const, const char*>& value) :
                     type_wrapper(pair_of_cstrings{value.first, value.second}) {}
-                constexpr explicit _tag(const std::pair<const char*, const char* const>& value) :
+                explicit _tag(const std::pair<const char*, const char* const>& value) :
                     type_wrapper(pair_of_cstrings{value.first, value.second}) {}
-                constexpr explicit _tag(const std::pair<const char*, const char*>& value) :
+                explicit _tag(const std::pair<const char*, const char*>& value) :
                     type_wrapper(pair_of_cstrings{value.first, value.second}) {}
                 explicit _tag(const pair_of_strings& value) :
                     type_wrapper(std::make_pair(value.first.c_str(), value.second.c_str())) {}
