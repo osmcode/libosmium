@@ -1,9 +1,9 @@
 #include "catch.hpp"
 
-#include <osmium/builder/builder_helper.hpp>
 #include <osmium/geom/geojson.hpp>
 
 #include "area_helper.hpp"
+#include "wnl_helper.hpp"
 
 TEST_CASE("GeoJSON_Geometry") {
 
@@ -23,13 +23,8 @@ SECTION("empty_point") {
 SECTION("linestring") {
     osmium::geom::GeoJSONFactory<> factory;
 
-    osmium::memory::Buffer buffer(10000);
-    auto& wnl = osmium::builder::build_way_node_list(buffer, {
-        {1, {3.2, 4.2}},
-        {3, {3.5, 4.7}},
-        {4, {3.5, 4.7}},
-        {2, {3.6, 4.9}}
-    });
+    osmium::memory::Buffer buffer(1000);
+    auto &wnl = create_test_wnl_okay(buffer);
 
     {
         std::string json {factory.create_linestring(wnl)};
@@ -55,8 +50,8 @@ SECTION("linestring") {
 SECTION("empty_linestring") {
     osmium::geom::GeoJSONFactory<> factory;
 
-    osmium::memory::Buffer buffer(10000);
-    auto& wnl = osmium::builder::build_way_node_list(buffer, {});
+    osmium::memory::Buffer buffer(1000);
+    auto& wnl = create_test_wnl_empty(buffer);
 
     REQUIRE_THROWS_AS(factory.create_linestring(wnl), osmium::geometry_error);
     REQUIRE_THROWS_AS(factory.create_linestring(wnl, osmium::geom::use_nodes::unique, osmium::geom::direction::backward), osmium::geometry_error);
@@ -67,11 +62,8 @@ SECTION("empty_linestring") {
 SECTION("linestring_with_two_same_locations") {
     osmium::geom::GeoJSONFactory<> factory;
 
-    osmium::memory::Buffer buffer(10000);
-    auto& wnl = osmium::builder::build_way_node_list(buffer, {
-        {1, {3.5, 4.7}},
-        {2, {3.5, 4.7}}
-    });
+    osmium::memory::Buffer buffer(1000);
+    auto& wnl = create_test_wnl_same_location(buffer);
 
     REQUIRE_THROWS_AS(factory.create_linestring(wnl), osmium::geometry_error);
     REQUIRE_THROWS_AS(factory.create_linestring(wnl, osmium::geom::use_nodes::unique, osmium::geom::direction::backward), osmium::geometry_error);
@@ -90,11 +82,8 @@ SECTION("linestring_with_two_same_locations") {
 SECTION("linestring_with_undefined_location") {
     osmium::geom::GeoJSONFactory<> factory;
 
-    osmium::memory::Buffer buffer(10000);
-    auto& wnl = osmium::builder::build_way_node_list(buffer, {
-        {1, {3.5, 4.7}},
-        {2, osmium::Location()}
-    });
+    osmium::memory::Buffer buffer(1000);
+    auto& wnl = create_test_wnl_undefined_location(buffer);
 
     REQUIRE_THROWS_AS(factory.create_linestring(wnl), osmium::invalid_location);
 }
@@ -102,7 +91,7 @@ SECTION("linestring_with_undefined_location") {
 SECTION("area_1outer_0inner") {
     osmium::geom::GeoJSONFactory<> factory;
 
-    osmium::memory::Buffer buffer(10000);
+    osmium::memory::Buffer buffer(1000);
     const osmium::Area& area = create_test_area_1outer_0inner(buffer);
 
     REQUIRE(!area.is_multipolygon());
@@ -118,7 +107,7 @@ SECTION("area_1outer_0inner") {
 SECTION("area_1outer_1inner") {
     osmium::geom::GeoJSONFactory<> factory;
 
-    osmium::memory::Buffer buffer(10000);
+    osmium::memory::Buffer buffer(1000);
     const osmium::Area& area = create_test_area_1outer_1inner(buffer);
 
     REQUIRE(!area.is_multipolygon());
@@ -135,7 +124,7 @@ SECTION("area_1outer_1inner") {
 SECTION("area_2outer_2inner") {
     osmium::geom::GeoJSONFactory<> factory;
 
-    osmium::memory::Buffer buffer(10000);
+    osmium::memory::Buffer buffer(1000);
     const osmium::Area& area = create_test_area_2outer_2inner(buffer);
 
     REQUIRE(area.is_multipolygon());

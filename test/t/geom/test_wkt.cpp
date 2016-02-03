@@ -1,9 +1,9 @@
 #include "catch.hpp"
 
-#include <osmium/builder/builder_helper.hpp>
 #include <osmium/geom/wkt.hpp>
 
 #include "area_helper.hpp"
+#include "wnl_helper.hpp"
 
 TEST_CASE("WKT_Geometry") {
 
@@ -24,12 +24,7 @@ SECTION("linestring") {
     osmium::geom::WKTFactory<> factory;
 
     osmium::memory::Buffer buffer(10000);
-    auto& wnl = osmium::builder::build_way_node_list(buffer, {
-        {1, {3.2, 4.2}},
-        {3, {3.5, 4.7}},
-        {4, {3.5, 4.7}},
-        {2, {3.6, 4.9}}
-    });
+    auto &wnl = create_test_wnl_okay(buffer);
 
     {
         std::string wkt {factory.create_linestring(wnl)};
@@ -56,7 +51,7 @@ SECTION("empty_linestring") {
     osmium::geom::WKTFactory<> factory;
 
     osmium::memory::Buffer buffer(10000);
-    auto& wnl = osmium::builder::build_way_node_list(buffer, {});
+    auto &wnl = create_test_wnl_empty(buffer);
 
     REQUIRE_THROWS_AS(factory.create_linestring(wnl), osmium::geometry_error);
     REQUIRE_THROWS_AS(factory.create_linestring(wnl, osmium::geom::use_nodes::unique, osmium::geom::direction::backward), osmium::geometry_error);
@@ -68,10 +63,7 @@ SECTION("linestring_with_two_same_locations") {
     osmium::geom::WKTFactory<> factory;
 
     osmium::memory::Buffer buffer(10000);
-    auto& wnl = osmium::builder::build_way_node_list(buffer, {
-        {1, {3.5, 4.7}},
-        {2, {3.5, 4.7}}
-    });
+    auto &wnl = create_test_wnl_same_location(buffer);
 
     REQUIRE_THROWS_AS(factory.create_linestring(wnl), osmium::geometry_error);
 
@@ -99,10 +91,7 @@ SECTION("linestring_with_undefined_location") {
     osmium::geom::WKTFactory<> factory;
 
     osmium::memory::Buffer buffer(10000);
-    auto& wnl = osmium::builder::build_way_node_list(buffer, {
-        {1, {3.5, 4.7}},
-        {2, osmium::Location()}
-    });
+    auto &wnl = create_test_wnl_undefined_location(buffer);
 
     REQUIRE_THROWS_AS(factory.create_linestring(wnl), osmium::invalid_location);
 }

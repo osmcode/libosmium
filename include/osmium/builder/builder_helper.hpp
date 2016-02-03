@@ -41,6 +41,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/builder/osm_object_builder.hpp>
 #include <osmium/memory/buffer.hpp>
+#include <osmium/util/compatibility.hpp>
 
 namespace osmium {
 
@@ -50,7 +51,11 @@ namespace osmium {
 
     namespace builder {
 
-        inline const osmium::WayNodeList& build_way_node_list(osmium::memory::Buffer& buffer, const std::initializer_list<osmium::NodeRef>& nodes) {
+        /**
+         * @deprecated
+         * Use osmium::builder::add_way_node_list() instead.
+         */
+        OSMIUM_DEPRECATED inline const osmium::WayNodeList& build_way_node_list(osmium::memory::Buffer& buffer, const std::initializer_list<osmium::NodeRef>& nodes) {
             size_t pos = buffer.committed();
             {
                 osmium::builder::WayNodeListBuilder wnl_builder(buffer);

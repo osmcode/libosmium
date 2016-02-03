@@ -1,9 +1,9 @@
 #include "catch.hpp"
 
-#include <osmium/builder/builder_helper.hpp>
 #include <osmium/geom/geos.hpp>
 
 #include "area_helper.hpp"
+#include "wnl_helper.hpp"
 
 TEST_CASE("GEOS geometry factory - create point") {
     osmium::geom::GEOSFactory<> factory;
@@ -43,12 +43,7 @@ TEST_CASE("GEOS geometry factory - create linestring") {
     osmium::geom::GEOSFactory<> factory;
 
     osmium::memory::Buffer buffer(10000);
-    auto& wnl = osmium::builder::build_way_node_list(buffer, {
-        {1, {3.2, 4.2}},
-        {3, {3.5, 4.7}},
-        {4, {3.5, 4.7}},
-        {2, {3.6, 4.9}}
-    });
+    auto &wnl = create_test_wnl_okay(buffer);
 
     SECTION("from way node list") {
         std::unique_ptr<geos::geom::LineString> linestring {factory.create_linestring(wnl)};

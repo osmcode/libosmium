@@ -816,6 +816,28 @@ namespace osmium {
             return buffer.commit();
         }
 
+        /**
+         * Create a WayNodeList using the given arguments and add it to the given buffer.
+         *
+         * @param buffer The buffer to which the list will be added.
+         * @param args The contents of the list.
+         * @returns The position in the buffer where this list was added.
+         */
+        template <typename... TArgs>
+        inline size_t add_way_node_list(osmium::memory::Buffer& buffer, const TArgs&... args) {
+            static_assert(sizeof...(args) > 0, "add_way_node_list() must have buffer and at least one additional argument");
+            static_assert(detail::are_all_handled_by<detail::nodes_handler, TArgs...>::value, "Attribute not allowed in add_way_node_list()");
+
+            {
+                WayNodeListBuilder builder(buffer);
+                (void)std::initializer_list<int>{
+                    (detail::nodes_handler::set_value(builder, args), 0)...
+                };
+            }
+
+            return buffer.commit();
+        }
+
     } // namespace builder
 
 } // namespace osmium

@@ -1,11 +1,11 @@
 #include "catch.hpp"
 
-#include <osmium/builder/builder_helper.hpp>
 #include <osmium/geom/geos.hpp>
 #include <osmium/geom/wkb.hpp>
 
 #include "helper.hpp"
 #include "area_helper.hpp"
+#include "wnl_helper.hpp"
 
 TEST_CASE("WKB_Geometry_with_GEOS") {
 
@@ -25,12 +25,7 @@ SECTION("linestring") {
     osmium::geom::GEOSFactory<> geos_factory;
 
     osmium::memory::Buffer buffer(10000);
-    auto& wnl = osmium::builder::build_way_node_list(buffer, {
-        {1, {3.2, 4.2}},
-        {3, {3.5, 4.7}},
-        {4, {3.5, 4.7}},
-        {2, {3.6, 4.9}}
-    });
+    auto &wnl = create_test_wnl_okay(buffer);
 
     {
         std::string wkb = wkb_factory.create_linestring(wnl);
