@@ -33,7 +33,9 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <cstddef>
 #include <cstdint>
+#include <ctime>
 #include <initializer_list>
 #include <iterator>
 #include <string>
@@ -41,9 +43,11 @@ DEALINGS IN THE SOFTWARE.
 #include <type_traits>
 #include <utility>
 
+#include <osmium/builder/builder.hpp>
 #include <osmium/builder/osm_object_builder.hpp>
 #include <osmium/memory/buffer.hpp>
 #include <osmium/osm/types.hpp>
+#include <osmium/osm.hpp>
 
 namespace osmium {
 

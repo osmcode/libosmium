@@ -34,8 +34,10 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <cassert>
+#include <cstddef>
 #include <cstring>
 #include <initializer_list>
+#include <limits>
 #include <new>
 #include <stdexcept>
 #include <string>
@@ -49,7 +51,6 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/object.hpp>
 #include <osmium/osm/tag.hpp>
 #include <osmium/osm/types.hpp>
-#include <osmium/util/cast.hpp>
 
 namespace osmium {
 
