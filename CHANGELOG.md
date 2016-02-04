@@ -8,6 +8,15 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+### Changed
+
+### Fixed
+
+
+## [2.6.0] - 2016-02-04
+
+### Added
+
 - The new handler osmium::handler::CheckOrder can be used to check that a
   file is properly ordered.
 - Add new method to build OSM nodes, ways, relations, changesets, and areas
@@ -251,7 +260,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   Doxygen (up to version 1.8.8). This version contains a workaround to fix
   this.
 
-[unreleased]: https://github.com/osmcode/libosmium/compare/v2.5.4...HEAD
+[unreleased]: https://github.com/osmcode/libosmium/compare/v2.6.0...HEAD
+[2.6.0]: https://github.com/osmcode/libosmium/compare/v2.5.4...v2.6.0
 [2.5.4]: https://github.com/osmcode/libosmium/compare/v2.5.3...v2.5.4
 [2.5.3]: https://github.com/osmcode/libosmium/compare/v2.5.2...v2.5.3
 [2.5.2]: https://github.com/osmcode/libosmium/compare/v2.5.1...v2.5.2
