@@ -696,7 +696,7 @@ namespace osmium {
                 }
 
                 // Now create the Area object and add the attributes and tags
-                // from the relation.
+                // from the way.
                 {
                     osmium::builder::AreaBuilder builder(out_buffer);
                     builder.initialize_from_object(way);
