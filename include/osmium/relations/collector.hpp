@@ -405,11 +405,6 @@ namespace osmium {
                     }
                 }
 
-                // Remove MemberMetas that were marked as removed.
-                mmv.erase(std::remove_if(mmv.begin(), mmv.end(), [](MemberMeta& mm) {
-                    return mm.removed();
-                }), mmv.end());
-
                 return true;
             }
 
