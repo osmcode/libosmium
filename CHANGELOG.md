@@ -8,7 +8,16 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+- Add `WITH_PROFILING` option to CMake config. When enabled, this sets the
+  `-fno-omit-frame-pointer` compiler option.
+
 ### Changed
+
+- Massiv speed improvements when building multipolygons.
+- Uses (and includes) new version 1.3.0 of protozero library.
+- Removed dependency on Boost Iterator for PBF writer.
+- Example program `osmium_area_test` now uses `cerr` instead of `cout` for
+  debug output.
 
 ### Fixed
 
