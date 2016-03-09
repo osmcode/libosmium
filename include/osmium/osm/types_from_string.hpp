@@ -70,7 +70,8 @@ namespace osmium {
 
     /**
      * Parse string with object type identifier followed by object id. This
-     * reads strings like "n1234" and "w10".
+     * reads strings like "n1234" and "w10". If there is no leading type
+     * identifier, the type osmium::item_type::undefined is returned.
      *
      * @pre input must not be nullptr.
      *
@@ -126,7 +127,7 @@ namespace osmium {
     }
 
     /**
-     * Convert string with object version to object_version_type.
+     * Convert string with changeset id to changeset_id_type.
      *
      * @pre input must not be nullptr.
      *
