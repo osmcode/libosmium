@@ -137,7 +137,7 @@ TEST_CASE("Location") {
     }
 
     SECTION("output_defined") {
-        osmium::Location p(-3.2, 47.3);
+        osmium::Location p(-3.20, 47.30);
         std::stringstream out;
         out << p;
         REQUIRE(out.str() == "(-3.2,47.3)");

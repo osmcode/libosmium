@@ -12,6 +12,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+- Output operator for Location shows full precision.
+
 
 ## [2.6.1] - 2016-02-22
 
