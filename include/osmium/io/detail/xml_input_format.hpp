@@ -419,11 +419,17 @@ namespace osmium {
                                     m_wnl_builder = std::unique_ptr<osmium::builder::WayNodeListBuilder>(new osmium::builder::WayNodeListBuilder(m_buffer, m_way_builder.get()));
                                 }
 
-                                check_attributes(attrs, [this](const XML_Char* name, const XML_Char* value) {
+                                NodeRef nr;
+                                check_attributes(attrs, [this, &nr](const XML_Char* name, const XML_Char* value) {
                                     if (!strcmp(name, "ref")) {
-                                        m_wnl_builder->add_node_ref(osmium::string_to_object_id(value));
+                                        nr.set_ref(osmium::string_to_object_id(value));
+                                    } else if (!strcmp(name, "lon")) {
+                                        nr.location().set_lon(std::atof(value)); // XXX doesn't detect garbage after the number
+                                    } else if (!strcmp(name, "lat")) {
+                                        nr.location().set_lat(std::atof(value)); // XXX doesn't detect garbage after the number
                                     }
                                 });
+                                m_wnl_builder->add_node_ref(nr);
                             } else if (!strcmp(element, "tag")) {
                                 m_wnl_builder.reset();
                                 get_tag(m_way_builder.get(), attrs);

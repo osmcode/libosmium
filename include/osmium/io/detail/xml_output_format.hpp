@@ -86,6 +86,8 @@ namespace osmium {
                  */
                 bool use_change_ops;
 
+                /// Should node locations be added to ways?
+                bool locations_on_ways;
             };
 
             class XMLOutputBlock : public OutputBlock {
@@ -287,9 +289,24 @@ namespace osmium {
 
                     *m_out += ">\n";
 
-                    for (const auto& node_ref : way.nodes()) {
-                        write_prefix();
-                        output_formatted("  <nd ref=\"%" PRId64 "\"/>\n", node_ref.ref());
+                    if (m_options.locations_on_ways) {
+                        for (const auto& node_ref : way.nodes()) {
+                            write_prefix();
+                            output_formatted("  <nd ref=\"%" PRId64 "\"", node_ref.ref());
+                            if (node_ref.location()) {
+                                *m_out += " lat=\"";
+                                osmium::util::double2string(std::back_inserter(*m_out), node_ref.location().lat_without_check(), 7);
+                                *m_out += "\" lon=\"";
+                                osmium::util::double2string(std::back_inserter(*m_out), node_ref.location().lon_without_check(), 7);
+                                *m_out += "\"";
+                            }
+                            *m_out += "/>\n";
+                        }
+                    } else {
+                        for (const auto& node_ref : way.nodes()) {
+                            write_prefix();
+                            output_formatted("  <nd ref=\"%" PRId64 "\"/>\n", node_ref.ref());
+                        }
                     }
 
                     write_tags(way.tags(), prefix_spaces());
@@ -394,9 +411,10 @@ namespace osmium {
                 XMLOutputFormat(const osmium::io::File& file, future_string_queue_type& output_queue) :
                     OutputFormat(output_queue),
                     m_options() {
-                    m_options.add_metadata     = file.is_not_false("add_metadata");
-                    m_options.use_change_ops   = file.is_true("xml_change_format");
-                    m_options.add_visible_flag = (file.has_multiple_object_versions() || file.is_true("force_visible_flag")) && !m_options.use_change_ops;
+                    m_options.add_metadata      = file.is_not_false("add_metadata");
+                    m_options.use_change_ops    = file.is_true("xml_change_format");
+                    m_options.add_visible_flag  = (file.has_multiple_object_versions() || file.is_true("force_visible_flag")) && !m_options.use_change_ops;
+                    m_options.locations_on_ways = file.is_true("locations_on_ways");
                 }
 
                 XMLOutputFormat(const XMLOutputFormat&) = delete;
