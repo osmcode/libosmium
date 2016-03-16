@@ -192,6 +192,17 @@ namespace osmium {
                         static_cast<XMLParser*>(data)->characters(text, len);
                     }
 
+                    // This handler is called when there are any XML entities
+                    // declared in the OSM file. Entities are normally not used,
+                    // but they can be misused. See
+                    // https://en.wikipedia.org/wiki/Billion_laughs
+                    // The handler will just throw an error.
+                    static void entity_declaration_handler(void*,
+                            const XML_Char*, int, const XML_Char*, int, const XML_Char*,
+                            const XML_Char*, const XML_Char*, const XML_Char*) {
+                        throw osmium::xml_error("XML entities are not supported");
+                    }
+
                 public:
 
                     explicit ExpatXMLParser(T* callback_object) :
@@ -202,6 +213,7 @@ namespace osmium {
                         XML_SetUserData(m_parser, callback_object);
                         XML_SetElementHandler(m_parser, start_element_wrapper, end_element_wrapper);
                         XML_SetCharacterDataHandler(m_parser, character_data_wrapper);
+                        XML_SetEntityDeclHandler(m_parser, entity_declaration_handler);
                     }
 
                     ExpatXMLParser(const ExpatXMLParser&) = delete;

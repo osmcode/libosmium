@@ -10,6 +10,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
+- XML parser will not allow any XML entities which are usually not used in OSM
+  files anyway. This can help avoiding DOS attacks.
+
 ### Fixed
 
 - Output operator for Location shows full precision.
