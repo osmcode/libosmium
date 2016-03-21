@@ -148,7 +148,7 @@ namespace osmium {
             /**
              * Add all points of an outer or inner ring to a multipolygon.
              */
-            void add_points(const osmium::OuterRing& nodes) {
+            void add_points(const osmium::NodeRefList& nodes) {
                 osmium::Location last_location;
                 for (const osmium::NodeRef& node_ref : nodes) {
                     if (last_location != node_ref.location()) {
@@ -378,8 +378,8 @@ namespace osmium {
                     m_impl.multipolygon_start();
 
                     for (auto it = area.cbegin(); it != area.cend(); ++it) {
-                        const osmium::OuterRing& ring = static_cast<const osmium::OuterRing&>(*it);
                         if (it->type() == osmium::item_type::outer_ring) {
+                            auto& ring = static_cast<const osmium::OuterRing&>(*it);
                             if (num_polygons > 0) {
                                 m_impl.multipolygon_polygon_finish();
                             }
@@ -390,6 +390,7 @@ namespace osmium {
                             ++num_rings;
                             ++num_polygons;
                         } else if (it->type() == osmium::item_type::inner_ring) {
+                            auto& ring = static_cast<const osmium::InnerRing&>(*it);
                             m_impl.multipolygon_inner_ring_start();
                             add_points(ring);
                             m_impl.multipolygon_inner_ring_finish();
