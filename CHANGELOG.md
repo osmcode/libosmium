@@ -8,6 +8,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+- New functions for iterating over specific item types in buffers
+  (`osmium::memory::Buffer::select()`), over specific subitems
+  (`osmium::OSMObject::subitems()`), and for iterating over all rings of
+  an area (`osmium::Areas::outer_rings(`), `inner_rings()`).
+
 ### Changed
 
 - XML parser will not allow any XML entities which are usually not used in OSM
