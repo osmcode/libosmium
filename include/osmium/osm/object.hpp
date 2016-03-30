@@ -355,6 +355,26 @@ namespace osmium {
             return cend();
         }
 
+        /**
+         * Get a range of subitems of a specific type.
+         *
+         * @tparam The type (must be derived from osmium::memory::Item.
+         */
+        template <typename T>
+        osmium::memory::ItemIteratorRange<T> subitems() {
+            return osmium::memory::ItemIteratorRange<T>{subitems_position(), next()};
+        }
+
+        /**
+         * Get a range of subitems of a specific type.
+         *
+         * @tparam The type (must be derived from osmium::memory::Item.
+         */
+        template <typename T>
+        osmium::memory::ItemIteratorRange<const T> subitems() const {
+            return osmium::memory::ItemIteratorRange<const T>{subitems_position(), next()};
+        }
+
         template <typename T>
         using t_iterator = osmium::memory::ItemIterator<T>;
 

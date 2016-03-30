@@ -167,7 +167,7 @@ TEST_CASE("create tag list") {
         });
     }
 
-    const osmium::TagList& tl = *buffer.begin<osmium::TagList>();
+    const osmium::TagList& tl = *buffer.select<osmium::TagList>().cbegin();
     REQUIRE(osmium::item_type::tag_list == tl.type());
     REQUIRE(2 == tl.size());
 

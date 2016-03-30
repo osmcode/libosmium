@@ -96,7 +96,7 @@ SECTION("area_1outer_0inner") {
 
     REQUIRE(!area.is_multipolygon());
     REQUIRE(std::distance(area.cbegin(), area.cend()) == 2);
-    REQUIRE(std::distance(area.cbegin<osmium::OuterRing>(), area.cend<osmium::OuterRing>()) == area.num_rings().first);
+    REQUIRE(area.subitems<osmium::OuterRing>().size() == area.num_rings().first);
 
     {
         std::string json {factory.create_multipolygon(area)};
@@ -112,8 +112,8 @@ SECTION("area_1outer_1inner") {
 
     REQUIRE(!area.is_multipolygon());
     REQUIRE(std::distance(area.cbegin(), area.cend()) == 3);
-    REQUIRE(std::distance(area.cbegin<osmium::OuterRing>(), area.cend<osmium::OuterRing>()) == area.num_rings().first);
-    REQUIRE(std::distance(area.cbegin<osmium::InnerRing>(), area.cend<osmium::InnerRing>()) == area.num_rings().second);
+    REQUIRE(area.subitems<osmium::OuterRing>().size() == area.num_rings().first);
+    REQUIRE(area.subitems<osmium::InnerRing>().size() == area.num_rings().second);
 
     {
         std::string json {factory.create_multipolygon(area)};
@@ -129,8 +129,8 @@ SECTION("area_2outer_2inner") {
 
     REQUIRE(area.is_multipolygon());
     REQUIRE(std::distance(area.cbegin(), area.cend()) == 5);
-    REQUIRE(std::distance(area.cbegin<osmium::OuterRing>(), area.cend<osmium::OuterRing>()) == area.num_rings().first);
-    REQUIRE(std::distance(area.cbegin<osmium::InnerRing>(), area.cend<osmium::InnerRing>()) == area.num_rings().second);
+    REQUIRE(area.subitems<osmium::OuterRing>().size() == area.num_rings().first);
+    REQUIRE(area.subitems<osmium::InnerRing>().size() == area.num_rings().second);
 
     int outer_ring=0;
     int inner_ring=0;

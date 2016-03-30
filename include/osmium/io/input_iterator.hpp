@@ -69,11 +69,11 @@ namespace osmium {
                     if (!m_buffer || !*m_buffer) { // end of input
                         m_source = nullptr;
                         m_buffer.reset();
-                        m_iter = item_iterator();
+                        m_iter = item_iterator{};
                         return;
                     }
-                    m_iter = m_buffer->begin<TItem>();
-                } while (m_iter == m_buffer->end<TItem>());
+                    m_iter = m_buffer->select<TItem>().begin();
+                } while (m_iter == m_buffer->select<TItem>().end());
             }
 
         public:
@@ -99,7 +99,7 @@ namespace osmium {
                 assert(m_buffer);
                 assert(m_iter);
                 ++m_iter;
-                if (m_iter == m_buffer->end<TItem>()) {
+                if (m_iter == m_buffer->select<TItem>().end()) {
                     update_buffer();
                 }
                 return *this;

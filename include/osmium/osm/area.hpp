@@ -144,8 +144,8 @@ namespace osmium {
          *
          * @returns Pair (number outer rings, number inner rings)
          */
-        std::pair<int, int> num_rings() const {
-            std::pair<int, int> counter { 0, 0 };
+        std::pair<size_t, size_t> num_rings() const {
+            std::pair<size_t, size_t> counter { 0, 0 };
 
             for (auto it = cbegin(); it != cend(); ++it) {
                 switch (it->type()) {

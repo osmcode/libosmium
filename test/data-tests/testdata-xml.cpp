@@ -336,10 +336,10 @@ TEST_CASE("Reading OSM XML 140") {
         reader.close();
 
         int count = 0;
-        for (auto it = buffer.begin<osmium::Node>(); it != buffer.end<osmium::Node>(); ++it) {
+        for (const auto& node : buffer.select<osmium::Node>()) {
             ++count;
-            REQUIRE(it->id() == count);
-            const osmium::TagList& t = it->tags();
+            REQUIRE(node.id() == count);
+            const osmium::TagList& t = node.tags();
 
             const char* uc = t["unicode_char"];
 
@@ -411,35 +411,35 @@ TEST_CASE("Reading OSM XML 142") {
         reader.close();
 
         int count = 0;
-        for (auto it = buffer.begin<osmium::Node>(); it != buffer.end<osmium::Node>(); ++it) {
+        for (const auto& node : buffer.select<osmium::Node>()) {
             ++count;
-            REQUIRE(it->id() == count);
-            REQUIRE(it->tags().size() == 1);
-            const osmium::Tag& tag = *(it->tags().begin());
+            REQUIRE(node.id() == count);
+            REQUIRE(node.tags().size() == 1);
+            const osmium::Tag& tag = *(node.tags().begin());
 
             switch (count) {
                 case 1:
-                    REQUIRE(S_(it->user()) == "user name");
+                    REQUIRE(S_(node.user()) == "user name");
                     REQUIRE(S_(tag.key()) == "key with space");
                     REQUIRE(S_(tag.value()) == "value with space");
                     break;
                 case 2:
-                    REQUIRE(S_(it->user()) == "line\nfeed");
+                    REQUIRE(S_(node.user()) == "line\nfeed");
                     REQUIRE(S_(tag.key()) == "key with\nlinefeed");
                     REQUIRE(S_(tag.value()) == "value with\nlinefeed");
                     break;
                 case 3:
-                    REQUIRE(S_(it->user()) == "carriage\rreturn");
+                    REQUIRE(S_(node.user()) == "carriage\rreturn");
                     REQUIRE(S_(tag.key()) == "key with\rcarriage\rreturn");
                     REQUIRE(S_(tag.value()) == "value with\rcarriage\rreturn");
                     break;
                 case 4:
-                    REQUIRE(S_(it->user()) == "tab\tulator");
+                    REQUIRE(S_(node.user()) == "tab\tulator");
                     REQUIRE(S_(tag.key()) == "key with\ttab");
                     REQUIRE(S_(tag.value()) == "value with\ttab");
                     break;
                 case 5:
-                    REQUIRE(S_(it->user()) == "unencoded linefeed");
+                    REQUIRE(S_(node.user()) == "unencoded linefeed");
                     REQUIRE(S_(tag.key()) == "key with unencoded linefeed");
                     REQUIRE(S_(tag.value()) == "value with unencoded linefeed");
                     break;
@@ -455,8 +455,8 @@ TEST_CASE("Reading OSM XML 142") {
         osmium::memory::Buffer buffer = reader.read();
         reader.close();
 
-        auto it = buffer.begin<osmium::Relation>();
-        REQUIRE(it != buffer.end<osmium::Relation>());
+        auto it = buffer.select<osmium::Relation>().begin();
+        REQUIRE(it != buffer.select<osmium::Relation>().end());
         REQUIRE(it->id() == 21);
         const auto& members = it->members();
         REQUIRE(members.size() == 5);
