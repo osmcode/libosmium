@@ -347,18 +347,22 @@ namespace gdalcpp {
         }
 
         Layer& start_transaction() {
+#if GDAL_VERSION_MAJOR < 2
             OGRErr result = m_layer->StartTransaction();
             if (result != OGRERR_NONE) {
                 throw gdal_error(std::string("starting transaction on layer '") + name() + "' failed", result, m_dataset.driver_name(), m_dataset.dataset_name(), name());
             }
+#endif
             return *this;
         }
 
         Layer& commit_transaction() {
+#if GDAL_VERSION_MAJOR < 2
             OGRErr result = m_layer->CommitTransaction();
             if (result != OGRERR_NONE) {
                 throw gdal_error(std::string("committing transaction on layer '") + name() + "' failed", result, m_dataset.driver_name(), m_dataset.dataset_name(), name());
             }
+#endif
             return *this;
          }
 
