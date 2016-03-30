@@ -134,19 +134,19 @@ SECTION("area_2outer_2inner") {
 
     int outer_ring=0;
     int inner_ring=0;
-    for (auto it_outer = area.cbegin<osmium::OuterRing>(); it_outer !=  area.cend<osmium::OuterRing>(); ++it_outer) {
+    for (const auto& outer : area.outer_rings()) {
         if (outer_ring == 0) {
-            REQUIRE(it_outer->front().ref() == 1);
+            REQUIRE(outer.front().ref() == 1);
         } else if (outer_ring == 1) {
-            REQUIRE(it_outer->front().ref() == 100);
+            REQUIRE(outer.front().ref() == 100);
         } else {
             REQUIRE(false);
         }
-        for (auto it_inner = area.inner_ring_cbegin(it_outer); it_inner != area.inner_ring_cend(it_outer); ++it_inner) {
+        for (const auto& inner : area.inner_rings(outer)) {
             if (outer_ring == 0 && inner_ring == 0) {
-                REQUIRE(it_inner->front().ref() == 5);
+                REQUIRE(inner.front().ref() == 5);
             } else if (outer_ring == 0 && inner_ring == 1) {
-                REQUIRE(it_inner->front().ref() == 10);
+                REQUIRE(inner.front().ref() == 10);
             } else {
                 REQUIRE(false);
             }

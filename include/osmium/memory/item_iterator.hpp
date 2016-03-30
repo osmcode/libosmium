@@ -187,7 +187,12 @@ namespace osmium {
                 return !(*this == rhs);
             }
 
-            unsigned char* data() const noexcept {
+            data_type data() noexcept {
+                assert(m_data);
+                return m_data;
+            }
+
+            const unsigned char* data() const noexcept {
                 assert(m_data);
                 return m_data;
             }
