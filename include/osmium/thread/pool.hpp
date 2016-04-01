@@ -123,7 +123,7 @@ namespace osmium {
                 osmium::thread::set_thread_name("_osmium_worker");
                 while (true) {
                     function_wrapper task;
-                    m_work_queue.wait_and_pop_with_timeout(task);
+                    m_work_queue.wait_and_pop(task);
                     if (task) {
                         if (task()) {
                             // The called tasks returns true only when the

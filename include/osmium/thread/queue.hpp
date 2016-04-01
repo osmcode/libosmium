@@ -172,27 +172,6 @@ namespace osmium {
                 }
             }
 
-            void wait_and_pop_with_timeout(T& value) {
-#ifdef OSMIUM_DEBUG_QUEUE_SIZE
-                ++m_pop_counter;
-#endif
-                std::unique_lock<std::mutex> lock(m_mutex);
-#ifdef OSMIUM_DEBUG_QUEUE_SIZE
-                if (m_queue.empty()) {
-                    ++m_empty_counter;
-                }
-#endif
-                if (!m_data_available.wait_for(lock, std::chrono::seconds(1), [this] {
-                    return !m_queue.empty();
-                })) {
-                    return;
-                }
-                if (!m_queue.empty()) {
-                    value = std::move(m_queue.front());
-                    m_queue.pop();
-                }
-            }
-
             bool try_pop(T& value) {
 #ifdef OSMIUM_DEBUG_QUEUE_SIZE
                 ++m_pop_counter;
