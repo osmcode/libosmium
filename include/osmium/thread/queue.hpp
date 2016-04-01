@@ -73,8 +73,6 @@ namespace osmium {
             /// Used to signal readers when data is available in the queue.
             std::condition_variable m_data_available;
 
-            std::atomic<bool> m_done;
-
 #ifdef OSMIUM_DEBUG_QUEUE_SIZE
             /// The largest size the queue has been so far.
             size_t m_largest_size;
@@ -111,8 +109,7 @@ namespace osmium {
                 m_name(name),
                 m_mutex(),
                 m_queue(),
-                m_data_available(),
-                m_done(false)
+                m_data_available()
 #ifdef OSMIUM_DEBUG_QUEUE_SIZE
                 ,
                 m_largest_size(0),
@@ -125,7 +122,6 @@ namespace osmium {
             }
 
             ~Queue() {
-                shutdown();
 #ifdef OSMIUM_DEBUG_QUEUE_SIZE
                 std::cerr << "queue '" << m_name << "' with max_size=" << m_max_size << " had largest size " << m_largest_size << " and was full " << m_full_counter << " times in " << m_push_counter << " push() calls and was empty " << m_empty_counter << " times in " << m_pop_counter << " pop() calls\n";
 #endif
@@ -157,11 +153,6 @@ namespace osmium {
                 m_data_available.notify_one();
             }
 
-            void shutdown() {
-                m_done = true;
-                m_data_available.notify_all();
-            }
-
             void wait_and_pop(T& value) {
 #ifdef OSMIUM_DEBUG_QUEUE_SIZE
                 ++m_pop_counter;
@@ -173,7 +164,7 @@ namespace osmium {
                 }
 #endif
                 m_data_available.wait(lock, [this] {
-                    return !m_queue.empty() || m_done;
+                    return !m_queue.empty();
                 });
                 if (!m_queue.empty()) {
                     value = std::move(m_queue.front());
@@ -192,7 +183,7 @@ namespace osmium {
                 }
 #endif
                 if (!m_data_available.wait_for(lock, std::chrono::seconds(1), [this] {
-                    return !m_queue.empty() || m_done;
+                    return !m_queue.empty();
                 })) {
                     return;
                 }

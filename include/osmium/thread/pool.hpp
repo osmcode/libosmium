@@ -180,7 +180,6 @@ namespace osmium {
 
             ~Pool() {
                 shutdown_all_workers();
-                m_work_queue.shutdown();
             }
 
             size_t queue_size() const {
