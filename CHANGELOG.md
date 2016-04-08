@@ -23,6 +23,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 - Output operator for Location shows full precision.
 - Undefined behaviour in WKB writer and types_from_string() function.
+- Fix unsigned overflow in pool.hpp.
 
 
 ## [2.6.1] - 2016-02-22

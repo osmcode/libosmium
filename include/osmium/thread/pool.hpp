@@ -66,7 +66,7 @@ namespace osmium {
                 }
 
                 if (num_threads < 0) {
-                    num_threads += hardware_concurrency;
+                    num_threads += int(hardware_concurrency);
                 }
 
                 if (num_threads < 1) {
