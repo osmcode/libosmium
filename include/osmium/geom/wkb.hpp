@@ -142,7 +142,8 @@ namespace osmium {
                 }
 
                 void set_size(const size_t offset, const size_t size) {
-                    *reinterpret_cast<uint32_t*>(&m_data[offset]) = static_cast_with_assert<uint32_t>(size);
+                    uint32_t s = static_cast_with_assert<uint32_t>(size);
+                    std::copy_n(reinterpret_cast<char*>(&s), sizeof(uint32_t), &m_data[offset]);
                 }
 
             public:
