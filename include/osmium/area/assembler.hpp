@@ -683,6 +683,11 @@ namespace osmium {
                     m_config.problem_reporter->set_object(osmium::item_type::way, way.id());
                 }
 
+                // ignore ways without segments
+                if (way.nodes().size() < 2) {
+                    return;
+                }
+
                 if (!way.ends_have_same_id()) {
                     if (m_config.problem_reporter) {
                         m_config.problem_reporter->report_duplicate_node(way.nodes().front().ref(), way.nodes().back().ref(), way.nodes().front().location());
