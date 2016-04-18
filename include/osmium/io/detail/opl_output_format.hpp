@@ -74,6 +74,9 @@ namespace osmium {
                 /// Should metadata of objects be added?
                 bool add_metadata;
 
+                /// Should node locations be added to ways?
+                bool locations_on_ways;
+
             };
 
             /**
@@ -160,13 +163,33 @@ namespace osmium {
 
                     *m_out += " N";
                     bool first = true;
-                    for (const auto& node_ref : way.nodes()) {
-                        if (first) {
-                            first = false;
-                        } else {
-                            *m_out += ',';
+                    if (m_options.locations_on_ways) {
+                        for (const auto& node_ref : way.nodes()) {
+                            if (first) {
+                                first = false;
+                            } else {
+                                *m_out += ',';
+                            }
+                            output_formatted("n%" PRId64 "x", node_ref.ref());
+                            if (node_ref.location()) {
+                                output_formatted("%.7fy%.7f",
+                                    node_ref.ref(),
+                                    node_ref.location().lon_without_check(),
+                                    node_ref.location().lat_without_check()
+                                );
+                            } else {
+                                *m_out += 'y';
+                            }
                         }
-                        output_formatted("n%" PRId64, node_ref.ref());
+                    } else {
+                        for (const auto& node_ref : way.nodes()) {
+                            if (first) {
+                                first = false;
+                            } else {
+                                *m_out += ',';
+                            }
+                            output_formatted("n%" PRId64, node_ref.ref());
+                        }
                     }
                     *m_out += '\n';
                 }
@@ -226,7 +249,8 @@ namespace osmium {
                 OPLOutputFormat(const osmium::io::File& file, future_string_queue_type& output_queue) :
                     OutputFormat(output_queue),
                     m_options() {
-                    m_options.add_metadata = file.is_not_false("add_metadata");
+                    m_options.add_metadata      = file.is_not_false("add_metadata");
+                    m_options.locations_on_ways = file.is_true("locations_on_ways");
                 }
 
                 OPLOutputFormat(const OPLOutputFormat&) = delete;
