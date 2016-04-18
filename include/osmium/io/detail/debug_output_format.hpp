@@ -44,12 +44,15 @@ DEALINGS IN THE SOFTWARE.
 #include <thread>
 #include <utility>
 
+#include <boost/crc.hpp>
+
 #include <osmium/io/detail/output_format.hpp>
 #include <osmium/io/file_format.hpp>
 #include <osmium/memory/buffer.hpp>
 #include <osmium/memory/collection.hpp>
 #include <osmium/osm/box.hpp>
 #include <osmium/osm/changeset.hpp>
+#include <osmium/osm/crc.hpp>
 #include <osmium/osm/item_type.hpp>
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/node.hpp>
@@ -89,6 +92,9 @@ namespace osmium {
 
                 /// Output with ANSI colors?
                 bool use_color;
+
+                /// Add CRC32 checksum to each object?
+                bool add_crc32;
 
             };
 
@@ -237,6 +243,21 @@ namespace osmium {
                     *m_out += '\n';
                 }
 
+                template <typename T>
+                void write_crc32(const T& object) {
+                    write_fieldname("crc32");
+                    osmium::CRC<boost::crc_32_type> crc32;
+                    crc32.update(object);
+                    output_formatted("    %x\n", crc32().checksum());
+                }
+
+                void write_crc32(const osmium::Changeset& object) {
+                    write_fieldname("crc32");
+                    osmium::CRC<boost::crc_32_type> crc32;
+                    crc32.update(object);
+                    output_formatted("      %x\n", crc32().checksum());
+                }
+
             public:
 
                 DebugOutputBlock(osmium::memory::Buffer&& buffer, const debug_output_options& options) :
@@ -274,6 +295,10 @@ namespace osmium {
 
                     write_tags(node.tags());
 
+                    if (m_options.add_crc32) {
+                        write_crc32(node);
+                    }
+
                     *m_out += '\n';
                 }
 
@@ -306,6 +331,10 @@ namespace osmium {
                         *m_out += '\n';
                     }
 
+                    if (m_options.add_crc32) {
+                        write_crc32(way);
+                    }
+
                     *m_out += '\n';
                 }
 
@@ -326,6 +355,10 @@ namespace osmium {
                         output_formatted(" %10" PRId64 " ", member.ref());
                         write_string(member.role());
                         *m_out += '\n';
+                    }
+
+                    if (m_options.add_crc32) {
+                        write_crc32(relation);
                     }
 
                     *m_out += '\n';
@@ -386,6 +419,10 @@ namespace osmium {
                         }
                     }
 
+                    if (m_options.add_crc32) {
+                        write_crc32(changeset);
+                    }
+
                     *m_out += '\n';
                 }
 
@@ -414,6 +451,7 @@ namespace osmium {
                     m_options() {
                     m_options.add_metadata = file.is_not_false("add_metadata");
                     m_options.use_color    = file.is_true("color");
+                    m_options.add_crc32    = file.is_true("add_crc32");
                 }
 
                 DebugOutputFormat(const DebugOutputFormat&) = delete;
