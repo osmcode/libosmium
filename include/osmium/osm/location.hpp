@@ -35,6 +35,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <cmath>
 #include <cstdint>
+#include <functional>
 #include <iosfwd>
 #include <stdexcept>
 #include <string>
@@ -282,6 +283,35 @@ namespace osmium {
         return out;
     }
 
+    namespace detail {
+
+        template <int N>
+        inline size_t hash(const osmium::Location& location) noexcept {
+            return location.x() ^ location.y();
+        }
+
+        template <>
+        inline size_t hash<8>(const osmium::Location& location) noexcept {
+            size_t h = location.x();
+            h <<= 32;
+            return h ^ location.y();
+        }
+
+    } // namespace detail
+
 } // namespace osmium
+
+namespace std {
+
+    template <>
+    struct hash<osmium::Location> {
+        using argument_type = osmium::Location;
+        using result_type = size_t;
+        size_t operator()(const osmium::Location& location) const noexcept {
+            return osmium::detail::hash<sizeof(size_t)>(location);
+        }
+    };
+
+} // namespace std
 
 #endif // OSMIUM_OSM_LOCATION_HPP
