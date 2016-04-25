@@ -237,6 +237,8 @@ namespace gdalcpp {
         detail::Options m_options;
         SRS m_srs;
         std::unique_ptr<gdal_dataset_type, gdal_dataset_deleter> m_dataset;
+        uint64_t m_edit_count = 0;
+        uint64_t m_max_edit_count = 0;
 
     public:
 
@@ -252,6 +254,15 @@ namespace gdalcpp {
 #endif
             if (!m_dataset) {
                 throw gdal_error(std::string("failed to create dataset '") + dataset_name + "'", OGRERR_NONE, driver_name, dataset_name);
+            }
+        }
+
+        ~Dataset() {
+            try {
+                if (m_edit_count > 0) {
+                    commit_transaction();
+                }
+            } catch (...) {
             }
         }
 
@@ -282,10 +293,14 @@ namespace gdalcpp {
             exec(sql.c_str());
         }
 
-
         Dataset& start_transaction() {
 #if GDAL_VERSION_MAJOR >= 2
             m_dataset->StartTransaction();
+#else
+            OGRLayer* layer = m_dataset->GetLayer(0);
+            if (layer) {
+                layer->StartTransaction();
+            }
 #endif
             return *this;
         }
@@ -293,7 +308,38 @@ namespace gdalcpp {
         Dataset& commit_transaction() {
 #if GDAL_VERSION_MAJOR >= 2
             m_dataset->CommitTransaction();
+#else
+            OGRLayer* layer = m_dataset->GetLayer(0);
+            if (layer) {
+                layer->CommitTransaction();
+            }
 #endif
+            m_edit_count = 0;
+            return *this;
+        }
+
+        void prepare_edit() {
+            if (m_max_edit_count != 0 && m_edit_count == 0) {
+                start_transaction();
+            }
+        }
+
+        void finalize_edit() {
+            if (m_max_edit_count != 0 && ++m_edit_count > m_max_edit_count) {
+                commit_transaction();
+            }
+        }
+
+        Dataset& enable_auto_transactions(uint64_t edits = 100000) {
+            m_max_edit_count = edits;
+            return *this;
+        }
+
+        Dataset& disable_auto_transactions() {
+            if (m_max_edit_count != 0 && m_edit_count > 0) {
+                commit_transaction();
+            }
+            m_max_edit_count = 0;
             return *this;
         }
 
@@ -346,6 +392,15 @@ namespace gdalcpp {
             return *this;
         }
 
+        void create_feature(OGRFeature& feature) {
+            dataset().prepare_edit();
+            OGRErr result = m_layer->CreateFeature(&feature);
+            if (result != OGRERR_NONE) {
+                throw gdal_error(std::string("creating feature in layer '") + name() + "' failed", result, dataset().driver_name(), dataset().dataset_name());
+            }
+            dataset().finalize_edit();
+        }
+
         Layer& start_transaction() {
 #if GDAL_VERSION_MAJOR < 2
             OGRErr result = m_layer->StartTransaction();
@@ -385,10 +440,7 @@ namespace gdalcpp {
         }
 
         void add_to_layer() {
-            OGRErr result = m_layer.get().CreateFeature(&m_feature);
-            if (result != OGRERR_NONE) {
-                throw gdal_error(std::string("creating feature in layer '") + m_layer.name() + "' failed", result, m_layer.dataset().driver_name(), m_layer.dataset().dataset_name());
-            }
+            m_layer.create_feature(m_feature);
         }
 
         template <class T>
