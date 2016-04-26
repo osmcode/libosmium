@@ -42,6 +42,7 @@ DEALINGS IN THE SOFTWARE.
 #include <set>
 #include <string>
 #include <map>
+#include <numeric>
 #include <unordered_set>
 #include <vector>
 

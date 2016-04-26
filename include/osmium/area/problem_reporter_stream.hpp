@@ -38,6 +38,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/area/problem_reporter.hpp>
 #include <osmium/osm/item_type.hpp>
 #include <osmium/osm/location.hpp>
+#include <osmium/osm/node_ref.hpp>
 #include <osmium/osm/types.hpp>
 
 namespace osmium {

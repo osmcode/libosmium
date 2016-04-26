@@ -42,6 +42,8 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
+    class NodeRef;
+
     namespace area {
 
         class ProblemReporterException : public ProblemReporterStream {

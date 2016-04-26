@@ -35,10 +35,12 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/osm/item_type.hpp>
 #include <osmium/osm/location.hpp>
-#include <osmium/osm/way.hpp>
 #include <osmium/osm/types.hpp>
 
 namespace osmium {
+
+    class NodeRef;
+    class Way;
 
     namespace area {
 
