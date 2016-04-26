@@ -304,8 +304,10 @@ namespace osmium {
 namespace std {
 
 // This pragma is a workaround for a bug in an old libc implementation
+#ifdef __clang__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmismatched-tags"
+#endif
     template <>
     struct hash<osmium::Location> {
         using argument_type = osmium::Location;
@@ -314,7 +316,9 @@ namespace std {
             return osmium::detail::hash<sizeof(size_t)>(location);
         }
     };
+#ifdef __clang__
 #pragma clang diagnostic pop
+#endif
 
 } // namespace std
 
