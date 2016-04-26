@@ -66,9 +66,17 @@ namespace osmium {
 
             gdalcpp::Layer m_layer_perror;
             gdalcpp::Layer m_layer_lerror;
+            gdalcpp::Layer m_layer_ways;
+
+            void set_object(gdalcpp::Feature& feature) {
+                char t[2] = { osmium::item_type_to_char(m_object_type), '\0' };
+                feature.set_field("object_type", t);
+                feature.set_field("object_id", int32_t(m_object_id));
+            }
 
             void write_point(const char* problem_type, osmium::object_id_type id1, osmium::object_id_type id2, osmium::Location location) {
                 gdalcpp::Feature feature(m_layer_perror, m_ogr_factory.create_point(location));
+                set_object(feature);
                 feature.set_field("id1", static_cast<double>(id1));
                 feature.set_field("id2", static_cast<double>(id2));
                 feature.set_field("problem_type", problem_type);
@@ -83,6 +91,7 @@ namespace osmium {
                 ogr_linestring->addPoint(ogr_point2.get());
 
                 gdalcpp::Feature feature(m_layer_lerror, std::move(ogr_linestring));
+                set_object(feature);
                 feature.set_field("id1", static_cast<double>(id1));
                 feature.set_field("id2", static_cast<double>(id2));
                 feature.set_field("problem_type", problem_type);
@@ -93,15 +102,24 @@ namespace osmium {
 
             explicit ProblemReporterOGR(gdalcpp::Dataset& dataset) :
                 m_layer_perror(dataset, "perrors", wkbPoint),
-                m_layer_lerror(dataset, "lerrors", wkbLineString) {
+                m_layer_lerror(dataset, "lerrors", wkbLineString),
+                m_layer_ways(dataset, "ways", wkbLineString) {
 
+                m_layer_perror.add_field("object_type", OFTString, 1);
+                m_layer_perror.add_field("object_id", OFTInteger, 8);
                 m_layer_perror.add_field("id1", OFTReal, 10);
                 m_layer_perror.add_field("id2", OFTReal, 10);
                 m_layer_perror.add_field("problem_type", OFTString, 30);
 
+                m_layer_lerror.add_field("object_type", OFTString, 1);
+                m_layer_lerror.add_field("object_id", OFTInteger, 8);
                 m_layer_lerror.add_field("id1", OFTReal, 10);
                 m_layer_lerror.add_field("id2", OFTReal, 10);
                 m_layer_lerror.add_field("problem_type", OFTString, 30);
+
+                m_layer_ways.add_field("object_type", OFTString, 1);
+                m_layer_ways.add_field("object_id", OFTInteger, 8);
+                m_layer_ways.add_field("way_id", OFTInteger, 8);
             }
 
             ~ProblemReporterOGR() override = default;
@@ -110,24 +128,54 @@ namespace osmium {
                 write_point("duplicate_node", node_id1, node_id2, location);
             }
 
-            void report_intersection(osmium::object_id_type way1_id, osmium::Location way1_seg_start, osmium::Location way1_seg_end,
-                                     osmium::object_id_type way2_id, osmium::Location way2_seg_start, osmium::Location way2_seg_end, osmium::Location intersection) override {
-                write_point("intersection", m_object_id, 0, intersection);
-                write_line("intersection", m_object_id, way1_id, way1_seg_start, way1_seg_end);
-                write_line("intersection", m_object_id, way2_id, way2_seg_start, way2_seg_end);
+            void report_touching_ring(osmium::object_id_type node_id, osmium::Location location) override {
+                write_point("touching_ring", node_id, 0, location);
             }
 
-            void report_ring_not_closed(osmium::Location end1, osmium::Location end2) override {
-                write_point("ring_not_closed", m_object_id, 0, end1);
-                write_point("ring_not_closed", m_object_id, 0, end2);
+            void report_intersection(osmium::object_id_type way1_id, osmium::Location way1_seg_start, osmium::Location way1_seg_end,
+                                     osmium::object_id_type way2_id, osmium::Location way2_seg_start, osmium::Location way2_seg_end, osmium::Location intersection) override {
+                write_point("intersection", 0, 0, intersection);
+                write_line("intersection", way1_id, 0, way1_seg_start, way1_seg_end);
+                write_line("intersection", way2_id, 0, way2_seg_start, way2_seg_end);
+            }
+
+            void report_duplicate_segment(const osmium::NodeRef& nr1, const osmium::NodeRef& nr2) override {
+                write_line("duplicate_segment", nr1.ref(), nr2.ref(), nr1.location(), nr2.location());
+            }
+
+            void report_ring_not_closed(const osmium::NodeRef& nr1, const osmium::NodeRef& nr2) override {
+                write_line("ring_not_closed", nr1.ref(), nr2.ref(), nr1.location(), nr2.location());
+            }
+
+            void report_spike_segment(const osmium::NodeRef& nr1, const osmium::NodeRef& nr2) override {
+                write_line("spike_segment", nr1.ref(), nr2.ref(), nr1.location(), nr2.location());
             }
 
             void report_role_should_be_outer(osmium::object_id_type way_id, osmium::Location seg_start, osmium::Location seg_end) override {
-                write_line("role_should_be_outer", m_object_id, way_id, seg_start, seg_end);
+                write_line("role_should_be_outer", way_id, 0, seg_start, seg_end);
             }
 
             void report_role_should_be_inner(osmium::object_id_type way_id, osmium::Location seg_start, osmium::Location seg_end) override {
-                write_line("role_should_be_inner", m_object_id, way_id, seg_start, seg_end);
+                write_line("role_should_be_inner", way_id, 0, seg_start, seg_end);
+            }
+
+            void report_way(const osmium::Way& way) override {
+                if (way.nodes().empty()) {
+                    return;
+                }
+                if (way.nodes().size() == 1) {
+                    write_point("single_node_in_way", way.id(), way.nodes()[0].ref(), way.nodes()[0].location());
+                    return;
+                }
+                try {
+                    std::unique_ptr<OGRLineString> ogr_linestring = m_ogr_factory.create_linestring(way);
+                    gdalcpp::Feature feature(m_layer_ways, std::move(ogr_linestring));
+                    set_object(feature);
+                    feature.set_field("way_id", int32_t(way.id()));
+                    feature.add_to_layer();
+                } catch (osmium::geometry_error& e) {
+                    // XXX
+                }
             }
 
         }; // class ProblemReporterOGR

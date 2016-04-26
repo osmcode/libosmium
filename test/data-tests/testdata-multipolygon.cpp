@@ -156,7 +156,9 @@ int main(int argc, char* argv[]) {
 
     osmium::area::ProblemReporterOGR problem_reporter(dataset);
     osmium::area::Assembler::config_type assembler_config(&problem_reporter);
-    assembler_config.enable_debug_output();
+    assembler_config.check_roles = true;
+    assembler_config.create_empty_areas = true;
+    assembler_config.debug_level = 2;
     osmium::area::MultipolygonCollector<osmium::area::Assembler> collector(assembler_config);
 
     std::cerr << "Pass 1...\n";

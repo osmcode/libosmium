@@ -62,6 +62,12 @@ namespace osmium {
                 throw std::runtime_error(m_sstream.str());
             }
 
+            void report_touching_ring(osmium::object_id_type node_id, osmium::Location location) override {
+                m_sstream.str();
+                ProblemReporterStream::report_touching_ring(node_id, location);
+                throw std::runtime_error(m_sstream.str());
+            }
+
             void report_intersection(osmium::object_id_type way1_id, osmium::Location way1_seg_start, osmium::Location way1_seg_end,
                                      osmium::object_id_type way2_id, osmium::Location way2_seg_start, osmium::Location way2_seg_end, osmium::Location intersection) override {
                 m_sstream.str();
@@ -69,9 +75,21 @@ namespace osmium {
                 throw std::runtime_error(m_sstream.str());
             }
 
-            void report_ring_not_closed(osmium::Location end1, osmium::Location end2) override {
+            void report_duplicate_segment(const osmium::NodeRef& nr1, const osmium::NodeRef& nr2) override {
                 m_sstream.str();
-                ProblemReporterStream::report_ring_not_closed(end1, end2);
+                ProblemReporterStream::report_duplicate_segment(nr1, nr2);
+                throw std::runtime_error(m_sstream.str());
+            }
+
+            void report_ring_not_closed(const osmium::NodeRef& nr1, const osmium::NodeRef& nr2) override {
+                m_sstream.str();
+                ProblemReporterStream::report_ring_not_closed(nr1, nr2);
+                throw std::runtime_error(m_sstream.str());
+            }
+
+            void report_spike_segment(const osmium::NodeRef& nr1, const osmium::NodeRef& nr2) override {
+                m_sstream.str();
+                ProblemReporterStream::report_spike_segment(nr1, nr2);
                 throw std::runtime_error(m_sstream.str());
             }
 

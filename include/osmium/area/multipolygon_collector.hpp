@@ -39,6 +39,7 @@ DEALINGS IN THE SOFTWARE.
 #include <cstring>
 #include <vector>
 
+#include <osmium/area/stats.hpp>
 #include <osmium/memory/buffer.hpp>
 #include <osmium/osm/item_type.hpp>
 #include <osmium/osm/location.hpp>
@@ -81,6 +82,8 @@ namespace osmium {
 
             osmium::memory::Buffer m_output_buffer;
 
+            osmium::area::area_stats m_stats;
+
             static constexpr size_t initial_output_buffer_size = 1024 * 1024;
             static constexpr size_t max_buffer_size_for_flush = 100 * 1024;
 
@@ -105,6 +108,10 @@ namespace osmium {
                 collector_type(),
                 m_assembler_config(assembler_config),
                 m_output_buffer(initial_output_buffer_size, osmium::memory::Buffer::auto_grow::yes) {
+            }
+
+            const osmium::area::area_stats& stats() const noexcept {
+                return m_stats;
             }
 
             /**
@@ -155,6 +162,7 @@ namespace osmium {
                         // way is closed and has enough nodes, build simple multipolygon
                         TAssembler assembler(m_assembler_config);
                         assembler(way, m_output_buffer);
+                        m_stats += assembler.stats();
                         possibly_flush_output_buffer();
                     }
                 } catch (osmium::invalid_location&) {
@@ -173,6 +181,7 @@ namespace osmium {
                 try {
                     TAssembler assembler(m_assembler_config);
                     assembler(relation, offsets, this->members_buffer(), m_output_buffer);
+                    m_stats += assembler.stats();
                     possibly_flush_output_buffer();
                 } catch (osmium::invalid_location&) {
                     // XXX ignore

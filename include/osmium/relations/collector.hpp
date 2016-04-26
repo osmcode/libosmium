@@ -313,6 +313,7 @@ namespace osmium {
             }
 
             const osmium::Relation& get_relation(size_t offset) const {
+                assert(m_relations_buffer.committed() > offset);
                 return m_relations_buffer.get<osmium::Relation>(offset);
             }
 
@@ -324,6 +325,7 @@ namespace osmium {
             }
 
             osmium::OSMObject& get_member(size_t offset) const {
+                assert(m_members_buffer.committed() > offset);
                 return m_members_buffer.get<osmium::OSMObject>(offset);
             }
 

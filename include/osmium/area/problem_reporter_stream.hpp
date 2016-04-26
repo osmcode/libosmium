@@ -65,6 +65,11 @@ namespace osmium {
                 *m_out << "node_id1=" << node_id1 << " node_id2=" << node_id2 << " location=" << location << "\n";
             }
 
+            void report_touching_ring(osmium::object_id_type node_id, osmium::Location location) override {
+                header("touching ring");
+                *m_out << "node_id=" << node_id << " location=" << location << "\n";
+            }
+
             void report_intersection(osmium::object_id_type way1_id, osmium::Location way1_seg_start, osmium::Location way1_seg_end,
                                      osmium::object_id_type way2_id, osmium::Location way2_seg_start, osmium::Location way2_seg_end, osmium::Location intersection) override {
                 header("intersection");
@@ -72,9 +77,22 @@ namespace osmium {
                        << " way2_id=" << way2_id << " way2_seg_start=" << way2_seg_start << " way2_seg_end=" << way2_seg_end << " intersection=" << intersection << "\n";
             }
 
-            void report_ring_not_closed(osmium::Location end1, osmium::Location end2) override {
+            void report_duplicate_segment(const osmium::NodeRef& nr1, const osmium::NodeRef& nr2) override {
+                header("duplicate segment");
+                *m_out << "node_id1=" << nr1.ref() << " location1=" << nr1.location()
+                       << " node_id2=" << nr2.ref() << " location2=" << nr2.location() << "\n";
+            }
+
+            void report_ring_not_closed(const osmium::NodeRef& nr1, const osmium::NodeRef& nr2) override {
                 header("ring not closed");
-                *m_out << "end1=" << end1 << " end2=" << end2 << "\n";
+                *m_out << "node_id1=" << nr1.ref() << " location1=" << nr1.location()
+                       << " node_id2=" << nr2.ref() << " location2=" << nr2.location() << "\n";
+            }
+
+            void report_spike_segment(const osmium::NodeRef& nr1, const osmium::NodeRef& nr2) override {
+                header("spike segment");
+                *m_out << "node_id1=" << nr1.ref() << " location1=" << nr1.location()
+                       << " node_id2=" << nr2.ref() << " location2=" << nr2.location() << "\n";
             }
 
             void report_role_should_be_outer(osmium::object_id_type way_id, osmium::Location seg_start, osmium::Location seg_end) override {
