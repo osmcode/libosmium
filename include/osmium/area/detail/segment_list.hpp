@@ -65,7 +65,9 @@ namespace osmium {
                 bool m_debug;
 
                 static role_type parse_role(const char* role) noexcept {
-                    if (!std::strcmp(role, "outer")) {
+                    if (role[0] == '\0') {
+                        return role_type::empty;
+                    } else if (!std::strcmp(role, "outer")) {
                         return role_type::outer;
                     } else if (!std::strcmp(role, "inner")) {
                         return role_type::inner;

@@ -60,7 +60,8 @@ namespace osmium {
             enum class role_type : uint8_t {
                 unknown = 0,
                 outer   = 1,
-                inner   = 2
+                inner   = 2,
+                empty   = 3
             };
 
             /**
@@ -195,6 +196,10 @@ namespace osmium {
 
                 bool role_inner() const noexcept {
                     return m_role == role_type::inner;
+                }
+
+                bool role_empty() const noexcept {
+                    return m_role == role_type::empty;
                 }
 
                 const osmium::Way* way() const noexcept {

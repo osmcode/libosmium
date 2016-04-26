@@ -303,7 +303,7 @@ namespace osmium {
 
                 for (const detail::ProtoRing& ring : m_rings) {
                     for (const auto& segment : ring.segments()) {
-                        if (ring.is_outer() ? !segment->role_outer() : !segment->role_inner()) {
+                        if (!segment->role_empty() && ring.is_outer() ? !segment->role_outer() : !segment->role_inner()) {
                             ++m_stats.wrong_role;
                             if (debug()) {
                                 std::cerr << "      Segment " << *segment << " from way " << segment->way()->id() << " should have role '" << (ring.is_outer() ? "outer" : "inner") << "'\n";
