@@ -1220,7 +1220,7 @@ namespace osmium {
                 return area_okay;
             }
 
-            bool create_area(const osmium::Relation& relation, const std::vector<size_t>& members, const osmium::memory::Buffer& in_buffer, osmium::memory::Buffer& out_buffer) {
+            bool create_area(const osmium::Relation& relation, const std::vector<const osmium::Way*>& members, osmium::memory::Buffer& out_buffer) {
                 osmium::builder::AreaBuilder builder(out_buffer);
                 builder.initialize_from_object(relation);
 
@@ -1231,9 +1231,8 @@ namespace osmium {
                 }
 
                 if (report_ways()) {
-                    for (size_t offset : members) {
-                        const osmium::Way& way = in_buffer.get<const osmium::Way>(offset);
-                        m_config.problem_reporter->report_way(way);
+                    for (const osmium::Way* way : members) {
+                        m_config.problem_reporter->report_way(*way);
                     }
                 }
 
@@ -1302,8 +1301,26 @@ namespace osmium {
              * All members are to be found in the in_buffer at the offsets
              * given by the members parameter.
              * The resulting area is put into the out_buffer.
+             *
+             * This function is deprecated. Use the other form of the function
+             * instead.
              */
             void operator()(const osmium::Relation& relation, const std::vector<size_t>& members, const osmium::memory::Buffer& in_buffer, osmium::memory::Buffer& out_buffer) {
+                std::vector<const osmium::Way*> ways;
+                for (size_t offset : members) {
+                    const osmium::Way& way = in_buffer.get<const osmium::Way>(offset);
+                    ways.push_back(&way);
+                }
+                operator()(relation, ways, out_buffer);
+            }
+
+            /**
+             * Assemble an area from the given relation and its members.
+             * The resulting area is put into the out_buffer.
+             */
+            void operator()(const osmium::Relation& relation, const std::vector<const osmium::Way*>& members, osmium::memory::Buffer& out_buffer) {
+                assert(relation.members().size() >= members.size());
+
                 if (m_config.problem_reporter) {
                     m_config.problem_reporter->set_object(osmium::item_type::relation, relation.id());
                 }
@@ -1314,7 +1331,7 @@ namespace osmium {
                 }
 
                 ++m_stats.from_relations;
-                m_stats.duplicate_nodes += m_segment_list.extract_segments_from_ways(m_config.problem_reporter, relation, members, in_buffer);
+                m_stats.duplicate_nodes += m_segment_list.extract_segments_from_ways(m_config.problem_reporter, relation, members);
                 m_stats.member_ways = members.size();
 
                 if (m_stats.member_ways == 1) {
@@ -1329,7 +1346,7 @@ namespace osmium {
 
                 // Now create the Area object and add the attributes and tags
                 // from the relation.
-                if (create_area(relation, members, in_buffer, out_buffer)) {
+                if (create_area(relation, members, out_buffer)) {
                     out_buffer.commit();
                 } else {
                     out_buffer.rollback();
@@ -1344,19 +1361,18 @@ namespace osmium {
                 std::vector<const osmium::Way*> ways_that_should_be_areas;
                 if (m_stats.wrong_role == 0) {
                     auto memit = relation.members().cbegin();
-                    for (size_t offset : members) {
+                    for (const osmium::Way* way : members) {
                         if (!std::strcmp(memit->role(), "inner")) {
-                            const osmium::Way& way = in_buffer.get<const osmium::Way>(offset);
-                            if (!way.nodes().empty() && way.is_closed() && way.tags().size() > 0) {
-                                auto d = std::count_if(way.tags().cbegin(), way.tags().cend(), filter());
+                            if (!way->nodes().empty() && way->is_closed() && way->tags().size() > 0) {
+                                auto d = std::count_if(way->tags().cbegin(), way->tags().cend(), filter());
                                 if (d > 0) {
-                                    osmium::tags::KeyFilter::iterator way_fi_begin(filter(), way.tags().cbegin(), way.tags().cend());
-                                    osmium::tags::KeyFilter::iterator way_fi_end(filter(), way.tags().cend(), way.tags().cend());
+                                    osmium::tags::KeyFilter::iterator way_fi_begin(filter(), way->tags().cbegin(), way->tags().cend());
+                                    osmium::tags::KeyFilter::iterator way_fi_end(filter(), way->tags().cend(), way->tags().cend());
                                     osmium::tags::KeyFilter::iterator area_fi_begin(filter(), area_tags.cbegin(), area_tags.cend());
                                     osmium::tags::KeyFilter::iterator area_fi_end(filter(), area_tags.cend(), area_tags.cend());
 
                                     if (!std::equal(way_fi_begin, way_fi_end, area_fi_begin) || d != std::distance(area_fi_begin, area_fi_end)) {
-                                        ways_that_should_be_areas.push_back(&way);
+                                        ways_that_should_be_areas.push_back(way);
                                     }
                                 }
                             }

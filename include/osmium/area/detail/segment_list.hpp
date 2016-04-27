@@ -75,24 +75,19 @@ namespace osmium {
                     return role_type::unknown;
                 }
 
-                size_t size_needed(const std::vector<size_t>& members, const osmium::memory::Buffer& in_buffer) const {
-                    size_t size = 0;
-                    for (size_t offset : members) {
-                        const osmium::Way& way = in_buffer.get<const osmium::Way>(offset);
-                        if (!way.nodes().empty()) {
-                            size += way.nodes().size() - 1;
+                /**
+                 * Calculate the number of segments in all the ways together.
+                 */
+                static size_t get_num_segments(const std::vector<const osmium::Way*>& members) noexcept {
+                    return std::accumulate(members.cbegin(), members.cend(), 0, [](size_t sum, const osmium::Way* way) {
+                        if (way->nodes().empty()) {
+                            return sum;
+                        } else {
+                            return sum + way->nodes().size() - 1;
                         }
-                    }
-                    return size;
+                    });
                 }
 
-                /**
-                 * Extract segments from given way and add them to the list.
-                 *
-                 * Segments connecting two nodes with the same location (ie
-                 * same node or different nodes with same location) are
-                 * removed after reporting the duplicate node.
-                 */
                 uint32_t extract_segments_from_way_impl(osmium::area::ProblemReporter* problem_reporter, const osmium::Way& way, role_type role) {
                     uint32_t duplicate_nodes = 0;
 
@@ -134,12 +129,13 @@ namespace osmium {
                     return m_segments.size();
                 }
 
+                /// Is the segment list empty?
                 bool empty() const noexcept {
                     return m_segments.empty();
                 }
 
-                typedef slist_type::const_iterator const_iterator;
-                typedef slist_type::iterator iterator;
+                using const_iterator = slist_type::const_iterator;
+                using iterator = slist_type::iterator;
 
                 NodeRefSegment& front() {
                     return m_segments.front();
@@ -188,29 +184,40 @@ namespace osmium {
                     std::sort(m_segments.begin(), m_segments.end());
                 }
 
+                /**
+                 * Extract segments from given way and add them to the list.
+                 *
+                 * Segments connecting two nodes with the same location (ie
+                 * same node or different nodes with same location) are
+                 * removed after reporting the duplicate node.
+                 */
                 uint32_t extract_segments_from_way(osmium::area::ProblemReporter* problem_reporter, const osmium::Way& way) {
-                    if (!way.nodes().empty()) {
-                        m_segments.reserve(way.nodes().size() - 1);
-                        return extract_segments_from_way_impl(problem_reporter, way, role_type::outer);
+                    if (way.nodes().empty()) {
+                        return 0;
                     }
-                    return 0;
+                    m_segments.reserve(way.nodes().size() - 1);
+                    return extract_segments_from_way_impl(problem_reporter, way, role_type::outer);
                 }
 
                 /**
                  * Extract all segments from all ways that make up this
                  * multipolygon relation and add them to the list.
                  */
-                uint32_t extract_segments_from_ways(osmium::area::ProblemReporter* problem_reporter, const osmium::Relation& relation, const std::vector<size_t>& members, const osmium::memory::Buffer& in_buffer) {
+                uint32_t extract_segments_from_ways(osmium::area::ProblemReporter* problem_reporter, const osmium::Relation& relation, const std::vector<const osmium::Way*>& members) {
+                    assert(relation.members().size() >= members.size());
                     uint32_t duplicate_nodes = 0;
 
-                    size_t num_segments = size_needed(members, in_buffer);
+                    size_t num_segments = get_num_segments(members);
                     problem_reporter->set_nodes(num_segments);
                     m_segments.reserve(num_segments);
-                    auto member_it = relation.members().begin();
-                    for (size_t offset : members) {
-                        const osmium::Way& way = in_buffer.get<const osmium::Way>(offset);
-                        duplicate_nodes += extract_segments_from_way_impl(problem_reporter, way, parse_role(member_it->role()));
-                        ++member_it;
+
+                    auto way_it = members.begin();
+                    for (const osmium::RelationMember& member : relation.members()) {
+                        if (member.type() == osmium::item_type::way) {
+                            assert(way_it != members.end());
+                            duplicate_nodes += extract_segments_from_way_impl(problem_reporter, **way_it, parse_role(member.role()));
+                            ++way_it;
+                        }
                     }
 
                     return duplicate_nodes;
