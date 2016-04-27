@@ -208,7 +208,9 @@ namespace osmium {
                     uint32_t duplicate_nodes = 0;
 
                     size_t num_segments = get_num_segments(members);
-                    problem_reporter->set_nodes(num_segments);
+                    if (problem_reporter) {
+                        problem_reporter->set_nodes(num_segments);
+                    }
                     m_segments.reserve(num_segments);
 
                     auto way_it = members.begin();
