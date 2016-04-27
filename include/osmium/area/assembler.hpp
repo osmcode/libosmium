@@ -272,7 +272,7 @@ namespace osmium {
             }
 
             void add_tags_to_area(osmium::builder::AreaBuilder& builder, const osmium::Relation& relation) const {
-                const auto count = std::count_if(relation.tags().begin(), relation.tags().end(), filter());
+                const auto count = std::count_if(relation.tags().cbegin(), relation.tags().cend(), filter());
 
                 if (debug()) {
                     std::cerr << "  found " << count << " tags on relation (without ignored ones)\n";
@@ -305,7 +305,7 @@ namespace osmium {
                             std::cerr << "      only one outer way\n";
                         }
                         osmium::builder::TagListBuilder tl_builder(builder.buffer(), &builder);
-                        for (const osmium::Tag& tag : (*ways.begin())->tags()) {
+                        for (const osmium::Tag& tag : (*ways.cbegin())->tags()) {
                             tl_builder.add_tag(tag.key(), tag.value());
                         }
                     } else {
@@ -678,7 +678,7 @@ namespace osmium {
              */
             bool find_split_locations() {
                 osmium::Location previous_location;
-                for (auto it = m_locations.begin(); it != m_locations.end(); it += 2) {
+                for (auto it = m_locations.cbegin(); it != m_locations.cend(); it += 2) {
                     osmium::Location loc = it->location(m_segment_list);
                     if (loc != std::next(it)->location(m_segment_list)) {
                         detail::NodeRefSegment& segment = m_segment_list[it->item];
@@ -822,8 +822,8 @@ namespace osmium {
                     }
                 }
 
-                const auto connections = std::equal_range(xrings.begin(),
-                                                          xrings.end(),
+                const auto connections = std::equal_range(xrings.cbegin(),
+                                                          xrings.cend(),
                                                           location_to_ring_map{cand.stop_location});
 
                 assert(connections.first != connections.second);
@@ -1157,7 +1157,7 @@ namespace osmium {
                     timer_roles.stop();
                 }
 
-                m_stats.outer_rings = std::count_if(m_rings.begin(), m_rings.end(), [](const detail::ProtoRing& ring){
+                m_stats.outer_rings = std::count_if(m_rings.cbegin(), m_rings.cend(), [](const detail::ProtoRing& ring){
                     return ring.is_outer();
                 });
                 m_stats.inner_rings = m_rings.size() - m_stats.outer_rings;
@@ -1342,17 +1342,17 @@ namespace osmium {
                 // them, too.
                 std::vector<const osmium::Way*> ways_that_should_be_areas;
                 if (m_stats.wrong_role == 0) {
-                    auto memit = relation.members().begin();
+                    auto memit = relation.members().cbegin();
                     for (size_t offset : members) {
                         if (!std::strcmp(memit->role(), "inner")) {
                             const osmium::Way& way = in_buffer.get<const osmium::Way>(offset);
                             if (!way.nodes().empty() && way.is_closed() && way.tags().size() > 0) {
-                                auto d = std::count_if(way.tags().begin(), way.tags().end(), filter());
+                                auto d = std::count_if(way.tags().cbegin(), way.tags().cend(), filter());
                                 if (d > 0) {
-                                    osmium::tags::KeyFilter::iterator way_fi_begin(filter(), way.tags().begin(), way.tags().end());
-                                    osmium::tags::KeyFilter::iterator way_fi_end(filter(), way.tags().end(), way.tags().end());
-                                    osmium::tags::KeyFilter::iterator area_fi_begin(filter(), area_tags.begin(), area_tags.end());
-                                    osmium::tags::KeyFilter::iterator area_fi_end(filter(), area_tags.end(), area_tags.end());
+                                    osmium::tags::KeyFilter::iterator way_fi_begin(filter(), way.tags().cbegin(), way.tags().cend());
+                                    osmium::tags::KeyFilter::iterator way_fi_end(filter(), way.tags().cend(), way.tags().cend());
+                                    osmium::tags::KeyFilter::iterator area_fi_begin(filter(), area_tags.cbegin(), area_tags.cend());
+                                    osmium::tags::KeyFilter::iterator area_fi_end(filter(), area_tags.cend(), area_tags.cend());
 
                                     if (!std::equal(way_fi_begin, way_fi_end, area_fi_begin) || d != std::distance(area_fi_begin, area_fi_end)) {
                                         ways_that_should_be_areas.push_back(&way);
