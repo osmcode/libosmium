@@ -58,7 +58,7 @@ namespace osmium {
             ~ProblemReporterStream() override = default;
 
             void header(const char* msg) {
-                *m_out << "DATA PROBLEM: " << msg << " on " << item_type_to_char(m_object_type) << m_object_id << ": ";
+                *m_out << "DATA PROBLEM: " << msg << " on " << item_type_to_char(m_object_type) << m_object_id << " (with " << m_nodes << " nodes): ";
             }
 
             void report_duplicate_node(osmium::object_id_type node_id1, osmium::object_id_type node_id2, osmium::Location location) override {

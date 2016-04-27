@@ -65,6 +65,9 @@ namespace osmium {
             // ID of the relation/way we are currently working on
             osmium::object_id_type m_object_id;
 
+            // Number of nodes in the area
+            size_t m_nodes;
+
         public:
 
             ProblemReporter() = default;
@@ -80,6 +83,10 @@ namespace osmium {
             void set_object(osmium::item_type object_type, osmium::object_id_type object_id) noexcept {
                 m_object_type = object_type;
                 m_object_id = object_id;
+            }
+
+            void set_nodes(size_t nodes) noexcept {
+                m_nodes = nodes;
             }
 
 // Disable "unused-parameter" warning, so that the compiler will not complain.

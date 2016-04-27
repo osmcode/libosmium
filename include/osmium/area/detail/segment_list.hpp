@@ -203,7 +203,9 @@ namespace osmium {
                 uint32_t extract_segments_from_ways(osmium::area::ProblemReporter* problem_reporter, const osmium::Relation& relation, const std::vector<size_t>& members, const osmium::memory::Buffer& in_buffer) {
                     uint32_t duplicate_nodes = 0;
 
-                    m_segments.reserve(size_needed(members, in_buffer));
+                    size_t num_segments = size_needed(members, in_buffer);
+                    problem_reporter->set_nodes(num_segments);
+                    m_segments.reserve(num_segments);
                     auto member_it = relation.members().begin();
                     for (size_t offset : members) {
                         const osmium::Way& way = in_buffer.get<const osmium::Way>(offset);

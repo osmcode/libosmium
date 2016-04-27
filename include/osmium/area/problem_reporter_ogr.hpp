@@ -76,6 +76,7 @@ namespace osmium {
                 char t[2] = { osmium::item_type_to_char(m_object_type), '\0' };
                 feature.set_field("object_type", t);
                 feature.set_field("object_id", int32_t(m_object_id));
+                feature.set_field("nodes", int32_t(m_nodes));
             }
 
             void write_point(const char* problem_type, osmium::object_id_type id1, osmium::object_id_type id2, osmium::Location location) {
@@ -111,12 +112,14 @@ namespace osmium {
 
                 m_layer_perror.add_field("object_type", OFTString, 1);
                 m_layer_perror.add_field("object_id", OFTInteger, 8);
+                m_layer_perror.add_field("nodes", OFTInteger, 8);
                 m_layer_perror.add_field("id1", OFTReal, 10);
                 m_layer_perror.add_field("id2", OFTReal, 10);
                 m_layer_perror.add_field("problem_type", OFTString, 30);
 
                 m_layer_lerror.add_field("object_type", OFTString, 1);
                 m_layer_lerror.add_field("object_id", OFTInteger, 8);
+                m_layer_lerror.add_field("nodes", OFTInteger, 8);
                 m_layer_lerror.add_field("id1", OFTReal, 10);
                 m_layer_lerror.add_field("id2", OFTReal, 10);
                 m_layer_lerror.add_field("problem_type", OFTString, 30);

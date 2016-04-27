@@ -1261,6 +1261,7 @@ namespace osmium {
             void operator()(const osmium::Way& way, osmium::memory::Buffer& out_buffer) {
                 if (m_config.problem_reporter) {
                     m_config.problem_reporter->set_object(osmium::item_type::way, way.id());
+                    m_config.problem_reporter->set_nodes(way.nodes().size());
                 }
 
                 // Ignore (but possibly report) ways without segments.
