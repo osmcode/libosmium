@@ -21,6 +21,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Removed SortedQueue implementation which was never used.
 - Also incorporate Locations in NodeRefs into CRC32 checksums. This means
   all checksums will be different compared to earlier versions of libosmium.
+- The completely new algorithm for assembling multipolygons is much faster,
+  has better error reporting, generates statistics and can build more complex
+  multipolygons correctly. The ProblemReporter classes have changed to make
+  this happen, if you have written your own, you have to fix it.
 
 ### Fixed
 
