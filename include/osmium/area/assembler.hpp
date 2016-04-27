@@ -272,7 +272,7 @@ namespace osmium {
                 return filter;
             }
 
-            void add_tags_to_area(osmium::builder::AreaBuilder& builder, const osmium::Relation& relation) const {
+            void add_tags_to_area(osmium::builder::AreaBuilder& builder, const osmium::Relation& relation) {
                 const auto count = std::count_if(relation.tags().cbegin(), relation.tags().cend(), filter());
 
                 if (debug()) {
@@ -292,6 +292,7 @@ namespace osmium {
                         }
                     }
                 } else {
+                    ++m_stats.no_tags_on_relation;
                     if (debug()) {
                         std::cerr << "    use tags from outer ways\n";
                     }

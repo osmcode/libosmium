@@ -57,6 +57,7 @@ namespace osmium {
             uint32_t inner_rings = 0;
             uint32_t intersections = 0;
             uint32_t member_ways = 0;
+            uint32_t no_tags_on_relation = 0;
             uint32_t no_way_in_mp_relation = 0;
             uint32_t nodes = 0;
             uint32_t open_rings = 0;
@@ -78,6 +79,7 @@ namespace osmium {
                 inner_rings += other.inner_rings;
                 intersections += other.intersections;
                 member_ways += other.member_ways;
+                no_tags_on_relation += other.no_tags_on_relation;
                 no_way_in_mp_relation += other.no_way_in_mp_relation;
                 nodes += other.nodes;
                 open_rings += other.open_rings;
@@ -104,6 +106,7 @@ namespace osmium {
                        << " inner_rings=" << s.inner_rings
                        << " intersections=" << s.intersections
                        << " member_ways=" << s.member_ways
+                       << " no_tags_on_relation=" << s.no_tags_on_relation
                        << " no_way_in_mp_relation=" << s.no_way_in_mp_relation
                        << " nodes=" << s.nodes
                        << " open_rings=" << s.open_rings
