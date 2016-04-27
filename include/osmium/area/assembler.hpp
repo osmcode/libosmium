@@ -53,6 +53,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/relation.hpp>
 #include <osmium/tags/filter.hpp>
 #include <osmium/util/compatibility.hpp>
+#include <osmium/util/iterator.hpp>
 #include <osmium/util/timer.hpp>
 
 #include <osmium/area/detail/proto_ring.hpp>
@@ -824,16 +825,15 @@ namespace osmium {
                     }
                 }
 
-                const auto connections = std::equal_range(xrings.cbegin(),
-                                                          xrings.cend(),
-                                                          location_to_ring_map{cand.stop_location});
+                const auto connections = make_range(std::equal_range(xrings.cbegin(),
+                                                                     xrings.cend(),
+                                                                     location_to_ring_map{cand.stop_location}));
 
                 assert(connections.first != connections.second);
 
                 assert(!cand.rings.empty());
                 const detail::ProtoRing* ring_leading_here = &cand.rings.back().first.ring();
-                for (auto it = connections.first; it != connections.second; ++it) {
-                    const location_to_ring_map& m = *it;
+                for (const location_to_ring_map& m : connections) {
                     const detail::ProtoRing& ring = m.ring();
 
                     if (&ring != ring_leading_here) {
@@ -974,12 +974,15 @@ namespace osmium {
                 // First create all the (partial) rings starting at the split locations
                 uint32_t count_remaining = m_segment_list.size();
                 for (const osmium::Location& location : m_split_locations) {
-                    auto p = std::equal_range(m_locations.begin(), m_locations.end(), slocation{}, [this, &location](const slocation& a, const slocation& b) {
+                    const auto locs = make_range(std::equal_range(m_locations.begin(),
+                                                                  m_locations.end(),
+                                                                  slocation{},
+                                                                  [this, &location](const slocation& a, const slocation& b) {
                         return a.location(m_segment_list, location) < b.location(m_segment_list, location);
-                    });
-                    for (auto it = p.first; it != p.second; ++it) {
-                        if (!m_segment_list[it->item].is_done()) {
-                            count_remaining -= add_new_ring_complex(*it);
+                    }));
+                    for (auto& loc : locs) {
+                        if (!m_segment_list[loc.item].is_done()) {
+                            count_remaining -= add_new_ring_complex(loc);
                             if (count_remaining == 0) {
                                 break;
                             }
