@@ -1290,6 +1290,10 @@ namespace osmium {
              * The resulting area is put into the out_buffer.
              */
             void operator()(const osmium::Way& way, osmium::memory::Buffer& out_buffer) {
+                if (way.tags().has_tag("area", "no")) {
+                    return;
+                }
+
                 if (m_config.problem_reporter) {
                     m_config.problem_reporter->set_object(osmium::item_type::way, way.id());
                     m_config.problem_reporter->set_nodes(way.nodes().size());
