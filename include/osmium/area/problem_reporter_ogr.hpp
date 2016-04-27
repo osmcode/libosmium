@@ -112,28 +112,38 @@ namespace osmium {
                 m_layer_werror(dataset, "werrors", wkbLineString),
                 m_layer_ways(dataset, "ways", wkbLineString) {
 
-                m_layer_perror.add_field("object_type", OFTString, 1);
-                m_layer_perror.add_field("object_id", OFTInteger, 8);
-                m_layer_perror.add_field("nodes", OFTInteger, 8);
-                m_layer_perror.add_field("id1", OFTReal, 10);
-                m_layer_perror.add_field("id2", OFTReal, 10);
-                m_layer_perror.add_field("problem_type", OFTString, 30);
+                m_layer_perror
+                    .add_field("object_type", OFTString, 1)
+                    .add_field("object_id", OFTInteger, 8)
+                    .add_field("nodes", OFTInteger, 8)
+                    .add_field("id1", OFTReal, 10)
+                    .add_field("id2", OFTReal, 10)
+                    .add_field("problem_type", OFTString, 30)
+                ;
 
-                m_layer_lerror.add_field("object_type", OFTString, 1);
-                m_layer_lerror.add_field("object_id", OFTInteger, 8);
-                m_layer_lerror.add_field("nodes", OFTInteger, 8);
-                m_layer_lerror.add_field("id1", OFTReal, 10);
-                m_layer_lerror.add_field("id2", OFTReal, 10);
-                m_layer_lerror.add_field("problem_type", OFTString, 30);
+                m_layer_lerror
+                    .add_field("object_type", OFTString, 1)
+                    .add_field("object_id", OFTInteger, 8)
+                    .add_field("nodes", OFTInteger, 8)
+                    .add_field("id1", OFTReal, 10)
+                    .add_field("id2", OFTReal, 10)
+                    .add_field("problem_type", OFTString, 30)
+                ;
 
-                m_layer_werror.add_field("object_type", OFTString, 1);
-                m_layer_werror.add_field("object_id", OFTInteger, 8);
-                m_layer_werror.add_field("way_id", OFTInteger, 8);
-                m_layer_werror.add_field("problem_type", OFTString, 30);
+                m_layer_werror
+                    .add_field("object_type", OFTString, 1)
+                    .add_field("object_id", OFTInteger, 8)
+                    .add_field("nodes", OFTInteger, 8)
+                    .add_field("way_id", OFTInteger, 8)
+                    .add_field("problem_type", OFTString, 30)
+                ;
 
-                m_layer_ways.add_field("object_type", OFTString, 1);
-                m_layer_ways.add_field("object_id", OFTInteger, 8);
-                m_layer_ways.add_field("way_id", OFTInteger, 8);
+                m_layer_ways
+                    .add_field("object_type", OFTString, 1)
+                    .add_field("object_id", OFTInteger, 8)
+                    .add_field("way_id", OFTInteger, 8)
+                    .add_field("nodes", OFTInteger, 8)
+                ;
             }
 
             ~ProblemReporterOGR() override = default;
