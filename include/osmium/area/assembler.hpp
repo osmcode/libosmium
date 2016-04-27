@@ -52,6 +52,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/relation.hpp>
 #include <osmium/tags/filter.hpp>
+#include <osmium/util/compatibility.hpp>
 #include <osmium/util/timer.hpp>
 
 #include <osmium/area/detail/proto_ring.hpp>
@@ -1302,10 +1303,11 @@ namespace osmium {
              * given by the members parameter.
              * The resulting area is put into the out_buffer.
              *
+             * @deprecated
              * This function is deprecated. Use the other form of the function
              * instead.
              */
-            void operator()(const osmium::Relation& relation, const std::vector<size_t>& members, const osmium::memory::Buffer& in_buffer, osmium::memory::Buffer& out_buffer) {
+            OSMIUM_DEPRECATED void operator()(const osmium::Relation& relation, const std::vector<size_t>& members, const osmium::memory::Buffer& in_buffer, osmium::memory::Buffer& out_buffer) {
                 std::vector<const osmium::Way*> ways;
                 for (size_t offset : members) {
                     const osmium::Way& way = in_buffer.get<const osmium::Way>(offset);

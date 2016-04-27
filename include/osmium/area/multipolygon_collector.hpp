@@ -74,9 +74,9 @@ namespace osmium {
         template <typename TAssembler>
         class MultipolygonCollector : public osmium::relations::Collector<MultipolygonCollector<TAssembler>, false, true, false> {
 
-            typedef typename osmium::relations::Collector<MultipolygonCollector<TAssembler>, false, true, false> collector_type;
+            using collector_type = osmium::relations::Collector<MultipolygonCollector<TAssembler>, false, true, false>;
 
-            typedef typename TAssembler::config_type assembler_config_type;
+            using assembler_config_type = typename TAssembler::config_type;
             const assembler_config_type m_assembler_config;
 
             osmium::memory::Buffer m_output_buffer;
@@ -171,15 +171,19 @@ namespace osmium {
 
             void complete_relation(osmium::relations::RelationMeta& relation_meta) {
                 const osmium::Relation& relation = this->get_relation(relation_meta);
-                std::vector<size_t> offsets;
+                const osmium::memory::Buffer& buffer = this->members_buffer();
+
+                std::vector<const osmium::Way*> ways;
                 for (const auto& member : relation.members()) {
                     if (member.ref() != 0) {
-                        offsets.push_back(this->get_offset(member.type(), member.ref()));
+                        size_t offset = this->get_offset(member.type(), member.ref());
+                        ways.push_back(&buffer.get<const osmium::Way>(offset));
                     }
                 }
+
                 try {
                     TAssembler assembler(m_assembler_config);
-                    assembler(relation, offsets, this->members_buffer(), m_output_buffer);
+                    assembler(relation, ways, m_output_buffer);
                     m_stats += assembler.stats();
                     possibly_flush_output_buffer();
                 } catch (osmium::invalid_location&) {
