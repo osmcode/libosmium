@@ -111,11 +111,51 @@ namespace osmium {
 
         }; // struct AssemblerConfig
 
+        namespace detail {
+
+            using open_ring_its_type = std::list<std::list<detail::ProtoRing>::iterator>;
+
+            struct location_to_ring_map {
+                osmium::Location location;
+                open_ring_its_type::iterator ring_it;
+                bool start;
+
+                location_to_ring_map(const osmium::Location& l, const open_ring_its_type::iterator& r, bool s) noexcept :
+                    location(l),
+                    ring_it(r),
+                    start(s) {
+                }
+
+                explicit location_to_ring_map(const osmium::Location& l) noexcept :
+                    location(l),
+                    ring_it(),
+                    start(false) {
+                }
+
+                const detail::ProtoRing& ring() const noexcept {
+                    return **ring_it;
+                }
+
+            }; // struct location_to_ring_map
+
+            inline bool operator==(const location_to_ring_map& a, const location_to_ring_map& b) noexcept {
+                return a.location == b.location;
+            }
+
+            inline bool operator<(const location_to_ring_map& a, const location_to_ring_map& b) noexcept {
+                return a.location < b.location;
+            }
+
+        } // namespace detail
+
         /**
          * Assembles area objects from closed ways or multipolygon relations
          * and their members.
          */
         class Assembler {
+
+            using open_ring_its_type = detail::open_ring_its_type;
+            using location_to_ring_map = detail::location_to_ring_map;
 
             struct slocation {
 
@@ -672,31 +712,6 @@ namespace osmium {
                 }
             }
 
-            using open_ring_its_type = std::list<std::list<detail::ProtoRing>::iterator>;
-
-            struct location_to_ring_map {
-                osmium::Location location;
-                open_ring_its_type::iterator ring_it;
-                bool start;
-
-                location_to_ring_map(const osmium::Location& l, const open_ring_its_type::iterator& r, bool s) noexcept :
-                    location(l),
-                    ring_it(r),
-                    start(s) {
-                }
-
-                explicit location_to_ring_map(const osmium::Location& l) noexcept :
-                    location(l),
-                    ring_it(),
-                    start(false) {
-                }
-
-                const detail::ProtoRing& ring() const noexcept {
-                    return **ring_it;
-                }
-
-            }; // struct location_to_ring_map
-
             std::vector<location_to_ring_map> create_location_to_ring_map(open_ring_its_type& open_ring_its) {
                 std::vector<location_to_ring_map> xrings;
                 xrings.reserve(open_ring_its.size() * 2);
@@ -709,9 +724,7 @@ namespace osmium {
                     xrings.emplace_back((*it)->get_node_ref_stop().location(), it, false);
                 }
 
-                std::sort(xrings.begin(), xrings.end(), [](const location_to_ring_map& a, const location_to_ring_map& b){
-                    return a.location < b.location;
-                });
+                std::sort(xrings.begin(), xrings.end());
 
                 return xrings;
             }
@@ -755,9 +768,7 @@ namespace osmium {
 
                 auto it = xrings.cbegin();
                 while (it != xrings.cend()) {
-                    it = std::adjacent_find(it, xrings.cend(), [](const location_to_ring_map& a, const location_to_ring_map& b){
-                        return a.location == b.location;
-                    });
+                    it = std::adjacent_find(it, xrings.cend());
                     if (it == xrings.cend()) {
                         return false;
                     }
@@ -813,10 +824,7 @@ namespace osmium {
 
                 const auto connections = std::equal_range(xrings.begin(),
                                                           xrings.end(),
-                                                          location_to_ring_map{cand.stop_location},
-                                                          [](const location_to_ring_map& a, const location_to_ring_map& b){
-                    return a.location < b.location;
-                });
+                                                          location_to_ring_map{cand.stop_location});
 
                 assert(connections.first != connections.second);
 
