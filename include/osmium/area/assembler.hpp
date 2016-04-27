@@ -1205,7 +1205,7 @@ namespace osmium {
             }
 #endif
 
-            bool create_area(const osmium::Way& way, osmium::memory::Buffer& out_buffer) {
+            bool create_area(osmium::memory::Buffer& out_buffer, const osmium::Way& way) {
                 osmium::builder::AreaBuilder builder(out_buffer);
                 builder.initialize_from_object(way);
 
@@ -1222,7 +1222,7 @@ namespace osmium {
                 return area_okay;
             }
 
-            bool create_area(const osmium::Relation& relation, const std::vector<const osmium::Way*>& members, osmium::memory::Buffer& out_buffer) {
+            bool create_area(osmium::memory::Buffer& out_buffer, const osmium::Relation& relation, const std::vector<const osmium::Way*>& members) {
                 osmium::builder::AreaBuilder builder(out_buffer);
                 builder.initialize_from_object(relation);
 
@@ -1287,7 +1287,7 @@ namespace osmium {
 
                 // Now create the Area object and add the attributes and tags
                 // from the way.
-                if (create_area(way, out_buffer)) {
+                if (create_area(out_buffer, way)) {
                     out_buffer.commit();
                 } else {
                     out_buffer.rollback();
@@ -1349,7 +1349,7 @@ namespace osmium {
 
                 // Now create the Area object and add the attributes and tags
                 // from the relation.
-                if (create_area(relation, members, out_buffer)) {
+                if (create_area(out_buffer, relation, members)) {
                     out_buffer.commit();
                 } else {
                     out_buffer.rollback();
