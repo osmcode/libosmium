@@ -53,6 +53,24 @@ namespace osmium {
         namespace detail {
 
             /**
+             * Iterate over all relation members and the vector of ways at the
+             * same time and call given function with the relation member and
+             * way as parameter. This takes into account that there might be
+             * non-way members in the relation.
+             */
+            template <typename F>
+            inline void for_each_member(const osmium::Relation& relation, const std::vector<const osmium::Way*> ways, F&& func) {
+                auto way_it = ways.cbegin();
+                for (const osmium::RelationMember& member : relation.members()) {
+                    if (member.type() == osmium::item_type::way) {
+                        assert(way_it != ways.cend());
+                        func(member, **way_it);
+                        ++way_it;
+                    }
+                }
+            }
+
+            /**
              * This is a helper class for the area assembler. It models
              * a list of segments.
              */
@@ -205,7 +223,6 @@ namespace osmium {
                  */
                 uint32_t extract_segments_from_ways(osmium::area::ProblemReporter* problem_reporter, const osmium::Relation& relation, const std::vector<const osmium::Way*>& members) {
                     assert(relation.members().size() >= members.size());
-                    uint32_t duplicate_nodes = 0;
 
                     size_t num_segments = get_num_segments(members);
                     if (problem_reporter) {
@@ -213,14 +230,10 @@ namespace osmium {
                     }
                     m_segments.reserve(num_segments);
 
-                    auto way_it = members.begin();
-                    for (const osmium::RelationMember& member : relation.members()) {
-                        if (member.type() == osmium::item_type::way) {
-                            assert(way_it != members.end());
-                            duplicate_nodes += extract_segments_from_way_impl(problem_reporter, **way_it, parse_role(member.role()));
-                            ++way_it;
-                        }
-                    }
+                    uint32_t duplicate_nodes = 0;
+                    for_each_member(relation, members, [this, &problem_reporter, &duplicate_nodes](const osmium::RelationMember& member, const osmium::Way& way) {
+                        duplicate_nodes += extract_segments_from_way_impl(problem_reporter, way, parse_role(member.role()));
+                    });
 
                     return duplicate_nodes;
                 }

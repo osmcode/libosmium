@@ -1345,7 +1345,7 @@ namespace osmium {
                     std::cerr << "\nAssembling relation " << relation.id() << " containing " << members.size() << " way members with " << m_segment_list.size() << " nodes\n";
                 }
 
-                size_t area_offset = out_buffer.committed();
+                const size_t area_offset = out_buffer.committed();
 
                 // Now create the Area object and add the attributes and tags
                 // from the relation.
@@ -1363,25 +1363,23 @@ namespace osmium {
                 // them, too.
                 std::vector<const osmium::Way*> ways_that_should_be_areas;
                 if (m_stats.wrong_role == 0) {
-                    auto memit = relation.members().cbegin();
-                    for (const osmium::Way* way : members) {
-                        if (!std::strcmp(memit->role(), "inner")) {
-                            if (!way->nodes().empty() && way->is_closed() && way->tags().size() > 0) {
-                                auto d = std::count_if(way->tags().cbegin(), way->tags().cend(), filter());
+                    detail::for_each_member(relation, members, [&ways_that_should_be_areas, &area_tags](const osmium::RelationMember& member, const osmium::Way& way) {
+                        if (!std::strcmp(member.role(), "inner")) {
+                            if (!way.nodes().empty() && way.is_closed() && way.tags().size() > 0) {
+                                auto d = std::count_if(way.tags().cbegin(), way.tags().cend(), filter());
                                 if (d > 0) {
-                                    osmium::tags::KeyFilter::iterator way_fi_begin(filter(), way->tags().cbegin(), way->tags().cend());
-                                    osmium::tags::KeyFilter::iterator way_fi_end(filter(), way->tags().cend(), way->tags().cend());
+                                    osmium::tags::KeyFilter::iterator way_fi_begin(filter(), way.tags().cbegin(), way.tags().cend());
+                                    osmium::tags::KeyFilter::iterator way_fi_end(filter(), way.tags().cend(), way.tags().cend());
                                     osmium::tags::KeyFilter::iterator area_fi_begin(filter(), area_tags.cbegin(), area_tags.cend());
                                     osmium::tags::KeyFilter::iterator area_fi_end(filter(), area_tags.cend(), area_tags.cend());
 
                                     if (!std::equal(way_fi_begin, way_fi_end, area_fi_begin) || d != std::distance(area_fi_begin, area_fi_end)) {
-                                        ways_that_should_be_areas.push_back(way);
+                                        ways_that_should_be_areas.push_back(&way);
                                     }
                                 }
                             }
                         }
-                        ++memit;
-                    }
+                    });
                 }
 
                 if (debug()) {
