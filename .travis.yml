@@ -154,6 +154,5 @@ before_script:
   - CXX=${COMPILER} CXXFLAGS=${COMPILER_FLAGS} cmake -LA .. -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DOSM_TESTDATA="${TRAVIS_BUILD_DIR}/deps/osm-testdata"
 
 script:
-  - make VERBOSE=1
-  - ctest --output-on-failure
+  - make VERBOSE=1 && ctest --output-on-failure
 
