@@ -43,6 +43,7 @@ DEALINGS IN THE SOFTWARE.
 #include <string>
 #include <map>
 #include <numeric>
+#include <unordered_map>
 #include <unordered_set>
 #include <vector>
 
@@ -351,8 +352,13 @@ namespace osmium {
                     std::cerr << "    Checking inner/outer roles\n";
                 }
 
+                std::unordered_map<const osmium::Way*, const detail::ProtoRing*> way_rings;
+                std::unordered_set<const osmium::Way*> ways_in_multiple_rings;
+
                 for (const detail::ProtoRing& ring : m_rings) {
                     for (const auto& segment : ring.segments()) {
+                        assert(segment->way());
+
                         if (!segment->role_empty() && ring.is_outer() ? !segment->role_outer() : !segment->role_inner()) {
                             ++m_stats.wrong_role;
                             if (debug()) {
@@ -366,8 +372,27 @@ namespace osmium {
                                 }
                             }
                         }
+
+                        auto& r = way_rings[segment->way()];
+                        if (!r) {
+                            r = &ring;
+                        } else if (r != &ring) {
+                            ways_in_multiple_rings.insert(segment->way());
+                        }
+
                     }
                 }
+
+                for (const osmium::Way* way : ways_in_multiple_rings) {
+                    ++m_stats.ways_in_multiple_rings;
+                    if (debug()) {
+                        std::cerr << "      Way " << way->id() << " is in multiple rings\n";
+                    }
+                    if (m_config.problem_reporter) {
+                        m_config.problem_reporter->report_way_in_multiple_rings(*way);
+                    }
+                }
+
             }
 
             detail::NodeRefSegment* get_next_segment(const osmium::Location& location) {

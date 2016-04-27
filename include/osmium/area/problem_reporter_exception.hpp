@@ -107,6 +107,12 @@ namespace osmium {
                 throw std::runtime_error(m_sstream.str());
             }
 
+            void report_way_in_multiple_rings(const osmium::Way& way) override {
+                m_sstream.str();
+                ProblemReporterStream::report_way_in_multiple_rings(way);
+                throw std::runtime_error(m_sstream.str());
+            }
+
         }; // class ProblemReporterException
 
     } // namespace area

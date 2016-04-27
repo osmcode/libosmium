@@ -40,6 +40,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/node_ref.hpp>
 #include <osmium/osm/types.hpp>
+#include <osmium/osm/way.hpp>
 
 namespace osmium {
 
@@ -104,6 +105,11 @@ namespace osmium {
             void report_role_should_be_inner(osmium::object_id_type way_id, osmium::Location seg_start, osmium::Location seg_end) override {
                 header("role should be inner");
                 *m_out << "way_id=" << way_id << " seg_start=" << seg_start << " seg_end=" << seg_end << "\n";
+            }
+
+            void report_way_in_multiple_rings(const osmium::Way& way) override {
+                header("way in multiple rings");
+                *m_out << "way_id=" << way.id() << '\n';
             }
 
         }; // class ProblemReporterStream

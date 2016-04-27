@@ -66,6 +66,7 @@ namespace osmium {
             uint32_t single_way_in_mp_relation = 0;
             uint32_t spike_segments = 0;
             uint32_t touching_rings = 0;
+            uint32_t ways_in_multiple_rings = 0;
             uint32_t wrong_role = 0;
 
             area_stats& operator+=(const area_stats& other) noexcept {
@@ -88,6 +89,7 @@ namespace osmium {
                 single_way_in_mp_relation += other.single_way_in_mp_relation;
                 spike_segments += other.spike_segments;
                 touching_rings += other.touching_rings;
+                ways_in_multiple_rings += other.ways_in_multiple_rings;
                 wrong_role += other.wrong_role;
                 return *this;
             }
@@ -115,6 +117,7 @@ namespace osmium {
                        << " single_way_in_mp_relation=" << s.single_way_in_mp_relation
                        << " spike_segments=" << s.spike_segments
                        << " touching_rings=" << s.touching_rings
+                       << " ways_in_multiple_rings=" << s.ways_in_multiple_rings
                        << " wrong_role=" << s.wrong_role;
         }
 

@@ -70,6 +70,7 @@ namespace osmium {
 
             gdalcpp::Layer m_layer_perror;
             gdalcpp::Layer m_layer_lerror;
+            gdalcpp::Layer m_layer_werror;
             gdalcpp::Layer m_layer_ways;
 
             void set_object(gdalcpp::Feature& feature) {
@@ -108,6 +109,7 @@ namespace osmium {
             explicit ProblemReporterOGR(gdalcpp::Dataset& dataset) :
                 m_layer_perror(dataset, "perrors", wkbPoint),
                 m_layer_lerror(dataset, "lerrors", wkbLineString),
+                m_layer_werror(dataset, "werrors", wkbLineString),
                 m_layer_ways(dataset, "ways", wkbLineString) {
 
                 m_layer_perror.add_field("object_type", OFTString, 1);
@@ -123,6 +125,11 @@ namespace osmium {
                 m_layer_lerror.add_field("id1", OFTReal, 10);
                 m_layer_lerror.add_field("id2", OFTReal, 10);
                 m_layer_lerror.add_field("problem_type", OFTString, 30);
+
+                m_layer_werror.add_field("object_type", OFTString, 1);
+                m_layer_werror.add_field("object_id", OFTInteger, 8);
+                m_layer_werror.add_field("way_id", OFTInteger, 8);
+                m_layer_werror.add_field("problem_type", OFTString, 30);
 
                 m_layer_ways.add_field("object_type", OFTString, 1);
                 m_layer_ways.add_field("object_id", OFTInteger, 8);
@@ -164,6 +171,21 @@ namespace osmium {
 
             void report_role_should_be_inner(osmium::object_id_type way_id, osmium::Location seg_start, osmium::Location seg_end) override {
                 write_line("role_should_be_inner", way_id, 0, seg_start, seg_end);
+            }
+
+            void report_way_in_multiple_rings(const osmium::Way& way) override {
+                if (way.nodes().size() < 2) {
+                    return;
+                }
+                try {
+                    gdalcpp::Feature feature(m_layer_werror, m_ogr_factory.create_linestring(way));
+                    set_object(feature);
+                    feature.set_field("way_id", int32_t(way.id()));
+                    feature.set_field("problem_type", "way_in_multiple_rings");
+                    feature.add_to_layer();
+                } catch (osmium::geometry_error& e) {
+                    // XXX
+                }
             }
 
             void report_way(const osmium::Way& way) override {

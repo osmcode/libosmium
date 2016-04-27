@@ -180,6 +180,16 @@ namespace osmium {
             }
 
             /**
+             * Report a way that is in multiple rings.
+             *
+             * @param way_id         ID of the way.
+             * @param seg_start      Start of the first segment.
+             * @param seg_end        End of the first segment.
+             */
+            virtual void report_way_in_multiple_rings(const osmium::Way& way) {
+            }
+
+            /**
              * In addition to reporting specific problems, this is used to
              * report all ways belonging to areas having problems.
              *
