@@ -788,9 +788,9 @@ namespace osmium {
                 return false;
             }
 
-            int open_rings() const noexcept {
-                return std::accumulate(m_rings.cbegin(), m_rings.cend(), 0, [](int s, const detail::ProtoRing& ring){
-                    return ring.closed() ? s : s+1;
+            bool there_are_open_rings() const noexcept {
+                return std::any_of(m_rings.cbegin(), m_rings.cend(), [](const detail::ProtoRing& ring){
+                    return !ring.closed();
                 });
             }
 
@@ -1002,7 +1002,7 @@ namespace osmium {
 
                 // If there are open rings, try to join them to create closed
                 // rings.
-                if (open_rings() > 0) {
+                if (there_are_open_rings()) {
                     ++m_stats.area_really_complex_case;
 
                     open_ring_its_type open_ring_its;
