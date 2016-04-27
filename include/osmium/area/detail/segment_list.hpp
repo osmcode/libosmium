@@ -36,6 +36,7 @@ DEALINGS IN THE SOFTWARE.
 #include <algorithm>
 #include <cassert>
 #include <iostream>
+#include <numeric>
 #include <vector>
 
 #include <osmium/area/problem_reporter.hpp>
