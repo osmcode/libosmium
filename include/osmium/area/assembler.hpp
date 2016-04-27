@@ -68,8 +68,12 @@ namespace osmium {
 
             osmium::area::ProblemReporter* problem_reporter;
 
-            // Enables debug output to stderr
-            int debug_level;
+            /**
+             * Debug level. If this is greater than zero, debug messages will
+             * be printed to stderr. Available levels are 1 to 3. Note that
+             * level 2 and above will generate a lot of messages!
+             */
+            int debug_level = 0;
 
             /**
              * The roles of multipolygon members are ignored when assembling
@@ -97,6 +101,9 @@ namespace osmium {
             /**
              * Enable or disable debug output to stderr. This is for Osmium
              * developers only.
+             *
+             * Usage of this function is deprecated. Just set debug_level
+             * instead.
              */
             void enable_debug_output(bool d = true) {
                 debug_level = d;
@@ -117,12 +124,12 @@ namespace osmium {
                 uint32_t item : 31;
                 uint32_t reverse : 1;
 
-                slocation() :
+                slocation() noexcept :
                     item(invalid_item),
                     reverse(false) {
                 }
 
-                explicit slocation(uint32_t n, bool r = false) :
+                explicit slocation(uint32_t n, bool r = false) noexcept :
                     item(n),
                     reverse(r) {
                 }
@@ -142,7 +149,7 @@ namespace osmium {
             }; // struct slocation
 
             // Configuration settings for this Assembler
-            const AssemblerConfig m_config;
+            const AssemblerConfig& m_config;
 
             // List of segments (connection between two nodes)
             osmium::area::detail::SegmentList m_segment_list;
@@ -335,7 +342,7 @@ namespace osmium {
 
             void remove_duplicates(std::vector<std::pair<int32_t, detail::ProtoRing*>>& outer_rings) {
                 while (true) {
-                    auto it = std::adjacent_find(outer_rings.begin(), outer_rings.end(), [](const std::pair<int32_t, detail::ProtoRing*>& a, const std::pair<int32_t, detail::ProtoRing*>& b){
+                    const auto it = std::adjacent_find(outer_rings.begin(), outer_rings.end(), [](const std::pair<int32_t, detail::ProtoRing*>& a, const std::pair<int32_t, detail::ProtoRing*>& b){
                         return a.second == b.second;
                     });
                     if (it == outer_rings.end()) {
@@ -349,10 +356,9 @@ namespace osmium {
                 if (debug()) {
                     std::cerr << "    Looking for ring enclosing " << *segment << "\n";
                 }
-                //auto location = segment->start().location();
-                // XXX
-                auto location = segment->first().location();
-                auto end_location = segment->second().location();
+
+                const auto location = segment->first().location();
+                const auto end_location = segment->second().location();
 
                 while (segment->first().location() == location) {
                     if (segment == &m_segment_list.back()) {
@@ -403,13 +409,13 @@ namespace osmium {
                             std::cerr << "        Is in x range\n";
                         }
 
-                        int64_t ax = a.x();
-                        int64_t bx = b.x();
-                        int64_t lx = location.x();
-                        int64_t ay = a.y();
-                        int64_t by = b.y();
-                        int64_t ly = location.y();
-                        auto z = (bx - ax)*(ly - ay) - (by - ay)*(lx - ax);
+                        const int64_t ax = a.x();
+                        const int64_t bx = b.x();
+                        const int64_t lx = location.x();
+                        const int64_t ay = a.y();
+                        const int64_t by = b.y();
+                        const int64_t ly = location.y();
+                        const auto z = (bx - ax)*(ly - ay) - (by - ay)*(lx - ax);
 
 //                        std::cerr << "z=" << z << "\n";
 
@@ -461,6 +467,10 @@ namespace osmium {
                 }
             }
 
+            bool is_split_location(const osmium::Location& location) const noexcept {
+                return std::find(m_split_locations.cbegin(), m_split_locations.cend(), location) != m_split_locations.cend();
+            }
+
             uint32_t add_new_ring(slocation& node) {
                 detail::NodeRefSegment* segment = &m_segment_list[node.item];
                 assert(!segment->is_done());
@@ -480,21 +490,16 @@ namespace osmium {
                 }
                 segment->mark_direction_done();
 
-                detail::ProtoRing* ring;
-                if (!outer_ring) {
-                    if (debug()) {
-                        std::cerr << "    This is an outer ring\n";
-                    }
-                    m_rings.emplace_back(segment);
-                    ring = &m_rings.back();
-                } else {
+                m_rings.emplace_back(segment);
+                detail::ProtoRing* ring = &m_rings.back();
+                if (outer_ring) {
                     if (debug()) {
                         std::cerr << "    This is an inner ring. Outer ring is " << *outer_ring << "\n";
                     }
-                    m_rings.emplace_back(segment);
-                    ring = &m_rings.back();
                     outer_ring->add_inner_ring(ring);
                     ring->set_outer_ring(outer_ring);
+                } else if (debug()) {
+                    std::cerr << "    This is an outer ring\n";
                 }
 
                 const osmium::Location& first_location = node.location(m_segment_list);
@@ -522,10 +527,6 @@ namespace osmium {
                 }
 
                 return nodes;
-            }
-
-            bool is_split_location(const osmium::Location& location) {
-                return std::find(m_split_locations.cbegin(), m_split_locations.cend(), location) != m_split_locations.cend();
             }
 
             uint32_t add_new_ring_complex(slocation& node) {
@@ -810,10 +811,10 @@ namespace osmium {
                     }
                 }
 
-                auto connections = std::equal_range(xrings.begin(),
-                                                    xrings.end(),
-                                                    location_to_ring_map{cand.stop_location},
-                                                    [](const location_to_ring_map& a, const location_to_ring_map& b){
+                const auto connections = std::equal_range(xrings.begin(),
+                                                          xrings.end(),
+                                                          location_to_ring_map{cand.stop_location},
+                                                          [](const location_to_ring_map& a, const location_to_ring_map& b){
                     return a.location < b.location;
                 });
 
@@ -1194,24 +1195,6 @@ namespace osmium {
             }
 #endif
 
-        public:
-
-            typedef osmium::area::AssemblerConfig config_type;
-
-            explicit Assembler(const config_type& config) :
-                m_config(config),
-                m_segment_list(config.debug_level > 1) {
-#ifdef OSMIUM_WITH_TIMER
-                init_header();
-#endif
-            }
-
-            ~Assembler() = default;
-
-            const osmium::area::area_stats& stats() const noexcept {
-                return m_stats;
-            }
-
             bool create_area(const osmium::Way& way, osmium::memory::Buffer& out_buffer) {
                 osmium::builder::AreaBuilder builder(out_buffer);
                 builder.initialize_from_object(way);
@@ -1228,6 +1211,40 @@ namespace osmium {
 
                 return area_okay;
             }
+
+            bool create_area(const osmium::Relation& relation, const std::vector<size_t>& members, const osmium::memory::Buffer& in_buffer, osmium::memory::Buffer& out_buffer) {
+                osmium::builder::AreaBuilder builder(out_buffer);
+                builder.initialize_from_object(relation);
+
+                const bool area_okay = create_rings() || m_config.create_empty_areas;
+                if (area_okay) {
+                    add_tags_to_area(builder, relation);
+                    add_rings_to_area(builder);
+                }
+
+                if (report_ways()) {
+                    for (size_t offset : members) {
+                        const osmium::Way& way = in_buffer.get<const osmium::Way>(offset);
+                        m_config.problem_reporter->report_way(way);
+                    }
+                }
+
+                return area_okay;
+            }
+
+        public:
+
+            using config_type = osmium::area::AssemblerConfig;
+
+            explicit Assembler(const config_type& config) :
+                m_config(config),
+                m_segment_list(config.debug_level > 1) {
+#ifdef OSMIUM_WITH_TIMER
+                init_header();
+#endif
+            }
+
+            ~Assembler() noexcept = default;
 
             /**
              * Assemble an area from the given way.
@@ -1269,26 +1286,6 @@ namespace osmium {
                 if (debug()) {
                     std::cerr << "Done: " << m_stats << "\n";
                 }
-            }
-
-            bool create_area(const osmium::Relation& relation, const std::vector<size_t>& members, const osmium::memory::Buffer& in_buffer, osmium::memory::Buffer& out_buffer) {
-                osmium::builder::AreaBuilder builder(out_buffer);
-                builder.initialize_from_object(relation);
-
-                const bool area_okay = create_rings() || m_config.create_empty_areas;
-                if (area_okay) {
-                    add_tags_to_area(builder, relation);
-                    add_rings_to_area(builder);
-                }
-
-                if (report_ways()) {
-                    for (size_t offset : members) {
-                        const osmium::Way& way = in_buffer.get<const osmium::Way>(offset);
-                        m_config.problem_reporter->report_way(way);
-                    }
-                }
-
-                return area_okay;
             }
 
             /**
@@ -1368,6 +1365,14 @@ namespace osmium {
                     Assembler assembler(m_config);
                     assembler(*way, out_buffer);
                 }
+            }
+
+            /**
+             * Get statistics from assembler. Call this after running the
+             * assembler to get statistics and data about errors.
+             */
+            const osmium::area::area_stats& stats() const noexcept {
+                return m_stats;
             }
 
         }; // class Assembler
