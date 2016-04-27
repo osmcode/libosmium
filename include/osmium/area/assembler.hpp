@@ -375,9 +375,11 @@ namespace osmium {
                     return a.location(m_segment_list, location) < b.location(m_segment_list, location);
                 });
 
+                assert(it != m_locations.end());
                 if (m_segment_list[it->item].is_done()) {
                     ++it;
                 }
+                assert(it != m_locations.end());
 
                 assert(!m_segment_list[it->item].is_done());
                 return &m_segment_list[it->item];
