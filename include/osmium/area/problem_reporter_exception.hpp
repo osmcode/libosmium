@@ -89,12 +89,6 @@ namespace osmium {
                 throw std::runtime_error(m_sstream.str());
             }
 
-            void report_spike_segment(const osmium::NodeRef& nr1, const osmium::NodeRef& nr2) override {
-                m_sstream.str();
-                ProblemReporterStream::report_spike_segment(nr1, nr2);
-                throw std::runtime_error(m_sstream.str());
-            }
-
             void report_role_should_be_outer(osmium::object_id_type way_id, osmium::Location seg_start, osmium::Location seg_end) override {
                 m_sstream.str();
                 ProblemReporterStream::report_role_should_be_outer(way_id, seg_start, seg_end);

@@ -150,15 +150,6 @@ namespace osmium {
             }
 
             /**
-             * Report a spike segment. These should always be fixed.
-             *
-             * @param nr1  NodeRef of one end of the segment.
-             * @param nr2  NodeRef of the other end of the segment.
-             */
-            virtual void report_spike_segment(const osmium::NodeRef& nr1, const osmium::NodeRef& nr2) {
-            }
-
-            /**
              * Report a segment that should have role "outer", but has a different role.
              *
              * @param way_id     ID of the way this segment is in.

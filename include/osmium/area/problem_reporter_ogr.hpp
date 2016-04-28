@@ -161,10 +161,6 @@ namespace osmium {
                 write_point("ring_not_closed", nr.ref(), 0, nr.location());
             }
 
-            void report_spike_segment(const osmium::NodeRef& nr1, const osmium::NodeRef& nr2) override {
-                write_line("spike_segment", nr1.ref(), nr2.ref(), nr1.location(), nr2.location());
-            }
-
             void report_role_should_be_outer(osmium::object_id_type way_id, osmium::Location seg_start, osmium::Location seg_end) override {
                 write_line("role_should_be_outer", way_id, 0, seg_start, seg_end);
             }

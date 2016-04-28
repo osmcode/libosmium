@@ -90,12 +90,6 @@ namespace osmium {
                 *m_out << "node_id=" << nr.ref() << " location=" << nr.location() << "\n";
             }
 
-            void report_spike_segment(const osmium::NodeRef& nr1, const osmium::NodeRef& nr2) override {
-                header("spike segment");
-                *m_out << "node_id1=" << nr1.ref() << " location1=" << nr1.location()
-                       << " node_id2=" << nr2.ref() << " location2=" << nr2.location() << "\n";
-            }
-
             void report_role_should_be_outer(osmium::object_id_type way_id, osmium::Location seg_start, osmium::Location seg_end) override {
                 header("role should be outer");
                 *m_out << "way_id=" << way_id << " seg_start=" << seg_start << " seg_end=" << seg_end << "\n";
