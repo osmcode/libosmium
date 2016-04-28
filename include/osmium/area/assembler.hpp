@@ -182,6 +182,11 @@ namespace osmium {
                     return reverse ? segment.second().location() : segment.first().location();
                 }
 
+                const osmium::NodeRef& node_ref(const detail::SegmentList& segment_list) const noexcept {
+                    const auto& segment = segment_list[item];
+                    return reverse ? segment.second() : segment.first();
+                }
+
                 osmium::Location location(const detail::SegmentList& segment_list, const osmium::Location& default_location) const noexcept {
                     if (item == invalid_item) {
                         return default_location;
@@ -219,11 +224,12 @@ namespace osmium {
                 }
                 return m_stats.duplicate_nodes ||
                        m_stats.duplicate_segments ||
-//                       m_stats.wrong_role ||
                        m_stats.intersections ||
-                       m_stats.spike_segments ||
+                       m_stats.open_rings ||
                        m_stats.short_ways ||
-                       m_stats.touching_rings;
+                       m_stats.touching_rings ||
+                       m_stats.ways_in_multiple_rings ||
+                       m_stats.wrong_role;
             }
 
             void add_tags_to_area(osmium::builder::AreaBuilder& builder, const osmium::Way& way) const {
@@ -736,30 +742,34 @@ namespace osmium {
 
             /**
              * Finds all locations where more than two segments meet. If there
-             * are any spike segments found along the way, they are reported
+             * are any open rings found along the way, they are reported
              * and the function returns false.
              */
             bool find_split_locations() {
                 osmium::Location previous_location;
-                for (auto it = m_locations.cbegin(); it != m_locations.cend(); it += 2) {
-                    osmium::Location loc = it->location(m_segment_list);
-                    if (loc != std::next(it)->location(m_segment_list)) {
-                        detail::NodeRefSegment& segment = m_segment_list[it->item];
-                        if (m_config.problem_reporter) {
-                            m_config.problem_reporter->report_spike_segment(segment.first(), segment.second());
-                        }
+                for (auto it = m_locations.cbegin(); it != m_locations.cend(); ++it) {
+                    const osmium::NodeRef& nr = it->node_ref(m_segment_list);
+                    const osmium::Location& loc = nr.location();
+                    if (std::next(it) == m_locations.cend() || loc != std::next(it)->location(m_segment_list)) {
                         if (debug()) {
-                            std::cerr << "  Found spike segment: " << segment << "\n";
+                            std::cerr << "  Found open ring at " << nr << "\n";
                         }
-                        ++m_stats.spike_segments;
-                        return false;
-                    }
-                    if (loc == previous_location && (m_split_locations.empty() || m_split_locations.back() != previous_location )) {
-                        m_split_locations.push_back(previous_location);
+                        if (m_config.problem_reporter) {
+                            m_config.problem_reporter->report_ring_not_closed(nr);
+                        }
+                        ++m_stats.open_rings;
+                    } else {
+                        if (loc == previous_location && (m_split_locations.empty() || m_split_locations.back() != previous_location )) {
+                            m_split_locations.push_back(previous_location);
+                        }
+                        ++it;
+                        if (it == m_locations.end()) {
+                            break;
+                        }
                     }
                     previous_location = loc;
                 }
-                return true;
+                return m_stats.open_rings == 0;
             }
 
             void create_rings_simple_case() {
@@ -982,8 +992,8 @@ namespace osmium {
                         ++m_stats.open_rings;
                         if (m_config.problem_reporter) {
                             for (auto& it : open_ring_its) {
-                                m_config.problem_reporter->
-                                    report_ring_not_closed(it->get_node_ref_start(), it->get_node_ref_stop());
+                                m_config.problem_reporter->report_ring_not_closed(it->get_node_ref_start());
+                                m_config.problem_reporter->report_ring_not_closed(it->get_node_ref_stop());
                             }
                         }
                     }

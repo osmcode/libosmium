@@ -83,9 +83,9 @@ namespace osmium {
                 throw std::runtime_error(m_sstream.str());
             }
 
-            void report_ring_not_closed(const osmium::NodeRef& nr1, const osmium::NodeRef& nr2) override {
+            void report_ring_not_closed(const osmium::NodeRef& nr) override {
                 m_sstream.str();
-                ProblemReporterStream::report_ring_not_closed(nr1, nr2);
+                ProblemReporterStream::report_ring_not_closed(nr);
                 throw std::runtime_error(m_sstream.str());
             }
 

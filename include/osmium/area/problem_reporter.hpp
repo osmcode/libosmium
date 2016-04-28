@@ -144,10 +144,9 @@ namespace osmium {
             /**
              * Report an open ring.
              *
-             * @param nr1  NodeRef of one end of the ring.
-             * @param nr2  NodeRef of the other end of the ring.
+             * @param nr  NodeRef of one end of the ring.
              */
-            virtual void report_ring_not_closed(const osmium::NodeRef& nr1, const osmium::NodeRef& nr2) {
+            virtual void report_ring_not_closed(const osmium::NodeRef& nr) {
             }
 
             /**

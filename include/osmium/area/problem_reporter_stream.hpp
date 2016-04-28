@@ -85,10 +85,9 @@ namespace osmium {
                        << " node_id2=" << nr2.ref() << " location2=" << nr2.location() << "\n";
             }
 
-            void report_ring_not_closed(const osmium::NodeRef& nr1, const osmium::NodeRef& nr2) override {
+            void report_ring_not_closed(const osmium::NodeRef& nr) override {
                 header("ring not closed");
-                *m_out << "node_id1=" << nr1.ref() << " location1=" << nr1.location()
-                       << " node_id2=" << nr2.ref() << " location2=" << nr2.location() << "\n";
+                *m_out << "node_id=" << nr.ref() << " location=" << nr.location() << "\n";
             }
 
             void report_spike_segment(const osmium::NodeRef& nr1, const osmium::NodeRef& nr2) override {

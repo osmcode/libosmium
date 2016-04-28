@@ -70,7 +70,6 @@ namespace osmium {
 
             gdalcpp::Layer m_layer_perror;
             gdalcpp::Layer m_layer_lerror;
-            gdalcpp::Layer m_layer_werror;
             gdalcpp::Layer m_layer_ways;
 
             void set_object(gdalcpp::Feature& feature) {
@@ -109,7 +108,6 @@ namespace osmium {
             explicit ProblemReporterOGR(gdalcpp::Dataset& dataset) :
                 m_layer_perror(dataset, "perrors", wkbPoint),
                 m_layer_lerror(dataset, "lerrors", wkbLineString),
-                m_layer_werror(dataset, "werrors", wkbLineString),
                 m_layer_ways(dataset, "ways", wkbLineString) {
 
                 m_layer_perror
@@ -127,14 +125,6 @@ namespace osmium {
                     .add_field("nodes", OFTInteger, 8)
                     .add_field("id1", OFTReal, 10)
                     .add_field("id2", OFTReal, 10)
-                    .add_field("problem_type", OFTString, 30)
-                ;
-
-                m_layer_werror
-                    .add_field("object_type", OFTString, 1)
-                    .add_field("object_id", OFTInteger, 8)
-                    .add_field("nodes", OFTInteger, 8)
-                    .add_field("way_id", OFTInteger, 8)
                     .add_field("problem_type", OFTString, 30)
                 ;
 
@@ -167,8 +157,8 @@ namespace osmium {
                 write_line("duplicate_segment", nr1.ref(), nr2.ref(), nr1.location(), nr2.location());
             }
 
-            void report_ring_not_closed(const osmium::NodeRef& nr1, const osmium::NodeRef& nr2) override {
-                write_line("ring_not_closed", nr1.ref(), nr2.ref(), nr1.location(), nr2.location());
+            void report_ring_not_closed(const osmium::NodeRef& nr) override {
+                write_point("ring_not_closed", nr.ref(), 0, nr.location());
             }
 
             void report_spike_segment(const osmium::NodeRef& nr1, const osmium::NodeRef& nr2) override {
@@ -188,9 +178,9 @@ namespace osmium {
                     return;
                 }
                 try {
-                    gdalcpp::Feature feature(m_layer_werror, m_ogr_factory.create_linestring(way));
+                    gdalcpp::Feature feature(m_layer_lerror, m_ogr_factory.create_linestring(way));
                     set_object(feature);
-                    feature.set_field("way_id", int32_t(way.id()));
+                    feature.set_field("id1", int32_t(way.id()));
                     feature.set_field("problem_type", "way_in_multiple_rings");
                     feature.add_to_layer();
                 } catch (osmium::geometry_error& e) {

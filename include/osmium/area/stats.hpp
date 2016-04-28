@@ -64,7 +64,6 @@ namespace osmium {
             uint32_t outer_rings = 0; ///< Number of outer rings in the area
             uint32_t short_ways = 0; ///< Number of ways with less than two nodes
             uint32_t single_way_in_mp_relation = 0; ///< Multipolygon relation containing a single way
-            uint32_t spike_segments = 0; ///< Segments jutting out of a ring
             uint32_t touching_rings = 0; ///< Rings touching in a node
             uint32_t ways_in_multiple_rings = 0; ///< Different segments of a way ended up in different rings
             uint32_t wrong_role = 0; ///< Member has wrong role (not "outer", "inner", or empty)
@@ -87,7 +86,6 @@ namespace osmium {
                 outer_rings += other.outer_rings;
                 short_ways += other.short_ways;
                 single_way_in_mp_relation += other.single_way_in_mp_relation;
-                spike_segments += other.spike_segments;
                 touching_rings += other.touching_rings;
                 ways_in_multiple_rings += other.ways_in_multiple_rings;
                 wrong_role += other.wrong_role;
@@ -115,7 +113,6 @@ namespace osmium {
                        << " outer_rings=" << s.outer_rings
                        << " short_ways=" << s.short_ways
                        << " single_way_in_mp_relation=" << s.single_way_in_mp_relation
-                       << " spike_segments=" << s.spike_segments
                        << " touching_rings=" << s.touching_rings
                        << " ways_in_multiple_rings=" << s.ways_in_multiple_rings
                        << " wrong_role=" << s.wrong_role;
