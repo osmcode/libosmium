@@ -244,13 +244,13 @@ namespace osmium {
                     }
                 }
 
-                size_t num_ways = ways.size();
+                const size_t num_ways = ways.size();
                 for (const auto& t_c : counter) {
                     if (debug()) {
                         std::cerr << "        tag " << t_c.first << " is used " << t_c.second << " times in " << num_ways << " ways\n";
                     }
                     if (t_c.second == num_ways) {
-                        size_t len = std::strlen(t_c.first.c_str());
+                        const size_t len = std::strlen(t_c.first.c_str());
                         tl_builder.add_tag(t_c.first.c_str(), t_c.first.c_str() + len + 1);
                     }
                 }
@@ -274,6 +274,15 @@ namespace osmium {
                 return filter;
             }
 
+            static void copy_tags_without_type(osmium::builder::AreaBuilder& builder, const osmium::TagList& tags) {
+                osmium::builder::TagListBuilder tl_builder(builder.buffer(), &builder);
+                for (const osmium::Tag& tag : tags) {
+                    if (std::strcmp(tag.key(), "type")) {
+                        tl_builder.add_tag(tag.key(), tag.value());
+                    }
+                }
+            }
+
             void add_tags_to_area(osmium::builder::AreaBuilder& builder, const osmium::Relation& relation) {
                 const auto count = std::count_if(relation.tags().cbegin(), relation.tags().cend(), filter());
 
@@ -286,13 +295,7 @@ namespace osmium {
                         std::cerr << "    use tags from relation\n";
                     }
 
-                    // write out all tags except type=*
-                    osmium::builder::TagListBuilder tl_builder(builder.buffer(), &builder);
-                    for (const osmium::Tag& tag : relation.tags()) {
-                        if (std::strcmp(tag.key(), "type")) {
-                            tl_builder.add_tag(tag.key(), tag.value());
-                        }
-                    }
+                    copy_tags_without_type(builder, relation.tags());
                 } else {
                     ++m_stats.no_tags_on_relation;
                     if (debug()) {
@@ -308,10 +311,7 @@ namespace osmium {
                         if (debug()) {
                             std::cerr << "      only one outer way\n";
                         }
-                        osmium::builder::TagListBuilder tl_builder(builder.buffer(), &builder);
-                        for (const osmium::Tag& tag : (*ways.cbegin())->tags()) {
-                            tl_builder.add_tag(tag.key(), tag.value());
-                        }
+                        builder.add_item(&(*ways.cbegin())->tags());
                     } else {
                         if (debug()) {
                             std::cerr << "      multiple outer ways, get common tags\n";
@@ -322,6 +322,15 @@ namespace osmium {
                 }
             }
 
+            template <typename TBuilder>
+            static void build_ring_from_proto_ring(osmium::builder::AreaBuilder& builder, const detail::ProtoRing& ring) {
+                TBuilder ring_builder(builder.buffer(), &builder);
+                ring_builder.add_node_ref(ring.get_node_ref_start());
+                for (const auto& segment : ring.segments()) {
+                    ring_builder.add_node_ref(segment->stop());
+                }
+            }
+
             /**
              * Append each outer ring together with its inner rings to the
              * area in the buffer.
@@ -329,19 +338,9 @@ namespace osmium {
             void add_rings_to_area(osmium::builder::AreaBuilder& builder) const {
                 for (const detail::ProtoRing& ring : m_rings) {
                     if (ring.is_outer()) {
-                        {
-                            osmium::builder::OuterRingBuilder ring_builder(builder.buffer(), &builder);
-                            ring_builder.add_node_ref(ring.get_node_ref_start());
-                            for (const auto& segment : ring.segments()) {
-                                ring_builder.add_node_ref(segment->stop());
-                            }
-                        }
+                        build_ring_from_proto_ring<osmium::builder::OuterRingBuilder>(builder, ring);
                         for (const detail::ProtoRing* inner : ring.inner_rings()) {
-                            osmium::builder::InnerRingBuilder ring_builder(builder.buffer(), &builder);
-                            ring_builder.add_node_ref(inner->get_node_ref_start());
-                            for (const auto& segment : inner->segments()) {
-                                ring_builder.add_node_ref(segment->stop());
-                            }
+                            build_ring_from_proto_ring<osmium::builder::InnerRingBuilder>(builder, *inner);
                         }
                     }
                 }
@@ -1400,7 +1399,7 @@ namespace osmium {
                     detail::for_each_member(relation, members, [&ways_that_should_be_areas, &area_tags](const osmium::RelationMember& member, const osmium::Way& way) {
                         if (!std::strcmp(member.role(), "inner")) {
                             if (!way.nodes().empty() && way.is_closed() && way.tags().size() > 0) {
-                                auto d = std::count_if(way.tags().cbegin(), way.tags().cend(), filter());
+                                const auto d = std::count_if(way.tags().cbegin(), way.tags().cend(), filter());
                                 if (d > 0) {
                                     osmium::tags::KeyFilter::iterator way_fi_begin(filter(), way.tags().cbegin(), way.tags().cend());
                                     osmium::tags::KeyFilter::iterator way_fi_end(filter(), way.tags().cend(), way.tags().cend());
