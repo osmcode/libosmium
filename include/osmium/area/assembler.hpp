@@ -755,7 +755,8 @@ namespace osmium {
                             std::cerr << "  Found open ring at " << nr << "\n";
                         }
                         if (m_config.problem_reporter) {
-                            m_config.problem_reporter->report_ring_not_closed(nr);
+                            const auto& segment = m_segment_list[it->item];
+                            m_config.problem_reporter->report_ring_not_closed(nr, segment.way());
                         }
                         ++m_stats.open_rings;
                     } else {
@@ -1188,7 +1189,12 @@ namespace osmium {
                     }
                     for (const auto& location : m_split_locations) {
                         if (m_config.problem_reporter) {
-                            m_config.problem_reporter->report_touching_ring(0, location);
+                            auto it = std::lower_bound(m_locations.cbegin(), m_locations.cend(), slocation{}, [this, &location](const slocation& a, const slocation& b) {
+                                return a.location(m_segment_list, location) < b.location(m_segment_list, location);
+                            });
+                            assert(it != m_locations.cend());
+                            const osmium::object_id_type id = it->node_ref(m_segment_list).ref();
+                            m_config.problem_reporter->report_touching_ring(id, location);
                         }
                         if (debug()) {
                             std::cerr << "    " << location << "\n";

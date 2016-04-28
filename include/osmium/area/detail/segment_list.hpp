@@ -288,7 +288,7 @@ namespace osmium {
 
                     uint32_t found_intersections = 0;
 
-                    for (auto it1 = m_segments.begin(); it1 != m_segments.end()-1; ++it1) {
+                    for (auto it1 = m_segments.cbegin(); it1 != m_segments.cend()-1; ++it1) {
                         const NodeRefSegment& s1 = *it1;
                         for (auto it2 = it1+1; it2 != m_segments.end(); ++it2) {
                             const NodeRefSegment& s2 = *it2;

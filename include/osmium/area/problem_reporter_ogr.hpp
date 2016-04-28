@@ -148,17 +148,17 @@ namespace osmium {
 
             void report_intersection(osmium::object_id_type way1_id, osmium::Location way1_seg_start, osmium::Location way1_seg_end,
                                      osmium::object_id_type way2_id, osmium::Location way2_seg_start, osmium::Location way2_seg_end, osmium::Location intersection) override {
-                write_point("intersection", 0, 0, intersection);
-                write_line("intersection", way1_id, 0, way1_seg_start, way1_seg_end);
-                write_line("intersection", way2_id, 0, way2_seg_start, way2_seg_end);
+                write_point("intersection", way1_id, way2_id, intersection);
+                write_line("intersection", way1_id, way2_id, way1_seg_start, way1_seg_end);
+                write_line("intersection", way2_id, way1_id, way2_seg_start, way2_seg_end);
             }
 
             void report_duplicate_segment(const osmium::NodeRef& nr1, const osmium::NodeRef& nr2) override {
                 write_line("duplicate_segment", nr1.ref(), nr2.ref(), nr1.location(), nr2.location());
             }
 
-            void report_ring_not_closed(const osmium::NodeRef& nr) override {
-                write_point("ring_not_closed", nr.ref(), 0, nr.location());
+            void report_ring_not_closed(const osmium::NodeRef& nr, const osmium::Way* way = nullptr) override {
+                write_point("ring_not_closed", nr.ref(), way ? way->id() : 0, nr.location());
             }
 
             void report_role_should_be_outer(osmium::object_id_type way_id, osmium::Location seg_start, osmium::Location seg_end) override {
@@ -177,6 +177,7 @@ namespace osmium {
                     gdalcpp::Feature feature(m_layer_lerror, m_ogr_factory.create_linestring(way));
                     set_object(feature);
                     feature.set_field("id1", int32_t(way.id()));
+                    feature.set_field("id2", 0);
                     feature.set_field("problem_type", "way_in_multiple_rings");
                     feature.add_to_layer();
                 } catch (osmium::geometry_error& e) {
