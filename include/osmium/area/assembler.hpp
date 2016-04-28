@@ -364,10 +364,11 @@ namespace osmium {
                     for (const auto& segment : ring.segments()) {
                         assert(segment->way());
 
-                        if (!segment->role_empty() && ring.is_outer() ? !segment->role_outer() : !segment->role_inner()) {
+                        if (!segment->role_empty() && (ring.is_outer() ? !segment->role_outer() : !segment->role_inner())) {
                             ++m_stats.wrong_role;
                             if (debug()) {
-                                std::cerr << "      Segment " << *segment << " from way " << segment->way()->id() << " should have role '" << (ring.is_outer() ? "outer" : "inner") << "'\n";
+                                std::cerr << "      Segment " << *segment << " from way " << segment->way()->id() << " has role '" << segment->role_name()
+                                          << "', but should have role '" << (ring.is_outer() ? "outer" : "inner") << "'\n";
                             }
                             if (m_config.problem_reporter) {
                                 if (ring.is_outer()) {

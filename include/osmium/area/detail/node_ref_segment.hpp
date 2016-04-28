@@ -202,6 +202,11 @@ namespace osmium {
                     return m_role == role_type::empty;
                 }
 
+                const char* role_name() const noexcept {
+                    static const char* names[] = { "unknown", "outer", "inner", "empty" };
+                    return names[int(m_role)];
+                }
+
                 const osmium::Way* way() const noexcept {
                     return m_way;
                 }
