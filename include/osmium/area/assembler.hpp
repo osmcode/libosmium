@@ -485,13 +485,13 @@ namespace osmium {
                     const osmium::Location& b = segment->second().location();
 
                     if (segment->first().location() == location) {
-                        int64_t ax = a.x();
-                        int64_t bx = b.x();
-                        int64_t lx = end_location.x();
-                        int64_t ay = a.y();
-                        int64_t by = b.y();
-                        int64_t ly = end_location.y();
-                        auto z = (bx - ax)*(ly - ay) - (by - ay)*(lx - ax);
+                        const int64_t ax = a.x();
+                        const int64_t bx = b.x();
+                        const int64_t lx = end_location.x();
+                        const int64_t ay = a.y();
+                        const int64_t by = b.y();
+                        const int64_t ly = end_location.y();
+                        const auto z = (bx - ax)*(ly - ay) - (by - ay)*(lx - ax);
                         if (debug()) {
                             std::cerr << "      Segment XXXX z=" << z << "\n";
                         }
@@ -889,7 +889,7 @@ namespace osmium {
                                                                      xrings.cend(),
                                                                      location_to_ring_map{cand.stop_location}));
 
-                assert(connections.first != connections.second);
+                assert(connections.begin() != connections.end());
 
                 assert(!cand.rings.empty());
                 const detail::ProtoRing* ring_leading_here = &cand.rings.back().first.ring();
@@ -1332,7 +1332,7 @@ namespace osmium {
                     m_config.problem_reporter->set_nodes(way.nodes().size());
                 }
 
-                // Ignore (but possibly report) ways without segments.
+                // Ignore (but count) ways without segments.
                 if (way.nodes().size() < 2) {
                     ++m_stats.short_ways;
                     return;
