@@ -409,11 +409,45 @@ namespace osmium {
                 return &m_segment_list[it->item];
             }
 
-            void remove_duplicates(std::vector<std::pair<int32_t, detail::ProtoRing*>>& outer_rings) {
+            class rings_stack_element {
+
+                int32_t m_y;
+                detail::ProtoRing* m_ring_ptr;
+
+            public:
+
+                rings_stack_element(int32_t y, detail::ProtoRing* ring_ptr) :
+                    m_y(y),
+                    m_ring_ptr(ring_ptr) {
+                }
+
+                int32_t y() const noexcept {
+                    return m_y;
+                }
+
+                const detail::ProtoRing& ring() const noexcept {
+                    return *m_ring_ptr;
+                }
+
+                detail::ProtoRing* ring_ptr() noexcept {
+                    return m_ring_ptr;
+                }
+
+                bool operator==(const rings_stack_element& rhs) const noexcept {
+                    return m_ring_ptr == rhs.m_ring_ptr;
+                }
+
+                bool operator<(const rings_stack_element& rhs) const noexcept {
+                    return m_y < rhs.m_y;
+                }
+
+            }; // class ring_stack_element
+
+            using rings_stack = std::vector<rings_stack_element>;
+
+            void remove_duplicates(rings_stack& outer_rings) {
                 while (true) {
-                    const auto it = std::adjacent_find(outer_rings.begin(), outer_rings.end(), [](const std::pair<int32_t, detail::ProtoRing*>& a, const std::pair<int32_t, detail::ProtoRing*>& b){
-                        return a.second == b.second;
-                    });
+                    const auto it = std::adjacent_find(outer_rings.begin(), outer_rings.end());
                     if (it == outer_rings.end()) {
                         return;
                     }
@@ -438,7 +472,7 @@ namespace osmium {
 
                 int nesting = 0;
 
-                std::vector<std::pair<int32_t, detail::ProtoRing*>> outer_rings;
+                rings_stack outer_rings;
                 while (segment >= &m_segment_list.front()) {
                     if (!segment->is_direction_done()) {
                         --segment;
@@ -470,7 +504,7 @@ namespace osmium {
                                 if (debug()) {
                                     std::cerr << "        Segment belongs to outer ring\n";
                                 }
-                                outer_rings.push_back(std::make_pair(a.y(), segment->ring()));
+                                outer_rings.emplace_back(a.y(), segment->ring());
                             }
                         }
                     } else if (a.x() <= location.x() && location.x() < b.x()) {
@@ -498,7 +532,7 @@ namespace osmium {
                                     std::cerr << "        Segment belongs to outer ring\n";
                                 }
                                 int32_t y = int32_t(ay + (by - ay) * (lx - ax) / (bx - ax));
-                                outer_rings.push_back(std::make_pair(y, segment->ring()));
+                                outer_rings.emplace_back(y, segment->ring());
                             }
                         }
                     }
@@ -519,7 +553,7 @@ namespace osmium {
                     std::sort(outer_rings.rbegin(), outer_rings.rend());
                     if (debug()) {
                         for (const auto& o : outer_rings) {
-                            std::cerr << "        y=" << o.first << " " << *(o.second) << "\n";
+                            std::cerr << "        y=" << o.y() << " " << o.ring() << "\n";
                         }
                     }
 
@@ -527,12 +561,12 @@ namespace osmium {
                     if (debug()) {
                         std::cerr << "      after remove duplicates:\n";
                         for (const auto& o : outer_rings) {
-                            std::cerr << "        y=" << o.first << " " << *(o.second) << "\n";
+                            std::cerr << "        y=" << o.y() << " " << o.ring() << "\n";
                         }
                     }
 
                     assert(!outer_rings.empty());
-                    return outer_rings.begin()->second;
+                    return outer_rings.front().ring_ptr();
                 }
             }
 
