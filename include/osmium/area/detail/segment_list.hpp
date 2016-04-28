@@ -256,9 +256,17 @@ namespace osmium {
                         if (m_debug) {
                             std::cerr << "  erase duplicate segment: " << *it << "\n";
                         }
-                        if (problem_reporter) {
-                            problem_reporter->report_duplicate_segment(it->first(), it->second());
+
+                        // Only count and report duplicate segments if they
+                        // belong to the same way. Those cases are definitely
+                        // wrong. If the duplicate segments belong to
+                        // different ways, they could be touching inner rings
+                        // which are perfectly okay.
+                        if (it->way() == std::next(it)->way()) {
                             ++duplicate_segments;
+                            if (problem_reporter) {
+                                problem_reporter->report_duplicate_segment(it->first(), it->second());
+                            }
                         }
                         m_segments.erase(it, it+2);
                     }
