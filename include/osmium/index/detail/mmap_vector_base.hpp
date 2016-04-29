@@ -72,13 +72,13 @@ namespace osmium {
 
             ~mmap_vector_base() noexcept = default;
 
-            typedef T value_type;
-            typedef T& reference;
-            typedef const T& const_reference;
-            typedef T* pointer;
-            typedef const T* const_pointer;
-            typedef T* iterator;
-            typedef const T* const_iterator;
+            using value_type      = T;
+            using pointer         = value_type*;
+            using const_pointer   = const value_type*;
+            using reference       = value_type&;
+            using const_reference = const value_type&;
+            using iterator        = value_type*;
+            using const_iterator  = const value_type*;
 
             void close() {
                 m_mapping.unmap();
