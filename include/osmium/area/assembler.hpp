@@ -233,20 +233,19 @@ namespace osmium {
             }
 
             void add_tags_to_area(osmium::builder::AreaBuilder& builder, const osmium::Way& way) const {
-                osmium::builder::TagListBuilder tl_builder(builder.buffer(), &builder);
-                for (const osmium::Tag& tag : way.tags()) {
-                    tl_builder.add_tag(tag.key(), tag.value());
-                }
+                copy_tags(builder, way.tags());
             }
 
             void add_common_tags(osmium::builder::TagListBuilder& tl_builder, std::set<const osmium::Way*>& ways) const {
                 std::map<std::string, size_t> counter;
                 for (const osmium::Way* way : ways) {
                     for (const auto& tag : way->tags()) {
-                        std::string kv {tag.key()};
-                        kv.append(1, '\0');
-                        kv.append(tag.value());
-                        ++counter[kv];
+                        if (keep(tag)) {
+                            std::string kv {tag.key()};
+                            kv.append(1, '\0');
+                            kv.append(tag.value());
+                            ++counter[kv];
+                        }
                     }
                 }
 
@@ -268,23 +267,43 @@ namespace osmium {
                     add(false, "type");
                     add(false, "created_by");
                     add(false, "source");
-                    add(false, "note");
                     add(false, "test:id");
                     add(false, "test:section");
                 }
 
             }; // struct MPFilter
 
-            static MPFilter& filter() {
-                static MPFilter filter;
+            static const MPFilter& filter() noexcept {
+                static const MPFilter filter;
                 return filter;
             }
 
-            static void copy_tags_without_type(osmium::builder::AreaBuilder& builder, const osmium::TagList& tags) {
+            struct CopyTagsFilter : public osmium::tags::KeyFilter {
+
+                CopyTagsFilter() : osmium::tags::KeyFilter(true) {
+                    add(false, "created_by");
+                    add(false, "odbl");
+                    add(false, "odbl:note");
+                    add(false, "source");
+                    add(false, "tiger:separated");
+                    add(false, "tiger:source");
+                    add(false, "tiger:tlid");
+                    add(false, "tiger:upload_uuid");
+                    add(false, "type");
+                }
+
+            }; // struct CopyTagsFilter
+
+            static bool keep(const osmium::Tag& tag) noexcept {
+                static const CopyTagsFilter filter;
+                return filter(tag);
+            }
+
+            static void copy_tags(osmium::builder::AreaBuilder& builder, const osmium::TagList& tags) {
                 osmium::builder::TagListBuilder tl_builder(builder.buffer(), &builder);
                 for (const osmium::Tag& tag : tags) {
-                    if (std::strcmp(tag.key(), "type")) {
-                        tl_builder.add_tag(tag.key(), tag.value());
+                    if (keep(tag)) {
+                        tl_builder.add_tag(tag);
                     }
                 }
             }
@@ -301,7 +320,7 @@ namespace osmium {
                         std::cerr << "    use tags from relation\n";
                     }
 
-                    copy_tags_without_type(builder, relation.tags());
+                    copy_tags(builder, relation.tags());
                 } else {
                     ++m_stats.no_tags_on_relation;
                     if (debug()) {
@@ -317,7 +336,7 @@ namespace osmium {
                         if (debug()) {
                             std::cerr << "      only one outer way\n";
                         }
-                        builder.add_item(&(*ways.cbegin())->tags());
+                        copy_tags(builder, (*ways.cbegin())->tags());
                     } else {
                         if (debug()) {
                             std::cerr << "      multiple outer ways, get common tags\n";
