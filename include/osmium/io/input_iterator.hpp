@@ -57,7 +57,7 @@ namespace osmium {
 
             static_assert(std::is_base_of<osmium::memory::Item, TItem>::value, "TItem must derive from osmium::buffer::Item");
 
-            typedef typename osmium::memory::Buffer::t_iterator<TItem> item_iterator;
+            using item_iterator = typename osmium::memory::Buffer::t_iterator<TItem>;
 
             TSource* m_source;
             std::shared_ptr<osmium::memory::Buffer> m_buffer;
@@ -78,11 +78,11 @@ namespace osmium {
 
         public:
 
-            typedef std::input_iterator_tag iterator_category;
-            typedef TItem                   value_type;
-            typedef ptrdiff_t               difference_type;
-            typedef TItem*                  pointer;
-            typedef TItem&                  reference;
+            using iterator_category = std::input_iterator_tag;
+            using value_type        = TItem;
+            using difference_type   = ptrdiff_t;
+            using pointer           = value_type*;
+            using reference         = value_type&;
 
             explicit InputIterator(TSource& source) :
                 m_source(&source) {

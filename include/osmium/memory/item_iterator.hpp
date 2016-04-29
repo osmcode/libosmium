@@ -116,14 +116,14 @@ namespace osmium {
         } // namespace detail
 
         template <typename TMember>
-        class ItemIterator : public std::iterator<std::forward_iterator_tag, TMember> {
+        class ItemIterator {
 
             static_assert(std::is_base_of<osmium::memory::Item, TMember>::value, "TMember must derive from osmium::memory::Item");
 
             // This data_type is either 'unsigned char*' or 'const unsigned char*' depending
             // on whether TMember is const. This allows this class to be used as an iterator and
             // as a const_iterator.
-            typedef typename std::conditional<std::is_const<TMember>::value, const unsigned char*, unsigned char*>::type data_type;
+            using data_type = typename std::conditional<std::is_const<TMember>::value, const unsigned char*, unsigned char*>::type;
 
             data_type m_data;
             data_type m_end;
@@ -136,6 +136,12 @@ namespace osmium {
             }
 
         public:
+
+            using iterator_category = std::forward_iterator_tag;
+            using value_type        = TMember;
+            using difference_type   = std::ptrdiff_t;
+            using pointer           = value_type*;
+            using reference         = value_type&;
 
             ItemIterator() noexcept :
                 m_data(nullptr),
@@ -233,7 +239,7 @@ namespace osmium {
 
             // This data_type is either 'unsigned char*' or
             // 'const unsigned char*' depending on whether T is const.
-            typedef typename std::conditional<std::is_const<T>::value, const unsigned char*, unsigned char*>::type data_type;
+            using data_type = typename std::conditional<std::is_const<T>::value, const unsigned char*, unsigned char*>::type;
 
             data_type m_begin;
             data_type m_end;
