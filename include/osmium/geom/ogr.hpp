@@ -62,11 +62,11 @@ namespace osmium {
 
             public:
 
-                typedef std::unique_ptr<OGRPoint>        point_type;
-                typedef std::unique_ptr<OGRLineString>   linestring_type;
-                typedef std::unique_ptr<OGRPolygon>      polygon_type;
-                typedef std::unique_ptr<OGRMultiPolygon> multipolygon_type;
-                typedef std::unique_ptr<OGRLinearRing>   ring_type;
+                using point_type        = std::unique_ptr<OGRPoint>;
+                using linestring_type   = std::unique_ptr<OGRLineString>;
+                using polygon_type      = std::unique_ptr<OGRPolygon>;
+                using multipolygon_type = std::unique_ptr<OGRMultiPolygon>;
+                using ring_type         = std::unique_ptr<OGRLinearRing>;
 
             private:
 

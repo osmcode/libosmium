@@ -148,11 +148,11 @@ namespace osmium {
 
             public:
 
-                typedef std::string point_type;
-                typedef std::string linestring_type;
-                typedef std::string polygon_type;
-                typedef std::string multipolygon_type;
-                typedef std::string ring_type;
+                using point_type        = std::string;
+                using linestring_type   = std::string;
+                using polygon_type      = std::string;
+                using multipolygon_type = std::string;
+                using ring_type         = std::string;
 
                 explicit WKBFactoryImpl(wkb_type wtype = wkb_type::wkb, out_type otype = out_type::binary) :
                     m_wkb_type(wtype),

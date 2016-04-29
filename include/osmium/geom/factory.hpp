@@ -182,12 +182,13 @@ namespace osmium {
                 m_impl(std::forward<TArgs>(args)...) {
             }
 
-            typedef TProjection projection_type;
-            typedef typename TGeomImpl::point_type        point_type;
-            typedef typename TGeomImpl::linestring_type   linestring_type;
-            typedef typename TGeomImpl::polygon_type      polygon_type;
-            typedef typename TGeomImpl::multipolygon_type multipolygon_type;
-            typedef typename TGeomImpl::ring_type         ring_type;
+            using projection_type   = TProjection;
+
+            using point_type        = typename TGeomImpl::point_type;
+            using linestring_type   = typename TGeomImpl::linestring_type;
+            using polygon_type      = typename TGeomImpl::polygon_type;
+            using multipolygon_type = typename TGeomImpl::multipolygon_type;
+            using ring_type         = typename TGeomImpl::ring_type;
 
             int epsg() const {
                 return m_projection.epsg();
