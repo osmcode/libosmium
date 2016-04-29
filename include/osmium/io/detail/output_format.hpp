@@ -133,11 +133,11 @@ namespace osmium {
 
             public:
 
-                typedef std::function<osmium::io::detail::OutputFormat*(const osmium::io::File&, future_string_queue_type&)> create_output_type;
+                using create_output_type = std::function<osmium::io::detail::OutputFormat*(const osmium::io::File&, future_string_queue_type&)>;
 
             private:
 
-                typedef std::map<osmium::io::file_format, create_output_type> map_type;
+                using map_type = std::map<osmium::io::file_format, create_output_type>;
 
                 map_type m_callbacks;
 

@@ -584,7 +584,7 @@ namespace osmium {
                     static auto map_node_ref = [](osmium::NodeRefList::const_iterator node_ref) noexcept -> osmium::object_id_type {
                         return node_ref->ref();
                     };
-                    typedef osmium::util::DeltaEncodeIterator<osmium::NodeRefList::const_iterator, decltype(map_node_ref), osmium::object_id_type> it_type;
+                    using it_type = osmium::util::DeltaEncodeIterator<osmium::NodeRefList::const_iterator, decltype(map_node_ref), osmium::object_id_type>;
                     it_type first { nodes.cbegin(), nodes.cend(), map_node_ref };
                     it_type last { nodes.cend(), nodes.cend(), map_node_ref };
                     pbf_way.add_packed_sint64(OSMFormat::Way::packed_sint64_refs, first, last);
@@ -626,7 +626,7 @@ namespace osmium {
                     static auto map_member_ref = [](osmium::RelationMemberList::const_iterator member) noexcept -> osmium::object_id_type {
                         return member->ref();
                     };
-                    typedef osmium::util::DeltaEncodeIterator<osmium::RelationMemberList::const_iterator, decltype(map_member_ref), osmium::object_id_type> it_type;
+                    using it_type = osmium::util::DeltaEncodeIterator<osmium::RelationMemberList::const_iterator, decltype(map_member_ref), osmium::object_id_type>;
                     const auto& members = relation.members();
                     it_type first { members.cbegin(), members.cend(), map_member_ref };
                     it_type last { members.cend(), members.cend(), map_member_ref };

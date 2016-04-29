@@ -126,9 +126,9 @@ private:
             void make_invalid() noexcept;
 
 #ifdef _WIN32
-            typedef DWORD flag_type;
+            using flag_type = DWORD;
 #else
-            typedef int flag_type;
+            using flag_type = int;
 #endif
 
             flag_type get_protection() const noexcept;

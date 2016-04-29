@@ -131,7 +131,7 @@ namespace osmium {
 
     public:
 
-        typedef size_t size_type;
+        using size_type = size_t;
 
         ChangesetDiscussion() :
             osmium::memory::Collection<ChangesetComment, osmium::item_type::changeset_discussion>() {
@@ -384,8 +384,8 @@ namespace osmium {
             }
         }
 
-        typedef osmium::memory::CollectionIterator<Item> iterator;
-        typedef osmium::memory::CollectionIterator<const Item> const_iterator;
+        using iterator       = osmium::memory::CollectionIterator<Item>;
+        using const_iterator = osmium::memory::CollectionIterator<const Item>;
 
         iterator begin() {
             return iterator(subitems_position());

@@ -328,8 +328,8 @@ namespace osmium {
             }
         }
 
-        typedef osmium::memory::CollectionIterator<Item> iterator;
-        typedef osmium::memory::CollectionIterator<const Item> const_iterator;
+        using iterator       = osmium::memory::CollectionIterator<Item>;
+        using const_iterator = osmium::memory::CollectionIterator<const Item>;
 
         iterator begin() {
             return iterator(subitems_position());

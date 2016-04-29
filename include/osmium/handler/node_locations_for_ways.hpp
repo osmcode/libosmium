@@ -50,7 +50,7 @@ namespace osmium {
 
     namespace handler {
 
-        typedef osmium::index::map::Dummy<osmium::unsigned_object_id_type, osmium::Location> dummy_type;
+        using dummy_type = osmium::index::map::Dummy<osmium::unsigned_object_id_type, osmium::Location>;
 
         /**
          * Handler to retrieve locations from nodes and add them to ways.
@@ -69,8 +69,8 @@ namespace osmium {
 
         public:
 
-            typedef TStoragePosIDs index_pos_type;
-            typedef TStorageNegIDs index_neg_type;
+            using index_pos_type = TStoragePosIDs;
+            using index_neg_type = TStorageNegIDs;
 
         private:
 
