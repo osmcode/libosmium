@@ -82,8 +82,8 @@ namespace osmium {
             void write_point(const char* problem_type, osmium::object_id_type id1, osmium::object_id_type id2, osmium::Location location) {
                 gdalcpp::Feature feature(m_layer_perror, m_ogr_factory.create_point(location));
                 set_object(feature);
-                feature.set_field("id1", static_cast<double>(id1));
-                feature.set_field("id2", static_cast<double>(id2));
+                feature.set_field("id1", double(id1));
+                feature.set_field("id2", double(id2));
                 feature.set_field("problem", problem_type);
                 feature.add_to_layer();
             }
@@ -110,28 +110,31 @@ namespace osmium {
                 m_layer_lerror(dataset, "lerrors", wkbLineString),
                 m_layer_ways(dataset, "ways", wkbLineString) {
 
+                // 64bit integers are not supported in GDAL < 2, so we
+                // are using a workaround here in fields where we expect
+                // node IDs, we use real numbers.
                 m_layer_perror
                     .add_field("obj_type", OFTString, 1)
-                    .add_field("obj_id", OFTInteger, 8)
+                    .add_field("obj_id", OFTInteger, 10)
                     .add_field("nodes", OFTInteger, 8)
-                    .add_field("id1", OFTReal, 10)
-                    .add_field("id2", OFTReal, 10)
+                    .add_field("id1", OFTReal, 12, 1)
+                    .add_field("id2", OFTReal, 12, 1)
                     .add_field("problem", OFTString, 30)
                 ;
 
                 m_layer_lerror
                     .add_field("obj_type", OFTString, 1)
-                    .add_field("obj_id", OFTInteger, 8)
+                    .add_field("obj_id", OFTInteger, 10)
                     .add_field("nodes", OFTInteger, 8)
-                    .add_field("id1", OFTReal, 10)
-                    .add_field("id2", OFTReal, 10)
+                    .add_field("id1", OFTReal, 12, 1)
+                    .add_field("id2", OFTReal, 12, 1)
                     .add_field("problem", OFTString, 30)
                 ;
 
                 m_layer_ways
                     .add_field("obj_type", OFTString, 1)
-                    .add_field("obj_id", OFTInteger, 8)
-                    .add_field("way_id", OFTInteger, 8)
+                    .add_field("obj_id", OFTInteger, 10)
+                    .add_field("way_id", OFTInteger, 10)
                     .add_field("nodes", OFTInteger, 8)
                 ;
             }
