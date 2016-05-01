@@ -74,8 +74,8 @@ namespace osmium {
 
             void set_object(gdalcpp::Feature& feature) {
                 char t[2] = { osmium::item_type_to_char(m_object_type), '\0' };
-                feature.set_field("object_type", t);
-                feature.set_field("object_id", int32_t(m_object_id));
+                feature.set_field("obj_type", t);
+                feature.set_field("obj_id", int32_t(m_object_id));
                 feature.set_field("nodes", int32_t(m_nodes));
             }
 
@@ -84,7 +84,7 @@ namespace osmium {
                 set_object(feature);
                 feature.set_field("id1", static_cast<double>(id1));
                 feature.set_field("id2", static_cast<double>(id2));
-                feature.set_field("problem_type", problem_type);
+                feature.set_field("problem", problem_type);
                 feature.add_to_layer();
             }
 
@@ -99,7 +99,7 @@ namespace osmium {
                 set_object(feature);
                 feature.set_field("id1", static_cast<double>(id1));
                 feature.set_field("id2", static_cast<double>(id2));
-                feature.set_field("problem_type", problem_type);
+                feature.set_field("problem", problem_type);
                 feature.add_to_layer();
             }
 
@@ -111,26 +111,26 @@ namespace osmium {
                 m_layer_ways(dataset, "ways", wkbLineString) {
 
                 m_layer_perror
-                    .add_field("object_type", OFTString, 1)
-                    .add_field("object_id", OFTInteger, 8)
+                    .add_field("obj_type", OFTString, 1)
+                    .add_field("obj_id", OFTInteger, 8)
                     .add_field("nodes", OFTInteger, 8)
                     .add_field("id1", OFTReal, 10)
                     .add_field("id2", OFTReal, 10)
-                    .add_field("problem_type", OFTString, 30)
+                    .add_field("problem", OFTString, 30)
                 ;
 
                 m_layer_lerror
-                    .add_field("object_type", OFTString, 1)
-                    .add_field("object_id", OFTInteger, 8)
+                    .add_field("obj_type", OFTString, 1)
+                    .add_field("obj_id", OFTInteger, 8)
                     .add_field("nodes", OFTInteger, 8)
                     .add_field("id1", OFTReal, 10)
                     .add_field("id2", OFTReal, 10)
-                    .add_field("problem_type", OFTString, 30)
+                    .add_field("problem", OFTString, 30)
                 ;
 
                 m_layer_ways
-                    .add_field("object_type", OFTString, 1)
-                    .add_field("object_id", OFTInteger, 8)
+                    .add_field("obj_type", OFTString, 1)
+                    .add_field("obj_id", OFTInteger, 8)
                     .add_field("way_id", OFTInteger, 8)
                     .add_field("nodes", OFTInteger, 8)
                 ;
@@ -178,7 +178,7 @@ namespace osmium {
                     set_object(feature);
                     feature.set_field("id1", int32_t(way.id()));
                     feature.set_field("id2", 0);
-                    feature.set_field("problem_type", "way_in_multiple_rings");
+                    feature.set_field("problem", "way_in_multiple_rings");
                     feature.add_to_layer();
                 } catch (osmium::geometry_error& e) {
                     // XXX
