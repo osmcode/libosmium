@@ -38,6 +38,7 @@ DEALINGS IN THE SOFTWARE.
 #include <cstdlib>
 #include <cstring>
 #include <stdexcept>
+#include <tuple>
 
 #include <osmium/memory/collection.hpp>
 #include <osmium/memory/item.hpp>
@@ -49,6 +50,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/timestamp.hpp>
 #include <osmium/osm/types.hpp>
 #include <osmium/osm/types_from_string.hpp>
+#include <osmium/util/misc.hpp>
 
 namespace osmium {
 
@@ -419,8 +421,8 @@ namespace osmium {
      * OSMObjects are equal if their type, id, and version are equal.
      */
     inline bool operator==(const OSMObject& lhs, const OSMObject& rhs) noexcept {
-        return lhs.type() == rhs.type() &&
-               lhs.id() == rhs.id() &&
+        return lhs.type()    == rhs.type() &&
+               lhs.id()      == rhs.id()   &&
                lhs.version() == rhs.version();
     }
 
@@ -429,16 +431,22 @@ namespace osmium {
     }
 
     /**
-     * OSMObjects can be ordered by type, id and version.
-     * Note that we use the absolute value of the id for a
-     * better ordering of objects with negative id.
+     * OSMObjects can be ordered by type, id, version, and timestamp. Usually
+     * ordering by timestamp is not necessary as there shouldn't be two
+     * objects with the same type, id, and version. But this can happen when
+     * creating diff files from extracts, so we take the timestamp into
+     * account  here.
+     *
+     * Note that we use the absolute value of the id for a better ordering
+     * of objects with negative id. If the IDs have the same absolute value,
+     * the positive ID comes first.
+     *
+     * See object_order_type_id_reverse_version if you need a different
+     * ordering.
      */
     inline bool operator<(const OSMObject& lhs, const OSMObject& rhs) noexcept {
-        if (lhs.type() != rhs.type()) {
-            return lhs.type() < rhs.type();
-        }
-        return (lhs.id() == rhs.id() && lhs.version() < rhs.version()) ||
-               lhs.positive_id() < rhs.positive_id();
+        return const_tie(lhs.type(), lhs.positive_id(), lhs.id() < 0, lhs.version(), lhs.timestamp()) <
+               const_tie(rhs.type(), rhs.positive_id(), rhs.id() < 0, rhs.version(), rhs.timestamp());
     }
 
     inline bool operator>(const OSMObject& lhs, const OSMObject& rhs) noexcept {

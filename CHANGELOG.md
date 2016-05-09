@@ -31,6 +31,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Output operator for Location shows full precision.
 - Undefined behaviour in WKB writer and types_from_string() function.
 - Fix unsigned overflow in pool.hpp.
+- OSM objects are now ordered by type (nodes, then ways, then relations),
+  then ID, then version, then timestamp. Ordering by timestamp is normally
+  not necessary, because there can't be two objects with same type, ID, and
+  version but different timestamp. But this can happen when diffs are
+  created from OSM extracts, so we check for this here. This change also
+  makes sure IDs are always ordered by absolute IDs, positives first, so
+  order is 0, 1, -1, 2, -2, ...
 
 
 ## [2.6.1] - 2016-02-22
