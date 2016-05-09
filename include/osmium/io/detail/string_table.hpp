@@ -199,7 +199,7 @@ namespace osmium {
             struct StrComp {
 
                 bool operator()(const char* lhs, const char* rhs) const {
-                    return strcmp(lhs, rhs) < 0;
+                    return std::strcmp(lhs, rhs) < 0;
                 }
 
             }; // struct StrComp

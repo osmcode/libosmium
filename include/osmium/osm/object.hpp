@@ -172,9 +172,9 @@ namespace osmium {
          * @returns Reference to object to make calls chainable.
          */
         OSMObject& set_visible(const char* visible) {
-            if (!strcmp("true", visible)) {
+            if (!std::strcmp("true", visible)) {
                 set_visible(true);
-            } else if (!strcmp("false", visible)) {
+            } else if (!std::strcmp("false", visible)) {
                 set_visible(false);
             } else {
                 throw std::invalid_argument("Unknown value for visible attribute (allowed is 'true' or 'false')");
@@ -313,17 +313,17 @@ namespace osmium {
          * @param value Value of the attribute
          */
         void set_attribute(const char* attr, const char* value) {
-            if (!strcmp(attr, "id")) {
+            if (!std::strcmp(attr, "id")) {
                 set_id(value);
-            } else if (!strcmp(attr, "version")) {
+            } else if (!std::strcmp(attr, "version")) {
                 set_version(value);
-            } else if (!strcmp(attr, "changeset")) {
+            } else if (!std::strcmp(attr, "changeset")) {
                 set_changeset(value);
-            } else if (!strcmp(attr, "timestamp")) {
+            } else if (!std::strcmp(attr, "timestamp")) {
                 set_timestamp(osmium::Timestamp(value));
-            } else if (!strcmp(attr, "uid")) {
+            } else if (!std::strcmp(attr, "uid")) {
                 set_uid(value);
-            } else if (!strcmp(attr, "visible")) {
+            } else if (!std::strcmp(attr, "visible")) {
                 set_visible(value);
             }
         }
