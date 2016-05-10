@@ -90,11 +90,13 @@ namespace osmium {
 
             /**
              * When the assembler can't create an area, usually because its
-             * geometry would be invalid, it will normally just ignore it.
-             * If this is set to true, an "empty" area object will be created
-             * that has no rings.
+             * geometry would be invalid, it will create an "empty" area object
+             * without rings. This allows you to detect where an area was
+             * invalid.
+             *
+             * If this is set to false, invalid areas will simply be discarded.
              */
-            bool create_empty_areas = false;
+            bool create_empty_areas = true;
 
             explicit AssemblerConfig(osmium::area::ProblemReporter* pr = nullptr, bool d = false) :
                 problem_reporter(pr),
