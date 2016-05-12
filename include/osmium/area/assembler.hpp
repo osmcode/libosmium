@@ -235,10 +235,7 @@ namespace osmium {
             }
 
             void add_tags_to_area(osmium::builder::AreaBuilder& builder, const osmium::Way& way) const {
-                osmium::builder::TagListBuilder tl_builder(builder.buffer(), &builder);
-                for (const osmium::Tag& tag : way.tags()) {
-                    tl_builder.add_tag(tag.key(), tag.value());
-                }
+                builder.add_item(&way.tags());
             }
 
             void add_common_tags(osmium::builder::TagListBuilder& tl_builder, std::set<const osmium::Way*>& ways) const {
@@ -277,8 +274,8 @@ namespace osmium {
 
             }; // struct MPFilter
 
-            static MPFilter& filter() {
-                static MPFilter filter;
+            static const MPFilter& filter() noexcept {
+                static const MPFilter filter;
                 return filter;
             }
 
