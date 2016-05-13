@@ -98,6 +98,29 @@ namespace osmium {
              */
             bool create_empty_areas = true;
 
+            /**
+             * Create areas for (multi)polygons where the tags are on the
+             * relation.
+             *
+             * If this is set to false, those areas will simply be discarded.
+             */
+            bool create_new_style_polygons = true;
+
+            /**
+             * Create areas for (multi)polygons where the tags are on the
+             * outer way(s).
+             *
+             * If this is set to false, those areas will simply be discarded.
+             */
+            bool create_old_style_polygons = true;
+
+            /**
+             * Create areas for polygons created from ways.
+             *
+             * If this is set to false, those areas will simply be discarded.
+             */
+            bool create_way_polygons = true;
+
             explicit AssemblerConfig(osmium::area::ProblemReporter* pr = nullptr, bool d = false) :
                 problem_reporter(pr),
                 debug_level(d) {
@@ -107,8 +130,7 @@ namespace osmium {
              * Enable or disable debug output to stderr. This is for Osmium
              * developers only.
              *
-             * Usage of this function is deprecated. Just set debug_level
-             * instead.
+             * @deprecated Set debug_level directly.
              */
             void enable_debug_output(bool d = true) {
                 debug_level = d;
@@ -1339,6 +1361,10 @@ namespace osmium {
              * The resulting area is put into the out_buffer.
              */
             void operator()(const osmium::Way& way, osmium::memory::Buffer& out_buffer) {
+                if (!m_config.create_way_polygons) {
+                    return;
+                }
+
                 if (way.tags().has_tag("area", "no")) {
                     return;
                 }
@@ -1433,7 +1459,12 @@ namespace osmium {
                 // Now create the Area object and add the attributes and tags
                 // from the relation.
                 if (create_area(out_buffer, relation, members)) {
-                    out_buffer.commit();
+                    if ((m_config.create_new_style_polygons && m_stats.no_tags_on_relation == 0) ||
+                        (m_config.create_old_style_polygons && m_stats.no_tags_on_relation != 0)) {
+                        out_buffer.commit();
+                    } else {
+                        out_buffer.rollback();
+                    }
                 } else {
                     out_buffer.rollback();
                 }
