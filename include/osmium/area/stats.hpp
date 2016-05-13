@@ -55,6 +55,7 @@ namespace osmium {
             uint32_t from_relations = 0; ///< Area created from multipolygon relation
             uint32_t from_ways = 0; ///< Area created from way
             uint32_t inner_rings = 0; ///< Number of inner rings
+            uint32_t inner_with_same_tags = 0; ///< Number of inner ways with same tags as area
             uint32_t intersections = 0; ///< Number of intersections between segments
             uint32_t member_ways = 0; ///< Number of ways in the area
             uint32_t no_tags_on_relation = 0; ///< No tags on relation (old-style multipolygon with tags on outer ways)
@@ -77,6 +78,7 @@ namespace osmium {
                 from_relations += other.from_relations;
                 from_ways += other.from_ways;
                 inner_rings += other.inner_rings;
+                inner_with_same_tags += other.inner_with_same_tags;
                 intersections += other.intersections;
                 member_ways += other.member_ways;
                 no_tags_on_relation += other.no_tags_on_relation;
@@ -104,6 +106,7 @@ namespace osmium {
                        << " from_relations=" << s.from_relations
                        << " from_ways=" << s.from_ways
                        << " inner_rings=" << s.inner_rings
+                       << " inner_with_same_tags=" << s.inner_with_same_tags
                        << " intersections=" << s.intersections
                        << " member_ways=" << s.member_ways
                        << " no_tags_on_relation=" << s.no_tags_on_relation

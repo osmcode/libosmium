@@ -179,6 +179,15 @@ namespace osmium {
             }
 
             /**
+             * Report a way with role inner that has the same tags as the
+             * relation or outer ways.
+             *
+             * @param way The way.
+             */
+            virtual void report_inner_with_same_tags(const osmium::Way& way) {
+            }
+
+            /**
              * In addition to reporting specific problems, this is used to
              * report all ways belonging to areas having problems.
              *

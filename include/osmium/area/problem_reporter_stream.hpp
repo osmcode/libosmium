@@ -109,6 +109,11 @@ namespace osmium {
                 *m_out << "way_id=" << way.id() << '\n';
             }
 
+            void report_inner_with_same_tags(const osmium::Way& way) override {
+                header("inner way with same tags as relation or outer");
+                *m_out << "way_id=" << way.id() << '\n';
+            }
+
         }; // class ProblemReporterStream
 
     } // namespace area

@@ -107,6 +107,12 @@ namespace osmium {
                 throw std::runtime_error(m_sstream.str());
             }
 
+            void report_inner_with_same_tags(const osmium::Way& way) override {
+                m_sstream.str();
+                ProblemReporterStream::report_inner_with_same_tags(way);
+                throw std::runtime_error(m_sstream.str());
+            }
+
         }; // class ProblemReporterException
 
     } // namespace area

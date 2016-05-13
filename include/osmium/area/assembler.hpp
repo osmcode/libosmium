@@ -1446,7 +1446,7 @@ namespace osmium {
                 // them, too.
                 std::vector<const osmium::Way*> ways_that_should_be_areas;
                 if (m_stats.wrong_role == 0) {
-                    detail::for_each_member(relation, members, [&ways_that_should_be_areas, &area_tags](const osmium::RelationMember& member, const osmium::Way& way) {
+                    detail::for_each_member(relation, members, [this, &ways_that_should_be_areas, &area_tags](const osmium::RelationMember& member, const osmium::Way& way) {
                         if (!std::strcmp(member.role(), "inner")) {
                             if (!way.nodes().empty() && way.is_closed() && way.tags().size() > 0) {
                                 const auto d = std::count_if(way.tags().cbegin(), way.tags().cend(), filter());
@@ -1458,6 +1458,11 @@ namespace osmium {
 
                                     if (!std::equal(way_fi_begin, way_fi_end, area_fi_begin) || d != std::distance(area_fi_begin, area_fi_end)) {
                                         ways_that_should_be_areas.push_back(&way);
+                                    } else {
+                                        ++m_stats.inner_with_same_tags;
+                                        if (m_config.problem_reporter) {
+                                            m_config.problem_reporter->report_inner_with_same_tags(way);
+                                        }
                                     }
                                 }
                             }

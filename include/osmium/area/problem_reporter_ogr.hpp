@@ -188,6 +188,22 @@ namespace osmium {
                 }
             }
 
+            void report_inner_with_same_tags(const osmium::Way& way) override {
+                if (way.nodes().size() < 2) {
+                    return;
+                }
+                try {
+                    gdalcpp::Feature feature(m_layer_lerror, m_ogr_factory.create_linestring(way));
+                    set_object(feature);
+                    feature.set_field("id1", int32_t(way.id()));
+                    feature.set_field("id2", 0);
+                    feature.set_field("problem", "inner_with_same_tags");
+                    feature.add_to_layer();
+                } catch (osmium::geometry_error& e) {
+                    // XXX
+                }
+            }
+
             void report_way(const osmium::Way& way) override {
                 if (way.nodes().empty()) {
                     return;
