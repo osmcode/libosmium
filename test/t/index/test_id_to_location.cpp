@@ -29,6 +29,8 @@ void test_func_all(TIndex& index) {
 
     index.sort();
 
+    REQUIRE_THROWS_AS(index.get(0), osmium::not_found);
+    REQUIRE_THROWS_AS(index.get(1), osmium::not_found);
     REQUIRE_THROWS_AS(index.get(5), osmium::not_found);
     REQUIRE_THROWS_AS(index.get(100), osmium::not_found);
 }
@@ -48,12 +50,20 @@ void test_func_real(TIndex& index) {
     REQUIRE(loc1 == index.get(id1));
     REQUIRE(loc2 == index.get(id2));
 
+    REQUIRE_THROWS_AS(index.get(0), osmium::not_found);
+    REQUIRE_THROWS_AS(index.get(1), osmium::not_found);
     REQUIRE_THROWS_AS(index.get(5), osmium::not_found);
     REQUIRE_THROWS_AS(index.get(100), osmium::not_found);
 
     index.clear();
 
     REQUIRE_THROWS_AS(index.get(id1), osmium::not_found);
+    REQUIRE_THROWS_AS(index.get(id2), osmium::not_found);
+
+    REQUIRE_THROWS_AS(index.get(0), osmium::not_found);
+    REQUIRE_THROWS_AS(index.get(1), osmium::not_found);
+    REQUIRE_THROWS_AS(index.get(5), osmium::not_found);
+    REQUIRE_THROWS_AS(index.get(100), osmium::not_found);
 }
 
 TEST_CASE("IdToLocation") {
