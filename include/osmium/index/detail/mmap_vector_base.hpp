@@ -33,11 +33,13 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <algorithm>
 #include <cassert>
 #include <cstddef>
 #include <new> // IWYU pragma: keep
 #include <stdexcept>
 
+#include <osmium/index/index.hpp>
 #include <osmium/util/memory_mapping.hpp>
 
 namespace osmium {
@@ -65,14 +67,14 @@ namespace osmium {
                 m_size(size),
                 m_mapping(capacity, osmium::util::MemoryMapping::mapping_mode::write_shared, fd) {
                 assert(size <= capacity);
-                new (data() + size) T[capacity - size];
+                std::fill(data() + size, data() + capacity, osmium::index::empty_value<T>());
                 shrink_to_fit();
             }
 
             explicit mmap_vector_base(size_t capacity = mmap_vector_size_increment) :
                 m_size(0),
                 m_mapping(capacity) {
-                new (data()) T[capacity];
+                std::fill_n(data(), capacity, osmium::index::empty_value<T>());
             }
 
             ~mmap_vector_base() noexcept = default;
@@ -126,7 +128,7 @@ namespace osmium {
             }
 
             void shrink_to_fit() {
-                while (m_size > 0 && data()[m_size - 1] == T{}) {
+                while (m_size > 0 && data()[m_size - 1] == osmium::index::empty_value<T>()) {
                     --m_size;
                 }
             }
@@ -141,8 +143,9 @@ namespace osmium {
 
             void reserve(size_t new_capacity) {
                 if (new_capacity > capacity()) {
+                    size_t old_capacity = capacity();
                     m_mapping.resize(new_capacity);
-                    new (data() + capacity()) T[new_capacity - capacity()];
+                    std::fill(data() + old_capacity, data() + new_capacity, osmium::index::empty_value<T>());
                 }
             }
 
