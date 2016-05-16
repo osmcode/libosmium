@@ -33,6 +33,7 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <cassert>
 #include <cstddef>
 #include <new> // IWYU pragma: keep
 #include <stdexcept>
@@ -63,11 +64,15 @@ namespace osmium {
             mmap_vector_base(int fd, size_t capacity, size_t size = 0) :
                 m_size(size),
                 m_mapping(capacity, osmium::util::MemoryMapping::mapping_mode::write_shared, fd) {
+                assert(size <= capacity);
+                new (data() + size) T[capacity - size];
+                shrink_to_fit();
             }
 
             explicit mmap_vector_base(size_t capacity = mmap_vector_size_increment) :
                 m_size(0),
                 m_mapping(capacity) {
+                new (data()) T[capacity];
             }
 
             ~mmap_vector_base() noexcept = default;
@@ -105,6 +110,7 @@ namespace osmium {
             }
 
             T& operator[](size_t n) {
+                assert(n < m_size);
                 return data()[n];
             }
 
@@ -120,7 +126,9 @@ namespace osmium {
             }
 
             void shrink_to_fit() {
-                // XXX do something here
+                while (m_size > 0 && data()[m_size - 1] == T{}) {
+                    --m_size;
+                }
             }
 
             void push_back(const T& value) {
@@ -134,15 +142,13 @@ namespace osmium {
             void reserve(size_t new_capacity) {
                 if (new_capacity > capacity()) {
                     m_mapping.resize(new_capacity);
+                    new (data() + capacity()) T[new_capacity - capacity()];
                 }
             }
 
             void resize(size_t new_size) {
                 if (new_size > capacity()) {
                     reserve(new_size + osmium::detail::mmap_vector_size_increment);
-                }
-                if (new_size > size()) {
-                    new (data() + size()) T[new_size - size()];
                 }
                 m_size = new_size;
             }
