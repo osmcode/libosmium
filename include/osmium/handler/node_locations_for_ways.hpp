@@ -33,6 +33,7 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <limits>
 #include <type_traits>
 
 #include <osmium/handler.hpp>
@@ -80,6 +81,8 @@ namespace osmium {
             /// Object that handles the actual storage of the node locations (with negative IDs).
             TStorageNegIDs& m_storage_neg;
 
+            osmium::unsigned_object_id_type m_last_id{0};
+
             bool m_ignore_errors {false};
 
             bool m_must_sort {false};
@@ -115,7 +118,11 @@ namespace osmium {
              * Store the location of the node in the storage.
              */
             void node(const osmium::Node& node) {
-                m_must_sort = true;
+                if (node.positive_id() < m_last_id) {
+                    m_must_sort = true;
+                }
+                m_last_id = node.positive_id();
+
                 const osmium::object_id_type id = node.id();
                 if (id >= 0) {
                     m_storage_pos.set(static_cast<osmium::unsigned_object_id_type>( id), node.location());
@@ -144,6 +151,7 @@ namespace osmium {
                     m_storage_pos.sort();
                     m_storage_neg.sort();
                     m_must_sort = false;
+                    m_last_id = std::numeric_limits<osmium::unsigned_object_id_type>::max();
                 }
                 bool error = false;
                 for (auto& node_ref : way.nodes()) {
