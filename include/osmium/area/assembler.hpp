@@ -1275,7 +1275,6 @@ namespace osmium {
 
                 if (m_split_locations.empty()) {
                     std::cout << ' ' << timer_simple_case.elapsed_microseconds() <<
-                                 " 0" <<
                                  " 0";
                 } else {
                     std::cout << " 0" <<
@@ -1296,7 +1295,7 @@ namespace osmium {
 
 #ifdef OSMIUM_WITH_TIMER
             static bool print_header() {
-                std::cout << "old_new nodes outer_rings inner_rings sort dupl intersection locations split simple_case complex_case find roles_check\n";
+                std::cout << "nodes outer_rings inner_rings sort dupl intersection locations split simple_case complex_case roles_check\n";
                 return true;
             }
 
