@@ -25,6 +25,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   has better error reporting, generates statistics and can build more complex
   multipolygons correctly. The ProblemReporter classes have changed to make
   this happen, if you have written your own, you have to fix it.
+- Sparse node location stores are now only sorted if needed, ie. when nodes
+  come in unordered.
 
 ### Fixed
 
@@ -38,6 +40,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   created from OSM extracts, so we check for this here. This change also
   makes sure IDs are always ordered by absolute IDs, positives first, so
   order is 0, 1, -1, 2, -2, ...
+- Data corruption bug fixed in disk based indexes (used for the node
+  location store for instance). This only affected you, if you created
+  and index, closed it, and re-opened it (possibly in a different process)
+  and if there were missing nodes. If you looked up those nodes, you got
+  location (0,0) back instead of an error.
 
 
 ## [2.6.1] - 2016-02-22
