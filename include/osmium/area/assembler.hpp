@@ -67,9 +67,17 @@ namespace osmium {
 
     namespace area {
 
+        /**
+         * Configuration for osmium::area::Assembler objects. Create this
+         * once, set the options you want and then re-use it every time you
+         * create an Assembler object.
+         */
         struct AssemblerConfig {
 
-            osmium::area::ProblemReporter* problem_reporter;
+            /**
+             * Optional pointer to problem reporter.
+             */
+            osmium::area::ProblemReporter* problem_reporter = nullptr;
 
             /**
              * Debug level. If this is greater than zero, debug messages will
@@ -121,7 +129,20 @@ namespace osmium {
              */
             bool create_way_polygons = true;
 
-            explicit AssemblerConfig(osmium::area::ProblemReporter* pr = nullptr, bool d = false) :
+            /**
+             * Keep the type tag from multipolygon relations on the area
+             * object. By default this is false, and the type tag will be
+             * removed.
+             */
+            bool keep_type_tag = false;
+
+            AssemblerConfig() noexcept = default;
+
+            /**
+             * Constructor
+             * @deprecated Use default constructor and set values afterwards.
+             */
+            explicit AssemblerConfig(osmium::area::ProblemReporter* pr, bool d = false) :
                 problem_reporter(pr),
                 debug_level(d) {
             }
@@ -322,7 +343,11 @@ namespace osmium {
                         std::cerr << "    use tags from relation\n";
                     }
 
-                    copy_tags_without_type(builder, relation.tags());
+                    if (m_config.keep_type_tag) {
+                        builder.add_item(&relation.tags());
+                    } else {
+                        copy_tags_without_type(builder, relation.tags());
+                    }
                 } else {
                     ++m_stats.no_tags_on_relation;
                     if (debug()) {
