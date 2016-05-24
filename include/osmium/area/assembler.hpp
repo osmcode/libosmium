@@ -1334,9 +1334,11 @@ namespace osmium {
                 osmium::builder::AreaBuilder builder(out_buffer);
                 builder.initialize_from_object(way);
 
-                const bool area_okay = create_rings() || m_config.create_empty_areas;
-                if (area_okay) {
+                const bool area_okay = create_rings();
+                if (area_okay || m_config.create_empty_areas) {
                     add_tags_to_area(builder, way);
+                }
+                if (area_okay) {
                     add_rings_to_area(builder);
                 }
 
@@ -1344,16 +1346,18 @@ namespace osmium {
                     m_config.problem_reporter->report_way(way);
                 }
 
-                return area_okay;
+                return area_okay || m_config.create_empty_areas;
             }
 
             bool create_area(osmium::memory::Buffer& out_buffer, const osmium::Relation& relation, const std::vector<const osmium::Way*>& members) {
                 osmium::builder::AreaBuilder builder(out_buffer);
                 builder.initialize_from_object(relation);
 
-                const bool area_okay = create_rings() || m_config.create_empty_areas;
-                if (area_okay) {
+                const bool area_okay = create_rings();
+                if (area_okay || m_config.create_empty_areas) {
                     add_tags_to_area(builder, relation);
+                }
+                if (area_okay) {
                     add_rings_to_area(builder);
                 }
 
@@ -1363,7 +1367,7 @@ namespace osmium {
                     }
                 }
 
-                return area_okay;
+                return area_okay || m_config.create_empty_areas;
             }
 
         public:
