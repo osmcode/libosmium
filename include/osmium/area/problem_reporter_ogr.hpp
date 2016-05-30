@@ -73,7 +73,7 @@ namespace osmium {
             gdalcpp::Layer m_layer_ways;
 
             void set_object(gdalcpp::Feature& feature) {
-                char t[2] = { osmium::item_type_to_char(m_object_type), '\0' };
+                const char t[2] = { osmium::item_type_to_char(m_object_type), '\0' };
                 feature.set_field("obj_type", t);
                 feature.set_field("obj_id", int32_t(m_object_id));
                 feature.set_field("nodes", int32_t(m_nodes));
@@ -89,11 +89,9 @@ namespace osmium {
             }
 
             void write_line(const char* problem_type, osmium::object_id_type id1, osmium::object_id_type id2, osmium::Location loc1, osmium::Location loc2) {
-                std::unique_ptr<OGRPoint> ogr_point1 = m_ogr_factory.create_point(loc1);
-                std::unique_ptr<OGRPoint> ogr_point2 = m_ogr_factory.create_point(loc2);
-                std::unique_ptr<OGRLineString> ogr_linestring = std::unique_ptr<OGRLineString>(new OGRLineString());
-                ogr_linestring->addPoint(ogr_point1.get());
-                ogr_linestring->addPoint(ogr_point2.get());
+                auto ogr_linestring = std::unique_ptr<OGRLineString>{new OGRLineString{}};
+                ogr_linestring->addPoint(loc1.lon(), loc1.lat());
+                ogr_linestring->addPoint(loc2.lon(), loc2.lat());
 
                 gdalcpp::Feature feature(m_layer_lerror, std::move(ogr_linestring));
                 set_object(feature);
@@ -209,12 +207,12 @@ namespace osmium {
                     return;
                 }
                 if (way.nodes().size() == 1) {
-                    write_point("single_node_in_way", way.id(), way.nodes()[0].ref(), way.nodes()[0].location());
+                    const auto& first_nr = way.nodes()[0];
+                    write_point("single_node_in_way", way.id(), first_nr.ref(), first_nr.location());
                     return;
                 }
                 try {
-                    std::unique_ptr<OGRLineString> ogr_linestring = m_ogr_factory.create_linestring(way);
-                    gdalcpp::Feature feature(m_layer_ways, std::move(ogr_linestring));
+                    gdalcpp::Feature feature(m_layer_ways, m_ogr_factory.create_linestring(way));
                     set_object(feature);
                     feature.set_field("way_id", int32_t(way.id()));
                     feature.add_to_layer();
