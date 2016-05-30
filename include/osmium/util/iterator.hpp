@@ -46,7 +46,7 @@ namespace osmium {
         iterator_range(P&& p) :
             P(std::forward<P>(p)) {
         }
-
+/*
         It begin() {
             return this->first;
         }
@@ -54,7 +54,7 @@ namespace osmium {
         It end() {
             return this->second;
         }
-
+*/
         It begin() const {
             return this->first;
         }
