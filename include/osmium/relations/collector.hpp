@@ -193,7 +193,7 @@ namespace osmium {
 
             iterator_range<mm_iterator> find_member_meta(osmium::item_type type, osmium::object_id_type id) {
                 auto& mmv = member_meta(type);
-                return iterator_range<mm_iterator>{std::equal_range(mmv.begin(), mmv.end(), MemberMeta(id))};
+                return make_range(std::equal_range(mmv.begin(), mmv.end(), MemberMeta(id)));
             }
 
         public:
