@@ -317,6 +317,13 @@ namespace osmium {
                 return get_relation(relation_meta.relation_offset());
             }
 
+            /**
+             * Get the relation from a member_meta.
+             */
+            const osmium::Relation& get_relation(const MemberMeta& member_meta) const {
+                return get_relation(m_relations[member_meta.relation_pos()]);
+            }
+
             osmium::OSMObject& get_member(size_t offset) const {
                 assert(m_members_buffer.committed() > offset);
                 return m_members_buffer.get<osmium::OSMObject>(offset);
@@ -440,7 +447,7 @@ namespace osmium {
                         }
 
                         for (auto& member_meta : range) {
-                            if (!member_meta.removed() && relation.id() == get_relation(member_meta.relation_pos()).id()) {
+                            if (!member_meta.removed() && relation.id() == get_relation(member_meta).id()) {
                                 member_meta.remove();
                                 break;
                             }
