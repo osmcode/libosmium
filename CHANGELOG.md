@@ -45,6 +45,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   and index, closed it, and re-opened it (possibly in a different process)
   and if there were missing nodes. If you looked up those nodes, you got
   location (0,0) back instead of an error.
+- Memory corruption bug showing up with GDAL 2.
 
 
 ## [2.6.1] - 2016-02-22

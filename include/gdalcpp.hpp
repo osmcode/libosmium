@@ -110,8 +110,12 @@ namespace gdalcpp {
     namespace detail {
 
         struct init_wrapper {
+#if GDAL_VERSION_MAJOR >= 2
+            init_wrapper() { GDALAllRegister(); }
+#else
             init_wrapper() { OGRRegisterAll(); }
             ~init_wrapper() { OGRCleanupAll(); }
+#endif
         };
 
         struct init_library {
@@ -392,9 +396,9 @@ namespace gdalcpp {
             return *this;
         }
 
-        void create_feature(OGRFeature& feature) {
+        void create_feature(OGRFeature* feature) {
             dataset().prepare_edit();
-            OGRErr result = m_layer->CreateFeature(&feature);
+            OGRErr result = m_layer->CreateFeature(feature);
             if (result != OGRERR_NONE) {
                 throw gdal_error(std::string("creating feature in layer '") + name() + "' failed", result, dataset().driver_name(), dataset().dataset_name());
             }
@@ -425,33 +429,44 @@ namespace gdalcpp {
 
     class Feature {
 
+        struct ogr_feature_deleter {
+
+            void operator()(OGRFeature* feature) {
+                 OGRFeature::DestroyFeature(feature);
+            }
+
+        }; // struct ogr_feature_deleter
+
         Layer& m_layer;
-        OGRFeature m_feature;
+        std::unique_ptr<OGRFeature, ogr_feature_deleter> m_feature;
 
     public:
 
         Feature(Layer& layer, std::unique_ptr<OGRGeometry>&& geometry) :
             m_layer(layer),
-            m_feature(m_layer.get().GetLayerDefn()) {
-            OGRErr result = m_feature.SetGeometryDirectly(geometry.release());
+            m_feature(OGRFeature::CreateFeature(m_layer.get().GetLayerDefn())) {
+            if (!m_feature) {
+                throw std::bad_alloc();
+            }
+            OGRErr result = m_feature->SetGeometryDirectly(geometry.release());
             if (result != OGRERR_NONE) {
                 throw gdal_error(std::string("setting feature geometry in layer '") + m_layer.name() + "' failed", result, m_layer.dataset().driver_name(), m_layer.dataset().dataset_name());
             }
         }
 
         void add_to_layer() {
-            m_layer.create_feature(m_feature);
+            m_layer.create_feature(m_feature.get());
         }
 
         template <class T>
         Feature& set_field(int n, T&& arg) {
-            m_feature.SetField(n, std::forward<T>(arg));
+            m_feature->SetField(n, std::forward<T>(arg));
             return *this;
         }
 
         template <class T>
         Feature& set_field(const char* name, T&& arg) {
-            m_feature.SetField(name, std::forward<T>(arg));
+            m_feature->SetField(name, std::forward<T>(arg));
             return *this;
         }
 
