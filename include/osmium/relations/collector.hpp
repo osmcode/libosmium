@@ -64,13 +64,6 @@ namespace osmium {
 
         namespace detail {
 
-            template <typename R>
-            inline typename std::iterator_traits<typename R::iterator>::difference_type count_not_removed(const R& range) {
-                return std::count_if(range.begin(), range.end(), [](MemberMeta& mm) {
-                    return !mm.removed();
-                });
-            }
-
         } // namespace detail
 
         /**
@@ -380,6 +373,12 @@ namespace osmium {
                 std::sort(m_member_meta[2].begin(), m_member_meta[2].end());
             }
 
+            static typename iterator_range<mm_iterator>::iterator::difference_type count_not_removed(const iterator_range<mm_iterator>& range) {
+                return std::count_if(range.begin(), range.end(), [](MemberMeta& mm) {
+                    return !mm.removed();
+                });
+            }
+
             /**
              * Find this object in the member vectors and add it to all
              * relations that need it.
@@ -390,7 +389,7 @@ namespace osmium {
             bool find_and_add_object(const osmium::OSMObject& object) {
                 auto range = find_member_meta(object.type(), object.id());
 
-                if (detail::count_not_removed(range) == 0) {
+                if (count_not_removed(range) == 0) {
                     // nothing found
                     return false;
                 }
@@ -436,7 +435,7 @@ namespace osmium {
 
                         // if this is the last time this object was needed
                         // then mark it as removed
-                        if (detail::count_not_removed(range) == 1) {
+                        if (count_not_removed(range) == 1) {
                             get_member(range.begin()->buffer_offset()).set_removed(true);
                         }
 
