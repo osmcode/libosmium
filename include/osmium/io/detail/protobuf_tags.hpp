@@ -33,6 +33,7 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#define PROTOZERO_STRICT_API
 #include <protozero/types.hpp>
 
 namespace osmium {

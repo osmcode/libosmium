@@ -44,6 +44,7 @@ DEALINGS IN THE SOFTWARE.
 #include <thread>
 #include <type_traits>
 
+#define PROTOZERO_STRICT_API
 #include <protozero/pbf_message.hpp>
 
 #include <osmium/io/detail/input_format.hpp>
@@ -123,13 +124,13 @@ namespace osmium {
                  * type. Return the size of the following Blob.
                  */
                 size_t decode_blob_header(protozero::pbf_message<FileFormat::BlobHeader>&& pbf_blob_header, const char* expected_type) {
-                    std::pair<const char*, size_t> blob_header_type;
+                    protozero::data_view blob_header_type;
                     size_t blob_header_datasize = 0;
 
                     while (pbf_blob_header.next()) {
                         switch (pbf_blob_header.tag()) {
                             case FileFormat::BlobHeader::required_string_type:
-                                blob_header_type = pbf_blob_header.get_data();
+                                blob_header_type = pbf_blob_header.get_view();
                                 break;
                             case FileFormat::BlobHeader::required_int32_datasize:
                                 blob_header_datasize = pbf_blob_header.get_int32();
@@ -143,7 +144,7 @@ namespace osmium {
                         throw osmium::pbf_error("PBF format error: BlobHeader.datasize missing or zero.");
                     }
 
-                    if (strncmp(expected_type, blob_header_type.first, blob_header_type.second)) {
+                    if (std::strncmp(expected_type, blob_header_type.data(), blob_header_type.size())) {
                         throw osmium::pbf_error("blob does not have expected type (OSMHeader in first blob, OSMData in following blobs)");
                     }
 

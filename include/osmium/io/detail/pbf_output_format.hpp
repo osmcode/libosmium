@@ -44,6 +44,7 @@ DEALINGS IN THE SOFTWARE.
 #include <time.h>
 #include <utility>
 
+#define PROTOZERO_STRICT_API
 #include <protozero/pbf_builder.hpp>
 
 #include <osmium/handler.hpp>
