@@ -47,27 +47,27 @@ namespace osmium {
          * there were.
          */
         struct area_stats {
-            uint32_t area_really_complex_case = 0; ///< Most difficult case with rings touching in multiple points
-            uint32_t area_simple_case = 0; ///< Simple case, no touching rings
-            uint32_t area_touching_rings_case = 0; ///< More difficult case with touching rings
-            uint32_t duplicate_nodes = 0; ///< Consecutive identical nodes or consecutive nodes with same location
-            uint32_t duplicate_segments = 0; ///< Segments duplicated (going back and forth)
-            uint32_t from_relations = 0; ///< Area created from multipolygon relation
-            uint32_t from_ways = 0; ///< Area created from way
-            uint32_t inner_rings = 0; ///< Number of inner rings
-            uint32_t inner_with_same_tags = 0; ///< Number of inner ways with same tags as area
-            uint32_t intersections = 0; ///< Number of intersections between segments
-            uint32_t member_ways = 0; ///< Number of ways in the area
-            uint32_t no_tags_on_relation = 0; ///< No tags on relation (old-style multipolygon with tags on outer ways)
-            uint32_t no_way_in_mp_relation = 0; ///< Multipolygon relation with no way members
-            uint32_t nodes = 0; ///< Number of nodes in the area
-            uint32_t open_rings = 0; ///< Number of open rings in the area
-            uint32_t outer_rings = 0; ///< Number of outer rings in the area
-            uint32_t short_ways = 0; ///< Number of ways with less than two nodes
-            uint32_t single_way_in_mp_relation = 0; ///< Multipolygon relation containing a single way
-            uint32_t touching_rings = 0; ///< Rings touching in a node
-            uint32_t ways_in_multiple_rings = 0; ///< Different segments of a way ended up in different rings
-            uint32_t wrong_role = 0; ///< Member has wrong role (not "outer", "inner", or empty)
+            uint64_t area_really_complex_case = 0; ///< Most difficult case with rings touching in multiple points
+            uint64_t area_simple_case = 0; ///< Simple case, no touching rings
+            uint64_t area_touching_rings_case = 0; ///< More difficult case with touching rings
+            uint64_t duplicate_nodes = 0; ///< Consecutive identical nodes or consecutive nodes with same location
+            uint64_t duplicate_segments = 0; ///< Segments duplicated (going back and forth)
+            uint64_t from_relations = 0; ///< Area created from multipolygon relation
+            uint64_t from_ways = 0; ///< Area created from way
+            uint64_t inner_rings = 0; ///< Number of inner rings
+            uint64_t inner_with_same_tags = 0; ///< Number of inner ways with same tags as area
+            uint64_t intersections = 0; ///< Number of intersections between segments
+            uint64_t member_ways = 0; ///< Number of ways in the area
+            uint64_t no_tags_on_relation = 0; ///< No tags on relation (old-style multipolygon with tags on outer ways)
+            uint64_t no_way_in_mp_relation = 0; ///< Multipolygon relation with no way members
+            uint64_t nodes = 0; ///< Number of nodes in the area
+            uint64_t open_rings = 0; ///< Number of open rings in the area
+            uint64_t outer_rings = 0; ///< Number of outer rings in the area
+            uint64_t short_ways = 0; ///< Number of ways with less than two nodes
+            uint64_t single_way_in_mp_relation = 0; ///< Multipolygon relation containing a single way
+            uint64_t touching_rings = 0; ///< Rings touching in a node
+            uint64_t ways_in_multiple_rings = 0; ///< Different segments of a way ended up in different rings
+            uint64_t wrong_role = 0; ///< Member has wrong role (not "outer", "inner", or empty)
 
             area_stats& operator+=(const area_stats& other) noexcept {
                 area_really_complex_case += other.area_really_complex_case;
