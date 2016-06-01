@@ -8,11 +8,20 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+### Changed
+
+### Fixed
+
+
+## [2.7.0] - 2016-06-01
+
+### Added
+
 - New functions for iterating over specific item types in buffers
   (`osmium::memory::Buffer::select()`), over specific subitems
   (`osmium::OSMObject::subitems()`), and for iterating over all rings of
   an area (`osmium::Areas::outer_rings(`), `inner_rings()`).
-- Debug output optionally prints CRC32 when "add_crc32" file option is set.
+- Debug output optionally prints CRC32 when `add_crc32` file option is set.
 
 ### Changed
 
@@ -31,7 +40,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 
 - Output operator for Location shows full precision.
-- Undefined behaviour in WKB writer and types_from_string() function.
+- Undefined behaviour in WKB writer and `types_from_string()` function.
 - Fix unsigned overflow in pool.hpp.
 - OSM objects are now ordered by type (nodes, then ways, then relations),
   then ID, then version, then timestamp. Ordering by timestamp is normally
@@ -311,7 +320,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   Doxygen (up to version 1.8.8). This version contains a workaround to fix
   this.
 
-[unreleased]: https://github.com/osmcode/libosmium/compare/v2.6.1...HEAD
+[unreleased]: https://github.com/osmcode/libosmium/compare/v2.7.0...HEAD
+[2.7.0]: https://github.com/osmcode/libosmium/compare/v2.6.1...v2.7.0
 [2.6.1]: https://github.com/osmcode/libosmium/compare/v2.6.0...v2.6.1
 [2.6.0]: https://github.com/osmcode/libosmium/compare/v2.5.4...v2.6.0
 [2.5.4]: https://github.com/osmcode/libosmium/compare/v2.5.3...v2.5.4
