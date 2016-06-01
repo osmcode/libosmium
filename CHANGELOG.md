@@ -327,7 +327,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   Doxygen (up to version 1.8.8). This version contains a workaround to fix
   this.
 
-[unreleased]: https://github.com/osmcode/libosmium/compare/v2.7.0...HEAD
+[unreleased]: https://github.com/osmcode/libosmium/compare/v2.7.1...HEAD
+[2.7.1]: https://github.com/osmcode/libosmium/compare/v2.7.0...v2.7.1
 [2.7.0]: https://github.com/osmcode/libosmium/compare/v2.6.1...v2.7.0
 [2.6.1]: https://github.com/osmcode/libosmium/compare/v2.6.0...v2.6.1
 [2.6.0]: https://github.com/osmcode/libosmium/compare/v2.5.4...v2.6.0
