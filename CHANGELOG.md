@@ -13,6 +13,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 
 
+## [2.7.1] - 2016-06-01
+
+### Fixes
+
+- Update version number in version.hpp.
+
+
 ## [2.7.0] - 2016-06-01
 
 ### Added
