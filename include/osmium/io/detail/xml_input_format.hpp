@@ -126,7 +126,12 @@ namespace osmium {
 
         namespace detail {
 
-            double atof_helper(const char *str) {
+            /**
+             * Helper function to avoid using std::atof, since for std::atof,
+             * the decimal separator may not be "." (depending on the locale),
+             * leading to coordinates being cut down to their integer parts.
+             */
+            inline double atof_helper(const char *str) {
               double val = 0.0f;
               std::istringstream istr(str);
               istr.imbue(std::locale("C"));
