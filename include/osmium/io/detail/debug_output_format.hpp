@@ -112,6 +112,11 @@ namespace osmium {
                     append_debug_encoded_string(*m_out, data, m_utf8_prefix, m_utf8_suffix);
                 }
 
+                template <typename... TArgs>
+                void output_formatted(const char* format, TArgs&&... args) {
+                    append_printf_formatted_string(*m_out, format, std::forward<TArgs>(args)...);
+                }
+
                 void write_color(const char* color) {
                     if (m_options.use_color) {
                         *m_out += color;
@@ -167,7 +172,9 @@ namespace osmium {
                 void write_timestamp(const osmium::Timestamp& timestamp) {
                     if (timestamp.valid()) {
                         *m_out += timestamp.to_iso();
-                        output_formatted(" (%d)", timestamp.seconds_since_epoch());
+                        *m_out += " (";
+                        output_int(timestamp.seconds_since_epoch());
+                        *m_out += ')';
                     } else {
                         write_error("NOT SET");
                     }
@@ -175,21 +182,26 @@ namespace osmium {
                 }
 
                 void write_meta(const osmium::OSMObject& object) {
-                    output_formatted("%" PRId64 "\n", object.id());
+                    output_int(object.id());
+                    *m_out += '\n';
                     if (m_options.add_metadata) {
                         write_fieldname("version");
-                        output_formatted("  %d", object.version());
+                        *m_out += "  ";
+                        output_int(object.version());
                         if (object.visible()) {
                             *m_out += " visible\n";
                         } else {
                             write_error(" deleted\n");
                         }
                         write_fieldname("changeset");
-                        output_formatted("%d\n", object.changeset());
+                        output_int(object.changeset());
+                        *m_out += '\n';
                         write_fieldname("timestamp");
                         write_timestamp(object.timestamp());
                         write_fieldname("user");
-                        output_formatted("     %d ", object.uid());
+                        *m_out += "     ";
+                        output_int(object.uid());
+                        *m_out += ' ';
                         write_string(object.user());
                         *m_out += '\n';
                     }
@@ -199,7 +211,9 @@ namespace osmium {
                     if (!tags.empty()) {
                         write_fieldname("tags");
                         *m_out += padding;
-                        output_formatted("     %d\n", tags.size());
+                        *m_out += "     ";
+                        output_int(tags.size());
+                        *m_out += '\n';
 
                         osmium::max_op<size_t> max;
                         for (const auto& tag : tags) {
@@ -312,7 +326,8 @@ namespace osmium {
 
                     write_fieldname("nodes");
 
-                    output_formatted("    %d", way.nodes().size());
+                    *m_out += "    ";
+                    output_int(way.nodes().size());
                     if (way.nodes().size() < 2) {
                         write_error(" LESS THAN 2 NODES!\n");
                     } else if (way.nodes().size() > 2000) {
@@ -350,7 +365,9 @@ namespace osmium {
                     write_tags(relation.tags());
 
                     write_fieldname("members");
-                    output_formatted("  %d\n", relation.members().size());
+                    *m_out += "  ";
+                    output_int(relation.members().size());
+                    *m_out += '\n';
 
                     int width = int(log10(relation.members().size())) + 1;
                     int n = 0;
@@ -371,10 +388,11 @@ namespace osmium {
 
                 void changeset(const osmium::Changeset& changeset) {
                     write_object_type("changeset");
-                    output_formatted("%d\n", changeset.id());
+                    output_int(changeset.id());
+                    *m_out += '\n';
 
                     write_fieldname("num changes");
-                    output_formatted("%d", changeset.num_changes());
+                    output_int(changeset.num_changes());
                     if (changeset.num_changes() == 0) {
                         write_error(" NO CHANGES!");
                     }
@@ -393,7 +411,9 @@ namespace osmium {
                     }
 
                     write_fieldname("user");
-                    output_formatted("       %d ", changeset.uid());
+                    *m_out += "       ";
+                    output_int(changeset.uid());
+                    *m_out += ' ';
                     write_string(changeset.user());
                     *m_out += '\n';
 
@@ -402,7 +422,9 @@ namespace osmium {
 
                     if (changeset.num_comments() > 0) {
                         write_fieldname("comments");
-                        output_formatted("   %d\n", changeset.num_comments());
+                        *m_out += "   ";
+                        output_int(changeset.num_comments());
+                        *m_out += '\n';
 
                         int width = int(log10(changeset.num_comments())) + 1;
                         int n = 0;
@@ -414,7 +436,8 @@ namespace osmium {
                             output_formatted("      %*s", width, "");
 
                             write_comment_field("user");
-                            output_formatted("%d ", comment.uid());
+                            output_int(comment.uid());
+                            *m_out += ' ';
                             write_string(comment.user());
                             output_formatted("\n      %*s", width, "");
 

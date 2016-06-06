@@ -70,9 +70,22 @@ namespace osmium {
                     m_out(std::make_shared<std::string>()) {
                 }
 
-                template <typename... TArgs>
-                void output_formatted(const char* format, TArgs&&... args) {
-                    append_printf_formatted_string(*m_out, format, std::forward<TArgs>(args)...);
+                void output_int(int64_t value) {
+                    if (value < 0) {
+                        *m_out += '-';
+                        value = -value;
+                    }
+
+                    char temp[20];
+                    char *t = temp;
+                    do {
+                        *t++ = char(value % 10) + '0';
+                        value /= 10;
+                    } while (value > 0);
+
+                    do {
+                        *m_out += *--t;
+                    } while (t != temp);
                 }
 
             }; // class OutputBlock;

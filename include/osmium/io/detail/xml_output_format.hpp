@@ -134,12 +134,21 @@ namespace osmium {
                     write_spaces(prefix_spaces());
                 }
 
+                template <typename T>
+                void write_attribute(const char* name, T value) {
+                    *m_out += ' ';
+                    *m_out += name;
+                    *m_out += "=\"";
+                    output_int(value);
+                    *m_out += '"';
+                }
+
                 void write_meta(const osmium::OSMObject& object) {
-                    output_formatted(" id=\"%" PRId64 "\"", object.id());
+                    write_attribute("id", object.id());
 
                     if (m_options.add_metadata) {
                         if (object.version()) {
-                            output_formatted(" version=\"%d\"", object.version());
+                            write_attribute("version", object.version());
                         }
 
                         if (object.timestamp()) {
@@ -149,13 +158,14 @@ namespace osmium {
                         }
 
                         if (!object.user_is_anonymous()) {
-                            output_formatted(" uid=\"%d\" user=\"", object.uid());
+                            write_attribute("uid", object.uid());
+                            *m_out += " user=\"";
                             append_xml_encoded_string(*m_out, object.user());
                             *m_out += "\"";
                         }
 
                         if (object.changeset()) {
-                            output_formatted(" changeset=\"%d\"", object.changeset());
+                            write_attribute("changeset", object.changeset());
                         }
 
                         if (m_options.add_visible_flag) {
@@ -181,7 +191,9 @@ namespace osmium {
 
                 void write_discussion(const osmium::ChangesetDiscussion& comments) {
                     for (const auto& comment : comments) {
-                        output_formatted("   <comment uid=\"%d\" user=\"", comment.uid());
+                        *m_out += "   <comment";
+                        write_attribute("uid", comment.uid());
+                        *m_out += " user=\"";
                         append_xml_encoded_string(*m_out, comment.user());
                         *m_out += "\" date=\"";
                         *m_out += comment.date().to_iso();
@@ -304,7 +316,8 @@ namespace osmium {
                     if (m_options.locations_on_ways) {
                         for (const auto& node_ref : way.nodes()) {
                             write_prefix();
-                            output_formatted("  <nd ref=\"%" PRId64 "\"", node_ref.ref());
+                            *m_out += "  <nd";
+                            write_attribute("ref", node_ref.ref());
                             if (node_ref.location()) {
                                 detail::append_lat_lon_attributes(*m_out, "lat", "lon", node_ref.location());
                             }
@@ -313,7 +326,9 @@ namespace osmium {
                     } else {
                         for (const auto& node_ref : way.nodes()) {
                             write_prefix();
-                            output_formatted("  <nd ref=\"%" PRId64 "\"/>\n", node_ref.ref());
+                            *m_out += "  <nd";
+                            write_attribute("ref", node_ref.ref());
+                            *m_out += "/>\n";
                         }
                     }
 
@@ -343,7 +358,9 @@ namespace osmium {
                         write_prefix();
                         *m_out += "  <member type=\"";
                         *m_out += item_type_to_name(member.type());
-                        output_formatted("\" ref=\"%" PRId64 "\" role=\"", member.ref());
+                        *m_out += '"';
+                        write_attribute("ref", member.ref());
+                        *m_out += " role=\"";
                         append_xml_encoded_string(*m_out, member.role());
                         *m_out += "\"/>\n";
                     }
@@ -357,7 +374,7 @@ namespace osmium {
                 void changeset(const osmium::Changeset& changeset) {
                     *m_out += " <changeset";
 
-                    output_formatted(" id=\"%" PRId32 "\"", changeset.id());
+                    write_attribute("id", changeset.id());
 
                     if (changeset.created_at()) {
                         *m_out += " created_at=\"";
@@ -376,7 +393,8 @@ namespace osmium {
                     if (!changeset.user_is_anonymous()) {
                         *m_out += " user=\"";
                         append_xml_encoded_string(*m_out, changeset.user());
-                        output_formatted("\" uid=\"%d\"", changeset.uid());
+                        *m_out += '"';
+                        write_attribute("uid", changeset.uid());
                     }
 
                     if (changeset.bounds()) {
@@ -384,8 +402,8 @@ namespace osmium {
                         detail::append_lat_lon_attributes(*m_out, "max_lat", "max_lon", changeset.bounds().top_right());
                     }
 
-                    output_formatted(" num_changes=\"%" PRId32 "\"", changeset.num_changes());
-                    output_formatted(" comments_count=\"%" PRId32 "\"", changeset.num_comments());
+                    write_attribute("num_changes", changeset.num_changes());
+                    write_attribute("comments_count", changeset.num_comments());
 
                     // If there are no tags and no comments, we can close the
                     // tag right here and are done.
