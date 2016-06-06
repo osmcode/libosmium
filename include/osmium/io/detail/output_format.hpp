@@ -70,6 +70,9 @@ namespace osmium {
                     m_out(std::make_shared<std::string>()) {
                 }
 
+                // Simple function to convert integer to string. This is much
+                // faster than using sprintf, but could be further optimized.
+                // See https://github.com/miloyip/itoa-benchmark .
                 void output_int(int64_t value) {
                     if (value < 0) {
                         *m_out += '-';
@@ -83,8 +86,11 @@ namespace osmium {
                         value /= 10;
                     } while (value > 0);
 
+                    const auto old_size = m_out->size();
+                    m_out->resize(old_size + (t - temp));
+                    char* data = &(*m_out)[old_size];
                     do {
-                        *m_out += *--t;
+                        *data++ += *--t;
                     } while (t != temp);
                 }
 
