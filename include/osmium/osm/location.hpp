@@ -63,6 +63,138 @@ namespace osmium {
 
     }; // struct invalid_location
 
+    namespace detail {
+
+        constexpr const int coordinate_precision = 10000000;
+
+        // Convert string with a floating point number into integer suitable
+        // for use as coordinate in a Location.
+        inline int32_t string_to_location_coordinate(const char* str) {
+            const char* full = str;
+
+            int32_t result = 0;
+            int sign = 1;
+            int scale = 7;
+
+            // optional minus sign
+            if (*str == '-') {
+                sign = -1;
+                ++str;
+            }
+
+            // first digit before decimal point
+            if (*str >= '0' && *str <= '9') {
+                result = *str - '0';
+                ++str;
+            } else {
+                goto error;
+            }
+
+            // optional second digit before decimal point
+            if (*str >= '0' && *str <= '9') {
+                result = result * 10 + *str - '0';
+                ++str;
+
+                // optional third digit before decimal point
+                if (*str >= '0' && *str <= '9') {
+                    result = result * 10 + *str - '0';
+                    ++str;
+                }
+            }
+
+            if (*str != '\0') {
+
+                // decimal point
+                if (*str != '.') {
+                    goto error;
+                }
+
+                ++str;
+
+                // read significant digits
+                for (; scale > 0 && *str >= '0' && *str <= '9'; --scale, ++str) {
+                    result = result * 10 + (*str - '0');
+                }
+
+                // use 8th digit after decimal point for rounding
+                if (scale == 0 && *str >= '5' && *str <= '9') {
+                    ++result;
+                    ++str;
+                }
+
+                // ignore further digits
+                while (*str >= '0' && *str <= '9') {
+                    ++str;
+                }
+
+                // should be at the end now
+                if (*str != '\0') {
+                    goto error;
+                }
+
+            }
+
+            for (; scale > 0; --scale) {
+                result *= 10;
+            }
+
+            return result * sign;
+
+        error:
+
+            throw invalid_location{std::string{"wrong format for coordinate: '"} + full + "'"};
+        }
+
+        // Convert integer as used by location for coordinates into a string.
+        template <typename T>
+        inline T append_location_coordinate_to_string(T iterator, int32_t value) {
+            // handle negative values
+            if (value < 0) {
+                *iterator++ = '-';
+                value = -value;
+            }
+
+            // write digits into temporary buffer
+            int32_t v = value;
+            char temp[10];
+            char* t = temp;
+            do {
+                *t++ = char(v % 10) + '0';
+                v /= 10;
+            } while (v != 0);
+
+            // write out digits before decimal point
+            if (value >= coordinate_precision) {
+                if (value >= 10 * coordinate_precision) {
+                    if (value >= 100 * coordinate_precision) {
+                        *iterator++ = *--t;
+                    }
+                    *iterator++ = *--t;
+                }
+                *iterator++ = *--t;
+            } else {
+                *iterator++ = '0';
+            }
+
+            // remove trailing zeros
+            const char* tn = temp;
+            while (tn < t && *tn == '0') {
+                ++tn;
+            }
+
+            // decimal point
+            if (t != tn) {
+                *iterator++ = '.';
+                while (t != tn) {
+                    *iterator++ = *--t;
+                }
+            }
+
+            return iterator;
+        }
+
+    } // namespace detail
+
     /**
      * Locations define a place on earth.
      *
@@ -90,14 +222,12 @@ namespace osmium {
         // static constexpr int32_t undefined_coordinate = std::numeric_limits<int32_t>::max();
         static constexpr int32_t undefined_coordinate = 2147483647;
 
-        static constexpr int coordinate_precision = 10000000;
-
         static int32_t double_to_fix(const double c) noexcept {
-            return static_cast<int32_t>(std::round(c * coordinate_precision));
+            return static_cast<int32_t>(std::round(c * detail::coordinate_precision));
         }
 
         static constexpr double fix_to_double(const int32_t c) noexcept {
-            return static_cast<double>(c) / coordinate_precision;
+            return static_cast<double>(c) / detail::coordinate_precision;
         }
 
         /**
@@ -155,10 +285,10 @@ namespace osmium {
          * usual bounds (-180<=lon<=180, -90<=lat<=90).
          */
         constexpr bool valid() const noexcept {
-            return m_x >= -180 * coordinate_precision
-                && m_x <=  180 * coordinate_precision
-                && m_y >=  -90 * coordinate_precision
-                && m_y <=   90 * coordinate_precision;
+            return m_x >= -180 * detail::coordinate_precision
+                && m_x <=  180 * detail::coordinate_precision
+                && m_y >=  -90 * detail::coordinate_precision
+                && m_y <=   90 * detail::coordinate_precision;
         }
 
         constexpr int32_t x() const noexcept {
@@ -227,11 +357,24 @@ namespace osmium {
             return *this;
         }
 
+        Location& set_lon(const char* str) noexcept {
+            m_x = detail::string_to_location_coordinate(str);
+            return *this;
+        }
+
+        Location& set_lat(const char* str) noexcept {
+            m_y = detail::string_to_location_coordinate(str);
+            return *this;
+        }
+
         template <typename T>
-        T as_string(T iterator, const char separator) const {
-            iterator = osmium::util::double2string(iterator, lon(), 7);
+        T as_string(T iterator, const char separator = ',') const {
+            if (!valid()) {
+                throw osmium::invalid_location("invalid location");
+            }
+            iterator = detail::append_location_coordinate_to_string(iterator, x());
             *iterator++ = separator;
-            return osmium::util::double2string(iterator, lat(), 7);
+            return detail::append_location_coordinate_to_string(iterator, y());
         }
 
     }; // class Location

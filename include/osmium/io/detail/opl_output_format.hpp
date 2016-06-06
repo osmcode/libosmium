@@ -115,13 +115,15 @@ namespace osmium {
                 }
 
                 void write_location(const osmium::Location& location, const char x, const char y) {
+                    *m_out += ' ';
+                    *m_out += x;
                     if (location) {
-                        output_formatted(" %c%.7f %c%.7f", x, location.lon_without_check(), y, location.lat_without_check());
-                    } else {
-                        *m_out += ' ';
-                        *m_out += x;
-                        *m_out += ' ';
-                        *m_out += y;
+                        osmium::detail::append_location_coordinate_to_string(std::back_inserter(*m_out), location.x());
+                    }
+                    *m_out += ' ';
+                    *m_out += y;
+                    if (location) {
+                        osmium::detail::append_location_coordinate_to_string(std::back_inserter(*m_out), location.y());
                     }
                 }
 
@@ -172,11 +174,7 @@ namespace osmium {
                             }
                             output_formatted("n%" PRId64 "x", node_ref.ref());
                             if (node_ref.location()) {
-                                output_formatted("%.7fy%.7f",
-                                    node_ref.ref(),
-                                    node_ref.location().lon_without_check(),
-                                    node_ref.location().lat_without_check()
-                                );
+                                node_ref.location().as_string(std::back_inserter(*m_out), 'y');
                             } else {
                                 *m_out += 'y';
                             }

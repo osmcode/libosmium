@@ -90,6 +90,22 @@ namespace osmium {
                 bool locations_on_ways;
             };
 
+            namespace detail {
+
+                inline void append_lat_lon_attributes(std::string& out, const char* lat, const char* lon, const osmium::Location& location) {
+                    out += ' ';
+                    out += lat;
+                    out += "=\"";
+                    osmium::detail::append_location_coordinate_to_string(std::back_inserter(out), location.y());
+                    out += "\" ";
+                    out += lon;
+                    out += "=\"";
+                    osmium::detail::append_location_coordinate_to_string(std::back_inserter(out), location.x());
+                    out += "\"";
+                }
+
+            } // namespace detail
+
             class XMLOutputBlock : public OutputBlock {
 
                 // operation (create, modify, delete) for osc files
@@ -253,11 +269,7 @@ namespace osmium {
                     write_meta(node);
 
                     if (node.location()) {
-                        *m_out += " lat=\"";
-                        osmium::util::double2string(std::back_inserter(*m_out), node.location().lat_without_check(), 7);
-                        *m_out += "\" lon=\"";
-                        osmium::util::double2string(std::back_inserter(*m_out), node.location().lon_without_check(), 7);
-                        *m_out += "\"";
+                        detail::append_lat_lon_attributes(*m_out, "lat", "lon", node.location());
                     }
 
                     if (node.tags().empty()) {
@@ -294,11 +306,7 @@ namespace osmium {
                             write_prefix();
                             output_formatted("  <nd ref=\"%" PRId64 "\"", node_ref.ref());
                             if (node_ref.location()) {
-                                *m_out += " lat=\"";
-                                osmium::util::double2string(std::back_inserter(*m_out), node_ref.location().lat_without_check(), 7);
-                                *m_out += "\" lon=\"";
-                                osmium::util::double2string(std::back_inserter(*m_out), node_ref.location().lon_without_check(), 7);
-                                *m_out += "\"";
+                                detail::append_lat_lon_attributes(*m_out, "lat", "lon", node_ref.location());
                             }
                             *m_out += "/>\n";
                         }
@@ -372,10 +380,8 @@ namespace osmium {
                     }
 
                     if (changeset.bounds()) {
-                        output_formatted(" min_lat=\"%.7f\"", changeset.bounds().bottom_left().lat_without_check());
-                        output_formatted(" min_lon=\"%.7f\"", changeset.bounds().bottom_left().lon_without_check());
-                        output_formatted(" max_lat=\"%.7f\"", changeset.bounds().top_right().lat_without_check());
-                        output_formatted(" max_lon=\"%.7f\"", changeset.bounds().top_right().lon_without_check());
+                        detail::append_lat_lon_attributes(*m_out, "min_lat", "min_lon", changeset.bounds().bottom_left());
+                        detail::append_lat_lon_attributes(*m_out, "max_lat", "max_lon", changeset.bounds().top_right());
                     }
 
                     output_formatted(" num_changes=\"%" PRId32 "\"", changeset.num_changes());
@@ -443,10 +449,9 @@ namespace osmium {
 
                     for (const auto& box : header.boxes()) {
                         out += "  <bounds";
-                        append_printf_formatted_string(out, " minlon=\"%.7f\"", box.bottom_left().lon());
-                        append_printf_formatted_string(out, " minlat=\"%.7f\"", box.bottom_left().lat());
-                        append_printf_formatted_string(out, " maxlon=\"%.7f\"", box.top_right().lon());
-                        append_printf_formatted_string(out, " maxlat=\"%.7f\"/>\n", box.top_right().lat());
+                        detail::append_lat_lon_attributes(out, "minlat", "minlon", box.bottom_left());
+                        detail::append_lat_lon_attributes(out, "maxlat", "maxlon", box.top_right());
+                        out += "/>\n";
                     }
 
                     send_to_output_queue(std::move(out));

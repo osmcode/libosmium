@@ -253,9 +253,9 @@ namespace osmium {
 
                     check_attributes(attrs, [&location, &user, &object](const XML_Char* name, const XML_Char* value) {
                         if (!std::strcmp(name, "lon")) {
-                            location.set_lon(std::atof(value)); // XXX doesn't detect garbage after the number
+                            location.set_lon(value);
                         } else if (!std::strcmp(name, "lat")) {
-                            location.set_lat(std::atof(value)); // XXX doesn't detect garbage after the number
+                            location.set_lat(value);
                         } else if (!std::strcmp(name, "user")) {
                             user = value;
                         } else {
@@ -278,13 +278,13 @@ namespace osmium {
                     osmium::Location max;
                     check_attributes(attrs, [&min, &max, &user, &new_changeset](const XML_Char* name, const XML_Char* value) {
                         if (!std::strcmp(name, "min_lon")) {
-                            min.set_lon(atof(value));
+                            min.set_lon(value);
                         } else if (!std::strcmp(name, "min_lat")) {
-                            min.set_lat(atof(value));
+                            min.set_lat(value);
                         } else if (!std::strcmp(name, "max_lon")) {
-                            max.set_lon(atof(value));
+                            max.set_lon(value);
                         } else if (!std::strcmp(name, "max_lat")) {
-                            max.set_lat(atof(value));
+                            max.set_lat(value);
                         } else if (!std::strcmp(name, "user")) {
                             user = value;
                         } else {
@@ -386,13 +386,13 @@ namespace osmium {
                                 osmium::Location max;
                                 check_attributes(attrs, [&min, &max](const XML_Char* name, const XML_Char* value) {
                                     if (!std::strcmp(name, "minlon")) {
-                                        min.set_lon(atof(value));
+                                        min.set_lon(value);
                                     } else if (!std::strcmp(name, "minlat")) {
-                                        min.set_lat(atof(value));
+                                        min.set_lat(value);
                                     } else if (!std::strcmp(name, "maxlon")) {
-                                        max.set_lon(atof(value));
+                                        max.set_lon(value);
                                     } else if (!std::strcmp(name, "maxlat")) {
-                                        max.set_lat(atof(value));
+                                        max.set_lat(value);
                                     }
                                 });
                                 osmium::Box box;
@@ -424,9 +424,9 @@ namespace osmium {
                                     if (!std::strcmp(name, "ref")) {
                                         nr.set_ref(osmium::string_to_object_id(value));
                                     } else if (!std::strcmp(name, "lon")) {
-                                        nr.location().set_lon(std::atof(value)); // XXX doesn't detect garbage after the number
+                                        nr.location().set_lon(value);
                                     } else if (!std::strcmp(name, "lat")) {
-                                        nr.location().set_lat(std::atof(value)); // XXX doesn't detect garbage after the number
+                                        nr.location().set_lat(value);
                                     }
                                 });
                                 m_wnl_builder->add_node_ref(nr);

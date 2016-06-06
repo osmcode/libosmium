@@ -166,3 +166,98 @@ TEST_CASE("Location hash") {
     }
 }
 
+#define C(s, v) REQUIRE(osmium::detail::string_to_location_coordinate(s)     == v); \
+                REQUIRE(osmium::detail::string_to_location_coordinate("-" s) == -v); \
+                REQUIRE(atof(s)     == Approx( v / 10000000.0)); \
+                REQUIRE(atof("-" s) == Approx(-v / 10000000.0));
+
+#define F(s) REQUIRE_THROWS_AS(osmium::detail::string_to_location_coordinate(s),     osmium::invalid_location); \
+             REQUIRE_THROWS_AS(osmium::detail::string_to_location_coordinate("-" s), osmium::invalid_location);
+
+TEST_CASE("Parsing coordinates from strings") {
+    F("x");
+    F(".");
+    F("--");
+    F("");
+    F(" ");
+    F(" 123");
+    F("123 ");
+    F("123x");
+    F("1.2x");
+
+    C("0", 0);
+
+    C("1",       10000000);
+    C("2",       20000000);
+
+    C("9",       90000000);
+    C("10",     100000000);
+    C("11",     110000000);
+
+    C("90",     900000000);
+    C("100",   1000000000);
+    C("101",   1010000000);
+
+    C("00",             0);
+    C("01",      10000000);
+    C("001",     10000000);
+
+    F("0001");
+    F("1234");
+    F("1234.");
+
+    C("0.",             0);
+    C("0.0",            0);
+    C("1.",      10000000);
+    C("1.0",     10000000);
+    C("1.2",     12000000);
+    C("0.1",      1000000);
+
+    C("1.1234567",  11234567);
+    C("1.12345670", 11234567);
+    C("1.12345674", 11234567);
+    C("1.12345675", 11234568);
+    C("1.12345679", 11234568);
+    C("1.12345680", 11234568);
+    C("1.12345681", 11234568);
+
+    C("180.0000000",  1800000000);
+    C("180.0000001",  1800000001);
+    C("179.9999999",  1799999999);
+    C("179.99999999", 1800000000);
+    C("200.123",      2001230000);
+
+}
+
+#undef C
+#undef F
+
+#define CW(v, s) buffer.clear(); \
+                 osmium::detail::append_location_coordinate_to_string(std::back_inserter(buffer), v); \
+                 CHECK(buffer == s); \
+                 buffer.clear(); \
+                 osmium::detail::append_location_coordinate_to_string(std::back_inserter(buffer), -v); \
+                 CHECK(buffer == "-" s);
+
+TEST_CASE("Writing coordinates into string") {
+    std::string buffer;
+
+    osmium::detail::append_location_coordinate_to_string(std::back_inserter(buffer), 0);
+    CHECK(buffer == "0");
+
+    CW(  10000000, "1");
+    CW(  90000000, "9");
+    CW( 100000000, "10");
+    CW(1000000000, "100");
+    CW(2000000000, "200");
+
+    CW(   1000000, "0.1");
+    CW(   1230000, "0.123");
+    CW(   9999999, "0.9999999");
+    CW(  40101010, "4.010101");
+    CW( 494561234, "49.4561234");
+    CW(1799999999, "179.9999999");
+}
+
+#undef CW
+

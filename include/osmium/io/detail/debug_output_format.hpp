@@ -221,7 +221,8 @@ namespace osmium {
 
                 void write_location(const osmium::Location& location) {
                     write_fieldname("lon/lat");
-                    output_formatted("  %.7f,%.7f", location.lon_without_check(), location.lat_without_check());
+                    *m_out += "  ";
+                    location.as_string(std::back_inserter(*m_out));
                     if (!location.valid()) {
                         write_error(" INVALID LOCATION!");
                     }
@@ -236,7 +237,9 @@ namespace osmium {
                     }
                     const auto& bl = box.bottom_left();
                     const auto& tr = box.top_right();
-                    output_formatted("%.7f,%.7f %.7f,%.7f", bl.lon_without_check(), bl.lat_without_check(), tr.lon_without_check(), tr.lat_without_check());
+                    bl.as_string(std::back_inserter(*m_out));
+                    *m_out += ' ';
+                    tr.as_string(std::back_inserter(*m_out));
                     if (!box.valid()) {
                         write_error(" INVALID BOX!");
                     }
@@ -326,7 +329,9 @@ namespace osmium {
                         write_counter(width, n++);
                         output_formatted("%10" PRId64, node_ref.ref());
                         if (node_ref.location().valid()) {
-                            output_formatted(" (%.7f,%.7f)", node_ref.location().lon_without_check(), node_ref.location().lat_without_check());
+                            *m_out += " (";
+                            node_ref.location().as_string(std::back_inserter(*m_out));
+                            *m_out += ')';
                         }
                         *m_out += '\n';
                     }
@@ -477,9 +482,9 @@ namespace osmium {
                     out += '\n';
                     for (const auto& box : header.boxes()) {
                         out += "    ";
-                        box.bottom_left().as_string(std::back_inserter(out), ',');
-                        out += " ";
-                        box.top_right().as_string(std::back_inserter(out), ',');
+                        box.bottom_left().as_string(std::back_inserter(out));
+                        out += ' ';
+                        box.top_right().as_string(std::back_inserter(out));
                         out += '\n';
                     }
                     write_fieldname(out, "options");
