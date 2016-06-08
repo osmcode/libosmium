@@ -134,16 +134,13 @@ namespace osmium {
             }
 
             void push_back(const T& value) {
-                if (m_size >= capacity()) {
-                    resize(m_size+1);
-                }
-                data()[m_size] = value;
-                ++m_size;
+                resize(m_size+1);
+                data()[m_size-1] = value;
             }
 
             void reserve(size_t new_capacity) {
                 if (new_capacity > capacity()) {
-                    size_t old_capacity = capacity();
+                    const size_t old_capacity = capacity();
                     m_mapping.resize(new_capacity);
                     std::fill(data() + old_capacity, data() + new_capacity, osmium::index::empty_value<T>());
                 }
