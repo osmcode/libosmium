@@ -190,6 +190,7 @@ namespace osmium {
                 }
 
                 void write_discussion(const osmium::ChangesetDiscussion& comments) {
+                    *m_out += "  <discussion>\n";
                     for (const auto& comment : comments) {
                         *m_out += "   <comment";
                         write_attribute("uid", comment.uid());
@@ -407,7 +408,7 @@ namespace osmium {
 
                     // If there are no tags and no comments, we can close the
                     // tag right here and are done.
-                    if (changeset.tags().empty() && changeset.num_comments() == 0) {
+                    if (changeset.tags().empty() && changeset.discussion().empty()) {
                         *m_out += "/>\n";
                         return;
                     }
@@ -416,8 +417,7 @@ namespace osmium {
 
                     write_tags(changeset.tags(), 0);
 
-                    if (changeset.num_comments() > 0) {
-                        *m_out += "  <discussion>\n";
+                    if (!changeset.discussion().empty()) {
                         write_discussion(changeset.discussion());
                     }
 
