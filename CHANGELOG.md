@@ -13,6 +13,20 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 
 
+## [2.7.2] - 2016-06-08
+
+### Changed
+
+- Much faster output of OSM files in XML, OPL, or debug formats.
+
+### Fixed
+
+- Parsing and output of coordinates now faster and always uses decimal dot
+  independant of locale setting.
+- Do not output empty discussion elements in changeset XML output.
+- Data corruption regression in mmap based indexes.
+
+
 ## [2.7.1] - 2016-06-01
 
 ### Fixes
@@ -327,7 +341,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   Doxygen (up to version 1.8.8). This version contains a workaround to fix
   this.
 
-[unreleased]: https://github.com/osmcode/libosmium/compare/v2.7.1...HEAD
+[unreleased]: https://github.com/osmcode/libosmium/compare/v2.7.2...HEAD
+[2.7.2]: https://github.com/osmcode/libosmium/compare/v2.7.1...v2.7.2
 [2.7.1]: https://github.com/osmcode/libosmium/compare/v2.7.0...v2.7.1
 [2.7.0]: https://github.com/osmcode/libosmium/compare/v2.6.1...v2.7.0
 [2.6.1]: https://github.com/osmcode/libosmium/compare/v2.6.0...v2.6.1
