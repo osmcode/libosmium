@@ -287,7 +287,7 @@ namespace osmium {
                 return linestring_finish(num_points);
             }
 
-            linestring_type create_linestring(const osmium::Way& way, use_nodes un=use_nodes::unique, direction dir=direction::forward) {
+            linestring_type create_linestring(const osmium::Way& way, use_nodes un=use_nodes::unique, direction dir = direction::forward) {
                 try {
                     return create_linestring(way.nodes(), un, dir);
                 } catch (osmium::geometry_error& e) {
@@ -361,7 +361,7 @@ namespace osmium {
                 return polygon_finish(num_points);
             }
 
-            polygon_type create_polygon(const osmium::Way& way, use_nodes un=use_nodes::unique, direction dir=direction::forward) {
+            polygon_type create_polygon(const osmium::Way& way, use_nodes un=use_nodes::unique, direction dir = direction::forward) {
                 try {
                     return create_polygon(way.nodes(), un, dir);
                 } catch (osmium::geometry_error& e) {
