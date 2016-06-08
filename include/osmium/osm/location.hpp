@@ -163,6 +163,10 @@ namespace osmium {
                 v /= 10;
             } while (v != 0);
 
+            while (t-temp < 7) {
+                *t++ = '0';
+            }
+
             // write out digits before decimal point
             if (value >= coordinate_precision) {
                 if (value >= 10 * coordinate_precision) {
