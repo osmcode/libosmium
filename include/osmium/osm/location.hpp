@@ -36,7 +36,10 @@ DEALINGS IN THE SOFTWARE.
 #include <cmath>
 #include <cstdint>
 #include <functional>
+#include <iomanip>
 #include <iosfwd>
+#include <locale>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 
@@ -67,10 +70,37 @@ namespace osmium {
 
         constexpr const int coordinate_precision = 10000000;
 
+        // Fallback function used when a coordinate is written in scientific
+        // notation. This function uses stringstream and is much more expensive
+        // than the handcrafted one. But coordinates in scientific notations
+        // shouldn't be used anyway.
+        inline int32_t string_to_location_coordinate_fallback(const char* str) {
+            double value;
+            std::istringstream ss{str};
+            ss.imbue(std::locale("C"));
+            ss >> std::noskipws >> value;
+
+            if (ss.fail() || !ss.eof() || ss.bad() || value > 215.0 || value < -215.0) {
+                throw invalid_location{std::string{"wrong format for coordinate: '"} + str + "'"};
+            }
+
+            return std::round(value * coordinate_precision);
+        }
+
         // Convert string with a floating point number into integer suitable
         // for use as coordinate in a Location.
         inline int32_t string_to_location_coordinate(const char* str) {
             const char* full = str;
+
+            // call fallback if scientific notation is used
+            while (*str) {
+                if (*str == 'e' || *str == 'E') {
+                    return string_to_location_coordinate_fallback(full);
+                }
+                ++str;
+            }
+
+            str = full;
 
             int32_t result = 0;
             int sign = 1;
