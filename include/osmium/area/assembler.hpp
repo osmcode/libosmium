@@ -153,7 +153,7 @@ namespace osmium {
              *
              * @deprecated Set debug_level directly.
              */
-            void enable_debug_output(bool d = true) {
+            OSMIUM_DEPRECATED void enable_debug_output(bool d = true) {
                 debug_level = d;
             }
 
