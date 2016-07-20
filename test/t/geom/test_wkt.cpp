@@ -1,5 +1,6 @@
 #include "catch.hpp"
 
+#include <osmium/geom/mercator_projection.hpp>
 #include <osmium/geom/wkt.hpp>
 
 #include "area_helper.hpp"
@@ -12,6 +13,20 @@ SECTION("point") {
 
     std::string wkt {factory.create_point(osmium::Location(3.2, 4.2))};
     REQUIRE(std::string{"POINT(3.2 4.2)"} == wkt);
+}
+
+SECTION("point in ewkt") {
+    osmium::geom::WKTFactory<> factory(7, osmium::geom::wkt_type::ewkt);
+
+    std::string wkt {factory.create_point(osmium::Location(3.2, 4.2))};
+    REQUIRE(std::string{"SRID=4326;POINT(3.2 4.2)"} == wkt);
+}
+
+SECTION("point in ewkt in web mercator") {
+    osmium::geom::WKTFactory<osmium::geom::MercatorProjection> factory(2, osmium::geom::wkt_type::ewkt);
+
+    std::string wkt {factory.create_point(osmium::Location(3.2, 4.2))};
+    REQUIRE(std::string{"SRID=3857;POINT(356222.37 467961.14)"} == wkt);
 }
 
 SECTION("empty_point") {
