@@ -60,7 +60,7 @@ namespace osmium {
                 using multipolygon_type = std::string;
                 using ring_type         = std::string;
 
-                WKTFactoryImpl(int precision = 7) :
+                WKTFactoryImpl(int /* srid */, int precision = 7) :
                     m_precision(precision) {
                 }
 

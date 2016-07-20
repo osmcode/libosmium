@@ -79,9 +79,6 @@ namespace osmium {
 
             class WKBFactoryImpl {
 
-                /// OSM data always uses SRID 4326 (WGS84).
-                static constexpr uint32_t srid = 4326;
-
                 /**
                 * Type of WKB geometry.
                 * These definitions are from
@@ -112,6 +109,7 @@ namespace osmium {
 
                 std::string m_data;
                 uint32_t m_points {0};
+                int m_srid;
                 wkb_type m_wkb_type;
                 out_type m_out_type;
 
@@ -130,7 +128,7 @@ namespace osmium {
 #endif
                     if (m_wkb_type == wkb_type::ewkb) {
                         str_push(str, type | wkbSRID);
-                        str_push(str, srid);
+                        str_push(str, m_srid);
                     } else {
                         str_push(str, type);
                     }
@@ -154,7 +152,8 @@ namespace osmium {
                 using multipolygon_type = std::string;
                 using ring_type         = std::string;
 
-                explicit WKBFactoryImpl(wkb_type wtype = wkb_type::wkb, out_type otype = out_type::binary) :
+                explicit WKBFactoryImpl(int srid, wkb_type wtype = wkb_type::wkb, out_type otype = out_type::binary) :
+                    m_srid(srid),
                     m_wkb_type(wtype),
                     m_out_type(otype) {
                 }

@@ -1,6 +1,7 @@
 #include "catch.hpp"
 
 #include <osmium/geom/geos.hpp>
+#include <osmium/geom/mercator_projection.hpp>
 
 #include "area_helper.hpp"
 #include "wnl_helper.hpp"
@@ -11,16 +12,16 @@ TEST_CASE("GEOS geometry factory - create point") {
     std::unique_ptr<geos::geom::Point> point {factory.create_point(osmium::Location(3.2, 4.2))};
     REQUIRE(3.2 == point->getX());
     REQUIRE(4.2 == point->getY());
-    REQUIRE(-1 == point->getSRID());
+    REQUIRE(4326 == point->getSRID());
 }
 
-TEST_CASE("GEOS geometry factory - create point with non-default srid") {
-    osmium::geom::GEOSFactory<> factory(4326);
+TEST_CASE("GEOS geometry factory - create point in web mercator") {
+    osmium::geom::GEOSFactory<osmium::geom::MercatorProjection> factory;
 
     std::unique_ptr<geos::geom::Point> point {factory.create_point(osmium::Location(3.2, 4.2))};
-    REQUIRE(3.2 == point->getX());
-    REQUIRE(4.2 == point->getY());
-    REQUIRE(4326 == point->getSRID());
+    REQUIRE(Approx(356222.3705384755l) == point->getX());
+    REQUIRE(Approx(467961.143605213l) == point->getY());
+    REQUIRE(3857 == point->getSRID());
 }
 
 TEST_CASE("GEOS geometry factory - create point with externally created GEOS factory") {

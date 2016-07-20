@@ -59,7 +59,7 @@ namespace osmium {
                 using multipolygon_type = void;
                 using ring_type         = void;
 
-                RapidGeoJSONFactoryImpl(TWriter& writer) :
+                RapidGeoJSONFactoryImpl(int /* srid */, TWriter& writer) :
                     m_writer(&writer) {
                 }
 

@@ -1,5 +1,6 @@
 #include "catch.hpp"
 
+#include <osmium/geom/mercator_projection.hpp>
 #include <osmium/geom/wkb.hpp>
 #include "wnl_helper.hpp"
 
@@ -14,11 +15,25 @@ SECTION("point") {
     REQUIRE(std::string{"01010000009A99999999990940CDCCCCCCCCCC1040"} == wkb);
 }
 
-SECTION("point_ewkb") {
+SECTION("point in web mercator") {
+    osmium::geom::WKBFactory<osmium::geom::MercatorProjection> factory(osmium::geom::wkb_type::wkb, osmium::geom::out_type::hex);
+
+    std::string wkb {factory.create_point(osmium::Location(3.2, 4.2))};
+    REQUIRE(std::string{"010100000028706E7BF9BD1541B03E0D93E48F1C41"} == wkb);
+}
+
+SECTION("point in ewkb") {
     osmium::geom::WKBFactory<> factory(osmium::geom::wkb_type::ewkb, osmium::geom::out_type::hex);
 
     std::string wkb {factory.create_point(osmium::Location(3.2, 4.2))};
     REQUIRE(std::string{"0101000020E61000009A99999999990940CDCCCCCCCCCC1040"} == wkb);
+}
+
+SECTION("point in ewkb in web mercator") {
+    osmium::geom::WKBFactory<osmium::geom::MercatorProjection> factory(osmium::geom::wkb_type::ewkb, osmium::geom::out_type::hex);
+
+    std::string wkb {factory.create_point(osmium::Location(3.2, 4.2))};
+    REQUIRE(std::string{"0101000020110F000028706E7BF9BD1541B03E0D93E48F1C41"} == wkb);
 }
 
 SECTION("linestring") {

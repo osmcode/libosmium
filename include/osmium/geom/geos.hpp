@@ -59,6 +59,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/geom/factory.hpp>
 #include <osmium/geom/coordinates.hpp>
+#include <osmium/util/compatibility.hpp>
 
 // MSVC doesn't support throw_with_nested yet
 #ifdef _MSC_VER
@@ -99,13 +100,23 @@ namespace osmium {
                 using multipolygon_type = std::unique_ptr<geos::geom::MultiPolygon>;
                 using ring_type         = std::unique_ptr<geos::geom::LinearRing>;
 
-                explicit GEOSFactoryImpl(geos::geom::GeometryFactory& geos_factory) :
+                explicit GEOSFactoryImpl(int /* srid */, geos::geom::GeometryFactory& geos_factory) :
                     m_precision_model(nullptr),
                     m_our_geos_factory(nullptr),
                     m_geos_factory(&geos_factory) {
                 }
 
-                explicit GEOSFactoryImpl(int srid = -1) :
+                /**
+                 * @deprecated Do not set SRID explicitly. It will be set to the
+                 *             correct value automatically.
+                 */
+                OSMIUM_DEPRECATED explicit GEOSFactoryImpl(int /* srid */, int srid) :
+                    m_precision_model(new geos::geom::PrecisionModel),
+                    m_our_geos_factory(new geos::geom::GeometryFactory(m_precision_model.get(), srid)),
+                    m_geos_factory(m_our_geos_factory.get()) {
+                }
+
+                explicit GEOSFactoryImpl(int srid) :
                     m_precision_model(new geos::geom::PrecisionModel),
                     m_our_geos_factory(new geos::geom::GeometryFactory(m_precision_model.get(), srid)),
                     m_geos_factory(m_our_geos_factory.get()) {

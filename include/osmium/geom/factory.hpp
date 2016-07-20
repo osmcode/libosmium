@@ -169,7 +169,7 @@ namespace osmium {
             template <typename... TArgs>
             explicit GeometryFactory<TGeomImpl, TProjection>(TArgs&&... args) :
                 m_projection(),
-                m_impl(std::forward<TArgs>(args)...) {
+                m_impl(m_projection.epsg(), std::forward<TArgs>(args)...) {
             }
 
             /**
@@ -179,7 +179,7 @@ namespace osmium {
             template <typename... TArgs>
             explicit GeometryFactory<TGeomImpl, TProjection>(TProjection&& projection, TArgs&&... args) :
                 m_projection(std::move(projection)),
-                m_impl(std::forward<TArgs>(args)...) {
+                m_impl(m_projection.epsg(), std::forward<TArgs>(args)...) {
             }
 
             using projection_type   = TProjection;

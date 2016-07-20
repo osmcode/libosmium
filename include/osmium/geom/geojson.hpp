@@ -59,7 +59,7 @@ namespace osmium {
                 using multipolygon_type = std::string;
                 using ring_type         = std::string;
 
-                GeoJSONFactoryImpl(int precision = 7) :
+                GeoJSONFactoryImpl(int /* srid */, int precision = 7) :
                     m_precision(precision) {
                 }
 
