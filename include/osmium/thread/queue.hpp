@@ -43,6 +43,10 @@ DEALINGS IN THE SOFTWARE.
 #include <thread>
 #include <utility> // IWYU pragma: keep (for std::move)
 
+#ifdef OSMIUM_DEBUG_QUEUE_SIZE
+# include <iostream>
+#endif
+
 namespace osmium {
 
     namespace thread {
@@ -81,6 +85,16 @@ namespace osmium {
             /// The number of times the queue was full and a thread pushing
             /// to the queue was blocked.
             std::atomic<int> m_full_counter;
+
+            /**
+             * The number of times wait_and_pop(with_timeout)() was called
+             * on the queue.
+             */
+            std::atomic<int> m_pop_counter;
+
+            /// The number of times the queue was full and a thread pushing
+            /// to the queue was blocked.
+            std::atomic<int> m_empty_counter;
 #endif
 
         public:
@@ -103,7 +117,9 @@ namespace osmium {
                 ,
                 m_largest_size(0),
                 m_push_counter(0),
-                m_full_counter(0)
+                m_full_counter(0),
+                m_pop_counter(0),
+                m_empty_counter(0)
 #endif
             {
             }
@@ -111,7 +127,7 @@ namespace osmium {
             ~Queue() {
                 shutdown();
 #ifdef OSMIUM_DEBUG_QUEUE_SIZE
-                std::cerr << "queue '" << m_name << "' with max_size=" << m_max_size << " had largest size " << m_largest_size << " and was full " << m_full_counter << " times in " << m_push_counter << " push() calls\n";
+                std::cerr << "queue '" << m_name << "' with max_size=" << m_max_size << " had largest size " << m_largest_size << " and was full " << m_full_counter << " times in " << m_push_counter << " push() calls and was empty " << m_empty_counter << " times in " << m_pop_counter << " pop() calls\n";
 #endif
             }
 
@@ -147,7 +163,15 @@ namespace osmium {
             }
 
             void wait_and_pop(T& value) {
+#ifdef OSMIUM_DEBUG_QUEUE_SIZE
+                ++m_pop_counter;
+#endif
                 std::unique_lock<std::mutex> lock(m_mutex);
+#ifdef OSMIUM_DEBUG_QUEUE_SIZE
+                if (m_queue.empty()) {
+                    ++m_empty_counter;
+                }
+#endif
                 m_data_available.wait(lock, [this] {
                     return !m_queue.empty() || m_done;
                 });
@@ -158,7 +182,15 @@ namespace osmium {
             }
 
             void wait_and_pop_with_timeout(T& value) {
+#ifdef OSMIUM_DEBUG_QUEUE_SIZE
+                ++m_pop_counter;
+#endif
                 std::unique_lock<std::mutex> lock(m_mutex);
+#ifdef OSMIUM_DEBUG_QUEUE_SIZE
+                if (m_queue.empty()) {
+                    ++m_empty_counter;
+                }
+#endif
                 if (!m_data_available.wait_for(lock, std::chrono::seconds(1), [this] {
                     return !m_queue.empty() || m_done;
                 })) {
@@ -171,8 +203,14 @@ namespace osmium {
             }
 
             bool try_pop(T& value) {
+#ifdef OSMIUM_DEBUG_QUEUE_SIZE
+                ++m_pop_counter;
+#endif
                 std::lock_guard<std::mutex> lock(m_mutex);
                 if (m_queue.empty()) {
+#ifdef OSMIUM_DEBUG_QUEUE_SIZE
+                    ++m_empty_counter;
+#endif
                     return false;
                 }
                 value = std::move(m_queue.front());
