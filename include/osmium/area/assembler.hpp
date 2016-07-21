@@ -573,8 +573,6 @@ namespace osmium {
                         const int64_t ly = location.y();
                         const auto z = (bx - ax)*(ly - ay) - (by - ay)*(lx - ax);
 
-//                        std::cerr << "z=" << z << "\n";
-
                         if (z >= 0) {
                             nesting += segment->is_reverse() ? -1 : 1;
                             if (debug()) {

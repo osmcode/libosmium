@@ -362,7 +362,6 @@ namespace osmium {
                 } else {
                     m_relations_buffer.commit();
                     m_relations.push_back(std::move(relation_meta));
-//                    std::cerr << "added relation id=" << relation.id() << "\n";
                 }
             }
 
@@ -371,10 +370,6 @@ namespace osmium {
              * search on them.
              */
             void sort_member_meta() {
-/*                std::cerr << "relations:        " << m_relations.size() << "\n";
-                std::cerr << "node members:     " << m_member_meta[0].size() << "\n";
-                std::cerr << "way members:      " << m_member_meta[1].size() << "\n";
-                std::cerr << "relation members: " << m_member_meta[2].size() << "\n";*/
                 std::sort(m_member_meta[0].begin(), m_member_meta[0].end());
                 std::sort(m_member_meta[1].begin(), m_member_meta[1].end());
                 std::sort(m_member_meta[2].begin(), m_member_meta[2].end());
@@ -417,9 +412,7 @@ namespace osmium {
                     assert(member_meta.member_id() == object.id());
                     assert(member_meta.relation_pos() < m_relations.size());
                     RelationMeta& relation_meta = m_relations[member_meta.relation_pos()];
-//                        std::cerr << "  => " << member_meta.member_pos() << " < " << get_relation(relation_meta).members().size() << " (id=" << get_relation(relation_meta).id() << ")\n";
                     assert(member_meta.member_pos() < get_relation(relation_meta).members().size());
-//                        std::cerr << "  add way " << member_meta.member_id() << " to rel " << get_relation(relation_meta).id() << " at pos " << member_meta.member_pos() << "\n";
                     relation_meta.got_one_member();
                     if (relation_meta.has_all_members()) {
                         const size_t relation_offset = member_meta.relation_pos();
