@@ -78,6 +78,11 @@ namespace osmium {
                 return num_threads;
             }
 
+            inline size_t get_work_queue_size() noexcept {
+                size_t n = osmium::config::get_max_queue_size("WORK", 10);
+                return n > 2 ? n : 2;
+            }
+
         } // namespace detail
 
         /**
@@ -160,10 +165,9 @@ namespace osmium {
         public:
 
             static constexpr int default_num_threads = 0;
-            static constexpr size_t max_work_queue_size = 10;
 
             static Pool& instance() {
-                static Pool pool(default_num_threads, max_work_queue_size);
+                static Pool pool(default_num_threads, detail::get_work_queue_size());
                 return pool;
             }
 
