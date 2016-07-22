@@ -44,7 +44,6 @@ DEALINGS IN THE SOFTWARE.
 #include <utility>
 #include <vector>
 
-#define PROTOZERO_STRICT_API
 #include <protozero/pbf_message.hpp>
 
 #include <osmium/builder/osm_object_builder.hpp>

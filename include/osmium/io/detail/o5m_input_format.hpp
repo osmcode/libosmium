@@ -42,7 +42,6 @@ DEALINGS IN THE SOFTWARE.
 #include <string>
 #include <utility>
 
-#define PROTOZERO_STRICT_API
 #include <protozero/varint.hpp>
 
 #include <osmium/builder/builder.hpp>

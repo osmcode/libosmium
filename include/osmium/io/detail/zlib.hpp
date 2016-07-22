@@ -39,7 +39,6 @@ DEALINGS IN THE SOFTWARE.
 
 #include <zlib.h>
 
-#define PROTOZERO_STRICT_API
 #include <protozero/types.hpp>
 
 #include <osmium/io/error.hpp>

@@ -44,7 +44,6 @@ DEALINGS IN THE SOFTWARE.
 #include <thread>
 #include <type_traits>
 
-#define PROTOZERO_STRICT_API
 #include <protozero/pbf_message.hpp>
 
 #include <osmium/io/detail/input_format.hpp>
