@@ -38,6 +38,7 @@ DEALINGS IN THE SOFTWARE.
 #include <utility>
 
 #include <osmium/util/cast.hpp>
+#include <osmium/util/compatibility.hpp>
 
 namespace osmium {
 
@@ -119,7 +120,7 @@ namespace osmium {
         }; // class DeltaDecode
 
         template <typename TBaseIterator, typename TTransform, typename TValue, typename TDelta = int64_t>
-        class DeltaEncodeIterator {
+        class OSMIUM_DEPRECATED DeltaEncodeIterator {
 
             TBaseIterator m_it;
             TBaseIterator m_end;

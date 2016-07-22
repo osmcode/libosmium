@@ -580,33 +580,29 @@ namespace osmium {
                     pbf_way.add_int64(OSMFormat::Way::required_int64_id, way.id());
                     add_meta(way, pbf_way);
 
-                    const auto& nodes = way.nodes();
-
-                    static auto map_node_ref = [](osmium::NodeRefList::const_iterator node_ref) noexcept -> osmium::object_id_type {
-                        return node_ref->ref();
-                    };
-                    using it_type = osmium::util::DeltaEncodeIterator<osmium::NodeRefList::const_iterator, decltype(map_node_ref), osmium::object_id_type>;
-                    it_type first { nodes.cbegin(), nodes.cend(), map_node_ref };
-                    it_type last { nodes.cend(), nodes.cend(), map_node_ref };
-                    pbf_way.add_packed_sint64(OSMFormat::Way::packed_sint64_refs, first, last);
+                    {
+                        osmium::util::DeltaEncode<object_id_type, int64_t> delta_id;
+                        protozero::packed_field_sint64 field{pbf_way, protozero::pbf_tag_type(OSMFormat::Way::packed_sint64_refs)};
+                        for (const auto& node_ref : way.nodes()) {
+                            field.add_element(delta_id.update(node_ref.ref()));
+                        }
+                    }
 
                     if (m_options.locations_on_ways) {
-                        static auto map_node_x = [](osmium::NodeRefList::const_iterator node_ref) noexcept -> int64_t {
-                            return lonlat2int(node_ref->location().lon_without_check());
-                        };
-                        static auto map_node_y = [](osmium::NodeRefList::const_iterator node_ref) noexcept -> int64_t {
-                            return lonlat2int(node_ref->location().lat_without_check());
-                        };
-                        using it_type_x = osmium::util::DeltaEncodeIterator<osmium::NodeRefList::const_iterator, decltype(map_node_x), int64_t>;
-                        using it_type_y = osmium::util::DeltaEncodeIterator<osmium::NodeRefList::const_iterator, decltype(map_node_y), int64_t>;
-
-                        it_type_x first_x { nodes.cbegin(), nodes.cend(), map_node_x };
-                        it_type_x last_x { nodes.cend(), nodes.cend(), map_node_x };
-                        pbf_way.add_packed_sint64(OSMFormat::Way::packed_sint64_lon, first_x, last_x);
-
-                        it_type_y first_y { nodes.cbegin(), nodes.cend(), map_node_y };
-                        it_type_y last_y { nodes.cend(), nodes.cend(), map_node_y };
-                        pbf_way.add_packed_sint64(OSMFormat::Way::packed_sint64_lat, first_y, last_y);
+                        {
+                            osmium::util::DeltaEncode<int64_t, int64_t> delta_id;
+                            protozero::packed_field_sint64 field{pbf_way, protozero::pbf_tag_type(OSMFormat::Way::packed_sint64_lon)};
+                            for (const auto& node_ref : way.nodes()) {
+                                field.add_element(delta_id.update(lonlat2int(node_ref.location().lon_without_check())));
+                            }
+                        }
+                        {
+                            osmium::util::DeltaEncode<int64_t, int64_t> delta_id;
+                            protozero::packed_field_sint64 field{pbf_way, protozero::pbf_tag_type(OSMFormat::Way::packed_sint64_lat)};
+                            for (const auto& node_ref : way.nodes()) {
+                                field.add_element(delta_id.update(lonlat2int(node_ref.location().lat_without_check())));
+                            }
+                        }
                     }
                 }
 
@@ -624,14 +620,13 @@ namespace osmium {
                         }
                     }
 
-                    static auto map_member_ref = [](osmium::RelationMemberList::const_iterator member) noexcept -> osmium::object_id_type {
-                        return member->ref();
-                    };
-                    using it_type = osmium::util::DeltaEncodeIterator<osmium::RelationMemberList::const_iterator, decltype(map_member_ref), osmium::object_id_type>;
-                    const auto& members = relation.members();
-                    it_type first { members.cbegin(), members.cend(), map_member_ref };
-                    it_type last { members.cend(), members.cend(), map_member_ref };
-                    pbf_relation.add_packed_sint64(OSMFormat::Relation::packed_sint64_memids, first, last);
+                    {
+                        osmium::util::DeltaEncode<object_id_type, int64_t> delta_id;
+                        protozero::packed_field_sint64 field{pbf_relation, protozero::pbf_tag_type(OSMFormat::Relation::packed_sint64_memids)};
+                        for (const auto& member : relation.members()) {
+                            field.add_element(delta_id.update(member.ref()));
+                        }
+                    }
 
                     {
                         protozero::packed_field_int32 field{pbf_relation, protozero::pbf_tag_type(OSMFormat::Relation::packed_MemberType_types)};
