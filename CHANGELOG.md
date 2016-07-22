@@ -8,9 +8,24 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+- EWKT support.
+- Track `pop` type calls and queue underruns when `OSMIUM_DEBUG_QUEUE_SIZE`
+  environment variable is set.
+- Make I/O max queue sizes configurable via environment.
+
 ### Changed
 
+- Switched to newest protozero v1.4.0. This should deliver some speedups
+  when parsing PBF files.
+
 ### Fixed
+
+- Automatically set correct SRID when creating WKB and GEOS geometries.
+  Note that this changes the behaviour of libosmium when creating GEOS
+  geometries. Before we created them with -1 as SRID unless set otherwise.
+  Manual setting of the SRID on the GEOSGeometryFactory is now deprecated.
+- Allow coordinates of nodes in scientific notation when reading XML files.
+  This shouldn't be used really, but sometimes you can find them.
 
 
 ## [2.7.2] - 2016-06-08
