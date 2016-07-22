@@ -16,7 +16,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 
 - Switched to newest protozero v1.4.0. This should deliver some speedups
-  when parsing PBF files.
+  when parsing PBF files. This removes use of the DeltaEncodeIterator
+  class, which is deprecated now.
 
 ### Fixed
 
