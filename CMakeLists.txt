@@ -63,6 +63,27 @@ option(WITH_PROFILING    "add flags needed for profiling" OFF)
 
 #-----------------------------------------------------------------------------
 #
+#  CCache support
+#
+#-----------------------------------------------------------------------------
+
+option(BUILD_WITH_CCACHE "build using ccache" OFF)
+
+if(BUILD_WITH_CCACHE)
+    find_program(CCACHE_PROGRAM ccache)
+    if(CCACHE_PROGRAM)
+        set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "CCACHE_CPP2=1 ${CCACHE_PROGRAM}")
+
+        # workaround for some clang versions
+        if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+            add_definitions(-Qunused-arguments)
+        endif()
+    endif()
+endif()
+
+
+#-----------------------------------------------------------------------------
+#
 #  Coverage support
 #
 #-----------------------------------------------------------------------------
