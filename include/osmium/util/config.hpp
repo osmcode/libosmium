@@ -72,7 +72,8 @@ namespace osmium {
             name += "_QUEUE_SIZE";
             const char* env = getenv(name.c_str());
             if (env) {
-                return std::atoi(env);
+                auto value = std::atoi(env);
+                return value == 0 ? default_value : value;
             }
             return default_value;
         }
