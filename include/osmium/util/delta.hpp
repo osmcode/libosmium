@@ -119,60 +119,6 @@ namespace osmium {
 
         }; // class DeltaDecode
 
-        template <typename TBaseIterator, typename TTransform, typename TValue, typename TDelta = int64_t>
-        class OSMIUM_DEPRECATED DeltaEncodeIterator {
-
-            TBaseIterator m_it;
-            TBaseIterator m_end;
-            TTransform m_trans;
-            DeltaEncode<TValue, TDelta> m_value;
-            TDelta m_delta;
-
-        public:
-
-            using iterator_category = std::input_iterator_tag;
-            using value_type        = TValue;
-            using difference_type   = std::ptrdiff_t;
-            using pointer           = value_type*;
-            using reference         = value_type&;
-
-            using delta_type        = TDelta;
-
-            DeltaEncodeIterator(TBaseIterator first, TBaseIterator last, TTransform& trans) :
-                m_it(first),
-                m_end(last),
-                m_trans(trans),
-                m_value(m_it != m_end ? m_trans(m_it) : 0),
-                m_delta(static_cast_with_assert<TDelta>(m_value.value())) {
-            }
-
-            DeltaEncodeIterator& operator++() {
-                if (++m_it != m_end) {
-                    m_delta = m_value.update(m_trans(m_it));
-                }
-                return *this;
-            }
-
-            DeltaEncodeIterator operator++(int) {
-                DeltaEncodeIterator tmp(*this);
-                operator++();
-                return tmp;
-            }
-
-            TDelta operator*() {
-                return m_delta;
-            }
-
-            bool operator==(const DeltaEncodeIterator& rhs) const {
-                return m_it == rhs.m_it && m_end == rhs.m_end;
-            }
-
-            bool operator!=(const DeltaEncodeIterator& rhs) const {
-                return !(*this == rhs);
-            }
-
-        }; // class DeltaEncodeIterator
-
     } // namespace util
 
 } // namespace osmium
