@@ -236,7 +236,7 @@ namespace osmium {
                 void write_location(const osmium::Location& location) {
                     write_fieldname("lon/lat");
                     *m_out += "  ";
-                    location.as_string(std::back_inserter(*m_out));
+                    location.as_string_without_check(std::back_inserter(*m_out));
                     if (!location.valid()) {
                         write_error(" INVALID LOCATION!");
                     }
