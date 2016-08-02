@@ -69,8 +69,8 @@ namespace osmium {
                 std::list<std::string> m_chunks;
 
                 void add_chunk() {
-                    m_chunks.push_front(std::string());
-                    m_chunks.front().reserve(m_chunk_size);
+                    m_chunks.emplace_back();
+                    m_chunks.back().reserve(m_chunk_size);
                 }
 
             public:
@@ -82,6 +82,7 @@ namespace osmium {
                 }
 
                 void clear() noexcept {
+                    assert(!m_chunks.empty());
                     m_chunks.erase(std::next(m_chunks.begin()), m_chunks.end());
                     m_chunks.front().clear();
                 }
@@ -97,16 +98,16 @@ namespace osmium {
 
                     assert(len <= m_chunk_size);
 
-                    size_t chunk_len = m_chunks.front().size();
-                    if (chunk_len + len > m_chunks.front().capacity()) {
+                    size_t chunk_len = m_chunks.back().size();
+                    if (chunk_len + len > m_chunks.back().capacity()) {
                         add_chunk();
                         chunk_len = 0;
                     }
 
-                    m_chunks.front().append(string);
-                    m_chunks.front().append(1, '\0');
+                    m_chunks.back().append(string);
+                    m_chunks.back().append(1, '\0');
 
-                    return m_chunks.front().c_str() + chunk_len;
+                    return m_chunks.back().c_str() + chunk_len;
                 }
 
                 class const_iterator {
@@ -191,14 +192,14 @@ namespace osmium {
                 }
 
                 size_t get_used_bytes_in_last_chunk() const noexcept {
-                    return m_chunks.front().size();
+                    return m_chunks.back().size();
                 }
 
             }; // class StringStore
 
             struct StrComp {
 
-                bool operator()(const char* lhs, const char* rhs) const {
+                bool operator()(const char* lhs, const char* rhs) const noexcept {
                     return std::strcmp(lhs, rhs) < 0;
                 }
 
@@ -219,8 +220,8 @@ namespace osmium {
 
             public:
 
-                StringTable() :
-                    m_strings(1024 * 1024),
+                explicit StringTable(size_t size = 1024 * 1024) :
+                    m_strings(size),
                     m_index(),
                     m_size(0) {
                     m_strings.add("");
