@@ -214,13 +214,22 @@ namespace osmium {
                 // Blob.
                 static constexpr const uint32_t max_entries = max_uncompressed_blob_size;
 
+                // There is one string table per PBF primitive block. Most of
+                // them are really small, because most blocks are full of nodes
+                // with no tags. But string tables can get really large for
+                // ways with many tags or for large relations.
+                // The chosen size is enough so that 99% of all string tables
+                // in typical OSM files will only need a single memory
+                // allocation.
+                static constexpr const size_t default_stringtable_chunk_size = 100 * 1024;
+
                 StringStore m_strings;
                 std::map<const char*, size_t, StrComp> m_index;
                 uint32_t m_size;
 
             public:
 
-                explicit StringTable(size_t size = 1024 * 1024) :
+                explicit StringTable(size_t size = default_stringtable_chunk_size) :
                     m_strings(size),
                     m_index(),
                     m_size(0) {
