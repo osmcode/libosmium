@@ -39,8 +39,8 @@ DEALINGS IN THE SOFTWARE.
 #include <cstring>
 #include <iterator>
 #include <list>
-#include <map>
 #include <string>
+#include <unordered_map>
 
 #include <osmium/io/detail/pbf.hpp>
 
@@ -197,13 +197,28 @@ namespace osmium {
 
             }; // class StringStore
 
-            struct StrComp {
+            struct str_equal {
 
                 bool operator()(const char* lhs, const char* rhs) const noexcept {
-                    return std::strcmp(lhs, rhs) < 0;
+                    return lhs == rhs || std::strcmp(lhs, rhs) == 0;
                 }
 
-            }; // struct StrComp
+            }; // struct str_equal
+
+            struct djb2_hash {
+
+                size_t operator()(const char* str) const noexcept {
+                    size_t hash = 5381;
+                    int c;
+
+                    while ((c = *str++)) {
+                        hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+                    }
+
+                    return hash;
+                }
+
+            }; // struct djb2_hash
 
             class StringTable {
 
@@ -224,7 +239,7 @@ namespace osmium {
                 static constexpr const size_t default_stringtable_chunk_size = 100 * 1024;
 
                 StringStore m_strings;
-                std::map<const char*, size_t, StrComp> m_index;
+                std::unordered_map<const char*, size_t, djb2_hash, str_equal> m_index;
                 uint32_t m_size;
 
             public:
