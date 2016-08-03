@@ -72,7 +72,6 @@ build_script:
     -DCMAKE_BUILD_TYPE=%config%
     -DBUILD_HEADERS=OFF
     -DBOOST_ROOT=%LODEPSDIR%\boost
-    -DBoost_PROGRAM_OPTIONS_LIBRARY=%LODEPSDIR%\boost\lib\libboost_program_options-vc140-mt-1_58.lib
     -DZLIB_LIBRARY=%LODEPSDIR%\zlib\lib\zlibwapi.lib
     -DBZIP2_LIBRARY_RELEASE=%LIBBZIP2%
     -DCMAKE_PREFIX_PATH=%LODEPSDIR%\zlib;%LODEPSDIR%\expat;%LODEPSDIR%\bzip2;%LODEPSDIR%\geos;%LODEPSDIR%\gdal;%LODEPSDIR%\proj;%LODEPSDIR%\sparsehash;%LODEPSDIR%\wingetopt
@@ -82,7 +81,6 @@ build_script:
   #  -DOsmium_DEBUG=TRUE
   #  -DCMAKE_BUILD_TYPE=%config%
   #  -DBOOST_ROOT=%LODEPSDIR%\boost
-  #  -DBoost_PROGRAM_OPTIONS_LIBRARY=%LODEPSDIR%\boost\lib\libboost_program_options-vc140-mt-1_57.lib
   #  -DZLIB_LIBRARY=%LODEPSDIR%\zlib\lib\zlibwapi.lib
   #  -DZLIB_INCLUDE_DIR=%LODEPSDIR%\zlib\include
   #  -DEXPAT_LIBRARY=%LODEPSDIR%\expat\lib\libexpat.lib
