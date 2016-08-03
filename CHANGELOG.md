@@ -11,16 +11,26 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - EWKT support.
 - Track `pop` type calls and queue underruns when `OSMIUM_DEBUG_QUEUE_SIZE`
   environment variable is set.
-- Make I/O max queue sizes configurable via environment.
 
 ### Changed
 
 - Switched to newest protozero v1.4.0. This should deliver some speedups
-  when parsing PBF files. This removes use of the DeltaEncodeIterator
-  class, which is deprecated now.
+  when parsing PBF files. This also removes the DeltaEncodeIterator class,
+  which isn't needed any more.
+- Uses `std::unordered_map` instead of `std::map` in PBF string table code
+  speeding up writing of PBF files considerably.
+- Uses less memory when writing PBF files (smaller string table by default).
+- Removes dependency on sparsehash and boost program options libraries for
+  examples.
 
 ### Fixed
 
+- A potentially very bad bug was fixed: When there are many and/or long strings
+  in tag keys and values and/or user names and/or relation roles, the string
+  table inside a PBF block would overflow. I have never seen this happen for
+  normal OSM data, but that doesn't mean it can't happen. The result is that
+  the strings will all be mixed up, keys for values, values for user names or
+  whatever.
 - Automatically set correct SRID when creating WKB and GEOS geometries.
   Note that this changes the behaviour of libosmium when creating GEOS
   geometries. Before we created them with -1 as SRID unless set otherwise.
