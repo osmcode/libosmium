@@ -8,6 +8,15 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+### Changed
+
+### Fixed
+
+
+## [2.8.0] - 2016-08-04
+
+### Added
+
 - EWKT support.
 - Track `pop` type calls and queue underruns when `OSMIUM_DEBUG_QUEUE_SIZE`
   environment variable is set.
@@ -22,6 +31,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Uses less memory when writing PBF files (smaller string table by default).
 - Removes dependency on sparsehash and boost program options libraries for
   examples.
+- Cleaned up threaded queue code.
 
 ### Fixed
 
@@ -367,7 +377,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   Doxygen (up to version 1.8.8). This version contains a workaround to fix
   this.
 
-[unreleased]: https://github.com/osmcode/libosmium/compare/v2.7.2...HEAD
+[unreleased]: https://github.com/osmcode/libosmium/compare/v2.8.0...HEAD
+[2.8.0]: https://github.com/osmcode/libosmium/compare/v2.7.2...v2.8.0
 [2.7.2]: https://github.com/osmcode/libosmium/compare/v2.7.1...v2.7.2
 [2.7.1]: https://github.com/osmcode/libosmium/compare/v2.7.0...v2.7.1
 [2.7.0]: https://github.com/osmcode/libosmium/compare/v2.6.1...v2.7.0
