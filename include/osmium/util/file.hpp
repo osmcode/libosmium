@@ -47,9 +47,6 @@ DEALINGS IN THE SOFTWARE.
 
 #ifndef _MSC_VER
 # include <unistd.h>
-#else
-// https://msdn.microsoft.com/en-us/library/whx354w1.aspx
-# define ftruncate _chsize_s
 #endif
 
 #include <osmium/util/cast.hpp>
@@ -94,8 +91,13 @@ namespace osmium {
          * @throws std::system_error If ftruncate(2) call failed
          */
         inline void resize_file(int fd, size_t new_size) {
+#ifdef _WIN32
+            // https://msdn.microsoft.com/en-us/library/whx354w1.aspx
+            if (::_chsize_s(fd, static_cast_with_assert<__int64>(new_size)) != 0) {
+#else
             if (::ftruncate(fd, static_cast_with_assert<off_t>(new_size)) != 0) {
-                throw std::system_error(errno, std::system_category(), "ftruncate failed");
+#endif
+                throw std::system_error(errno, std::system_category(), "resizing file failed");
             }
         }
 
