@@ -4,12 +4,6 @@
 Read this if you want to contribute to Libosmium.
 
 
-## Versioning
-
-Osmium is currently considered in beta and doesn't use versioning yet. Proper
-versions will be introduced as soon as it is somewhat stable.
-
-
 ## Namespace
 
 All Osmium code MUST be in the `osmium` namespace or one of its sub-namespaces.
