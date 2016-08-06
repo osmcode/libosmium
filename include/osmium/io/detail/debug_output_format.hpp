@@ -83,6 +83,10 @@ namespace osmium {
             constexpr const char* color_magenta = "\x1b[35m";
             constexpr const char* color_cyan    = "\x1b[36m";
             constexpr const char* color_white   = "\x1b[37m";
+
+            constexpr const char* color_backg_red   = "\x1b[41m";
+            constexpr const char* color_backg_green = "\x1b[42m";
+
             constexpr const char* color_reset   = "\x1b[0m";
 
             struct debug_output_options {
@@ -96,6 +100,8 @@ namespace osmium {
                 /// Add CRC32 checksum to each object?
                 bool add_crc32;
 
+                /// Write in form of a diff file?
+                bool format_as_diff;
             };
 
             /**
@@ -107,6 +113,8 @@ namespace osmium {
 
                 const char* m_utf8_prefix = "";
                 const char* m_utf8_suffix = "";
+
+                char m_diff_char = '\0';
 
                 void append_encoded_string(const char* data) {
                     append_debug_encoded_string(*m_out, data, m_utf8_prefix, m_utf8_suffix);
@@ -123,6 +131,30 @@ namespace osmium {
                     }
                 }
 
+                void write_diff() {
+                    if (!m_diff_char) {
+                        return;
+                    }
+                    if (m_options.use_color) {
+                        if (m_diff_char == '-') {
+                            *m_out += color_backg_red;
+                            *m_out += color_white;
+                            *m_out += color_bold;
+                            *m_out += '-';
+                            *m_out += color_reset;
+                            return;
+                        } else if (m_diff_char == '+') {
+                            *m_out += color_backg_green;
+                            *m_out += color_white;
+                            *m_out += color_bold;
+                            *m_out += '+';
+                            *m_out += color_reset;
+                            return;
+                        }
+                    }
+                    *m_out += m_diff_char;
+                }
+
                 void write_string(const char* string) {
                     *m_out += '"';
                     write_color(color_blue);
@@ -132,6 +164,7 @@ namespace osmium {
                 }
 
                 void write_object_type(const char* object_type, bool visible = true) {
+                    write_diff();
                     if (visible) {
                         write_color(color_bold);
                     } else {
@@ -143,6 +176,7 @@ namespace osmium {
                 }
 
                 void write_fieldname(const char* name) {
+                    write_diff();
                     *m_out += "  ";
                     write_color(color_cyan);
                     *m_out += name;
@@ -208,28 +242,30 @@ namespace osmium {
                 }
 
                 void write_tags(const osmium::TagList& tags, const char* padding="") {
-                    if (!tags.empty()) {
-                        write_fieldname("tags");
-                        *m_out += padding;
-                        *m_out += "     ";
-                        output_int(tags.size());
-                        *m_out += '\n';
+                    if (tags.empty()) {
+                        return;
+                    }
+                    write_fieldname("tags");
+                    *m_out += padding;
+                    *m_out += "     ";
+                    output_int(tags.size());
+                    *m_out += '\n';
 
-                        osmium::max_op<size_t> max;
-                        for (const auto& tag : tags) {
-                            max.update(std::strlen(tag.key()));
+                    osmium::max_op<size_t> max;
+                    for (const auto& tag : tags) {
+                        max.update(std::strlen(tag.key()));
+                    }
+                    for (const auto& tag : tags) {
+                        write_diff();
+                        *m_out += "    ";
+                        write_string(tag.key());
+                        auto spacing = max() - std::strlen(tag.key());
+                        while (spacing--) {
+                            *m_out += " ";
                         }
-                        for (const auto& tag : tags) {
-                            *m_out += "    ";
-                            write_string(tag.key());
-                            auto spacing = max() - std::strlen(tag.key());
-                            while (spacing--) {
-                                *m_out += " ";
-                            }
-                            *m_out += " = ";
-                            write_string(tag.value());
-                            *m_out += '\n';
-                        }
+                        *m_out += " = ";
+                        write_string(tag.value());
+                        *m_out += '\n';
                     }
                 }
 
@@ -303,6 +339,8 @@ namespace osmium {
                 }
 
                 void node(const osmium::Node& node) {
+                    m_diff_char = m_options.format_as_diff ? node.diff_as_char() : '\0';
+
                     write_object_type("node", node.visible());
                     write_meta(node);
 
@@ -320,6 +358,8 @@ namespace osmium {
                 }
 
                 void way(const osmium::Way& way) {
+                    m_diff_char = m_options.format_as_diff ? way.diff_as_char() : '\0';
+
                     write_object_type("way", way.visible());
                     write_meta(way);
                     write_tags(way.tags());
@@ -341,6 +381,7 @@ namespace osmium {
                     int width = int(log10(way.nodes().size())) + 1;
                     int n = 0;
                     for (const auto& node_ref : way.nodes()) {
+                        write_diff();
                         write_counter(width, n++);
                         output_formatted("%10" PRId64, node_ref.ref());
                         if (node_ref.location().valid()) {
@@ -360,6 +401,9 @@ namespace osmium {
 
                 void relation(const osmium::Relation& relation) {
                     static const char* short_typename[] = { "node", "way ", "rel " };
+
+                    m_diff_char = m_options.format_as_diff ? relation.diff_as_char() : '\0';
+
                     write_object_type("relation", relation.visible());
                     write_meta(relation);
                     write_tags(relation.tags());
@@ -372,6 +416,7 @@ namespace osmium {
                     int width = int(log10(relation.members().size())) + 1;
                     int n = 0;
                     for (const auto& member : relation.members()) {
+                        write_diff();
                         write_counter(width, n++);
                         *m_out += short_typename[item_type_to_nwr_index(member.type())];
                         output_formatted(" %10" PRId64 " ", member.ref());
@@ -477,9 +522,10 @@ namespace osmium {
                 DebugOutputFormat(const osmium::io::File& file, future_string_queue_type& output_queue) :
                     OutputFormat(output_queue),
                     m_options() {
-                    m_options.add_metadata = file.is_not_false("add_metadata");
-                    m_options.use_color    = file.is_true("color");
-                    m_options.add_crc32    = file.is_true("add_crc32");
+                    m_options.add_metadata   = file.is_not_false("add_metadata");
+                    m_options.use_color      = file.is_true("color");
+                    m_options.add_crc32      = file.is_true("add_crc32");
+                    m_options.format_as_diff = file.is_true("diff");
                 }
 
                 DebugOutputFormat(const DebugOutputFormat&) = delete;
@@ -488,6 +534,10 @@ namespace osmium {
                 ~DebugOutputFormat() noexcept final = default;
 
                 void write_header(const osmium::io::Header& header) final {
+                    if (m_options.format_as_diff) {
+                        return;
+                    }
+
                     std::string out;
 
                     if (m_options.use_color) {

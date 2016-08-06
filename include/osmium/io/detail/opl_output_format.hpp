@@ -77,6 +77,9 @@ namespace osmium {
                 /// Should node locations be added to ways?
                 bool locations_on_ways;
 
+                /// Write in form of a diff file?
+                bool format_as_diff;
+
             };
 
             /**
@@ -152,6 +155,12 @@ namespace osmium {
                     }
                 }
 
+                void write_diff(const osmium::OSMObject& object) {
+                    if (m_options.format_as_diff) {
+                        *m_out += object.diff_as_char();
+                    }
+                }
+
             public:
 
                 OPLOutputBlock(osmium::memory::Buffer&& buffer, const opl_output_options& options) :
@@ -178,6 +187,7 @@ namespace osmium {
                 }
 
                 void node(const osmium::Node& node) {
+                    write_diff(node);
                     *m_out += 'n';
                     write_meta(node);
                     write_location(node.location(), 'x', 'y');
@@ -195,6 +205,7 @@ namespace osmium {
                 }
 
                 void way(const osmium::Way& way) {
+                    write_diff(way);
                     *m_out += 'w';
                     write_meta(way);
 
@@ -228,6 +239,7 @@ namespace osmium {
                 }
 
                 void relation(const osmium::Relation& relation) {
+                    write_diff(relation);
                     *m_out += 'r';
                     write_meta(relation);
 
@@ -278,6 +290,7 @@ namespace osmium {
                     m_options() {
                     m_options.add_metadata      = file.is_not_false("add_metadata");
                     m_options.locations_on_ways = file.is_true("locations_on_ways");
+                    m_options.format_as_diff    = file.is_true("diff");
                 }
 
                 OPLOutputFormat(const OPLOutputFormat&) = delete;

@@ -45,6 +45,13 @@ namespace osmium {
         class Builder;
     } // namespace builder
 
+    enum class diff_indicator_type {
+        none  = 0,
+        left  = 1,
+        right = 2,
+        both  = 3
+    }; // diff_indicator_type
+
     namespace memory {
 
         using item_size_type = uint32_t;
@@ -100,7 +107,8 @@ namespace osmium {
             item_size_type m_size;
             item_type m_type;
             uint16_t m_removed : 1;
-            uint16_t m_padding : 15;
+            uint16_t m_diff : 2;
+            uint16_t m_padding : 13;
 
             template <typename TMember>
             friend class CollectionIterator;
@@ -163,6 +171,19 @@ namespace osmium {
 
             void set_removed(bool removed) noexcept {
                 m_removed = removed;
+            }
+
+            diff_indicator_type diff() const noexcept {
+                return diff_indicator_type(m_diff);
+            }
+
+            char diff_as_char() const noexcept {
+                static constexpr const char* diff_chars = "*-+ ";
+                return diff_chars[m_diff];
+            }
+
+            void set_diff(diff_indicator_type diff) noexcept {
+                m_diff = uint16_t(diff);
             }
 
         }; // class Item
