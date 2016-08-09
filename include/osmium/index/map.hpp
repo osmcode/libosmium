@@ -207,7 +207,7 @@ namespace osmium {
             }
 
             bool has_map_type(const std::string& map_type_name) const {
-                return m_callbacks.count(map_type_name);
+                return m_callbacks.count(map_type_name) != 0;
             }
 
             std::vector<std::string> map_types() const {

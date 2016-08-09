@@ -819,7 +819,7 @@ namespace osmium {
             }
 
             void create_rings_simple_case() {
-                uint32_t count_remaining = m_segment_list.size();
+                auto count_remaining = m_segment_list.size();
                 for (slocation& sl : m_locations) {
                     const detail::NodeRefSegment& segment = m_segment_list[sl.item];
                     if (!segment.is_done()) {
@@ -1088,7 +1088,7 @@ namespace osmium {
 
             bool create_rings_complex_case() {
                 // First create all the (partial) rings starting at the split locations
-                uint32_t count_remaining = m_segment_list.size();
+                auto count_remaining = m_segment_list.size();
                 for (const osmium::Location& location : m_split_locations) {
                     const auto locs = make_range(std::equal_range(m_locations.begin(),
                                                                   m_locations.end(),
