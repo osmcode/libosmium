@@ -84,7 +84,7 @@ namespace osmium {
                 throw invalid_location{std::string{"wrong format for coordinate: '"} + str + "'"};
             }
 
-            return std::round(value * coordinate_precision);
+            return int32_t(std::round(value * coordinate_precision));
         }
 
         // Convert string with a floating point number into integer suitable
