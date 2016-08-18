@@ -73,10 +73,10 @@ namespace osmium {
              *
              * The values are not checked for validity.
              *
-             * @pre @code zoom < 32 && x < 2^zoom && y < 2^zoom @endcode
+             * @pre @code zoom <= 30 && x < 2^zoom && y < 2^zoom @endcode
              */
             explicit Tile(uint32_t zoom, uint32_t tx, uint32_t ty) noexcept : x(tx), y(ty), z(zoom) {
-                assert(zoom < 32u);
+                assert(zoom <= 30u);
                 assert(x < (1u << zoom));
                 assert(y < (1u << zoom));
             }
@@ -87,11 +87,11 @@ namespace osmium {
              *
              * The values are not checked for validity.
              *
-             * @pre @code location.valid() && zoom < 32 @endcode
+             * @pre @code location.valid() && zoom <= 30 @endcode
              */
             explicit Tile(uint32_t zoom, const osmium::Location& location) :
                 z(zoom) {
-                assert(zoom < 32u);
+                assert(zoom <= 30u);
                 assert(location.valid());
                 osmium::geom::Coordinates c = lonlat_to_mercator(location);
                 const int32_t n = 1 << zoom;
@@ -102,11 +102,11 @@ namespace osmium {
 
             /**
              * Check whether this tile is valid. For a tile to be valid the
-             * zoom level must be between 0 and 31 and the coordinates must
+             * zoom level must be between 0 and 30 and the coordinates must
              * each be between 0 and 2^zoom-1.
              */
             bool valid() const noexcept {
-                if (z >= 32) {
+                if (z > 30) {
                     return false;
                 }
                 const uint32_t max = 1 << z;

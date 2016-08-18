@@ -53,6 +53,16 @@ TEST_CASE("Tile from x0.0 y0.0 at zoom 4") {
     REQUIRE(t.valid());
 }
 
+TEST_CASE("Tile from max values at zoom 4") {
+    osmium::geom::Tile t{4u, 15u, 15u};
+    REQUIRE(t.valid());
+}
+
+TEST_CASE("Tile from max values at zoom 30") {
+    osmium::geom::Tile t{30u, 1u<<30 - 1, 1u<<30 - 1};
+    REQUIRE(t.valid());
+}
+
 TEST_CASE("Tile equality") {
     osmium::geom::Tile a{4, 3, 4};
     osmium::geom::Tile b{4, 3, 4};
