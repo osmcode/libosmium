@@ -33,6 +33,7 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <cassert>
 #include <cstdint>
 
 #include <osmium/geom/mercator_projection.hpp>
@@ -57,15 +58,41 @@ namespace osmium {
          */
         struct Tile {
 
+            /// x coordinate
             uint32_t x;
+
+            /// y coordinate
             uint32_t y;
+
+            /// Zoom level
             uint32_t z;
 
+            /**
+             * Create a tile with the given zoom level and x any y tile
+             * coordinates.
+             *
+             * The values are not checked for validity.
+             *
+             * @pre @code zoom < 32 && x < 2^zoom && y < 2^zoom @endcode
+             */
             explicit Tile(uint32_t zoom, uint32_t tx, uint32_t ty) noexcept : x(tx), y(ty), z(zoom) {
+                assert(zoom < 32u);
+                assert(x < (1u << zoom));
+                assert(y < (1u << zoom));
             }
 
+            /**
+             * Create a tile with the given zoom level that contains the given
+             * location.
+             *
+             * The values are not checked for validity.
+             *
+             * @pre @code location.valid() && zoom < 32 @endcode
+             */
             explicit Tile(uint32_t zoom, const osmium::Location& location) :
                 z(zoom) {
+                assert(zoom < 32u);
+                assert(location.valid());
                 osmium::geom::Coordinates c = lonlat_to_mercator(location);
                 const int32_t n = 1 << zoom;
                 const double scale = detail::max_coordinate_epsg3857 * 2 / n;
@@ -73,8 +100,22 @@ namespace osmium {
                 y = uint32_t(detail::restrict_to_range<int32_t>(int32_t((detail::max_coordinate_epsg3857 - c.y) / scale), 0, n-1));
             }
 
+            /**
+             * Check whether this tile is valid. For a tile to be valid the
+             * zoom level must be between 0 and 31 and the coordinates must
+             * each be between 0 and 2^zoom-1.
+             */
+            bool valid() const noexcept {
+                if (z >= 32) {
+                    return false;
+                }
+                const uint32_t max = 1 << z;
+                return x < max && y < max;
+            }
+
         }; // struct Tile
 
+        /// Tiles are equal if all their attributes are equal.
         inline bool operator==(const Tile& a, const Tile& b) {
             return a.z == b.z && a.x == b.x && a.y == b.y;
         }
