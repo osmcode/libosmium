@@ -261,6 +261,34 @@ namespace osmium {
 
             }; // class member_type
 
+            class member_type_string {
+
+                osmium::item_type      m_type;
+                osmium::object_id_type m_ref;
+                std::string            m_role;
+
+            public:
+
+                member_type_string(osmium::item_type type, osmium::object_id_type ref, std::string&& role) :
+                    m_type(type),
+                    m_ref(ref),
+                    m_role(std::move(role)) {
+                }
+
+                osmium::item_type type() const noexcept {
+                    return m_type;
+                }
+
+                osmium::object_id_type ref() const noexcept {
+                    return m_ref;
+                }
+
+                const char* role() const noexcept {
+                    return m_role.c_str();
+                }
+
+            }; // class member_type_string
+
             class comment_type {
 
                 osmium::Timestamp    m_date;
