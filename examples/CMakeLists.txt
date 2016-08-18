@@ -18,6 +18,7 @@ set(EXAMPLES
     index
     read
     serdump
+    tiles
     use_node_cache
     CACHE STRING "Example programs"
 )
