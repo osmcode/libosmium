@@ -33,6 +33,8 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <cstddef>
+
 #include <osmium/geom/coordinates.hpp>
 #include <osmium/geom/factory.hpp>
 

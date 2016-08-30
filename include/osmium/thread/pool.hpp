@@ -34,9 +34,7 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <algorithm>
-#include <atomic>
 #include <cstddef>
-#include <cstdlib>
 #include <future>
 #include <thread>
 #include <type_traits>

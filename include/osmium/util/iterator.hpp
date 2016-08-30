@@ -34,6 +34,7 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <cstddef>
+#include <type_traits>
 #include <utility>
 
 namespace osmium {

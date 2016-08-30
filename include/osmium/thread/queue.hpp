@@ -33,7 +33,6 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <atomic>
 #include <chrono>
 #include <condition_variable>
 #include <cstddef>
@@ -44,6 +43,7 @@ DEALINGS IN THE SOFTWARE.
 #include <utility> // IWYU pragma: keep (for std::move)
 
 #ifdef OSMIUM_DEBUG_QUEUE_SIZE
+# include <atomic>
 # include <iostream>
 #endif
 

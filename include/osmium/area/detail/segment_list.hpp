@@ -35,13 +35,15 @@ DEALINGS IN THE SOFTWARE.
 
 #include <algorithm>
 #include <cassert>
+#include <cstdint>
+#include <cstring>
 #include <iostream>
+#include <iterator>
 #include <numeric>
 #include <vector>
 
 #include <osmium/area/problem_reporter.hpp>
 #include <osmium/area/detail/node_ref_segment.hpp>
-#include <osmium/memory/buffer.hpp>
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/node_ref.hpp>
 #include <osmium/osm/relation.hpp>

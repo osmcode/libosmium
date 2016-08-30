@@ -34,10 +34,9 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <algorithm>
+#include <cassert>
 #include <cstdint>
-#include <cstdlib>
 #include <iostream>
-#include <iterator>
 #include <set>
 #include <vector>
 
@@ -46,6 +45,8 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/area/detail/node_ref_segment.hpp>
 
 namespace osmium {
+
+    class Way;
 
     namespace area {
 

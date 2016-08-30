@@ -33,10 +33,8 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <algorithm>
 #include <cstddef>
 #include <iosfwd>
-#include <iterator>
 
 #include <osmium/osm/types.hpp>
 

@@ -35,7 +35,6 @@ DEALINGS IN THE SOFTWARE.
 
 #include <algorithm>
 #include <cassert>
-#include <cstddef>
 #include <cstdint>
 #include <cstring>
 #include <new>

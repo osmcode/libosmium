@@ -42,9 +42,14 @@ DEALINGS IN THE SOFTWARE.
  * @attention If you include this file, you'll need to link with `libgeos`.
  */
 
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <iterator>
 #include <memory>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include <geos/geom/Coordinate.h>
 #include <geos/geom/CoordinateSequence.h>
@@ -65,6 +70,7 @@ DEALINGS IN THE SOFTWARE.
 #ifdef _MSC_VER
 # define THROW throw
 #else
+# include <exception>
 # define THROW std::throw_with_nested
 #endif
 

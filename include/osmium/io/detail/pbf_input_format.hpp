@@ -38,10 +38,9 @@ DEALINGS IN THE SOFTWARE.
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
+#include <future>
 #include <memory>
-#include <sstream>
 #include <string>
-#include <thread>
 #include <type_traits>
 
 #include <protozero/pbf_message.hpp>

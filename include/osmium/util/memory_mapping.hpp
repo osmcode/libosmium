@@ -35,6 +35,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <cassert>
 #include <cerrno>
+#include <cstddef>
 #include <stdexcept>
 #include <system_error>
 

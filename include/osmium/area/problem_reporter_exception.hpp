@@ -43,6 +43,7 @@ DEALINGS IN THE SOFTWARE.
 namespace osmium {
 
     class NodeRef;
+    class Way;
 
     namespace area {
 
