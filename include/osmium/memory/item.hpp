@@ -59,9 +59,7 @@ namespace osmium {
         // align datastructures to this many bytes
         constexpr item_size_type align_bytes = 8;
 
-        template <typename T>
-        inline T padded_length(T length) noexcept {
-            static_assert(std::is_integral<T>::value && std::is_unsigned<T>::value, "Template parameter must be unsigned integral type");
+        inline std::size_t padded_length(std::size_t length) noexcept {
             return (length + align_bytes - 1) & ~(align_bytes - 1);
         }
 
