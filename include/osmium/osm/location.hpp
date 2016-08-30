@@ -35,6 +35,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <cmath>
 #include <cstdint>
+#include <cstring>
 #include <functional>
 #include <iomanip>
 #include <iosfwd>
@@ -74,33 +75,36 @@ namespace osmium {
         // notation. This function uses stringstream and is much more expensive
         // than the handcrafted one. But coordinates in scientific notations
         // shouldn't be used anyway.
-        inline int32_t string_to_location_coordinate_fallback(const char* str) {
+        inline int32_t string_to_location_coordinate_fallback(const char** const data) {
+            size_t length = std::strlen(*data);
             double value;
-            std::istringstream ss{str};
+            std::istringstream ss{*data};
             ss.imbue(std::locale("C"));
             ss >> std::noskipws >> value;
 
-            if (ss.fail() || !ss.eof() || ss.bad() || value > 215.0 || value < -215.0) {
-                throw invalid_location{std::string{"wrong format for coordinate: '"} + str + "'"};
+            if (ss.fail() || ss.bad() || value > 215.0 || value < -215.0) {
+                throw invalid_location{std::string{"wrong format for coordinate: '"} + (*data) + "'"};
             }
+
+            while (ss.get() != std::char_traits<char>::eof()) {
+                --length;
+            }
+
+            *data += length;
 
             return int32_t(std::round(value * coordinate_precision));
         }
 
         // Convert string with a floating point number into integer suitable
         // for use as coordinate in a Location.
-        inline int32_t string_to_location_coordinate(const char* str) {
+        inline int32_t string_to_location_coordinate(const char** data) {
+            const char* str = *data;
             const char* full = str;
 
             // call fallback if scientific notation is used
-            while (*str) {
-                if (*str == 'e' || *str == 'E') {
-                    return string_to_location_coordinate_fallback(full);
-                }
-                ++str;
+            if (std::strpbrk(str, "eE")) {
+                return string_to_location_coordinate_fallback(data);
             }
-
-            str = full;
 
             int32_t result = 0;
             int sign = 1;
@@ -130,15 +134,14 @@ namespace osmium {
                     result = result * 10 + *str - '0';
                     ++str;
                 }
-            }
 
-            if (*str != '\0') {
-
-                // decimal point
-                if (*str != '.') {
+                // no more digits allowed
+                if (*str >= '0' && *str <= '9') {
                     goto error;
                 }
+            }
 
+            if (*str == '.') {
                 ++str;
 
                 // read significant digits
@@ -156,18 +159,13 @@ namespace osmium {
                 while (*str >= '0' && *str <= '9') {
                     ++str;
                 }
-
-                // should be at the end now
-                if (*str != '\0') {
-                    goto error;
-                }
-
             }
 
             for (; scale > 0; --scale) {
                 result *= 10;
             }
 
+            *data = str;
             return result * sign;
 
         error:
@@ -391,12 +389,30 @@ namespace osmium {
             return *this;
         }
 
-        Location& set_lon(const char* str) noexcept {
+        Location& set_lon(const char* str) {
+            const char** data = &str;
+            m_x = detail::string_to_location_coordinate(data);
+            if (**data != '\0') {
+                throw invalid_location{std::string{"characters after coordinate: '"} + *data + "'"};
+            }
+            return *this;
+        }
+
+        Location& set_lat(const char* str) {
+            const char** data = &str;
+            m_y = detail::string_to_location_coordinate(data);
+            if (**data != '\0') {
+                throw invalid_location{std::string{"characters after coordinate: '"} + *data + "'"};
+            }
+            return *this;
+        }
+
+        Location& set_lon_partial(const char** str) {
             m_x = detail::string_to_location_coordinate(str);
             return *this;
         }
 
-        Location& set_lat(const char* str) noexcept {
+        Location& set_lat_partial(const char** str) {
             m_y = detail::string_to_location_coordinate(str);
             return *this;
         }

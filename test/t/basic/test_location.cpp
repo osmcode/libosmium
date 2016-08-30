@@ -166,13 +166,29 @@ TEST_CASE("Location hash") {
     }
 }
 
-#define C(s, v) REQUIRE(osmium::detail::string_to_location_coordinate(s)     == v); \
-                REQUIRE(osmium::detail::string_to_location_coordinate("-" s) == -v); \
-                REQUIRE(atof(s)     == Approx( v / 10000000.0)); \
-                REQUIRE(atof("-" s) == Approx(-v / 10000000.0));
+#define CR(s, v, r) { \
+                const char* strm = "-" s; \
+                const char* strp = strm + 1; \
+                REQUIRE(std::atof(strp) == Approx( v / 10000000.0)); \
+                REQUIRE(std::atof(strm) == Approx(-v / 10000000.0)); \
+                const char** data = &strp; \
+                REQUIRE(osmium::detail::string_to_location_coordinate(data) == v); \
+                REQUIRE(std::string{*data} == r); \
+                data = &strm; \
+                REQUIRE(osmium::detail::string_to_location_coordinate(data) == -v); \
+                REQUIRE(std::string{*data} == r); \
+                }
 
-#define F(s) REQUIRE_THROWS_AS(osmium::detail::string_to_location_coordinate(s),     osmium::invalid_location); \
-             REQUIRE_THROWS_AS(osmium::detail::string_to_location_coordinate("-" s), osmium::invalid_location);
+#define C(s, v) CR(s, v, "")
+
+#define F(s) { \
+             const char* strm = "-" s; \
+             const char* strp = strm + 1; \
+             const char** data = &strp; \
+             REQUIRE_THROWS_AS(osmium::detail::string_to_location_coordinate(data), osmium::invalid_location); \
+             data = &strm; \
+             REQUIRE_THROWS_AS(osmium::detail::string_to_location_coordinate(data), osmium::invalid_location); \
+             }
 
 TEST_CASE("Parsing coordinates from strings") {
     F("x");
@@ -181,11 +197,12 @@ TEST_CASE("Parsing coordinates from strings") {
     F("");
     F(" ");
     F(" 123");
-    F("123 ");
-    F("123x");
-    F("1.2x");
 
-    C("0", 0);
+    CR("123 ", 1230000000, " ");
+    CR("123x", 1230000000, "x");
+    CR("1.2x",   12000000, "x");
+
+    C("0",              0);
 
     C("1",       10000000);
     C("2",       20000000);
@@ -262,11 +279,14 @@ TEST_CASE("Parsing coordinates from strings") {
     F("e");
     F(" e");
     F(" 1.1e2");
-    F("1.1e2 ");
-    F("1.1e2x");
+
+    CR("1e2 ",   1000000000, " ");
+    CR("1.1e2 ", 1100000000, " ");
+    CR("1.1e2x", 1100000000, "x");
 }
 
 #undef C
+#undef CR
 #undef F
 
 #define CW(v, s) buffer.clear(); \
@@ -304,4 +324,34 @@ TEST_CASE("Writing coordinates into string") {
 }
 
 #undef CW
+
+TEST_CASE("set lon/lat from string") {
+    osmium::Location loc;
+    loc.set_lon("1.2");
+    loc.set_lat("3.4");
+    REQUIRE(loc.lon() == Approx(1.2));
+    REQUIRE(loc.lat() == Approx(3.4));
+}
+
+TEST_CASE("set lon/lat from string with trailing characters") {
+    osmium::Location loc;
+    REQUIRE_THROWS_AS({
+        loc.set_lon("1.2x");
+    }, osmium::invalid_location);
+    REQUIRE_THROWS_AS({
+        loc.set_lat("3.4e1 ");
+    }, osmium::invalid_location);
+}
+
+TEST_CASE("set lon/lat from string with trailing characters using partial") {
+    osmium::Location loc;
+    const char* x = "1.2x";
+    const char* y = "3.4 ";
+    loc.set_lon_partial(&x);
+    loc.set_lat_partial(&y);
+    REQUIRE(loc.lon() == Approx(1.2));
+    REQUIRE(loc.lat() == Approx(3.4));
+    REQUIRE(*x == 'x');
+    REQUIRE(*y == ' ');
+}
 
