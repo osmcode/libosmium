@@ -5,6 +5,7 @@
 */
 
 #include <cstdint>
+#include <iostream>
 #include <vector>
 
 #include <osmium/io/any_input.hpp>

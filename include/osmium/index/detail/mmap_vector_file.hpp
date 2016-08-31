@@ -34,6 +34,8 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <algorithm>
+#include <cstddef>
+#include <stdexcept>
 #include <string>
 
 #include <osmium/index/detail/mmap_vector_base.hpp>

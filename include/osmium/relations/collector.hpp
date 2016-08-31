@@ -39,7 +39,7 @@ DEALINGS IN THE SOFTWARE.
 #include <cstdint>
 #include <functional>
 #include <iomanip>
-//#include <iostream>
+#include <iostream>
 #include <vector>
 
 #include <osmium/fwd.hpp>

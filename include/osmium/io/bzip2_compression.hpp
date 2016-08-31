@@ -45,8 +45,8 @@ DEALINGS IN THE SOFTWARE.
 #include <cerrno>
 #include <cstddef>
 #include <cstdio>
-#include <stdexcept>
 #include <string>
+#include <system_error>
 
 #include <bzlib.h>
 
@@ -55,6 +55,7 @@ DEALINGS IN THE SOFTWARE.
 #endif
 
 #include <osmium/io/compression.hpp>
+#include <osmium/io/detail/read_write.hpp>
 #include <osmium/io/error.hpp>
 #include <osmium/io/file_compression.hpp>
 #include <osmium/io/writer_options.hpp>

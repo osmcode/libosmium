@@ -37,7 +37,6 @@ DEALINGS IN THE SOFTWARE.
 #include <cstddef>
 #include <iterator>
 #include <map>
-#include <stdexcept>
 #include <vector>
 
 #include <osmium/index/map.hpp>
