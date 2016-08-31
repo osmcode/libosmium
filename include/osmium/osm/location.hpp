@@ -37,17 +37,11 @@ DEALINGS IN THE SOFTWARE.
 #include <cstdint>
 #include <cstring>
 #include <functional>
-#include <iomanip>
 #include <iosfwd>
-#include <locale>
-#include <sstream>
+#include <iterator>
+#include <limits>
 #include <stdexcept>
 #include <string>
-
-#include <iostream>
-
-#include <osmium/util/compatibility.hpp>
-#include <osmium/util/double.hpp>
 
 namespace osmium {
 
@@ -71,44 +65,20 @@ namespace osmium {
 
         constexpr const int coordinate_precision = 10000000;
 
-        // Fallback function used when a coordinate is written in scientific
-        // notation. This function uses stringstream and is much more expensive
-        // than the handcrafted one. But coordinates in scientific notations
-        // shouldn't be used anyway.
-        inline int32_t string_to_location_coordinate_fallback(const char** const data) {
-            size_t length = std::strlen(*data);
-            double value;
-            std::istringstream ss{*data};
-            ss.imbue(std::locale("C"));
-            ss >> std::noskipws >> value;
-
-            if (ss.fail() || ss.bad() || value > 215.0 || value < -215.0) {
-                throw invalid_location{std::string{"wrong format for coordinate: '"} + (*data) + "'"};
-            }
-
-            while (ss.get() != std::char_traits<char>::eof()) {
-                --length;
-            }
-
-            *data += length;
-
-            return int32_t(std::round(value * coordinate_precision));
-        }
-
         // Convert string with a floating point number into integer suitable
         // for use as coordinate in a Location.
         inline int32_t string_to_location_coordinate(const char** data) {
             const char* str = *data;
             const char* full = str;
 
-            // call fallback if scientific notation is used
-            if (std::strpbrk(str, "eE")) {
-                return string_to_location_coordinate_fallback(data);
-            }
-
-            int32_t result = 0;
+            int64_t result = 0;
             int sign = 1;
-            int scale = 7;
+
+            // one more than significant digits to allow rounding
+            int scale = 8;
+
+            // paranoia check for maximum number of digits
+            int max_digits = 10;
 
             // optional minus sign
             if (*str == '-') {
@@ -116,7 +86,7 @@ namespace osmium {
                 ++str;
             }
 
-            // first digit before decimal point
+            // there has to be at least one digit
             if (*str >= '0' && *str <= '9') {
                 result = *str - '0';
                 ++str;
@@ -124,23 +94,18 @@ namespace osmium {
                 goto error;
             }
 
-            // optional second digit before decimal point
-            if (*str >= '0' && *str <= '9') {
-                result = result * 10 + *str - '0';
+            // optional additional digits before decimal point
+            while (*str >= '0' && *str <= '9' && max_digits > 0) {
+                result = result * 10 + (*str - '0');
                 ++str;
-
-                // optional third digit before decimal point
-                if (*str >= '0' && *str <= '9') {
-                    result = result * 10 + *str - '0';
-                    ++str;
-                }
-
-                // no more digits allowed
-                if (*str >= '0' && *str <= '9') {
-                    goto error;
-                }
+                --max_digits;
             }
 
+            if (max_digits == 0) {
+                goto error;
+            }
+
+            // optional decimal point
             if (*str == '.') {
                 ++str;
 
@@ -149,24 +114,71 @@ namespace osmium {
                     result = result * 10 + (*str - '0');
                 }
 
-                // use 8th digit after decimal point for rounding
-                if (scale == 0 && *str >= '5' && *str <= '9') {
-                    ++result;
+                // ignore non-significant digits
+                max_digits = 20;
+                while (*str >= '0' && *str <= '9' && max_digits > 0) {
                     ++str;
+                    --max_digits;
                 }
 
-                // ignore further digits
-                while (*str >= '0' && *str <= '9') {
-                    ++str;
+                if (max_digits == 0) {
+                    goto error;
                 }
             }
 
-            for (; scale > 0; --scale) {
-                result *= 10;
+            // optional exponent in scientific notation
+            if (*str == 'e' || *str == 'E') {
+                ++str;
+
+                int esign = 1;
+                // optional minus sign
+                if (*str == '-') {
+                    esign = -1;
+                    ++str;
+                }
+
+                int64_t eresult = 0;
+
+                // there has to be at least one digit in exponent
+                if (*str >= '0' && *str <= '9') {
+                    eresult = *str - '0';
+                    ++str;
+                } else {
+                    goto error;
+                }
+
+                // optional additional digits in exponent
+                max_digits = 5;
+                while (*str >= '0' && *str <= '9' && max_digits > 0) {
+                    eresult = eresult * 10 + (*str - '0');
+                    ++str;
+                    --max_digits;
+                }
+
+                if (max_digits == 0) {
+                    goto error;
+                }
+
+                scale += eresult * esign;
+            }
+
+            if (scale < 0) {
+                result = 0;
+            } else {
+                for (; scale > 0; --scale) {
+                    result *= 10;
+                }
+
+                result = (result + 5) / 10 * sign;
+
+                if (result > std::numeric_limits<int32_t>::max() ||
+                    result < std::numeric_limits<int32_t>::min()) {
+                    goto error;
+                }
             }
 
             *data = str;
-            return result * sign;
+            return static_cast<int32_t>(result);
 
         error:
 
