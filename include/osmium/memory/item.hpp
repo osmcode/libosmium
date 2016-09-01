@@ -127,6 +127,7 @@ namespace osmium {
                 m_size(size),
                 m_type(type),
                 m_removed(false),
+                m_diff(0),
                 m_padding(0) {
             }
 
