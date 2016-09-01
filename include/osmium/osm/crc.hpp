@@ -86,11 +86,11 @@ namespace osmium {
 
     public:
 
-        TCRC& operator()() {
+        TCRC& operator()() noexcept {
             return m_crc;
         }
 
-        const TCRC& operator()() const {
+        const TCRC& operator()() const noexcept {
             return m_crc;
         }
 
@@ -206,10 +206,10 @@ namespace osmium {
 
         void update(const osmium::Area& area) {
             update(static_cast<const osmium::OSMObject&>(area));
-            for (auto it = area.cbegin(); it != area.cend(); ++it) {
-                if (it->type() == osmium::item_type::outer_ring ||
-                    it->type() == osmium::item_type::inner_ring) {
-                    update(static_cast<const osmium::NodeRefList&>(*it));
+            for (const auto& subitem : area) {
+                if (subitem.type() == osmium::item_type::outer_ring ||
+                    subitem.type() == osmium::item_type::inner_ring) {
+                    update(static_cast<const osmium::NodeRefList&>(subitem));
                 }
             }
         }

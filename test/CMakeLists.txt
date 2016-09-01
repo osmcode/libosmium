@@ -127,6 +127,7 @@ endif()
 add_unit_test(area test_area_id)
 add_unit_test(area test_node_ref_segment)
 
+add_unit_test(basic test_area)
 add_unit_test(basic test_box)
 add_unit_test(basic test_changeset)
 add_unit_test(basic test_crc)
