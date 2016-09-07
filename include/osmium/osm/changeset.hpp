@@ -187,6 +187,11 @@ namespace osmium {
 
     public:
 
+        // Dummy to avoid warning because of unused private fields. Do not use.
+        int32_t do_not_use() const noexcept {
+            return m_padding1 + m_padding2;
+        }
+
         /// Get ID of this changeset
         changeset_id_type id() const noexcept {
             return m_id;
