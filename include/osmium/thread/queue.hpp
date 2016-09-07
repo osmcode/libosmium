@@ -40,7 +40,7 @@ DEALINGS IN THE SOFTWARE.
 #include <queue>
 #include <string>
 #include <thread>
-#include <utility> // IWYU pragma: keep (for std::move)
+#include <utility> // IWYU pragma: keep
 
 #ifdef OSMIUM_DEBUG_QUEUE_SIZE
 # include <atomic>
