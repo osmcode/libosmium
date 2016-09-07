@@ -1,5 +1,5 @@
-#ifndef OSMIUM_IO_ANY_INPUT_HPP
-#define OSMIUM_IO_ANY_INPUT_HPP
+#ifndef OSMIUM_OPL_HPP
+#define OSMIUM_OPL_HPP
 
 /*
 
@@ -33,21 +33,38 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-/**
- * @file
- *
- * Include this file if you want to read all kinds of OSM files.
- *
- * @attention If you include this file, you'll need to link with
- *            `ws2_32` (Windows only), `libexpat`, `libz`, `libbz2`,
- *            and enable multithreading.
- */
+#include <osmium/io/detail/opl_parser_functions.hpp>
 
-#include <osmium/io/any_compression.hpp> // IWYU pragma: export
+namespace osmium {
 
-#include <osmium/io/o5m_input.hpp> // IWYU pragma: export
-#include <osmium/io/opl_input.hpp> // IWYU pragma: export
-#include <osmium/io/pbf_input.hpp> // IWYU pragma: export
-#include <osmium/io/xml_input.hpp> // IWYU pragma: export
+    namespace memory {
+        class Buffer;
+    } // namespace memory
 
-#endif // OSMIUM_IO_ANY_INPUT_HPP
+    /**
+     * Parses one line in OPL format. The line must not have a newline
+     * character at the end. Buffer.commit() is called automatically if the
+     * write succeeded.
+     *
+     * @param data Line must be in this zero-delimited string.
+     * @param buffer Result will be written to this buffer.
+     *
+     * @returns true if an entity was parsed, false otherwise (for instance
+     *          when the line is empty).
+     * @throws osmium::opl_error If the parsing fails.
+     */
+    inline bool opl_parse(const char* data, osmium::memory::Buffer& buffer) {
+        try {
+            bool wrote_something = osmium::io::detail::opl_parse_line(0, data, buffer);
+            buffer.commit();
+            return wrote_something;
+        } catch (const osmium::opl_error& e) {
+            buffer.rollback();
+            throw;
+        }
+    }
+
+} // namespace osmium
+
+
+#endif // OSMIUM_OPL_HPP

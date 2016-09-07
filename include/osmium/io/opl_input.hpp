@@ -1,5 +1,5 @@
-#ifndef OSMIUM_IO_ANY_INPUT_HPP
-#define OSMIUM_IO_ANY_INPUT_HPP
+#ifndef OSMIUM_IO_OPL_INPUT_HPP
+#define OSMIUM_IO_OPL_INPUT_HPP
 
 /*
 
@@ -36,18 +36,11 @@ DEALINGS IN THE SOFTWARE.
 /**
  * @file
  *
- * Include this file if you want to read all kinds of OSM files.
+ * Include this file if you want to read OSM OPL files.
  *
- * @attention If you include this file, you'll need to link with
- *            `ws2_32` (Windows only), `libexpat`, `libz`, `libbz2`,
- *            and enable multithreading.
  */
 
-#include <osmium/io/any_compression.hpp> // IWYU pragma: export
+#include <osmium/io/reader.hpp> // IWYU pragma: export
+#include <osmium/io/detail/opl_input_format.hpp> // IWYU pragma: export
 
-#include <osmium/io/o5m_input.hpp> // IWYU pragma: export
-#include <osmium/io/opl_input.hpp> // IWYU pragma: export
-#include <osmium/io/pbf_input.hpp> // IWYU pragma: export
-#include <osmium/io/xml_input.hpp> // IWYU pragma: export
-
-#endif // OSMIUM_IO_ANY_INPUT_HPP
+#endif // OSMIUM_IO_OPL_INPUT_HPP
