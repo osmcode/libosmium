@@ -181,7 +181,7 @@ namespace osmium {
                     feature.set_field("id2", 0);
                     feature.set_field("problem", "way_in_multiple_rings");
                     feature.add_to_layer();
-                } catch (osmium::geometry_error& e) {
+                } catch (const osmium::geometry_error&) {
                     // XXX
                 }
             }
@@ -197,7 +197,7 @@ namespace osmium {
                     feature.set_field("id2", 0);
                     feature.set_field("problem", "inner_with_same_tags");
                     feature.add_to_layer();
-                } catch (osmium::geometry_error& e) {
+                } catch (const osmium::geometry_error&) {
                     // XXX
                 }
             }
@@ -216,7 +216,7 @@ namespace osmium {
                     set_object(feature);
                     feature.set_field("way_id", int32_t(way.id()));
                     feature.add_to_layer();
-                } catch (osmium::geometry_error& e) {
+                } catch (const osmium::geometry_error&) {
                     // XXX
                 }
             }

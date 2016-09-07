@@ -320,7 +320,7 @@ namespace osmium {
                     }
                     try {
                         m_buffer.push_back(item);
-                    } catch (osmium::buffer_is_full&) {
+                    } catch (const osmium::buffer_is_full&) {
                         do_flush();
                         m_buffer.push_back(item);
                     }

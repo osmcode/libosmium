@@ -103,7 +103,7 @@ namespace osmium {
                     try {
                         const std::string input_data = read_from_input_queue(sizeof(size_in_network_byte_order));
                         size_in_network_byte_order = *reinterpret_cast<const uint32_t*>(input_data.data());
-                    } catch (osmium::pbf_error&) {
+                    } catch (const osmium::pbf_error&) {
                         return 0; // EOF
                     }
 

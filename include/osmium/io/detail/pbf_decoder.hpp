@@ -627,7 +627,7 @@ namespace osmium {
                     try {
                         decode_primitive_block_metadata();
                         decode_primitive_block_data();
-                    } catch (std::out_of_range&) {
+                    } catch (const std::out_of_range&) {
                         throw osmium::pbf_error("string id out of range");
                     }
 

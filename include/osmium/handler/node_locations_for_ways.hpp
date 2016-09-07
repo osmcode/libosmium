@@ -160,7 +160,7 @@ namespace osmium {
                         if (!node_ref.location()) {
                             error = true;
                         }
-                    } catch (osmium::not_found&) {
+                    } catch (const osmium::not_found&) {
                         error = true;
                     }
                 }

@@ -88,7 +88,7 @@ namespace osmium {
                             not_found_error(id);
                         }
                         return value;
-                    } catch (std::out_of_range&) {
+                    } catch (const std::out_of_range&) {
                         not_found_error(id);
                     }
                 }

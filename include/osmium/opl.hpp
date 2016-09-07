@@ -55,7 +55,7 @@ namespace osmium {
             bool wrote_something = osmium::io::detail::opl_parse_line(0, data, buffer);
             buffer.commit();
             return wrote_something;
-        } catch (const osmium::opl_error& e) {
+        } catch (const osmium::opl_error&) {
             buffer.rollback();
             throw;
         }

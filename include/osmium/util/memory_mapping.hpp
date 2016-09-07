@@ -215,7 +215,7 @@ private:
             ~MemoryMapping() noexcept {
                 try {
                     unmap();
-                } catch (std::system_error&) {
+                } catch (const std::system_error&) {
                     // Ignore any exceptions because destructor must not throw.
                 }
             }

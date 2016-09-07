@@ -536,7 +536,7 @@ namespace osmium {
                             uint64_t length = 0;
                             try {
                                 length = protozero::decode_varint(&m_data, m_end);
-                            } catch (protozero::end_of_buffer_exception&) {
+                            } catch (const protozero::end_of_buffer_exception&) {
                                 throw o5m_error("premature end of file");
                             }
 
