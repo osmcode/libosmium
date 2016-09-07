@@ -75,7 +75,7 @@ namespace osmium {
             int sign = 1;
 
             // one more than significant digits to allow rounding
-            int scale = 8;
+            int64_t scale = 8;
 
             // paranoia check for maximum number of digits
             int max_digits = 10;

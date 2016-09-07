@@ -36,6 +36,8 @@ DEALINGS IN THE SOFTWARE.
 #include <cstddef>
 #include <cstdint>
 
+#include <osmium/util/cast.hpp>
+
 namespace osmium {
 
     // forward declaration, see osmium/osm/item_type.hpp for declaration
@@ -157,7 +159,7 @@ namespace osmium {
             }
 
             item_size_type padded_size() const {
-                return padded_length(m_size);
+                return static_cast_with_assert<item_size_type>(padded_length(m_size));
             }
 
             item_type type() const noexcept {
