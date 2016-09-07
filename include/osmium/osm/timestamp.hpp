@@ -103,14 +103,14 @@ namespace osmium {
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
             };
             if (strptime(timestamp, timestamp_format(), &tm) == nullptr) {
-                throw std::invalid_argument("can't parse timestamp");
+                throw std::invalid_argument("can not parse timestamp");
             }
             m_timestamp = static_cast<uint32_t>(timegm(&tm));
 #else
             struct tm tm;
             int n = sscanf(timestamp, "%4d-%2d-%2dT%2d:%2d:%2dZ", &tm.tm_year, &tm.tm_mon, &tm.tm_mday, &tm.tm_hour, &tm.tm_min, &tm.tm_sec);
             if (n != 6) {
-                throw std::invalid_argument("can't parse timestamp");
+                throw std::invalid_argument("can not parse timestamp");
             }
             tm.tm_year -= 1900;
             tm.tm_mon--;
