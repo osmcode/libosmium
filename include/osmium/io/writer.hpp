@@ -34,11 +34,13 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <cassert>
+#include <cstddef>
+#include <exception>
+#include <functional>
 #include <future>
+#include <initializer_list>
 #include <memory>
-#include <stdexcept>
 #include <string>
-#include <thread>
 #include <utility>
 
 #include <osmium/io/compression.hpp>
@@ -55,6 +57,10 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/util/config.hpp>
 
 namespace osmium {
+
+    namespace memory {
+        class Item;
+    } //namespace memory
 
     namespace io {
 

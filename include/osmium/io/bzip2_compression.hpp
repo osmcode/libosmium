@@ -43,7 +43,6 @@ DEALINGS IN THE SOFTWARE.
  */
 
 #include <cerrno>
-#include <cstddef>
 #include <cstdio>
 #include <string>
 #include <system_error>

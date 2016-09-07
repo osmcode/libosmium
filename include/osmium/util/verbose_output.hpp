@@ -33,11 +33,11 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <time.h>
-
+#include <ctime>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
+#include <string>
 
 namespace osmium {
 

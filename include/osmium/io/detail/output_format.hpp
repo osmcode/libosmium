@@ -33,16 +33,16 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <cstdint>
 #include <functional>
 #include <map>
 #include <memory>
-#include <stdexcept>
 #include <string>
 #include <utility>
 
 #include <osmium/handler.hpp>
 #include <osmium/io/detail/queue_util.hpp>
-#include <osmium/io/detail/string_util.hpp>
+#include <osmium/io/error.hpp>
 #include <osmium/io/file.hpp>
 #include <osmium/io/file_format.hpp>
 #include <osmium/memory/buffer.hpp>

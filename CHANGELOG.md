@@ -8,9 +8,22 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+- Support for reading OPL files.
+- For diff output OSM objects in buffers can be marked as only in one or the
+  other file. The OPL and debug output formats support diff output based on
+  this.
+- Add documentation and range checks to Tile struct.
+- More documentation.
+
 ### Changed
 
+- Parse coordinates in scientific notations ourselves.
+- Updated included protozero version to 1.4.2.
+
 ### Fixed
+
+- Fixed a problem limiting cache file sizes on Windows to 32 bit.
+- Fixed includes.
 
 
 ## [2.8.0] - 2016-08-04

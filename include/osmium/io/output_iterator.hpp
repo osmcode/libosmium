@@ -35,10 +35,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <cstddef>
 #include <iterator>
-#include <memory>
-#include <utility>
 
-#include <osmium/memory/buffer.hpp>
 #include <osmium/osm/diff_object.hpp>
 #include <osmium/util/compatibility.hpp>
 

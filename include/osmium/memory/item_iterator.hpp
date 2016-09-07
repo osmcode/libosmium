@@ -34,15 +34,28 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <cassert>
+#include <cstddef>
 #include <iterator>
 #include <iosfwd>
 #include <type_traits>
 
-#include <osmium/fwd.hpp>
 #include <osmium/memory/item.hpp>
 #include <osmium/osm/item_type.hpp>
 
 namespace osmium {
+
+    class Area;
+    class Changeset;
+    class InnerRing;
+    class Node;
+    class OSMEntity;
+    class OSMObject;
+    class OuterRing;
+    class Relation;
+    class RelationMemberList;
+    class TagList;
+    class Way;
+    class WayNodeList;
 
     namespace memory {
 

@@ -34,32 +34,35 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <cinttypes>
-#include <cstddef>
-#include <cstdint>
-#include <cstdio>
-#include <future>
+#include <cmath>
+#include <cstring>
 #include <iterator>
 #include <memory>
 #include <string>
-#include <thread>
 #include <utility>
 
 #include <boost/crc.hpp>
 
 #include <osmium/io/detail/output_format.hpp>
+#include <osmium/io/detail/queue_util.hpp>
+#include <osmium/io/detail/string_util.hpp>
+#include <osmium/io/file.hpp>
 #include <osmium/io/file_format.hpp>
+#include <osmium/io/header.hpp>
 #include <osmium/memory/buffer.hpp>
-#include <osmium/memory/collection.hpp>
+#include <osmium/memory/item_iterator.hpp>
 #include <osmium/osm/box.hpp>
 #include <osmium/osm/changeset.hpp>
 #include <osmium/osm/crc.hpp>
 #include <osmium/osm/item_type.hpp>
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/node.hpp>
+#include <osmium/osm/node_ref.hpp>
 #include <osmium/osm/object.hpp>
 #include <osmium/osm/relation.hpp>
 #include <osmium/osm/tag.hpp>
 #include <osmium/osm/timestamp.hpp>
+#include <osmium/osm/types.hpp>
 #include <osmium/osm/way.hpp>
 #include <osmium/thread/pool.hpp>
 #include <osmium/util/minmax.hpp>
@@ -68,8 +71,6 @@ DEALINGS IN THE SOFTWARE.
 namespace osmium {
 
     namespace io {
-
-        class File;
 
         namespace detail {
 
@@ -378,7 +379,7 @@ namespace osmium {
                         *m_out += " (open)\n";
                     }
 
-                    int width = int(log10(way.nodes().size())) + 1;
+                    int width = int(std::log10(way.nodes().size())) + 1;
                     int n = 0;
                     for (const auto& node_ref : way.nodes()) {
                         write_diff();
@@ -413,7 +414,7 @@ namespace osmium {
                     output_int(relation.members().size());
                     *m_out += '\n';
 
-                    int width = int(log10(relation.members().size())) + 1;
+                    int width = int(std::log10(relation.members().size())) + 1;
                     int n = 0;
                     for (const auto& member : relation.members()) {
                         write_diff();
@@ -471,7 +472,7 @@ namespace osmium {
                         output_int(changeset.num_comments());
                         *m_out += '\n';
 
-                        int width = int(log10(changeset.num_comments())) + 1;
+                        int width = int(std::log10(changeset.num_comments())) + 1;
                         int n = 0;
                         for (const auto& comment : changeset.discussion()) {
                             write_counter(width, n++);

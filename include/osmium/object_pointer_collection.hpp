@@ -40,11 +40,9 @@ DEALINGS IN THE SOFTWARE.
 #include <boost/iterator/indirect_iterator.hpp>
 
 #include <osmium/handler.hpp>
-#include <osmium/memory/item.hpp>
 #include <osmium/osm/object.hpp>
 
 // IWYU pragma: no_forward_declare osmium::OSMObject
-// IWYU pragma: no_forward_declare osmium::memory::Item
 
 namespace osmium {
 

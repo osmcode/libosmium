@@ -33,8 +33,6 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <cstddef>
-#include <cstdint>
 #include <cstdlib>
 #include <cstring>
 #include <stdexcept>

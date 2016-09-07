@@ -35,7 +35,6 @@ DEALINGS IN THE SOFTWARE.
 
 #include <cerrno>
 #include <cstddef>
-#include <errno.h>
 #include <fcntl.h>
 #include <string>
 #include <system_error>

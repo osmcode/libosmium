@@ -33,7 +33,9 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <cstdint>
 #include <cstring>
+#include <iterator>
 
 #include <osmium/memory/collection.hpp>
 #include <osmium/memory/item.hpp>

@@ -33,9 +33,20 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <osmium/fwd.hpp>
-
 namespace osmium {
+
+    class Area;
+    class Changeset;
+    class ChangesetDiscussion;
+    class InnerRing;
+    class Node;
+    class OSMObject;
+    class OuterRing;
+    class Relation;
+    class RelationMemberList;
+    class TagList;
+    class Way;
+    class WayNodeList;
 
     /**
      * @brief Osmium handlers provide callbacks for OSM objects

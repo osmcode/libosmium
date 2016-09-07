@@ -41,6 +41,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/io/detail/input_format.hpp>
 #include <osmium/io/detail/opl_parser_functions.hpp>
+#include <osmium/io/detail/queue_util.hpp>
 #include <osmium/io/file_format.hpp>
 #include <osmium/io/header.hpp>
 #include <osmium/memory/buffer.hpp>

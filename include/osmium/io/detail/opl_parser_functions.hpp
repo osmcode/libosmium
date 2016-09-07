@@ -58,6 +58,10 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
+    namespace builder {
+        class Builder;
+    } // namespace builder
+
     /**
      * Exception thrown when there was a problem with parsing the OPL format
      * of a file.

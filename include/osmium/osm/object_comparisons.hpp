@@ -33,7 +33,10 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <tuple>
+
 #include <osmium/osm/object.hpp>
+#include <osmium/osm/timestamp.hpp>
 #include <osmium/util/misc.hpp>
 
 namespace osmium {

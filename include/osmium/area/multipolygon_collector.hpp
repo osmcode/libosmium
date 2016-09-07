@@ -47,7 +47,6 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/tag.hpp>
 #include <osmium/osm/way.hpp>
 #include <osmium/relations/collector.hpp>
-#include <osmium/relations/detail/member_meta.hpp>
 
 namespace osmium {
 

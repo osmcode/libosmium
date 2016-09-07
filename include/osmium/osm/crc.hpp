@@ -36,11 +36,17 @@ DEALINGS IN THE SOFTWARE.
 #include <cstdint>
 
 #include <osmium/osm/area.hpp>
+#include <osmium/osm/box.hpp>
 #include <osmium/osm/changeset.hpp>
+#include <osmium/osm/item_type.hpp>
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/node.hpp>
+#include <osmium/osm/node_ref.hpp>
 #include <osmium/osm/node_ref_list.hpp>
+#include <osmium/osm/object.hpp>
 #include <osmium/osm/relation.hpp>
+#include <osmium/osm/tag.hpp>
+#include <osmium/osm/timestamp.hpp>
 #include <osmium/osm/way.hpp>
 #include <osmium/util/endian.hpp>
 

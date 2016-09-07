@@ -34,10 +34,7 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <cassert>
-#include <cstddef>
-#include <cstdlib>
 #include <cstring>
-#include <exception>
 #include <future>
 #include <memory>
 #include <string>
@@ -53,15 +50,19 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/io/file_format.hpp>
 #include <osmium/io/header.hpp>
 #include <osmium/memory/buffer.hpp>
-#include <osmium/osm.hpp>
 #include <osmium/osm/box.hpp>
+#include <osmium/osm/changeset.hpp>
 #include <osmium/osm/entity_bits.hpp>
 #include <osmium/osm/item_type.hpp>
 #include <osmium/osm/location.hpp>
+#include <osmium/osm/node.hpp>
+#include <osmium/osm/node_ref.hpp>
 #include <osmium/osm/object.hpp>
+#include <osmium/osm/relation.hpp>
+#include <osmium/osm/timestamp.hpp>
 #include <osmium/osm/types.hpp>
 #include <osmium/osm/types_from_string.hpp>
-#include <osmium/thread/queue.hpp>
+#include <osmium/osm/way.hpp>
 #include <osmium/thread/util.hpp>
 #include <osmium/util/cast.hpp>
 

@@ -34,7 +34,6 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <cassert>
-#include <cstddef>
 #include <cstring>
 #include <initializer_list>
 #include <limits>
@@ -44,15 +43,22 @@ DEALINGS IN THE SOFTWARE.
 #include <utility>
 
 #include <osmium/builder/builder.hpp>
-#include <osmium/osm.hpp>
 #include <osmium/osm/item_type.hpp>
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/node_ref.hpp>
 #include <osmium/osm/object.hpp>
 #include <osmium/osm/tag.hpp>
 #include <osmium/osm/types.hpp>
+#include <osmium/memory/item.hpp>
+#include <osmium/osm/area.hpp>
+#include <osmium/osm/changeset.hpp>
+#include <osmium/osm/relation.hpp>
+#include <osmium/osm/timestamp.hpp>
+#include <osmium/osm/way.hpp>
 
 namespace osmium {
+
+    class Node;
 
     namespace memory {
         class Buffer;

@@ -34,13 +34,14 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <cassert>
+#include <cstddef>
 #include <cstdint>
-#include <cstdlib>
 #include <cstring>
 #include <iterator>
 #include <list>
 #include <string>
 #include <unordered_map>
+#include <utility>
 
 #include <osmium/io/detail/pbf.hpp>
 

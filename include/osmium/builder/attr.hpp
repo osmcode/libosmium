@@ -46,8 +46,15 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/builder/builder.hpp>
 #include <osmium/builder/osm_object_builder.hpp>
 #include <osmium/memory/buffer.hpp>
+#include <osmium/osm/changeset.hpp>
+#include <osmium/osm/item_type.hpp>
+#include <osmium/osm/location.hpp>
+#include <osmium/osm/node.hpp>
+#include <osmium/osm/node_ref.hpp>
+#include <osmium/osm/object.hpp>
+#include <osmium/osm/relation.hpp>
+#include <osmium/osm/timestamp.hpp>
 #include <osmium/osm/types.hpp>
-#include <osmium/osm.hpp>
 
 namespace osmium {
 

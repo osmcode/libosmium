@@ -35,10 +35,12 @@ DEALINGS IN THE SOFTWARE.
 
 #include <cassert>
 #include <cstdlib>
+#include <iterator>
 #include <utility>
 
 #include <osmium/memory/collection.hpp>
 #include <osmium/memory/item.hpp>
+#include <osmium/memory/item_iterator.hpp>
 #include <osmium/osm/item_type.hpp>
 #include <osmium/osm/object.hpp>
 #include <osmium/osm/types.hpp>

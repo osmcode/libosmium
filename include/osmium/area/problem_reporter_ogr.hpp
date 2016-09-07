@@ -42,7 +42,6 @@ DEALINGS IN THE SOFTWARE.
  * @attention If you include this file, you'll need to link with `libgdal`.
  */
 
-#include <cstdint>
 #include <memory>
 
 #include <gdalcpp.hpp>

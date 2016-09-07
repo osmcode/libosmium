@@ -33,13 +33,10 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <osmium/memory/buffer.hpp>
 #include <osmium/io/detail/opl_parser_functions.hpp>
 
 namespace osmium {
-
-    namespace memory {
-        class Buffer;
-    } // namespace memory
 
     /**
      * Parses one line in OPL format. The line must not have a newline

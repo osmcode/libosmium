@@ -33,10 +33,8 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <cstddef>
 #include <cstdint>
 #include <cstring>
-#include <algorithm>
 #include <limits>
 #include <memory>
 #include <stdexcept>
@@ -44,22 +42,34 @@ DEALINGS IN THE SOFTWARE.
 #include <utility>
 #include <vector>
 
+#include <protozero/iterators.hpp>
 #include <protozero/pbf_message.hpp>
+#include <protozero/types.hpp>
 
 #include <osmium/builder/osm_object_builder.hpp>
 #include <osmium/io/detail/pbf.hpp> // IWYU pragma: export
 #include <osmium/io/detail/protobuf_tags.hpp>
 #include <osmium/io/detail/zlib.hpp>
 #include <osmium/io/header.hpp>
+#include <osmium/memory/buffer.hpp>
+#include <osmium/osm/box.hpp>
+#include <osmium/osm/entity_bits.hpp>
+#include <osmium/osm/item_type.hpp>
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/node.hpp>
+#include <osmium/osm/object.hpp>
+#include <osmium/osm/relation.hpp>
+#include <osmium/osm/timestamp.hpp>
 #include <osmium/osm/types.hpp>
-#include <osmium/memory/buffer.hpp>
-#include <osmium/osm/entity_bits.hpp>
+#include <osmium/osm/way.hpp>
 #include <osmium/util/cast.hpp>
 #include <osmium/util/delta.hpp>
 
 namespace osmium {
+
+    namespace builder {
+        class Builder;
+    } // namespace builder
 
     namespace io {
 

@@ -38,11 +38,11 @@ DEALINGS IN THE SOFTWARE.
 #include <future>
 #include <map>
 #include <memory>
-#include <stdexcept>
 #include <string>
 #include <utility>
 
 #include <osmium/io/detail/queue_util.hpp>
+#include <osmium/io/error.hpp>
 #include <osmium/io/file.hpp>
 #include <osmium/io/file_format.hpp>
 #include <osmium/io/header.hpp>
