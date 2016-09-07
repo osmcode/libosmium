@@ -68,8 +68,8 @@ namespace osmium {
      */
     struct opl_error : public io_error {
 
-        size_t line = 0;
-        size_t column = 0;
+        uint64_t line = 0;
+        uint64_t column = 0;
         const char* data;
         std::string msg;
 
@@ -87,7 +87,7 @@ namespace osmium {
             msg.append(what);
         }
 
-        void set_pos(size_t l, size_t col) {
+        void set_pos(uint64_t l, uint64_t col) {
             line = l;
             column = col;
             msg.append(" on line ");
@@ -245,6 +245,10 @@ namespace osmium {
                 return opl_parse_int<osmium::object_id_type>(s);
             }
 
+            inline osmium::object_id_type opl_parse_changeset_id(const char** s) {
+                return opl_parse_int<osmium::changeset_id_type>(s);
+            }
+
             inline osmium::object_version_type opl_parse_version(const char** s) {
                 return opl_parse_int<osmium::object_version_type>(s);
             }
@@ -384,7 +388,7 @@ namespace osmium {
                             node.set_visible(opl_parse_visible(data));
                             break;
                         case 'c':
-                            node.set_changeset(opl_parse_id(data));
+                            node.set_changeset(opl_parse_changeset_id(data));
                             break;
                         case 't':
                             node.set_timestamp(opl_parse_timestamp(data));
@@ -457,7 +461,7 @@ namespace osmium {
                             way.set_visible(opl_parse_visible(data));
                             break;
                         case 'c':
-                            way.set_changeset(opl_parse_id(data));
+                            way.set_changeset(opl_parse_changeset_id(data));
                             break;
                         case 't':
                             way.set_timestamp(opl_parse_timestamp(data));
@@ -556,7 +560,7 @@ namespace osmium {
                             relation.set_visible(opl_parse_visible(data));
                             break;
                         case 'c':
-                            relation.set_changeset(opl_parse_id(data));
+                            relation.set_changeset(opl_parse_changeset_id(data));
                             break;
                         case 't':
                             relation.set_timestamp(opl_parse_timestamp(data));
@@ -600,7 +604,7 @@ namespace osmium {
                 osmium::builder::ChangesetBuilder builder{buffer};
                 osmium::Changeset& changeset = builder.object();
 
-                changeset.set_id(opl_parse_id(data));
+                changeset.set_id(opl_parse_changeset_id(data));
 
                 const char* tags_begin = nullptr;
 
@@ -680,7 +684,7 @@ namespace osmium {
                 buffer.commit();
             }
 
-            inline bool opl_parse_line(int line_count,
+            inline bool opl_parse_line(uint64_t line_count,
                                        const char* data,
                                        osmium::memory::Buffer& buffer,
                                        osmium::osm_entity_bits::type read_types = osmium::osm_entity_bits::all) {

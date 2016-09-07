@@ -58,7 +58,7 @@ namespace osmium {
 
                 osmium::memory::Buffer m_buffer{1024*1024};
                 const char* m_data;
-                size_t m_line_count = 0;
+                uint64_t m_line_count = 0;
 
                 void maybe_flush() {
                     if (m_buffer.committed() > 800*1024) {
