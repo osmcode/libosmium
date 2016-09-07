@@ -245,7 +245,7 @@ namespace osmium {
                 return opl_parse_int<osmium::object_id_type>(s);
             }
 
-            inline osmium::object_id_type opl_parse_changeset_id(const char** s) {
+            inline osmium::changeset_id_type opl_parse_changeset_id(const char** s) {
                 return opl_parse_int<osmium::changeset_id_type>(s);
             }
 
