@@ -44,7 +44,10 @@ DEALINGS IN THE SOFTWARE.
 
 #include <cstddef>
 #include <string>
-#include <unistd.h>
+
+#ifndef _MSC_VER
+# include <unistd.h>
+#endif
 
 #include <errno.h>
 #include <zlib.h>
