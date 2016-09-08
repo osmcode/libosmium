@@ -61,14 +61,13 @@ namespace osmium {
 
             template <typename T>
             inline void str_push(std::string& str, T data) {
-                size_t size = str.size();
-                str.resize(size + sizeof(T));
-                std::copy_n(reinterpret_cast<char*>(&data), sizeof(T), &str[size]);
+                str.append(reinterpret_cast<const char*>(&data), sizeof(T));
             }
 
             inline std::string convert_to_hex(const std::string& str) {
                 static const char* lookup_hex = "0123456789ABCDEF";
                 std::string out;
+                out.reserve(str.size() * 2);
 
                 for (char c : str) {
                     out += lookup_hex[(c >> 4) & 0xf];
