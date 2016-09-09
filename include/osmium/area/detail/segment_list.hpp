@@ -63,7 +63,7 @@ namespace osmium {
              * non-way members in the relation.
              */
             template <typename F>
-            inline void for_each_member(const osmium::Relation& relation, const std::vector<const osmium::Way*> ways, F&& func) {
+            inline void for_each_member(const osmium::Relation& relation, const std::vector<const osmium::Way*>& ways, F&& func) {
                 auto way_it = ways.cbegin();
                 for (const osmium::RelationMember& member : relation.members()) {
                     if (member.type() == osmium::item_type::way) {
