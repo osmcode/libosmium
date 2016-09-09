@@ -59,9 +59,6 @@ namespace osmium {
                 int m_precision;
                 wkt_type m_wkt_type;
 
-                void init_srid() {
-                }
-
             public:
 
                 using point_type        = std::string;
