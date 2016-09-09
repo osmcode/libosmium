@@ -31,7 +31,7 @@ class IndexSearch {
     void dump_dense() {
         dense_index_type index(m_fd);
 
-        for (size_t i = 0; i < index.size(); ++i) {
+        for (std::size_t i = 0; i < index.size(); ++i) {
             if (index.get(i) != TValue()) {
                 std::cout << i << " " << index.get(i) << "\n";
             }
@@ -51,9 +51,9 @@ class IndexSearch {
 
         try {
             TValue value = index.get(key);
-            std::cout << key << " " << value << std::endl;
+            std::cout << key << " " << value << "\n";
         } catch (...) {
-            std::cout << key << " not found" << std::endl;
+            std::cout << key << " not found\n";
             return false;
         }
 
@@ -69,7 +69,7 @@ class IndexSearch {
             return lhs.first < rhs.first;
         });
         if (positions.first == positions.second) {
-            std::cout << key << " not found" << std::endl;
+            std::cout << key << " not found\n";
             return false;
         }
 
@@ -103,7 +103,7 @@ public:
         }
     }
 
-    bool search(std::vector<TKey> keys) {
+    bool search(const std::vector<TKey>& keys) {
         bool found_all = true;
 
         for (const auto key : keys) {
@@ -173,7 +173,7 @@ public:
                     break;
                 case 'h':
                     print_help();
-                    exit(return_code::okay);
+                    std::exit(return_code::okay);
                 case 'l':
                     m_list_format = true;
                     m_filename = optarg;
@@ -185,22 +185,22 @@ public:
                     m_type = optarg;
                     if (m_type != "location" && m_type != "offset") {
                         std::cerr << "Unknown type '" << m_type << "'. Must be 'location' or 'offset'.\n";
-                        exit(return_code::fatal);
+                        std::exit(return_code::fatal);
                     }
                     break;
                 default:
-                    exit(return_code::fatal);
+                    std::exit(return_code::fatal);
             }
         }
 
         if (m_array_format == m_list_format) {
             std::cerr << "Need option --array or --list, but not both\n";
-            exit(return_code::fatal);
+            std::exit(return_code::fatal);
         }
 
         if (m_type.empty()) {
             std::cerr << "Need --type argument.\n";
-            exit(return_code::fatal);
+            std::exit(return_code::fatal);
         }
 
     }
@@ -255,6 +255,6 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    exit(result_okay ? return_code::okay : return_code::not_found);
+    std::exit(result_okay ? return_code::okay : return_code::not_found);
 }
 

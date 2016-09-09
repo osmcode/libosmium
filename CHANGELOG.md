@@ -14,6 +14,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   this.
 - Add documentation and range checks to Tile struct.
 - More documentation.
+- Extensive comments in examples.
 
 ### Changed
 
