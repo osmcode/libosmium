@@ -228,7 +228,7 @@ namespace osmium {
                 uint32_t extract_segments_from_ways(osmium::area::ProblemReporter* problem_reporter, const osmium::Relation& relation, const std::vector<const osmium::Way*>& members) {
                     assert(relation.members().size() >= members.size());
 
-                    size_t num_segments = get_num_segments(members);
+                    const size_t num_segments = get_num_segments(members);
                     if (problem_reporter) {
                         problem_reporter->set_nodes(num_segments);
                     }

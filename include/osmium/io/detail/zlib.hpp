@@ -62,7 +62,7 @@ namespace osmium {
 
                 std::string output(output_size, '\0');
 
-                auto result = ::compress(
+                const auto result = ::compress(
                     reinterpret_cast<unsigned char*>(const_cast<char *>(output.data())),
                     &output_size,
                     reinterpret_cast<const unsigned char*>(input.data()),
@@ -92,7 +92,7 @@ namespace osmium {
             inline protozero::data_view zlib_uncompress_string(const char* input, unsigned long input_size, unsigned long raw_size, std::string& output) {
                 output.resize(raw_size);
 
-                auto result = ::uncompress(
+                const auto result = ::uncompress(
                     reinterpret_cast<unsigned char*>(&*output.begin()),
                     &raw_size,
                     reinterpret_cast<const unsigned char*>(input),

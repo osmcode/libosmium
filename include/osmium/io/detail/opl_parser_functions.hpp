@@ -206,7 +206,7 @@ namespace osmium {
                 if (**s == '\0') {
                     throw opl_error{"expected integer", *s};
                 }
-                bool negative = (**s == '-');
+                const bool negative = (**s == '-');
                 if (negative) {
                     ++*s;
                 }

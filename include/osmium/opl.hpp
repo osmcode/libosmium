@@ -52,7 +52,7 @@ namespace osmium {
      */
     inline bool opl_parse(const char* data, osmium::memory::Buffer& buffer) {
         try {
-            bool wrote_something = osmium::io::detail::opl_parse_line(0, data, buffer);
+            const bool wrote_something = osmium::io::detail::opl_parse_line(0, data, buffer);
             buffer.commit();
             return wrote_something;
         } catch (const osmium::opl_error&) {

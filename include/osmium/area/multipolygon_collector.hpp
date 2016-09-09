@@ -175,7 +175,7 @@ namespace osmium {
                 std::vector<const osmium::Way*> ways;
                 for (const auto& member : relation.members()) {
                     if (member.ref() != 0) {
-                        size_t offset = this->get_offset(member.type(), member.ref());
+                        const size_t offset = this->get_offset(member.type(), member.ref());
                         ways.push_back(&buffer.get<const osmium::Way>(offset));
                     }
                 }

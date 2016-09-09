@@ -67,7 +67,7 @@ namespace osmium {
          * Returns the number of NodeRefs in the collection.
          */
         size_t size() const noexcept {
-            auto size_node_refs = byte_size() - sizeof(NodeRefList);
+            const auto size_node_refs = byte_size() - sizeof(NodeRefList);
             assert(size_node_refs % sizeof(NodeRef) == 0);
             return size_node_refs / sizeof(NodeRef);
         }

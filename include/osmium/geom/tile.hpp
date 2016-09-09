@@ -95,7 +95,7 @@ namespace osmium {
                 z(zoom) {
                 assert(zoom <= 30u);
                 assert(location.valid());
-                osmium::geom::Coordinates c = lonlat_to_mercator(location);
+                const osmium::geom::Coordinates c = lonlat_to_mercator(location);
                 const int32_t n = 1 << zoom;
                 const double scale = detail::max_coordinate_epsg3857 * 2 / n;
                 x = uint32_t(detail::restrict_to_range<int32_t>(int32_t((c.x + detail::max_coordinate_epsg3857) / scale), 0, n-1));

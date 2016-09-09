@@ -54,7 +54,7 @@ namespace osmium {
         class mmap_vector_file : public mmap_vector_base<T> {
 
             size_t filesize(int fd) const {
-                size_t size = osmium::util::file_size(fd);
+                const size_t size = osmium::util::file_size(fd);
 
                 if (size % sizeof(T) != 0) {
                     throw std::runtime_error("Index file has wrong size (must be multiple of " + std::to_string(sizeof(T)) + ").");

@@ -67,7 +67,7 @@ namespace osmium {
 #ifdef _MSC_VER
             // Windows implementation
             // https://msdn.microsoft.com/en-us/library/dfbc2kec.aspx
-            auto size = ::_filelengthi64(fd);
+            const auto size = ::_filelengthi64(fd);
             if (size == -1L) {
                 throw std::system_error(errno, std::system_category(), "_filelengthi64 failed");
             }

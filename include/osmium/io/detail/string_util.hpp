@@ -101,24 +101,24 @@ namespace osmium {
                 static const size_t max_size = 0;
 #endif
 
-                size_t old_size = out.size();
+                const size_t old_size = out.size();
 
-                int len = string_snprintf(out,
-                                          old_size,
-                                          max_size,
-                                          format,
-                                          std::forward<TArgs>(args)...);
+                const int len = string_snprintf(out,
+                                                old_size,
+                                                max_size,
+                                                format,
+                                                std::forward<TArgs>(args)...);
                 assert(len > 0);
 
                 if (size_t(len) >= max_size) {
 #ifndef NDEBUG
-                    int len2 =
+                    const int len2 =
 #endif
-                               string_snprintf(out,
-                                               old_size,
-                                               size_t(len) + 1,
-                                               format,
-                                               std::forward<TArgs>(args)...);
+                                     string_snprintf(out,
+                                                     old_size,
+                                                     size_t(len) + 1,
+                                                     format,
+                                                     std::forward<TArgs>(args)...);
                     assert(len2 == len);
                 }
 
@@ -151,7 +151,7 @@ namespace osmium {
 
                 while (data != end) {
                     const char* last = data;
-                    uint32_t c = utf8::next(data, end);
+                    const uint32_t c = utf8::next(data, end);
 
                     // This is a list of Unicode code points that we let
                     // through instead of escaping them. It is incomplete

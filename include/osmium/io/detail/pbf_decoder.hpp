@@ -80,7 +80,7 @@ namespace osmium {
 
             class PBFPrimitiveBlockDecoder {
 
-                static constexpr size_t initial_buffer_size = 2 * 1024 * 1024;
+                static constexpr const size_t initial_buffer_size = 2 * 1024 * 1024;
 
                 data_view m_data;
                 std::vector<osm_string_len_type> m_stringtable;
@@ -101,7 +101,7 @@ namespace osmium {
 
                     protozero::pbf_message<OSMFormat::StringTable> pbf_string_table(data);
                     while (pbf_string_table.next(OSMFormat::StringTable::repeated_bytes_s)) {
-                        auto str_view = pbf_string_table.get_view();
+                        const auto str_view = pbf_string_table.get_view();
                         if (str_view.size() > osmium::max_osm_string_length) {
                             throw osmium::pbf_error("overlong string in string table");
                         }
@@ -183,7 +183,7 @@ namespace osmium {
                         switch (pbf_info.tag()) {
                             case OSMFormat::Info::optional_int32_version:
                                 {
-                                    auto version = pbf_info.get_int32();
+                                    const auto version = pbf_info.get_int32();
                                     if (version < 0) {
                                         throw osmium::pbf_error("object version must not be negative");
                                     }
@@ -195,7 +195,7 @@ namespace osmium {
                                 break;
                             case OSMFormat::Info::optional_int64_changeset:
                                 {
-                                    auto changeset_id = pbf_info.get_int64();
+                                    const auto changeset_id = pbf_info.get_int64();
                                     if (changeset_id < 0) {
                                         throw osmium::pbf_error("object changeset_id must not be negative");
                                     }
@@ -414,7 +414,7 @@ namespace osmium {
                         osmium::util::DeltaDecode<int64_t> ref;
                         while (!roles.empty() && !refs.empty() && !types.empty()) {
                             const auto& r = m_stringtable.at(roles.front());
-                            int type = types.front();
+                            const int type = types.front();
                             if (type < 0 || type > 2) {
                                 throw osmium::pbf_error("unknown relation member type");
                             }
@@ -538,14 +538,14 @@ namespace osmium {
                                 throw osmium::pbf_error("PBF format error");
                             }
 
-                            auto version = versions.front();
+                            const auto version = versions.front();
                             versions.drop_front();
                             if (version < 0) {
                                 throw osmium::pbf_error("object version must not be negative");
                             }
                             node.set_version(static_cast<osmium::object_version_type>(version));
 
-                            auto changeset_id = dense_changeset.update(changesets.front());
+                            const auto changeset_id = dense_changeset.update(changesets.front());
                             changesets.drop_front();
                             if (changeset_id < 0) {
                                 throw osmium::pbf_error("object changeset_id must not be negative");
@@ -753,7 +753,7 @@ namespace osmium {
                             break;
                         case OSMFormat::HeaderBlock::optional_int64_osmosis_replication_timestamp:
                             {
-                                auto timestamp = osmium::Timestamp(pbf_header_block.get_int64()).to_iso();
+                                const auto timestamp = osmium::Timestamp(pbf_header_block.get_int64()).to_iso();
                                 header.set("osmosis_replication_timestamp", timestamp);
                                 header.set("timestamp", timestamp);
                             }

@@ -589,7 +589,7 @@ namespace osmium {
                                 if (debug()) {
                                     std::cerr << "        Segment belongs to outer ring\n";
                                 }
-                                int32_t y = int32_t(ay + (by - ay) * (lx - ax) / (bx - ax));
+                                const int32_t y = int32_t(ay + (by - ay) * (lx - ax) / (bx - ax));
                                 outer_rings.emplace_back(y, segment->ring());
                             }
                         }
@@ -1012,7 +1012,7 @@ namespace osmium {
 
                 std::vector<location_to_ring_map> xrings = create_location_to_ring_map(open_ring_its);
 
-                auto ring_min = std::min_element(xrings.begin(), xrings.end(), [](const location_to_ring_map& a, const location_to_ring_map& b) {
+                const auto ring_min = std::min_element(xrings.begin(), xrings.end(), [](const location_to_ring_map& a, const location_to_ring_map& b) {
                     return a.ring().min_segment() < b.ring().min_segment();
                 });
 
@@ -1064,7 +1064,7 @@ namespace osmium {
                 }
 
                 // Find the candidate with the smallest/largest area
-                auto chosen_cand = ring_min_is_outer ?
+                const auto chosen_cand = ring_min_is_outer ?
                      std::min_element(candidates.cbegin(), candidates.cend(), [](const candidate& a, const candidate& b) {
                         return std::abs(a.sum) < std::abs(b.sum);
                      }) :

@@ -379,7 +379,7 @@ namespace osmium {
                         *m_out += " (open)\n";
                     }
 
-                    int width = int(std::log10(way.nodes().size())) + 1;
+                    const int width = int(std::log10(way.nodes().size())) + 1;
                     int n = 0;
                     for (const auto& node_ref : way.nodes()) {
                         write_diff();
@@ -414,7 +414,7 @@ namespace osmium {
                     output_int(relation.members().size());
                     *m_out += '\n';
 
-                    int width = int(std::log10(relation.members().size())) + 1;
+                    const int width = int(std::log10(relation.members().size())) + 1;
                     int n = 0;
                     for (const auto& member : relation.members()) {
                         write_diff();
@@ -472,7 +472,7 @@ namespace osmium {
                         output_int(changeset.num_comments());
                         *m_out += '\n';
 
-                        int width = int(std::log10(changeset.num_comments())) + 1;
+                        const int width = int(std::log10(changeset.num_comments())) + 1;
                         int n = 0;
                         for (const auto& comment : changeset.discussion()) {
                             write_counter(width, n++);

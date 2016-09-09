@@ -132,7 +132,7 @@ namespace osmium {
                     } else {
                         str_push(str, type);
                     }
-                    size_t offset = str.size();
+                    const size_t offset = str.size();
                     if (add_length) {
                         str_push(str, static_cast<uint32_t>(0));
                     }

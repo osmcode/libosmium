@@ -241,19 +241,19 @@ namespace osmium {
              */
             inline bool operator<(const NodeRefSegment& lhs, const NodeRefSegment& rhs) noexcept {
                 if (lhs.first().location() == rhs.first().location()) {
-                    vec p0{lhs.first().location()};
-                    vec p1{lhs.second().location()};
-                    vec q0{rhs.first().location()};
-                    vec q1{rhs.second().location()};
-                    vec p = p1 - p0;
-                    vec q = q1 - q0;
+                    const vec p0{lhs.first().location()};
+                    const vec p1{lhs.second().location()};
+                    const vec q0{rhs.first().location()};
+                    const vec q1{rhs.second().location()};
+                    const vec p = p1 - p0;
+                    const vec q = q1 - q0;
 
                     if (p.x == 0 && q.x == 0) {
                         return p.y < q.y;
                     }
 
-                    auto a = p.y * q.x;
-                    auto b = q.y * p.x;
+                    const auto a = p.y * q.x;
+                    const auto b = q.y * p.x;
                     if (a == b) {
                         return p.x < q.x;
                     }

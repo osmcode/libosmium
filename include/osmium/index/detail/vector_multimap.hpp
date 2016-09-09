@@ -127,7 +127,7 @@ namespace osmium {
                 }
 
                 void remove(const TId id, const TValue value) {
-                    auto r = get_all(id);
+                    const auto r = get_all(id);
                     for (auto it = r.first; it != r.second; ++it) {
                         if (it->second == value) {
                             it->second = 0;

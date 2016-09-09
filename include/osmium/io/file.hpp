@@ -113,7 +113,7 @@ namespace osmium {
                 }
 
                 // if filename is a URL, default to XML format
-                std::string protocol = m_filename.substr(0, m_filename.find_first_of(':'));
+                const std::string protocol = m_filename.substr(0, m_filename.find_first_of(':'));
                 if (protocol == "http" || protocol == "https") {
                     m_file_format = file_format::xml;
                 }
@@ -172,7 +172,7 @@ namespace osmium {
                 }
 
                 for (auto& option : options) {
-                    size_t pos = option.find_first_of('=');
+                    const size_t pos = option.find_first_of('=');
                     if (pos == std::string::npos) {
                         set(option, true);
                     } else {

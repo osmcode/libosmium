@@ -43,7 +43,7 @@ namespace osmium {
 
     namespace util {
 
-        constexpr int max_double_length = 20; // should fit any double
+        constexpr const int max_double_length = 20; // should fit any double
 
         /**
          * Write double to iterator, removing superfluous '0' characters at

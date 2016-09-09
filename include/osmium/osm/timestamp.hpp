@@ -57,7 +57,7 @@ namespace osmium {
     class Timestamp {
 
         // length of ISO timestamp string yyyy-mm-ddThh:mm:ssZ\0
-        static constexpr int timestamp_length = 20 + 1;
+        static constexpr const int timestamp_length = 20 + 1;
 
         // The timestamp format for OSM timestamps in strftime(3) format.
         // This is the ISO-Format "yyyy-mm-ddThh:mm:ssZ".
@@ -108,7 +108,7 @@ namespace osmium {
             m_timestamp = static_cast<uint32_t>(timegm(&tm));
 #else
             struct tm tm;
-            int n = sscanf(timestamp, "%4d-%2d-%2dT%2d:%2d:%2dZ", &tm.tm_year, &tm.tm_mon, &tm.tm_mday, &tm.tm_hour, &tm.tm_min, &tm.tm_sec);
+            const int n = sscanf(timestamp, "%4d-%2d-%2dT%2d:%2d:%2dZ", &tm.tm_year, &tm.tm_mon, &tm.tm_mday, &tm.tm_hour, &tm.tm_min, &tm.tm_sec);
             if (n != 6) {
                 throw std::invalid_argument("can not parse timestamp");
             }
