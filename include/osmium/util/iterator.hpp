@@ -44,7 +44,7 @@ namespace osmium {
 
         using iterator = It;
 
-        iterator_range(P&& p) :
+        explicit iterator_range(P&& p) :
             P(std::forward<P>(p)) {
         }
 /*

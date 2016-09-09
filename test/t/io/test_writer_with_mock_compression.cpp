@@ -15,7 +15,7 @@ class MockCompressor : public osmium::io::Compressor {
 
 public:
 
-    MockCompressor(const std::string& fail_in) :
+    explicit MockCompressor(const std::string& fail_in) :
         Compressor(osmium::io::fsync::no),
         m_fail_in(fail_in) {
         if (m_fail_in == "constructor") {

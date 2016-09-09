@@ -78,8 +78,8 @@ namespace osmium {
 
     struct geos_geometry_error : public geometry_error {
 
-        geos_geometry_error(const char* message) :
-            geometry_error(std::string("geometry creation failed in GEOS library: ") + message) {
+        explicit geos_geometry_error(const char* message) :
+            geometry_error(std::string{"geometry creation failed in GEOS library: "} + message) {
         }
 
     }; // struct geos_geometry_error

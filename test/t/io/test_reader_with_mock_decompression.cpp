@@ -19,7 +19,7 @@ class MockDecompressor : public osmium::io::Decompressor {
 
 public:
 
-    MockDecompressor(const std::string& fail_in) :
+    explicit MockDecompressor(const std::string& fail_in) :
         Decompressor(),
         m_fail_in(fail_in) {
         if (m_fail_in == "constructor") {

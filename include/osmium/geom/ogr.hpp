@@ -77,7 +77,7 @@ namespace osmium {
 
             public:
 
-                OGRFactoryImpl(int /* srid */) {
+                explicit OGRFactoryImpl(int /* srid */) {
                 }
 
                 /* Point */

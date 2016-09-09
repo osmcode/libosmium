@@ -108,7 +108,7 @@ namespace osmium {
 
             public:
 
-                HandlerPass1(TCollector& collector) noexcept :
+                explicit HandlerPass1(TCollector& collector) noexcept :
                     m_collector(collector) {
                 }
 
@@ -131,7 +131,7 @@ namespace osmium {
 
             public:
 
-                HandlerPass2(TCollector& collector) noexcept :
+                explicit HandlerPass2(TCollector& collector) noexcept :
                     m_collector(collector) {
                 }
 
