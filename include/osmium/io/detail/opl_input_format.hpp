@@ -57,7 +57,7 @@ namespace osmium {
             class OPLParser : public Parser {
 
                 osmium::memory::Buffer m_buffer{1024*1024};
-                const char* m_data;
+                const char* m_data = nullptr;
                 uint64_t m_line_count = 0;
 
                 void maybe_flush() {
