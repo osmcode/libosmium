@@ -20,6 +20,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 - Parse coordinates in scientific notations ourselves.
 - Updated included protozero version to 1.4.2.
+- Lots of one-argument constructors are now explicit.
 
 ### Fixed
 
