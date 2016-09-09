@@ -567,6 +567,20 @@ TEST_CASE("Parse OPL: members") {
         REQUIRE(it == rml.end());
     }
 
+    SECTION("Valid format: one member without role") {
+        const char* const s = "n123@";
+        oid::opl_parse_relation_members(s, s + std::strlen(s), buffer);
+        REQUIRE(buffer.written() > 0);
+        const auto& rml = buffer.get<osmium::RelationMemberList>(0);
+        REQUIRE(rml.size() == 1);
+        auto it = rml.begin();
+        REQUIRE(it->type() == osmium::item_type::node);
+        REQUIRE(it->ref() == 123);
+        REQUIRE(std::string{it->role()} == "");
+        ++it;
+        REQUIRE(it == rml.end());
+    }
+
     SECTION("Valid format: three members") {
         const char* const s = "n123@,w456@abc,r78@type";
         oid::opl_parse_relation_members(s, s + std::strlen(s), buffer);

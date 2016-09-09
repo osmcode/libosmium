@@ -520,7 +520,8 @@ namespace osmium {
                     osmium::object_id_type ref = opl_parse_id(&s);
                     opl_parse_char(&s, '@');
                     if (s == e) {
-                        throw opl_error{"expected role", s};
+                        builder.add_member(type, ref, "");
+                        return;
                     }
                     std::string role;
                     opl_parse_string(&s, role);
