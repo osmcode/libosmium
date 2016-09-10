@@ -176,6 +176,7 @@ namespace osmium {
                     detail::throw_gzip_error(m_gzfile, "read failed");
                 }
                 buffer.resize(static_cast<std::string::size_type>(nread));
+                set_offset(size_t(::gzoffset(m_gzfile)));
                 return buffer;
             }
 

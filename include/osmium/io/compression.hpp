@@ -33,6 +33,7 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <atomic>
 #include <cerrno>
 #include <cstddef>
 #include <functional>
@@ -54,6 +55,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/io/file_compression.hpp>
 #include <osmium/io/writer_options.hpp>
 #include <osmium/util/compatibility.hpp>
+#include <osmium/util/file.hpp>
 
 namespace osmium {
 
@@ -86,6 +88,9 @@ namespace osmium {
 
         class Decompressor {
 
+            std::atomic<size_t> m_file_size {0};
+            std::atomic<size_t> m_offset {0};
+
         public:
 
             static constexpr unsigned int input_buffer_size = 1024 * 1024;
@@ -104,6 +109,22 @@ namespace osmium {
             virtual std::string read() = 0;
 
             virtual void close() = 0;
+
+            size_t file_size() const noexcept {
+                return m_file_size;
+            }
+
+            void set_file_size(size_t size) noexcept {
+                m_file_size = size;
+            }
+
+            size_t offset() const noexcept {
+                return m_offset;
+            }
+
+            void set_offset(size_t offset) noexcept {
+                m_offset = offset;
+            }
 
         }; // class Decompressor
 
@@ -182,7 +203,9 @@ namespace osmium {
                 auto it = m_callbacks.find(compression);
 
                 if (it != m_callbacks.end()) {
-                    return std::unique_ptr<osmium::io::Decompressor>(std::get<1>(it->second)(fd));
+                    auto p = std::unique_ptr<osmium::io::Decompressor>(std::get<1>(it->second)(fd));
+                    p->set_file_size(osmium::util::file_size(fd));
+                    return p;
                 }
 
                 error(compression);
@@ -241,6 +264,7 @@ namespace osmium {
             int m_fd;
             const char *m_buffer;
             size_t m_buffer_size;
+            size_t m_offset = 0;
 
         public:
 
@@ -283,6 +307,9 @@ namespace osmium {
                     }
                     buffer.resize(std::string::size_type(nread));
                 }
+
+                m_offset += buffer.size();
+                set_offset(m_offset);
 
                 return buffer;
             }

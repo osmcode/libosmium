@@ -116,6 +116,8 @@ namespace osmium {
 
             osmium::thread::thread_handler m_thread;
 
+            size_t m_file_size;
+
             // This function will run in a separate thread.
             static void parser_thread(const osmium::io::File& file,
                                       detail::future_string_queue_type& input_queue,
@@ -223,7 +225,8 @@ namespace osmium {
                 m_osmdata_queue_wrapper(m_osmdata_queue),
                 m_header_future(),
                 m_header(),
-                m_thread() {
+                m_thread(),
+                m_file_size(m_decompressor->file_size()) {
                 std::promise<osmium::io::Header> header_promise;
                 m_header_future = header_promise.get_future();
                 m_thread = osmium::thread::thread_handler{parser_thread, std::ref(m_file), std::ref(m_input_queue), std::ref(m_osmdata_queue), std::move(header_promise), read_which_entities};
@@ -360,6 +363,32 @@ namespace osmium {
              */
             bool eof() const {
                 return m_status == status::eof || m_status == status::closed;
+            }
+
+            /**
+             * Get the size of the input file. Returns 0 if the file size
+             * is not available (for instance when reading from stdin).
+             */
+            size_t file_size() const noexcept {
+                return m_file_size;
+            }
+
+            /**
+             * Returns the current offset into the input file. Returns 0 if
+             * the offset is not available (for instance when reading from
+             * stdin).
+             *
+             * The offset can be used together with the result of file_size()
+             * to estimate how much of the file has been read. Note that due
+             * to buffering inside Osmium, this value will be larger than
+             * the amount of data actually available to the application.
+             *
+             * Do not call this function too often, certainly not for every
+             * object you are reading. Depending on the file type it might
+             * do an expensive system call.
+             */
+            size_t offset() const noexcept {
+                return m_decompressor->offset();
             }
 
         }; // class Reader

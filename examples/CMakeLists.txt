@@ -17,6 +17,7 @@ set(EXAMPLES
     filter_discussions
     index
     read
+    read_with_progress
     serdump
     tiles
     use_node_cache

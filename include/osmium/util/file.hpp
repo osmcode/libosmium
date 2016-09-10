@@ -116,6 +116,37 @@ namespace osmium {
 #endif
         }
 
+        /**
+         * Get current offset into file.
+         *
+         * @param fd Open file descriptor.
+         * @returns File offset or 0 if it is not available.
+         */
+        inline size_t file_offset(int fd) {
+#ifdef _MSC_VER
+            // https://msdn.microsoft.com/en-us/library/1yee101t.aspx
+            auto offset = _lseeki64(fd, 0, SEEK_CUR);
+#else
+            auto offset = ::lseek(fd, 0, SEEK_CUR);
+#endif
+            if (offset == -1) {
+                return 0;
+            }
+            return size_t(offset);
+        }
+
+        /**
+         * Check whether the file descriptor refers to a TTY.
+         */
+        inline bool isatty(int fd) {
+#ifdef _MSC_VER
+            // https://msdn.microsoft.com/en-us/library/f4s0ddew.aspx
+            return _isatty(fd);
+#else
+            return ::isatty(fd);
+#endif
+        }
+
     } // namespace util
 
 } // namespace osmium

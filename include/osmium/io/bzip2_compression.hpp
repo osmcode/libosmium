@@ -109,7 +109,7 @@ namespace osmium {
 
             explicit Bzip2Compressor(int fd, fsync sync) :
                 Compressor(sync),
-                m_file(fdopen(dup(fd), "wb")),
+                m_file(fdopen(::dup(fd), "wb")),
                 m_bzerror(BZ_OK),
                 m_bzfile(::BZ2_bzWriteOpen(&m_bzerror, m_file, 6, 0, 0)) {
                 if (!m_bzfile) {
@@ -165,7 +165,7 @@ namespace osmium {
 
             explicit Bzip2Decompressor(int fd) :
                 Decompressor(),
-                m_file(fdopen(dup(fd), "rb")),
+                m_file(fdopen(::dup(fd), "rb")),
                 m_bzerror(BZ_OK),
                 m_bzfile(::BZ2_bzReadOpen(&m_bzerror, m_file, 0, 0, nullptr, 0)) {
                 if (!m_bzfile) {
@@ -214,6 +214,8 @@ namespace osmium {
                     }
                     buffer.resize(static_cast<std::string::size_type>(nread));
                 }
+
+                set_offset(size_t(ftell(m_file)));
 
                 return buffer;
             }
