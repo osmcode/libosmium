@@ -176,7 +176,9 @@ namespace osmium {
                     detail::throw_gzip_error(m_gzfile, "read failed");
                 }
                 buffer.resize(static_cast<std::string::size_type>(nread));
+#if ZLIB_VERNUM >= 0x1240
                 set_offset(size_t(::gzoffset(m_gzfile)));
+#endif
                 return buffer;
             }
 
