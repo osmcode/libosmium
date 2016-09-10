@@ -53,7 +53,8 @@ namespace osmium {
 
         static constexpr const size_t length = 70;
 
-        size_t m_last_percent = 100 + 1;
+        size_t m_max_size;
+        size_t m_prev_percent = 100 + 1;
         bool m_enable;
         bool m_do_cleanup = true;
 
@@ -62,11 +63,13 @@ namespace osmium {
         /**
          * Initializes the progress bar. No output yet.
          *
+         * @param max_size Max size equivalent to 100%.
          * @param enable Set to false to disable (for instance if stderr is
          *               not a TTY).
          */
-        explicit ProgressBar(bool enable) noexcept :
-            m_enable(enable) {
+        explicit ProgressBar(size_t max_size, bool enable) noexcept :
+            m_max_size(max_size),
+            m_enable(max_size > 0 && enable) {
         }
 
         ~ProgressBar() {
@@ -80,20 +83,19 @@ namespace osmium {
          * only happen if the percentage changed from the last time this
          * function was called.
          *
-         * @param current Current value. Used together with the max value to
-         *                calculate the percentage.
-         * @param max Maximum value.
+         * @param current_size Current size. Used together with the max_size
+         *                     from constructor to calculate the percentage.
          */
-        void update(size_t current, size_t max) {
-            if (max == 0 || !m_enable) {
+        void update(size_t current_size) {
+            if (!m_enable) {
                 return;
             }
 
-            const size_t percent = 100 * current / max;
-            if (m_last_percent == percent) {
+            const size_t percent = 100 * current_size / m_max_size;
+            if (m_prev_percent == percent) {
                 return;
             }
-            m_last_percent = percent;
+            m_prev_percent = percent;
 
             const size_t num = percent * (length / 100.0);
             std::cerr << '[';
@@ -120,7 +122,7 @@ namespace osmium {
         void done() {
             m_do_cleanup = false;
             if (m_enable) {
-                update(100, 100);
+                update(m_max_size);
                 std::cerr << '\n';
             }
         }

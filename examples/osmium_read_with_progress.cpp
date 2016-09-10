@@ -38,12 +38,12 @@ int main(int argc, char* argv[]) {
     osmium::io::Reader reader{input_file};
 
     // Initialize progress bar, enable it only if STDERR is a TTY.
-    osmium::ProgressBar progress{osmium::util::isatty(2)};
+    osmium::ProgressBar progress{reader.file_size(), osmium::util::isatty(2)};
 
     // OSM data comes in buffers, read until there are no more.
     while (osmium::memory::Buffer buffer = reader.read()) {
         // Update progress bar for each buffer.
-        progress.update(reader.offset(), reader.file_size());
+        progress.update(reader.offset());
     }
 
     // Progress bar is done.
