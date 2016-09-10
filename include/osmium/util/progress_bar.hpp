@@ -111,7 +111,7 @@ namespace osmium {
             if (percent < 100) {
                 std::cerr << ' ';
             }
-            std::cerr << percent << "%\r";
+            std::cerr << percent << "% \r";
         }
 
         /**
