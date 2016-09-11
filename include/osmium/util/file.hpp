@@ -141,9 +141,9 @@ namespace osmium {
         inline bool isatty(int fd) {
 #ifdef _MSC_VER
             // https://msdn.microsoft.com/en-us/library/f4s0ddew.aspx
-            return _isatty(fd);
+            return _isatty(fd) != 0;
 #else
-            return ::isatty(fd);
+            return ::isatty(fd) != 0;
 #endif
         }
 
