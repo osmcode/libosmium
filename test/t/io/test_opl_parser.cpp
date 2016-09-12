@@ -981,7 +981,7 @@ TEST_CASE("Get context for errors") {
         bool error = false;
         try {
             oid::opl_parse_line(0, "~~~", buffer);
-        } catch (osmium::opl_error& e) {
+        } catch (const osmium::opl_error& e) {
             error = true;
             REQUIRE(e.line == 0);
             REQUIRE(e.column == 0);
@@ -994,7 +994,7 @@ TEST_CASE("Get context for errors") {
         bool error = false;
         try {
             oid::opl_parse_line(0, "n~~~", buffer);
-        } catch (osmium::opl_error& e) {
+        } catch (const osmium::opl_error& e) {
             error = true;
             REQUIRE(e.line == 0);
             REQUIRE(e.column == 1);
@@ -1007,7 +1007,7 @@ TEST_CASE("Get context for errors") {
         bool error = false;
         try {
             oid::opl_parse_line(1, "n123~~~", buffer);
-        } catch (osmium::opl_error& e) {
+        } catch (const osmium::opl_error& e) {
             error = true;
             REQUIRE(e.line == 1);
             REQUIRE(e.column == 4);
@@ -1020,7 +1020,7 @@ TEST_CASE("Get context for errors") {
         bool error = false;
         try {
             oid::opl_parse_line(2, "n123 ~~~", buffer);
-        } catch (osmium::opl_error& e) {
+        } catch (const osmium::opl_error& e) {
             error = true;
             REQUIRE(e.line == 2);
             REQUIRE(e.column == 5);
@@ -1033,7 +1033,7 @@ TEST_CASE("Get context for errors") {
         bool error = false;
         try {
             oid::opl_parse_line(3, "n123 v~~~", buffer);
-        } catch (osmium::opl_error& e) {
+        } catch (const osmium::opl_error& e) {
             error = true;
             REQUIRE(e.line == 3);
             REQUIRE(e.column == 6);
