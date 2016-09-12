@@ -14,7 +14,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   this.
 - Add documentation and range checks to Tile struct.
 - More documentation.
-- Extensive comments in examples.
+- More examples and more extensive comments on examples.
 - Support for a progress report in osmium::io::Reader() and a ProgressBar
   utility class to use it.
 - New OSMObject::set_timestamp(const char*) function.
