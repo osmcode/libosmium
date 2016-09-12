@@ -12,17 +12,17 @@ set(EXAMPLES
     area_test
     convert
     count
-    create_node_cache
     debug
     filter_discussions
     index
+    location_cache_create
+    location_cache_use
     pub_names
     read
     read_with_progress
     road_length
     serdump
     tiles
-    use_node_cache
     CACHE STRING "Example programs"
 )
 
