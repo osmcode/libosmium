@@ -17,12 +17,15 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Extensive comments in examples.
 - Support for a progress report in osmium::io::Reader() and a ProgressBar
   utility class to use it.
+- New OSMObject::set_timestamp(const char*) function.
 
 ### Changed
 
 - Parse coordinates in scientific notations ourselves.
 - Updated included protozero version to 1.4.2.
 - Lots of one-argument constructors are now explicit.
+- Timestamp parser now uses our own implementation instead of strptime.
+  This is faster and independant of locale settings.
 
 ### Fixed
 
