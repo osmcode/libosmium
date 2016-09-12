@@ -47,12 +47,11 @@
 // Allow any format of input files (XML, PBF, ...)
 #include <osmium/io/any_input.hpp>
 
-// Needed for osmium::apply()
+// For osmium::apply()
 #include <osmium/visitor.hpp>
 
 // For the location index. There are different types of indexes available.
 // This will work for small and medium sized input files.
-#include <osmium/index/map/dummy.hpp>
 #include <osmium/index/map/sparse_mem_array.hpp>
 
 // The type of index used. This must match the include file above

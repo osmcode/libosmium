@@ -30,7 +30,7 @@
 // Utility class gives us access to memory usage information
 #include <osmium/util/memory.hpp>
 
-// Needed for the osmium::apply() function
+// For osmium::apply()
 #include <osmium/visitor.hpp>
 
 // Handler derive from the osmium::handler::Handler base class. Usually you

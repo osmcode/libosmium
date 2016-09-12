@@ -16,8 +16,10 @@ set(EXAMPLES
     debug
     filter_discussions
     index
+    pub_names
     read
     read_with_progress
+    road_length
     serdump
     tiles
     use_node_cache
