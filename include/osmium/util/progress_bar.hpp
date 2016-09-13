@@ -150,9 +150,11 @@ namespace osmium {
          * @param file_size The size of the file just finished.
          */
         void file_done(size_t file_size) {
-            m_done_size += file_size;
-            m_current_size = 0;
-            display();
+            if (m_enable) {
+                m_done_size += file_size;
+                m_current_size = 0;
+                display();
+            }
         }
 
         /**
