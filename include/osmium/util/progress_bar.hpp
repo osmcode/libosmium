@@ -53,45 +53,31 @@ namespace osmium {
 
         static constexpr const size_t length = 70;
 
+        // The max size is the file size if there is a single file and the
+        // sum of all file sizes if there are multiple files. It corresponds
+        // to 100%.
         size_t m_max_size;
+
+        // The sum of the file sizes already done.
+        size_t m_done_size = 0;
+
+        // The currently read size in the current file.
+        size_t m_current_size = 0;
+
+        // The percentage calculated when it was last displayed. Used to decide
+        // whether we need to update the display. Start setting is one that
+        // will always be different from any legal setting.
         size_t m_prev_percent = 100 + 1;
+
+        // Is the progress bar enabled at all?
         bool m_enable;
+
+        // Used to make sure we do cleanup in the destructor if it was not
+        // already done.
         bool m_do_cleanup = true;
 
-    public:
-
-        /**
-         * Initializes the progress bar. No output yet.
-         *
-         * @param max_size Max size equivalent to 100%.
-         * @param enable Set to false to disable (for instance if stderr is
-         *               not a TTY).
-         */
-        explicit ProgressBar(size_t max_size, bool enable) noexcept :
-            m_max_size(max_size),
-            m_enable(max_size > 0 && enable) {
-        }
-
-        ~ProgressBar() {
-            if (m_do_cleanup) {
-                done();
-            }
-        }
-
-        /**
-         * Call this function to update the progress bar. Actual update will
-         * only happen if the percentage changed from the last time this
-         * function was called.
-         *
-         * @param current_size Current size. Used together with the max_size
-         *                     from constructor to calculate the percentage.
-         */
-        void update(size_t current_size) {
-            if (!m_enable) {
-                return;
-            }
-
-            const size_t percent = 100 * current_size / m_max_size;
+        void display() {
+            const size_t percent = 100 * (m_done_size + m_current_size) / m_max_size;
             if (m_prev_percent == percent) {
                 return;
             }
@@ -114,6 +100,61 @@ namespace osmium {
             std::cerr << percent << "% \r";
         }
 
+    public:
+
+        /**
+         * Initializes the progress bar. No output yet.
+         *
+         * @param max_size Max size equivalent to 100%.
+         * @param enable Set to false to disable (for instance if stderr is
+         *               not a TTY).
+         */
+        ProgressBar(size_t max_size, bool enable) noexcept :
+            m_max_size(max_size),
+            m_enable(max_size > 0 && enable) {
+        }
+
+        ~ProgressBar() {
+            if (m_do_cleanup) {
+                try {
+                    done();
+                } catch (...) {
+                    // Swallow any exceptions, because a destructor should
+                    // not throw.
+                }
+            }
+        }
+
+        /**
+         * Call this function to update the progress bar. Actual update will
+         * only happen if the percentage changed from the last time this
+         * function was called.
+         *
+         * @param current_size Current size. Used together with the max_size
+         *                     from constructor to calculate the percentage.
+         */
+        void update(size_t current_size) {
+            if (!m_enable) {
+                return;
+            }
+
+            m_current_size = current_size;
+
+            display();
+        }
+
+        /**
+         * If you are reading multiple files, call this function after each
+         * file is finished.
+         *
+         * @param file_size The size of the file just finished.
+         */
+        void file_done(size_t file_size) {
+            m_done_size += file_size;
+            m_current_size = 0;
+            display();
+        }
+
         /**
          * Call this at the end. Will update the progress bar to 100% and
          * print a final line feed. If this is not called explicitly the
@@ -122,7 +163,9 @@ namespace osmium {
         void done() {
             m_do_cleanup = false;
             if (m_enable) {
-                update(m_max_size);
+                m_done_size = m_max_size;
+                m_current_size = 0;
+                display();
                 std::cerr << '\n';
             }
         }
