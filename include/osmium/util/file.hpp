@@ -92,15 +92,16 @@ namespace osmium {
          * @throws std::system_error If system call failed
          */
         inline size_t file_size(const char* name) {
-            struct stat s;
 #ifdef _MSC_VER
             // Windows implementation
             // https://msdn.microsoft.com/en-us/library/14h5k7ff.aspx
+            struct _stat64 s;
             if (::_stati64(name, &s) != 0) {
                 throw std::system_error(errno, std::system_category(), "_stati64 failed");
             }
 #else
             // Unix implementation
+            struct stat s;
             if (::stat(name, &s) != 0) {
                 throw std::system_error(errno, std::system_category(), "stat failed");
             }
