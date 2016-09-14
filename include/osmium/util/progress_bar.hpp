@@ -83,7 +83,7 @@ namespace osmium {
             }
             m_prev_percent = percent;
 
-            const size_t num = percent * (length / 100.0);
+            const size_t num = size_t(percent * (length / 100.0));
             std::cerr << '[';
             if (num >= length) {
                 std::cerr << bar();
