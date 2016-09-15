@@ -285,6 +285,10 @@ if(BUILD_DATA_TESTS)
     add_subdirectory(test/data-tests)
 endif()
 
+if(BUILD_EXAMPLES)
+    add_subdirectory(test/examples)
+endif()
+
 
 #-----------------------------------------------------------------------------
 #
