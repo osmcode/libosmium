@@ -283,7 +283,7 @@ namespace osmium {
                 }
 
                 if (num_points < 2) {
-                    throw osmium::geometry_error("need at least two points for linestring");
+                    throw osmium::geometry_error{"need at least two points for linestring"};
                 }
 
                 return linestring_finish(num_points);
@@ -357,7 +357,7 @@ namespace osmium {
                 }
 
                 if (num_points < 4) {
-                    throw osmium::geometry_error("need at least four points for polygon");
+                    throw osmium::geometry_error{"need at least four points for polygon"};
                 }
 
                 return polygon_finish(num_points);
@@ -403,7 +403,7 @@ namespace osmium {
 
                     // if there are no rings, this area is invalid
                     if (num_rings == 0) {
-                        throw osmium::geometry_error("area contains no rings");
+                        throw osmium::geometry_error{"invalid area"};
                     }
 
                     m_impl.multipolygon_polygon_finish();
