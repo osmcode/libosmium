@@ -26,11 +26,15 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Lots of one-argument constructors are now explicit.
 - Timestamp parser now uses our own implementation instead of strptime.
   This is faster and independant of locale settings.
+- More cases of invalid areas with duplicate segments are reported as
+  errors.
 
 ### Fixed
 
 - Fixed a problem limiting cache file sizes on Windows to 32 bit.
 - Fixed includes.
+- Exception messages for invalid areas do not report "area contains no rings"
+  any more, but "invalid area".
 
 
 ## [2.8.0] - 2016-08-04
