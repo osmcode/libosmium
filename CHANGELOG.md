@@ -110,7 +110,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - New functions for iterating over specific item types in buffers
   (`osmium::memory::Buffer::select()`), over specific subitems
   (`osmium::OSMObject::subitems()`), and for iterating over all rings of
-  an area (`osmium::Areas::outer_rings(`), `inner_rings()`).
+  an area (`osmium::Areas::outer_rings()`, `inner_rings()`).
 - Debug output optionally prints CRC32 when `add_crc32` file option is set.
 
 ### Changed
@@ -267,9 +267,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   one in Writer. Calling flush() on the OutputIterator isn't needed any
   more.
 - Reader now throws when trying to read after eof or an error.
-- I/O functions that used to throw std::runtime_error now throw
-  osmium::io_error or derived.
-- Optional parameters on osmium::io::Writer now work in any order.
+- I/O functions that used to throw `std::runtime_error` now throw
+  `osmium::io_error` or derived.
+- Optional parameters on `osmium::io::Writer` now work in any order.
 
 ### Fixed
 
