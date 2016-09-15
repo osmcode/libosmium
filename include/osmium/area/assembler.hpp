@@ -266,6 +266,9 @@ namespace osmium {
             // Statistics
             area_stats m_stats;
 
+            // The number of members the multipolygon relation has
+            size_t m_num_members = 0;
+
             bool debug() const noexcept {
                 return m_config.debug_level > 1;
             }
@@ -1169,6 +1172,20 @@ namespace osmium {
             }
 
             /**
+             * Checks if any ways were completely removed in the
+             * erase_duplicate_segments step.
+             */
+            bool ways_were_lost() {
+                std::unordered_set<const osmium::Way*> ways_in_segments;
+
+                for (const auto& segment : m_segment_list) {
+                    ways_in_segments.insert(segment.way());
+                }
+
+                return ways_in_segments.size() < m_num_members;
+            }
+
+            /**
              * Create rings from segments.
              */
             bool create_rings() {
@@ -1192,6 +1209,15 @@ namespace osmium {
                 if (m_segment_list.empty()) {
                     if (debug()) {
                         std::cerr << "  No segments left\n";
+                    }
+                    return false;
+                }
+
+                // If one or more complete ways was removed because of
+                // duplicate segments, this isn't a valid area.
+                if (ways_were_lost()) {
+                    if (debug()) {
+                        std::cerr << "  Complete ways removed because of duplicate segments\n";
                     }
                     return false;
                 }
@@ -1355,6 +1381,7 @@ namespace osmium {
             }
 
             bool create_area(osmium::memory::Buffer& out_buffer, const osmium::Relation& relation, const std::vector<const osmium::Way*>& members) {
+                m_num_members = members.size();
                 osmium::builder::AreaBuilder builder(out_buffer);
                 builder.initialize_from_object(relation);
 
