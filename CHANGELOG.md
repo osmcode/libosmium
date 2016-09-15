@@ -8,16 +8,25 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+### Changed
+
+### Fixed
+
+
+## [2.9.0] - 2016-09-15
+
+### Added
+
 - Support for reading OPL files.
 - For diff output OSM objects in buffers can be marked as only in one or the
   other file. The OPL and debug output formats support diff output based on
   this.
-- Add documentation and range checks to Tile struct.
+- Add documentation and range checks to `Tile` struct.
 - More documentation.
 - More examples and more extensive comments on examples.
-- Support for a progress report in osmium::io::Reader() and a ProgressBar
+- Support for a progress report in `osmium::io::Reader()` and a `ProgressBar`
   utility class to use it.
-- New OSMObject::set_timestamp(const char*) function.
+- New `OSMObject::set_timestamp(const char*)` function.
 
 ### Changed
 
@@ -401,7 +410,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   Doxygen (up to version 1.8.8). This version contains a workaround to fix
   this.
 
-[unreleased]: https://github.com/osmcode/libosmium/compare/v2.8.0...HEAD
+[unreleased]: https://github.com/osmcode/libosmium/compare/v2.9.0...HEAD
+[2.9.0]: https://github.com/osmcode/libosmium/compare/v2.8.0...v2.9.0
 [2.8.0]: https://github.com/osmcode/libosmium/compare/v2.7.2...v2.8.0
 [2.7.2]: https://github.com/osmcode/libosmium/compare/v2.7.1...v2.7.2
 [2.7.1]: https://github.com/osmcode/libosmium/compare/v2.7.0...v2.7.1
