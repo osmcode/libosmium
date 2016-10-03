@@ -90,7 +90,7 @@ namespace osmium {
             if (*str >= '0' && *str <= '9') {
                 result = *str - '0';
                 ++str;
-            } else {
+            } else if (*str != '.') {
                 goto error;
             }
 
