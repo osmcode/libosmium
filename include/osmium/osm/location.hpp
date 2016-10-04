@@ -73,6 +73,7 @@ namespace osmium {
 
             int64_t result = 0;
             int sign = 1;
+            int digit_count = 0;
 
             // one more than significant digits to allow rounding
             int64_t scale = 8;
@@ -89,14 +90,16 @@ namespace osmium {
             // there has to be at least one digit
             if (*str >= '0' && *str <= '9') {
                 result = *str - '0';
+                ++digit_count;
                 ++str;
-            } else if (*str != '.') {
+            } else if (*str != '.' && digit_count == 0) {
                 goto error;
             }
 
             // optional additional digits before decimal point
             while (*str >= '0' && *str <= '9' && max_digits > 0) {
                 result = result * 10 + (*str - '0');
+                ++digit_count;
                 ++str;
                 --max_digits;
             }
@@ -111,17 +114,19 @@ namespace osmium {
 
                 // read significant digits
                 for (; scale > 0 && *str >= '0' && *str <= '9'; --scale, ++str) {
+                    ++digit_count;
                     result = result * 10 + (*str - '0');
                 }
 
                 // ignore non-significant digits
                 max_digits = 20;
                 while (*str >= '0' && *str <= '9' && max_digits > 0) {
+                    ++digit_count;
                     ++str;
                     --max_digits;
                 }
 
-                if (max_digits == 0) {
+                if (max_digits == 0 || digit_count == 0) {
                     goto error;
                 }
             }
