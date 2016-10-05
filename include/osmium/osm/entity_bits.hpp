@@ -60,7 +60,9 @@ namespace osmium {
          * assert(! (entities & osmium::osm_entity_bits::changeset));
          * @endcode
          */
-        enum type : unsigned char {
+        enum type : unsigned char { // this should have been an enum class
+                                    // but now we can't change it any more
+                                    // without breaking lots of code
 
             nothing    = 0x00,
             node       = 0x01,
@@ -76,11 +78,11 @@ namespace osmium {
         }; // enum type
 
         inline constexpr type operator|(const type lhs, const type rhs) noexcept {
-            return static_cast<type>(static_cast<int>(lhs) | static_cast<int> (rhs));
+            return static_cast<type>(static_cast<int>(lhs) | static_cast<int>(rhs));
         }
 
         inline constexpr type operator&(const type lhs, const type rhs) noexcept {
-            return static_cast<type>(static_cast<int>(lhs) & static_cast<int> (rhs));
+            return static_cast<type>(static_cast<int>(lhs) & static_cast<int>(rhs));
         }
 
         inline constexpr type operator~(const type value) noexcept {
