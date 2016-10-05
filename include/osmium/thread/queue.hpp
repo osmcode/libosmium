@@ -51,7 +51,11 @@ namespace osmium {
 
     namespace thread {
 
-        static const std::chrono::milliseconds full_queue_sleep_duration { 10 }; // XXX
+        // Time we sleep when the queue is full before we try again to push
+        // something on it. This has to be large enough that we don't busy
+        // wait, but small enough that we are not wasting time. This value
+        // has been derived at experimentally by doing some benchmarks.
+        static const std::chrono::microseconds full_queue_sleep_duration {1};
 
         /**
          *  A thread-safe queue.
@@ -128,8 +132,8 @@ namespace osmium {
             }
 
             /**
-             * Push an element onto the queue. If the queue has a max size, this
-             * call will block if the queue is full.
+             * Push an element onto the queue. If the queue has a max size,
+             * this call will block if the queue is full.
              */
             void push(T value) {
 #ifdef OSMIUM_DEBUG_QUEUE_SIZE
