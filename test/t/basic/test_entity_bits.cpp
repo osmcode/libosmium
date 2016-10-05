@@ -2,6 +2,21 @@
 
 #include <osmium/osm/entity_bits.hpp>
 
+static_assert(osmium::osm_entity_bits::node |
+              osmium::osm_entity_bits::way |
+              osmium::osm_entity_bits::relation == osmium::osm_entity_bits::nwr, "entity_bits nwr failed");
+static_assert(osmium::osm_entity_bits::node |
+              osmium::osm_entity_bits::way |
+              osmium::osm_entity_bits::relation |
+              osmium::osm_entity_bits::area == osmium::osm_entity_bits::nwr, "entity_bits nwra failed");
+static_assert(osmium::osm_entity_bits::nwra |
+              osmium::osm_entity_bits::changeset == osmium::osm_entity_bits::all, "entity_bits all failed");
+static_assert(osmium::osm_entity_bits::all &
+              osmium::osm_entity_bits::node == osmium::osm_entity_bits::node, "entity_bits node failed");
+static_assert(~osmium::osm_entity_bits::all == osmium::osm_entity_bits::nothing, "entity_bits nothing is the inverse of all");
+static_assert(~osmium::osm_entity_bits::nothing == osmium::osm_entity_bits::all, "entity_bits all is the inverse of nothing");
+static_assert(~osmium::osm_entity_bits::changeset == osmium::osm_entity_bits::nwra, "entity_bits nwra is the inverse of changeset");
+
 TEST_CASE("Bitwise 'and' and 'or' on entity bits") {
     osmium::osm_entity_bits::type entities = osmium::osm_entity_bits::node | osmium::osm_entity_bits::way;
     REQUIRE(entities == (osmium::osm_entity_bits::node | osmium::osm_entity_bits::way));

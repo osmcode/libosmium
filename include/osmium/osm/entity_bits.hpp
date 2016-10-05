@@ -75,21 +75,21 @@ namespace osmium {
 
         }; // enum type
 
-        inline type operator|(const type lhs, const type rhs) noexcept {
+        inline constexpr type operator|(const type lhs, const type rhs) noexcept {
             return static_cast<type>(static_cast<int>(lhs) | static_cast<int> (rhs));
+        }
+
+        inline constexpr type operator&(const type lhs, const type rhs) noexcept {
+            return static_cast<type>(static_cast<int>(lhs) & static_cast<int> (rhs));
+        }
+
+        inline constexpr type operator~(const type value) noexcept {
+            return all & static_cast<type>(~static_cast<int>(value));
         }
 
         inline type& operator|=(type& lhs, const type rhs) noexcept {
             lhs = lhs | rhs;
             return lhs;
-        }
-
-        inline type operator&(const type lhs, const type rhs) noexcept {
-            return static_cast<type>(static_cast<int>(lhs) & static_cast<int> (rhs));
-        }
-
-        inline type operator~(const type value) noexcept {
-            return all & static_cast<type>(~static_cast<int>(value));
         }
 
         inline type operator&=(type& lhs, const type rhs) noexcept {
@@ -104,7 +104,7 @@ namespace osmium {
          *      changeset.
          */
         inline type from_item_type(osmium::item_type item_type) noexcept {
-            auto ut = static_cast<std::underlying_type<osmium::item_type>::type>(item_type);
+            const auto ut = static_cast<std::underlying_type<osmium::item_type>::type>(item_type);
             assert(ut <= 0x05);
             if (ut == 0) {
                 return nothing;
