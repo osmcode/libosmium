@@ -89,7 +89,7 @@ namespace osmium {
         }
 
         inline type operator~(const type value) noexcept {
-            return static_cast<type>(~static_cast<int>(value));
+            return all & static_cast<type>(~static_cast<int>(value));
         }
 
         inline type operator&=(type& lhs, const type rhs) noexcept {
