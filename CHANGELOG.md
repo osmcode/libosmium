@@ -10,7 +10,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
+- Updated embedded Catch unit test header to version 1.5.7.
+- More speedups for reading and writing OSM files.
+
 ### Fixed
+
+- Parsing of coordinates starting with decimal dot.
+- `~` operator for `entity_bits` doesn't set unused bits any more.
 
 
 ## [2.9.0] - 2016-09-15
