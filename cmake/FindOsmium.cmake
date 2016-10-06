@@ -2,8 +2,8 @@
 #
 #  FindOsmium.cmake
 #
-#  Find the Libosmium headers and, optionally, several components needed for
-#  different Libosmium functions.
+#  Find the Libosmium headers and, optionally, several components needed
+#  for different Libosmium functions.
 #
 #----------------------------------------------------------------------
 #
@@ -18,8 +18,11 @@
 #
 #    Then add the following in your CMakeLists.txt:
 #
-#      find_package(Osmium REQUIRED COMPONENTS <XXX>)
+#      find_package(Osmium [version] REQUIRED COMPONENTS <XXX>)
 #      include_directories(SYSTEM ${OSMIUM_INCLUDE_DIRS})
+#
+#    The version number is optional. If it is not set, any version of
+#    libosmium will do.
 #
 #    For the <XXX> substitute a space separated list of one or more of the
 #    following components:
@@ -52,7 +55,7 @@
 #----------------------------------------------------------------------
 
 # Look for the header file.
-find_path(OSMIUM_INCLUDE_DIR osmium/osm.hpp
+find_path(OSMIUM_INCLUDE_DIR osmium/version.hpp
     PATH_SUFFIXES include
     PATHS
         ../libosmium
@@ -61,6 +64,16 @@ find_path(OSMIUM_INCLUDE_DIR osmium/osm.hpp
         /opt/local # DarwinPorts
         /opt
 )
+
+# Check libosmium version number
+if(Osmium_FIND_VERSION)
+    file(STRINGS "${OSMIUM_INCLUDE_DIR}/osmium/version.hpp" _libosmium_version_define REGEX "#define LIBOSMIUM_VERSION_STRING")
+    if("${_libosmium_version_define}" MATCHES "#define LIBOSMIUM_VERSION_STRING \"([0-9.]+)\"")
+        set(_libosmium_version "${CMAKE_MATCH_1}")
+    else()
+        set(_libosmium_version "unknown")
+    endif()
+endif()
 
 set(OSMIUM_INCLUDE_DIRS "${OSMIUM_INCLUDE_DIR}")
 
@@ -102,6 +115,7 @@ if(Osmium_USE_PBF)
             ${CMAKE_THREAD_LIBS_INIT}
         )
         if(WIN32)
+            # This is needed for the ntohl() function
             list(APPEND OSMIUM_PBF_LIBRARIES ws2_32)
         endif()
         list(APPEND OSMIUM_INCLUDE_DIRS
@@ -203,7 +217,7 @@ if(Osmium_USE_SPARSEHASH)
     if(SPARSEHASH_INCLUDE_DIR)
         # Find size of sparsetable::size_type. This does not work on older
         # CMake versions because they can do this check only in C, not in C++.
-        if (NOT CMAKE_VERSION VERSION_LESS 3.0)
+        if(NOT CMAKE_VERSION VERSION_LESS 3.0)
            include(CheckTypeSize)
            set(CMAKE_REQUIRED_INCLUDES ${SPARSEHASH_INCLUDE_DIR})
            set(CMAKE_EXTRA_INCLUDE_FILES "google/sparsetable")
@@ -253,13 +267,15 @@ endif()
 #  Check that all required libraries are available
 #
 #----------------------------------------------------------------------
-if (OSMIUM_EXTRA_FIND_VARS)
+if(OSMIUM_EXTRA_FIND_VARS)
     list(REMOVE_DUPLICATES OSMIUM_EXTRA_FIND_VARS)
 endif()
-# Handle the QUIETLY and REQUIRED arguments and set OSMIUM_FOUND to TRUE if
-# all listed variables are TRUE.
+# Handle the QUIETLY and REQUIRED arguments and the optional version check
+# and set OSMIUM_FOUND to TRUE if all listed variables are TRUE.
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(Osmium REQUIRED_VARS OSMIUM_INCLUDE_DIR ${OSMIUM_EXTRA_FIND_VARS})
+find_package_handle_standard_args(Osmium
+                                  REQUIRED_VARS OSMIUM_INCLUDE_DIR ${OSMIUM_EXTRA_FIND_VARS}
+                                  VERSION_VAR _libosmium_version)
 unset(OSMIUM_EXTRA_FIND_VARS)
 
 #----------------------------------------------------------------------
