@@ -54,15 +54,20 @@
 #
 #----------------------------------------------------------------------
 
-# Look for the header file.
-find_path(OSMIUM_INCLUDE_DIR osmium/version.hpp
-    PATH_SUFFIXES include
-    PATHS
+# This is the list of directories where we look for osmium and protozero
+# includes.
+list(APPEND _osmium_include_path
         ../libosmium
         ~/Library/Frameworks
         /Library/Frameworks
         /opt/local # DarwinPorts
         /opt
+)
+
+# Look for the header file.
+find_path(OSMIUM_INCLUDE_DIR osmium/version.hpp
+    PATH_SUFFIXES include
+    PATHS ${_osmium_include_path}
 )
 
 # Check libosmium version number
@@ -108,8 +113,19 @@ if(Osmium_USE_PBF)
     find_package(ZLIB)
     find_package(Threads)
 
-    list(APPEND OSMIUM_EXTRA_FIND_VARS ZLIB_FOUND Threads_FOUND)
-    if(ZLIB_FOUND AND Threads_FOUND)
+    message(STATUS "Looking for protozero")
+    find_path(PROTOZERO_INCLUDE_DIR protozero/version.hpp
+        PATH_SUFFIXES include
+        PATHS ${_osmium_include_path}
+    )
+    if(PROTOZERO_INCLUDE_DIR)
+        message(STATUS "Looking for protozero - found")
+    else()
+        message(STATUS "Looking for protozero - not found")
+    endif()
+
+    list(APPEND OSMIUM_EXTRA_FIND_VARS ZLIB_FOUND Threads_FOUND PROTOZERO_INCLUDE_DIR)
+    if(ZLIB_FOUND AND Threads_FOUND AND PROTOZERO_INCLUDE_DIR)
         list(APPEND OSMIUM_PBF_LIBRARIES
             ${ZLIB_LIBRARIES}
             ${CMAKE_THREAD_LIBS_INIT}
@@ -120,6 +136,7 @@ if(Osmium_USE_PBF)
         endif()
         list(APPEND OSMIUM_INCLUDE_DIRS
             ${ZLIB_INCLUDE_DIR}
+            ${PROTOZERO_INCLUDE_DIR}
         )
     else()
         message(WARNING "Osmium: Can not find some libraries for PBF input/output, please install them or configure the paths.")
