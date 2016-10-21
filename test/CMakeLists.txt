@@ -163,6 +163,7 @@ add_unit_test(geom test_tile ENABLE_IF ${GEOS_FOUND})
 add_unit_test(geom test_wkb)
 add_unit_test(geom test_wkt)
 
+add_unit_test(index test_id_set)
 add_unit_test(index test_id_to_location ENABLE_IF ${SPARSEHASH_FOUND})
 add_unit_test(index test_file_based_index)
 
