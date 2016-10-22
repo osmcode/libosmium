@@ -34,7 +34,7 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <algorithm>
-#include <array>
+#include <cstring>
 #include <memory>
 #include <type_traits>
 #include <unordered_set>
@@ -58,10 +58,9 @@ namespace osmium {
             static_assert(sizeof(T) >= 4, "Needs at least 32bit type");
 
             constexpr static const size_t chunk_bits = 26;
+            constexpr static const size_t chunk_size = 1 << chunk_bits;
 
-            using chunk_type = std::array<unsigned char, 1 << chunk_bits>;
-
-            std::vector<std::unique_ptr<chunk_type>> m_data;
+            std::vector<std::unique_ptr<unsigned char[]>> m_data;
 
             static size_t chunk(T id) {
                 return id >> (chunk_bits + 3);
@@ -86,10 +85,11 @@ namespace osmium {
                 }
 
                 if (!m_data[c]) {
-                    m_data[c].reset(new chunk_type{});
+                    m_data[c].reset(new unsigned char[chunk_size]);
+                    ::memset(m_data[c].get(), 0, chunk_size);
                 }
 
-                auto& r = *m_data[c];
+                auto* r = m_data[c].get();
                 r[offset(id)] |= bitmask(id);
             }
 
@@ -97,11 +97,11 @@ namespace osmium {
                 if (chunk(id) >= m_data.size()) {
                     return false;
                 }
-                chunk_type* r = m_data[chunk(id)].get();
+                auto* r = m_data[chunk(id)].get();
                 if (!r) {
                     return false;
                 }
-                return ((*r)[offset(id)] & bitmask(id)) != 0;
+                return (r[offset(id)] & bitmask(id)) != 0;
             }
 
             bool empty() const noexcept {
