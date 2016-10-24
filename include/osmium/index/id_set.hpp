@@ -44,20 +44,42 @@ namespace osmium {
 
     namespace index {
 
+        template <typename T>
+        class IdSet {
+
+        public:
+
+            virtual ~IdSet() {
+            }
+
+            virtual void set(T id) = 0;
+            virtual bool get(T id) const noexcept = 0;
+            virtual bool empty() const = 0;
+            virtual void clear() = 0;
+
+        }; // class IdSet
+
         /**
          * A set of Ids of the given type. Internal storage is in chunks of
-         * arrays used as bit fields.
+         * arrays used as bit fields. Internally those chunks will be allocated
+         * as needed, so it works relatively efficiently with both smaller
+         * and larger Id sets. If it is not used, no memory is allocated at
+         * all.
          *
          * Elements can never be removed from the the set, you can only clear
          * the whole set at once.
          */
         template <typename T>
-        class IdSet {
+        class IdSetDense : public IdSet<T> {
 
             static_assert(std::is_unsigned<T>::value, "Needs unsigned type");
             static_assert(sizeof(T) >= 4, "Needs at least 32bit type");
 
-            constexpr static const size_t chunk_bits = 26;
+            // This value is a compromise. For node Ids it could be bigger
+            // which would mean less (but larger) memory allocations. For
+            // relations Ids it could be smaller, because they would all fit
+            // into a smaller allocation.
+            constexpr static const size_t chunk_bits = 22;
             constexpr static const size_t chunk_size = 1 << chunk_bits;
 
             std::vector<std::unique_ptr<unsigned char[]>> m_data;
@@ -76,9 +98,9 @@ namespace osmium {
 
         public:
 
-            IdSet() = default;
+            IdSetDense() = default;
 
-            void set(T id) {
+            void set(T id) override final {
                 const auto c = chunk(id);
                 if (c >= m_data.size()) {
                     m_data.resize(c+1);
@@ -93,7 +115,7 @@ namespace osmium {
                 r[offset(id)] |= bitmask(id);
             }
 
-            bool get(T id) const noexcept {
+            bool get(T id) const noexcept override final {
                 if (chunk(id) >= m_data.size()) {
                     return false;
                 }
@@ -104,15 +126,41 @@ namespace osmium {
                 return (r[offset(id)] & bitmask(id)) != 0;
             }
 
-            bool empty() const noexcept {
+            bool empty() const noexcept override final {
                 return m_data.empty();
             }
 
-            void clear() {
+            void clear() override final {
                 m_data.clear();
             }
 
-        }; // class IdSet
+        }; // class IdSetDense
+
+        template <typename T>
+        class IdSetSmall : public IdSet<T> {
+
+            std::vector<T> m_data;
+
+        public:
+
+            void set(T id) override final {
+                m_data.push_back(id);
+            }
+
+            bool get(T id) const noexcept override final {
+                const auto it = std::find(m_data.cbegin(), m_data.cend(), id);
+                return it != m_data.cend();
+            }
+
+            bool empty() const noexcept override final {
+                return m_data.empty();
+            }
+
+            void clear() override final {
+                m_data.clear();
+            }
+
+        }; // IdSetSmall
 
     } // namespace index
 
