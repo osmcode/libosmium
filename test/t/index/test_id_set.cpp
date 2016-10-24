@@ -10,19 +10,73 @@ TEST_CASE("Basic functionality of IdSetDense") {
     REQUIRE_FALSE(s.get(17));
     REQUIRE_FALSE(s.get(28));
     REQUIRE(s.empty());
+    REQUIRE(s.size() == 0);
 
     s.set(17);
     REQUIRE(s.get(17));
     REQUIRE_FALSE(s.get(28));
     REQUIRE_FALSE(s.empty());
+    REQUIRE(s.size() == 1);
 
     s.set(28);
     REQUIRE(s.get(17));
     REQUIRE(s.get(28));
     REQUIRE_FALSE(s.empty());
+    REQUIRE(s.size() == 2);
+
+    s.set(17);
+    REQUIRE(s.get(17));
+    REQUIRE(s.size() == 2);
+
+    REQUIRE_FALSE(s.check_and_set(17));
+    REQUIRE(s.get(17));
+    REQUIRE(s.size() == 2);
+
+    s.unset(17);
+    REQUIRE_FALSE(s.get(17));
+    REQUIRE(s.size() == 1);
+
+    REQUIRE(s.check_and_set(32));
+    REQUIRE(s.get(32));
+    REQUIRE(s.size() == 2);
 
     s.clear();
     REQUIRE(s.empty());
+    REQUIRE(s.size() == 0);
+}
+
+TEST_CASE("Iterating over IdSetDense") {
+    osmium::index::IdSetDense<osmium::unsigned_object_id_type> s;
+    s.set(7);
+    s.set(35);
+    s.set(35);
+    s.set(20);
+    s.set(1LL << 33);
+    s.set(21);
+    s.set(1LL << 27 + 13);
+
+    REQUIRE(s.size() == 6);
+
+    auto it = s.begin();
+    REQUIRE(it != s.end());
+    REQUIRE(*it == 7);
+    ++it;
+    REQUIRE(it != s.end());
+    REQUIRE(*it == 20);
+    ++it;
+    REQUIRE(it != s.end());
+    REQUIRE(*it == 21);
+    ++it;
+    REQUIRE(it != s.end());
+    REQUIRE(*it == 35);
+    ++it;
+    REQUIRE(it != s.end());
+    s.set(1LL << 27 + 13);
+    ++it;
+    REQUIRE(it != s.end());
+    s.set(1LL << 33);
+    ++it;
+    REQUIRE(it == s.end());
 }
 
 TEST_CASE("Test with larger Ids") {

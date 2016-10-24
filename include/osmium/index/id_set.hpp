@@ -34,11 +34,15 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <algorithm>
+#include <cassert>
 #include <cstring>
 #include <memory>
 #include <type_traits>
 #include <unordered_set>
 #include <vector>
+
+#include <osmium/osm/item_type.hpp>
+#include <osmium/osm/types.hpp>
 
 namespace osmium {
 
@@ -59,21 +63,92 @@ namespace osmium {
 
         }; // class IdSet
 
+        template <typename T>
+        class IdSetDense;
+
+        template <typename T>
+        class IdSetDenseIterator {
+
+            const IdSetDense<T>* m_set;
+            T m_value;
+            T m_last;
+
+            void next() noexcept {
+                while (m_value != m_last && !m_set->get(m_value)) {
+                    const auto cid = IdSetDense<T>::chunk_id(m_value);
+                    assert(cid < m_set->m_data.size());
+                    if (!m_set->m_data[cid]) {
+                        m_value = (cid + 1) << (IdSetDense<T>::chunk_bits + 3);
+                    } else {
+                        const auto slot = m_set->m_data[cid][IdSetDense<T>::offset(m_value)];
+                        if (slot == 0) {
+                            m_value += 8;
+                            m_value &= ~0x7;
+                        } else {
+                            ++m_value;
+                        }
+                    }
+                }
+            }
+
+        public:
+
+            using iterator_category = std::forward_iterator_tag;
+            using value_type        = T;
+            using pointer           = value_type*;
+            using reference         = value_type&;
+
+            IdSetDenseIterator(const IdSetDense<T>* set, T value, T last) noexcept :
+                m_set(set),
+                m_value(value),
+                m_last(last) {
+                next();
+            }
+
+            IdSetDenseIterator<T>& operator++() noexcept {
+                if (m_value != m_last) {
+                    ++m_value;
+                    next();
+                }
+                return *this;
+            }
+
+            IdSetDenseIterator<T> operator++(int) noexcept {
+                IdSetDenseIterator<T> tmp(*this);
+                operator++();
+                return tmp;
+            }
+
+            bool operator==(const IdSetDenseIterator<T>& rhs) const noexcept {
+                return m_set == rhs.m_set && m_value == rhs.m_value;
+            }
+
+            bool operator!=(const IdSetDenseIterator<T>& rhs) const noexcept {
+                return ! (*this == rhs);
+            }
+
+            T operator*() const noexcept {
+                assert(m_value < m_last);
+                return m_value;
+            }
+
+        }; // class IdSetDenseIterator
+
+
         /**
          * A set of Ids of the given type. Internal storage is in chunks of
          * arrays used as bit fields. Internally those chunks will be allocated
          * as needed, so it works relatively efficiently with both smaller
          * and larger Id sets. If it is not used, no memory is allocated at
          * all.
-         *
-         * Elements can never be removed from the the set, you can only clear
-         * the whole set at once.
          */
         template <typename T>
         class IdSetDense : public IdSet<T> {
 
             static_assert(std::is_unsigned<T>::value, "Needs unsigned type");
             static_assert(sizeof(T) >= 4, "Needs at least 32bit type");
+
+            friend class IdSetDenseIterator<T>;
 
             // This value is a compromise. For node Ids it could be bigger
             // which would mean less (but larger) memory allocations. For
@@ -83,43 +158,73 @@ namespace osmium {
             constexpr static const size_t chunk_size = 1 << chunk_bits;
 
             std::vector<std::unique_ptr<unsigned char[]>> m_data;
+            size_t m_size = 0;
 
-            static size_t chunk(T id) {
+            static size_t chunk_id(T id) noexcept {
                 return id >> (chunk_bits + 3);
             }
 
-            static size_t offset(T id) {
+            static size_t offset(T id) noexcept {
                 return (id >> 3) & ((1 << chunk_bits) - 1);
             }
 
-            static unsigned char bitmask(T id) {
+            static unsigned char bitmask(T id) noexcept {
                 return 1 << (id & 0x7);
+            }
+
+            T last() const noexcept {
+                return m_data.size() * chunk_size * 8;
+            }
+
+            unsigned char& get_element(T id) {
+                const auto cid = chunk_id(id);
+                if (cid >= m_data.size()) {
+                    m_data.resize(cid + 1);
+                }
+
+                auto& chunk = m_data[cid];
+                if (!chunk) {
+                    chunk.reset(new unsigned char[chunk_size]);
+                    ::memset(chunk.get(), 0, chunk_size);
+                }
+
+                return chunk[offset(id)];
             }
 
         public:
 
             IdSetDense() = default;
 
+            bool check_and_set(T id) {
+                auto& element = get_element(id);
+
+                if ((element & bitmask(id)) == 0) {
+                    element |= bitmask(id);
+                    ++m_size;
+                    return true;
+                }
+
+                return false;
+            }
+
             void set(T id) override final {
-                const auto c = chunk(id);
-                if (c >= m_data.size()) {
-                    m_data.resize(c+1);
-                }
+                check_and_set(id);
+            }
 
-                if (!m_data[c]) {
-                    m_data[c].reset(new unsigned char[chunk_size]);
-                    ::memset(m_data[c].get(), 0, chunk_size);
-                }
+            void unset(T id) {
+                auto& element = get_element(id);
 
-                auto* r = m_data[c].get();
-                r[offset(id)] |= bitmask(id);
+                if ((element & bitmask(id)) != 0) {
+                    element &= ~bitmask(id);
+                    --m_size;
+                }
             }
 
             bool get(T id) const noexcept override final {
-                if (chunk(id) >= m_data.size()) {
+                if (chunk_id(id) >= m_data.size()) {
                     return false;
                 }
-                auto* r = m_data[chunk(id)].get();
+                auto* r = m_data[chunk_id(id)].get();
                 if (!r) {
                     return false;
                 }
@@ -127,11 +232,24 @@ namespace osmium {
             }
 
             bool empty() const noexcept override final {
-                return m_data.empty();
+                return m_size == 0;
+            }
+
+            size_t size() const noexcept {
+                return m_size;
             }
 
             void clear() override final {
                 m_data.clear();
+                m_size = 0;
+            }
+
+            IdSetDenseIterator<T> begin() const {
+                return IdSetDenseIterator<T>{this, 0, last()};
+            }
+
+            IdSetDenseIterator<T> end() const {
+                return IdSetDenseIterator<T>{this, last(), last()};
             }
 
         }; // class IdSetDense
@@ -160,7 +278,26 @@ namespace osmium {
                 m_data.clear();
             }
 
-        }; // IdSetSmall
+        }; // class IdSetSmall
+
+        template <template<typename> class IdSetType>
+        class NWRIdSet {
+
+            using id_set_type = IdSetType<osmium::unsigned_object_id_type>;
+
+            id_set_type m_sets[3];
+
+        public:
+
+            id_set_type& operator()(osmium::item_type type) noexcept {
+                return m_sets[osmium::item_type_to_nwr_index(type)];
+            }
+
+            const id_set_type& operator()(osmium::item_type type) const noexcept {
+                return m_sets[osmium::item_type_to_nwr_index(type)];
+            }
+
+        }; // class NWRIdSet
 
     } // namespace index
 
