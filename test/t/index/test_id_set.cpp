@@ -53,7 +53,7 @@ TEST_CASE("Iterating over IdSetDense") {
     s.set(20);
     s.set(1LL << 33);
     s.set(21);
-    s.set(1LL << 27 + 13);
+    s.set((1LL << 27) + 13);
 
     REQUIRE(s.size() == 6);
 
@@ -71,10 +71,10 @@ TEST_CASE("Iterating over IdSetDense") {
     REQUIRE(*it == 35);
     ++it;
     REQUIRE(it != s.end());
-    s.set(1LL << 27 + 13);
+    REQUIRE(*it == (1LL << 27) + 13);
     ++it;
     REQUIRE(it != s.end());
-    s.set(1LL << 33);
+    REQUIRE(*it == 1LL << 33);
     ++it;
     REQUIRE(it == s.end());
 }
@@ -125,5 +125,42 @@ TEST_CASE("Basic functionality of IdSetSmall") {
 
     s.clear();
     REQUIRE(s.empty());
+}
+
+TEST_CASE("Iterating over IdSetSmall") {
+    osmium::index::IdSetSmall<osmium::unsigned_object_id_type> s;
+    s.set(7);
+    s.set(35);
+    s.set(35);
+    s.set(20);
+    s.set(1LL << 33);
+    s.set(21);
+    s.set((1LL << 27) + 13);
+
+    // needs to be called before size() and iterator will work properly
+    s.sort_unique();
+
+    REQUIRE(s.size() == 6);
+
+    auto it = s.begin();
+    REQUIRE(it != s.end());
+    REQUIRE(*it == 7);
+    ++it;
+    REQUIRE(it != s.end());
+    REQUIRE(*it == 20);
+    ++it;
+    REQUIRE(it != s.end());
+    REQUIRE(*it == 21);
+    ++it;
+    REQUIRE(it != s.end());
+    REQUIRE(*it == 35);
+    ++it;
+    REQUIRE(it != s.end());
+    REQUIRE(*it == (1LL << 27) + 13);
+    ++it;
+    REQUIRE(it != s.end());
+    REQUIRE(*it == 1LL << 33);
+    ++it;
+    REQUIRE(it == s.end());
 }
 

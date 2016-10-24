@@ -48,6 +48,10 @@ namespace osmium {
 
     namespace index {
 
+        /**
+         * Virtual parent class for IdSets. Use one of the implementations
+         * provided.
+         */
         template <typename T>
         class IdSet {
 
@@ -56,9 +60,24 @@ namespace osmium {
             virtual ~IdSet() {
             }
 
+            /**
+             * Add the given Id to the set.
+             */
             virtual void set(T id) = 0;
+
+            /**
+             * Is the Id in the set?
+             */
             virtual bool get(T id) const noexcept = 0;
+
+            /**
+             * Is the set empty?
+             */
             virtual bool empty() const = 0;
+
+            /**
+             * Clear the set.
+             */
             virtual void clear() = 0;
 
         }; // class IdSet
@@ -66,6 +85,9 @@ namespace osmium {
         template <typename T>
         class IdSetDense;
 
+        /**
+         * Const_iterator for iterating over a IdSetDense.
+         */
         template <typename T>
         class IdSetDenseIterator {
 
@@ -134,7 +156,6 @@ namespace osmium {
 
         }; // class IdSetDenseIterator
 
-
         /**
          * A set of Ids of the given type. Internal storage is in chunks of
          * arrays used as bit fields. Internally those chunks will be allocated
@@ -193,8 +214,16 @@ namespace osmium {
 
         public:
 
+            using const_iterator = IdSetDenseIterator<T>;
+
             IdSetDense() = default;
 
+            /**
+             * Add the Id to the set if it is not already in there.
+             *
+             * @param id The Id to set.
+             * @returns true if the Id was added, false if it was already set.
+             */
             bool check_and_set(T id) {
                 auto& element = get_element(id);
 
@@ -207,10 +236,20 @@ namespace osmium {
                 return false;
             }
 
+            /**
+             * Add the given Id to the set.
+             *
+             * @param id The Id to set.
+             */
             void set(T id) override final {
-                check_and_set(id);
+                (void)check_and_set(id);
             }
 
+            /**
+             * Remove the given Id from the set.
+             *
+             * @param id The Id to set.
+             */
             void unset(T id) {
                 auto& element = get_element(id);
 
@@ -220,6 +259,11 @@ namespace osmium {
                 }
             }
 
+            /**
+             * Is the Id in the set?
+             *
+             * @param id The Id to check.
+             */
             bool get(T id) const noexcept override final {
                 if (chunk_id(id) >= m_data.size()) {
                     return false;
@@ -231,14 +275,23 @@ namespace osmium {
                 return (r[offset(id)] & bitmask(id)) != 0;
             }
 
+            /**
+             * Is the set empty?
+             */
             bool empty() const noexcept override final {
                 return m_size == 0;
             }
 
+            /**
+             * The number of Ids stored in the set.
+             */
             size_t size() const noexcept {
                 return m_size;
             }
 
+            /**
+             * Clear the set.
+             */
             void clear() override final {
                 m_data.clear();
                 m_size = 0;
@@ -254,6 +307,10 @@ namespace osmium {
 
         }; // class IdSetDense
 
+        /**
+         * IdSet implementation for small Id sets. It writes the Ids
+         * into a vector and uses linear search.
+         */
         template <typename T>
         class IdSetSmall : public IdSet<T> {
 
@@ -261,21 +318,89 @@ namespace osmium {
 
         public:
 
+            /**
+             * Add the given Id to the set.
+             */
             void set(T id) override final {
                 m_data.push_back(id);
             }
 
+            /**
+             * Is the Id in the set? Uses linear search.
+             *
+             * @param id The Id to check.
+             */
             bool get(T id) const noexcept override final {
                 const auto it = std::find(m_data.cbegin(), m_data.cend(), id);
                 return it != m_data.cend();
             }
 
+            /**
+             * Is the Id in the set? Uses a binary search. For larger sets
+             * this might be more efficient than calling get(), the set
+             * must be sorted.
+             *
+             * @param id The Id to check.
+             * @pre You must have called sort_unique() before calling this
+             *      or be sure there are no duplicates and the Ids have been
+             *      set in order.
+             */
+            bool get_binary_search(T id) const noexcept {
+                return std::binary_search(m_data.cbegin(), m_data.cend(), id);
+            }
+
+            /**
+             * Is the set empty?
+             */
             bool empty() const noexcept override final {
                 return m_data.empty();
             }
 
+            /**
+             * Clear the set.
+             */
             void clear() override final {
                 m_data.clear();
+            }
+
+            /**
+             * Sort the internal vector and remove any duplicates. Call this
+             * before using size(), get_binary_search() or using an iterator.
+             */
+            void sort_unique() {
+                std::sort(m_data.begin(), m_data.end());
+                const auto last = std::unique(m_data.begin(), m_data.end());
+                m_data.erase(last, m_data.end());
+
+            }
+
+            /**
+             * The number of Ids stored in the set.
+             *
+             * @pre You must have called sort_unique() before calling this
+             *      or be sure there are no duplicates.
+             */
+            size_t size() const noexcept {
+                return m_data.size();
+            }
+
+            /// Iterator type. There is no non-const iterator.
+            using const_iterator = typename std::vector<T>::const_iterator;
+
+            const_iterator begin() const noexcept {
+                return m_data.cbegin();
+            }
+
+            const_iterator end() const noexcept {
+                return m_data.cend();
+            }
+
+            const_iterator cbegin() const noexcept {
+                return m_data.cbegin();
+            }
+
+            const_iterator cend() const noexcept {
+                return m_data.cend();
             }
 
         }; // class IdSetSmall
