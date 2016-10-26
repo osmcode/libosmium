@@ -52,6 +52,15 @@ namespace osmium {
 
     public:
 
+        using value_type             = NodeRef;
+        using reference              = NodeRef&;
+        using const_reference        = const NodeRef&;
+        using iterator               = NodeRef*;
+        using const_iterator         = const NodeRef*;
+        using const_reverse_iterator = std::reverse_iterator<const NodeRef*>;
+        using difference_type        = std::ptrdiff_t;
+        using size_type              = std::size_t;
+
         explicit NodeRefList(osmium::item_type itemtype) noexcept :
             osmium::memory::Item(sizeof(NodeRefList), itemtype) {
         }
@@ -66,7 +75,7 @@ namespace osmium {
         /**
          * Returns the number of NodeRefs in the collection.
          */
-        size_t size() const noexcept {
+        size_type size() const noexcept {
             const auto size_node_refs = byte_size() - sizeof(NodeRefList);
             assert(size_node_refs % sizeof(NodeRef) == 0);
             return size_node_refs / sizeof(NodeRef);
@@ -79,7 +88,7 @@ namespace osmium {
          *
          * @param n Get the n-th element of the collection.
          */
-        const NodeRef& operator[](size_t n) const noexcept {
+        const NodeRef& operator[](size_type n) const noexcept {
             assert(n < size());
             const NodeRef* node_ref = &*(cbegin());
             return node_ref[n];
@@ -136,10 +145,6 @@ namespace osmium {
             assert(front().location() && back().location());
             return front().location() == back().location();
         }
-
-        using iterator = NodeRef*;
-        using const_iterator = const NodeRef*;
-        using const_reverse_iterator = std::reverse_iterator<const NodeRef*>;
 
         /// Returns an iterator to the beginning.
         iterator begin() noexcept {

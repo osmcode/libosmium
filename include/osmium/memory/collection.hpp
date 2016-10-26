@@ -118,9 +118,11 @@ namespace osmium {
 
         public:
 
-            using iterator       = CollectionIterator<TMember>;
-            using const_iterator = CollectionIterator<const TMember>;
-            using value_type     = TMember;
+            using value_type      = TMember;
+            using reference       = TMember&;
+            using const_reference = const TMember&;
+            using iterator        = CollectionIterator<TMember>;
+            using const_iterator  = CollectionIterator<const TMember>;
 
             static constexpr osmium::item_type itemtype = TCollectionItemType;
 
