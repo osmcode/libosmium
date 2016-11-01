@@ -377,8 +377,6 @@ namespace osmium {
                             decode_tags(&builder, &data, end);
                         }
                     }
-
-                    m_buffer.commit();
                 }
 
                 void decode_way(const char* data, const char* const end) {
@@ -411,8 +409,6 @@ namespace osmium {
                             decode_tags(&builder, &data, end);
                         }
                     }
-
-                    m_buffer.commit();
                 }
 
                 osmium::item_type decode_member_type(char c) {
@@ -484,8 +480,6 @@ namespace osmium {
                             decode_tags(&builder, &data, end);
                         }
                     }
-
-                    m_buffer.commit();
                 }
 
                 void decode_bbox(const char* data, const char* const end) {
@@ -549,18 +543,21 @@ namespace osmium {
                                     mark_header_as_done();
                                     if (read_types() & osmium::osm_entity_bits::node) {
                                         decode_node(m_data, m_data + length);
+                                        m_buffer.commit();
                                     }
                                     break;
                                 case dataset_type::way:
                                     mark_header_as_done();
                                     if (read_types() & osmium::osm_entity_bits::way) {
                                         decode_way(m_data, m_data + length);
+                                        m_buffer.commit();
                                     }
                                     break;
                                 case dataset_type::relation:
                                     mark_header_as_done();
                                     if (read_types() & osmium::osm_entity_bits::relation) {
                                         decode_relation(m_data, m_data + length);
+                                        m_buffer.commit();
                                     }
                                     break;
                                 case dataset_type::bounding_box:

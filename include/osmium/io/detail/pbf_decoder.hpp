@@ -143,6 +143,7 @@ namespace osmium {
                                 case OSMFormat::PrimitiveGroup::repeated_Node_nodes:
                                     if (m_read_types & osmium::osm_entity_bits::node) {
                                         decode_node(pbf_primitive_group.get_view());
+                                        m_buffer.commit();
                                     } else {
                                         pbf_primitive_group.skip();
                                     }
@@ -150,6 +151,7 @@ namespace osmium {
                                 case OSMFormat::PrimitiveGroup::optional_DenseNodes_dense:
                                     if (m_read_types & osmium::osm_entity_bits::node) {
                                         decode_dense_nodes(pbf_primitive_group.get_view());
+                                        m_buffer.commit();
                                     } else {
                                         pbf_primitive_group.skip();
                                     }
@@ -157,6 +159,7 @@ namespace osmium {
                                 case OSMFormat::PrimitiveGroup::repeated_Way_ways:
                                     if (m_read_types & osmium::osm_entity_bits::way) {
                                         decode_way(pbf_primitive_group.get_view());
+                                        m_buffer.commit();
                                     } else {
                                         pbf_primitive_group.skip();
                                     }
@@ -164,6 +167,7 @@ namespace osmium {
                                 case OSMFormat::PrimitiveGroup::repeated_Relation_relations:
                                     if (m_read_types & osmium::osm_entity_bits::relation) {
                                         decode_relation(pbf_primitive_group.get_view());
+                                        m_buffer.commit();
                                     } else {
                                         pbf_primitive_group.skip();
                                     }
@@ -293,8 +297,6 @@ namespace osmium {
                     builder.add_user(user.first, user.second);
 
                     build_tag_list(builder, keys, vals);
-
-                    m_buffer.commit();
                 }
 
                 void decode_way(const data_view& data) {
@@ -363,8 +365,6 @@ namespace osmium {
                     }
 
                     build_tag_list(builder, keys, vals);
-
-                    m_buffer.commit();
                 }
 
                 void decode_relation(const data_view& data) {
@@ -431,8 +431,6 @@ namespace osmium {
                     }
 
                     build_tag_list(builder, keys, vals);
-
-                    m_buffer.commit();
                 }
 
                 void decode_dense_nodes(const data_view& data) {
@@ -602,8 +600,6 @@ namespace osmium {
                                 ++tag_it;
                             }
                         }
-
-                        m_buffer.commit();
                     }
 
                 }

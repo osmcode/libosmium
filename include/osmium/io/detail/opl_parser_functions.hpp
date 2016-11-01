@@ -430,8 +430,6 @@ namespace osmium {
                 if (tags_begin) {
                     opl_parse_tags(tags_begin, buffer, &builder);
                 }
-
-                buffer.commit();
             }
 
             inline void opl_parse_way(const char** data, osmium::memory::Buffer& buffer) {
@@ -495,8 +493,6 @@ namespace osmium {
                 }
 
                 opl_parse_way_nodes(nodes_begin, nodes_end, buffer, &builder);
-
-                buffer.commit();
             }
 
             inline void opl_parse_relation_members(const char* s, const char* e, osmium::memory::Buffer& buffer, osmium::builder::RelationBuilder* parent_builder = nullptr) {
@@ -597,8 +593,6 @@ namespace osmium {
                 if (members_begin != members_end) {
                     opl_parse_relation_members(members_begin, members_end, buffer, &builder);
                 }
-
-                buffer.commit();
             }
 
             inline void opl_parse_changeset(const char** data, osmium::memory::Buffer& buffer) {
@@ -681,8 +675,6 @@ namespace osmium {
                 if (tags_begin) {
                     opl_parse_tags(tags_begin, buffer, &builder);
                 }
-
-                buffer.commit();
             }
 
             inline bool opl_parse_line(uint64_t line_count,
@@ -702,6 +694,7 @@ namespace osmium {
                             if (read_types & osmium::osm_entity_bits::node) {
                                 ++data;
                                 opl_parse_node(&data, buffer);
+                                buffer.commit();
                                 return true;
                             }
                             break;
@@ -709,6 +702,7 @@ namespace osmium {
                             if (read_types & osmium::osm_entity_bits::way) {
                                 ++data;
                                 opl_parse_way(&data, buffer);
+                                buffer.commit();
                                 return true;
                             }
                             break;
@@ -716,6 +710,7 @@ namespace osmium {
                             if (read_types & osmium::osm_entity_bits::relation) {
                                 ++data;
                                 opl_parse_relation(&data, buffer);
+                                buffer.commit();
                                 return true;
                             }
                             break;
@@ -723,6 +718,7 @@ namespace osmium {
                             if (read_types & osmium::osm_entity_bits::changeset) {
                                 ++data;
                                 opl_parse_changeset(&data, buffer);
+                                buffer.commit();
                                 return true;
                             }
                             break;

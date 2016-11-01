@@ -80,9 +80,9 @@ TEST_CASE("Node in Buffer") {
             node.set_location(osmium::Location(3.5, 4.7));
 
             node_builder.add_user("testuser");
-
-            buffer.commit();
         }
+
+        buffer.commit();
 
         {
             // add node 2
@@ -100,14 +100,12 @@ TEST_CASE("Node in Buffer") {
 
             node_builder.add_user("testuser");
 
-            {
-                osmium::builder::TagListBuilder tag_builder(buffer, &node_builder);
-                tag_builder.add_tag("amenity", "bank");
-                tag_builder.add_tag("name", "OSM Savings");
-            }
-
-            buffer.commit();
+            osmium::builder::TagListBuilder tag_builder(buffer, &node_builder);
+            tag_builder.add_tag("amenity", "bank");
+            tag_builder.add_tag("name", "OSM Savings");
         }
+
+        buffer.commit();
 
         REQUIRE(2 == std::distance(buffer.begin(), buffer.end()));
         int item_no = 0;
@@ -150,9 +148,9 @@ TEST_CASE("Node in Buffer") {
             node.set_location(osmium::Location(3.5, 4.7));
 
             node_builder.add_user("testuser");
-
-            buffer.commit();
         }
+
+        buffer.commit();
 
         osmium::memory::Buffer buffer2(buffer_size, osmium::memory::Buffer::auto_grow::yes);
 
@@ -182,9 +180,9 @@ TEST_CASE("Node in Buffer") {
             node.set_location(osmium::Location(3.5, 4.7));
 
             node_builder.add_user("testuser");
-
-            buffer.commit();
         }
+
+        buffer.commit();
 
         osmium::memory::Buffer buffer2(buffer_size, osmium::memory::Buffer::auto_grow::yes);
 
