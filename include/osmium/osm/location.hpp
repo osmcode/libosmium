@@ -171,18 +171,20 @@ namespace osmium {
             }
 
             if (scale < 0) {
-                result = 0;
+                for (; scale < 0 && result > 0; ++scale) {
+                    result /= 10;
+                }
             } else {
                 for (; scale > 0; --scale) {
                     result *= 10;
                 }
+            }
 
-                result = (result + 5) / 10 * sign;
+            result = (result + 5) / 10 * sign;
 
-                if (result > std::numeric_limits<int32_t>::max() ||
-                    result < std::numeric_limits<int32_t>::min()) {
-                    goto error;
-                }
+            if (result > std::numeric_limits<int32_t>::max() ||
+                result < std::numeric_limits<int32_t>::min()) {
+                goto error;
             }
 
             *data = str;
