@@ -146,6 +146,7 @@ add_unit_test(memory test_buffer_node)
 add_unit_test(memory test_buffer_purge)
 
 add_unit_test(builder test_attr)
+add_unit_test(builder test_object_builder)
 
 add_unit_test(geom test_factory_with_projection
     ENABLE_IF ${GEOS_AND_PROJ_FOUND}

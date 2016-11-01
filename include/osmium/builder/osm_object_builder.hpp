@@ -45,6 +45,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/builder/builder.hpp>
 #include <osmium/osm/item_type.hpp>
 #include <osmium/osm/location.hpp>
+#include <osmium/osm/node.hpp>
 #include <osmium/osm/node_ref.hpp>
 #include <osmium/osm/object.hpp>
 #include <osmium/osm/tag.hpp>
@@ -339,6 +340,12 @@ namespace osmium {
 
         }; // class ChangesetDiscussionBuilder
 
+#define OSMIUM_FORWARD(setter) \
+    template <typename... TArgs> \
+    void setter(TArgs&&... args) { \
+        this->object().setter(std::forward<TArgs>(args)...); \
+    }
+
         template <typename T>
         class OSMObjectBuilder : public ObjectBuilder<T> {
 
@@ -350,6 +357,15 @@ namespace osmium {
                 static_cast<Builder*>(this)->add_size(sizeof(string_size_type));
             }
 
+            OSMIUM_FORWARD(set_id)
+            OSMIUM_FORWARD(set_visible)
+            OSMIUM_FORWARD(set_deleted)
+            OSMIUM_FORWARD(set_version)
+            OSMIUM_FORWARD(set_changeset)
+            OSMIUM_FORWARD(set_uid)
+            OSMIUM_FORWARD(set_timestamp)
+            OSMIUM_FORWARD(set_attribute)
+
             void add_tags(const std::initializer_list<std::pair<const char*, const char*>>& tags) {
                 osmium::builder::TagListBuilder tl_builder(static_cast<Builder*>(this)->buffer(), this);
                 for (const auto& p : tags) {
@@ -359,8 +375,17 @@ namespace osmium {
 
         }; // class OSMObjectBuilder
 
-        using NodeBuilder     = OSMObjectBuilder<osmium::Node>;
-        using RelationBuilder = OSMObjectBuilder<osmium::Relation>;
+        class NodeBuilder : public OSMObjectBuilder<osmium::Node> {
+
+        public:
+
+            explicit NodeBuilder(osmium::memory::Buffer& buffer, Builder* parent = nullptr) :
+                OSMObjectBuilder<osmium::Node>(buffer, parent) {
+            }
+
+            OSMIUM_FORWARD(set_location)
+
+        }; // class NodeBuilder
 
         class WayBuilder : public OSMObjectBuilder<osmium::Way> {
 
@@ -378,6 +403,8 @@ namespace osmium {
             }
 
         }; // class WayBuilder
+
+        using RelationBuilder = OSMObjectBuilder<osmium::Relation>;
 
         class AreaBuilder : public OSMObjectBuilder<osmium::Area> {
 
@@ -404,7 +431,29 @@ namespace osmium {
 
         }; // class AreaBuilder
 
-        using ChangesetBuilder = ObjectBuilder<osmium::Changeset>;
+        class ChangesetBuilder : public ObjectBuilder<osmium::Changeset> {
+
+        public:
+
+            explicit ChangesetBuilder(osmium::memory::Buffer& buffer, Builder* parent = nullptr) :
+                ObjectBuilder<osmium::Changeset>(buffer, parent) {
+            }
+
+            OSMIUM_FORWARD(set_id)
+            OSMIUM_FORWARD(set_uid)
+            OSMIUM_FORWARD(set_created_at)
+            OSMIUM_FORWARD(set_closed_at)
+            OSMIUM_FORWARD(set_num_changes)
+            OSMIUM_FORWARD(set_num_comments)
+            OSMIUM_FORWARD(set_attribute)
+
+            osmium::Box& bounds() noexcept {
+                return this->object().bounds();
+            }
+
+        }; // class ChangesetBuilder
+
+#undef OSMIUM_FORWARD
 
     } // namespace builder
 
