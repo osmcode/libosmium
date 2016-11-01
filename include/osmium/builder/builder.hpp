@@ -74,11 +74,23 @@ namespace osmium {
                 m_buffer.reserve_space(size);
                 assert(buffer.is_aligned());
                 if (m_parent) {
+                    assert(m_buffer.builder_count() == 1 && "Only one sub-builder can be open at any time.");
                     m_parent->add_size(size);
+                } else {
+                    assert(m_buffer.builder_count() == 0 && "Only one builder can be open at any time.");
                 }
+#ifndef NDEBUG
+                m_buffer.increment_builder_count();
+#endif
             }
 
+#ifdef NDEBUG
             ~Builder() = default;
+#else
+            ~Builder() noexcept {
+                m_buffer.decrement_builder_count();
+            }
+#endif
 
             osmium::memory::Item& item() const {
                 return *reinterpret_cast<osmium::memory::Item*>(m_buffer.data() + m_item_offset);

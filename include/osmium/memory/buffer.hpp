@@ -113,6 +113,9 @@ namespace osmium {
             size_t m_capacity;
             size_t m_written;
             size_t m_committed;
+#ifndef NDEBUG
+            uint8_t m_builder_count{0};
+#endif
             auto_grow m_auto_grow {auto_grow::no};
             std::function<void(Buffer&)> m_full;
 
@@ -216,6 +219,21 @@ namespace osmium {
 
             ~Buffer() = default;
 
+#ifndef NDEBUG
+            void increment_builder_count() noexcept {
+                ++m_builder_count;
+            }
+
+            void decrement_builder_count() noexcept {
+                assert(m_builder_count > 0);
+                --m_builder_count;
+            }
+
+            uint8_t builder_count() const noexcept {
+                return m_builder_count;
+            }
+#endif
+
             /**
              * Return a pointer to data inside the buffer.
              *
@@ -292,7 +310,6 @@ namespace osmium {
              * This works only with internally memory-managed buffers.
              * If the given size is not larger than the current capacity,
              * nothing is done.
-             * Already written but not committed data is discarded.
              *
              * @pre The buffer must be valid.
              *
@@ -325,8 +342,10 @@ namespace osmium {
             /**
              * Mark currently written bytes in the buffer as committed.
              *
-             * @pre The buffer must be valid and aligned properly (as indicated
+             * @pre The buffer must be valid.
+             * @pre The buffer must be aligned properly (as indicated
              *      by is_aligned().
+             * @pre No builder can be open on this buffer.
              *
              * @returns Number of committed bytes before this commit. Can be
              *          used as an offset into the buffer to get to the
@@ -335,6 +354,7 @@ namespace osmium {
             size_t commit() {
                 assert(m_data);
                 assert(is_aligned());
+                assert(m_builder_count == 0 && "Make sure there are no Builder objects still in scope");
 
                 const size_t offset = m_committed;
                 m_committed = m_written;
@@ -345,9 +365,11 @@ namespace osmium {
              * Roll back changes in buffer to last committed state.
              *
              * @pre The buffer must be valid.
+             * @pre No builder can be open on this buffer.
              */
             void rollback() {
                 assert(m_data);
+                assert(m_builder_count == 0 && "Make sure there are no Builder objects still in scope");
                 m_written = m_committed;
             }
 
@@ -356,9 +378,12 @@ namespace osmium {
              *
              * No-op on an invalid buffer.
              *
+             * @pre No builder can be open on this buffer.
+             *
              * @returns Number of bytes in the buffer before it was cleared.
              */
             size_t clear() {
+                assert(m_builder_count == 0 && "Make sure there are no Builder objects still in scope");
                 const size_t committed = m_committed;
                 m_written = 0;
                 m_committed = 0;
@@ -465,6 +490,7 @@ namespace osmium {
              * Add committed contents of the given buffer to this buffer.
              *
              * @pre The buffer must be valid.
+             * @pre No builder can be open on this buffer.
              *
              * Note that you have to eventually call commit() to actually
              * commit this data.
@@ -473,6 +499,7 @@ namespace osmium {
              */
             void add_buffer(const Buffer& buffer) {
                 assert(m_data && buffer);
+                assert(m_builder_count == 0 && "Make sure there are no Builder objects still in scope");
                 unsigned char* target = reserve_space(buffer.committed());
                 std::copy_n(buffer.data(), buffer.committed(), target);
             }
@@ -482,11 +509,13 @@ namespace osmium {
              * you can use std::back_inserter.
              *
              * @pre The buffer must be valid.
+             * @pre No builder can be open on this buffer.
              *
              * @param item The item to be added.
              */
             void push_back(const osmium::memory::Item& item) {
                 assert(m_data);
+                assert(m_builder_count == 0 && "Make sure there are no Builder objects still in scope");
                 add_item(item);
                 commit();
             }
