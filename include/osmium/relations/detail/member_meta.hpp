@@ -74,6 +74,14 @@ namespace osmium {
              */
             size_t m_buffer_offset { 0 };
 
+            /**
+             * Has this member been found in the input data.
+             */
+            bool m_available = false;
+
+            /**
+             * Marks this member as removed. It can not be used any more.
+             */
             bool m_removed = false;
 
         public:
@@ -107,6 +115,11 @@ namespace osmium {
 
             void set_buffer_offset(size_t offset) noexcept {
                 m_buffer_offset = offset;
+                m_available = true;
+            }
+
+            bool is_available() const noexcept {
+                return m_available;
             }
 
             bool removed() const noexcept {
@@ -115,6 +128,7 @@ namespace osmium {
 
             void remove() noexcept {
                 m_removed = true;
+                m_available = false;
             }
 
         }; // class MemberMeta
