@@ -353,7 +353,7 @@ namespace osmium {
                         member_meta(member.type()).emplace_back(member.ref(), m_relations.size(), n);
                         relation_meta.increment_need_members();
                     } else {
-                        member.ref(0); // set member id to zero to indicate we are not interested
+                        member.set_ref(0); // set member id to zero to indicate we are not interested
                     }
                     ++n;
                 }

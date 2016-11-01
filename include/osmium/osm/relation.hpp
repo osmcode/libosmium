@@ -43,6 +43,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/item_type.hpp>
 #include <osmium/osm/object.hpp>
 #include <osmium/osm/types.hpp>
+#include <osmium/util/compatibility.hpp>
 
 namespace osmium {
 
@@ -109,7 +110,8 @@ namespace osmium {
             return m_ref;
         }
 
-        RelationMember& ref(object_id_type ref) noexcept {
+        /// @deprecated Use set_ref() instead.
+        OSMIUM_DEPRECATED RelationMember& ref(object_id_type ref) noexcept {
             m_ref = ref;
             return *this;
         }
