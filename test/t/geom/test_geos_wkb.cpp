@@ -1,11 +1,23 @@
 #include "catch.hpp"
 
+#include <memory>
+#include <sstream>
+#include <string>
+
 #include <osmium/geom/geos.hpp>
 #include <osmium/geom/wkb.hpp>
 
-#include "helper.hpp"
 #include "area_helper.hpp"
 #include "wnl_helper.hpp"
+
+#include <geos/io/WKBWriter.h>
+
+inline std::string to_wkb(const geos::geom::Geometry* geometry) {
+    std::stringstream ss;
+    geos::io::WKBWriter wkb_writer;
+    wkb_writer.writeHEX(*geometry, ss);
+    return ss.str();
+}
 
 TEST_CASE("WKB_Geometry_with_GEOS") {
 
@@ -16,7 +28,7 @@ SECTION("point") {
     std::string wkb {wkb_factory.create_point(osmium::Location(3.2, 4.2))};
 
     std::unique_ptr<geos::geom::Point> geos_point = geos_factory.create_point(osmium::Location(3.2, 4.2));
-    REQUIRE(geos_to_wkb(geos_point.get()) == wkb);
+    REQUIRE(to_wkb(geos_point.get()) == wkb);
 }
 
 
@@ -30,25 +42,25 @@ SECTION("linestring") {
     {
         std::string wkb = wkb_factory.create_linestring(wnl);
         std::unique_ptr<geos::geom::LineString> geos = geos_factory.create_linestring(wnl);
-        REQUIRE(geos_to_wkb(geos.get()) == wkb);
+        REQUIRE(to_wkb(geos.get()) == wkb);
     }
 
     {
         std::string wkb = wkb_factory.create_linestring(wnl, osmium::geom::use_nodes::unique, osmium::geom::direction::backward);
         std::unique_ptr<geos::geom::LineString> geos = geos_factory.create_linestring(wnl, osmium::geom::use_nodes::unique, osmium::geom::direction::backward);
-        REQUIRE(geos_to_wkb(geos.get()) == wkb);
+        REQUIRE(to_wkb(geos.get()) == wkb);
     }
 
     {
         std::string wkb = wkb_factory.create_linestring(wnl, osmium::geom::use_nodes::all);
         std::unique_ptr<geos::geom::LineString> geos = geos_factory.create_linestring(wnl, osmium::geom::use_nodes::all);
-        REQUIRE(geos_to_wkb(geos.get()) == wkb);
+        REQUIRE(to_wkb(geos.get()) == wkb);
     }
 
     {
         std::string wkb = wkb_factory.create_linestring(wnl, osmium::geom::use_nodes::all, osmium::geom::direction::backward);
         std::unique_ptr<geos::geom::LineString> geos = geos_factory.create_linestring(wnl, osmium::geom::use_nodes::all, osmium::geom::direction::backward);
-        REQUIRE(geos_to_wkb(geos.get()) == wkb);
+        REQUIRE(to_wkb(geos.get()) == wkb);
     }
 }
 
@@ -61,7 +73,7 @@ SECTION("area_1outer_0inner") {
 
     std::string wkb = wkb_factory.create_multipolygon(area);
     std::unique_ptr<geos::geom::MultiPolygon> geos = geos_factory.create_multipolygon(area);
-    REQUIRE(geos_to_wkb(geos.get()) == wkb);
+    REQUIRE(to_wkb(geos.get()) == wkb);
 }
 
 SECTION("area_1outer_1inner") {
@@ -73,7 +85,7 @@ SECTION("area_1outer_1inner") {
 
     std::string wkb = wkb_factory.create_multipolygon(area);
     std::unique_ptr<geos::geom::MultiPolygon> geos = geos_factory.create_multipolygon(area);
-    REQUIRE(geos_to_wkb(geos.get()) == wkb);
+    REQUIRE(to_wkb(geos.get()) == wkb);
 }
 
 SECTION("area_2outer_2inner") {
@@ -85,7 +97,7 @@ SECTION("area_2outer_2inner") {
 
     std::string wkb = wkb_factory.create_multipolygon(area);
     std::unique_ptr<geos::geom::MultiPolygon> geos = geos_factory.create_multipolygon(area);
-    REQUIRE(geos_to_wkb(geos.get()) == wkb);
+    REQUIRE(to_wkb(geos.get()) == wkb);
 }
 
 }
