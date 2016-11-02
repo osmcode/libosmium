@@ -112,12 +112,6 @@ if(NOT Threads_FOUND)
     set(Threads_FOUND FALSE)
 endif()
 
-if(GEOS_FOUND AND PROJ_FOUND)
-    set(GEOS_AND_PROJ_FOUND TRUE)
-else()
-    set(GEOS_AND_PROJ_FOUND FALSE)
-endif()
-
 
 #-----------------------------------------------------------------------------
 #
@@ -148,12 +142,9 @@ add_unit_test(memory test_buffer_purge)
 add_unit_test(builder test_attr)
 add_unit_test(builder test_object_builder)
 
-add_unit_test(geom test_factory_with_projection
-    ENABLE_IF ${GEOS_AND_PROJ_FOUND}
-    LIBS ${GEOS_LIBRARY} ${PROJ_LIBRARY})
-
 add_unit_test(geom test_crs ENABLE_IF ${PROJ_FOUND} LIBS ${PROJ_LIBRARY})
 add_unit_test(geom test_exception)
+add_unit_test(geom test_factory_with_projection ENABLE_IF ${PROJ_FOUND} LIBS ${PROJ_LIBRARY})
 add_unit_test(geom test_geojson)
 add_unit_test(geom test_geos ENABLE_IF ${GEOS_FOUND} LIBS ${GEOS_LIBRARY})
 add_unit_test(geom test_geos_wkb ENABLE_IF ${GEOS_FOUND} LIBS ${GEOS_LIBRARY})
