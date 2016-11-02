@@ -240,7 +240,7 @@ namespace osmium {
              * @pre The buffer must be valid.
              */
             unsigned char* data() const noexcept {
-                assert(m_data);
+                assert(m_data && "This must be a valid buffer");
                 return m_data;
             }
 
@@ -276,7 +276,7 @@ namespace osmium {
              * @pre The buffer must be valid.
              */
             bool is_aligned() const noexcept {
-                assert(m_data);
+                assert(m_data && "This must be a valid buffer");
                 return (m_written % align_bytes == 0) && (m_committed % align_bytes == 0);
             }
 
@@ -301,7 +301,7 @@ namespace osmium {
              * than the difference between committed() and capacity().
              */
             OSMIUM_DEPRECATED void set_full_callback(std::function<void(Buffer&)> full) {
-                assert(m_data);
+                assert(m_data && "This must be a valid buffer");
                 m_full = full;
             }
 
@@ -322,7 +322,7 @@ namespace osmium {
              * @throws std::bad_alloc if there isn't enough memory available.
              */
             void grow(size_t size) {
-                assert(m_data);
+                assert(m_data && "This must be a valid buffer");
                 if (!m_memory) {
                     throw std::logic_error("Can't grow Buffer if it doesn't use internal memory management.");
                 }
@@ -352,9 +352,9 @@ namespace osmium {
              *          object being committed by this call.
              */
             size_t commit() {
-                assert(m_data);
-                assert(is_aligned());
+                assert(m_data && "This must be a valid buffer");
                 assert(m_builder_count == 0 && "Make sure there are no Builder objects still in scope");
+                assert(is_aligned());
 
                 const size_t offset = m_committed;
                 m_committed = m_written;
@@ -368,7 +368,7 @@ namespace osmium {
              * @pre No builder can be open on this buffer.
              */
             void rollback() {
-                assert(m_data);
+                assert(m_data && "This must be a valid buffer");
                 assert(m_builder_count == 0 && "Make sure there are no Builder objects still in scope");
                 m_written = m_committed;
             }
@@ -402,7 +402,7 @@ namespace osmium {
              */
             template <typename T>
             T& get(const size_t offset) const {
-                assert(m_data);
+                assert(m_data && "This must be a valid buffer");
                 return *reinterpret_cast<T*>(&m_data[offset]);
             }
 
@@ -440,7 +440,7 @@ namespace osmium {
              *         no callback defined and the buffer isn't auto-growing.
              */
             unsigned char* reserve_space(const size_t size) {
-                assert(m_data);
+                assert(m_data && "This must be a valid buffer");
                 // try to flush the buffer empty first.
                 if (m_written + size > m_capacity && m_full) {
                     m_full(*this);
@@ -480,7 +480,7 @@ namespace osmium {
              */
             template <typename T>
             T& add_item(const T& item) {
-                assert(m_data);
+                assert(m_data && "This must be a valid buffer");
                 unsigned char* target = reserve_space(item.padded_size());
                 std::copy_n(reinterpret_cast<const unsigned char*>(&item), item.padded_size(), target);
                 return *reinterpret_cast<T*>(target);
@@ -498,7 +498,8 @@ namespace osmium {
              * @param buffer The source of the copy. Must be valid.
              */
             void add_buffer(const Buffer& buffer) {
-                assert(m_data && buffer);
+                assert(m_data && "This must be a valid buffer");
+                assert(buffer && "Buffer parameter must be a valid buffer");
                 assert(m_builder_count == 0 && "Make sure there are no Builder objects still in scope");
                 unsigned char* target = reserve_space(buffer.committed());
                 std::copy_n(buffer.data(), buffer.committed(), target);
@@ -514,7 +515,7 @@ namespace osmium {
              * @param item The item to be added.
              */
             void push_back(const osmium::memory::Item& item) {
-                assert(m_data);
+                assert(m_data && "This must be a valid buffer");
                 assert(m_builder_count == 0 && "Make sure there are no Builder objects still in scope");
                 add_item(item);
                 commit();
@@ -566,7 +567,7 @@ namespace osmium {
              */
             template <typename T>
             t_iterator<T> begin() {
-                assert(m_data);
+                assert(m_data && "This must be a valid buffer");
                 return t_iterator<T>(m_data, m_data + m_committed);
             }
 
@@ -579,7 +580,7 @@ namespace osmium {
              * @returns Iterator to first OSMEntity in the buffer.
              */
             iterator begin() {
-                assert(m_data);
+                assert(m_data && "This must be a valid buffer");
                 return iterator(m_data, m_data + m_committed);
             }
 
@@ -594,7 +595,7 @@ namespace osmium {
              */
             template <typename T>
             t_iterator<T> get_iterator(size_t offset) {
-                assert(m_data);
+                assert(m_data && "This must be a valid buffer");
                 return t_iterator<T>(m_data + offset, m_data + m_committed);
             }
 
@@ -608,7 +609,7 @@ namespace osmium {
              *          buffer.
              */
             iterator get_iterator(size_t offset) {
-                assert(m_data);
+                assert(m_data && "This must be a valid buffer");
                 return iterator(m_data + offset, m_data + m_committed);
             }
 
@@ -622,7 +623,7 @@ namespace osmium {
              */
             template <typename T>
             t_iterator<T> end() {
-                assert(m_data);
+                assert(m_data && "This must be a valid buffer");
                 return t_iterator<T>(m_data + m_committed, m_data + m_committed);
             }
 
@@ -635,40 +636,40 @@ namespace osmium {
              * @returns End iterator.
              */
             iterator end() {
-                assert(m_data);
+                assert(m_data && "This must be a valid buffer");
                 return iterator(m_data + m_committed, m_data + m_committed);
             }
 
             template <typename T>
             t_const_iterator<T> cbegin() const {
-                assert(m_data);
+                assert(m_data && "This must be a valid buffer");
                 return t_const_iterator<T>(m_data, m_data + m_committed);
             }
 
             const_iterator cbegin() const {
-                assert(m_data);
+                assert(m_data && "This must be a valid buffer");
                 return const_iterator(m_data, m_data + m_committed);
             }
 
             template <typename T>
             t_const_iterator<T> get_iterator(size_t offset) const {
-                assert(m_data);
+                assert(m_data && "This must be a valid buffer");
                 return t_const_iterator<T>(m_data + offset, m_data + m_committed);
             }
 
             const_iterator get_iterator(size_t offset) const {
-                assert(m_data);
+                assert(m_data && "This must be a valid buffer");
                 return const_iterator(m_data + offset, m_data + m_committed);
             }
 
             template <typename T>
             t_const_iterator<T> cend() const {
-                assert(m_data);
+                assert(m_data && "This must be a valid buffer");
                 return t_const_iterator<T>(m_data + m_committed, m_data + m_committed);
             }
 
             const_iterator cend() const {
-                assert(m_data);
+                assert(m_data && "This must be a valid buffer");
                 return const_iterator(m_data + m_committed, m_data + m_committed);
             }
 
@@ -727,7 +728,7 @@ namespace osmium {
              */
             template <typename TCallbackClass>
             void purge_removed(TCallbackClass* callback) {
-                assert(m_data);
+                assert(m_data && "This must be a valid buffer");
                 if (begin() == end()) {
                     return;
                 }
