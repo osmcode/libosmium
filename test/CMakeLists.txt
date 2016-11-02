@@ -160,7 +160,7 @@ add_unit_test(geom test_geos_wkb ENABLE_IF ${GEOS_FOUND} LIBS ${GEOS_LIBRARY})
 add_unit_test(geom test_mercator)
 add_unit_test(geom test_ogr ENABLE_IF ${GDAL_FOUND} LIBS ${GDAL_LIBRARY})
 add_unit_test(geom test_projection ENABLE_IF ${PROJ_FOUND} LIBS ${PROJ_LIBRARY})
-add_unit_test(geom test_tile ENABLE_IF ${GEOS_FOUND})
+add_unit_test(geom test_tile)
 add_unit_test(geom test_wkb)
 add_unit_test(geom test_wkt)
 
