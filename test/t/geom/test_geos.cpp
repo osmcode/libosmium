@@ -1,6 +1,10 @@
-#include "catch.hpp"
 
 #include <osmium/geom/geos.hpp>
+
+#ifdef OSMIUM_WITH_GEOS
+
+#include "catch.hpp"
+
 #include <osmium/geom/mercator_projection.hpp>
 
 #include "area_helper.hpp"
@@ -143,4 +147,6 @@ TEST_CASE("GEOS geometry factory - create area with two outer and two inner ring
     const geos::geom::LineString* l1e = p1->getExteriorRing();
     REQUIRE(5 == l1e->getNumPoints());
 }
+
+#endif
 
