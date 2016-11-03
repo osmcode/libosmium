@@ -38,7 +38,7 @@ TEST_CASE("create objects using builder") {
                 .set_uid(555)
                 .set_timestamp("2015-07-01T00:00:01Z")
                 .set_location(loc)
-                .add_user(user);
+                .set_user(user);
 
             builder.add_tags({{"highway", "primary"}, {"oneway", "yes"}});
         }
@@ -83,7 +83,7 @@ TEST_CASE("create objects using builder") {
                 .set_changeset(123)
                 .set_uid(555)
                 .set_timestamp("2015-07-01T00:00:01Z")
-                .add_user(user);
+                .set_user(user);
 
             builder.add_tags({{"highway", "primary"}, {"oneway", "yes"}});
         }
@@ -127,7 +127,7 @@ TEST_CASE("create objects using builder") {
                 .set_changeset(123)
                 .set_uid(555)
                 .set_timestamp("2015-07-01T00:00:01Z")
-                .add_user(user);
+                .set_user(user);
 
             builder.add_tags({{"highway", "primary"}, {"oneway", "yes"}});
         }
@@ -175,7 +175,7 @@ TEST_CASE("create objects using builder") {
                 .set_num_changes(3)
                 .set_num_comments(2)
                 .set_bounds(osmium::Box{bl, tr})
-                .add_user(user);
+                .set_user(user);
         }
 
         const auto& changeset = buffer.get<osmium::Changeset>(buffer.commit());
@@ -196,13 +196,13 @@ TEST_CASE("create objects using builder") {
 
 }
 
-TEST_CASE("add_user") {
+TEST_CASE("set_user") {
     osmium::memory::Buffer buffer{1024*10};
     std::string user = "userx";
 
     {
         osmium::builder::NodeBuilder builder(buffer);
-        builder.add_user(user.c_str(), 4);
+        builder.set_user(user.c_str(), 4);
     }
 
     const auto& node = buffer.get<osmium::Node>(buffer.commit());

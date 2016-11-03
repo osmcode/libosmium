@@ -361,7 +361,7 @@ namespace osmium {
 
                     builder.set_id(m_delta_id.update(zvarint(&data, end)));
 
-                    builder.add_user(decode_info(builder.object(), &data, end));
+                    builder.set_user(decode_info(builder.object(), &data, end));
 
                     if (data == end) {
                         // no location, object is deleted
@@ -383,7 +383,7 @@ namespace osmium {
 
                     builder.set_id(m_delta_id.update(zvarint(&data, end)));
 
-                    builder.add_user(decode_info(builder.object(), &data, end));
+                    builder.set_user(decode_info(builder.object(), &data, end));
 
                     if (data == end) {
                         // no reference section, object is deleted
@@ -446,7 +446,7 @@ namespace osmium {
 
                     builder.set_id(m_delta_id.update(zvarint(&data, end)));
 
-                    builder.add_user(decode_info(builder.object(), &data, end));
+                    builder.set_user(decode_info(builder.object(), &data, end));
 
                     if (data == end) {
                         // no reference section, object is deleted

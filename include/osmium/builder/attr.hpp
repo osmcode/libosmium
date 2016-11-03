@@ -617,7 +617,7 @@ namespace osmium {
 
             template <typename TBuilder, typename... TArgs>
             inline void add_user(TBuilder& builder, const TArgs&... args) {
-                builder.add_user(get_user(args...));
+                builder.set_user(get_user(args...));
             }
 
             // ==============================================================

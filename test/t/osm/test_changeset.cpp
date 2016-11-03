@@ -97,9 +97,9 @@ TEST_CASE("Create changeset without helper") {
             .set_closed_at(200)
             .set_num_changes(7)
             .set_num_comments(2)
-            .set_uid(9);
+            .set_uid(9)
+            .set_user("user");
 
-        builder.add_user("user");
         {
             osmium::builder::TagListBuilder tl_builder{buffer, &builder};
             tl_builder.add_tag("key1", "val1");

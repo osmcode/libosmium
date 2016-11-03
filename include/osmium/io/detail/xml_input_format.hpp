@@ -296,7 +296,7 @@ namespace osmium {
                     new_changeset.bounds().extend(min);
                     new_changeset.bounds().extend(max);
 
-                    builder->add_user(user);
+                    builder->set_user(user);
                 }
 
                 void get_tag(osmium::builder::Builder* builder, const XML_Char** attrs) {
@@ -350,7 +350,7 @@ namespace osmium {
                                 mark_header_as_done();
                                 if (read_types() & osmium::osm_entity_bits::node) {
                                     m_node_builder = std::unique_ptr<osmium::builder::NodeBuilder>(new osmium::builder::NodeBuilder(m_buffer));
-                                    m_node_builder->add_user(init_object(m_node_builder->object(), attrs));
+                                    m_node_builder->set_user(init_object(m_node_builder->object(), attrs));
                                     m_context = context::node;
                                 } else {
                                     m_context = context::ignored_node;
@@ -359,7 +359,7 @@ namespace osmium {
                                 mark_header_as_done();
                                 if (read_types() & osmium::osm_entity_bits::way) {
                                     m_way_builder = std::unique_ptr<osmium::builder::WayBuilder>(new osmium::builder::WayBuilder(m_buffer));
-                                    m_way_builder->add_user(init_object(m_way_builder->object(), attrs));
+                                    m_way_builder->set_user(init_object(m_way_builder->object(), attrs));
                                     m_context = context::way;
                                 } else {
                                     m_context = context::ignored_way;
@@ -368,7 +368,7 @@ namespace osmium {
                                 mark_header_as_done();
                                 if (read_types() & osmium::osm_entity_bits::relation) {
                                     m_relation_builder = std::unique_ptr<osmium::builder::RelationBuilder>(new osmium::builder::RelationBuilder(m_buffer));
-                                    m_relation_builder->add_user(init_object(m_relation_builder->object(), attrs));
+                                    m_relation_builder->set_user(init_object(m_relation_builder->object(), attrs));
                                     m_context = context::relation;
                                 } else {
                                     m_context = context::ignored_relation;

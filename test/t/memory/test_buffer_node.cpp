@@ -76,7 +76,7 @@ TEST_CASE("Node in Buffer") {
                 .set_uid(21)
                 .set_timestamp(123)
                 .set_location(osmium::Location{3.5, 4.7})
-                .add_user("testuser");
+                .set_user("testuser");
         }
 
         buffer.commit();
@@ -92,7 +92,7 @@ TEST_CASE("Node in Buffer") {
                 .set_uid(21)
                 .set_timestamp(123)
                 .set_location(osmium::Location{3.5, 4.7})
-                .add_user("testuser");
+                .set_user("testuser");
 
             osmium::builder::TagListBuilder tag_builder{buffer, &node_builder};
             tag_builder.add_tag("amenity", "bank");
@@ -138,7 +138,7 @@ TEST_CASE("Node in Buffer") {
                 .set_uid(21)
                 .set_timestamp(123)
                 .set_location(osmium::Location{3.5, 4.7})
-                .add_user("testuser");
+                .set_user("testuser");
         }
 
         buffer.commit();
@@ -167,7 +167,7 @@ TEST_CASE("Node in Buffer") {
                 .set_uid(21)
                 .set_timestamp(123)
                 .set_location(osmium::Location{3.5, 4.7})
-                .add_user("testuser");
+                .set_user("testuser");
         }
 
         buffer.commit();

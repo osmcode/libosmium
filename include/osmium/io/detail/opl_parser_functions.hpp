@@ -424,7 +424,7 @@ namespace osmium {
                     builder.set_location(location);
                 }
 
-                builder.add_user(user);
+                builder.set_user(user);
 
                 if (tags_begin) {
                     opl_parse_tags(tags_begin, buffer, &builder);
@@ -484,7 +484,7 @@ namespace osmium {
                     }
                 }
 
-                builder.add_user(user);
+                builder.set_user(user);
 
                 if (tags_begin) {
                     opl_parse_tags(tags_begin, buffer, &builder);
@@ -581,7 +581,7 @@ namespace osmium {
                     }
                 }
 
-                builder.add_user(user);
+                builder.set_user(user);
 
                 if (tags_begin) {
                     opl_parse_tags(tags_begin, buffer, &builder);
@@ -668,7 +668,7 @@ namespace osmium {
                     builder.set_bounds(box);
                 }
 
-                builder.add_user(user);
+                builder.set_user(user);
 
                 if (tags_begin) {
                     opl_parse_tags(tags_begin, buffer, &builder);

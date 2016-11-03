@@ -32,7 +32,7 @@ TEST_CASE("Purge data from buffer") {
     SECTION("purge buffer with one object but nothing to delete") {
         {
             osmium::builder::NodeBuilder node_builder{buffer};
-            node_builder.add_user("testuser");
+            node_builder.set_user("testuser");
         }
         buffer.commit();
         REQUIRE(std::distance(buffer.begin(), buffer.end()) == 1);
@@ -49,7 +49,7 @@ TEST_CASE("Purge data from buffer") {
     SECTION("purge buffer with one object which gets deleted") {
         {
             osmium::builder::NodeBuilder node_builder{buffer};
-            node_builder.add_user("testuser");
+            node_builder.set_user("testuser");
             node_builder.set_removed(true);
         }
         buffer.commit();
@@ -66,14 +66,14 @@ TEST_CASE("Purge data from buffer") {
     SECTION("purge buffer with two objects, first gets deleted") {
         {
             osmium::builder::NodeBuilder node_builder{buffer};
-            node_builder.add_user("testuser");
+            node_builder.set_user("testuser");
             node_builder.set_removed(true);
         }
         buffer.commit();
         const size_t size1 = buffer.committed();
         {
             osmium::builder::NodeBuilder node_builder{buffer};
-            node_builder.add_user("testuser");
+            node_builder.set_user("testuser");
         }
         buffer.commit();
         const size_t size2 = buffer.committed() - size1;
@@ -90,13 +90,13 @@ TEST_CASE("Purge data from buffer") {
     SECTION("purge buffer with two objects, second gets deleted") {
         {
             osmium::builder::NodeBuilder node_builder{buffer};
-            node_builder.add_user("testuser_longer_name");
+            node_builder.set_user("testuser_longer_name");
         }
         buffer.commit();
         size_t size1 = buffer.committed();
         {
             osmium::builder::NodeBuilder node_builder{buffer};
-            node_builder.add_user("testuser");
+            node_builder.set_user("testuser");
             node_builder.set_removed(true);
         }
         buffer.commit();
@@ -114,20 +114,20 @@ TEST_CASE("Purge data from buffer") {
     SECTION("purge buffer with three objects, middle one gets deleted") {
         {
             osmium::builder::NodeBuilder node_builder{buffer};
-            node_builder.add_user("testuser_longer_name");
+            node_builder.set_user("testuser_longer_name");
         }
         buffer.commit();
 
         {
             osmium::builder::NodeBuilder node_builder{buffer};
-            node_builder.add_user("testuser");
+            node_builder.set_user("testuser");
             node_builder.set_removed(true);
         }
         buffer.commit();
 
         {
             osmium::builder::NodeBuilder node_builder{buffer};
-            node_builder.add_user("sn");
+            node_builder.set_user("sn");
         }
         buffer.commit();
 
@@ -143,21 +143,21 @@ TEST_CASE("Purge data from buffer") {
     SECTION("purge buffer with three objects, all get deleted") {
         {
             osmium::builder::NodeBuilder node_builder{buffer};
-            node_builder.add_user("testuser_longer_name");
+            node_builder.set_user("testuser_longer_name");
             node_builder.set_removed(true);
         }
         buffer.commit();
 
         {
             osmium::builder::NodeBuilder node_builder{buffer};
-            node_builder.add_user("testuser");
+            node_builder.set_user("testuser");
             node_builder.set_removed(true);
         }
         buffer.commit();
 
         {
             osmium::builder::NodeBuilder node_builder{buffer};
-            node_builder.add_user("sn");
+            node_builder.set_user("sn");
             node_builder.set_removed(true);
         }
         buffer.commit();

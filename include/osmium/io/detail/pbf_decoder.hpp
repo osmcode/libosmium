@@ -294,7 +294,7 @@ namespace osmium {
                         ));
                     }
 
-                    builder.add_user(user.first, user.second);
+                    builder.set_user(user.first, user.second);
 
                     build_tag_list(builder, keys, vals);
                 }
@@ -339,7 +339,7 @@ namespace osmium {
                         }
                     }
 
-                    builder.add_user(user.first, user.second);
+                    builder.set_user(user.first, user.second);
 
                     if (!refs.empty()) {
                         osmium::builder::WayNodeListBuilder wnl_builder(m_buffer, &builder);
@@ -407,7 +407,7 @@ namespace osmium {
                         }
                     }
 
-                    builder.add_user(user.first, user.second);
+                    builder.set_user(user.first, user.second);
 
                     if (!refs.empty()) {
                         osmium::builder::RelationMemberListBuilder rml_builder(m_buffer, &builder);
@@ -567,9 +567,7 @@ namespace osmium {
 
                             const auto& u = m_stringtable.at(dense_user_sid.update(user_sids.front()));
                             user_sids.drop_front();
-                            builder.add_user(u.first, u.second);
-                        } else {
-                            builder.add_user("");
+                            builder.set_user(u.first, u.second);
                         }
 
                         // even if the node isn't visible, there's still a record

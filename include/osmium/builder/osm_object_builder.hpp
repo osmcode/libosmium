@@ -374,14 +374,14 @@ namespace osmium {
             }
 
             /**
-             * Add user name to buffer.
+             * Set user name.
              *
              * @param user Pointer to user name.
              * @param length Length of user name (without \0 termination).
              */
-            void add_user(const char* user, const string_size_type length) {
+            TDerived& set_user(const char* user, const string_size_type length) {
                 assert(object().user_size() == 1 && (size() <= object().sizeof_object() + osmium::memory::padded_length(1))
-                       && "add_user() must be called at most once and before any sub-builders");
+                       && "set_user() must be called at most once and before any sub-builders");
                 const auto available_space = size() - object().sizeof_object();
                 const auto space_needed = length + 1 - available_space;
                 if (space_needed > 0) {
@@ -392,24 +392,32 @@ namespace osmium {
                 std::copy_n(user, length, object().data() + object().sizeof_object());
                 *(object().data() + object().sizeof_object() + length) = '\0';
                 object().set_user_size(length + 1);
+
+                return static_cast<TDerived&>(*this);
             }
 
             /**
-             * Add user name to buffer.
+             * Set user name.
              *
              * @param user Pointer to \0-terminated user name.
              */
-            void add_user(const char* user) {
-                add_user(user, static_cast_with_assert<string_size_type>(std::strlen(user)));
+            TDerived& set_user(const char* user) {
+                return set_user(user, static_cast_with_assert<string_size_type>(std::strlen(user)));
             }
 
             /**
-             * Add user name to buffer.
+             * Set user name.
              *
              * @param user User name.
              */
-            void add_user(const std::string& user) {
-                add_user(user.data(), static_cast_with_assert<string_size_type>(user.size()));
+            TDerived& set_user(const std::string& user) {
+                return set_user(user.data(), static_cast_with_assert<string_size_type>(user.size()));
+            }
+
+            /// @deprecated User set_user(...) instead.
+            template <typename... TArgs>
+            void add_user(TArgs&&... args) {
+                set_user(std::forward<TArgs>(args)...);
             }
 
             OSMIUM_FORWARD(set_id)
@@ -496,8 +504,7 @@ namespace osmium {
                 set_timestamp(source.timestamp());
                 set_visible(source.visible());
                 set_uid(source.uid());
-
-                add_user(source.user());
+                set_user(source.user());
             }
 
         }; // class AreaBuilder
@@ -540,14 +547,14 @@ namespace osmium {
             }
 
             /**
-             * Add user name to buffer.
+             * Set user name.
              *
              * @param user Pointer to user name.
              * @param length Length of user name (without \0 termination).
              */
-            void add_user(const char* user, const string_size_type length) {
+            ChangesetBuilder& set_user(const char* user, const string_size_type length) {
                 assert(object().user_size() == 1 && (size() <= sizeof(Changeset) + osmium::memory::padded_length(1))
-                       && "add_user() must be called at most once and before any sub-builders");
+                       && "set_user() must be called at most once and before any sub-builders");
                 const auto available_space = size() - sizeof(Changeset);
                 const auto space_needed = length + 1 - available_space;
                 if (space_needed > 0) {
@@ -558,24 +565,32 @@ namespace osmium {
                 std::copy_n(user, length, object().data() + sizeof(Changeset));
                 *(object().data() + sizeof(Changeset) + length) = '\0';
                 object().set_user_size(length + 1);
+
+                return *this;
             }
 
             /**
-             * Add user name to buffer.
+             * Set user name.
              *
              * @param user Pointer to \0-terminated user name.
              */
-            void add_user(const char* user) {
-                add_user(user, static_cast_with_assert<string_size_type>(std::strlen(user)));
+            ChangesetBuilder& set_user(const char* user) {
+                return set_user(user, static_cast_with_assert<string_size_type>(std::strlen(user)));
             }
 
             /**
-             * Add user name to buffer.
+             * Set user name.
              *
              * @param user User name.
              */
-            void add_user(const std::string& user) {
-                add_user(user.data(), static_cast_with_assert<string_size_type>(user.size()));
+            ChangesetBuilder& set_user(const std::string& user) {
+                return set_user(user.data(), static_cast_with_assert<string_size_type>(user.size()));
+            }
+
+            /// @deprecated User set_user(...) instead.
+            template <typename... TArgs>
+            void add_user(TArgs&&... args) {
+                set_user(std::forward<TArgs>(args)...);
             }
 
         }; // class ChangesetBuilder
