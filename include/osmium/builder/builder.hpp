@@ -71,7 +71,7 @@ namespace osmium {
                 m_buffer(buffer),
                 m_parent(parent),
                 m_item_offset(buffer.written()) {
-                m_buffer.reserve_space(size);
+                reserve_space(size);
                 assert(buffer.is_aligned());
                 if (m_parent) {
                     assert(m_buffer.builder_count() == 1 && "Only one sub-builder can be open at any time.");
@@ -96,6 +96,10 @@ namespace osmium {
                 return *reinterpret_cast<osmium::memory::Item*>(m_buffer.data() + m_item_offset);
             }
 
+            unsigned char* reserve_space(size_t size) {
+                return m_buffer.reserve_space(size);
+            }
+
         public:
 
             /**
@@ -114,7 +118,7 @@ namespace osmium {
             void add_padding(bool self = false) {
                 const auto padding = osmium::memory::align_bytes - (size() % osmium::memory::align_bytes);
                 if (padding != osmium::memory::align_bytes) {
-                    std::fill_n(m_buffer.reserve_space(padding), padding, 0);
+                    std::fill_n(reserve_space(padding), padding, 0);
                     if (self) {
                         add_size(padding);
                     } else if (m_parent) {
@@ -136,7 +140,7 @@ namespace osmium {
             }
 
             void add_item(const osmium::memory::Item* item) {
-                unsigned char* target = m_buffer.reserve_space(item->padded_size());
+                unsigned char* target = reserve_space(item->padded_size());
                 std::copy_n(reinterpret_cast<const unsigned char*>(item), item->padded_size(), target);
                 add_size(item->padded_size());
             }
@@ -148,7 +152,7 @@ namespace osmium {
             template <typename T>
             T* reserve_space_for() {
                 assert(m_buffer.is_aligned());
-                return reinterpret_cast<T*>(m_buffer.reserve_space(sizeof(T)));
+                return reinterpret_cast<T*>(reserve_space(sizeof(T)));
             }
 
             /**
@@ -161,7 +165,7 @@ namespace osmium {
              * @returns The number of bytes appended (length).
              */
             osmium::memory::item_size_type append(const char* data, const osmium::memory::item_size_type length) {
-                unsigned char* target = m_buffer.reserve_space(length);
+                unsigned char* target = reserve_space(length);
                 std::copy_n(reinterpret_cast<const unsigned char*>(data), length, target);
                 return length;
             }
@@ -182,7 +186,7 @@ namespace osmium {
              * @returns The number of bytes appended (always 1).
              */
             osmium::memory::item_size_type append_zero() {
-                *m_buffer.reserve_space(1) = '\0';
+                *reserve_space(1) = '\0';
                 return 1;
             }
 

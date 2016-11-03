@@ -464,6 +464,9 @@ namespace osmium {
             explicit ChangesetBuilder(osmium::memory::Buffer& buffer, Builder* parent = nullptr) :
                 Builder(buffer, parent, sizeof(Changeset)) {
                 new (&item()) Changeset();
+                this->add_size(this->append_zero());
+                this->add_padding(true);
+                object().set_user_size(1);
             }
 
             OSMIUM_FORWARD(set_id)
@@ -490,9 +493,17 @@ namespace osmium {
              * @param length Length of user name (without \0 termination).
              */
             void add_user(const char* user, const string_size_type length) {
+                assert(object().user_size() == 1 && (size() <= sizeof(Changeset) + osmium::memory::padded_length(1))
+                       && "add_user() must be called at most once and before any sub-builders");
+                const auto available_space = size() - sizeof(Changeset);
+                const auto space_needed = length + 1 - available_space;
+                if (space_needed > 0) {
+                    reserve_space(space_needed);
+                    add_size(space_needed);
+                    add_padding(true);
+                }
+                std::copy_n(user, length + 1, object().data() + sizeof(Changeset));
                 object().set_user_size(length + 1);
-                add_size(append(user, length) + append_zero());
-                add_padding(true);
             }
 
             /**

@@ -103,6 +103,23 @@ TEST_CASE("create node") {
         osmium::Location bl{-1.2, -3.4};
         osmium::Location tr{1.2, 3.4};
 
+        std::string user;
+        SECTION("user length small") {
+            user = "foo";
+        }
+        SECTION("user length 7") {
+            user = "1234567";
+        }
+        SECTION("user length 8") {
+            user = "12345678";
+        }
+        SECTION("user length 9") {
+            user = "123456789";
+        }
+        SECTION("user length large") {
+            user = "very long user name";
+        }
+
         {
             osmium::builder::ChangesetBuilder builder(buffer);
 
@@ -114,7 +131,7 @@ TEST_CASE("create node") {
             builder.set_num_comments(2);
             builder.bounds() = osmium::Box{bl, tr};
 
-            builder.add_user("foo");
+            builder.add_user(user);
         }
 
         const auto& changeset = buffer.get<osmium::Changeset>(buffer.commit());
@@ -130,7 +147,7 @@ TEST_CASE("create node") {
         REQUIRE(box.bottom_left() == bl);
         REQUIRE(box.top_right() == tr);
 
-        REQUIRE(std::string{changeset.user()} == "foo");
+        REQUIRE(user == changeset.user());
     }
 
 }

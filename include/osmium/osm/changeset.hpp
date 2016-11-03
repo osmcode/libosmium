@@ -174,8 +174,12 @@ namespace osmium {
             OSMEntity(sizeof(Changeset), osmium::item_type::changeset) {
         }
 
-        void set_user_size(string_size_type size) {
+        void set_user_size(string_size_type size) noexcept {
             m_user_size = size;
+        }
+
+        string_size_type user_size() const noexcept {
+            return m_user_size;
         }
 
         unsigned char* subitems_position() {
