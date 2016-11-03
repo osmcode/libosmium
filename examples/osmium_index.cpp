@@ -6,6 +6,7 @@
 
 */
 
+#include <cstring>
 #include <fcntl.h>
 #include <iomanip>
 #include <iostream>
@@ -22,14 +23,14 @@
 template <typename TKey, typename TValue>
 class IndexSearch {
 
-    typedef typename osmium::index::map::DenseFileArray<TKey, TValue> dense_index_type;
-    typedef typename osmium::index::map::SparseFileArray<TKey, TValue> sparse_index_type;
+    using dense_index_type = typename osmium::index::map::DenseFileArray<TKey, TValue>;
+    using sparse_index_type = typename osmium::index::map::SparseFileArray<TKey, TValue>;
 
     int m_fd;
     bool m_dense_format;
 
     void dump_dense() {
-        dense_index_type index(m_fd);
+        dense_index_type index{m_fd};
 
         for (std::size_t i = 0; i < index.size(); ++i) {
             if (index.get(i) != TValue()) {
@@ -39,15 +40,15 @@ class IndexSearch {
     }
 
     void dump_sparse() {
-        sparse_index_type index(m_fd);
+        sparse_index_type index{m_fd};
 
-        for (auto& element : index) {
+        for (const auto& element : index) {
             std::cout << element.first << " " << element.second << "\n";
         }
     }
 
     bool search_dense(TKey key) {
-        dense_index_type index(m_fd);
+        dense_index_type index{m_fd};
 
         try {
             TValue value = index.get(key);
@@ -61,11 +62,11 @@ class IndexSearch {
     }
 
     bool search_sparse(TKey key) {
-        typedef typename sparse_index_type::element_type element_type;
-        sparse_index_type index(m_fd);
+        using element_type = typename sparse_index_type::element_type;
+        sparse_index_type index{m_fd};
 
         element_type elem {key, TValue()};
-        auto positions = std::equal_range(index.begin(), index.end(), elem, [](const element_type& lhs, const element_type& rhs) {
+        const auto positions = std::equal_range(index.begin(), index.end(), elem, [](const element_type& lhs, const element_type& rhs) {
             return lhs.first < rhs.first;
         });
         if (positions.first == positions.second) {
@@ -73,7 +74,7 @@ class IndexSearch {
             return false;
         }
 
-        for (auto& it = positions.first; it != positions.second; ++it) {
+        for (auto it = positions.first; it != positions.second; ++it) {
             std::cout << it->first << " " << it->second << "\n";
         }
 
@@ -106,7 +107,7 @@ public:
     bool search(const std::vector<TKey>& keys) {
         bool found_all = true;
 
-        for (const auto key : keys) {
+        for (const auto& key : keys) {
             if (!search(key)) {
                 found_all = false;
             }
@@ -158,7 +159,7 @@ public:
         };
 
         while (true) {
-            int c = getopt_long(argc, argv, "a:dhl:s:t:", long_options, 0);
+            const int c = getopt_long(argc, argv, "a:dhl:s:t:", long_options, 0);
             if (c == -1) {
                 break;
             }
@@ -230,15 +231,20 @@ public:
 int main(int argc, char* argv[]) {
     std::ios_base::sync_with_stdio(false);
 
-    Options options(argc, argv);
+    Options options{argc, argv};
 
     std::cout << std::fixed << std::setprecision(7);
-    int fd = open(options.filename().c_str(), O_RDWR);
+    const int fd = open(options.filename().c_str(), O_RDWR);
+
+    if (fd < 0) {
+        std::cerr << "Can not open file '" << options.filename() << "': " << std::strerror(errno) << "\n";
+        std::exit(return_code::fatal);
+    }
 
     bool result_okay = true;
 
     if (options.type_is("location")) {
-        IndexSearch<osmium::unsigned_object_id_type, osmium::Location> is(fd, options.dense_format());
+        IndexSearch<osmium::unsigned_object_id_type, osmium::Location> is{fd, options.dense_format()};
 
         if (options.do_dump()) {
             is.dump();
@@ -246,7 +252,7 @@ int main(int argc, char* argv[]) {
             result_okay = is.search(options.search_keys());
         }
     } else {
-        IndexSearch<osmium::unsigned_object_id_type, size_t> is(fd, options.dense_format());
+        IndexSearch<osmium::unsigned_object_id_type, size_t> is{fd, options.dense_format()};
 
         if (options.do_dump()) {
             is.dump();

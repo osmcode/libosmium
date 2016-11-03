@@ -67,7 +67,7 @@ int main(int argc, char* argv[]) {
 
     // Read options from command line.
     while (true) {
-        int c = getopt_long(argc, argv, "dhf:t:", long_options, 0);
+        const int c = getopt_long(argc, argv, "dhf:t:", long_options, 0);
         if (c == -1) {
             break;
         }
