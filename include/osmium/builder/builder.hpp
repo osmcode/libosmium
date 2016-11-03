@@ -53,6 +53,10 @@ namespace osmium {
      */
     namespace builder {
 
+        /**
+         * Parent class for individual builder classes. Instantiate one of
+         * its derived classes.
+         */
         class Builder {
 
             osmium::memory::Buffer& m_buffer;
@@ -100,8 +104,6 @@ namespace osmium {
                 return m_buffer.reserve_space(size);
             }
 
-        public:
-
             /**
              * Add padding to buffer (if needed) to align data properly.
              *
@@ -137,12 +139,6 @@ namespace osmium {
 
             uint32_t size() const noexcept {
                 return item().byte_size();
-            }
-
-            void add_item(const osmium::memory::Item* item) {
-                unsigned char* target = reserve_space(item->padded_size());
-                std::copy_n(reinterpret_cast<const unsigned char*>(item), item->padded_size(), target);
-                add_size(item->padded_size());
             }
 
             /**
@@ -190,9 +186,17 @@ namespace osmium {
                 return 1;
             }
 
+        public:
+
             /// Return the buffer this builder is using.
             osmium::memory::Buffer& buffer() noexcept {
                 return m_buffer;
+            }
+
+            void add_item(const osmium::memory::Item* item) {
+                unsigned char* target = reserve_space(item->padded_size());
+                std::copy_n(reinterpret_cast<const unsigned char*>(item), item->padded_size(), target);
+                add_size(item->padded_size());
             }
 
         }; // class Builder

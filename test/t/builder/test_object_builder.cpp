@@ -173,11 +173,9 @@ TEST_CASE("create objects using builder") {
                 .set_created_at(osmium::Timestamp{"2016-07-03T01:23:45Z"})
                 .set_closed_at(osmium::Timestamp{"2016-07-03T01:23:48Z"})
                 .set_num_changes(3)
-                .set_num_comments(2);
-
-            builder.bounds() = osmium::Box{bl, tr};
-
-            builder.add_user(user);
+                .set_num_comments(2)
+                .set_bounds(osmium::Box{bl, tr})
+                .add_user(user);
         }
 
         const auto& changeset = buffer.get<osmium::Changeset>(buffer.commit());

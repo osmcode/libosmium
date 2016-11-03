@@ -662,8 +662,10 @@ namespace osmium {
                 }
 
                 if (location1.valid() && location2.valid()) {
-                    builder.bounds().extend(location1);
-                    builder.bounds().extend(location2);
+                    osmium::Box box;
+                    box.extend(location1);
+                    box.extend(location2);
+                    builder.set_bounds(box);
                 }
 
                 builder.add_user(user);

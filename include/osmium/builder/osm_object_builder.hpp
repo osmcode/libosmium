@@ -56,6 +56,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/relation.hpp>
 #include <osmium/osm/timestamp.hpp>
 #include <osmium/osm/way.hpp>
+#include <osmium/util/compatibility.hpp>
 
 namespace osmium {
 
@@ -489,13 +490,12 @@ namespace osmium {
              * Initialize area attributes from the attributes of the given object.
              */
             void initialize_from_object(const osmium::OSMObject& source) {
-                osmium::Area& area = object();
-                area.set_id(osmium::object_id_to_area_id(source.id(), source.type()));
-                area.set_version(source.version());
-                area.set_changeset(source.changeset());
-                area.set_timestamp(source.timestamp());
-                area.set_visible(source.visible());
-                area.set_uid(source.uid());
+                set_id(osmium::object_id_to_area_id(source.id(), source.type()));
+                set_version(source.version());
+                set_changeset(source.changeset());
+                set_timestamp(source.timestamp());
+                set_visible(source.visible());
+                set_uid(source.uid());
 
                 add_user(source.user());
             }
@@ -516,6 +516,10 @@ namespace osmium {
                 object().set_user_size(1);
             }
 
+            Changeset& object() noexcept {
+                return static_cast<Changeset&>(item());
+            }
+
             OSMIUM_FORWARD(set_id)
             OSMIUM_FORWARD(set_uid)
             OSMIUM_FORWARD(set_created_at)
@@ -525,12 +529,14 @@ namespace osmium {
             OSMIUM_FORWARD(set_attribute)
             OSMIUM_FORWARD(set_removed)
 
-            osmium::Box& bounds() noexcept {
+            // @deprecated Use set_bounds() instead.
+            OSMIUM_DEPRECATED osmium::Box& bounds() noexcept {
                 return object().bounds();
             }
 
-            Changeset& object() noexcept {
-                return static_cast<Changeset&>(item());
+            ChangesetBuilder& set_bounds(const osmium::Box& box) noexcept {
+                object().bounds() = box;
+                return *this;
             }
 
             /**
