@@ -48,7 +48,9 @@ DEALINGS IN THE SOFTWARE.
 namespace osmium {
 
     namespace builder {
-        template <typename> class ObjectBuilder;
+        template <typename TDerived, typename T>
+        class OSMObjectBuilder;
+
         class RelationMemberListBuilder;
     } // namespace builder
 
@@ -167,7 +169,8 @@ namespace osmium {
 
     class Relation : public OSMObject {
 
-        friend class osmium::builder::ObjectBuilder<osmium::Relation>;
+        template <typename TDerived, typename T>
+        friend class osmium::builder::OSMObjectBuilder;
 
         Relation() noexcept :
             OSMObject(sizeof(Relation), osmium::item_type::relation) {

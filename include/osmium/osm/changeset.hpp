@@ -51,7 +51,6 @@ namespace osmium {
 
     namespace builder {
         class ChangesetDiscussionBuilder;
-        template <typename T> class ObjectBuilder;
         class ChangesetBuilder;
     } // namespace builder
 
@@ -129,8 +128,6 @@ namespace osmium {
     }; // class ChangesetComment
 
     class ChangesetDiscussion : public osmium::memory::Collection<ChangesetComment, osmium::item_type::changeset_discussion> {
-
-        friend class osmium::builder::ObjectBuilder<osmium::Changeset>;
 
     public:
 

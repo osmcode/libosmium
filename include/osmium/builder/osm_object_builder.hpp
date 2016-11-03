@@ -352,16 +352,51 @@ namespace osmium {
     }
 
         template <typename TDerived, typename T>
-        class OSMObjectBuilder : public ObjectBuilder<T> {
+        class OSMObjectBuilder : public Builder {
 
             using type = TDerived;
 
         public:
 
             explicit OSMObjectBuilder(osmium::memory::Buffer& buffer, Builder* parent = nullptr) :
-                ObjectBuilder<T>(buffer, parent) {
+                Builder(buffer, parent, sizeof(T)) {
+                new (&item()) T();
                 static_cast<Builder*>(this)->reserve_space_for<string_size_type>();
                 static_cast<Builder*>(this)->add_size(sizeof(string_size_type));
+            }
+
+            T& object() noexcept {
+                return static_cast<T&>(item());
+            }
+
+            /**
+             * Add user name to buffer.
+             *
+             * @param user Pointer to user name.
+             * @param length Length of user name (without \0 termination).
+             */
+            void add_user(const char* user, const string_size_type length) {
+                object().set_user_size(length + 1);
+                add_size(append(user, length) + append_zero());
+                add_padding(true);
+            }
+
+            /**
+             * Add user name to buffer.
+             *
+             * @param user Pointer to \0-terminated user name.
+             */
+            void add_user(const char* user) {
+                add_user(user, static_cast_with_assert<string_size_type>(std::strlen(user)));
+            }
+
+            /**
+             * Add user name to buffer.
+             *
+             * @param user User name.
+             */
+            void add_user(const std::string& user) {
+                add_user(user.data(), static_cast_with_assert<string_size_type>(user.size()));
             }
 
             OSMIUM_FORWARD(set_id)

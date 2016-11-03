@@ -41,12 +41,14 @@ DEALINGS IN THE SOFTWARE.
 namespace osmium {
 
     namespace builder {
-        template <typename T> class ObjectBuilder;
+        template <typename TDerived, typename T>
+        class OSMObjectBuilder;
     } // namespace builder
 
     class Node : public OSMObject {
 
-        friend class osmium::builder::ObjectBuilder<osmium::Node>;
+        template <typename TDerived, typename T>
+        friend class osmium::builder::OSMObjectBuilder;
 
         osmium::Location m_location;
 

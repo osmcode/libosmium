@@ -197,54 +197,6 @@ namespace osmium {
 
         }; // class Builder
 
-        template <typename TItem>
-        class ObjectBuilder : public Builder {
-
-            static_assert(std::is_base_of<osmium::memory::Item, TItem>::value, "ObjectBuilder can only build objects derived from osmium::memory::Item");
-
-        public:
-
-            explicit ObjectBuilder(osmium::memory::Buffer& buffer, Builder* parent = nullptr) :
-                Builder(buffer, parent, sizeof(TItem)) {
-                new (&item()) TItem();
-            }
-
-            TItem& object() noexcept {
-                return static_cast<TItem&>(item());
-            }
-
-            /**
-             * Add user name to buffer.
-             *
-             * @param user Pointer to user name.
-             * @param length Length of user name (without \0 termination).
-             */
-            void add_user(const char* user, const string_size_type length) {
-                object().set_user_size(length + 1);
-                add_size(append(user, length) + append_zero());
-                add_padding(true);
-            }
-
-            /**
-             * Add user name to buffer.
-             *
-             * @param user Pointer to \0-terminated user name.
-             */
-            void add_user(const char* user) {
-                add_user(user, static_cast_with_assert<string_size_type>(std::strlen(user)));
-            }
-
-            /**
-             * Add user name to buffer.
-             *
-             * @param user User name.
-             */
-            void add_user(const std::string& user) {
-                add_user(user.data(), static_cast_with_assert<string_size_type>(user.size()));
-            }
-
-        }; // class ObjectBuilder
-
     } // namespace builder
 
 } // namespace osmium

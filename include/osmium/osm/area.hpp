@@ -50,7 +50,8 @@ DEALINGS IN THE SOFTWARE.
 namespace osmium {
 
     namespace builder {
-        template <class T> class ObjectBuilder;
+        template <typename TDerived, typename T>
+        class OSMObjectBuilder;
     } // namespace builder
 
     /**
@@ -117,7 +118,8 @@ namespace osmium {
      */
     class Area : public OSMObject {
 
-        friend class osmium::builder::ObjectBuilder<osmium::Area>;
+        template <typename TDerived, typename T>
+        friend class osmium::builder::OSMObjectBuilder;
 
         Area() :
             OSMObject(sizeof(Area), osmium::item_type::area) {
