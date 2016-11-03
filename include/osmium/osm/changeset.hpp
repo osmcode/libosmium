@@ -52,6 +52,7 @@ namespace osmium {
     namespace builder {
         class ChangesetDiscussionBuilder;
         template <typename T> class ObjectBuilder;
+        class ChangesetBuilder;
     } // namespace builder
 
     class Changeset;
@@ -156,7 +157,7 @@ namespace osmium {
      */
     class Changeset : public osmium::OSMEntity {
 
-        friend class osmium::builder::ObjectBuilder<osmium::Changeset>;
+        friend class osmium::builder::ChangesetBuilder;
 
         osmium::Box       m_bounds;
         osmium::Timestamp m_created_at;
