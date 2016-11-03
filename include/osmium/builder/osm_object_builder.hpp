@@ -342,13 +342,15 @@ namespace osmium {
 
 #define OSMIUM_FORWARD(setter) \
     template <typename... TArgs> \
-    auto setter(TArgs&&... args) -> decltype(*this) { \
+    type& setter(TArgs&&... args) { \
         this->object().setter(std::forward<TArgs>(args)...); \
-        return *this; \
+        return static_cast<type&>(*this); \
     }
 
-        template <typename T>
+        template <typename TDerived, typename T>
         class OSMObjectBuilder : public ObjectBuilder<T> {
+
+            using type = TDerived;
 
         public:
 
@@ -357,6 +359,16 @@ namespace osmium {
                 static_cast<Builder*>(this)->reserve_space_for<string_size_type>();
                 static_cast<Builder*>(this)->add_size(sizeof(string_size_type));
             }
+
+            OSMIUM_FORWARD(set_id)
+            OSMIUM_FORWARD(set_visible)
+            OSMIUM_FORWARD(set_deleted)
+            OSMIUM_FORWARD(set_version)
+            OSMIUM_FORWARD(set_changeset)
+            OSMIUM_FORWARD(set_uid)
+            OSMIUM_FORWARD(set_timestamp)
+            OSMIUM_FORWARD(set_attribute)
+            OSMIUM_FORWARD(set_removed)
 
             void add_tags(const std::initializer_list<std::pair<const char*, const char*>>& tags) {
                 osmium::builder::TagListBuilder tl_builder(static_cast<Builder*>(this)->buffer(), this);
@@ -367,44 +379,29 @@ namespace osmium {
 
         }; // class OSMObjectBuilder
 
-        class NodeBuilder : public OSMObjectBuilder<osmium::Node> {
+        class NodeBuilder : public OSMObjectBuilder<NodeBuilder, Node> {
+
+            using type = NodeBuilder;
 
         public:
 
             explicit NodeBuilder(osmium::memory::Buffer& buffer, Builder* parent = nullptr) :
-                OSMObjectBuilder<osmium::Node>(buffer, parent) {
+                OSMObjectBuilder<NodeBuilder, Node>(buffer, parent) {
             }
 
-            OSMIUM_FORWARD(set_id)
-            OSMIUM_FORWARD(set_visible)
-            OSMIUM_FORWARD(set_deleted)
-            OSMIUM_FORWARD(set_version)
-            OSMIUM_FORWARD(set_changeset)
-            OSMIUM_FORWARD(set_uid)
-            OSMIUM_FORWARD(set_timestamp)
-            OSMIUM_FORWARD(set_attribute)
             OSMIUM_FORWARD(set_location)
-            OSMIUM_FORWARD(set_removed)
 
         }; // class NodeBuilder
 
-        class WayBuilder : public OSMObjectBuilder<osmium::Way> {
+        class WayBuilder : public OSMObjectBuilder<WayBuilder, Way> {
+
+            using type = WayBuilder;
 
         public:
 
             explicit WayBuilder(osmium::memory::Buffer& buffer, Builder* parent = nullptr) :
-                OSMObjectBuilder<osmium::Way>(buffer, parent) {
+                OSMObjectBuilder<WayBuilder, Way>(buffer, parent) {
             }
-
-            OSMIUM_FORWARD(set_id)
-            OSMIUM_FORWARD(set_visible)
-            OSMIUM_FORWARD(set_deleted)
-            OSMIUM_FORWARD(set_version)
-            OSMIUM_FORWARD(set_changeset)
-            OSMIUM_FORWARD(set_uid)
-            OSMIUM_FORWARD(set_timestamp)
-            OSMIUM_FORWARD(set_attribute)
-            OSMIUM_FORWARD(set_removed)
 
             void add_node_refs(const std::initializer_list<osmium::NodeRef>& nodes) {
                 osmium::builder::WayNodeListBuilder builder(buffer(), this);
@@ -415,43 +412,27 @@ namespace osmium {
 
         }; // class WayBuilder
 
-        class RelationBuilder : public OSMObjectBuilder<osmium::Relation> {
+        class RelationBuilder : public OSMObjectBuilder<RelationBuilder, Relation> {
+
+            using type = RelationBuilder;
 
         public:
 
             explicit RelationBuilder(osmium::memory::Buffer& buffer, Builder* parent = nullptr) :
-                OSMObjectBuilder<osmium::Relation>(buffer, parent) {
+                OSMObjectBuilder<RelationBuilder, Relation>(buffer, parent) {
             }
-
-            OSMIUM_FORWARD(set_id)
-            OSMIUM_FORWARD(set_visible)
-            OSMIUM_FORWARD(set_deleted)
-            OSMIUM_FORWARD(set_version)
-            OSMIUM_FORWARD(set_changeset)
-            OSMIUM_FORWARD(set_uid)
-            OSMIUM_FORWARD(set_timestamp)
-            OSMIUM_FORWARD(set_attribute)
-            OSMIUM_FORWARD(set_removed)
 
         }; // class RelationBuilder
 
-        class AreaBuilder : public OSMObjectBuilder<osmium::Area> {
+        class AreaBuilder : public OSMObjectBuilder<AreaBuilder, Area> {
+
+            using type = AreaBuilder;
 
         public:
 
             explicit AreaBuilder(osmium::memory::Buffer& buffer, Builder* parent = nullptr) :
-                OSMObjectBuilder<osmium::Area>(buffer, parent) {
+                OSMObjectBuilder<AreaBuilder, Area>(buffer, parent) {
             }
-
-            OSMIUM_FORWARD(set_id)
-            OSMIUM_FORWARD(set_visible)
-            OSMIUM_FORWARD(set_deleted)
-            OSMIUM_FORWARD(set_version)
-            OSMIUM_FORWARD(set_changeset)
-            OSMIUM_FORWARD(set_uid)
-            OSMIUM_FORWARD(set_timestamp)
-            OSMIUM_FORWARD(set_attribute)
-            OSMIUM_FORWARD(set_removed)
 
             /**
              * Initialize area attributes from the attributes of the given object.
@@ -471,6 +452,8 @@ namespace osmium {
         }; // class AreaBuilder
 
         class ChangesetBuilder : public ObjectBuilder<osmium::Changeset> {
+
+            using type = ChangesetBuilder;
 
         public:
 
