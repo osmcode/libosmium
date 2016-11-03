@@ -384,6 +384,7 @@ namespace osmium {
             OSMIUM_FORWARD(set_timestamp)
             OSMIUM_FORWARD(set_attribute)
             OSMIUM_FORWARD(set_location)
+            OSMIUM_FORWARD(set_removed)
 
         }; // class NodeBuilder
 
@@ -403,6 +404,7 @@ namespace osmium {
             OSMIUM_FORWARD(set_uid)
             OSMIUM_FORWARD(set_timestamp)
             OSMIUM_FORWARD(set_attribute)
+            OSMIUM_FORWARD(set_removed)
 
             void add_node_refs(const std::initializer_list<osmium::NodeRef>& nodes) {
                 osmium::builder::WayNodeListBuilder builder(buffer(), this);
@@ -429,6 +431,7 @@ namespace osmium {
             OSMIUM_FORWARD(set_uid)
             OSMIUM_FORWARD(set_timestamp)
             OSMIUM_FORWARD(set_attribute)
+            OSMIUM_FORWARD(set_removed)
 
         }; // class RelationBuilder
 
@@ -448,6 +451,7 @@ namespace osmium {
             OSMIUM_FORWARD(set_uid)
             OSMIUM_FORWARD(set_timestamp)
             OSMIUM_FORWARD(set_attribute)
+            OSMIUM_FORWARD(set_removed)
 
             /**
              * Initialize area attributes from the attributes of the given object.
@@ -481,6 +485,7 @@ namespace osmium {
             OSMIUM_FORWARD(set_num_changes)
             OSMIUM_FORWARD(set_num_comments)
             OSMIUM_FORWARD(set_attribute)
+            OSMIUM_FORWARD(set_removed)
 
             osmium::Box& bounds() noexcept {
                 return this->object().bounds();
