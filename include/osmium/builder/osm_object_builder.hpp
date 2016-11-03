@@ -181,12 +181,12 @@ namespace osmium {
             }
 
             ~NodeRefListBuilder() {
-                static_cast<Builder*>(this)->add_padding();
+                add_padding();
             }
 
             void add_node_ref(const NodeRef& node_ref) {
-                new (static_cast<Builder*>(this)->reserve_space_for<osmium::NodeRef>()) osmium::NodeRef(node_ref);
-                static_cast<Builder*>(this)->add_size(sizeof(osmium::NodeRef));
+                new (reserve_space_for<osmium::NodeRef>()) osmium::NodeRef(node_ref);
+                add_size(sizeof(osmium::NodeRef));
             }
 
             void add_node_ref(const object_id_type ref, const osmium::Location& location = Location{}) {
@@ -375,7 +375,7 @@ namespace osmium {
             OSMIUM_FORWARD(set_removed)
 
             void add_tags(const std::initializer_list<std::pair<const char*, const char*>>& tags) {
-                osmium::builder::TagListBuilder tl_builder(static_cast<Builder*>(this)->buffer(), this);
+                osmium::builder::TagListBuilder tl_builder{this->buffer(), this};
                 for (const auto& p : tags) {
                     tl_builder.add_tag(p.first, p.second);
                 }
@@ -408,7 +408,7 @@ namespace osmium {
             }
 
             void add_node_refs(const std::initializer_list<osmium::NodeRef>& nodes) {
-                osmium::builder::WayNodeListBuilder builder(buffer(), this);
+                osmium::builder::WayNodeListBuilder builder{buffer(), this};
                 for (const auto& node_ref : nodes) {
                     builder.add_node_ref(node_ref);
                 }
