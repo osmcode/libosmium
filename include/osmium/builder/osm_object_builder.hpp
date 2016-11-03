@@ -67,12 +67,13 @@ namespace osmium {
 
     namespace builder {
 
-        class TagListBuilder : public ObjectBuilder<TagList> {
+        class TagListBuilder : public Builder {
 
         public:
 
             explicit TagListBuilder(osmium::memory::Buffer& buffer, Builder* parent = nullptr) :
-                ObjectBuilder<TagList>(buffer, parent) {
+                Builder(buffer, parent, sizeof(TagList)) {
+                new (&item()) TagList();
             }
 
             ~TagListBuilder() {
@@ -170,12 +171,13 @@ namespace osmium {
         }; // class TagListBuilder
 
         template <typename T>
-        class NodeRefListBuilder : public ObjectBuilder<T> {
+        class NodeRefListBuilder : public Builder {
 
         public:
 
             explicit NodeRefListBuilder(osmium::memory::Buffer& buffer, Builder* parent = nullptr) :
-                ObjectBuilder<T>(buffer, parent) {
+                Builder(buffer, parent, sizeof(T)) {
+                new (&item()) T();
             }
 
             ~NodeRefListBuilder() {
@@ -197,7 +199,7 @@ namespace osmium {
         using OuterRingBuilder   = NodeRefListBuilder<OuterRing>;
         using InnerRingBuilder   = NodeRefListBuilder<InnerRing>;
 
-        class RelationMemberListBuilder : public ObjectBuilder<RelationMemberList> {
+        class RelationMemberListBuilder : public Builder {
 
             /**
              * Add role to buffer.
@@ -220,7 +222,8 @@ namespace osmium {
         public:
 
             explicit RelationMemberListBuilder(osmium::memory::Buffer& buffer, Builder* parent = nullptr) :
-                ObjectBuilder<RelationMemberList>(buffer, parent) {
+                Builder(buffer, parent, sizeof(RelationMemberList)) {
+                new (&item()) RelationMemberList();
             }
 
             ~RelationMemberListBuilder() {
@@ -282,7 +285,7 @@ namespace osmium {
 
         }; // class RelationMemberListBuilder
 
-        class ChangesetDiscussionBuilder : public ObjectBuilder<ChangesetDiscussion> {
+        class ChangesetDiscussionBuilder : public Builder {
 
             osmium::ChangesetComment* m_comment = nullptr;
 
@@ -310,7 +313,8 @@ namespace osmium {
         public:
 
             explicit ChangesetDiscussionBuilder(osmium::memory::Buffer& buffer, Builder* parent = nullptr) :
-                ObjectBuilder<ChangesetDiscussion>(buffer, parent) {
+                Builder(buffer, parent, sizeof(ChangesetDiscussion)) {
+                new (&item()) ChangesetDiscussion();
             }
 
             ~ChangesetDiscussionBuilder() {
