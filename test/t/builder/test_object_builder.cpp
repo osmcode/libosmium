@@ -6,10 +6,27 @@
 #include <osmium/osm.hpp>
 
 TEST_CASE("create node") {
-    osmium::memory::Buffer buffer(1024*10);
+    osmium::memory::Buffer buffer{1024*10};
+    std::string user;
 
     SECTION("complete node with tags") {
         osmium::Location loc{1.2, 3.4};
+
+        SECTION("user length small") {
+            user = "foo";
+        }
+        SECTION("user length 7") {
+            user = "1234567";
+        }
+        SECTION("user length 8") {
+            user = "12345678";
+        }
+        SECTION("user length 9") {
+            user = "123456789";
+        }
+        SECTION("user length large") {
+            user = "very long user name";
+        }
 
         {
             osmium::builder::NodeBuilder builder(buffer);
@@ -21,7 +38,7 @@ TEST_CASE("create node") {
                 .set_uid(555)
                 .set_timestamp("2015-07-01T00:00:01Z")
                 .set_location(loc)
-                .add_user("foo");
+                .add_user(user);
 
             builder.add_tags({{"highway", "primary"}, {"oneway", "yes"}});
         }
@@ -35,12 +52,28 @@ TEST_CASE("create node") {
         REQUIRE(node.timestamp() == osmium::Timestamp{"2015-07-01T00:00:01Z"});
         REQUIRE(node.location() == loc);
 
-        REQUIRE(std::string{node.user()} == "foo");
+        REQUIRE(user == node.user());
 
         REQUIRE(node.tags().size() == 2);
     }
 
     SECTION("complete way with tags") {
+        SECTION("user length small") {
+            user = "foo";
+        }
+        SECTION("user length 7") {
+            user = "1234567";
+        }
+        SECTION("user length 8") {
+            user = "12345678";
+        }
+        SECTION("user length 9") {
+            user = "123456789";
+        }
+        SECTION("user length large") {
+            user = "very long user name";
+        }
+
         {
             osmium::builder::WayBuilder builder(buffer);
 
@@ -50,7 +83,7 @@ TEST_CASE("create node") {
                 .set_changeset(123)
                 .set_uid(555)
                 .set_timestamp("2015-07-01T00:00:01Z")
-                .add_user("foo");
+                .add_user(user);
 
             builder.add_tags({{"highway", "primary"}, {"oneway", "yes"}});
         }
@@ -63,12 +96,28 @@ TEST_CASE("create node") {
         REQUIRE(way.uid() == 555);
         REQUIRE(way.timestamp() == osmium::Timestamp{"2015-07-01T00:00:01Z"});
 
-        REQUIRE(std::string{way.user()} == "foo");
+        REQUIRE(user == way.user());
 
         REQUIRE(way.tags().size() == 2);
     }
 
     SECTION("complete relation with tags") {
+        SECTION("user length small") {
+            user = "foo";
+        }
+        SECTION("user length 7") {
+            user = "1234567";
+        }
+        SECTION("user length 8") {
+            user = "12345678";
+        }
+        SECTION("user length 9") {
+            user = "123456789";
+        }
+        SECTION("user length large") {
+            user = "very long user name";
+        }
+
         {
             osmium::builder::RelationBuilder builder(buffer);
 
@@ -78,7 +127,7 @@ TEST_CASE("create node") {
                 .set_changeset(123)
                 .set_uid(555)
                 .set_timestamp("2015-07-01T00:00:01Z")
-                .add_user("foo");
+                .add_user(user);
 
             builder.add_tags({{"highway", "primary"}, {"oneway", "yes"}});
         }
@@ -91,7 +140,7 @@ TEST_CASE("create node") {
         REQUIRE(relation.uid() == 555);
         REQUIRE(relation.timestamp() == osmium::Timestamp{"2015-07-01T00:00:01Z"});
 
-        REQUIRE(std::string{relation.user()} == "foo");
+        REQUIRE(user == relation.user());
 
         REQUIRE(relation.tags().size() == 2);
     }
@@ -100,7 +149,6 @@ TEST_CASE("create node") {
         osmium::Location bl{-1.2, -3.4};
         osmium::Location tr{1.2, 3.4};
 
-        std::string user;
         SECTION("user length small") {
             user = "foo";
         }

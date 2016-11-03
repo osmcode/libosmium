@@ -347,7 +347,7 @@ namespace osmium {
 #define OSMIUM_FORWARD(setter) \
     template <typename... TArgs> \
     type& setter(TArgs&&... args) { \
-        this->object().setter(std::forward<TArgs>(args)...); \
+        object().setter(std::forward<TArgs>(args)...); \
         return static_cast<type&>(*this); \
     }
 
@@ -361,8 +361,11 @@ namespace osmium {
             explicit OSMObjectBuilder(osmium::memory::Buffer& buffer, Builder* parent = nullptr) :
                 Builder(buffer, parent, sizeof(T)) {
                 new (&item()) T();
-                static_cast<Builder*>(this)->reserve_space_for<string_size_type>();
-                static_cast<Builder*>(this)->add_size(sizeof(string_size_type));
+                reserve_space_for<string_size_type>();
+                add_size(sizeof(string_size_type));
+                add_size(append_zero());
+                add_padding(true);
+                object().set_user_size(1);
             }
 
             T& object() noexcept {
@@ -376,9 +379,17 @@ namespace osmium {
              * @param length Length of user name (without \0 termination).
              */
             void add_user(const char* user, const string_size_type length) {
+                assert(object().user_size() == 1 && (size() <= object().sizeof_object() + osmium::memory::padded_length(1))
+                       && "add_user() must be called at most once and before any sub-builders");
+                const auto available_space = size() - object().sizeof_object();
+                const auto space_needed = length + 1 - available_space;
+                if (space_needed > 0) {
+                    reserve_space(space_needed);
+                    add_size(space_needed);
+                    add_padding(true);
+                }
+                std::copy_n(user, length + 1, object().data() + object().sizeof_object());
                 object().set_user_size(length + 1);
-                add_size(append(user, length) + append_zero());
-                add_padding(true);
             }
 
             /**
@@ -410,7 +421,7 @@ namespace osmium {
             OSMIUM_FORWARD(set_removed)
 
             void add_tags(const std::initializer_list<std::pair<const char*, const char*>>& tags) {
-                osmium::builder::TagListBuilder tl_builder{this->buffer(), this};
+                osmium::builder::TagListBuilder tl_builder{buffer(), this};
                 for (const auto& p : tags) {
                     tl_builder.add_tag(p.first, p.second);
                 }
@@ -499,8 +510,8 @@ namespace osmium {
             explicit ChangesetBuilder(osmium::memory::Buffer& buffer, Builder* parent = nullptr) :
                 Builder(buffer, parent, sizeof(Changeset)) {
                 new (&item()) Changeset();
-                this->add_size(this->append_zero());
-                this->add_padding(true);
+                add_size(append_zero());
+                add_padding(true);
                 object().set_user_size(1);
             }
 
@@ -514,7 +525,7 @@ namespace osmium {
             OSMIUM_FORWARD(set_removed)
 
             osmium::Box& bounds() noexcept {
-                return this->object().bounds();
+                return object().bounds();
             }
 
             Changeset& object() noexcept {
