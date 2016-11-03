@@ -5,7 +5,7 @@
 #include <osmium/memory/buffer.hpp>
 #include <osmium/osm.hpp>
 
-TEST_CASE("create node") {
+TEST_CASE("create objects using builder") {
     osmium::memory::Buffer buffer{1024*10};
     std::string user;
 
@@ -196,5 +196,19 @@ TEST_CASE("create node") {
         REQUIRE(user == changeset.user());
     }
 
+}
+
+TEST_CASE("add_user") {
+    osmium::memory::Buffer buffer{1024*10};
+    std::string user = "userx";
+
+    {
+        osmium::builder::NodeBuilder builder(buffer);
+        builder.add_user(user.c_str(), 4);
+    }
+
+    const auto& node = buffer.get<osmium::Node>(buffer.commit());
+
+    REQUIRE(std::string{"user"} == node.user());
 }
 

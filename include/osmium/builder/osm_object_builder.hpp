@@ -388,7 +388,8 @@ namespace osmium {
                     add_size(space_needed);
                     add_padding(true);
                 }
-                std::copy_n(user, length + 1, object().data() + object().sizeof_object());
+                std::copy_n(user, length, object().data() + object().sizeof_object());
+                *(object().data() + object().sizeof_object() + length) = '\0';
                 object().set_user_size(length + 1);
             }
 
@@ -548,7 +549,8 @@ namespace osmium {
                     add_size(space_needed);
                     add_padding(true);
                 }
-                std::copy_n(user, length + 1, object().data() + sizeof(Changeset));
+                std::copy_n(user, length, object().data() + sizeof(Changeset));
+                *(object().data() + sizeof(Changeset) + length) = '\0';
                 object().set_user_size(length + 1);
             }
 
