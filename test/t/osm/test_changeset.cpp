@@ -9,7 +9,7 @@
 using namespace osmium::builder::attr;
 
 TEST_CASE("Build changeset") {
-    osmium::memory::Buffer buffer(10 * 1000);
+    osmium::memory::Buffer buffer{10 * 1000};
 
     osmium::builder::add_changeset(buffer,
         _cid(42),
@@ -88,26 +88,25 @@ TEST_CASE("Build changeset") {
 }
 
 TEST_CASE("Create changeset without helper") {
-    osmium::memory::Buffer buffer(10 * 1000);
+    osmium::memory::Buffer buffer{10 * 1000};
     {
-        osmium::builder::ChangesetBuilder builder(buffer);
+        osmium::builder::ChangesetBuilder builder{buffer};
 
-        osmium::Changeset& cs1 = builder.object();
-        cs1.set_id(42)
-        .set_created_at(100)
-        .set_closed_at(200)
-        .set_num_changes(7)
-        .set_num_comments(2)
-        .set_uid(9);
+        builder.set_id(42)
+            .set_created_at(100)
+            .set_closed_at(200)
+            .set_num_changes(7)
+            .set_num_comments(2)
+            .set_uid(9);
 
         builder.add_user("user");
         {
-            osmium::builder::TagListBuilder tl_builder(buffer, &builder);
+            osmium::builder::TagListBuilder tl_builder{buffer, &builder};
             tl_builder.add_tag("key1", "val1");
             tl_builder.add_tag("key2", "val2");
         }
 
-        osmium::builder::ChangesetDiscussionBuilder disc_builder(buffer, &builder);
+        osmium::builder::ChangesetDiscussionBuilder disc_builder{buffer, &builder};
         disc_builder.add_comment(osmium::Timestamp(300), 10, "user2");
         disc_builder.add_comment_text("foo");
         disc_builder.add_comment(osmium::Timestamp(400), 9, "user");
