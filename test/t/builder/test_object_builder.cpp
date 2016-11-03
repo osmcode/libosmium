@@ -14,15 +14,14 @@ TEST_CASE("create node") {
         {
             osmium::builder::NodeBuilder builder(buffer);
 
-            builder.set_id(17);
-            builder.set_visible(true);
-            builder.set_version(1);
-            builder.set_changeset(123);
-            builder.set_uid(555);
-            builder.set_timestamp("2015-07-01T00:00:01Z");
-            builder.set_location(loc);
-
-            builder.add_user("foo");
+            builder.set_id(17)
+                .set_visible(true)
+                .set_version(1)
+                .set_changeset(123)
+                .set_uid(555)
+                .set_timestamp("2015-07-01T00:00:01Z")
+                .set_location(loc)
+                .add_user("foo");
 
             builder.add_tags({{"highway", "primary"}, {"oneway", "yes"}});
         }
@@ -45,14 +44,13 @@ TEST_CASE("create node") {
         {
             osmium::builder::WayBuilder builder(buffer);
 
-            builder.set_id(17);
-            builder.set_visible(true);
-            builder.set_version(1);
-            builder.set_changeset(123);
-            builder.set_uid(555);
-            builder.set_timestamp("2015-07-01T00:00:01Z");
-
-            builder.add_user("foo");
+            builder.set_id(17)
+                .set_visible(true)
+                .set_version(1)
+                .set_changeset(123)
+                .set_uid(555)
+                .set_timestamp("2015-07-01T00:00:01Z")
+                .add_user("foo");
 
             builder.add_tags({{"highway", "primary"}, {"oneway", "yes"}});
         }
@@ -74,14 +72,13 @@ TEST_CASE("create node") {
         {
             osmium::builder::RelationBuilder builder(buffer);
 
-            builder.set_id(17);
-            builder.set_visible(true);
-            builder.set_version(1);
-            builder.set_changeset(123);
-            builder.set_uid(555);
-            builder.set_timestamp("2015-07-01T00:00:01Z");
-
-            builder.add_user("foo");
+            builder.set_id(17)
+                .set_visible(true)
+                .set_version(1)
+                .set_changeset(123)
+                .set_uid(555)
+                .set_timestamp("2015-07-01T00:00:01Z")
+                .add_user("foo");
 
             builder.add_tags({{"highway", "primary"}, {"oneway", "yes"}});
         }
@@ -123,12 +120,13 @@ TEST_CASE("create node") {
         {
             osmium::builder::ChangesetBuilder builder(buffer);
 
-            builder.set_id(17);
-            builder.set_uid(222);
-            builder.set_created_at(osmium::Timestamp{"2016-07-03T01:23:45Z"});
-            builder.set_closed_at(osmium::Timestamp{"2016-07-03T01:23:48Z"});
-            builder.set_num_changes(3);
-            builder.set_num_comments(2);
+            builder.set_id(17)
+                .set_uid(222)
+                .set_created_at(osmium::Timestamp{"2016-07-03T01:23:45Z"})
+                .set_closed_at(osmium::Timestamp{"2016-07-03T01:23:48Z"})
+                .set_num_changes(3)
+                .set_num_comments(2);
+
             builder.bounds() = osmium::Box{bl, tr};
 
             builder.add_user(user);
