@@ -386,7 +386,7 @@ namespace osmium {
                 const auto space_needed = length + 1 - available_space;
                 if (space_needed > 0) {
                     reserve_space(space_needed);
-                    add_size(space_needed);
+                    add_size(static_cast<uint32_t>(space_needed));
                     add_padding(true);
                 }
                 std::copy_n(user, length, object().data() + object().sizeof_object());
@@ -559,7 +559,7 @@ namespace osmium {
                 const auto space_needed = length + 1 - available_space;
                 if (space_needed > 0) {
                     reserve_space(space_needed);
-                    add_size(space_needed);
+                    add_size(static_cast<uint32_t>(space_needed));
                     add_padding(true);
                 }
                 std::copy_n(user, length, object().data() + sizeof(Changeset));
