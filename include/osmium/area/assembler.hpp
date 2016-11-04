@@ -288,7 +288,7 @@ namespace osmium {
             }
 
             void add_tags_to_area(osmium::builder::AreaBuilder& builder, const osmium::Way& way) const {
-                builder.add_item(&way.tags());
+                builder.add_item(way.tags());
             }
 
             void add_common_tags(osmium::builder::TagListBuilder& tl_builder, std::set<const osmium::Way*>& ways) const {
@@ -354,7 +354,7 @@ namespace osmium {
                     }
 
                     if (m_config.keep_type_tag) {
-                        builder.add_item(&relation.tags());
+                        builder.add_item(relation.tags());
                     } else {
                         copy_tags_without_type(builder, relation.tags());
                     }
@@ -373,7 +373,7 @@ namespace osmium {
                         if (debug()) {
                             std::cerr << "      only one outer way\n";
                         }
-                        builder.add_item(&(*ways.cbegin())->tags());
+                        builder.add_item((*ways.cbegin())->tags());
                     } else {
                         if (debug()) {
                             std::cerr << "      multiple outer ways, get common tags\n";

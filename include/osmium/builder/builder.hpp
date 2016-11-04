@@ -45,6 +45,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/memory/item.hpp>
 #include <osmium/osm/types.hpp>
 #include <osmium/util/cast.hpp>
+#include <osmium/util/compatibility.hpp>
 
 namespace osmium {
 
@@ -193,10 +194,22 @@ namespace osmium {
                 return m_buffer;
             }
 
-            void add_item(const osmium::memory::Item* item) {
-                unsigned char* target = reserve_space(item->padded_size());
-                std::copy_n(reinterpret_cast<const unsigned char*>(item), item->padded_size(), target);
-                add_size(item->padded_size());
+            /**
+             * Add a subitem to the object being built. This can be something
+             * like a TagList or RelationMemberList.
+             */
+            void add_item(const osmium::memory::Item& item) {
+                m_buffer.add_item(item);
+                add_size(item.padded_size());
+            }
+
+            /**
+             * @deprecated Use the version of add_item() taking a
+             *             reference instead.
+             */
+            OSMIUM_DEPRECATED void add_item(const osmium::memory::Item* item) {
+                assert(item);
+                add_item(*item);
             }
 
         }; // class Builder

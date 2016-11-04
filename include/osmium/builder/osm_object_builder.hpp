@@ -250,7 +250,7 @@ namespace osmium {
                 add_size(sizeof(RelationMember));
                 add_role(*member, role, role_length);
                 if (full_member) {
-                    add_item(full_member);
+                    add_item(*full_member);
                 }
             }
 
