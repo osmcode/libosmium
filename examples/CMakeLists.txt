@@ -10,6 +10,7 @@ message(STATUS "Configuring examples")
 
 set(EXAMPLES
     area_test
+    change_tags
     convert
     count
     debug
