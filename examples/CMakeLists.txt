@@ -32,7 +32,7 @@ set(EXAMPLES
 #  Examples depending on wingetopt
 #
 #-----------------------------------------------------------------------------
-set(GETOPT_EXAMPLES area_test convert index serdump)
+set(GETOPT_EXAMPLES area_test convert index)
 if(NOT GETOPT_MISSING)
     foreach(example ${GETOPT_EXAMPLES})
         list(APPEND EXAMPLE_LIBS_${example} ${GETOPT_LIBRARY})

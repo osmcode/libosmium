@@ -126,7 +126,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    int remaining_args = argc - optind;
+    const int remaining_args = argc - optind;
     if (remaining_args != 1) {
         std::cerr << "Usage: " << argv[0] << " [OPTIONS] OSMFILE\n";
         std::exit(1);
