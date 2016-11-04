@@ -13,6 +13,7 @@ set(EXAMPLES
     change_tags
     convert
     count
+    create_pois
     debug
     filter_discussions
     index
