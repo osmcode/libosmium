@@ -19,14 +19,3 @@ TEST_CASE("Projection using Projection class to WKT") {
     REQUIRE(wkt == "POINT(356222.37 467961.14)");
 }
 
-#if __BYTE_ORDER == __LITTLE_ENDIAN
-
-TEST_CASE("Projection using Projection class to WKB") {
-    osmium::geom::WKBFactory<osmium::geom::Projection> factory{osmium::geom::Projection{3857}, osmium::geom::wkb_type::wkb, osmium::geom::out_type::hex};
-
-    const std::string wkb{factory.create_point(osmium::Location{3.2, 4.2})};
-    REQUIRE(wkb == "010100000030706E7BF9BD1541B03E0D93E48F1C41");
-}
-
-#endif
-
