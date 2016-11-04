@@ -380,17 +380,18 @@ namespace osmium {
              * @param length Length of user name (without \0 termination).
              */
             TDerived& set_user(const char* user, const string_size_type length) {
-                assert(object().user_size() == 1 && (size() <= object().sizeof_object() + osmium::memory::padded_length(1))
+                const auto size_of_object = sizeof(T) + sizeof(string_size_type);
+                assert(object().user_size() == 1 && (size() <= size_of_object + osmium::memory::padded_length(1))
                        && "set_user() must be called at most once and before any sub-builders");
-                const auto available_space = size() - object().sizeof_object();
+                const auto available_space = size() - size_of_object;
                 const auto space_needed = length + 1 - available_space;
                 if (space_needed > 0) {
                     reserve_space(space_needed);
                     add_size(static_cast<uint32_t>(space_needed));
                     add_padding(true);
                 }
-                std::copy_n(user, length, object().data() + object().sizeof_object());
-                *(object().data() + object().sizeof_object() + length) = '\0';
+                std::copy_n(user, length, object().data() + size_of_object);
+                *(object().data() + size_of_object + length) = '\0';
                 object().set_user_size(length + 1);
 
                 return static_cast<TDerived&>(*this);
