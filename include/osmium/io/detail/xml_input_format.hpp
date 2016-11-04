@@ -299,7 +299,7 @@ namespace osmium {
                     builder->set_user(user);
                 }
 
-                void get_tag(osmium::builder::Builder* builder, const XML_Char** attrs) {
+                void get_tag(osmium::builder::Builder& builder, const XML_Char** attrs) {
                     const char* k = "";
                     const char* v = "";
                     check_attributes(attrs, [&k, &v](const XML_Char* name, const XML_Char* value) {
@@ -310,7 +310,7 @@ namespace osmium {
                         }
                     });
                     if (!m_tl_builder) {
-                        m_tl_builder = std::unique_ptr<osmium::builder::TagListBuilder>(new osmium::builder::TagListBuilder(m_buffer, builder));
+                        m_tl_builder = std::unique_ptr<osmium::builder::TagListBuilder>(new osmium::builder::TagListBuilder{builder});
                     }
                     m_tl_builder->add_tag(k, v);
                 }
@@ -407,7 +407,7 @@ namespace osmium {
                             m_last_context = context::node;
                             m_context = context::in_object;
                             if (!std::strcmp(element, "tag")) {
-                                get_tag(m_node_builder.get(), attrs);
+                                get_tag(*m_node_builder, attrs);
                             }
                             break;
                         case context::way:
@@ -417,7 +417,7 @@ namespace osmium {
                                 m_tl_builder.reset();
 
                                 if (!m_wnl_builder) {
-                                    m_wnl_builder = std::unique_ptr<osmium::builder::WayNodeListBuilder>(new osmium::builder::WayNodeListBuilder(m_buffer, m_way_builder.get()));
+                                    m_wnl_builder = std::unique_ptr<osmium::builder::WayNodeListBuilder>(new osmium::builder::WayNodeListBuilder{*m_way_builder});
                                 }
 
                                 NodeRef nr;
@@ -433,7 +433,7 @@ namespace osmium {
                                 m_wnl_builder->add_node_ref(nr);
                             } else if (!std::strcmp(element, "tag")) {
                                 m_wnl_builder.reset();
-                                get_tag(m_way_builder.get(), attrs);
+                                get_tag(*m_way_builder, attrs);
                             }
                             break;
                         case context::relation:
@@ -443,7 +443,7 @@ namespace osmium {
                                 m_tl_builder.reset();
 
                                 if (!m_rml_builder) {
-                                    m_rml_builder = std::unique_ptr<osmium::builder::RelationMemberListBuilder>(new osmium::builder::RelationMemberListBuilder(m_buffer, m_relation_builder.get()));
+                                    m_rml_builder = std::unique_ptr<osmium::builder::RelationMemberListBuilder>(new osmium::builder::RelationMemberListBuilder{*m_relation_builder});
                                 }
 
                                 item_type type = item_type::undefined;
@@ -467,7 +467,7 @@ namespace osmium {
                                 m_rml_builder->add_member(type, ref, role);
                             } else if (!std::strcmp(element, "tag")) {
                                 m_rml_builder.reset();
-                                get_tag(m_relation_builder.get(), attrs);
+                                get_tag(*m_relation_builder, attrs);
                             }
                             break;
                         case context::changeset:
@@ -476,12 +476,12 @@ namespace osmium {
                                 m_context = context::discussion;
                                 m_tl_builder.reset();
                                 if (!m_changeset_discussion_builder) {
-                                    m_changeset_discussion_builder = std::unique_ptr<osmium::builder::ChangesetDiscussionBuilder>(new osmium::builder::ChangesetDiscussionBuilder(m_buffer, m_changeset_builder.get()));
+                                    m_changeset_discussion_builder = std::unique_ptr<osmium::builder::ChangesetDiscussionBuilder>(new osmium::builder::ChangesetDiscussionBuilder{*m_changeset_builder});
                                 }
                             } else if (!std::strcmp(element, "tag")) {
                                 m_context = context::in_object;
                                 m_changeset_discussion_builder.reset();
-                                get_tag(m_changeset_builder.get(), attrs);
+                                get_tag(*m_changeset_builder, attrs);
                             }
                             break;
                         case context::discussion:

@@ -101,12 +101,12 @@ TEST_CASE("Create changeset without helper") {
             .set_user("user");
 
         {
-            osmium::builder::TagListBuilder tl_builder{buffer, &builder};
+            osmium::builder::TagListBuilder tl_builder{builder};
             tl_builder.add_tag("key1", "val1");
             tl_builder.add_tag("key2", "val2");
         }
 
-        osmium::builder::ChangesetDiscussionBuilder disc_builder{buffer, &builder};
+        osmium::builder::ChangesetDiscussionBuilder disc_builder{builder};
         disc_builder.add_comment(osmium::Timestamp(300), 10, "user2");
         disc_builder.add_comment_text("foo");
         disc_builder.add_comment(osmium::Timestamp(400), 9, "user");

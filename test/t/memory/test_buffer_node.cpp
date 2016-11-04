@@ -94,7 +94,7 @@ TEST_CASE("Node in Buffer") {
                 .set_location(osmium::Location{3.5, 4.7})
                 .set_user("testuser");
 
-            osmium::builder::TagListBuilder tag_builder{buffer, &node_builder};
+            osmium::builder::TagListBuilder tag_builder{node_builder};
             tag_builder.add_tag("amenity", "bank");
             tag_builder.add_tag("name", "OSM Savings");
         }

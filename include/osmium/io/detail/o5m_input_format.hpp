@@ -302,10 +302,10 @@ namespace osmium {
                     return std::make_pair(static_cast_with_assert<osmium::user_id_type>(uid), user);
                 }
 
-                void decode_tags(osmium::builder::Builder* builder, const char** dataptr, const char* const end) {
-                    osmium::builder::TagListBuilder tl_builder(m_buffer, builder);
+                void decode_tags(osmium::builder::Builder& parent, const char** dataptr, const char* const end) {
+                    osmium::builder::TagListBuilder builder{parent};
 
-                    while(*dataptr != end) {
+                    while (*dataptr != end) {
                         bool update_pointer = (**dataptr == 0x00);
                         const char* data = decode_string(dataptr, end);
                         const char* start = data;
@@ -328,7 +328,7 @@ namespace osmium {
                             *dataptr = data;
                         }
 
-                        tl_builder.add_tag(start, value);
+                        builder.add_tag(start, value);
                     }
                 }
 
@@ -373,7 +373,7 @@ namespace osmium {
                         builder.set_location(osmium::Location{lon, lat});
 
                         if (data != end) {
-                            decode_tags(&builder, &data, end);
+                            decode_tags(builder, &data, end);
                         }
                     }
                 }
@@ -396,7 +396,7 @@ namespace osmium {
                                 throw o5m_error{"way nodes ref section too long"};
                             }
 
-                            osmium::builder::WayNodeListBuilder wn_builder(m_buffer, &builder);
+                            osmium::builder::WayNodeListBuilder wn_builder{builder};
 
                             while (data < end_refs) {
                                 wn_builder.add_node_ref(m_delta_way_node_id.update(zvarint(&data, end)));
@@ -404,7 +404,7 @@ namespace osmium {
                         }
 
                         if (data != end) {
-                            decode_tags(&builder, &data, end);
+                            decode_tags(builder, &data, end);
                         }
                     }
                 }
@@ -459,7 +459,7 @@ namespace osmium {
                                 throw o5m_error{"relation format error"};
                             }
 
-                            osmium::builder::RelationMemberListBuilder rml_builder(m_buffer, &builder);
+                            osmium::builder::RelationMemberListBuilder rml_builder{builder};
 
                             while (data < end_refs) {
                                 auto delta_id = zvarint(&data, end);
@@ -474,7 +474,7 @@ namespace osmium {
                         }
 
                         if (data != end) {
-                            decode_tags(&builder, &data, end);
+                            decode_tags(builder, &data, end);
                         }
                     }
                 }

@@ -77,6 +77,11 @@ namespace osmium {
                 new (&item()) TagList();
             }
 
+            explicit TagListBuilder(Builder& parent) :
+                Builder(parent.buffer(), &parent, sizeof(TagList)) {
+                new (&item()) TagList();
+            }
+
             ~TagListBuilder() {
                 add_padding();
             }
@@ -181,6 +186,11 @@ namespace osmium {
                 new (&item()) T();
             }
 
+            explicit NodeRefListBuilder(Builder& parent) :
+                Builder(parent.buffer(), &parent, sizeof(T)) {
+                new (&item()) T();
+            }
+
             ~NodeRefListBuilder() {
                 add_padding();
             }
@@ -224,6 +234,11 @@ namespace osmium {
 
             explicit RelationMemberListBuilder(osmium::memory::Buffer& buffer, Builder* parent = nullptr) :
                 Builder(buffer, parent, sizeof(RelationMemberList)) {
+                new (&item()) RelationMemberList();
+            }
+
+            explicit RelationMemberListBuilder(Builder& parent) :
+                Builder(parent.buffer(), &parent, sizeof(RelationMemberList)) {
                 new (&item()) RelationMemberList();
             }
 
@@ -315,6 +330,11 @@ namespace osmium {
 
             explicit ChangesetDiscussionBuilder(osmium::memory::Buffer& buffer, Builder* parent = nullptr) :
                 Builder(buffer, parent, sizeof(ChangesetDiscussion)) {
+                new (&item()) ChangesetDiscussion();
+            }
+
+            explicit ChangesetDiscussionBuilder(Builder& parent) :
+                Builder(parent.buffer(), &parent, sizeof(ChangesetDiscussion)) {
                 new (&item()) ChangesetDiscussion();
             }
 
@@ -450,6 +470,10 @@ namespace osmium {
                 OSMObjectBuilder<NodeBuilder, Node>(buffer, parent) {
             }
 
+            explicit NodeBuilder(Builder& parent) :
+                OSMObjectBuilder<NodeBuilder, Node>(parent.buffer(), &parent) {
+            }
+
             OSMIUM_FORWARD(set_location)
 
         }; // class NodeBuilder
@@ -462,6 +486,10 @@ namespace osmium {
 
             explicit WayBuilder(osmium::memory::Buffer& buffer, Builder* parent = nullptr) :
                 OSMObjectBuilder<WayBuilder, Way>(buffer, parent) {
+            }
+
+            explicit WayBuilder(Builder& parent) :
+                OSMObjectBuilder<WayBuilder, Way>(parent.buffer(), &parent) {
             }
 
             void add_node_refs(const std::initializer_list<osmium::NodeRef>& nodes) {
@@ -483,6 +511,10 @@ namespace osmium {
                 OSMObjectBuilder<RelationBuilder, Relation>(buffer, parent) {
             }
 
+            explicit RelationBuilder(Builder& parent) :
+                OSMObjectBuilder<RelationBuilder, Relation>(parent.buffer(), &parent) {
+            }
+
         }; // class RelationBuilder
 
         class AreaBuilder : public OSMObjectBuilder<AreaBuilder, Area> {
@@ -493,6 +525,10 @@ namespace osmium {
 
             explicit AreaBuilder(osmium::memory::Buffer& buffer, Builder* parent = nullptr) :
                 OSMObjectBuilder<AreaBuilder, Area>(buffer, parent) {
+            }
+
+            explicit AreaBuilder(Builder& parent) :
+                OSMObjectBuilder<AreaBuilder, Area>(parent.buffer(), &parent) {
             }
 
             /**

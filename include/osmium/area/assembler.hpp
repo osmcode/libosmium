@@ -333,7 +333,7 @@ namespace osmium {
             }
 
             static void copy_tags_without_type(osmium::builder::AreaBuilder& builder, const osmium::TagList& tags) {
-                osmium::builder::TagListBuilder tl_builder(builder.buffer(), &builder);
+                osmium::builder::TagListBuilder tl_builder{builder};
                 for (const osmium::Tag& tag : tags) {
                     if (std::strcmp(tag.key(), "type")) {
                         tl_builder.add_tag(tag.key(), tag.value());
@@ -378,7 +378,7 @@ namespace osmium {
                         if (debug()) {
                             std::cerr << "      multiple outer ways, get common tags\n";
                         }
-                        osmium::builder::TagListBuilder tl_builder(builder.buffer(), &builder);
+                        osmium::builder::TagListBuilder tl_builder{builder};
                         add_common_tags(tl_builder, ways);
                     }
                 }
@@ -386,7 +386,7 @@ namespace osmium {
 
             template <typename TBuilder>
             static void build_ring_from_proto_ring(osmium::builder::AreaBuilder& builder, const detail::ProtoRing& ring) {
-                TBuilder ring_builder(builder.buffer(), &builder);
+                TBuilder ring_builder{builder};
                 ring_builder.add_node_ref(ring.get_node_ref_start());
                 for (const auto& segment : ring.segments()) {
                     ring_builder.add_node_ref(segment->stop());
@@ -1362,7 +1362,7 @@ namespace osmium {
 #endif
 
             bool create_area(osmium::memory::Buffer& out_buffer, const osmium::Way& way) {
-                osmium::builder::AreaBuilder builder(out_buffer);
+                osmium::builder::AreaBuilder builder{out_buffer};
                 builder.initialize_from_object(way);
 
                 const bool area_okay = create_rings();
@@ -1382,7 +1382,7 @@ namespace osmium {
 
             bool create_area(osmium::memory::Buffer& out_buffer, const osmium::Relation& relation, const std::vector<const osmium::Way*>& members) {
                 m_num_members = members.size();
-                osmium::builder::AreaBuilder builder(out_buffer);
+                osmium::builder::AreaBuilder builder{out_buffer};
                 builder.initialize_from_object(relation);
 
                 const bool area_okay = create_rings();

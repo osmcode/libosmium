@@ -225,9 +225,9 @@ namespace osmium {
 
                 using kv_type = protozero::iterator_range<protozero::pbf_reader::const_uint32_iterator>;
 
-                void build_tag_list(osmium::builder::Builder& builder, const kv_type& keys, const kv_type& vals) {
+                void build_tag_list(osmium::builder::Builder& parent, const kv_type& keys, const kv_type& vals) {
                     if (!keys.empty()) {
-                        osmium::builder::TagListBuilder tl_builder(m_buffer, &builder);
+                        osmium::builder::TagListBuilder builder{parent};
                         auto kit = keys.begin();
                         auto vit = vals.begin();
                         while (kit != keys.end()) {
@@ -237,7 +237,7 @@ namespace osmium {
                             }
                             const auto& k = m_stringtable.at(*kit++);
                             const auto& v = m_stringtable.at(*vit++);
-                            tl_builder.add_tag(k.first, k.second, v.first, v.second);
+                            builder.add_tag(k.first, k.second, v.first, v.second);
                         }
                     }
                 }
@@ -247,7 +247,7 @@ namespace osmium {
                 }
 
                 void decode_node(const data_view& data) {
-                    osmium::builder::NodeBuilder builder(m_buffer);
+                    osmium::builder::NodeBuilder builder{m_buffer};
                     osmium::Node& node = builder.object();
 
                     kv_type keys;
@@ -300,7 +300,7 @@ namespace osmium {
                 }
 
                 void decode_way(const data_view& data) {
-                    osmium::builder::WayBuilder builder(m_buffer);
+                    osmium::builder::WayBuilder builder{m_buffer};
 
                     kv_type keys;
                     kv_type vals;
@@ -342,7 +342,7 @@ namespace osmium {
                     builder.set_user(user.first, user.second);
 
                     if (!refs.empty()) {
-                        osmium::builder::WayNodeListBuilder wnl_builder(m_buffer, &builder);
+                        osmium::builder::WayNodeListBuilder wnl_builder{builder};
                         osmium::util::DeltaDecode<int64_t> ref;
                         if (lats.empty()) {
                             for (const auto& ref_value : refs) {
@@ -368,7 +368,7 @@ namespace osmium {
                 }
 
                 void decode_relation(const data_view& data) {
-                    osmium::builder::RelationBuilder builder(m_buffer);
+                    osmium::builder::RelationBuilder builder{m_buffer};
 
                     kv_type keys;
                     kv_type vals;
@@ -410,7 +410,7 @@ namespace osmium {
                     builder.set_user(user.first, user.second);
 
                     if (!refs.empty()) {
-                        osmium::builder::RelationMemberListBuilder rml_builder(m_buffer, &builder);
+                        osmium::builder::RelationMemberListBuilder rml_builder{builder};
                         osmium::util::DeltaDecode<int64_t> ref;
                         while (!roles.empty() && !refs.empty() && !types.empty()) {
                             const auto& r = m_stringtable.at(roles.front());
@@ -520,7 +520,7 @@ namespace osmium {
 
                         bool visible = true;
 
-                        osmium::builder::NodeBuilder builder(m_buffer);
+                        osmium::builder::NodeBuilder builder{m_buffer};
                         osmium::Node& node = builder.object();
 
                         node.set_id(dense_id.update(ids.front()));
@@ -584,7 +584,7 @@ namespace osmium {
                         }
 
                         if (tag_it != tags.end()) {
-                            osmium::builder::TagListBuilder tl_builder(m_buffer, &builder);
+                            osmium::builder::TagListBuilder tl_builder{builder};
                             while (tag_it != tags.end() && *tag_it != 0) {
                                 const auto& k = m_stringtable.at(*tag_it++);
                                 if (tag_it == tags.end()) {
