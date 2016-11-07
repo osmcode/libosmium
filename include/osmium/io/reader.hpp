@@ -123,10 +123,11 @@ namespace osmium {
                                       detail::future_string_queue_type& input_queue,
                                       detail::future_buffer_queue_type& osmdata_queue,
                                       std::promise<osmium::io::Header>&& header_promise,
-                                      osmium::osm_entity_bits::type read_which_entities) {
+                                      osmium::osm_entity_bits::type read_which_entities,
+                                      osmium::io::read_metadata read_metadata) {
                 std::promise<osmium::io::Header> promise = std::move(header_promise);
                 const auto creator = detail::ParserFactory::instance().get_creator_function(file);
-                const auto parser = creator(input_queue, osmdata_queue, promise, read_which_entities);
+                const auto parser = creator(input_queue, osmdata_queue, promise, read_which_entities, read_metadata);
                 parser->parse();
             }
 
@@ -211,7 +212,7 @@ namespace osmium {
              *                            significantly if objects that are not needed anyway are not
              *                            parsed.
              */
-            explicit Reader(const osmium::io::File& file, osmium::osm_entity_bits::type read_which_entities = osmium::osm_entity_bits::all) :
+            explicit Reader(const osmium::io::File& file, osmium::osm_entity_bits::type read_which_entities = osmium::osm_entity_bits::all, osmium::io::read_metadata read_metadata = osmium::io::read_metadata::yes) :
                 m_file(file.check()),
                 m_read_which_entities(read_which_entities),
                 m_status(status::okay),
@@ -229,7 +230,7 @@ namespace osmium {
                 m_file_size(m_decompressor->file_size()) {
                 std::promise<osmium::io::Header> header_promise;
                 m_header_future = header_promise.get_future();
-                m_thread = osmium::thread::thread_handler{parser_thread, std::ref(m_file), std::ref(m_input_queue), std::ref(m_osmdata_queue), std::move(header_promise), read_which_entities};
+                m_thread = osmium::thread::thread_handler{parser_thread, std::ref(m_file), std::ref(m_input_queue), std::ref(m_osmdata_queue), std::move(header_promise), read_which_entities, read_metadata};
             }
 
             explicit Reader(const std::string& filename, osmium::osm_entity_bits::type read_types = osmium::osm_entity_bits::all) :

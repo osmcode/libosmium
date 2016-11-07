@@ -25,8 +25,9 @@ public:
                osmium::io::detail::future_buffer_queue_type& output_queue,
                std::promise<osmium::io::Header>& header_promise,
                osmium::osm_entity_bits::type read_types,
+               osmium::io::read_metadata read_metadata,
                const std::string& fail_in) :
-        Parser(input_queue, output_queue, header_promise, read_types),
+        Parser(input_queue, output_queue, header_promise, read_types, read_metadata),
         m_fail_in(fail_in) {
     }
 
@@ -59,8 +60,9 @@ TEST_CASE("Test Reader using MockParser") {
         [&](osmium::io::detail::future_string_queue_type& input_queue,
             osmium::io::detail::future_buffer_queue_type& output_queue,
             std::promise<osmium::io::Header>& header_promise,
-            osmium::osm_entity_bits::type read_which_entities) {
-        return std::unique_ptr<osmium::io::detail::Parser>(new MockParser(input_queue, output_queue, header_promise, read_which_entities, fail_in));
+            osmium::osm_entity_bits::type read_which_entities,
+            osmium::io::read_metadata read_metadata) {
+        return std::unique_ptr<osmium::io::detail::Parser>(new MockParser(input_queue, output_queue, header_promise, read_which_entities, read_metadata, fail_in));
     });
 
     SECTION("no failure") {

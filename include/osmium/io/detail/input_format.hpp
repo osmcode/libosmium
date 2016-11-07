@@ -61,6 +61,7 @@ namespace osmium {
                 std::promise<osmium::io::Header>& m_header_promise;
                 queue_wrapper<std::string> m_input_queue;
                 osmium::osm_entity_bits::type m_read_types;
+                osmium::io::read_metadata m_read_metadata;
                 bool m_header_is_done;
 
             protected:
@@ -73,11 +74,15 @@ namespace osmium {
                     return m_input_queue.has_reached_end_of_data();
                 }
 
-                osmium::osm_entity_bits::type read_types() const {
+                osmium::osm_entity_bits::type read_types() const noexcept {
                     return m_read_types;
                 }
 
-                bool header_is_done() const {
+                osmium::io::read_metadata read_metadata() const noexcept {
+                    return m_read_metadata;
+                }
+
+                bool header_is_done() const noexcept {
                     return m_header_is_done;
                 }
 
@@ -111,11 +116,13 @@ namespace osmium {
                 Parser(future_string_queue_type& input_queue,
                        future_buffer_queue_type& output_queue,
                        std::promise<osmium::io::Header>& header_promise,
-                       osmium::osm_entity_bits::type read_types) :
+                       osmium::osm_entity_bits::type read_types,
+                       osmium::io::read_metadata read_metadata) :
                     m_output_queue(output_queue),
                     m_header_promise(header_promise),
                     m_input_queue(input_queue),
                     m_read_types(read_types),
+                    m_read_metadata(read_metadata),
                     m_header_is_done(false) {
                 }
 
@@ -157,7 +164,8 @@ namespace osmium {
                 using create_parser_type = std::function<std::unique_ptr<Parser>(future_string_queue_type&,
                                                                                  future_buffer_queue_type&,
                                                                                  std::promise<osmium::io::Header>& header_promise,
-                                                                                 osmium::osm_entity_bits::type read_which_entities)>;
+                                                                                 osmium::osm_entity_bits::type read_which_entities,
+                                                                                 osmium::io::read_metadata read_metadata)>;
 
             private:
 

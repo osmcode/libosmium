@@ -50,6 +50,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/io/detail/pbf.hpp> // IWYU pragma: export
 #include <osmium/io/detail/protobuf_tags.hpp>
 #include <osmium/io/detail/zlib.hpp>
+#include <osmium/io/file_format.hpp>
 #include <osmium/io/header.hpp>
 #include <osmium/memory/buffer.hpp>
 #include <osmium/osm/box.hpp>
@@ -93,6 +94,8 @@ namespace osmium {
                 osmium::osm_entity_bits::type m_read_types;
 
                 osmium::memory::Buffer m_buffer { initial_buffer_size };
+
+                osmium::io::read_metadata  m_read_metadata;
 
                 void decode_stringtable(const data_view& data) {
                     if (!m_stringtable.empty()) {
@@ -270,7 +273,11 @@ namespace osmium {
                                 vals = pbf_node.get_packed_uint32();
                                 break;
                             case OSMFormat::Node::optional_Info_info:
-                                user = decode_info(pbf_node.get_view(), builder.object());
+                                if (read_metadata() == osmium::io::read_metadata::yes) {
+                                    user = decode_info(pbf_node.get_view(), builder.object());
+                                } else {
+                                    pbf_node.skip();
+                                }
                                 break;
                             case OSMFormat::Node::required_sint64_lat:
                                 lat = pbf_node.get_sint64();
@@ -323,7 +330,11 @@ namespace osmium {
                                 vals = pbf_way.get_packed_uint32();
                                 break;
                             case OSMFormat::Way::optional_Info_info:
-                                user = decode_info(pbf_way.get_view(), builder.object());
+                                if (read_metadata() == osmium::io::read_metadata::yes) {
+                                    user = decode_info(pbf_way.get_view(), builder.object());
+                                } else {
+                                    pbf_way.skip();
+                                }
                                 break;
                             case OSMFormat::Way::packed_sint64_refs:
                                 refs = pbf_way.get_packed_sint64();
@@ -391,7 +402,11 @@ namespace osmium {
                                 vals = pbf_relation.get_packed_uint32();
                                 break;
                             case OSMFormat::Relation::optional_Info_info:
-                                user = decode_info(pbf_relation.get_view(), builder.object());
+                                if (read_metadata() == osmium::io::read_metadata::yes) {
+                                    user = decode_info(pbf_relation.get_view(), builder.object());
+                                } else {
+                                    pbf_relation.skip();
+                                }
                                 break;
                             case OSMFormat::Relation::packed_int32_roles_sid:
                                 roles = pbf_relation.get_packed_int32();
@@ -457,7 +472,7 @@ namespace osmium {
                                 ids = pbf_dense_nodes.get_packed_sint64();
                                 break;
                             case OSMFormat::DenseNodes::optional_DenseInfo_denseinfo:
-                                {
+                                if (m_read_metadata == osmium::io::read_metadata::yes) {
                                     has_info = true;
                                     protozero::pbf_message<OSMFormat::DenseInfo> pbf_dense_info = pbf_dense_nodes.get_message();
                                     while (pbf_dense_info.next()) {
@@ -485,6 +500,8 @@ namespace osmium {
                                                 pbf_dense_info.skip();
                                         }
                                     }
+                                } else {
+                                    pbf_dense_nodes.skip();
                                 }
                                 break;
                             case OSMFormat::DenseNodes::packed_sint64_lat:
@@ -604,9 +621,10 @@ namespace osmium {
 
             public:
 
-                PBFPrimitiveBlockDecoder(const data_view& data, osmium::osm_entity_bits::type read_types) :
+                PBFPrimitiveBlockDecoder(const data_view& data, osmium::osm_entity_bits::type read_types, osmium::io::read_metadata read_metadata) :
                     m_data(data),
-                    m_read_types(read_types) {
+                    m_read_types(read_types),
+                    m_read_metadata(read_metadata) {
                 }
 
                 PBFPrimitiveBlockDecoder(const PBFPrimitiveBlockDecoder&) = delete;
@@ -783,12 +801,14 @@ namespace osmium {
 
                 std::shared_ptr<std::string> m_input_buffer;
                 osmium::osm_entity_bits::type m_read_types;
+                osmium::io::read_metadata m_read_metadata;
 
             public:
 
-                PBFDataBlobDecoder(std::string&& input_buffer, osmium::osm_entity_bits::type read_types) :
+                PBFDataBlobDecoder(std::string&& input_buffer, osmium::osm_entity_bits::type read_types, osmium::io::read_metadata read_metadata) :
                     m_input_buffer(std::make_shared<std::string>(std::move(input_buffer))),
-                    m_read_types(read_types) {
+                    m_read_types(read_types),
+                    m_read_metadata(read_metadata) {
                 }
 
                 PBFDataBlobDecoder(const PBFDataBlobDecoder&) = default;
@@ -801,7 +821,7 @@ namespace osmium {
 
                 osmium::memory::Buffer operator()() {
                     std::string output;
-                    PBFPrimitiveBlockDecoder decoder(decode_blob(*m_input_buffer, output), m_read_types);
+                    PBFPrimitiveBlockDecoder decoder(decode_blob(*m_input_buffer, output), m_read_types, m_read_metadata);
                     return decoder();
                 }
 
