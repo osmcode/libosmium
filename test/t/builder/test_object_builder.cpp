@@ -10,10 +10,26 @@ TEST_CASE("create objects using builder") {
     std::string user;
 
     SECTION("complete node with tags") {
-        osmium::Location loc{1.2, 3.4};
-
-        SECTION("user length small") {
-            user = "foo";
+        SECTION("user length 0") {
+            user = "";
+        }
+        SECTION("user length 1") {
+            user = "1";
+        }
+        SECTION("user length 2") {
+            user = "12";
+        }
+        SECTION("user length 3") {
+            user = "123";
+        }
+        SECTION("user length 4") {
+            user = "1234";
+        }
+        SECTION("user length 5") {
+            user = "12345";
+        }
+        SECTION("user length 6") {
+            user = "123456";
         }
         SECTION("user length 7") {
             user = "1234567";
@@ -24,12 +40,38 @@ TEST_CASE("create objects using builder") {
         SECTION("user length 9") {
             user = "123456789";
         }
-        SECTION("user length large") {
-            user = "very long user name";
+        SECTION("user length 10") {
+            user = "1234567890";
+        }
+        SECTION("user length 11") {
+            user = "12345678901";
+        }
+        SECTION("user length 12") {
+            user = "123456789012";
+        }
+        SECTION("user length 13") {
+            user = "1234567890123";
+        }
+        SECTION("user length 14") {
+            user = "12345678901234";
+        }
+        SECTION("user length 15") {
+            user = "123456789012345";
+        }
+        SECTION("user length 16") {
+            user = "1234567890123456";
+        }
+        SECTION("user length 17") {
+            user = "12345678901234567";
+        }
+        SECTION("user length 18") {
+            user = "123456789012345678";
         }
 
+        osmium::Location loc{1.2, 3.4};
+
         {
-            osmium::builder::NodeBuilder builder(buffer);
+            osmium::builder::NodeBuilder builder{buffer};
 
             builder.set_id(17)
                 .set_visible(true)
@@ -58,8 +100,26 @@ TEST_CASE("create objects using builder") {
     }
 
     SECTION("complete way with tags") {
-        SECTION("user length small") {
-            user = "foo";
+        SECTION("user length 0") {
+            user = "";
+        }
+        SECTION("user length 1") {
+            user = "1";
+        }
+        SECTION("user length 2") {
+            user = "12";
+        }
+        SECTION("user length 3") {
+            user = "123";
+        }
+        SECTION("user length 4") {
+            user = "1234";
+        }
+        SECTION("user length 5") {
+            user = "12345";
+        }
+        SECTION("user length 6") {
+            user = "123456";
         }
         SECTION("user length 7") {
             user = "1234567";
@@ -70,12 +130,36 @@ TEST_CASE("create objects using builder") {
         SECTION("user length 9") {
             user = "123456789";
         }
-        SECTION("user length large") {
-            user = "very long user name";
+        SECTION("user length 10") {
+            user = "1234567890";
+        }
+        SECTION("user length 11") {
+            user = "12345678901";
+        }
+        SECTION("user length 12") {
+            user = "123456789012";
+        }
+        SECTION("user length 13") {
+            user = "1234567890123";
+        }
+        SECTION("user length 14") {
+            user = "12345678901234";
+        }
+        SECTION("user length 15") {
+            user = "123456789012345";
+        }
+        SECTION("user length 16") {
+            user = "1234567890123456";
+        }
+        SECTION("user length 17") {
+            user = "12345678901234567";
+        }
+        SECTION("user length 18") {
+            user = "123456789012345678";
         }
 
         {
-            osmium::builder::WayBuilder builder(buffer);
+            osmium::builder::WayBuilder builder{buffer};
 
             builder.set_id(17)
                 .set_visible(true)
@@ -102,8 +186,26 @@ TEST_CASE("create objects using builder") {
     }
 
     SECTION("complete relation with tags") {
-        SECTION("user length small") {
-            user = "foo";
+        SECTION("user length 0") {
+            user = "";
+        }
+        SECTION("user length 1") {
+            user = "1";
+        }
+        SECTION("user length 2") {
+            user = "12";
+        }
+        SECTION("user length 3") {
+            user = "123";
+        }
+        SECTION("user length 4") {
+            user = "1234";
+        }
+        SECTION("user length 5") {
+            user = "12345";
+        }
+        SECTION("user length 6") {
+            user = "123456";
         }
         SECTION("user length 7") {
             user = "1234567";
@@ -114,12 +216,36 @@ TEST_CASE("create objects using builder") {
         SECTION("user length 9") {
             user = "123456789";
         }
-        SECTION("user length large") {
-            user = "very long user name";
+        SECTION("user length 10") {
+            user = "1234567890";
+        }
+        SECTION("user length 11") {
+            user = "12345678901";
+        }
+        SECTION("user length 12") {
+            user = "123456789012";
+        }
+        SECTION("user length 13") {
+            user = "1234567890123";
+        }
+        SECTION("user length 14") {
+            user = "12345678901234";
+        }
+        SECTION("user length 15") {
+            user = "123456789012345";
+        }
+        SECTION("user length 16") {
+            user = "1234567890123456";
+        }
+        SECTION("user length 17") {
+            user = "12345678901234567";
+        }
+        SECTION("user length 18") {
+            user = "123456789012345678";
         }
 
         {
-            osmium::builder::RelationBuilder builder(buffer);
+            osmium::builder::RelationBuilder builder{buffer};
 
             builder.set_id(17)
                 .set_visible(true)
@@ -149,8 +275,26 @@ TEST_CASE("create objects using builder") {
         osmium::Location bl{-1.2, -3.4};
         osmium::Location tr{1.2, 3.4};
 
-        SECTION("user length small") {
-            user = "foo";
+        SECTION("user length 0") {
+            user = "";
+        }
+        SECTION("user length 1") {
+            user = "1";
+        }
+        SECTION("user length 2") {
+            user = "12";
+        }
+        SECTION("user length 3") {
+            user = "123";
+        }
+        SECTION("user length 4") {
+            user = "1234";
+        }
+        SECTION("user length 5") {
+            user = "12345";
+        }
+        SECTION("user length 6") {
+            user = "123456";
         }
         SECTION("user length 7") {
             user = "1234567";
@@ -161,12 +305,36 @@ TEST_CASE("create objects using builder") {
         SECTION("user length 9") {
             user = "123456789";
         }
-        SECTION("user length large") {
-            user = "very long user name";
+        SECTION("user length 10") {
+            user = "1234567890";
+        }
+        SECTION("user length 11") {
+            user = "12345678901";
+        }
+        SECTION("user length 12") {
+            user = "123456789012";
+        }
+        SECTION("user length 13") {
+            user = "1234567890123";
+        }
+        SECTION("user length 14") {
+            user = "12345678901234";
+        }
+        SECTION("user length 15") {
+            user = "123456789012345";
+        }
+        SECTION("user length 16") {
+            user = "1234567890123456";
+        }
+        SECTION("user length 17") {
+            user = "12345678901234567";
+        }
+        SECTION("user length 18") {
+            user = "123456789012345678";
         }
 
         {
-            osmium::builder::ChangesetBuilder builder(buffer);
+            osmium::builder::ChangesetBuilder builder{buffer};
 
             builder.set_id(17)
                 .set_uid(222)
@@ -196,17 +364,81 @@ TEST_CASE("create objects using builder") {
 
 }
 
-TEST_CASE("set_user") {
+TEST_CASE("no call to set_user on node") {
+    osmium::memory::Buffer buffer{1024*10};
+
+    {
+        osmium::builder::NodeBuilder builder{buffer};
+    }
+
+    const auto& node = buffer.get<osmium::Node>(buffer.commit());
+
+    REQUIRE(*node.user() == '\0');
+}
+
+TEST_CASE("set_user with length on node") {
     osmium::memory::Buffer buffer{1024*10};
     std::string user = "userx";
 
     {
-        osmium::builder::NodeBuilder builder(buffer);
+        osmium::builder::NodeBuilder builder{buffer};
         builder.set_user(user.c_str(), 4);
     }
 
     const auto& node = buffer.get<osmium::Node>(buffer.commit());
 
     REQUIRE(std::string{"user"} == node.user());
+}
+
+TEST_CASE("no call to set_user on way") {
+    osmium::memory::Buffer buffer{1024*10};
+
+    {
+        osmium::builder::WayBuilder builder{buffer};
+    }
+
+    const auto& way = buffer.get<osmium::Way>(buffer.commit());
+
+    REQUIRE(*way.user() == '\0');
+}
+
+TEST_CASE("set_user with length on way") {
+    osmium::memory::Buffer buffer{1024*10};
+    std::string user = "userx";
+
+    {
+        osmium::builder::WayBuilder builder{buffer};
+        builder.set_user(user.c_str(), 4);
+    }
+
+    const auto& way = buffer.get<osmium::Way>(buffer.commit());
+
+    REQUIRE(std::string{"user"} == way.user());
+}
+
+TEST_CASE("no call to set_user on changeset") {
+    osmium::memory::Buffer buffer{1024*10};
+
+    {
+        osmium::builder::ChangesetBuilder builder{buffer};
+    }
+
+    const auto& changeset = buffer.get<osmium::Changeset>(buffer.commit());
+
+    REQUIRE(*changeset.user() == '\0');
+}
+
+TEST_CASE("set_user with length on changeset") {
+    osmium::memory::Buffer buffer{1024*10};
+    std::string user = "userx";
+
+    {
+        osmium::builder::ChangesetBuilder builder{buffer};
+        builder.set_user(user.c_str(), 4);
+    }
+
+    const auto& changeset = buffer.get<osmium::Changeset>(buffer.commit());
+
+    REQUIRE(std::string{"user"} == changeset.user());
 }
 

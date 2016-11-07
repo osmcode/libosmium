@@ -377,15 +377,15 @@ namespace osmium {
 
             using type = TDerived;
 
+            constexpr static const size_t min_size_for_user = osmium::memory::padded_length(sizeof(string_size_type) + 1);
+
         public:
 
             explicit OSMObjectBuilder(osmium::memory::Buffer& buffer, Builder* parent = nullptr) :
-                Builder(buffer, parent, sizeof(T)) {
+                Builder(buffer, parent, sizeof(T) + min_size_for_user) {
                 new (&item()) T();
-                reserve_space_for<string_size_type>();
-                add_size(sizeof(string_size_type));
-                add_size(append_zero());
-                add_padding(true);
+                add_size(min_size_for_user);
+                std::fill_n(object().data() + sizeof(T), min_size_for_user, 0);
                 object().set_user_size(1);
             }
 
@@ -403,15 +403,14 @@ namespace osmium {
                 const auto size_of_object = sizeof(T) + sizeof(string_size_type);
                 assert(object().user_size() == 1 && (size() <= size_of_object + osmium::memory::padded_length(1))
                        && "set_user() must be called at most once and before any sub-builders");
-                const auto available_space = size() - size_of_object;
-                const auto space_needed = length + 1 - available_space;
-                if (space_needed > 0) {
+                const auto available_space = min_size_for_user - sizeof(string_size_type) - 1;
+                if (length > available_space) {
+                    const auto space_needed = osmium::memory::padded_length(length - available_space);
                     reserve_space(space_needed);
                     add_size(static_cast<uint32_t>(space_needed));
-                    add_padding(true);
                 }
                 std::copy_n(user, length, object().data() + size_of_object);
-                *(object().data() + size_of_object + length) = '\0';
+                std::fill_n(object().data() + size_of_object + length, osmium::memory::padded_length(length + 1) - length, 0);
                 object().set_user_size(length + 1);
 
                 return static_cast<TDerived&>(*this);
@@ -550,13 +549,15 @@ namespace osmium {
 
             using type = ChangesetBuilder;
 
+            constexpr static const size_t min_size_for_user = osmium::memory::padded_length(1);
+
         public:
 
             explicit ChangesetBuilder(osmium::memory::Buffer& buffer, Builder* parent = nullptr) :
-                Builder(buffer, parent, sizeof(Changeset)) {
+                Builder(buffer, parent, sizeof(Changeset) + min_size_for_user) {
                 new (&item()) Changeset();
-                add_size(append_zero());
-                add_padding(true);
+                add_size(min_size_for_user);
+                std::fill_n(object().data() + sizeof(Changeset), min_size_for_user, 0);
                 object().set_user_size(1);
             }
 
@@ -592,15 +593,14 @@ namespace osmium {
             ChangesetBuilder& set_user(const char* user, const string_size_type length) {
                 assert(object().user_size() == 1 && (size() <= sizeof(Changeset) + osmium::memory::padded_length(1))
                        && "set_user() must be called at most once and before any sub-builders");
-                const auto available_space = size() - sizeof(Changeset);
-                const auto space_needed = length + 1 - available_space;
-                if (space_needed > 0) {
+                const auto available_space = min_size_for_user - 1;
+                if (length > available_space) {
+                    const auto space_needed = osmium::memory::padded_length(length - available_space);
                     reserve_space(space_needed);
                     add_size(static_cast<uint32_t>(space_needed));
-                    add_padding(true);
                 }
                 std::copy_n(user, length, object().data() + sizeof(Changeset));
-                *(object().data() + sizeof(Changeset) + length) = '\0';
+                std::fill_n(object().data() + sizeof(Changeset) + length, osmium::memory::padded_length(length + 1) - length, 0);
                 object().set_user_size(length + 1);
 
                 return *this;
