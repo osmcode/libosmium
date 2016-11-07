@@ -153,7 +153,11 @@ namespace osmium {
                                     break;
                                 case OSMFormat::PrimitiveGroup::optional_DenseNodes_dense:
                                     if (m_read_types & osmium::osm_entity_bits::node) {
-                                        decode_dense_nodes(pbf_primitive_group.get_view());
+                                        if (read_metadata() == osmium::io::read_metadata::yes) {
+                                            decode_dense_nodes(pbf_primitive_group.get_view());
+                                        } else {
+                                            decode_dense_nodes_without_metadata(pbf_primitive_group.get_view());
+                                        }
                                         m_buffer.commit();
                                     } else {
                                         pbf_primitive_group.skip();
@@ -448,6 +452,80 @@ namespace osmium {
                     build_tag_list(builder, keys, vals);
                 }
 
+                void decode_dense_nodes_without_metadata(const data_view& data) {
+                    protozero::iterator_range<protozero::pbf_reader::const_sint64_iterator> ids;
+                    protozero::iterator_range<protozero::pbf_reader::const_sint64_iterator> lats;
+                    protozero::iterator_range<protozero::pbf_reader::const_sint64_iterator> lons;
+
+                    protozero::iterator_range<protozero::pbf_reader::const_int32_iterator>  tags;
+
+                    protozero::pbf_message<OSMFormat::DenseNodes> pbf_dense_nodes(data);
+                    while (pbf_dense_nodes.next()) {
+                        switch (pbf_dense_nodes.tag()) {
+                            case OSMFormat::DenseNodes::packed_sint64_id:
+                                ids = pbf_dense_nodes.get_packed_sint64();
+                                break;
+                            case OSMFormat::DenseNodes::packed_sint64_lat:
+                                lats = pbf_dense_nodes.get_packed_sint64();
+                                break;
+                            case OSMFormat::DenseNodes::packed_sint64_lon:
+                                lons = pbf_dense_nodes.get_packed_sint64();
+                                break;
+                            case OSMFormat::DenseNodes::packed_int32_keys_vals:
+                                tags = pbf_dense_nodes.get_packed_int32();
+                                break;
+                            default:
+                                pbf_dense_nodes.skip();
+                        }
+                    }
+
+                    osmium::util::DeltaDecode<int64_t> dense_id;
+                    osmium::util::DeltaDecode<int64_t> dense_latitude;
+                    osmium::util::DeltaDecode<int64_t> dense_longitude;
+
+                    auto tag_it = tags.begin();
+
+                    while (!ids.empty()) {
+                        if (lons.empty() ||
+                            lats.empty()) {
+                            // this is against the spec, must have same number of elements
+                            throw osmium::pbf_error("PBF format error");
+                        }
+
+                        osmium::builder::NodeBuilder builder{m_buffer};
+                        osmium::Node& node = builder.object();
+
+                        node.set_id(dense_id.update(ids.front()));
+                        ids.drop_front();
+
+                        const auto lon = dense_longitude.update(lons.front());
+                        lons.drop_front();
+                        const auto lat = dense_latitude.update(lats.front());
+                        lats.drop_front();
+                        builder.object().set_location(osmium::Location(
+                                convert_pbf_coordinate(lon),
+                                convert_pbf_coordinate(lat)
+                        ));
+
+                        if (tag_it != tags.end()) {
+                            osmium::builder::TagListBuilder tl_builder{builder};
+                            while (tag_it != tags.end() && *tag_it != 0) {
+                                const auto& k = m_stringtable.at(*tag_it++);
+                                if (tag_it == tags.end()) {
+                                    throw osmium::pbf_error("PBF format error"); // this is against the spec, keys/vals must come in pairs
+                                }
+                                const auto& v = m_stringtable.at(*tag_it++);
+                                tl_builder.add_tag(k.first, k.second, v.first, v.second);
+                            }
+
+                            if (tag_it != tags.end()) {
+                                ++tag_it;
+                            }
+                        }
+                    }
+
+                }
+
                 void decode_dense_nodes(const data_view& data) {
                     bool has_info     = false;
                     bool has_visibles = false;
@@ -472,7 +550,7 @@ namespace osmium {
                                 ids = pbf_dense_nodes.get_packed_sint64();
                                 break;
                             case OSMFormat::DenseNodes::optional_DenseInfo_denseinfo:
-                                if (m_read_metadata == osmium::io::read_metadata::yes) {
+                                {
                                     has_info = true;
                                     protozero::pbf_message<OSMFormat::DenseInfo> pbf_dense_info = pbf_dense_nodes.get_message();
                                     while (pbf_dense_info.next()) {
@@ -500,8 +578,6 @@ namespace osmium {
                                                 pbf_dense_info.skip();
                                         }
                                     }
-                                } else {
-                                    pbf_dense_nodes.skip();
                                 }
                                 break;
                             case OSMFormat::DenseNodes::packed_sint64_lat:
