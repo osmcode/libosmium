@@ -49,7 +49,7 @@ namespace osmium {
             debug   = 6
         };
 
-        enum class read_metadata {
+        enum class read_meta {
             no  = 0,
             yes = 1
         };

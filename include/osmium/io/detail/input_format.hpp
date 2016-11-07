@@ -61,7 +61,7 @@ namespace osmium {
                 std::promise<osmium::io::Header>& m_header_promise;
                 queue_wrapper<std::string> m_input_queue;
                 osmium::osm_entity_bits::type m_read_types;
-                osmium::io::read_metadata m_read_metadata;
+                osmium::io::read_meta m_read_metadata;
                 bool m_header_is_done;
 
             protected:
@@ -78,7 +78,7 @@ namespace osmium {
                     return m_read_types;
                 }
 
-                osmium::io::read_metadata read_metadata() const noexcept {
+                osmium::io::read_meta read_metadata() const noexcept {
                     return m_read_metadata;
                 }
 
@@ -117,7 +117,7 @@ namespace osmium {
                        future_buffer_queue_type& output_queue,
                        std::promise<osmium::io::Header>& header_promise,
                        osmium::osm_entity_bits::type read_types,
-                       osmium::io::read_metadata read_metadata) :
+                       osmium::io::read_meta read_metadata) :
                     m_output_queue(output_queue),
                     m_header_promise(header_promise),
                     m_input_queue(input_queue),
@@ -165,7 +165,7 @@ namespace osmium {
                                                                                  future_buffer_queue_type&,
                                                                                  std::promise<osmium::io::Header>& header_promise,
                                                                                  osmium::osm_entity_bits::type read_which_entities,
-                                                                                 osmium::io::read_metadata read_metadata)>;
+                                                                                 osmium::io::read_meta read_metadata)>;
 
             private:
 

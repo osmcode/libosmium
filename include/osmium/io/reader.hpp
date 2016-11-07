@@ -124,7 +124,7 @@ namespace osmium {
                                       detail::future_buffer_queue_type& osmdata_queue,
                                       std::promise<osmium::io::Header>&& header_promise,
                                       osmium::osm_entity_bits::type read_which_entities,
-                                      osmium::io::read_metadata read_metadata) {
+                                      osmium::io::read_meta read_metadata) {
                 std::promise<osmium::io::Header> promise = std::move(header_promise);
                 const auto creator = detail::ParserFactory::instance().get_creator_function(file);
                 const auto parser = creator(input_queue, osmdata_queue, promise, read_which_entities, read_metadata);
@@ -212,7 +212,7 @@ namespace osmium {
              *                            significantly if objects that are not needed anyway are not
              *                            parsed.
              */
-            explicit Reader(const osmium::io::File& file, osmium::osm_entity_bits::type read_which_entities = osmium::osm_entity_bits::all, osmium::io::read_metadata read_metadata = osmium::io::read_metadata::yes) :
+            explicit Reader(const osmium::io::File& file, osmium::osm_entity_bits::type read_which_entities = osmium::osm_entity_bits::all, osmium::io::read_meta read_metadata = osmium::io::read_meta::yes) :
                 m_file(file.check()),
                 m_read_which_entities(read_which_entities),
                 m_status(status::okay),
@@ -233,11 +233,11 @@ namespace osmium {
                 m_thread = osmium::thread::thread_handler{parser_thread, std::ref(m_file), std::ref(m_input_queue), std::ref(m_osmdata_queue), std::move(header_promise), read_which_entities, read_metadata};
             }
 
-            explicit Reader(const std::string& filename, osmium::osm_entity_bits::type read_types = osmium::osm_entity_bits::all, osmium::io::read_metadata read_metadata = osmium::io::read_metadata::yes) :
+            explicit Reader(const std::string& filename, osmium::osm_entity_bits::type read_types = osmium::osm_entity_bits::all, osmium::io::read_meta read_metadata = osmium::io::read_meta::yes) :
                 Reader(osmium::io::File(filename), read_types) {
             }
 
-            explicit Reader(const char* filename, osmium::osm_entity_bits::type read_types = osmium::osm_entity_bits::all, osmium::io::read_metadata read_metadata = osmium::io::read_metadata::yes) :
+            explicit Reader(const char* filename, osmium::osm_entity_bits::type read_types = osmium::osm_entity_bits::all, osmium::io::read_meta read_metadata = osmium::io::read_meta::yes) :
                 Reader(osmium::io::File(filename), read_types) {
             }
 

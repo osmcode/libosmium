@@ -95,7 +95,7 @@ namespace osmium {
 
                 osmium::memory::Buffer m_buffer { initial_buffer_size };
 
-                osmium::io::read_metadata  m_read_metadata;
+                osmium::io::read_meta m_read_metadata;
 
                 void decode_stringtable(const data_view& data) {
                     if (!m_stringtable.empty()) {
@@ -153,7 +153,7 @@ namespace osmium {
                                     break;
                                 case OSMFormat::PrimitiveGroup::optional_DenseNodes_dense:
                                     if (m_read_types & osmium::osm_entity_bits::node) {
-                                        if (read_metadata() == osmium::io::read_metadata::yes) {
+                                        if (m_read_metadata == osmium::io::read_meta::yes) {
                                             decode_dense_nodes(pbf_primitive_group.get_view());
                                         } else {
                                             decode_dense_nodes_without_metadata(pbf_primitive_group.get_view());
@@ -277,7 +277,7 @@ namespace osmium {
                                 vals = pbf_node.get_packed_uint32();
                                 break;
                             case OSMFormat::Node::optional_Info_info:
-                                if (read_metadata() == osmium::io::read_metadata::yes) {
+                                if (m_read_metadata == osmium::io::read_meta::yes) {
                                     user = decode_info(pbf_node.get_view(), builder.object());
                                 } else {
                                     pbf_node.skip();
@@ -334,7 +334,7 @@ namespace osmium {
                                 vals = pbf_way.get_packed_uint32();
                                 break;
                             case OSMFormat::Way::optional_Info_info:
-                                if (read_metadata() == osmium::io::read_metadata::yes) {
+                                if (m_read_metadata == osmium::io::read_meta::yes) {
                                     user = decode_info(pbf_way.get_view(), builder.object());
                                 } else {
                                     pbf_way.skip();
@@ -406,7 +406,7 @@ namespace osmium {
                                 vals = pbf_relation.get_packed_uint32();
                                 break;
                             case OSMFormat::Relation::optional_Info_info:
-                                if (read_metadata() == osmium::io::read_metadata::yes) {
+                                if (m_read_metadata == osmium::io::read_meta::yes) {
                                     user = decode_info(pbf_relation.get_view(), builder.object());
                                 } else {
                                     pbf_relation.skip();
@@ -697,7 +697,7 @@ namespace osmium {
 
             public:
 
-                PBFPrimitiveBlockDecoder(const data_view& data, osmium::osm_entity_bits::type read_types, osmium::io::read_metadata read_metadata) :
+                PBFPrimitiveBlockDecoder(const data_view& data, osmium::osm_entity_bits::type read_types, osmium::io::read_meta read_metadata) :
                     m_data(data),
                     m_read_types(read_types),
                     m_read_metadata(read_metadata) {
@@ -877,11 +877,11 @@ namespace osmium {
 
                 std::shared_ptr<std::string> m_input_buffer;
                 osmium::osm_entity_bits::type m_read_types;
-                osmium::io::read_metadata m_read_metadata;
+                osmium::io::read_meta m_read_metadata;
 
             public:
 
-                PBFDataBlobDecoder(std::string&& input_buffer, osmium::osm_entity_bits::type read_types, osmium::io::read_metadata read_metadata) :
+                PBFDataBlobDecoder(std::string&& input_buffer, osmium::osm_entity_bits::type read_types, osmium::io::read_meta read_metadata) :
                     m_input_buffer(std::make_shared<std::string>(std::move(input_buffer))),
                     m_read_types(read_types),
                     m_read_metadata(read_metadata) {

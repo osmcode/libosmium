@@ -593,7 +593,7 @@ namespace osmium {
                           future_buffer_queue_type& output_queue,
                           std::promise<osmium::io::Header>& header_promise,
                           osmium::osm_entity_bits::type read_types,
-                          osmium::io::read_metadata read_metadata) :
+                          osmium::io::read_meta read_metadata) :
                     Parser(input_queue, output_queue, header_promise, read_types, read_metadata),
                     m_header(),
                     m_buffer(buffer_size),
@@ -621,7 +621,7 @@ namespace osmium {
                     future_buffer_queue_type& output_queue,
                     std::promise<osmium::io::Header>& header_promise,
                     osmium::osm_entity_bits::type read_which_entities,
-                    osmium::io::read_metadata read_metadata) {
+                    osmium::io::read_meta read_metadata) {
                     return std::unique_ptr<Parser>(new O5mParser(input_queue, output_queue, header_promise, read_which_entities, read_metadata));
             });
 
