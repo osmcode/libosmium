@@ -435,9 +435,9 @@ namespace osmium {
                 return set_user(user.data(), static_cast_with_assert<string_size_type>(user.size()));
             }
 
-            /// @deprecated User set_user(...) instead.
+            /// @deprecated Use set_user(...) instead.
             template <typename... TArgs>
-            void add_user(TArgs&&... args) {
+            OSMIUM_DEPRECATED void add_user(TArgs&&... args) {
                 set_user(std::forward<TArgs>(args)...);
             }
 
@@ -624,9 +624,9 @@ namespace osmium {
                 return set_user(user.data(), static_cast_with_assert<string_size_type>(user.size()));
             }
 
-            /// @deprecated User set_user(...) instead.
+            /// @deprecated Use set_user(...) instead.
             template <typename... TArgs>
-            void add_user(TArgs&&... args) {
+            OSMIUM_DEPRECATED void add_user(TArgs&&... args) {
                 set_user(std::forward<TArgs>(args)...);
             }
 
