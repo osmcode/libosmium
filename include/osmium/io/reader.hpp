@@ -233,11 +233,11 @@ namespace osmium {
                 m_thread = osmium::thread::thread_handler{parser_thread, std::ref(m_file), std::ref(m_input_queue), std::ref(m_osmdata_queue), std::move(header_promise), read_which_entities, read_metadata};
             }
 
-            explicit Reader(const std::string& filename, osmium::osm_entity_bits::type read_types = osmium::osm_entity_bits::all) :
+            explicit Reader(const std::string& filename, osmium::osm_entity_bits::type read_types = osmium::osm_entity_bits::all, osmium::io::read_metadata read_metadata = osmium::io::read_metadata::yes) :
                 Reader(osmium::io::File(filename), read_types) {
             }
 
-            explicit Reader(const char* filename, osmium::osm_entity_bits::type read_types = osmium::osm_entity_bits::all) :
+            explicit Reader(const char* filename, osmium::osm_entity_bits::type read_types = osmium::osm_entity_bits::all, osmium::io::read_metadata read_metadata = osmium::io::read_metadata::yes) :
                 Reader(osmium::io::File(filename), read_types) {
             }
 
