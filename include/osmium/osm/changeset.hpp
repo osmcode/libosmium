@@ -131,14 +131,8 @@ namespace osmium {
 
     public:
 
-        using size_type = size_t;
-
         ChangesetDiscussion() :
             osmium::memory::Collection<ChangesetComment, osmium::item_type::changeset_discussion>() {
-        }
-
-        size_type size() const noexcept {
-            return static_cast<size_type>(std::distance(begin(), end()));
         }
 
     }; // class ChangesetDiscussion

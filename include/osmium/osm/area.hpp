@@ -132,6 +132,8 @@ namespace osmium {
         /**
          * Was this area created from a way? (In contrast to areas
          * created from a relation and their members.)
+         *
+         * Complexity: Constant.
          */
         bool from_way() const noexcept {
             return (positive_id() & 0x1) == 0;
@@ -139,6 +141,8 @@ namespace osmium {
 
         /**
          * Return the Id of the way or relation this area was created from.
+         *
+         * Complexity: Constant.
          */
         osmium::object_id_type orig_id() const noexcept {
             return osmium::area_id_to_object_id(id());
@@ -146,6 +150,8 @@ namespace osmium {
 
         /**
          * Count the number of outer and inner rings of this area.
+         *
+         * Complexity: Linear in the number of rings.
          *
          * @returns Pair (number outer rings, number inner rings)
          */

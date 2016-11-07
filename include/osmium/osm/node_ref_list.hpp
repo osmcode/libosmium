@@ -67,6 +67,8 @@ namespace osmium {
 
         /**
          * Checks whether the collection is empty.
+         *
+         * Complexity: Constant.
          */
         bool empty() const noexcept {
             return sizeof(NodeRefList) == byte_size();
@@ -74,6 +76,8 @@ namespace osmium {
 
         /**
          * Returns the number of NodeRefs in the collection.
+         *
+         * Complexity: Constant.
          */
         size_type size() const noexcept {
             const auto size_node_refs = byte_size() - sizeof(NodeRefList);
@@ -83,6 +87,8 @@ namespace osmium {
 
         /**
          * Access specified element.
+         *
+         * Complexity: Constant.
          *
          * @pre @code n < size() @endcode
          *
@@ -97,6 +103,8 @@ namespace osmium {
         /**
          * Access the first element.
          *
+         * Complexity: Constant.
+         *
          * @pre @code !empty() @endcode
          */
         const NodeRef& front() const noexcept {
@@ -106,6 +114,8 @@ namespace osmium {
 
         /**
          * Access the last element.
+         *
+         * Complexity: Constant.
          *
          * @pre @code !empty() @endcode
          */
@@ -118,6 +128,8 @@ namespace osmium {
          * Checks whether the first and last node in the collection have the
          * same ID. The locations are not checked.
          *
+         * Complexity: Constant.
+         *
          * @pre @code !empty() @endcode
          */
         bool is_closed() const noexcept {
@@ -128,6 +140,8 @@ namespace osmium {
          * Checks whether the first and last node in the collection have the
          * same ID. The locations are not checked.
          *
+         * Complexity: Constant.
+         *
          * @pre @code !empty() @endcode
          */
         bool ends_have_same_id() const noexcept {
@@ -137,6 +151,8 @@ namespace osmium {
         /**
          * Checks whether the first and last node in the collection have the
          * same location. The IDs are not checked.
+         *
+         * Complexity: Constant.
          *
          * @pre @code !empty() @endcode
          * @pre @code front().location() && back().location() @endcode

@@ -153,14 +153,8 @@ namespace osmium {
 
     public:
 
-        using size_type = size_t;
-
         RelationMemberList() :
             osmium::memory::Collection<RelationMember, osmium::item_type::relation_member_list>() {
-        }
-
-        size_type size() const noexcept {
-            return static_cast<size_type>(std::distance(begin(), end()));
         }
 
     }; // class RelationMemberList

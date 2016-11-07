@@ -87,11 +87,13 @@ namespace osmium {
     }; // class Tag
 
     inline bool operator==(const Tag& a, const Tag& b) {
-        return !std::strcmp(a.key(), b.key()) && !std::strcmp(a.value(), b.value());
+        return !std::strcmp(a.key(), b.key()) &&
+               !std::strcmp(a.value(), b.value());
     }
 
     inline bool operator<(const Tag& a, const Tag& b) {
-        return (!std::strcmp(a.key(), b.key()) && (std::strcmp(a.value(), b.value()) < 0)) || (std::strcmp(a.key(), b.key()) < 0);
+        const auto c = std::strcmp(a.key(), b.key());
+        return (c == 0 ? std::strcmp(a.value(), b.value()) : c) < 0;
     }
 
     /**
@@ -112,17 +114,8 @@ namespace osmium {
 
     public:
 
-        using size_type = size_t;
-
         TagList() :
             osmium::memory::Collection<Tag, osmium::item_type::tag_list>() {
-        }
-
-        /**
-         * Returns the number of tags in this tag list.
-         */
-        size_type size() const noexcept {
-            return static_cast<size_type>(std::distance(begin(), end()));
         }
 
         /**
