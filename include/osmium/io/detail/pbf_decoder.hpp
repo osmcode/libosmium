@@ -452,6 +452,22 @@ namespace osmium {
                     build_tag_list(builder, keys, vals);
                 }
 
+                void build_taglist(osmium::builder::NodeBuilder& builder, protozero::pbf_reader::const_int32_iterator& it, protozero::pbf_reader::const_int32_iterator last) {
+                    osmium::builder::TagListBuilder tl_builder{builder};
+                    while (it != last && *it != 0) {
+                        const auto& k = m_stringtable.at(*it++);
+                        if (it == last) {
+                            throw osmium::pbf_error("PBF format error"); // this is against the spec, keys/vals must come in pairs
+                        }
+                        const auto& v = m_stringtable.at(*it++);
+                        tl_builder.add_tag(k.first, k.second, v.first, v.second);
+                    }
+
+                    if (it != last) {
+                        ++it;
+                    }
+                }
+
                 void decode_dense_nodes_without_metadata(const data_view& data) {
                     protozero::iterator_range<protozero::pbf_reader::const_sint64_iterator> ids;
                     protozero::iterator_range<protozero::pbf_reader::const_sint64_iterator> lats;
@@ -508,19 +524,7 @@ namespace osmium {
                         ));
 
                         if (tag_it != tags.end()) {
-                            osmium::builder::TagListBuilder tl_builder{builder};
-                            while (tag_it != tags.end() && *tag_it != 0) {
-                                const auto& k = m_stringtable.at(*tag_it++);
-                                if (tag_it == tags.end()) {
-                                    throw osmium::pbf_error("PBF format error"); // this is against the spec, keys/vals must come in pairs
-                                }
-                                const auto& v = m_stringtable.at(*tag_it++);
-                                tl_builder.add_tag(k.first, k.second, v.first, v.second);
-                            }
-
-                            if (tag_it != tags.end()) {
-                                ++tag_it;
-                            }
+                            build_taglist(builder, tag_it, tags.end());
                         }
                     }
 
@@ -677,19 +681,7 @@ namespace osmium {
                         }
 
                         if (tag_it != tags.end()) {
-                            osmium::builder::TagListBuilder tl_builder{builder};
-                            while (tag_it != tags.end() && *tag_it != 0) {
-                                const auto& k = m_stringtable.at(*tag_it++);
-                                if (tag_it == tags.end()) {
-                                    throw osmium::pbf_error("PBF format error"); // this is against the spec, keys/vals must come in pairs
-                                }
-                                const auto& v = m_stringtable.at(*tag_it++);
-                                tl_builder.add_tag(k.first, k.second, v.first, v.second);
-                            }
-
-                            if (tag_it != tags.end()) {
-                                ++tag_it;
-                            }
+                            build_taglist(builder, tag_it, tags.end());
                         }
                     }
 
