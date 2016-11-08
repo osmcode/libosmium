@@ -55,13 +55,17 @@ namespace osmium {
 
         namespace detail {
 
+            struct reader_options {
+                osmium::osm_entity_bits::type read_which_entities = osm_entity_bits::all;
+                osmium::io::read_meta read_metadata = read_meta::yes;
+            };
+
             class Parser {
 
                 future_buffer_queue_type& m_output_queue;
                 std::promise<osmium::io::Header>& m_header_promise;
                 queue_wrapper<std::string> m_input_queue;
-                osmium::osm_entity_bits::type m_read_types;
-                osmium::io::read_meta m_read_metadata;
+                reader_options m_options;
                 bool m_header_is_done;
 
             protected:
@@ -75,11 +79,11 @@ namespace osmium {
                 }
 
                 osmium::osm_entity_bits::type read_types() const noexcept {
-                    return m_read_types;
+                    return m_options.read_which_entities;
                 }
 
                 osmium::io::read_meta read_metadata() const noexcept {
-                    return m_read_metadata;
+                    return m_options.read_metadata;
                 }
 
                 bool header_is_done() const noexcept {
@@ -116,13 +120,11 @@ namespace osmium {
                 Parser(future_string_queue_type& input_queue,
                        future_buffer_queue_type& output_queue,
                        std::promise<osmium::io::Header>& header_promise,
-                       osmium::osm_entity_bits::type read_types,
-                       osmium::io::read_meta read_metadata) :
+                       osmium::io::detail::reader_options options) :
                     m_output_queue(output_queue),
                     m_header_promise(header_promise),
                     m_input_queue(input_queue),
-                    m_read_types(read_types),
-                    m_read_metadata(read_metadata),
+                    m_options(options),
                     m_header_is_done(false) {
                 }
 
@@ -164,8 +166,7 @@ namespace osmium {
                 using create_parser_type = std::function<std::unique_ptr<Parser>(future_string_queue_type&,
                                                                                  future_buffer_queue_type&,
                                                                                  std::promise<osmium::io::Header>& header_promise,
-                                                                                 osmium::osm_entity_bits::type read_which_entities,
-                                                                                 osmium::io::read_meta read_metadata)>;
+                                                                                 osmium::io::detail::reader_options options)>;
 
             private:
 
