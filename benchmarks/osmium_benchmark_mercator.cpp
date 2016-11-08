@@ -12,12 +12,12 @@
 #include <osmium/io/any_input.hpp>
 #include <osmium/handler.hpp>
 #include <osmium/visitor.hpp>
-#include <osmium/geom/geojson.hpp>
+#include <osmium/geom/wkb.hpp>
 #include <osmium/geom/mercator_projection.hpp>
 
 struct GeomHandler : public osmium::handler::Handler {
 
-    osmium::geom::GeoJSONFactory<osmium::geom::MercatorProjection> factory;
+    osmium::geom::WKBFactory<osmium::geom::MercatorProjection> factory;
 
     void node(const osmium::Node& node) {
         const std::string geom = factory.create_point(node);
@@ -39,6 +39,5 @@ int main(int argc, char* argv[]) {
     GeomHandler handler;
     osmium::apply(reader, handler);
     reader.close();
-
 }
 

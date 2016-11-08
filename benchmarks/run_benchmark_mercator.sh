@@ -1,11 +1,11 @@
 #!/bin/sh
 #
-#  run_benchmark_proj_geojson.sh
+#  run_benchmark_mercator.sh
 #
 
 set -e
 
-BENCHMARK_NAME=proj_geojson
+BENCHMARK_NAME=mercator
 
 . @CMAKE_BINARY_DIR@/benchmarks/setup.sh
 

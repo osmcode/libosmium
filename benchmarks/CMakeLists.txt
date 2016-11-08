@@ -12,7 +12,7 @@ set(BENCHMARKS
     count
     count_tag
     index_map
-    proj_geojson
+    mercator
     static_vs_dynamic_index
     write_pbf
     CACHE STRING "Benchmark programs"
