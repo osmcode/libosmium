@@ -167,6 +167,11 @@ TEST_CASE("Map Id to location: Dynamic map choice") {
     const std::vector<std::string> map_type_names = map_factory.map_types();
     REQUIRE(map_type_names.size() >= 5);
 
+    REQUIRE_THROWS_AS(map_factory.create_map(""), osmium::map_factory_error);
+    REQUIRE_THROWS_AS(map_factory.create_map("does not exist"), osmium::map_factory_error);
+    REQUIRE_THROWS_WITH(map_factory.create_map(""), "Need non-empty map type name");
+    REQUIRE_THROWS_WITH(map_factory.create_map("does not exist"), "Support for map type 'does not exist' not compiled into this binary");
+
     for (const auto& map_type_name : map_type_names) {
         std::unique_ptr<map_type> index1 = map_factory.create_map(map_type_name);
         index1->reserve(1000);
