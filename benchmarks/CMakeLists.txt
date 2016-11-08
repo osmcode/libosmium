@@ -38,6 +38,8 @@ foreach(benchmark ${BENCHMARKS})
                    @ONLY)
 endforeach()
 
+string(TOUPPER "${CMAKE_BUILD_TYPE}" _cmake_build_type)
+set(_cxx_flags "${CMAKE_CXX_FLAGS_${_cmake_build_type}}")
 foreach(file setup run_benchmarks)
     configure_file(${file}.sh ${CMAKE_CURRENT_BINARY_DIR}/${file}.sh @ONLY)
 endforeach()
