@@ -51,13 +51,13 @@ namespace osmium {
 
     namespace thread {
 
+        static const std::chrono::milliseconds max_wait{10};
+
         /**
          *  A thread-safe queue.
          */
         template <typename T>
         class Queue {
-
-            constexpr static const std::chrono::milliseconds max_wait{10};
 
             /// Maximum size of this queue. If the queue is full pushing to
             /// the queue will block.
