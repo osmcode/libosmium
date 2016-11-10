@@ -15,6 +15,7 @@ set(EXAMPLES
     count
     create_pois
     debug
+    dump_internal
     filter_discussions
     index
     location_cache_create
@@ -23,7 +24,6 @@ set(EXAMPLES
     read
     read_with_progress
     road_length
-    serdump
     tiles
     CACHE STRING "Example programs"
 )
