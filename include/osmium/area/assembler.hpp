@@ -193,12 +193,12 @@ namespace osmium {
 
             }; // struct location_to_ring_map
 
-            inline bool operator==(const location_to_ring_map& a, const location_to_ring_map& b) noexcept {
-                return a.location == b.location;
+            inline bool operator==(const location_to_ring_map& lhs, const location_to_ring_map& rhs) noexcept {
+                return lhs.location == rhs.location;
             }
 
-            inline bool operator<(const location_to_ring_map& a, const location_to_ring_map& b) noexcept {
-                return a.location < b.location;
+            inline bool operator<(const location_to_ring_map& lhs, const location_to_ring_map& rhs) noexcept {
+                return lhs.location < rhs.location;
             }
 
         } // namespace detail
@@ -458,8 +458,8 @@ namespace osmium {
             }
 
             detail::NodeRefSegment* get_next_segment(const osmium::Location& location) {
-                auto it = std::lower_bound(m_locations.begin(), m_locations.end(), slocation{}, [this, &location](const slocation& a, const slocation& b) {
-                    return a.location(m_segment_list, location) < b.location(m_segment_list, location);
+                auto it = std::lower_bound(m_locations.begin(), m_locations.end(), slocation{}, [this, &location](const slocation& lhs, const slocation& rhs) {
+                    return lhs.location(m_segment_list, location) < rhs.location(m_segment_list, location);
                 });
 
                 assert(it != m_locations.end());
@@ -744,8 +744,8 @@ namespace osmium {
                     m_locations.emplace_back(n, true);
                 }
 
-                std::stable_sort(m_locations.begin(), m_locations.end(), [this](const slocation& a, const slocation& b) {
-                    return a.location(m_segment_list) < b.location(m_segment_list);
+                std::stable_sort(m_locations.begin(), m_locations.end(), [this](const slocation& lhs, const slocation& rhs) {
+                    return lhs.location(m_segment_list) < rhs.location(m_segment_list);
                 });
             }
 
@@ -1015,8 +1015,8 @@ namespace osmium {
 
                 std::vector<location_to_ring_map> xrings = create_location_to_ring_map(open_ring_its);
 
-                const auto ring_min = std::min_element(xrings.begin(), xrings.end(), [](const location_to_ring_map& a, const location_to_ring_map& b) {
-                    return a.ring().min_segment() < b.ring().min_segment();
+                const auto ring_min = std::min_element(xrings.begin(), xrings.end(), [](const location_to_ring_map& lhs, const location_to_ring_map& rhs) {
+                    return lhs.ring().min_segment() < rhs.ring().min_segment();
                 });
 
                 find_inner_outer_complex();
@@ -1068,11 +1068,11 @@ namespace osmium {
 
                 // Find the candidate with the smallest/largest area
                 const auto chosen_cand = ring_min_is_outer ?
-                     std::min_element(candidates.cbegin(), candidates.cend(), [](const candidate& a, const candidate& b) {
-                        return std::abs(a.sum) < std::abs(b.sum);
+                     std::min_element(candidates.cbegin(), candidates.cend(), [](const candidate& lhs, const candidate& rhs) {
+                        return std::abs(lhs.sum) < std::abs(rhs.sum);
                      }) :
-                     std::max_element(candidates.cbegin(), candidates.cend(), [](const candidate& a, const candidate& b) {
-                        return std::abs(a.sum) < std::abs(b.sum);
+                     std::max_element(candidates.cbegin(), candidates.cend(), [](const candidate& lhs, const candidate& rhs) {
+                        return std::abs(lhs.sum) < std::abs(rhs.sum);
                      });
 
                 if (debug()) {
@@ -1103,8 +1103,8 @@ namespace osmium {
                     const auto locs = make_range(std::equal_range(m_locations.begin(),
                                                                   m_locations.end(),
                                                                   slocation{},
-                                                                  [this, &location](const slocation& a, const slocation& b) {
-                        return a.location(m_segment_list, location) < b.location(m_segment_list, location);
+                                                                  [this, &location](const slocation& lhs, const slocation& rhs) {
+                        return lhs.location(m_segment_list, location) < rhs.location(m_segment_list, location);
                     }));
                     for (auto& loc : locs) {
                         if (!m_segment_list[loc.item].is_done()) {
@@ -1267,8 +1267,8 @@ namespace osmium {
                     }
                     for (const auto& location : m_split_locations) {
                         if (m_config.problem_reporter) {
-                            auto it = std::lower_bound(m_locations.cbegin(), m_locations.cend(), slocation{}, [this, &location](const slocation& a, const slocation& b) {
-                                return a.location(m_segment_list, location) < b.location(m_segment_list, location);
+                            auto it = std::lower_bound(m_locations.cbegin(), m_locations.cend(), slocation{}, [this, &location](const slocation& lhs, const slocation& rhs) {
+                                return lhs.location(m_segment_list, location) < rhs.location(m_segment_list, location);
                             });
                             assert(it != m_locations.cend());
                             const osmium::object_id_type id = it->node_ref(m_segment_list).ref();

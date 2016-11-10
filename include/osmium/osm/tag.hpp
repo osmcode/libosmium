@@ -86,14 +86,14 @@ namespace osmium {
 
     }; // class Tag
 
-    inline bool operator==(const Tag& a, const Tag& b) {
-        return !std::strcmp(a.key(), b.key()) &&
-               !std::strcmp(a.value(), b.value());
+    inline bool operator==(const Tag& lhs, const Tag& rhs) {
+        return !std::strcmp(lhs.key(), rhs.key()) &&
+               !std::strcmp(lhs.value(), rhs.value());
     }
 
-    inline bool operator<(const Tag& a, const Tag& b) {
-        const auto c = std::strcmp(a.key(), b.key());
-        return (c == 0 ? std::strcmp(a.value(), b.value()) : c) < 0;
+    inline bool operator<(const Tag& lhs, const Tag& rhs) {
+        const auto c = std::strcmp(lhs.key(), rhs.key());
+        return (c == 0 ? std::strcmp(lhs.value(), rhs.value()) : c) < 0;
     }
 
     /**
