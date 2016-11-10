@@ -27,6 +27,7 @@
 #include <fcntl.h>     // for open
 #include <getopt.h>    // for getopt_long
 #include <iostream>    // for std::cout, std::cerr
+#include <memory>      // for std::unique_ptr
 #include <string>      // for std::string
 #include <sys/stat.h>  // for open
 #include <sys/types.h> // for open
@@ -317,15 +318,15 @@ int main(int argc, char* argv[]) {
     // Depending on the type of index, we have different implementations.
     if (options.type_is("location")) {
         // index id -> location
-        const auto index{create<osmium::Location>(options.dense_format(), fd)};
+        const auto index = create<osmium::Location>(options.dense_format(), fd);
         return run(*index, options);
     } else if (options.type_is("id")) {
         // index id -> id
-        const auto index{create<osmium::unsigned_object_id_type>(options.dense_format(), fd)};
+        const auto index = create<osmium::unsigned_object_id_type>(options.dense_format(), fd);
         return run(*index, options);
     } else {
         // index id -> offset
-        const auto index{create<std::size_t>(options.dense_format(), fd)};
+        const auto index = create<std::size_t>(options.dense_format(), fd);
         return run(*index, options);
     }
 }
