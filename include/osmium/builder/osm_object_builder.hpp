@@ -389,6 +389,13 @@ namespace osmium {
                 object().set_user_size(1);
             }
 
+            /**
+             * Get a reference to the object buing built.
+             *
+             * Note that this reference will be invalidated by every action
+             * on the builder that might make the buffer grow. This includes
+             * calls to set_user() and any time a new sub-builder is created.
+             */
             T& object() noexcept {
                 return static_cast<T&>(item());
             }
@@ -446,6 +453,7 @@ namespace osmium {
             OSMIUM_FORWARD(set_version)
             OSMIUM_FORWARD(set_changeset)
             OSMIUM_FORWARD(set_uid)
+            OSMIUM_FORWARD(set_uid_from_signed)
             OSMIUM_FORWARD(set_timestamp)
             OSMIUM_FORWARD(set_attribute)
             OSMIUM_FORWARD(set_removed)
@@ -561,12 +569,20 @@ namespace osmium {
                 object().set_user_size(1);
             }
 
+            /**
+             * Get a reference to the changeset buing built.
+             *
+             * Note that this reference will be invalidated by every action
+             * on the builder that might make the buffer grow. This includes
+             * calls to set_user() and any time a new sub-builder is created.
+             */
             Changeset& object() noexcept {
                 return static_cast<Changeset&>(item());
             }
 
             OSMIUM_FORWARD(set_id)
             OSMIUM_FORWARD(set_uid)
+            OSMIUM_FORWARD(set_uid_from_signed)
             OSMIUM_FORWARD(set_created_at)
             OSMIUM_FORWARD(set_closed_at)
             OSMIUM_FORWARD(set_num_changes)
