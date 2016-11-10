@@ -34,7 +34,7 @@ set(EXAMPLES
 #  Examples depending on wingetopt
 #
 #-----------------------------------------------------------------------------
-set(GETOPT_EXAMPLES area_test convert index)
+set(GETOPT_EXAMPLES area_test convert index_lookup)
 if(NOT GETOPT_MISSING)
     foreach(example ${GETOPT_EXAMPLES})
         list(APPEND EXAMPLE_LIBS_${example} ${GETOPT_LIBRARY})
