@@ -452,7 +452,7 @@ namespace osmium {
                     build_tag_list(builder, keys, vals);
                 }
 
-                void build_taglist(osmium::builder::NodeBuilder& builder, protozero::pbf_reader::const_int32_iterator& it, protozero::pbf_reader::const_int32_iterator last) {
+                void build_tag_list_from_dense_nodes(osmium::builder::NodeBuilder& builder, protozero::pbf_reader::const_int32_iterator& it, protozero::pbf_reader::const_int32_iterator last) {
                     osmium::builder::TagListBuilder tl_builder{builder};
                     while (it != last && *it != 0) {
                         const auto& k = m_stringtable.at(*it++);
@@ -524,7 +524,7 @@ namespace osmium {
                         ));
 
                         if (tag_it != tags.end()) {
-                            build_taglist(builder, tag_it, tags.end());
+                            build_tag_list_from_dense_nodes(builder, tag_it, tags.end());
                         }
                     }
 
@@ -681,7 +681,7 @@ namespace osmium {
                         }
 
                         if (tag_it != tags.end()) {
-                            build_taglist(builder, tag_it, tags.end());
+                            build_tag_list_from_dense_nodes(builder, tag_it, tags.end());
                         }
                     }
 
