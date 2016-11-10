@@ -34,6 +34,8 @@ them.
 * `osmium_change_tags`
 * `osmium_location_cache_create`
 * `osmium_location_cache_use`
+* `osmium_dump_internal`
+* `osmium_index_lookup`
 
 ## License
 

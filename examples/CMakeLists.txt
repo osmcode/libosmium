@@ -17,7 +17,7 @@ set(EXAMPLES
     debug
     dump_internal
     filter_discussions
-    index
+    index_lookup
     location_cache_create
     location_cache_use
     pub_names
