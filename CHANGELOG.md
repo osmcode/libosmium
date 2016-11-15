@@ -10,7 +10,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
+- Updated embedded protozero to 1.4.3.
+
 ### Fixed
+
+- Made IdSet work on 32bit systems.
+- Fixed endianness check for WKB tests.
 
 
 ## [2.10.0] - 2016-11-11
