@@ -10,7 +10,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
+- Updated embedded protozero to 1.4.4.
+
 ### Fixed
+
+- Buffer overflow in osmium::Buffer.
 
 
 ## [2.10.1] - 2016-11-15

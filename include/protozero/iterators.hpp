@@ -200,7 +200,7 @@ public:
         value_type result;
         std::memcpy(&result, m_data, sizeof(value_type));
 #if PROTOZERO_BYTE_ORDER != PROTOZERO_LITTLE_ENDIAN
-        detail::byteswap_inplace(result);
+        detail::byteswap_inplace(&result);
 #endif
         return result;
     }
