@@ -74,7 +74,7 @@ namespace osmium {
         using iterator       = boost::indirect_iterator<std::vector<osmium::OSMObject*>::iterator, osmium::OSMObject>;
         using const_iterator = boost::indirect_iterator<std::vector<osmium::OSMObject*>::const_iterator, const osmium::OSMObject>;
 
-        ObjectPointerCollection() noexcept = default;
+        ObjectPointerCollection() = default;
 
         /**
          * Add a pointer to an object to the collection.
