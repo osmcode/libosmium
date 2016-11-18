@@ -33,6 +33,7 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <cassert>
 #include <tuple>
 
 #include <osmium/osm/object.hpp>
@@ -51,7 +52,9 @@ namespace osmium {
             return lhs == rhs;
         }
 
+        /// @pre lhs and rhs must not be nullptr
         bool operator()(const osmium::OSMObject* lhs, const osmium::OSMObject* rhs) const noexcept {
+            assert(lhs && rhs);
             return *lhs == *rhs;
         }
 
@@ -68,7 +71,9 @@ namespace osmium {
                    lhs.id() == rhs.id();
         }
 
+        /// @pre lhs and rhs must not be nullptr
         bool operator()(const osmium::OSMObject* lhs, const osmium::OSMObject* rhs) const noexcept {
+            assert(lhs && rhs);
             return operator()(*lhs, *rhs);
         }
 
@@ -84,7 +89,9 @@ namespace osmium {
             return lhs < rhs;
         }
 
+        /// @pre lhs and rhs must not be nullptr
         bool operator()(const osmium::OSMObject* lhs, const osmium::OSMObject* rhs) const noexcept {
+            assert(lhs && rhs);
             return *lhs < *rhs;
         }
 
@@ -104,7 +111,9 @@ namespace osmium {
                    const_tie(rhs.type(), rhs.id() < 0, rhs.positive_id(), lhs.version(), lhs.timestamp());
         }
 
+        /// @pre lhs and rhs must not be nullptr
         bool operator()(const osmium::OSMObject* lhs, const osmium::OSMObject* rhs) const noexcept {
+            assert(lhs && rhs);
             return operator()(*lhs, *rhs);
         }
 
