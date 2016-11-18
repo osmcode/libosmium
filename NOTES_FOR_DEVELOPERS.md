@@ -85,12 +85,12 @@ compilers don't support them yet. This list might change as we get more data
 about which compilers support which feature and what operating system versions
 or distributions have which versions of these compilers installed.
 
-GCC 4.6   - too old, not supported (Ubuntu 12.04 LTS)
-GCC 4.7.2 - can probably not be supported (Debian wheezy)
-GCC 4.7.3 - probably works
-GCC 4.8   - works and is supported from here on
-clang 3.0 - too old, not supported (Debian wheezy, Ubuntu 12.04 LTS)
-clang 3.2 - probably works
+GCC 4.6   - too old, not supported (Ubuntu 12.04 LTS)  
+GCC 4.7.2 - can probably not be supported (Debian wheezy)  
+GCC 4.7.3 - probably works  
+GCC 4.8   - works and is supported from here on  
+clang 3.0 - too old, not supported (Debian wheezy, Ubuntu 12.04 LTS)  
+clang 3.2 - probably works  
 clang 3.5 - works and is supported from here on
 
 Use `include/osmium/util/compatibility.hpp` if there are compatibility problems
