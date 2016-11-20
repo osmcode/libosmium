@@ -13,6 +13,14 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 
 
+## [2.10.3] - 2016-11-20
+
+### Changed
+
+- Round out ObjectPointerCollection implementation and test it.
+- Updated embedded protozero to 1.4.5.
+
+
 ## [2.10.2] - 2016-11-16
 
 ### Changed
@@ -480,7 +488,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   Doxygen (up to version 1.8.8). This version contains a workaround to fix
   this.
 
-[unreleased]: https://github.com/osmcode/libosmium/compare/v2.10.2...HEAD
+[unreleased]: https://github.com/osmcode/libosmium/compare/v2.10.3...HEAD
+[2.10.3]: https://github.com/osmcode/libosmium/compare/v2.10.2...v2.10.3
 [2.10.2]: https://github.com/osmcode/libosmium/compare/v2.10.1...v2.10.2
 [2.10.1]: https://github.com/osmcode/libosmium/compare/v2.10.0...v2.10.1
 [2.10.0]: https://github.com/osmcode/libosmium/compare/v2.9.0...v2.10.0
