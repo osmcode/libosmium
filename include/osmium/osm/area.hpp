@@ -234,7 +234,7 @@ namespace osmium {
          * Return an iterator range for all inner rings in the given outer
          * ring.
          * You can use the usual begin() and end() functions to iterate over
-         * all outer rings.
+         * all inner rings.
          */
         osmium::memory::ItemIteratorRange<const osmium::InnerRing> inner_rings(const osmium::OuterRing& outer) const {
             osmium::memory::ItemIteratorRange<const osmium::OuterRing> outer_range{outer.data(), next()};

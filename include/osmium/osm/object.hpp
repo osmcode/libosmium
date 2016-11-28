@@ -36,6 +36,7 @@ DEALINGS IN THE SOFTWARE.
 #include <cstdlib>
 #include <cstring>
 #include <stdexcept>
+#include <type_traits>
 #include <tuple>
 
 #include <osmium/memory/collection.hpp>
@@ -383,20 +384,22 @@ namespace osmium {
         /**
          * Get a range of subitems of a specific type.
          *
-         * @tparam The type (must be derived from osmium::memory::Item.
+         * @tparam The type (must be derived from osmium::memory::Item).
          */
         template <typename T>
         osmium::memory::ItemIteratorRange<T> subitems() {
+            static_assert(std::is_base_of<osmium::memory::Item, T>::value, "T must be derived from osmium::memory::Item");
             return osmium::memory::ItemIteratorRange<T>{subitems_position(), next()};
         }
 
         /**
          * Get a range of subitems of a specific type.
          *
-         * @tparam The type (must be derived from osmium::memory::Item.
+         * @tparam The type (must be derived from osmium::memory::Item).
          */
         template <typename T>
         osmium::memory::ItemIteratorRange<const T> subitems() const {
+            static_assert(std::is_base_of<osmium::memory::Item, T>::value, "T must be derived from osmium::memory::Item");
             return osmium::memory::ItemIteratorRange<const T>{subitems_position(), next()};
         }
 
