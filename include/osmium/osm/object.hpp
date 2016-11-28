@@ -115,6 +115,13 @@ namespace osmium {
 
     public:
 
+        constexpr static bool is_compatible_to(osmium::item_type t) noexcept {
+            return t == osmium::item_type::node ||
+                   t == osmium::item_type::way ||
+                   t == osmium::item_type::relation ||
+                   t == osmium::item_type::area;
+        }
+
         /// Get ID of this object.
         object_id_type id() const noexcept {
             return m_id;

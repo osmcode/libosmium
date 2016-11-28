@@ -57,6 +57,10 @@ namespace osmium {
 
         static constexpr osmium::item_type itemtype = osmium::item_type::way_node_list;
 
+        constexpr static bool is_compatible_to(osmium::item_type t) noexcept {
+            return t == itemtype;
+        }
+
         WayNodeList():
             NodeRefList(itemtype) {
         }
@@ -75,6 +79,12 @@ namespace osmium {
         }
 
     public:
+
+        static constexpr osmium::item_type itemtype = osmium::item_type::way;
+
+        constexpr static bool is_compatible_to(osmium::item_type t) noexcept {
+            return t == itemtype;
+        }
 
         WayNodeList& nodes() {
             return osmium::detail::subitem_of_type<WayNodeList>(begin(), end());

@@ -183,6 +183,12 @@ namespace osmium {
 
     public:
 
+        static constexpr osmium::item_type itemtype = osmium::item_type::changeset;
+
+        constexpr static bool is_compatible_to(osmium::item_type t) noexcept {
+            return t == itemtype;
+        }
+
         // Dummy to avoid warning because of unused private fields. Do not use.
         int32_t do_not_use() const noexcept {
             return m_padding1 + m_padding2;

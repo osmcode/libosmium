@@ -146,6 +146,10 @@ namespace osmium {
 
         public:
 
+            constexpr static bool is_compatible_to(osmium::item_type /*t*/) noexcept {
+                return true;
+            }
+
             unsigned char* next() noexcept {
                 return data() + padded_size();
             }

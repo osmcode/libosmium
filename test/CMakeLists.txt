@@ -138,6 +138,7 @@ add_unit_test(osm test_way)
 add_unit_test(memory test_buffer_basics)
 add_unit_test(memory test_buffer_node)
 add_unit_test(memory test_buffer_purge)
+add_unit_test(memory test_type_is_compatible)
 
 add_unit_test(builder test_attr)
 add_unit_test(builder test_object_builder)

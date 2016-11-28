@@ -63,6 +63,10 @@ namespace osmium {
 
         static constexpr osmium::item_type itemtype = osmium::item_type::outer_ring;
 
+        constexpr static bool is_compatible_to(osmium::item_type t) noexcept {
+            return t == itemtype;
+        }
+
         OuterRing():
             NodeRefList(itemtype) {
         }
@@ -79,6 +83,10 @@ namespace osmium {
     public:
 
         static constexpr osmium::item_type itemtype = osmium::item_type::inner_ring;
+
+        constexpr static bool is_compatible_to(osmium::item_type t) noexcept {
+            return t == itemtype;
+        }
 
         InnerRing():
             NodeRefList(itemtype) {
@@ -128,6 +136,10 @@ namespace osmium {
     public:
 
         static constexpr osmium::item_type itemtype = osmium::item_type::area;
+
+        constexpr static bool is_compatible_to(osmium::item_type t) noexcept {
+            return t == itemtype;
+        }
 
         /**
          * Was this area created from a way? (In contrast to areas

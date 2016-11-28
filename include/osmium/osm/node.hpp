@@ -60,6 +60,10 @@ namespace osmium {
 
         static constexpr osmium::item_type itemtype = osmium::item_type::node;
 
+        constexpr static bool is_compatible_to(osmium::item_type t) noexcept {
+            return t == itemtype;
+        }
+
         osmium::Location location() const noexcept {
             return m_location;
         }

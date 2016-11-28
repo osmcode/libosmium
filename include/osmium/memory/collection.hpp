@@ -127,6 +127,10 @@ namespace osmium {
 
             static constexpr osmium::item_type itemtype = TCollectionItemType;
 
+            constexpr static bool is_compatible_to(osmium::item_type t) noexcept {
+                return t == itemtype;
+            }
+
             Collection() :
                 Item(sizeof(Collection<TMember, TCollectionItemType>), TCollectionItemType) {
             }
