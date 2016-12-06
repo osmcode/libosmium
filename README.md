@@ -24,8 +24,9 @@ Different parts of Libosmium (and the applications built on top of it) need
 different libraries. You DO NOT NEED to install all of them, just install those
 you need for your programs.
 
-For details see the
-[list of dependencies](https://github.com/osmcode/libosmium/wiki/Libosmium-dependencies).
+For details see the [list of
+dependencies](http://osmcode.org/libosmium/manual.html#dependencies) in the
+manual.
 
 The following external (header-only) libraries are included in the libosmium
 repository:
@@ -70,13 +71,13 @@ cmake:
 This will build the examples and tests. Call `ctest` to run the tests.
 
 For more see the
-[Libosmium Wiki](https://github.com/osmcode/libosmium/wiki/Building-Libosmium).
+[Libosmium Manual](http://osmcode.org/libosmium/manual.html#building-libosmium).
 
 
 ## Testing
 
 See the
-[Libosmium Wiki](https://github.com/osmcode/libosmium/wiki/Testing-Libosmium)
+[Libosmium Manual](http://osmcode.org/libosmium/manual.html#running-tests).
 for instructions.
 
 
@@ -98,8 +99,8 @@ Please report any issues you have and we might be able to solve them.
 ## Switching from the old Osmium
 
 If you have been using the old version of Osmium at
-https://github.com/joto/osmium you might want to read about the
-[changes needed](https://github.com/osmcode/libosmium/wiki/Changes-from-old-versions-of-Osmium).
+https://github.com/joto/osmium you might want to read about the [changes
+needed](http://osmcode.org/libosmium/manual.html#changes-from-old-versions-of-osmium).
 
 
 ## License
