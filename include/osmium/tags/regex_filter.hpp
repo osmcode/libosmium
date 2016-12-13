@@ -42,6 +42,14 @@ namespace osmium {
 
     namespace tags {
 
+        template <> struct match_key<std::regex>
+        {
+            bool operator()(const std::regex &rule_key, const char *tag_key)
+            {
+                return std::regex_match(tag_key, rule_key);
+            }
+        }; // struct match_key<std::regex>
+
         template <>
         struct match_value<std::regex> {
             bool operator()(const std::regex& rule_value, const char* tag_value) {

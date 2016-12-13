@@ -219,4 +219,19 @@ TEST_CASE("Filter") {
         check_filter(tag_list, filter, {false, true});
     }
 
+    SECTION("Filter_regex_matches_some_tags") {
+        osmium::tags::Filter<std::regex> filter(false);
+        filter.add(true, std::regex("restriction.+conditional"));
+
+        osmium::memory::Buffer buffer(10240);
+        const osmium::TagList& tag_list = make_tag_list(buffer, {
+            { "highway", "primary" },
+            { "restrictionconditional", "only_right_turn @ (Mo-Fr 07:00-14:00)" },
+            { "restriction:conditional", "only_right_turn @ (Mo-Fr 07:00-14:00)" },
+            { "restriction:psv:conditional", "only_right_turn @ (Mo-Fr 07:00-14:00)" }
+        });
+
+        check_filter(tag_list, filter, {false, false, true, true});
+    }
+
 }
