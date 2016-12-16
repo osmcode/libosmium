@@ -66,7 +66,7 @@ TEST_CASE("WayNodeList") {
             osmium::builder::WayNodeListBuilder builder(buffer);
         }
         REQUIRE(buffer.commit() == 0);
-        REQUIRE(buffer.committed( )> 0);
+        REQUIRE(buffer.committed() > 0);
 
         const osmium::WayNodeList& nrl = buffer.get<osmium::WayNodeList>(0);
         REQUIRE(nrl.empty());
@@ -75,11 +75,11 @@ TEST_CASE("WayNodeList") {
 
     SECTION("Small area") {
         osmium::builder::add_way_node_list(buffer, osmium::builder::attr::_nodes({
-            { 1, {0, 0}},
-            { 2, {0, 1}},
-            { 3, {1, 1}},
-            { 4, {1, 0}},
-            { 1, {0, 0}},
+            { 1, {0.0, 0.0}},
+            { 2, {0.0, 1.0}},
+            { 3, {1.0, 1.0}},
+            { 4, {1.0, 0.0}},
+            { 1, {0.0, 0.0}},
         }));
 
         const osmium::WayNodeList& nrl = buffer.get<osmium::WayNodeList>(0);
@@ -88,13 +88,19 @@ TEST_CASE("WayNodeList") {
         REQUIRE(nrl.is_closed());
         REQUIRE(nrl.ends_have_same_id());
         REQUIRE(nrl.ends_have_same_location());
+
+        osmium::Box envelope = nrl.envelope();
+        REQUIRE(envelope.bottom_left().lon() == Approx(0));
+        REQUIRE(envelope.bottom_left().lat() == Approx(0));
+        REQUIRE(envelope.top_right().lon() == Approx(1));
+        REQUIRE(envelope.top_right().lat() == Approx(1));
     }
 
     SECTION("Not an area") {
         osmium::builder::add_way_node_list(buffer, osmium::builder::attr::_nodes({
-            { 1, {0, 0}},
-            { 2, {1, 0}},
-            { 1, {0, 0}},
+            { 1, {0.0, 0.0}},
+            { 2, {1.0, 0.0}},
+            { 1, {0.0, 0.0}},
         }));
 
         const osmium::WayNodeList& nrl = buffer.get<osmium::WayNodeList>(0);

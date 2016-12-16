@@ -35,6 +35,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/memory/collection.hpp>
 #include <osmium/memory/item.hpp>
+#include <osmium/osm/box.hpp>
 #include <osmium/osm/entity.hpp>
 #include <osmium/osm/item_type.hpp>
 #include <osmium/osm/node_ref.hpp>
@@ -119,6 +120,16 @@ namespace osmium {
 
         bool ends_have_same_location() const {
             return nodes().ends_have_same_location();
+        }
+
+        /**
+         * Calculate the envelope of this way. If the locations of the nodes
+         * are not set, the resulting box will be invalid.
+         *
+         * Complexity: Linear in the number of nodes.
+         */
+        osmium::Box envelope() const noexcept {
+            return nodes().envelope();
         }
 
     }; // class Way

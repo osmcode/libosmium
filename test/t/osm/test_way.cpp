@@ -91,5 +91,11 @@ TEST_CASE("build way with helpers") {
     REQUIRE(2 == way.nodes().size());
     REQUIRE(22 == way.nodes()[0].ref());
     REQUIRE(4.1 == Approx(way.nodes()[1].location().lon()));
+
+    osmium::Box envelope = way.envelope();
+    REQUIRE(envelope.bottom_left().lon() == Approx(3.5));
+    REQUIRE(envelope.bottom_left().lat() == Approx(2.2));
+    REQUIRE(envelope.top_right().lon() == Approx(4.1));
+    REQUIRE(envelope.top_right().lat() == Approx(4.7));
 }
 

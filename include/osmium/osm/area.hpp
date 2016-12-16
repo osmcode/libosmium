@@ -41,6 +41,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/memory/collection.hpp>
 #include <osmium/memory/item.hpp>
 #include <osmium/memory/item_iterator.hpp>
+#include <osmium/osm/box.hpp>
 #include <osmium/osm/item_type.hpp>
 #include <osmium/osm/object.hpp>
 #include <osmium/osm/types.hpp>
@@ -251,6 +252,19 @@ namespace osmium {
         osmium::memory::ItemIteratorRange<const osmium::InnerRing> inner_rings(const osmium::OuterRing& outer) const {
             osmium::memory::ItemIteratorRange<const osmium::OuterRing> outer_range{outer.data(), next()};
             return osmium::memory::ItemIteratorRange<const osmium::InnerRing>{outer_range.cbegin().data(), std::next(outer_range.cbegin()).data()};
+        }
+
+        /**
+         * Calculate the envelope of this area.
+         *
+         * Complexity: Linear in the number of nodes in the outer rings.
+         */
+        osmium::Box envelope() const noexcept {
+            osmium::Box box;
+            for (const auto& ring : outer_rings()) {
+                box.extend(ring.envelope());
+            }
+            return box;
         }
 
     }; // class Area
