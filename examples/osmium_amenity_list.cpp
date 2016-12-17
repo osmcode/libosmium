@@ -57,11 +57,11 @@ class AmenityHandler : public osmium::handler::Handler {
         std::printf("%8.4f,%8.4f %-15s %s\n", c.x, c.y, type, name ? name : "");
     }
 
-    // Calculate the centroid (center point) of a NodeRefList.
-    osmium::geom::Coordinates calc_centroid(const osmium::NodeRefList& nr_list) {
+    // Calculate the center point of a NodeRefList.
+    osmium::geom::Coordinates calc_center(const osmium::NodeRefList& nr_list) {
         // Coordinates simply store an X and Y coordinate pair as doubles.
         // (Unlike osmium::Location which stores them more efficiently as
-        // 32 bit integers) Use Coordinates when you want to to calculations
+        // 32 bit integers.) Use Coordinates when you want to do calculations
         // or store projected coordinates.
         osmium::geom::Coordinates c{0.0, 0.0};
 
@@ -91,12 +91,12 @@ public:
     void area(const osmium::Area& area) {
         const char* amenity = area.tags()["amenity"];
         if (amenity) {
-            // Use the centroid of the first outer ring. Because we set
+            // Use the center of the first outer ring. Because we set
             // create_empty_areas = false in the assembler config, we can
             // be sure there will always be at least one outer ring.
-            auto centroid = calc_centroid(*area.cbegin<osmium::OuterRing>());
+            const auto center = calc_center(*area.cbegin<osmium::OuterRing>());
 
-            print_amenity(amenity, area.tags()["name"], centroid);
+            print_amenity(amenity, area.tags()["name"], center);
         }
     }
 
