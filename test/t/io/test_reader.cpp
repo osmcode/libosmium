@@ -210,3 +210,17 @@ TEST_CASE("Reader failure modes") {
 
 }
 
+
+TEST_CASE("Applying rvalue handler on reader") {
+
+    SECTION("apply can be used with rvalue handler") {
+        osmium::io::File file(with_data_dir("t/io/data.osm"));
+        osmium::io::Reader reader(file);
+
+        struct NullHandler : public osmium::handler::Handler { };
+
+        osmium::apply(reader, NullHandler{});
+    }
+
+}
+
