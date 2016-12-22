@@ -1,0 +1,13 @@
+{
+    "name": "libosmium",
+    "version": "2.10.3",
+    "description": "Fast and flexible C++ library for working with OpenStreetMap data",
+    "main": "include_dirs.js",
+    "repository"   :  {
+      "type" : "git",
+      "url"  : "git://github.com/osmcode/libosmium.git"
+    },
+    "files": [
+        "include/osmium"
+    ]
+}
