@@ -160,6 +160,7 @@ add_unit_test(index test_id_set)
 add_unit_test(index test_id_to_location ENABLE_IF ${SPARSEHASH_FOUND})
 add_unit_test(index test_file_based_index)
 add_unit_test(index test_object_pointer_collection)
+add_unit_test(index test_relations_map)
 
 add_unit_test(io test_compression_factory)
 add_unit_test(io test_bzip2 ENABLE_IF ${BZIP2_FOUND} LIBS ${BZIP2_LIBRARIES})
