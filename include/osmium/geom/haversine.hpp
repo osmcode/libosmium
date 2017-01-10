@@ -60,6 +60,8 @@ namespace osmium {
 
             /**
              * Calculate distance in meters between two sets of coordinates.
+             *
+             * @pre @code c1.valid() && c2.valid() @endcode
              */
             inline double distance(const osmium::geom::Coordinates& c1, const osmium::geom::Coordinates& c2) {
                 double lonh = sin(deg_to_rad(c1.x - c2.x) * 0.5);

@@ -143,6 +143,7 @@ add_unit_test(memory test_type_is_compatible)
 add_unit_test(builder test_attr)
 add_unit_test(builder test_object_builder)
 
+add_unit_test(geom test_coordinates)
 add_unit_test(geom test_crs ENABLE_IF ${PROJ_FOUND} LIBS ${PROJ_LIBRARY})
 add_unit_test(geom test_exception)
 add_unit_test(geom test_factory_with_projection ENABLE_IF ${PROJ_FOUND} LIBS ${PROJ_LIBRARY})

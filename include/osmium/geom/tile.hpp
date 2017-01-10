@@ -147,7 +147,7 @@ namespace osmium {
              *
              * The values are not checked for validity.
              *
-             * @pre @code location.valid() && zoom <= 30 @endcode
+             * @pre @code coordinates.valid() && zoom <= 30 @endcode
              */
             explicit Tile(uint32_t zoom, const osmium::geom::Coordinates& coordinates) :
                 z(zoom) {

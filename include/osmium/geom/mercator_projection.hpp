@@ -73,10 +73,20 @@ namespace osmium {
          */
         constexpr double MERCATOR_MAX_LAT = 85.0511288;
 
+        /**
+         * Convert the coordinates from WGS84 lon/lat to web mercator.
+         *
+         * @pre @code c.valid() @endcode
+         */
         inline Coordinates lonlat_to_mercator(const Coordinates& c) {
             return Coordinates(detail::lon_to_x(c.x), detail::lat_to_y(c.y));
         }
 
+        /**
+         * Convert the coordinates from web mercator to WGS84 lon/lat.
+         *
+         * @pre @code c.valid() @endcode
+         */
         inline Coordinates mercator_to_lonlat(const Coordinates& c) {
             return Coordinates(detail::x_to_lon(c.x), detail::y_to_lat(c.y));
         }
