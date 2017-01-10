@@ -81,7 +81,7 @@ namespace osmium {
                     m_vector[id] = value;
                 }
 
-                const TValue get(const TId id) const final {
+                TValue get(const TId id) const final {
                     try {
                         const TValue& value = m_vector.at(id);
                         if (value == osmium::index::empty_value<TValue>()) {
@@ -91,6 +91,13 @@ namespace osmium {
                     } catch (const std::out_of_range&) {
                         throw osmium::not_found{id};
                     }
+                }
+
+                TValue get_noexcept(const TId id) const noexcept final {
+                    if (id >= m_vector.size()) {
+                        return osmium::index::empty_value<TValue>();
+                    }
+                    return m_vector[id];
                 }
 
                 size_t size() const final {
@@ -155,6 +162,16 @@ namespace osmium {
 
                 vector_type m_vector;
 
+                typename vector_type::const_iterator find_id(const TId id) const noexcept {
+                    const element_type element {
+                        id,
+                        osmium::index::empty_value<TValue>()
+                    };
+                    return std::lower_bound(m_vector.begin(), m_vector.end(), element, [](const element_type& a, const element_type& b) {
+                        return a.first < b.first;
+                    });
+                }
+
             public:
 
                 VectorBasedSparseMap() :
@@ -171,19 +188,22 @@ namespace osmium {
                     m_vector.push_back(element_type(id, value));
                 }
 
-                const TValue get(const TId id) const final {
-                    const element_type element {
-                        id,
-                        osmium::index::empty_value<TValue>()
-                    };
-                    const auto result = std::lower_bound(m_vector.begin(), m_vector.end(), element, [](const element_type& a, const element_type& b) {
-                        return a.first < b.first;
-                    });
+                TValue get(const TId id) const final {
+                    const auto result = find_id(id);
                     if (result == m_vector.end() || result->first != id) {
                         throw osmium::not_found{id};
-                    } else {
-                        return result->second;
                     }
+
+                    return result->second;
+                }
+
+                TValue get_noexcept(const TId id) const noexcept final {
+                    const auto result = find_id(id);
+                    if (result == m_vector.end() || result->first != id) {
+                        return osmium::index::empty_value<TValue>();
+                    }
+
+                    return result->second;
                 }
 
                 size_t size() const final {

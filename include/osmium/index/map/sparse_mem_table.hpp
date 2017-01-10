@@ -97,12 +97,19 @@ namespace osmium {
                     m_elements[id] = value;
                 }
 
-                const TValue get(const TId id) const final {
+                TValue get(const TId id) const final {
                     if (id >= m_elements.size()) {
                         throw osmium::not_found{id};
                     }
                     if (m_elements[id] == osmium::index::empty_value<TValue>()) {
                         throw osmium::not_found{id};
+                    }
+                    return m_elements[id];
+                }
+
+                TValue get_noexcept(const TId id) const noexcept final {
+                    if (id >= m_elements.size()) {
+                        return osmium::index::empty_value<TValue>();
                     }
                     return m_elements[id];
                 }

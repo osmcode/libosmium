@@ -62,8 +62,12 @@ namespace osmium {
                     // intentionally left blank
                 }
 
-                const TValue get(const TId id) const final {
+                TValue get(const TId id) const final {
                     throw osmium::not_found{id};
+                }
+
+                TValue get_noexcept(const TId /*id*/) const noexcept final {
+                    return osmium::index::empty_value<TValue>();
                 }
 
                 size_t size() const final {
