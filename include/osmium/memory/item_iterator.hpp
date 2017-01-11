@@ -1,5 +1,5 @@
-#ifndef OSMIUM_ITEM_ITERATOR_HPP
-#define OSMIUM_ITEM_ITERATOR_HPP
+#ifndef OSMIUM_MEMORY_ITEM_ITERATOR_HPP
+#define OSMIUM_MEMORY_ITEM_ITERATOR_HPP
 
 /*
 
@@ -247,4 +247,4 @@ namespace osmium {
 
 } // namespace osmium
 
-#endif // OSMIUM_ITEM_ITERATOR_HPP
+#endif // OSMIUM_MEMORY_ITEM_ITERATOR_HPP
