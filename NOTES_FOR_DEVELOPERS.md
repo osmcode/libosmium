@@ -72,9 +72,7 @@ different.
 * The ellipsis in variadic template never has a space to the left of it and
   always has a space to the right: `template <typename... TArgs>` etc.
 
-Keep to the indentation and other styles used in the code. Use `make indent`
-in the toplevel directory to fix indentation and styling. It calls `astyle`
-with the right parameters. This program is in the `astyle` Debian package.
+Keep to the indentation and other styles used in the code.
 
 
 ## C++11
