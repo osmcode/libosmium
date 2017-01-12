@@ -321,6 +321,9 @@ public:
      *    }
      * @endcode
      *
+     * Note that this will not check the wire type. The two-argument version
+     * of this function will also check the wire type.
+     *
      * @returns `true` if there is a next field with this tag.
      * @pre There must be no current field.
      * @post If it returns `true` there is a current field now with the given tag.
@@ -328,6 +331,45 @@ public:
     bool next(pbf_tag_type next_tag) {
         while (next()) {
             if (m_tag == next_tag) {
+                return true;
+            } else {
+                skip();
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Set next field with given tag and wire type in the message as the
+     * current field. Fields with other tags are skipped. This is usually
+     * called in a while loop for repeated fields:
+     *
+     * @code
+     *    pbf_reader message(...);
+     *    while (message.next(17, pbf_wire_type::varint)) {
+     *        // handle field
+     *    }
+     * @endcode
+     *
+     * or you can call it just once to get the one field with this tag:
+     *
+     * @code
+     *    pbf_reader message(...);
+     *    if (message.next(17, pbf_wire_type::varint)) {
+     *        // handle field
+     *    }
+     * @endcode
+     *
+     * Note that this will also check the wire type. The one-argument version
+     * of this function will not check the wire type.
+     *
+     * @returns `true` if there is a next field with this tag.
+     * @pre There must be no current field.
+     * @post If it returns `true` there is a current field now with the given tag.
+     */
+    bool next(pbf_tag_type next_tag, pbf_wire_type wire_type) {
+        while (next()) {
+            if (m_tag == next_tag && m_wire_type == wire_type) {
                 return true;
             } else {
                 skip();
@@ -366,6 +408,32 @@ public:
      */
     pbf_wire_type wire_type() const noexcept {
         return m_wire_type;
+    }
+
+    /**
+     * Get the tag and wire type of the current field in one integer suitable
+     * for comparison with a switch statement.
+     *
+     * Use it like this:
+     *
+     * @code
+     *    pbf_reader message(...);
+     *    while (message.next()) {
+     *        switch (message.tag_and_type()) {
+     *            case tag_and_type(17, pbf_wire_type::length_delimited):
+     *                ....
+     *                break;
+     *            case tag_and_type(21, pbf_wire_type::varint):
+     *                ....
+     *                break;
+     *            default:
+     *                message.skip();
+     *        }
+     *    }
+     * @endcode
+     */
+    uint32_t tag_and_type() const noexcept {
+        return protozero::tag_and_type(tag(), wire_type());
     }
 
     /**
