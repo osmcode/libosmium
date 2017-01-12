@@ -41,7 +41,7 @@ namespace osmium {
      * Like std::tie(), but takes its arguments as const references. Used
      * as a helper function when sorting.
      */
-    template<typename... Ts>
+    template <typename... Ts>
     inline std::tuple<const Ts&...>
     const_tie(const Ts&... args) noexcept {
         return std::tuple<const Ts&...>(args...);

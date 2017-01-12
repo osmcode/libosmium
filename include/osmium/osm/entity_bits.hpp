@@ -64,16 +64,16 @@ namespace osmium {
                                     // but now we can't change it any more
                                     // without breaking lots of code
 
-            nothing    = 0x00,
-            node       = 0x01,
-            way        = 0x02,
-            relation   = 0x04,
-            nwr        = 0x07, ///< node, way, or relation object
-            area       = 0x08,
-            nwra       = 0x0f, ///< node, way, relation, or area object
-            object     = 0x0f, ///< node, way, relation, or area object
-            changeset  = 0x10,
-            all        = 0x1f  ///< object or changeset
+            nothing   = 0x00,
+            node      = 0x01,
+            way       = 0x02,
+            relation  = 0x04,
+            nwr       = 0x07, ///< node, way, or relation object
+            area      = 0x08,
+            nwra      = 0x0f, ///< node, way, relation, or area object
+            object    = 0x0f, ///< node, way, relation, or area object
+            changeset = 0x10,
+            all       = 0x1f ///< object or changeset
 
         }; // enum type
 

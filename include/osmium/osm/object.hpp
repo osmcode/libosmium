@@ -36,8 +36,8 @@ DEALINGS IN THE SOFTWARE.
 #include <cstdlib>
 #include <cstring>
 #include <stdexcept>
-#include <type_traits>
 #include <tuple>
+#include <type_traits>
 
 #include <osmium/memory/collection.hpp>
 #include <osmium/memory/item.hpp>

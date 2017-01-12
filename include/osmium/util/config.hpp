@@ -67,7 +67,7 @@ namespace osmium {
         }
 
         inline size_t get_max_queue_size(const char* queue_name, size_t default_value) noexcept {
-            std::string name {"OSMIUM_MAX_"};
+            std::string name{"OSMIUM_MAX_"};
             name += queue_name;
             name += "_QUEUE_SIZE";
             const char* env = getenv(name.c_str());

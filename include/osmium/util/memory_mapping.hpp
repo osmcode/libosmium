@@ -94,14 +94,15 @@ namespace osmium {
          */
         class MemoryMapping {
 
-public:
+        public:
+
             enum class mapping_mode {
                 readonly      = 0,
                 write_private = 1,
                 write_shared  = 2
             };
 
-private:
+        private:
 
             /// The size of the mapping
             size_t m_size;

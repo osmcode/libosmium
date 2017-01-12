@@ -39,7 +39,7 @@ namespace osmium {
 
     template <typename T>
     inline T min_op_start_value() {
-         return std::numeric_limits<T>::max();
+        return std::numeric_limits<T>::max();
     }
 
     /**
@@ -78,7 +78,7 @@ namespace osmium {
 
     template <typename T>
     inline T max_op_start_value() {
-         return std::numeric_limits<T>::min();
+        return std::numeric_limits<T>::min();
     }
 
     /**

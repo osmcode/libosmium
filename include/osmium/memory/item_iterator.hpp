@@ -35,8 +35,8 @@ DEALINGS IN THE SOFTWARE.
 
 #include <cassert>
 #include <cstddef>
-#include <iterator>
 #include <iosfwd>
+#include <iterator>
 #include <type_traits>
 
 #include <osmium/memory/item.hpp>

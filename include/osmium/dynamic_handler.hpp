@@ -104,7 +104,8 @@ auto _name_##_dispatch(THandler& handler, const osmium::_type_& object, long) ->
             }
 
             template <typename THandler>
-            void flush_dispatch(THandler&, long) {}
+            void flush_dispatch(THandler&, long) {
+            }
 
             template <typename THandler>
             class HandlerWrapper : public HandlerWrapperBase {

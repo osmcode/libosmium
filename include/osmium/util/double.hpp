@@ -67,10 +67,10 @@ namespace osmium {
 #endif
             assert(len > 0 && len < max_double_length);
 
-            while (buffer[len-1] == '0') {
+            while (buffer[len - 1] == '0') {
                 --len;
             }
-            if (buffer[len-1] == '.') {
+            if (buffer[len - 1] == '.') {
                 --len;
             }
 

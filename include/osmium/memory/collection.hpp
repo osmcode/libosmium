@@ -33,8 +33,8 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <iterator>
 #include <iosfwd>
+#include <iterator>
 #include <type_traits>
 
 #include <osmium/memory/item.hpp>

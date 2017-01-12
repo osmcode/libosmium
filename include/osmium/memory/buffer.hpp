@@ -116,7 +116,7 @@ namespace osmium {
 #ifndef NDEBUG
             uint8_t m_builder_count{0};
 #endif
-            auto_grow m_auto_grow {auto_grow::no};
+            auto_grow m_auto_grow{auto_grow::no};
             std::function<void(Buffer&)> m_full;
 
         public:

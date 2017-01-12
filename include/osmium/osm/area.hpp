@@ -43,9 +43,9 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/memory/item_iterator.hpp>
 #include <osmium/osm/box.hpp>
 #include <osmium/osm/item_type.hpp>
+#include <osmium/osm/node_ref_list.hpp>
 #include <osmium/osm/object.hpp>
 #include <osmium/osm/types.hpp>
-#include <osmium/osm/node_ref_list.hpp>
 #include <osmium/util/compatibility.hpp>
 
 namespace osmium {
@@ -169,7 +169,7 @@ namespace osmium {
          * @returns Pair (number outer rings, number inner rings)
          */
         std::pair<size_t, size_t> num_rings() const {
-            std::pair<size_t, size_t> counter { 0, 0 };
+            std::pair<size_t, size_t> counter{0, 0};
 
             for (auto it = cbegin(); it != cend(); ++it) {
                 switch (it->type()) {
