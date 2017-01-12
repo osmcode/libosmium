@@ -82,15 +82,14 @@ namespace osmium {
                 }
 
                 TValue get(const TId id) const final {
-                    try {
-                        const TValue& value = m_vector.at(id);
-                        if (value == osmium::index::empty_value<TValue>()) {
-                            throw osmium::not_found{id};
-                        }
-                        return value;
-                    } catch (const std::out_of_range&) {
+                    if (id >= m_vector.size()) {
                         throw osmium::not_found{id};
                     }
+                    const TValue value = m_vector[id];
+                    if (value == osmium::index::empty_value<TValue>()) {
+                        throw osmium::not_found{id};
+                    }
+                    return value;
                 }
 
                 TValue get_noexcept(const TId id) const noexcept final {
