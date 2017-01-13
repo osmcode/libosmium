@@ -102,6 +102,21 @@ namespace osmium {
         }
 
         /**
+         * Access specified element.
+         *
+         * Complexity: Constant.
+         *
+         * @pre @code n < size() @endcode
+         *
+         * @param n Get the n-th element of the collection.
+         */
+        NodeRef& operator[](size_type n) noexcept {
+            assert(n < size());
+            NodeRef* node_ref = &*(begin());
+            return node_ref[n];
+        }
+
+        /**
          * Access the first element.
          *
          * Complexity: Constant.

@@ -5,65 +5,61 @@
 #include <osmium/osm/node_ref.hpp>
 #include <osmium/osm/node_ref_list.hpp>
 
-TEST_CASE("NodeRef") {
+TEST_CASE("Default construct a NodeRef") {
+    osmium::NodeRef node_ref;
+    REQUIRE(node_ref.ref() == 0);
+    REQUIRE(node_ref.location() == osmium::Location{});
+}
 
-    SECTION("instantiation_with_default_parameters") {
-        osmium::NodeRef node_ref;
-        REQUIRE(node_ref.ref() == 0);
-//    REQUIRE(!node_ref.has_location());
-    }
+TEST_CASE("Construct a NodeRef with an id") {
+    osmium::NodeRef node_ref{7};
+    REQUIRE(node_ref.ref() == 7);
+}
 
-    SECTION("instantiation_with_id") {
-        osmium::NodeRef node_ref(7);
-        REQUIRE(node_ref.ref() == 7);
-    }
+TEST_CASE("Equality comparison fo NodeRefs") {
+    osmium::NodeRef node_ref1{7, {1.2, 3.4}};
+    osmium::NodeRef node_ref2{7, {1.4, 3.1}};
+    osmium::NodeRef node_ref3{9, {1.2, 3.4}};
+    REQUIRE(node_ref1 == node_ref2);
+    REQUIRE(node_ref1 != node_ref3);
+    REQUIRE(!osmium::location_equal()(node_ref1, node_ref2));
+    REQUIRE(!osmium::location_equal()(node_ref2, node_ref3));
+    REQUIRE(osmium::location_equal()(node_ref1, node_ref3));
+}
 
-    SECTION("equality") {
-        osmium::NodeRef node_ref1(7, { 1.2, 3.4 });
-        osmium::NodeRef node_ref2(7, { 1.4, 3.1 });
-        osmium::NodeRef node_ref3(9, { 1.2, 3.4 });
-        REQUIRE(node_ref1 == node_ref2);
-        REQUIRE(node_ref1 != node_ref3);
-        REQUIRE(!osmium::location_equal()(node_ref1, node_ref2));
-        REQUIRE(!osmium::location_equal()(node_ref2, node_ref3));
-        REQUIRE(osmium::location_equal()(node_ref1, node_ref3));
-    }
+TEST_CASE("Set location on a NodeRef") {
+    osmium::NodeRef node_ref{7};
+    REQUIRE(!node_ref.location().valid());
+    REQUIRE(node_ref.location() == osmium::Location());
+    node_ref.set_location(osmium::Location(13.5, -7.2));
+    REQUIRE(node_ref.location().lon() == 13.5);
+    REQUIRE(node_ref.location().valid());
+}
 
-    SECTION("set_location") {
-        osmium::NodeRef node_ref(7);
-        REQUIRE(!node_ref.location().valid());
-        REQUIRE(node_ref.location() == osmium::Location());
-        node_ref.set_location(osmium::Location(13.5, -7.2));
-        REQUIRE(node_ref.location().lon() == 13.5);
-        REQUIRE(node_ref.location().valid());
-    }
+TEST_CASE("Ordering of NodeRefs") {
+    osmium::NodeRef node_ref1{1, {1.0, 3.0}};
+    osmium::NodeRef node_ref2{2, {1.4, 2.9}};
+    osmium::NodeRef node_ref3{3, {1.2, 3.0}};
+    osmium::NodeRef node_ref4{4, {1.2, 3.3}};
 
-    SECTION("ordering") {
-        osmium::NodeRef node_ref1(1, { 1.0, 3.0 });
-        osmium::NodeRef node_ref2(2, { 1.4, 2.9 });
-        osmium::NodeRef node_ref3(3, { 1.2, 3.0 });
-        osmium::NodeRef node_ref4(4, { 1.2, 3.3 });
+    REQUIRE(node_ref1 < node_ref2);
+    REQUIRE(node_ref2 < node_ref3);
+    REQUIRE(node_ref1 < node_ref3);
+    REQUIRE(node_ref1 >= node_ref1);
 
-        REQUIRE(node_ref1 < node_ref2);
-        REQUIRE(node_ref2 < node_ref3);
-        REQUIRE(node_ref1 < node_ref3);
-        REQUIRE(node_ref1 >= node_ref1);
-
-        REQUIRE(osmium::location_less()(node_ref1, node_ref2));
-        REQUIRE(!osmium::location_less()(node_ref2, node_ref3));
-        REQUIRE(osmium::location_less()(node_ref1, node_ref3));
-        REQUIRE(osmium::location_less()(node_ref3, node_ref4));
-        REQUIRE(!osmium::location_less()(node_ref1, node_ref1));
-    }
-
+    REQUIRE(osmium::location_less()(node_ref1, node_ref2));
+    REQUIRE(!osmium::location_less()(node_ref2, node_ref3));
+    REQUIRE(osmium::location_less()(node_ref1, node_ref3));
+    REQUIRE(osmium::location_less()(node_ref3, node_ref4));
+    REQUIRE(!osmium::location_less()(node_ref1, node_ref1));
 }
 
 TEST_CASE("WayNodeList") {
-    osmium::memory::Buffer buffer(1024);
+    osmium::memory::Buffer buffer{1024};
 
     SECTION("Empty list") {
         {
-            osmium::builder::WayNodeListBuilder builder(buffer);
+            osmium::builder::WayNodeListBuilder builder{buffer};
         }
         REQUIRE(buffer.commit() == 0);
         REQUIRE(buffer.committed() > 0);
@@ -73,13 +69,28 @@ TEST_CASE("WayNodeList") {
         REQUIRE(nrl.size() == 0);
     }
 
+    SECTION("Change a WayNodeList") {
+        osmium::builder::add_way_node_list(buffer, osmium::builder::attr::_nodes({
+            {1, {0.0, 0.0}},
+            {2, {0.0, 1.0}},
+            {3, {1.0, 1.0}}
+        }));
+
+        osmium::WayNodeList& nrl = buffer.get<osmium::WayNodeList>(0);
+        REQUIRE(nrl.size() == 3);
+
+        REQUIRE(nrl[1].location() == osmium::Location(0.0, 1.0));
+        nrl[1].set_location(osmium::Location(13.5, -7.2));
+        REQUIRE(nrl[1].location() == osmium::Location(13.5, -7.2));
+    }
+
     SECTION("Small area") {
         osmium::builder::add_way_node_list(buffer, osmium::builder::attr::_nodes({
-            { 1, {0.0, 0.0}},
-            { 2, {0.0, 1.0}},
-            { 3, {1.0, 1.0}},
-            { 4, {1.0, 0.0}},
-            { 1, {0.0, 0.0}},
+            {1, {0.0, 0.0}},
+            {2, {0.0, 1.0}},
+            {3, {1.0, 1.0}},
+            {4, {1.0, 0.0}},
+            {1, {0.0, 0.0}},
         }));
 
         const osmium::WayNodeList& nrl = buffer.get<osmium::WayNodeList>(0);
@@ -98,9 +109,9 @@ TEST_CASE("WayNodeList") {
 
     SECTION("Not an area") {
         osmium::builder::add_way_node_list(buffer, osmium::builder::attr::_nodes({
-            { 1, {0.0, 0.0}},
-            { 2, {1.0, 0.0}},
-            { 1, {0.0, 0.0}},
+            {1, {0.0, 0.0}},
+            {2, {1.0, 0.0}},
+            {1, {0.0, 0.0}},
         }));
 
         const osmium::WayNodeList& nrl = buffer.get<osmium::WayNodeList>(0);
