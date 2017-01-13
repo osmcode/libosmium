@@ -57,6 +57,12 @@ namespace osmium {
                 return earth_radius_for_epsg3857 * std::log(std::tan(osmium::geom::PI/4 + deg_to_rad(lat)/2));
             }
 
+#ifdef OSMIUM_USE_SLOW_MERCATOR_PROJECTION
+            inline double lat_to_y(double lat) {
+                return lat_to_y_with_tan(lat);
+            }
+#else
+
             // This is a much faster implementation than the canonical
             // implementation using the tan() function. For details
             // see https://github.com/osmcode/mercator-projection .
@@ -88,6 +94,7 @@ namespace osmium {
                               -3.4554675198786337842e-4)  * lat +
                               -5.4367203601085991108e-4)  * lat + 1.0);
             }
+#endif
 
             constexpr inline double x_to_lon(double x) {
                 return rad_to_deg(x) / earth_radius_for_epsg3857;
