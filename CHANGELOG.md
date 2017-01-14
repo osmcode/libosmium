@@ -8,6 +8,15 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+### Changed
+
+### Fixed
+
+
+## [2.11.0] - 2017-01-14
+
+### Added
+
 - New index::RelationsMap(Stash|Index) classes implementing an index for
   looking up parent relation IDs given a member relation ID.
 - Add `get_noexcept()` method to all index maps. For cases where ids are
