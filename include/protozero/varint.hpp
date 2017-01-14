@@ -142,7 +142,7 @@ inline void skip_varint(const char** data, const char* end) {
  */
 template <typename T>
 inline int write_varint(T data, uint64_t value) {
-    int n=1;
+    int n = 1;
 
     while (value >= 0x80) {
         *data++ = char((value & 0x7f) | 0x80);
