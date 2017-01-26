@@ -116,34 +116,34 @@ namespace osmium {
         } // namespace detail
 
         /**
-        * Index for looking up parent relation IDs given a member relation ID.
-        * You can not instantiate such an index yourself, instead you need to
-        * instantiate a RelationsMapStash, fill it and then create an index from
-        * it:
-        *
-        * @code
-        * RelationsMapStash stash;
-        * ...
-        * for_each_relation(const osmium::Relation& relation) {
-        *    stash.add_members(relation);
-        * }
-        * ...
-        * const auto index = stash.build_index();
-        * ...
-        * osmium::unsigned_object_id_type member_id = ...;
-        * index.for_each_parent(member_id, [](osmium::unsigned_object_id_type id) {
-        *   ...
-        * });
-        * ...
-        * @endcode
-        *
-        */
+         * Index for looking up parent relation IDs given a member relation ID.
+         * You can not instantiate such an index yourself, instead you need to
+         * instantiate a RelationsMapStash, fill it and then create an index from
+         * it:
+         *
+         * @code
+         * RelationsMapStash stash;
+         * ...
+         * for_each_relation(const osmium::Relation& relation) {
+         *    stash.add_members(relation);
+         * }
+         * ...
+         * const auto index = stash.build_index();
+         * ...
+         * osmium::unsigned_object_id_type member_id = ...;
+         * index.for_each_parent(member_id, [](osmium::unsigned_object_id_type id) {
+         *   ...
+         * });
+         * ...
+         * @endcode
+         *
+         */
         class RelationsMapIndex {
 
             friend class RelationsMapStash;
 
             using map_type = detail::flat_map<osmium::unsigned_object_id_type, uint32_t,
-                                            osmium::unsigned_object_id_type, uint32_t>;
+                                              osmium::unsigned_object_id_type, uint32_t>;
 
             map_type m_map;
 
@@ -162,19 +162,19 @@ namespace osmium {
             RelationsMapIndex& operator=(RelationsMapIndex&&) = default;
 
             /**
-            * Find the given relation id in the index and call the given function
-            * with all parent relation ids.
-            *
-            * @code
-            * osmium::unsigned_object_id_type member_id = 17;
-            * index.for_each_parent(member_id, [](osmium::unsigned_object_id_type id) {
-            *   ...
-            * });
-            * @endcode
-            *
-            * Complexity: Logarithmic in the number of elements in the index.
-            *             (Lookup uses binary search.)
-            */
+             * Find the given relation id in the index and call the given function
+             * with all parent relation ids.
+             *
+             * @code
+             * osmium::unsigned_object_id_type member_id = 17;
+             * index.for_each_parent(member_id, [](osmium::unsigned_object_id_type id) {
+             *   ...
+             * });
+             * @endcode
+             *
+             * Complexity: Logarithmic in the number of elements in the index.
+             *             (Lookup uses binary search.)
+             */
             template <typename Func>
             void for_each_parent(osmium::unsigned_object_id_type member_id, Func&& func) const {
                 const auto parents = m_map.get(member_id);
@@ -184,19 +184,19 @@ namespace osmium {
             }
 
             /**
-            * Is this index empty?
-            *
-            * Complexity: Constant.
-            */
+             * Is this index empty?
+             *
+             * Complexity: Constant.
+             */
             bool empty() const noexcept {
                 return m_map.empty();
             }
 
             /**
-            * How many entries are in this index?
-            *
-            * Complexity: Constant.
-            */
+             * How many entries are in this index?
+             *
+             * Complexity: Constant.
+             */
             size_t size() const noexcept {
                 return m_map.size();
             }
@@ -204,14 +204,14 @@ namespace osmium {
         }; // RelationsMapIndex
 
         /**
-        * The RelationsMapStash is used to build up the data needed to create
-        * an index of member relation ID to parent relation ID. See the
-        * RelationsMapIndex class for more.
-        */
+         * The RelationsMapStash is used to build up the data needed to create
+         * an index of member relation ID to parent relation ID. See the
+         * RelationsMapIndex class for more.
+         */
         class RelationsMapStash {
 
             using map_type = detail::flat_map<osmium::unsigned_object_id_type, uint32_t,
-                                            osmium::unsigned_object_id_type, uint32_t>;
+                                              osmium::unsigned_object_id_type, uint32_t>;
 
             map_type m_map;
 
@@ -230,16 +230,16 @@ namespace osmium {
             RelationsMapStash& operator=(RelationsMapStash&&) = default;
 
             /**
-            * Add mapping from member to parent relation in the stash.
-            */
+             * Add mapping from member to parent relation in the stash.
+             */
             void add(osmium::unsigned_object_id_type member_id, osmium::unsigned_object_id_type relation_id) {
                 assert(m_valid && "You can't use the RelationsMap any more after calling build_index()");
                 m_map.set(member_id, relation_id);
             }
 
             /**
-            * Add mapping from all members to given parent relation in the stash.
-            */
+             * Add mapping from all members to given parent relation in the stash.
+             */
             void add_members(const osmium::Relation& relation) {
                 assert(m_valid && "You can't use the RelationsMap any more after calling build_index()");
                 for (const auto& member : relation.members()) {
@@ -250,30 +250,30 @@ namespace osmium {
             }
 
             /**
-            * Is this stash empty?
-            *
-            * Complexity: Constant.
-            */
+             * Is this stash empty?
+             *
+             * Complexity: Constant.
+             */
             bool empty() const noexcept {
                 assert(m_valid && "You can't use the RelationsMap any more after calling build_index()");
                 return m_map.empty();
             }
 
             /**
-            * How many entries are in this stash?
-            *
-            * Complexity: Constant.
-            */
+             * How many entries are in this stash?
+             *
+             * Complexity: Constant.
+             */
             size_t size() const noexcept {
                 assert(m_valid && "You can't use the RelationsMap any more after calling build_index()");
                 return m_map.size();
             }
 
             /**
-            * Build an index with the contents of this stash and return it.
-            *
-            * After you get the index you can not use the stash any more!
-            */
+             * Build an index with the contents of this stash and return it.
+             *
+             * After you get the index you can not use the stash any more!
+             */
             RelationsMapIndex build_index() {
                 assert(m_valid && "You can't use the RelationsMap any more after calling build_index()");
                 m_map.sort_unique();
