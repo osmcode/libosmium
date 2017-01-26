@@ -60,6 +60,8 @@ option(INSTALL_UTFCPP    "also install utfcpp headers" OFF)
 
 option(WITH_PROFILING    "add flags needed for profiling" OFF)
 
+option(BUILD_DOC "build documentation" ON)
+
 
 #-----------------------------------------------------------------------------
 #
@@ -353,7 +355,9 @@ if(BUILD_BENCHMARKS)
     add_subdirectory(benchmarks)
 endif()
 
-add_subdirectory(doc)
+if(BUILD_DOC)
+  add_subdirectory(doc)
+endif()
 
 
 #-----------------------------------------------------------------------------
