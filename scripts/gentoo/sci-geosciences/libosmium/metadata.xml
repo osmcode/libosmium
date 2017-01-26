@@ -12,9 +12,6 @@
     <flag name="gdalcpp">Also install gdalcpp headers.</flag>
     <flag name="protozero">Also install protozero headers.</flag>
     <flag name="utfcpp">Also install utfcpp headers.</flag>
-    <flag name="clang-tidy">Enable clang tidy analyzer.</flag>
-    <flag name="cppcheck">Enable cppcheck analyzer.</flag>
-    <flag name="ccache">Build using ccache.</flag>
     <flag name="doc">Build documentation.</flag>
     <flag name="test">Build and run tests.</flag>
   </use>
