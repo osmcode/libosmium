@@ -3,7 +3,7 @@
 
 EAPI="5"
 
-inherit cmake-multilib cmake-utils git-2
+inherit cmake-utils git-2
 
 DESCRIPTION="Fast and flexible C++ library for working with OpenStreetMap data."
 HOMEPAGE="https://github.com/osmcode/libosmium"
@@ -13,7 +13,7 @@ LICENSE="Boost-1.0"
 SLOT="0/9999"
 KEYWORDS=""
 
-IUSE="gdalcpp protozero utfcpp clang-tidy cppcheck ccache doc test"
+IUSE="gdalcpp protozero utfcpp doc test"
 
 RDEPEND="
     sys-libs/zlib
@@ -24,9 +24,6 @@ RDEPEND="
     sci-libs/proj
     dev-cpp/sparsehash
     dev-libs/boost:=[threads]
-    clang-tidy? ( sys-devel/clang[static-analyzer] )
-    cppcheck? ( dev-util/cppcheck )
-    ccache? ( dev-util/ccache )
     doc? ( app-doc/doxygen )
 "
 DEPEND="${RDEPEND}"
@@ -41,17 +38,16 @@ src_configure() {
         $(cmake-utils_use protozero INSTALL_PROTOZERO)
         $(cmake-utils_use utfcpp    INSTALL_UTFCPP)
 
-        $(cmake-utils_use ccache BUILD_WITH_CCACHE)
         $(cmake-utils_use doc    BUILD_DOC)
         $(cmake-utils_use test   BUILD_TESTING)
     )
-    cmake-multilib_src_configure
+    cmake-utils_src_configure
 }
 
 src_test() {
-    cmake-multilib_src_test
+    cmake-utils_src_test
 }
 
 src_install() {
-    cmake-multilib_src_install
+    cmake-utils_src_install
 }
