@@ -38,8 +38,8 @@ src_configure() {
         $(cmake-utils_use protozero INSTALL_PROTOZERO)
         $(cmake-utils_use utfcpp    INSTALL_UTFCPP)
 
-        $(cmake-utils_use doc    BUILD_DOC)
-        $(cmake-utils_use test   BUILD_TESTING)
+        $(cmake-utils_use doc  BUILD_DOC)
+        $(cmake-utils_use test BUILD_TESTING)
     )
     cmake-utils_src_configure
 }
