@@ -1,7 +1,5 @@
 #include "catch.hpp"
 
-#include <iterator>
-
 #include <osmium/util/options.hpp>
 
 TEST_CASE("Options") {
