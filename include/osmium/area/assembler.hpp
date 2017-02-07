@@ -38,6 +38,7 @@ DEALINGS IN THE SOFTWARE.
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
+#include <functional>
 #include <iostream>
 #include <iterator>
 #include <list>
@@ -342,7 +343,7 @@ namespace osmium {
             }
 
             void add_tags_to_area(osmium::builder::AreaBuilder& builder, const osmium::Relation& relation) {
-                const auto count = std::count_if(relation.tags().cbegin(), relation.tags().cend(), filter());
+                const auto count = std::count_if(relation.tags().cbegin(), relation.tags().cend(), std::cref(filter()));
 
                 if (debug()) {
                     std::cerr << "  found " << count << " tags on relation (without ignored ones)\n";
@@ -1540,12 +1541,12 @@ namespace osmium {
                     detail::for_each_member(relation, members, [this, &ways_that_should_be_areas, &area_tags](const osmium::RelationMember& member, const osmium::Way& way) {
                         if (!std::strcmp(member.role(), "inner")) {
                             if (!way.nodes().empty() && way.is_closed() && way.tags().size() > 0) {
-                                const auto d = std::count_if(way.tags().cbegin(), way.tags().cend(), filter());
+                                const auto d = std::count_if(way.tags().cbegin(), way.tags().cend(), std::cref(filter()));
                                 if (d > 0) {
-                                    osmium::tags::KeyFilter::iterator way_fi_begin(filter(), way.tags().cbegin(), way.tags().cend());
-                                    osmium::tags::KeyFilter::iterator way_fi_end(filter(), way.tags().cend(), way.tags().cend());
-                                    osmium::tags::KeyFilter::iterator area_fi_begin(filter(), area_tags.cbegin(), area_tags.cend());
-                                    osmium::tags::KeyFilter::iterator area_fi_end(filter(), area_tags.cend(), area_tags.cend());
+                                    osmium::tags::KeyFilter::iterator way_fi_begin(std::cref(filter()), way.tags().cbegin(), way.tags().cend());
+                                    osmium::tags::KeyFilter::iterator way_fi_end(std::cref(filter()), way.tags().cend(), way.tags().cend());
+                                    osmium::tags::KeyFilter::iterator area_fi_begin(std::cref(filter()), area_tags.cbegin(), area_tags.cend());
+                                    osmium::tags::KeyFilter::iterator area_fi_end(std::cref(filter()), area_tags.cend(), area_tags.cend());
 
                                     if (!std::equal(way_fi_begin, way_fi_end, area_fi_begin) || d != std::distance(area_fi_begin, area_fi_end)) {
                                         ways_that_should_be_areas.push_back(&way);
