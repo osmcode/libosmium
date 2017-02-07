@@ -153,15 +153,19 @@ namespace osmium {
 
             /**
              * Return the number of rules in this filter.
+             *
+             * Complexity: Constant.
              */
-            size_t count() const {
+            size_t count() const noexcept {
                 return m_rules.size();
             }
 
             /**
              * Is this filter empty, ie are there no rules defined?
+             *
+             * Complexity: Constant.
              */
-            bool empty() const {
+            bool empty() const noexcept {
                 return m_rules.empty();
             }
 
