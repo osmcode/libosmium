@@ -55,12 +55,12 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/relation.hpp>
 #include <osmium/osm/types.hpp>
 #include <osmium/osm/way.hpp>
-#include <osmium/util/compatibility.hpp>
 #include <osmium/util/iterator.hpp>
 #include <osmium/util/timer.hpp>
 
-#include <osmium/area/detail/proto_ring.hpp>
+#include <osmium/area/assembler_config.hpp>
 #include <osmium/area/detail/node_ref_segment.hpp>
+#include <osmium/area/detail/proto_ring.hpp>
 #include <osmium/area/detail/segment_list.hpp>
 #include <osmium/area/problem_reporter.hpp>
 #include <osmium/area/stats.hpp>
@@ -68,98 +68,6 @@ DEALINGS IN THE SOFTWARE.
 namespace osmium {
 
     namespace area {
-
-        /**
-         * Configuration for osmium::area::Assembler objects. Create this
-         * once, set the options you want and then re-use it every time you
-         * create an Assembler object.
-         */
-        struct AssemblerConfig {
-
-            /**
-             * Optional pointer to problem reporter.
-             */
-            osmium::area::ProblemReporter* problem_reporter = nullptr;
-
-            /**
-             * Debug level. If this is greater than zero, debug messages will
-             * be printed to stderr. Available levels are 1 to 3. Note that
-             * level 2 and above will generate a lot of messages!
-             */
-            int debug_level = 0;
-
-            /**
-             * The roles of multipolygon members are ignored when assembling
-             * multipolygons, because they are often missing or wrong. If this
-             * is set, the roles are checked after the multipolygons are built
-             * against what the assembly process decided where the inner and
-             * outer rings are. This slows down the processing, so it only
-             * makes sense if you want to get the problem reports.
-             */
-            bool check_roles = false;
-
-            /**
-             * When the assembler can't create an area, usually because its
-             * geometry would be invalid, it will create an "empty" area object
-             * without rings. This allows you to detect where an area was
-             * invalid.
-             *
-             * If this is set to false, invalid areas will simply be discarded.
-             */
-            bool create_empty_areas = true;
-
-            /**
-             * Create areas for (multi)polygons where the tags are on the
-             * relation.
-             *
-             * If this is set to false, those areas will simply be discarded.
-             */
-            bool create_new_style_polygons = true;
-
-            /**
-             * Create areas for (multi)polygons where the tags are on the
-             * outer way(s).
-             *
-             * If this is set to false, those areas will simply be discarded.
-             */
-            bool create_old_style_polygons = true;
-
-            /**
-             * Create areas for polygons created from ways.
-             *
-             * If this is set to false, those areas will simply be discarded.
-             */
-            bool create_way_polygons = true;
-
-            /**
-             * Keep the type tag from multipolygon relations on the area
-             * object. By default this is false, and the type tag will be
-             * removed.
-             */
-            bool keep_type_tag = false;
-
-            AssemblerConfig() noexcept = default;
-
-            /**
-             * Constructor
-             * @deprecated Use default constructor and set values afterwards.
-             */
-            explicit AssemblerConfig(osmium::area::ProblemReporter* pr, bool d = false) :
-                problem_reporter(pr),
-                debug_level(d) {
-            }
-
-            /**
-             * Enable or disable debug output to stderr. This is for Osmium
-             * developers only.
-             *
-             * @deprecated Set debug_level directly.
-             */
-            OSMIUM_DEPRECATED void enable_debug_output(bool d = true) {
-                debug_level = d;
-            }
-
-        }; // struct AssemblerConfig
 
         namespace detail {
 
