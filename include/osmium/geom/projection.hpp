@@ -73,7 +73,7 @@ namespace osmium {
             explicit CRS(const std::string& crs) :
                 m_crs(pj_init_plus(crs.c_str()), ProjCRSDeleter()) {
                 if (!m_crs) {
-                    throw osmium::projection_error(std::string{"creation of CRS failed: "} + pj_strerrno(*pj_get_errno_ref()));
+                    throw osmium::projection_error{std::string{"creation of CRS failed: "} + pj_strerrno(*pj_get_errno_ref())};
                 }
             }
 
@@ -108,12 +108,12 @@ namespace osmium {
          *
          * Coordinates have to be in radians and are produced in radians.
          *
-         * @throws osmmium::projection_error if the projection fails
+         * @throws osmium::projection_error if the projection fails
          */
         inline Coordinates transform(const CRS& src, const CRS& dest, Coordinates c) {
-            int result = pj_transform(src.get(), dest.get(), 1, 1, &c.x, &c.y, nullptr);
+            const int result = pj_transform(src.get(), dest.get(), 1, 1, &c.x, &c.y, nullptr);
             if (result != 0) {
-                throw osmium::projection_error(std::string("projection failed: ") + pj_strerrno(result));
+                throw osmium::projection_error{std::string("projection failed: ") + pj_strerrno(result)};
             }
             return c;
         }
@@ -126,7 +126,7 @@ namespace osmium {
 
             int m_epsg;
             std::string m_proj_string;
-            CRS m_crs_wgs84 {4326};
+            CRS m_crs_wgs84{4326};
             CRS m_crs_user;
 
         public:
@@ -150,10 +150,10 @@ namespace osmium {
             }
 
             Coordinates operator()(osmium::Location location) const {
-                Coordinates c {location.lon(), location.lat()};
+                Coordinates c{location.lon(), location.lat()};
 
                 if (m_epsg != 4326) {
-                    c = transform(m_crs_wgs84, m_crs_user, Coordinates(deg_to_rad(location.lon()), deg_to_rad(location.lat())));
+                    c = transform(m_crs_wgs84, m_crs_user, Coordinates{deg_to_rad(location.lon()), deg_to_rad(location.lat())});
                     if (m_crs_user.is_latlong()) {
                         c.x = rad_to_deg(c.x);
                         c.y = rad_to_deg(c.y);
