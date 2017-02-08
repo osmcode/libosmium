@@ -33,7 +33,7 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <osmium/area/basic_assembler.hpp>
+#include <osmium/area/detail/basic_assembler.hpp>
 #include <osmium/builder/osm_object_builder.hpp>
 #include <osmium/memory/buffer.hpp>
 #include <osmium/osm/item_type.hpp>
