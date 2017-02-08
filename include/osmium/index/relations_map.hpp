@@ -91,6 +91,24 @@ namespace osmium {
                     m_map.emplace_back(key, value);
                 }
 
+                typename std::enable_if<std::is_same<TKey, TValue>::value>::type flip_in_place() {
+                    for (auto& p : m_map) {
+                        using std::swap;
+                        swap(p.key, p.value);
+                    }
+                }
+
+                flat_map<TValue, TValueInternal, TKey, TKeyInternal> flip_copy() {
+                    flat_map<TValue, TValueInternal, TKey, TKeyInternal> map;
+                    map.reserve(m_map.size());
+
+                    for (const auto& p : m_map) {
+                        map.set(p.value, p.key);
+                    }
+
+                    return map;
+                }
+
                 void sort_unique() {
                     std::sort(m_map.begin(), m_map.end());
                     const auto last = std::unique(m_map.begin(), m_map.end());
@@ -111,15 +129,21 @@ namespace osmium {
                     return m_map.size();
                 }
 
+                void reserve(size_t size) {
+                    m_map.reserve(size);
+                }
+
             }; // class flat_map
 
         } // namespace detail
 
         /**
-         * Index for looking up parent relation IDs given a member relation ID.
+         * Index for looking up parent relation IDs given a member relation ID
+         * or the other way around.
+         *
          * You can not instantiate such an index yourself, instead you need to
-         * instantiate a RelationsMapStash, fill it and then create an index from
-         * it:
+         * instantiate a RelationsMapStash, fill it and then create an index
+         * from it:
          *
          * @code
          * RelationsMapStash stash;
@@ -128,10 +152,10 @@ namespace osmium {
          *    stash.add_members(relation);
          * }
          * ...
-         * const auto index = stash.build_index();
+         * const auto index = stash.build_member_to_parent_index();
          * ...
          * osmium::unsigned_object_id_type member_id = ...;
-         * index.for_each_parent(member_id, [](osmium::unsigned_object_id_type id) {
+         * index.for_each(member_id, [](osmium::unsigned_object_id_type parent_id) {
          *   ...
          * });
          * ...
@@ -141,6 +165,7 @@ namespace osmium {
         class RelationsMapIndex {
 
             friend class RelationsMapStash;
+            friend class RelationsMapIndexes;
 
             using map_type = detail::flat_map<osmium::unsigned_object_id_type, uint32_t,
                                               osmium::unsigned_object_id_type, uint32_t>;
@@ -162,8 +187,8 @@ namespace osmium {
             RelationsMapIndex& operator=(RelationsMapIndex&&) = default;
 
             /**
-             * Find the given relation id in the index and call the given function
-             * with all parent relation ids.
+             * Find the given relation id in the index and call the given
+             * function with all parent relation ids.
              *
              * @code
              * osmium::unsigned_object_id_type member_id = 17;
@@ -172,14 +197,38 @@ namespace osmium {
              * });
              * @endcode
              *
+             * @deprecated Use for_each() instead.
+             *
              * Complexity: Logarithmic in the number of elements in the index.
              *             (Lookup uses binary search.)
              */
-            template <typename Func>
-            void for_each_parent(osmium::unsigned_object_id_type member_id, Func&& func) const {
+            template <typename TFunc>
+            void for_each_parent(osmium::unsigned_object_id_type member_id, TFunc&& func) const {
                 const auto parents = m_map.get(member_id);
                 for (auto it = parents.first; it != parents.second; ++it) {
-                    std::forward<Func>(func)(it->value);
+                    std::forward<TFunc>(func)(it->value);
+                }
+            }
+
+            /**
+             * Find the given relation id in the index and call the given
+             * function with all related relation ids.
+             *
+             * @code
+             * osmium::unsigned_object_id_type id = 17;
+             * index.for_each(id, [](osmium::unsigned_object_id_type rid) {
+             *   ...
+             * });
+             * @endcode
+             *
+             * Complexity: Logarithmic in the number of elements in the index.
+             *             (Lookup uses binary search.)
+             */
+            template <typename TFunc>
+            void for_each(osmium::unsigned_object_id_type id, TFunc&& func) const {
+                const auto parents = m_map.get(id);
+                for (auto it = parents.first; it != parents.second; ++it) {
+                    std::forward<TFunc>(func)(it->value);
                 }
             }
 
@@ -201,12 +250,54 @@ namespace osmium {
                 return m_map.size();
             }
 
-        }; // RelationsMapIndex
+        }; // class RelationsMapIndex
+
+        class RelationsMapIndexes {
+
+            friend class RelationsMapStash;
+
+            RelationsMapIndex m_member_to_parent;
+            RelationsMapIndex m_parent_to_member;
+
+            RelationsMapIndexes(RelationsMapIndex::map_type&& map1, RelationsMapIndex::map_type&& map2) :
+                m_member_to_parent(std::move(map1)),
+                m_parent_to_member(std::move(map2)) {
+            }
+
+        public:
+
+            const RelationsMapIndex& member_to_parent() const noexcept {
+                return m_member_to_parent;
+            }
+
+            const RelationsMapIndex& parent_to_member() const noexcept {
+                return m_parent_to_member;
+            }
+
+            /**
+             * Is this index empty?
+             *
+             * Complexity: Constant.
+             */
+            bool empty() const noexcept {
+                return m_member_to_parent.empty();
+            }
+
+            /**
+             * How many entries are in this index?
+             *
+             * Complexity: Constant.
+             */
+            size_t size() const noexcept {
+                return m_member_to_parent.size();
+            }
+
+        }; // class RelationsMapIndexes
 
         /**
          * The RelationsMapStash is used to build up the data needed to create
-         * an index of member relation ID to parent relation ID. See the
-         * RelationsMapIndex class for more.
+         * an index of member relation ID to parent relation ID or the other
+         * way around. See the RelationsMapIndex class for more.
          */
         class RelationsMapStash {
 
@@ -270,9 +361,12 @@ namespace osmium {
             }
 
             /**
-             * Build an index with the contents of this stash and return it.
+             * Build an index for member to parent lookups from the contents
+             * of this stash and return it.
              *
              * After you get the index you can not use the stash any more!
+             *
+             * @deprecated Use build_member_to_parent_index() instead.
              */
             RelationsMapIndex build_index() {
                 assert(m_valid && "You can't use the RelationsMap any more after calling build_index()");
@@ -281,6 +375,54 @@ namespace osmium {
                 m_valid = false;
 #endif
                 return RelationsMapIndex{std::move(m_map)};
+            }
+
+            /**
+             * Build an index for member to parent lookups from the contents
+             * of this stash and return it.
+             *
+             * After you get the index you can not use the stash any more!
+             */
+            RelationsMapIndex build_member_to_parent_index() {
+                assert(m_valid && "You can't use the RelationsMap any more after calling build_member_to_parent_index()");
+                m_map.sort_unique();
+#ifndef NDEBUG
+                m_valid = false;
+#endif
+                return RelationsMapIndex{std::move(m_map)};
+            }
+
+            /**
+             * Build an index for parent to member lookups from the contents
+             * of this stash and return it.
+             *
+             * After you get the index you can not use the stash any more!
+             */
+            RelationsMapIndex build_parent_to_member_index() {
+                assert(m_valid && "You can't use the RelationsMap any more after calling build_parent_to_member_index()");
+                m_map.flip_in_place();
+                m_map.sort_unique();
+#ifndef NDEBUG
+                m_valid = false;
+#endif
+                return RelationsMapIndex{std::move(m_map)};
+            }
+
+            /**
+             * Build indexes for member-to-parent and parent-to-member lookups
+             * from the contents of this stash and return them.
+             *
+             * After you get the index you can not use the stash any more!
+             */
+            RelationsMapIndexes build_indexes() {
+                assert(m_valid && "You can't use the RelationsMap any more after calling build_indexes()");
+                auto reverse_map = m_map.flip_copy();
+                reverse_map.sort_unique();
+                m_map.sort_unique();
+#ifndef NDEBUG
+                m_valid = false;
+#endif
+                return RelationsMapIndexes{std::move(m_map), std::move(reverse_map)};
             }
 
         }; // class RelationsMapStash
