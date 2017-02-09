@@ -58,6 +58,9 @@ function(add_unit_test _tgroup _tname)
                 message("  Adding libs: ${_param_LIBS}")
             endif()
             target_link_libraries(${_testid} ${_param_LIBS})
+            if(_param_LIBS MATCHES "lpthread")
+                set_pthread_on_target(${_testid})
+            endif()
         endif()
 
         add_test(NAME ${_testid}

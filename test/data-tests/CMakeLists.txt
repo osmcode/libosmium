@@ -37,6 +37,7 @@ include_directories("../include")
 #-----------------------------------------------------------------------------
 file(GLOB TESTCASE_CPPS testcases/*.cpp)
 add_executable(testdata-testcases testdata-testcases.cpp ${TESTCASE_CPPS})
+set_pthread_on_target(testdata-testcases)
 target_link_libraries(testdata-testcases
                       ${OSMIUM_XML_LIBRARIES}
 )
@@ -54,6 +55,7 @@ set_tests_properties(testdata-testcases PROPERTIES
 #
 #-----------------------------------------------------------------------------
 add_executable(testdata-xml testdata-xml.cpp)
+set_pthread_on_target(testdata-xml)
 target_link_libraries(testdata-xml
                       ${OSMIUM_XML_LIBRARIES}
 )
@@ -71,6 +73,7 @@ set_tests_properties(testdata-xml PROPERTIES
 #
 #-----------------------------------------------------------------------------
 add_executable(testdata-overview testdata-overview.cpp)
+set_pthread_on_target(testdata-overview)
 target_link_libraries(testdata-overview
                       ${OSMIUM_XML_LIBRARIES}
                       ${GDAL_LIBRARIES}
@@ -94,6 +97,7 @@ find_program(SPATIALITE spatialite)
 
 if(RUBY AND GEM_json_FOUND AND SPATIALITE)
     add_executable(testdata-multipolygon testdata-multipolygon.cpp)
+    set_pthread_on_target(testdata-multipolygon)
     target_link_libraries(testdata-multipolygon
                         ${OSMIUM_XML_LIBRARIES}
                         ${GDAL_LIBRARIES}
