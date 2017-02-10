@@ -114,6 +114,12 @@ namespace osmium {
                 throw std::runtime_error(m_sstream.str());
             }
 
+            void report_invalid_location(osmium::object_id_type way_id, osmium::object_id_type node_id) override {
+                m_sstream.str();
+                ProblemReporterStream::report_invalid_location(way_id, node_id);
+                throw std::runtime_error(m_sstream.str());
+            }
+
         }; // class ProblemReporterException
 
     } // namespace area

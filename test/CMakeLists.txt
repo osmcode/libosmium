@@ -122,6 +122,7 @@ endif()
 #
 #-----------------------------------------------------------------------------
 add_unit_test(area test_area_id)
+add_unit_test(area test_assembler)
 add_unit_test(area test_node_ref_segment)
 
 add_unit_test(osm test_area)

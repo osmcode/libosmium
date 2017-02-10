@@ -267,7 +267,12 @@ namespace osmium {
                 }
 
                 ++stats().from_ways;
-                stats().duplicate_nodes += segment_list().extract_segments_from_way(config().problem_reporter, way);
+                stats().invalid_locations = segment_list().extract_segments_from_way(config().problem_reporter,
+                                                                                     stats().duplicate_nodes,
+                                                                                     way);
+                if (!config().ignore_invalid_locations && stats().invalid_locations > 0) {
+                    return false;
+                }
 
                 if (config().debug_level > 0) {
                     std::cerr << "\nAssembling way " << way.id() << " containing " << segment_list().size() << " nodes\n";
@@ -328,7 +333,13 @@ namespace osmium {
                 }
 
                 ++stats().from_relations;
-                stats().duplicate_nodes += segment_list().extract_segments_from_ways(config().problem_reporter, relation, members);
+                stats().invalid_locations = segment_list().extract_segments_from_ways(config().problem_reporter,
+                                                                                      stats().duplicate_nodes,
+                                                                                      relation,
+                                                                                      members);
+                if (!config().ignore_invalid_locations && stats().invalid_locations > 0) {
+                    return false;
+                }
                 stats().member_ways = members.size();
 
                 if (stats().member_ways == 1) {

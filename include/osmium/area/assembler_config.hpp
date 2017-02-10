@@ -110,6 +110,18 @@ namespace osmium {
              */
             bool keep_type_tag = false;
 
+            /**
+             * If there is an invalid location in any of the ways needed for
+             * assembling the multipolygon, the assembler will normally fail.
+             * If this is set, the assembler will silently ignore the invalid
+             * locations pretending them to be not referenced from the ways.
+             * This will allow some areas to be built, others will now be
+             * incorrect. This can sometimes be useful to assemble areas
+             * crossing the boundary of an extract, but you will also get
+             * geometrically valid but wrong (multi)polygons.
+             */
+            bool ignore_invalid_locations = false;
+
             AssemblerConfig() noexcept = default;
 
             /**

@@ -48,8 +48,9 @@ namespace osmium {
         /**
          * Assembles area objects from closed ways or multipolygon relations
          * and their members. Unlike the Assembler, this one doesn't take
-         * tags into account at all. And it doesn't do all the checks and
-         * error reporting the Assembler does.
+         * tags into account at all. And it doesn't interpret all the config
+         * settings and doesn't do all the checks and error reporting the
+         * Assembler does.
          *
          * This class was developed specifically for the need of osm2pgsql.
          * Unless you know what you are doing, use the Assembler class instead
@@ -77,7 +78,7 @@ namespace osmium {
              *          area, true otherwise.
              */
             bool operator()(const osmium::Way& way, osmium::memory::Buffer& out_buffer) {
-                segment_list().extract_segments_from_way(config().problem_reporter, way);
+                segment_list().extract_segments_from_way(config().problem_reporter, stats().duplicate_nodes, way);
 
                 if (!create_rings()) {
                     return false;
@@ -104,7 +105,7 @@ namespace osmium {
              */
             bool operator()(const osmium::Relation& relation, const osmium::memory::Buffer& ways_buffer, osmium::memory::Buffer& out_buffer) {
                 for (const auto& way : ways_buffer.select<osmium::Way>()) {
-                    segment_list().extract_segments_from_way(config().problem_reporter, way);
+                    segment_list().extract_segments_from_way(config().problem_reporter, stats().duplicate_nodes, way);
                 }
 
                 if (!create_rings()) {
