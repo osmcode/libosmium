@@ -235,14 +235,17 @@ namespace osmium {
             /**
              * Assemble an area from the given way.
              * The resulting area is put into the out_buffer.
+             *
+             * @returns false if there was some kind of error building the
+             *          area, true otherwise.
              */
-            void operator()(const osmium::Way& way, osmium::memory::Buffer& out_buffer) {
+            bool operator()(const osmium::Way& way, osmium::memory::Buffer& out_buffer) {
                 if (!config().create_way_polygons) {
-                    return;
+                    return true;
                 }
 
                 if (way.tags().has_tag("area", "no")) {
-                    return;
+                    return true;
                 }
 
                 if (config().problem_reporter) {
@@ -253,7 +256,7 @@ namespace osmium {
                 // Ignore (but count) ways without segments.
                 if (way.nodes().size() < 2) {
                     ++stats().short_ways;
-                    return;
+                    return false;
                 }
 
                 if (!way.ends_have_same_id()) {
@@ -272,7 +275,8 @@ namespace osmium {
 
                 // Now create the Area object and add the attributes and tags
                 // from the way.
-                if (create_area(out_buffer, way)) {
+                const bool okay = create_area(out_buffer, way);
+                if (okay) {
                     out_buffer.commit();
                 } else {
                     out_buffer.rollback();
@@ -281,6 +285,8 @@ namespace osmium {
                 if (debug()) {
                     std::cerr << "Done: " << stats() << "\n";
                 }
+
+                return okay;
             }
 
             /**
@@ -305,8 +311,11 @@ namespace osmium {
             /**
              * Assemble an area from the given relation and its members.
              * The resulting area is put into the out_buffer.
+             *
+             * @returns false if there was some kind of error building the
+             *          area(s), true otherwise.
              */
-            void operator()(const osmium::Relation& relation, const std::vector<const osmium::Way*>& members, osmium::memory::Buffer& out_buffer) {
+            bool operator()(const osmium::Relation& relation, const std::vector<const osmium::Way*>& members, osmium::memory::Buffer& out_buffer) {
                 assert(relation.members().size() >= members.size());
 
                 if (config().problem_reporter) {
@@ -315,7 +324,7 @@ namespace osmium {
 
                 if (relation.members().empty()) {
                     ++stats().no_way_in_mp_relation;
-                    return;
+                    return false;
                 }
 
                 ++stats().from_relations;
@@ -334,7 +343,8 @@ namespace osmium {
 
                 // Now create the Area object and add the attributes and tags
                 // from the relation.
-                if (create_area(out_buffer, relation, members)) {
+                bool okay = create_area(out_buffer, relation, members);
+                if (okay) {
                     if ((config().create_new_style_polygons && stats().no_tags_on_relation == 0) ||
                         (config().create_old_style_polygons && stats().no_tags_on_relation != 0)) {
                         out_buffer.commit();
@@ -384,8 +394,12 @@ namespace osmium {
                 // Now build areas for all ways found in the last step.
                 for (const osmium::Way* way : ways_that_should_be_areas) {
                     Assembler assembler{config()};
-                    assembler(*way, out_buffer);
+                    if (!assembler(*way, out_buffer)) {
+                        okay = false;
+                    }
                 }
+
+                return okay;
             }
 
         }; // class Assembler
