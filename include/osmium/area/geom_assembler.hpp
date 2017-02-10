@@ -127,4 +127,4 @@ namespace osmium {
 
 } // namespace osmium
 
-#endif //  OSMIUM_AREA_GEOM_ASSEMBLER_HPP
+#endif // OSMIUM_AREA_GEOM_ASSEMBLER_HPP
