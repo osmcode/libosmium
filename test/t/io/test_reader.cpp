@@ -65,9 +65,7 @@ TEST_CASE("Reader should throw after eof") {
 
     REQUIRE(reader.eof());
 
-    REQUIRE_THROWS_AS({
-        reader.read();
-    }, osmium::io_error);
+    REQUIRE_THROWS_AS(reader.read(), osmium::io_error);
 }
 
 TEST_CASE("Reader should not hang when apply() is called twice on reader") {
@@ -76,9 +74,7 @@ TEST_CASE("Reader should not hang when apply() is called twice on reader") {
     osmium::handler::Handler handler;
 
     osmium::apply(reader, handler);
-    REQUIRE_THROWS_AS({
-        osmium::apply(reader, handler);
-    }, osmium::io_error);
+    REQUIRE_THROWS_AS(osmium::apply(reader, handler), osmium::io_error);
 }
 
 TEST_CASE("Reader should work with a buffer with uncompressed data") {
@@ -137,7 +133,7 @@ TEST_CASE("Reader should work with a buffer with bzip2-compressed data") {
 
 TEST_CASE("Reader should decode zero node positions in history (XML)") {
     osmium::io::Reader reader{with_data_dir("t/io/deleted_nodes.osh"),
-                                osmium::osm_entity_bits::node};
+                              osmium::osm_entity_bits::node};
     ZeroPositionNodeCountHandler handler;
 
     REQUIRE(handler.count == 0);
@@ -151,7 +147,7 @@ TEST_CASE("Reader should decode zero node positions in history (XML)") {
 
 TEST_CASE("Reader should decode zero node positions in history (PBF)") {
     osmium::io::Reader reader{with_data_dir("t/io/deleted_nodes.osh.pbf"),
-                                osmium::osm_entity_bits::node};
+                              osmium::osm_entity_bits::node};
     ZeroPositionNodeCountHandler handler;
 
     REQUIRE(handler.count == 0);
@@ -164,21 +160,15 @@ TEST_CASE("Reader should decode zero node positions in history (PBF)") {
 }
 
 TEST_CASE("Reader should fail with nonexistent file") {
-    REQUIRE_THROWS({
-        osmium::io::Reader reader{with_data_dir("t/io/nonexistent-file.osm")};
-    });
+    REQUIRE_THROWS(osmium::io::Reader{with_data_dir("t/io/nonexistent-file.osm")});
 }
 
 TEST_CASE("Reader should fail with nonexistent file (gz)") {
-    REQUIRE_THROWS({
-        osmium::io::Reader reader{with_data_dir("t/io/nonexistent-file.osm.gz")};
-    });
+    REQUIRE_THROWS(osmium::io::Reader{with_data_dir("t/io/nonexistent-file.osm.gz")});
 }
 
 TEST_CASE("Reader should fail with nonexistent file (pbf)") {
-    REQUIRE_THROWS({
-        osmium::io::Reader reader{with_data_dir("t/io/nonexistent-file.osm.pbf")};
-    });
+    REQUIRE_THROWS(osmium::io::Reader{with_data_dir("t/io/nonexistent-file.osm.pbf")});
 }
 
 TEST_CASE("Reader should work when there is an exception in main thread before getting header") {

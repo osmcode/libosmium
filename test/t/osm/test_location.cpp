@@ -381,12 +381,8 @@ TEST_CASE("set lon/lat from string") {
 
 TEST_CASE("set lon/lat from string with trailing characters") {
     osmium::Location loc;
-    REQUIRE_THROWS_AS({
-        loc.set_lon("1.2x");
-    }, osmium::invalid_location);
-    REQUIRE_THROWS_AS({
-        loc.set_lat("3.4e1 ");
-    }, osmium::invalid_location);
+    REQUIRE_THROWS_AS(loc.set_lon("1.2x"), osmium::invalid_location);
+    REQUIRE_THROWS_AS(loc.set_lat("3.4e1 "), osmium::invalid_location);
 }
 
 TEST_CASE("set lon/lat from string with trailing characters using partial") {

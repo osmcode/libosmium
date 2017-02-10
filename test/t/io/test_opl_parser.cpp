@@ -33,17 +33,13 @@ TEST_CASE("Parse OPL: space") {
     std::string d{"a b \t c"};
 
     const char* s = d.data();
-    REQUIRE_THROWS_AS({
-        oid::opl_parse_space(&s);
-    }, osmium::opl_error);
+    REQUIRE_THROWS_AS(oid::opl_parse_space(&s), osmium::opl_error);
 
     s = d.data() + 1;
     oid::opl_parse_space(&s);
     REQUIRE(*s == 'b');
 
-    REQUIRE_THROWS_AS({
-        oid::opl_parse_space(&s);
-    }, osmium::opl_error);
+    REQUIRE_THROWS_AS(oid::opl_parse_space(&s), osmium::opl_error);
 
     ++s;
     oid::opl_parse_space(&s);
@@ -76,30 +72,26 @@ TEST_CASE("Parse OPL: parse escaped") {
 
     SECTION("Empty string") {
         const char* s = "";
-        REQUIRE_THROWS_WITH({
-            oid::opl_parse_escaped(&s, result);
-        }, "OPL error: eol");
+        REQUIRE_THROWS_WITH(oid::opl_parse_escaped(&s, result),
+                            "OPL error: eol");
     }
 
     SECTION("Illegal character for hex") {
         const char* s = "x";
-        REQUIRE_THROWS_WITH({
-            oid::opl_parse_escaped(&s, result);
-        }, "OPL error: not a hex char");
+        REQUIRE_THROWS_WITH(oid::opl_parse_escaped(&s, result),
+                            "OPL error: not a hex char");
     }
 
     SECTION("Illegal character for hex after legal hex characters") {
         const char* s = "0123x";
-        REQUIRE_THROWS_WITH({
-            oid::opl_parse_escaped(&s, result);
-        }, "OPL error: not a hex char");
+        REQUIRE_THROWS_WITH(oid::opl_parse_escaped(&s, result),
+                            "OPL error: not a hex char");
     }
 
     SECTION("Too long") {
         const char* s = "123456780";
-        REQUIRE_THROWS_WITH({
-            oid::opl_parse_escaped(&s, result);
-        }, "OPL error: hex escape too long");
+        REQUIRE_THROWS_WITH(oid::opl_parse_escaped(&s, result),
+                            "OPL error: hex escape too long");
     }
 
     SECTION("No data") {
@@ -237,16 +229,14 @@ TEST_CASE("Parse OPL: parse string") {
 
     SECTION("string with invalid escaping") {
         const char* s = "foo%";
-        REQUIRE_THROWS_WITH({
-            oid::opl_parse_string(&s, result);
-        }, "OPL error: eol");
+        REQUIRE_THROWS_WITH(oid::opl_parse_string(&s, result),
+                            "OPL error: eol");
     }
 
     SECTION("string with invalid escaped characters") {
         const char* s = "foo%x%";
-        REQUIRE_THROWS_WITH({
-            oid::opl_parse_string(&s, result);
-        }, "OPL error: not a hex char");
+        REQUIRE_THROWS_WITH(oid::opl_parse_string(&s, result),
+                            "OPL error: not a hex char");
     }
 
 }
@@ -267,25 +257,20 @@ TEST_CASE("Parse OPL: integer") {
     REQUIRE(test_parse_int("1234567890123x") == 1234567890123);
     REQUIRE(test_parse_int("-1234567890123x") == -1234567890123);
 
-    REQUIRE_THROWS_WITH({
-        test_parse_int("");
-    }, "OPL error: expected integer");
+    REQUIRE_THROWS_WITH(test_parse_int(""),
+                        "OPL error: expected integer");
 
-    REQUIRE_THROWS_WITH({
-        test_parse_int("-x");
-    }, "OPL error: expected integer");
+    REQUIRE_THROWS_WITH(test_parse_int("-x"),
+                        "OPL error: expected integer");
 
-    REQUIRE_THROWS_WITH({
-        test_parse_int(" 1");
-    }, "OPL error: expected integer");
+    REQUIRE_THROWS_WITH(test_parse_int(" 1"),
+                        "OPL error: expected integer");
 
-    REQUIRE_THROWS_WITH({
-        test_parse_int("x");
-    }, "OPL error: expected integer");
+    REQUIRE_THROWS_WITH(test_parse_int("x"),
+                        "OPL error: expected integer");
 
-    REQUIRE_THROWS_WITH({
-        test_parse_int("99999999999999999999999x");
-    }, "OPL error: integer too long");
+    REQUIRE_THROWS_WITH(test_parse_int("99999999999999999999999x"),
+                        "OPL error: integer too long");
 }
 
 TEST_CASE("Parse OPL: int32_t") {
@@ -293,29 +278,24 @@ TEST_CASE("Parse OPL: int32_t") {
     REQUIRE(test_parse_int<int32_t>("123x") == 123);
     REQUIRE(test_parse_int<int32_t>("-123x") == -123);
 
-    REQUIRE_THROWS_WITH({
-        test_parse_int<int32_t>("12345678901x");
-    }, "OPL error: integer too long");
-    REQUIRE_THROWS_WITH({
-        test_parse_int<int32_t>("-12345678901x");
-    }, "OPL error: integer too long");
+    REQUIRE_THROWS_WITH(test_parse_int<int32_t>("12345678901x"),
+                        "OPL error: integer too long");
+    REQUIRE_THROWS_WITH(test_parse_int<int32_t>("-12345678901x"),
+                        "OPL error: integer too long");
 }
 
 TEST_CASE("Parse OPL: uint32_t") {
     REQUIRE(test_parse_int<uint32_t>("0x") == 0);
     REQUIRE(test_parse_int<uint32_t>("123x") == 123);
 
-    REQUIRE_THROWS_WITH({
-        test_parse_int<uint32_t>("-123x");
-    }, "OPL error: integer too long");
+    REQUIRE_THROWS_WITH(test_parse_int<uint32_t>("-123x"),
+                        "OPL error: integer too long");
 
-    REQUIRE_THROWS_WITH({
-        test_parse_int<uint32_t>("12345678901x");
-    }, "OPL error: integer too long");
+    REQUIRE_THROWS_WITH(test_parse_int<uint32_t>("12345678901x"),
+                        "OPL error: integer too long");
 
-    REQUIRE_THROWS_WITH({
-        test_parse_int<uint32_t>("-12345678901x");
-    }, "OPL error: integer too long");
+    REQUIRE_THROWS_WITH(test_parse_int<uint32_t>("-12345678901x"),
+                        "OPL error: integer too long");
 }
 
 TEST_CASE("Parse OPL: visible flag") {
@@ -335,9 +315,8 @@ TEST_CASE("Parse OPL: deleted flag") {
 
 TEST_CASE("Parse OPL: invalid visible flag") {
     const char* data = "x";
-    REQUIRE_THROWS_WITH({
-        oid::opl_parse_visible(&data);
-    }, "OPL error: invalid visible flag");
+    REQUIRE_THROWS_WITH(oid::opl_parse_visible(&data),
+                        "OPL error: invalid visible flag");
 }
 
 TEST_CASE("Parse OPL: timestamp (empty)") {
@@ -363,9 +342,8 @@ TEST_CASE("Parse OPL: timestamp (tab)") {
 
 TEST_CASE("Parse OPL: timestamp (invalid)") {
     const char* data = "abc";
-    REQUIRE_THROWS_WITH({
-        oid::opl_parse_timestamp(&data);
-    }, "OPL error: can not parse timestamp");
+    REQUIRE_THROWS_WITH(oid::opl_parse_timestamp(&data),
+                        "OPL error: can not parse timestamp");
 }
 
 TEST_CASE("Parse OPL: timestamp (valid)") {
@@ -386,9 +364,8 @@ TEST_CASE("Parse OPL: tags") {
 
     SECTION("Empty") {
         const char* data = "";
-        REQUIRE_THROWS_WITH({
-            oid::opl_parse_tags(data, buffer);
-        }, "OPL error: expected '='");
+        REQUIRE_THROWS_WITH(oid::opl_parse_tags(data, buffer),
+                            "OPL error: expected '='");
     }
 
     SECTION("One tag") {
@@ -429,16 +406,14 @@ TEST_CASE("Parse OPL: tags") {
 
     SECTION("No equal signs") {
         const char* data = "a";
-        REQUIRE_THROWS_WITH({
-            oid::opl_parse_tags(data, buffer);
-        }, "OPL error: expected '='");
+        REQUIRE_THROWS_WITH(oid::opl_parse_tags(data, buffer),
+                            "OPL error: expected '='");
     }
 
     SECTION("Two equal signs") {
         const char* data = "a=b=c";
-        REQUIRE_THROWS_WITH({
-            oid::opl_parse_tags(data, buffer);
-        }, "OPL error: expected ','");
+        REQUIRE_THROWS_WITH(oid::opl_parse_tags(data, buffer),
+                            "OPL error: expected ','");
     }
 
 }
@@ -454,16 +429,14 @@ TEST_CASE("Parse OPL: nodes") {
 
     SECTION("Invalid format, missing n") {
         const char* const s = "xyz";
-        REQUIRE_THROWS_WITH({
-            oid::opl_parse_way_nodes(s, s + std::strlen(s), buffer);
-        }, "OPL error: expected 'n'");
+        REQUIRE_THROWS_WITH(oid::opl_parse_way_nodes(s, s + std::strlen(s), buffer),
+                            "OPL error: expected 'n'");
     }
 
     SECTION("Invalid format, missing ID") {
         const char* const s = "nx";
-        REQUIRE_THROWS_WITH({
-            oid::opl_parse_way_nodes(s, s + std::strlen(s), buffer);
-        }, "OPL error: expected integer");
+        REQUIRE_THROWS_WITH(oid::opl_parse_way_nodes(s, s + std::strlen(s), buffer),
+                            "OPL error: expected integer");
     }
 
     SECTION("Valid format: one node") {
@@ -534,23 +507,20 @@ TEST_CASE("Parse OPL: members") {
 
     SECTION("Invalid: unknown object type") {
         const char* const s = "x123@foo";
-        REQUIRE_THROWS_WITH({
-            oid::opl_parse_relation_members(s, s + std::strlen(s), buffer);
-        }, "OPL error: unknown object type");
+        REQUIRE_THROWS_WITH(oid::opl_parse_relation_members(s, s + std::strlen(s), buffer),
+                            "OPL error: unknown object type");
     }
 
     SECTION("Invalid: illegal ref") {
         const char* const s = "wx";
-        REQUIRE_THROWS_WITH({
-            oid::opl_parse_relation_members(s, s + std::strlen(s), buffer);
-        }, "OPL error: expected integer");
+        REQUIRE_THROWS_WITH(oid::opl_parse_relation_members(s, s + std::strlen(s), buffer),
+                            "OPL error: expected integer");
     }
 
     SECTION("Invalid: missing @") {
         const char* const s = "n123foo";
-        REQUIRE_THROWS_WITH({
-            oid::opl_parse_relation_members(s, s + std::strlen(s), buffer);
-        }, "OPL error: expected '@'");
+        REQUIRE_THROWS_WITH(oid::opl_parse_relation_members(s, s + std::strlen(s), buffer),
+                            "OPL error: expected '@'");
     }
 
     SECTION("Valid format: one member") {
@@ -926,16 +896,14 @@ TEST_CASE("Parse line") {
     }
 
     SECTION("Fail") {
-        REQUIRE_THROWS_WITH({
-            oid::opl_parse_line(0, "X", buffer);
-        }, "OPL error: unknown type on line 0 column 0");
+        REQUIRE_THROWS_WITH(oid::opl_parse_line(0, "X", buffer),
+                            "OPL error: unknown type on line 0 column 0");
         REQUIRE(buffer.written() == 0);
     }
 
     SECTION("New line at end not allowed") {
-        REQUIRE_THROWS_WITH({
-            oid::opl_parse_line(0, "n12 v3\n", buffer);
-        }, "OPL error: expected space or tab character on line 0 column 6");
+        REQUIRE_THROWS_WITH(oid::opl_parse_line(0, "n12 v3\n", buffer),
+                            "OPL error: expected space or tab character on line 0 column 6");
     }
 
     SECTION("Node, but not asking for nodes") {
@@ -1064,9 +1032,8 @@ TEST_CASE("Parse line with external interface") {
     }
 
     SECTION("Failure") {
-        REQUIRE_THROWS_WITH({
-            osmium::opl_parse("x", buffer);
-        }, "OPL error: unknown type on line 0 column 0");
+        REQUIRE_THROWS_WITH(osmium::opl_parse("x", buffer),
+                            "OPL error: unknown type on line 0 column 0");
         REQUIRE(buffer.written() == 0);
         REQUIRE(buffer.committed() == 0);
     }

@@ -33,9 +33,7 @@ TEST_CASE("Anonymous mapping: simple memory mapping should work") {
 }
 
 TEST_CASE("Anonymous mapping: memory mapping of zero length should fail") {
-    REQUIRE_THROWS({
-        osmium::util::MemoryMapping mapping(0, osmium::util::MemoryMapping::mapping_mode::write_private);
-    });
+    REQUIRE_THROWS(osmium::util::MemoryMapping(0, osmium::util::MemoryMapping::mapping_mode::write_private));
 }
 
 TEST_CASE("Anonymous mapping: moving a memory mapping should work") {

@@ -28,7 +28,7 @@ TEST_CASE("Writer") {
         SECTION("Empty buffer") {
             filename = "test-writer-out-empty-buffer.osm";
             osmium::io::Writer writer{filename, header, osmium::io::overwrite::allow};
-            osmium::memory::Buffer empty_buffer(1024);
+            osmium::memory::Buffer empty_buffer{1024};
             writer(std::move(empty_buffer));
             writer.close();
         }
@@ -54,9 +54,7 @@ TEST_CASE("Writer") {
             writer(std::move(buffer));
             writer.close();
 
-            REQUIRE_THROWS_AS({
-                writer(osmium::memory::Buffer{});
-            }, osmium::io_error);
+            REQUIRE_THROWS_AS(writer(osmium::memory::Buffer{}), osmium::io_error);
         }
 
         SECTION("Writer item") {

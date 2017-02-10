@@ -15,13 +15,10 @@ TEST_CASE("Compression factory") {
     }
 
     SECTION("fail on undefined compression") {
-        REQUIRE_THROWS_AS({
-            factory.create_compressor(osmium::io::file_compression::gzip, -1, osmium::io::fsync::no);
-        }, osmium::unsupported_file_format_error);
-        REQUIRE_THROWS_WITH({
-            factory.create_compressor(osmium::io::file_compression::gzip, -1, osmium::io::fsync::no);
-        }, "Support for compression 'gzip' not compiled into this binary");
+        REQUIRE_THROWS_AS(factory.create_compressor(osmium::io::file_compression::gzip, -1, osmium::io::fsync::no),
+                          osmium::unsupported_file_format_error);
+        REQUIRE_THROWS_WITH(factory.create_compressor(osmium::io::file_compression::gzip, -1, osmium::io::fsync::no),
+                            "Support for compression 'gzip' not compiled into this binary");
     }
-
 }
 

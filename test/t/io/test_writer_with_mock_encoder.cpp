@@ -68,11 +68,11 @@ TEST_CASE("Test Writer with MockOutputFormat") {
 
         fail_in = "header";
 
-        REQUIRE_THROWS_AS({
+        REQUIRE_THROWS_AS([&](){
             osmium::io::Writer writer("test-writer-mock-fail-on-construction.osm", header, osmium::io::overwrite::allow);
             writer(std::move(buffer));
             writer.close();
-        }, std::logic_error);
+        }(), std::logic_error);
 
     }
 
@@ -80,11 +80,11 @@ TEST_CASE("Test Writer with MockOutputFormat") {
 
         fail_in = "write";
 
-        REQUIRE_THROWS_AS({
+        REQUIRE_THROWS_AS([&](){
             osmium::io::Writer writer("test-writer-mock-fail-on-construction.osm", header, osmium::io::overwrite::allow);
             writer(std::move(buffer));
             writer.close();
-        }, std::logic_error);
+        }(), std::logic_error);
 
     }
 
@@ -92,11 +92,11 @@ TEST_CASE("Test Writer with MockOutputFormat") {
 
         fail_in = "write_end";
 
-        REQUIRE_THROWS_AS({
+        REQUIRE_THROWS_AS([&](){
             osmium::io::Writer writer("test-writer-mock-fail-on-construction.osm", header, osmium::io::overwrite::allow);
             writer(std::move(buffer));
             writer.close();
-        }, std::logic_error);
+        }(), std::logic_error);
 
     }
 
