@@ -104,6 +104,11 @@ namespace osmium {
                 return lhs.location < rhs.location;
             }
 
+            /**
+             * Class for assembling ways and relations into multipolygons
+             * (areas). Contains the basic functionality needed but is not
+             * used directly. Use the osmium::area::Assembler class instead.
+             */
             class BasicAssembler {
 
                 struct slocation {

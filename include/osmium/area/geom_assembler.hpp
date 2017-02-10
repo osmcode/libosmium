@@ -48,18 +48,34 @@ namespace osmium {
         /**
          * Assembles area objects from closed ways or multipolygon relations
          * and their members. Unlike the Assembler, this one doesn't take
-         * tags into account at all.
+         * tags into account at all. And it doesn't do all the checks and
+         * error reporting the Assembler does.
+         *
+         * This class was developed specifically for the need of osm2pgsql.
+         * Unless you know what you are doing, use the Assembler class instead
+         * of this class. Contact the Libosmium developers if you want to use
+         * this class.
          */
         class GeomAssembler : public detail::BasicAssembler {
 
         public:
 
-            explicit GeomAssembler(const osmium::area::AssemblerConfig& config) :
+            using config_type = osmium::area::AssemblerConfig;
+
+            explicit GeomAssembler(const config_type& config) :
                 detail::BasicAssembler(config) {
             }
 
             ~GeomAssembler() noexcept = default;
 
+            /**
+             * Assemble an area from the given way.
+             *
+             * The resulting area is put into the out_buffer.
+             *
+             * @returns false if there was some kind of error building the
+             *          area, true otherwise.
+             */
             bool operator()(const osmium::Way& way, osmium::memory::Buffer& out_buffer) {
                 segment_list().extract_segments_from_way(config().problem_reporter, way);
 
@@ -73,11 +89,21 @@ namespace osmium {
                     add_rings_to_area(builder);
                 }
                 out_buffer.commit();
+
                 return true;
             }
 
-            bool operator()(const osmium::Relation& relation, const osmium::memory::Buffer& ways, osmium::memory::Buffer& out_buffer) {
-                for (const auto& way : ways.select<osmium::Way>()) {
+            /**
+             * Assemble an area from the given relation and its member ways
+             * which are in the ways_buffer.
+             *
+             * The resulting area is put into the out_buffer.
+             *
+             * @returns false if there was some kind of error building the
+             *          area, true otherwise.
+             */
+            bool operator()(const osmium::Relation& relation, const osmium::memory::Buffer& ways_buffer, osmium::memory::Buffer& out_buffer) {
+                for (const auto& way : ways_buffer.select<osmium::Way>()) {
                     segment_list().extract_segments_from_way(config().problem_reporter, way);
                 }
 
@@ -91,6 +117,7 @@ namespace osmium {
                     add_rings_to_area(builder);
                 }
                 out_buffer.commit();
+
                 return true;
             }
 
