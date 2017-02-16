@@ -196,6 +196,7 @@ add_unit_test(util test_memory_mapping)
 add_unit_test(util test_minmax)
 add_unit_test(util test_options)
 add_unit_test(util test_string)
+add_unit_test(util test_string_matcher)
 
 
 #-----------------------------------------------------------------------------
