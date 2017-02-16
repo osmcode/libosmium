@@ -184,6 +184,8 @@ add_unit_test(io test_writer_with_mock_encoder ENABLE_IF ${Threads_FOUND} LIBS $
 add_unit_test(tags test_filter)
 add_unit_test(tags test_operators)
 add_unit_test(tags test_tag_list)
+add_unit_test(tags test_tag_matcher)
+add_unit_test(tags test_tags_filter)
 
 add_unit_test(thread test_pool ENABLE_IF ${Threads_FOUND} LIBS ${CMAKE_THREAD_LIBS_INIT})
 
