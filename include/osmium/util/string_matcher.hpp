@@ -34,9 +34,14 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <cstring>
-#include <regex>
 #include <string>
 #include <vector>
+
+// std::regex doesn't work properly in glibc++ before version 4.9 and
+// libc++ before version 3.7 (?), so the use is disabled by default.
+#ifdef OSMIUM_WITH_REGEX
+# include <regex>
+#endif
 
 #include <boost/variant.hpp>
 
@@ -148,6 +153,7 @@ namespace osmium {
 
         }; // class substring
 
+#ifdef OSMIUM_WITH_REGEX
         /**
          * Matches if the test string matches the regular expression.
          */
@@ -166,6 +172,7 @@ namespace osmium {
             }
 
         }; // class regex
+#endif
 
         /**
          * Matches if the test string is equal to any of the stored strings.
@@ -213,7 +220,9 @@ namespace osmium {
                                             equal,
                                             prefix,
                                             substring,
+#ifdef OSMIUM_WITH_REGEX
                                             regex,
+#endif
                                             list>;
 
         matcher_type m_matcher;
@@ -277,6 +286,7 @@ namespace osmium {
             m_matcher(equal{str}) {
         }
 
+#ifdef OSMIUM_WITH_REGEX
         /**
          * Create a string matcher that will match the specified regex.
          * Shortcut for
@@ -285,6 +295,7 @@ namespace osmium {
         StringMatcher(const std::regex& aregex) :
             m_matcher(regex{aregex}) {
         }
+#endif
 
         /**
          * Create a string matcher that will match if any of the strings

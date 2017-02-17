@@ -44,6 +44,7 @@ TEST_CASE("String matcher: empty prefix") {
     REQUIRE(m.match(""));
 }
 
+#ifdef OSMIUM_WITH_REGEX
 TEST_CASE("String matcher: regex prefix") {
     osmium::StringMatcher::regex m{std::regex{"^foo", std::regex::optimize}};
     REQUIRE(m.match("foo"));
@@ -60,6 +61,7 @@ TEST_CASE("String matcher: regex substr") {
     REQUIRE(m.match("xfoox"));
     REQUIRE_FALSE(m.match(""));
 }
+#endif
 
 TEST_CASE("String matcher: list") {
     osmium::StringMatcher::list m{{"foo", "bar"}};
@@ -105,11 +107,13 @@ TEST_CASE("Construct StringMatcher from string") {
     REQUIRE_FALSE(m("bar"));
 }
 
+#ifdef OSMIUM_WITH_REGEX
 TEST_CASE("Construct StringMatcher from regex") {
     osmium::StringMatcher m{std::regex{"^foo"}};
     REQUIRE(m("foo"));
     REQUIRE_FALSE(m("bar"));
 }
+#endif
 
 TEST_CASE("Construct StringMatcher from list") {
     std::vector<std::string> v{"foo", "xxx"};
