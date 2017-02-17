@@ -33,6 +33,9 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <utility>
+#include <vector>
+
 #include <osmium/osm/tag.hpp>
 #include <osmium/tags/matcher.hpp>
 
