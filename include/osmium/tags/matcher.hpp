@@ -50,6 +50,15 @@ namespace osmium {
     public:
 
         /**
+         * Create a default TagMatcher that matches no tags.
+         */
+        TagMatcher() :
+            m_key_matcher(osmium::StringMatcher::always_false{}),
+            m_value_matcher(osmium::StringMatcher::always_false{}),
+            m_result(true) {
+        }
+
+        /**
          * Create a TagMatcher matching the key against the specified
          * StringMatcher.
          *

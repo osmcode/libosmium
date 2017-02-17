@@ -1,6 +1,14 @@
 #include "catch.hpp"
 
+#include <type_traits>
+
 #include <osmium/util/string_matcher.hpp>
+
+static_assert(std::is_default_constructible<osmium::StringMatcher>::value, "StringMatcher should be default constructible");
+static_assert(std::is_copy_constructible<osmium::StringMatcher>::value, "StringMatcher should be copy constructible");
+static_assert(std::is_move_constructible<osmium::StringMatcher>::value, "StringMatcher should be move constructible");
+static_assert(std::is_copy_assignable<osmium::StringMatcher>::value, "StringMatcher should be copyable");
+static_assert(std::is_move_assignable<osmium::StringMatcher>::value, "StringMatcher should be moveable");
 
 TEST_CASE("String matcher: always false") {
     osmium::StringMatcher::always_false m;

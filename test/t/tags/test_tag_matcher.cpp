@@ -1,8 +1,16 @@
 #include "catch.hpp"
 
+#include <type_traits>
+
 #include <osmium/builder/attr.hpp>
 #include <osmium/memory/buffer.hpp>
 #include <osmium/tags/matcher.hpp>
+
+static_assert(std::is_default_constructible<osmium::TagMatcher>::value, "TagMatcher should be default constructible");
+static_assert(std::is_copy_constructible<osmium::TagMatcher>::value, "TagMatcher should be copy constructible");
+static_assert(std::is_move_constructible<osmium::TagMatcher>::value, "TagMatcher should be move constructible");
+static_assert(std::is_copy_assignable<osmium::TagMatcher>::value, "TagMatcher should be copyable");
+static_assert(std::is_move_assignable<osmium::TagMatcher>::value, "TagMatcher should be moveable");
 
 TEST_CASE("Tag matcher") {
     osmium::memory::Buffer buffer{10240};
