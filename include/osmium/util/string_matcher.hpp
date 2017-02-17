@@ -38,10 +38,29 @@ DEALINGS IN THE SOFTWARE.
 #include <string>
 #include <vector>
 
-// std::regex doesn't work properly in glibc++ before version 4.9 and
-// libc++ before version 3.7 (?), so the use is disabled by default.
-#ifdef OSMIUM_WITH_REGEX
-# include <regex>
+#include <regex>
+
+// std::regex isn't implemented properly in glibc++ (before the version
+// delivered with GCC 4.9) and libc++ before the version 3.6, so the use is
+// disabled by these checks. Checks for GLIBC were based on
+// http://stackoverflow.com/questions/12530406/is-gcc-4-8-or-earlier-buggy-about-regular-expressions
+// Checks for libc++ are simply based on compiler defines. This is probably
+// not optimal but seems to work for now.
+#if defined(__GLIBCXX__)
+# if ((__cplusplus >= 201402L) || \
+        defined(_GLIBCXX_REGEX_DFS_QUANTIFIERS_LIMIT) || \
+        defined(_GLIBCXX_REGEX_STATE_LIMIT))
+#  define OSMIUM_WITH_REGEX
+# else
+#  pragma message("Disabling regex functionality. See source code for info.")
+# endif
+#elif defined(__clang__)
+# if ((__clang_major__ > 3) || \
+      (__clang_minor__ == 3 && __clang_minor__ > 5))
+#  define OSMIUM_WITH_REGEX
+# else
+#  pragma message("Disabling regex functionality")
+# endif
 #endif
 
 #include <boost/variant.hpp>
