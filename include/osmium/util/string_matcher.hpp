@@ -34,6 +34,7 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <cstring>
+#include <iosfwd>
 #include <string>
 #include <vector>
 
@@ -69,6 +70,10 @@ namespace osmium {
                 return false;
             }
 
+            void print(std::ostream& out) const {
+                out << "always_false";
+            }
+
         }; // class always_false
 
         /**
@@ -80,6 +85,10 @@ namespace osmium {
 
             bool match(const char* /*test_string*/) const noexcept {
                 return true;
+            }
+
+            void print(std::ostream& out) const {
+                out << "always_true";
             }
 
         }; // class always_true
@@ -105,6 +114,10 @@ namespace osmium {
                 return !std::strcmp(m_str.c_str(), test_string);
             }
 
+            void print(std::ostream& out) const {
+                out << "equal[" << m_str << ']';
+            }
+
         }; // class equal
 
         /**
@@ -126,6 +139,10 @@ namespace osmium {
 
             bool match(const char* test_string) const noexcept {
                 return m_str.compare(0, std::string::npos, test_string, 0, m_str.size()) == 0;
+            }
+
+            void print(std::ostream& out) const {
+                out << "prefix[" << m_str << ']';
             }
 
         }; // class prefix
@@ -151,6 +168,10 @@ namespace osmium {
                 return std::strstr(test_string, m_str.c_str());
             }
 
+            void print(std::ostream& out) const {
+                out << "substring[" << m_str << ']';
+            }
+
         }; // class substring
 
 #ifdef OSMIUM_WITH_REGEX
@@ -169,6 +190,10 @@ namespace osmium {
 
             bool match(const char* test_string) const noexcept {
                 return std::regex_search(test_string, m_regex);
+            }
+
+            void print(std::ostream& out) const {
+                out << "regex";
             }
 
         }; // class regex
@@ -211,6 +236,14 @@ namespace osmium {
 
             }
 
+            void print(std::ostream& out) const {
+                out << "list[";
+                for (const auto& s : m_strings) {
+                    out << '[' << s << ']';
+                }
+                out << ']';
+            }
+
         }; // class list
 
     private:
@@ -227,13 +260,13 @@ namespace osmium {
 
         matcher_type m_matcher;
 
-        class visitor : public boost::static_visitor<bool> {
+        class match_visitor : public boost::static_visitor<bool> {
 
             const char* m_str;
 
         public:
 
-            visitor(const char* str) noexcept :
+            match_visitor(const char* str) noexcept :
                 m_str(str) {
             }
 
@@ -242,7 +275,24 @@ namespace osmium {
                 return t.match(m_str);
             }
 
-        }; // struct visitor
+        }; // class match_visitor
+
+        class print_visitor : public boost::static_visitor<void> {
+
+            std::ostream& m_out;
+
+        public:
+
+            print_visitor(std::ostream& out) :
+                m_out(out) {
+            }
+
+            template <typename TMatcher>
+            void operator()(const TMatcher& t) const noexcept {
+                t.print(m_out);
+            }
+
+        }; // class print_visitor
 
     public:
 
@@ -324,7 +374,7 @@ namespace osmium {
          * Match the specified string.
          */
         bool operator()(const char* str) const noexcept {
-            return boost::apply_visitor(visitor{str}, m_matcher);
+            return boost::apply_visitor(match_visitor{str}, m_matcher);
         }
 
         /**
@@ -334,7 +384,16 @@ namespace osmium {
             return operator()(str.c_str());
         }
 
+        void print(std::ostream& out) const {
+            return boost::apply_visitor(print_visitor{out}, m_matcher);
+        }
+
     }; // class StringMatcher
+
+    inline std::ostream& operator<<(std::ostream& out, const StringMatcher& matcher) {
+        matcher.print(out);
+        return out;
+    }
 
 } // namespace osmium
 
