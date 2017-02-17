@@ -56,7 +56,7 @@ namespace osmium {
          * @param key_matcher StringMatcher for matching the key.
          */
         template <typename TKey>
-        explicit TagMatcher(TKey&& key_matcher) :
+        TagMatcher(TKey&& key_matcher) :
             m_key_matcher(std::forward<TKey>(key_matcher)),
             m_value_matcher(osmium::StringMatcher::always_true{}),
             m_result(true) {
@@ -71,7 +71,7 @@ namespace osmium {
          * @param invert If set to true, invert the result of the value_matcher.
          */
         template <typename TKey, typename TValue>
-        explicit TagMatcher(TKey&& key_matcher, TValue&& value_matcher, bool invert = false) :
+        TagMatcher(TKey&& key_matcher, TValue&& value_matcher, bool invert = false) :
             m_key_matcher(std::forward<TKey>(key_matcher)),
             m_value_matcher(std::forward<TValue>(value_matcher)),
             m_result(!invert) {
