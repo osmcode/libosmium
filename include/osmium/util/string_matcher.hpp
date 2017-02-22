@@ -298,17 +298,17 @@ namespace osmium {
 
         class print_visitor : public boost::static_visitor<void> {
 
-            std::ostream& m_out;
+            std::ostream* m_out;
 
         public:
 
             print_visitor(std::ostream& out) :
-                m_out(out) {
+                m_out(&out) {
             }
 
             template <typename TMatcher>
             void operator()(const TMatcher& t) const noexcept {
-                t.print(m_out);
+                t.print(*m_out);
             }
 
         }; // class print_visitor
