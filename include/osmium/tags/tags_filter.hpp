@@ -59,8 +59,8 @@ namespace osmium {
             m_default_result(default_result) {
         }
 
-        TagsFilter& add_rule(bool result, TagMatcher&& matcher) {
-            m_rules.emplace_back(result, std::forward<TagMatcher>(matcher));
+        TagsFilter& add_rule(bool result, const TagMatcher& matcher) {
+            m_rules.emplace_back(result, matcher);
             return *this;
         }
 
