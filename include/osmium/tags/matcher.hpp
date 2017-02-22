@@ -33,6 +33,9 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <type_traits>
+#include <utility>
+
 #include <osmium/osm/tag.hpp>
 #include <osmium/util/string_matcher.hpp>
 
@@ -64,7 +67,8 @@ namespace osmium {
          *
          * @param key_matcher StringMatcher for matching the key.
          */
-        template <typename TKey>
+        template <typename TKey, typename std::enable_if<
+            std::is_convertible<TKey, osmium::StringMatcher>::value, int>::type = 0>
         TagMatcher(TKey&& key_matcher) :
             m_key_matcher(std::forward<TKey>(key_matcher)),
             m_value_matcher(osmium::StringMatcher::always_true{}),
@@ -79,7 +83,9 @@ namespace osmium {
          * @param value_matcher StringMatcher for matching the value.
          * @param invert If set to true, invert the result of the value_matcher.
          */
-        template <typename TKey, typename TValue>
+        template <typename TKey, typename TValue,
+            typename std::enable_if<std::is_convertible<TKey, osmium::StringMatcher>::value, int>::type = 0,
+            typename std::enable_if<std::is_convertible<TValue, osmium::StringMatcher>::value, int>::type = 0>
         TagMatcher(TKey&& key_matcher, TValue&& value_matcher, bool invert = false) :
             m_key_matcher(std::forward<TKey>(key_matcher)),
             m_value_matcher(std::forward<TValue>(value_matcher)),
