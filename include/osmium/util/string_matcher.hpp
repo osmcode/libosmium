@@ -404,7 +404,7 @@ namespace osmium {
         }
 
         void print(std::ostream& out) const {
-            return boost::apply_visitor(print_visitor{out}, m_matcher);
+            boost::apply_visitor(print_visitor{out}, m_matcher);
         }
 
     }; // class StringMatcher
