@@ -89,7 +89,8 @@ namespace osmium {
                 return false;
             }
 
-            void print(std::ostream& out) const {
+            template <typename TChar, typename TTraits>
+            void print(std::basic_ostream<TChar, TTraits>& out) const {
                 out << "always_false";
             }
 
@@ -106,7 +107,8 @@ namespace osmium {
                 return true;
             }
 
-            void print(std::ostream& out) const {
+            template <typename TChar, typename TTraits>
+            void print(std::basic_ostream<TChar, TTraits>& out) const {
                 out << "always_true";
             }
 
@@ -133,7 +135,8 @@ namespace osmium {
                 return !std::strcmp(m_str.c_str(), test_string);
             }
 
-            void print(std::ostream& out) const {
+            template <typename TChar, typename TTraits>
+            void print(std::basic_ostream<TChar, TTraits>& out) const {
                 out << "equal[" << m_str << ']';
             }
 
@@ -160,7 +163,8 @@ namespace osmium {
                 return m_str.compare(0, std::string::npos, test_string, 0, m_str.size()) == 0;
             }
 
-            void print(std::ostream& out) const {
+            template <typename TChar, typename TTraits>
+            void print(std::basic_ostream<TChar, TTraits>& out) const {
                 out << "prefix[" << m_str << ']';
             }
 
@@ -187,7 +191,8 @@ namespace osmium {
                 return std::strstr(test_string, m_str.c_str());
             }
 
-            void print(std::ostream& out) const {
+            template <typename TChar, typename TTraits>
+            void print(std::basic_ostream<TChar, TTraits>& out) const {
                 out << "substring[" << m_str << ']';
             }
 
@@ -211,7 +216,8 @@ namespace osmium {
                 return std::regex_search(test_string, m_regex);
             }
 
-            void print(std::ostream& out) const {
+            template <typename TChar, typename TTraits>
+            void print(std::basic_ostream<TChar, TTraits>& out) const {
                 out << "regex";
             }
 
@@ -255,7 +261,8 @@ namespace osmium {
 
             }
 
-            void print(std::ostream& out) const {
+            template <typename TChar, typename TTraits>
+            void print(std::basic_ostream<TChar, TTraits>& out) const {
                 out << "list[";
                 for (const auto& s : m_strings) {
                     out << '[' << s << ']';
@@ -296,13 +303,14 @@ namespace osmium {
 
         }; // class match_visitor
 
+        template <typename TChar, typename TTraits>
         class print_visitor : public boost::static_visitor<void> {
 
-            std::ostream* m_out;
+            std::basic_ostream<TChar, TTraits>* m_out;
 
         public:
 
-            print_visitor(std::ostream& out) :
+            print_visitor(std::basic_ostream<TChar, TTraits>& out) :
                 m_out(&out) {
             }
 
@@ -403,13 +411,15 @@ namespace osmium {
             return operator()(str.c_str());
         }
 
-        void print(std::ostream& out) const {
-            boost::apply_visitor(print_visitor{out}, m_matcher);
+        template <typename TChar, typename TTraits>
+        void print(std::basic_ostream<TChar, TTraits>& out) const {
+            boost::apply_visitor(print_visitor<TChar, TTraits>{out}, m_matcher);
         }
 
     }; // class StringMatcher
 
-    inline std::ostream& operator<<(std::ostream& out, const StringMatcher& matcher) {
+    template <typename TChar, typename TTraits>
+    inline std::basic_ostream<TChar, TTraits>& operator<<(std::basic_ostream<TChar, TTraits>& out, const StringMatcher& matcher) {
         matcher.print(out);
         return out;
     }
