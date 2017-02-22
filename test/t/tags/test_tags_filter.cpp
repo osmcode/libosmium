@@ -1,5 +1,7 @@
 #include "catch.hpp"
 
+#include <functional>
+
 #include <osmium/builder/attr.hpp>
 #include <osmium/memory/buffer.hpp>
 #include <osmium/tags/tags_filter.hpp>
@@ -56,11 +58,11 @@ TEST_CASE("Tags filter") {
         filter.add_rule(true, osmium::StringMatcher::equal{"highway"})
               .add_rule(true, osmium::StringMatcher::equal{"source"});
 
-        osmium::TagsFilter::iterator it{filter, tag_list1.begin(),
-                                                tag_list1.end()};
+        osmium::TagsFilter::iterator it{std::cref(filter), tag_list1.begin(),
+                                                           tag_list1.end()};
 
-        const osmium::TagsFilter::iterator end{filter, tag_list1.end(),
-                                                       tag_list1.end()};
+        const osmium::TagsFilter::iterator end{std::cref(filter), tag_list1.end(),
+                                                                  tag_list1.end()};
 
         REQUIRE(2 == std::distance(it, end));
 
