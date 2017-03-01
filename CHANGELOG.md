@@ -6,11 +6,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [unreleased] -
 
-### Added
-
-### Changed
-
 ### Fixed
+
+- Terminate called on full non-auto-growing buffer. (Issue #189.)
+- When file formats were used that were not compiled into the binary, it
+  terminated instead of throwing. (Issue #197.)
+- The `Filter::count()` method didn't compile at all.
 
 
 ## [2.11.0] - 2017-01-14
