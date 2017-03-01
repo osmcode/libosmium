@@ -44,7 +44,20 @@ DEALINGS IN THE SOFTWARE.
 namespace osmium {
 
     /**
-     * Check a Tag or TagList against a list of TagMatchers.
+     * A TagsFilter is a list of rules (defined using TagMatchers) to check
+     * tags against. The first rule that matches sets the result.
+     *
+     * Here is an example matching any "highway" tag except "highway=motorway":
+     * @code
+     * osmium::TagsFilter filter{false};
+     * filter.add_rule(false, osmium::TagMatcher{"highway", "motorway"});
+     * filter.add_rule(true, osmium::TagMatcher{"highway"});
+     *
+     * osmium::Tag& tag = ...;
+     * bool result = filter(tag);
+     * @endcode
+     *
+     * Use this instead of the old osmium::tags::Filter.
      */
     class TagsFilter {
 
@@ -55,21 +68,48 @@ namespace osmium {
 
         using iterator = boost::filter_iterator<TagsFilter, osmium::TagList::const_iterator>;
 
+        /**
+         * Constructor.
+         *
+         * @param default_result The result the matching function will return
+         *                       if none of the rules matched.
+         */
         explicit TagsFilter(bool default_result = false) :
             m_default_result(default_result) {
         }
 
+        /**
+         * Add a rule to the filter.
+         *
+         * @param result The result returned when this rule matches.
+         * @param matcher The TagMatcher for checking tags.
+         * @returns A reference to this filter for chaining.
+         */
         TagsFilter& add_rule(bool result, const TagMatcher& matcher) {
             m_rules.emplace_back(result, matcher);
             return *this;
         }
 
+        /**
+         * Add a rule to the filter.
+         *
+         * @param result The result returned when this rule matches.
+         * @param args Arguments to construct a TagMatcher from that is used
+         *             for checking tags.
+         * @returns A reference to this filter for chaining.
+         */
         template <typename... TArgs>
         TagsFilter& add_rule(bool result, TArgs&&... args) {
-            m_rules.emplace_back(result, osmium::TagMatcher{std::forward<TArgs>(args)...});
-            return *this;
+            return add_rule(result, osmium::TagMatcher{std::forward<TArgs>(args)...});
         }
 
+        /**
+         * Matching function. Check the specified tag against the rules.
+         *
+         * @param tag A tag.
+         * @returns The result of the matching rule, or, if none of the rules
+         *          matched, the default result.
+         */
         bool operator()(const osmium::Tag& tag) const noexcept {
             for (const auto& rule : m_rules) {
                 if (rule.second(tag)) {
