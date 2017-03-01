@@ -100,7 +100,8 @@ namespace osmium {
          */
         template <typename... TArgs>
         TagsFilter& add_rule(bool result, TArgs&&... args) {
-            return add_rule(result, osmium::TagMatcher{std::forward<TArgs>(args)...});
+            m_rules.emplace_back(result, osmium::TagMatcher{std::forward<TArgs>(args)...});
+            return *this;
         }
 
         /**
