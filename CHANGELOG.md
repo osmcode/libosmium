@@ -8,9 +8,53 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+- `TagMatcher` and `TagsFilter` classes for more flexibly matching tags and
+  selecting objects based on tags. This obsoletes the less flexible classes
+  based on `osmium::tags::Filter` classes.
+- Extended `index::RelationsMap(Stash|Index)` classes to also allow
+  parent-to-member lookups.
+- New `nrw_array` helper class.
+
 ### Changed
 
+- Area assembler can now detect invalid locations and report them in the
+  stats and through the problem reporter. If the new config option
+  `ignore_invalid_locations` is set, the Assembler will pretend they weren't
+  even referenced in the ways. (Issue #195.)
+- `osmium::area::Assembler::operator()` will now return a boolean reporting
+  whether building of the area(s) was successful.
+- Split up area `Assembler` class into three classes: The
+  `detail::BasicAssembler` is now the parent class. `Assembler` is the child
+  class for usual use. The new `GeomAssembler` also derives from
+  `BasicAssembler` and builds areas without taking tags into account at all.
+  This is to support osm2pgsql which does tag handling itself. (Issue #194.)
+- The `Projection` class can do any projection supported by the Proj.4
+  library. As a special case it now uses our own Mercator projection
+  functions when the web mercator projection (EPSG 3857) is used. This is
+  much faster than going through Proj.4.
+- Better error messages for low-level file utility functions.
+- Mark `build_tag_list*` functions in `builder_helper.hpp` as deprecated. You
+  should use the functions from `osmium/builder/attr.hpp` instead.
+- Improved performance of the `osmium::tags::match_(any|all|none)_of`
+  functions.
+- Improved performance of string comparison in `tags::Filter`.
+- Update version of Catch unit test framework to 1.8.0. This meant some
+  tests had to be updated.
+- And lots of code and test cleanups...
+
 ### Fixed
+
+- Terminate called on full non-auto-growing buffer. (Issue #189.)
+- When file formats were used that were not compiled into the binary, it
+  terminated instead of throwing. (Issue #197.)
+- Windows build problem related to including two different winsock versions.
+- Windows build problem related to forced build for old Windows versions.
+  (Issue #196.)
+- Clear stream contents in ProblemReporterException correctly.
+- Add `-pthread` compiler and linker options on Linux/OSX. This should fix
+  a problem where some linker versions will not link binaries correctly when
+  the `--as-needed` option is used.
+- The `Filter::count()` method didn't compile at all.
 
 
 ## [2.11.0] - 2017-01-14
