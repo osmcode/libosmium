@@ -155,6 +155,11 @@ namespace osmium {
                 }
                 bool error = false;
                 for (auto& node_ref : way.nodes()) {
+                    if (node_ref.location()) {
+                        // Node location is already known because the input file contained it as extra
+                        // attributes in the <nd> tag.
+                        continue;
+                    }
                     try {
                         node_ref.set_location(get_node_location(node_ref.ref()));
                         if (!node_ref.location()) {
