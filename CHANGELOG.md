@@ -38,7 +38,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Improved performance of the `osmium::tags::match_(any|all|none)_of`
   functions.
 - Improved performance of string comparison in `tags::Filter`.
-- Update version of Catch unit test framework to 1.8.0. This meant some
+- Update version of Catch unit test framework to 1.8.1. This meant some
   tests had to be updated.
 - And lots of code and test cleanups...
 
@@ -55,6 +55,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   a problem where some linker versions will not link binaries correctly when
   the `--as-needed` option is used.
 - The `Filter::count()` method didn't compile at all.
+- XML reader doesn't fail on relation member ref=0 any more.
 
 
 ## [2.11.0] - 2017-01-14
