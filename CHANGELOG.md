@@ -14,6 +14,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Extended `index::RelationsMap(Stash|Index)` classes to also allow
   parent-to-member lookups.
 - New `nrw_array` helper class.
+- `ObjectPointerCollection::unique()` function.
 
 ### Changed
 
