@@ -41,6 +41,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Improved performance of string comparison in `tags::Filter`.
 - Update version of Catch unit test framework to 1.8.1. This meant some
   tests had to be updated.
+- Use `get_noexcept()` in `NodeLocationsForWays` handler.
 - And lots of code and test cleanups...
 
 ### Fixed
