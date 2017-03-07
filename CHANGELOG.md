@@ -8,6 +8,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+
+## [2.11.1] - 2017-03-07
+
+### Fixed
+
 - Terminate called on full non-auto-growing buffer. (Issue #189.)
 - When file formats were used that were not compiled into the binary, it
   terminated instead of throwing. (Issue #197.)
@@ -526,7 +531,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   Doxygen (up to version 1.8.8). This version contains a workaround to fix
   this.
 
-[unreleased]: https://github.com/osmcode/libosmium/compare/v2.10.3...HEAD
+[unreleased]: https://github.com/osmcode/libosmium/compare/v2.11.1...HEAD
+[2.11.1]: https://github.com/osmcode/libosmium/compare/v2.11.0...v2.11.1
+[2.11.0]: https://github.com/osmcode/libosmium/compare/v2.10.3...v2.11.0
 [2.10.3]: https://github.com/osmcode/libosmium/compare/v2.10.2...v2.10.3
 [2.10.2]: https://github.com/osmcode/libosmium/compare/v2.10.1...v2.10.2
 [2.10.1]: https://github.com/osmcode/libosmium/compare/v2.10.0...v2.10.1
