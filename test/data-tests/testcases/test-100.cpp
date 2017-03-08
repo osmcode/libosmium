@@ -1,4 +1,5 @@
 
+#include <cmath>
 #include <cstring>
 #include <stdexcept>
 
@@ -20,8 +21,8 @@ public:
             REQUIRE(node.uid() == 1);
             REQUIRE(!std::strcmp(node.user(), "test"));
             REQUIRE(node.changeset() == 1);
-            REQUIRE(node.location().lon() - 1.02 < epsilon);
-            REQUIRE(node.location().lat() - 1.02 < epsilon);
+            REQUIRE(std::abs(node.location().lon() - 1.02) < epsilon);
+            REQUIRE(std::abs(node.location().lat() - 1.02) < epsilon);
         } else {
             throw std::runtime_error{"Unknown ID"};
         }

@@ -1,4 +1,5 @@
 
+#include <cmath>
 #include <cstring>
 #include <stdexcept>
 
@@ -15,11 +16,11 @@ public:
     void node(const osmium::Node& node) {
         constexpr const double epsilon = 0.00000001;
         if (node.id() == 110000) {
-            REQUIRE(node.location().lon() - 1.02 < epsilon);
-            REQUIRE(node.location().lat() - 1.12 < epsilon);
+            REQUIRE(std::abs(node.location().lon() - 1.02) < epsilon);
+            REQUIRE(std::abs(node.location().lat() - 1.12) < epsilon);
         } else if (node.id() == 110001) {
-            REQUIRE(node.location().lon() - 1.07 < epsilon);
-            REQUIRE(node.location().lat() - 1.13 < epsilon);
+            REQUIRE(std::abs(node.location().lon() - 1.07) < epsilon);
+            REQUIRE(std::abs(node.location().lat() - 1.13) < epsilon);
         } else {
             throw std::runtime_error{"Unknown ID"};
         }

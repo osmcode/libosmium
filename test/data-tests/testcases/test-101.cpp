@@ -1,4 +1,5 @@
 
+#include <cmath>
 #include <stdexcept>
 
 #include "common.hpp"
@@ -15,12 +16,12 @@ public:
         constexpr const double epsilon = 0.00000001;
         if (node.id() == 101000) {
             REQUIRE(node.version() == 1);
-            REQUIRE(node.location().lon() - 1.12 < epsilon);
-            REQUIRE(node.location().lat() - 1.02 < epsilon);
+            REQUIRE(std::abs(node.location().lon() - 1.12) < epsilon);
+            REQUIRE(std::abs(node.location().lat() - 1.02) < epsilon);
         } else if (node.id() == 101001) {
             REQUIRE(node.version() == 1);
-            REQUIRE(node.location().lon() - 1.12 < epsilon);
-            REQUIRE(node.location().lat() - 1.03 < epsilon);
+            REQUIRE(std::abs(node.location().lon() - 1.12) < epsilon);
+            REQUIRE(std::abs(node.location().lat() - 1.03) < epsilon);
         } else if (node.id() == 101002) {
         } else if (node.id() == 101003) {
         } else {
