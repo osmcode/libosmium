@@ -184,7 +184,11 @@ endif()
 #-----------------------------------------------------------------------------
 if(NOT MSVC)
     if(NOT USE_CPP_VERSION)
-        set(USE_CPP_VERSION c++11)
+        if(CYGWIN)
+            set(USE_CPP_VERSION gnu++11)
+        else()
+            set(USE_CPP_VERSION c++11)
+        endif()
     endif()
     message(STATUS "Use C++ version: ${USE_CPP_VERSION}")
     # following only available from cmake 2.8.12:
