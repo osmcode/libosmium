@@ -12,6 +12,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+- Build on Cygwin.
+
 
 ## [2.12.0] - 2017-03-07
 
