@@ -98,7 +98,7 @@ namespace osmium {
                 }
 
                 if (m_max_node_id == node.id()) {
-                    throw out_of_order_error{"Node ID twice in input.", node.id()};
+                    throw out_of_order_error{"Node ID twice in input. Maybe you are using a history or changes file?", node.id()};
                 }
                 if (m_max_node_id > node.id()) {
                     throw out_of_order_error{"Node IDs out of order.", node.id()};
@@ -112,7 +112,7 @@ namespace osmium {
                 }
 
                 if (m_max_way_id == way.id()) {
-                    throw out_of_order_error{"Way ID twice in input.", way.id()};
+                    throw out_of_order_error{"Way ID twice in input. Maybe you are using a history or changes file?", way.id()};
                 }
                 if (m_max_way_id > way.id()) {
                     throw out_of_order_error{"Way IDs out of order.", way.id()};
@@ -122,7 +122,7 @@ namespace osmium {
 
             void relation(const osmium::Relation& relation) {
                 if (m_max_relation_id == relation.id()) {
-                    throw out_of_order_error{"Relation ID twice in input.", relation.id()};
+                    throw out_of_order_error{"Relation ID twice in input. Maybe you are using a history or changes file?", relation.id()};
                 }
                 if (m_max_relation_id > relation.id()) {
                     throw out_of_order_error{"Relation IDs out of order.", relation.id()};
