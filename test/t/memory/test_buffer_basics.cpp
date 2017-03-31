@@ -47,3 +47,8 @@ TEST_CASE("Buffer with minimum size") {
     REQUIRE(buffer.capacity() == 64);
 }
 
+TEST_CASE("Buffer with non-aligned size") {
+    osmium::memory::Buffer buffer{65};
+    REQUIRE(buffer.capacity() > 65);
+}
+
