@@ -79,6 +79,14 @@ namespace osmium {
         }
 
         /**
+         * Set the default result, the result the matching function will
+         * return if none of the rules matched.
+         */
+        void set_default_result(bool default_result) noexcept {
+            m_default_result = default_result;
+        }
+
+        /**
          * Add a rule to the filter.
          *
          * @param result The result returned when this rule matches.
