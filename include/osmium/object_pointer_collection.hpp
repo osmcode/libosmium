@@ -98,7 +98,8 @@ namespace osmium {
          */
         template <typename TEqual>
         void unique(TEqual&& equal) {
-            std::unique(m_objects.begin(), m_objects.end(), std::forward<TEqual>(equal));
+            const auto last = std::unique(m_objects.begin(), m_objects.end(), std::forward<TEqual>(equal));
+            m_objects.erase(last, m_objects.end());
         }
 
         /**
