@@ -8,10 +8,24 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+- New `TagsFilter::set_default_result()` function.
+
 ### Changed
+
+- Use larger capacity for `Buffer` if necessary for alignment instead of
+  throwing an exception. Minimum buffer size is now 64 bytes.
+- Check order of input data in relations collector. The relations collector
+  can not deal with history data or a changes file. This was documented as a
+  requirement, but often lead to problems, because this was ignored by users.
+  So it now checks that the input data it gets is ordered and throws an
+  exception otherwise.
+- When writing an OSM file, set generator to libosmium if not set by app.
 
 ### Fixed
 
+- Infinite loop in `Buffer::reserve_space()`. (Issue #202.)
+- `ObjectPointerCollection::unique()` now removes elements at end.
+- Tests comparing double using `==` operator.
 - Build on Cygwin.
 
 
