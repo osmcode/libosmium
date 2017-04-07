@@ -91,7 +91,7 @@ class RewriteHandler : public osmium::handler::Handler {
 public:
 
     // Constructor. New data will be added to the given buffer.
-    RewriteHandler(osmium::memory::Buffer& buffer) :
+    explicit RewriteHandler(osmium::memory::Buffer& buffer) :
         m_buffer(buffer) {
     }
 

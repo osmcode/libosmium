@@ -66,7 +66,7 @@ class IndexFile {
 
 public:
 
-    IndexFile(const std::string& filename) :
+    explicit IndexFile(const std::string& filename) :
         m_fd(::open(filename.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0666)) {
         if (m_fd < 0) {
             std::cerr << "Can't open index file '" << filename << "': " << std::strerror(errno) << "\n";

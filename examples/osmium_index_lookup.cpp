@@ -52,7 +52,7 @@ class IndexAccess {
 
 public:
 
-    IndexAccess(int fd) :
+    explicit IndexAccess(int fd) :
         m_fd(fd) {
     }
 
@@ -83,7 +83,7 @@ class IndexAccessDense : public IndexAccess<TValue> {
 
 public:
 
-    IndexAccessDense(int fd) :
+    explicit IndexAccessDense(int fd) :
         IndexAccess<TValue>(fd) {
     }
 
@@ -122,7 +122,7 @@ class IndexAccessSparse : public IndexAccess<TValue> {
 
 public:
 
-    IndexAccessSparse(int fd) :
+    explicit IndexAccessSparse(int fd) :
         IndexAccess<TValue>(fd) {
     }
 
