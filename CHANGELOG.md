@@ -8,6 +8,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+## [2.11.2] - 2017-04-10
+
+### Fixed
+
+- Use minimum size of 64 bytes for buffers. This fixes an infinite loop
+  when buffer size is zero.
+
 
 ## [2.11.1] - 2017-03-07
 
@@ -531,7 +538,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   Doxygen (up to version 1.8.8). This version contains a workaround to fix
   this.
 
-[unreleased]: https://github.com/osmcode/libosmium/compare/v2.11.1...HEAD
+[unreleased]: https://github.com/osmcode/libosmium/compare/v2.11.2...HEAD
+[2.11.2]: https://github.com/osmcode/libosmium/compare/v2.11.1...v2.11.2
 [2.11.1]: https://github.com/osmcode/libosmium/compare/v2.11.0...v2.11.1
 [2.11.0]: https://github.com/osmcode/libosmium/compare/v2.10.3...v2.11.0
 [2.10.3]: https://github.com/osmcode/libosmium/compare/v2.10.2...v2.10.3
