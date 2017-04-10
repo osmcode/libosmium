@@ -8,6 +8,15 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+### Changed
+
+### Fixed
+
+
+## [2.12.1] - 2017-04-10
+
+### Added
+
 - New `TagsFilter::set_default_result()` function.
 
 ### Changed
@@ -597,7 +606,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   Doxygen (up to version 1.8.8). This version contains a workaround to fix
   this.
 
-[unreleased]: https://github.com/osmcode/libosmium/compare/v2.12.0...HEAD
+[unreleased]: https://github.com/osmcode/libosmium/compare/v2.12.1...HEAD
+[2.12.1]: https://github.com/osmcode/libosmium/compare/v2.12.0...v2.12.1
 [2.12.0]: https://github.com/osmcode/libosmium/compare/v2.11.0...v2.12.0
 [2.11.0]: https://github.com/osmcode/libosmium/compare/v2.10.3...v2.11.0
 [2.10.3]: https://github.com/osmcode/libosmium/compare/v2.10.2...v2.10.3
