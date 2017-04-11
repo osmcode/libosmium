@@ -58,7 +58,13 @@ TEST_CASE("Reader should throw after eof") {
     osmium::io::File file{with_data_dir("t/io/data.osm")};
     osmium::io::Reader reader{file};
 
-    REQUIRE(!reader.eof());
+    SECTION("Get header") {
+        const auto header = reader.header();
+        REQUIRE(header.get("generator") == "testdata");
+        REQUIRE_FALSE(reader.eof());
+    }
+
+    REQUIRE_FALSE(reader.eof());
 
     while (osmium::memory::Buffer buffer = reader.read()) {
     }
@@ -66,6 +72,9 @@ TEST_CASE("Reader should throw after eof") {
     REQUIRE(reader.eof());
 
     REQUIRE_THROWS_AS(reader.read(), osmium::io_error);
+
+    reader.close();
+    REQUIRE(reader.eof());
 }
 
 TEST_CASE("Reader should not hang when apply() is called twice on reader") {
@@ -194,5 +203,46 @@ TEST_CASE("Applying rvalue handler on reader") {
     osmium::io::Reader reader{with_data_dir("t/io/data.osm")};
     struct NullHandler : public osmium::handler::Handler { };
     osmium::apply(reader, NullHandler{});
+}
+
+TEST_CASE("Can call read() exactly once on Reader with entity_bits nothing") {
+    osmium::io::File file{with_data_dir("t/io/data.osm")};
+    osmium::io::Reader reader{file, osmium::osm_entity_bits::nothing};
+    REQUIRE_FALSE(reader.eof());
+
+    SECTION("Get header") {
+        const auto header = reader.header();
+        REQUIRE(header.get("generator") == "testdata");
+        REQUIRE_FALSE(reader.eof());
+    }
+
+    osmium::memory::Buffer buffer = reader.read();
+    REQUIRE_FALSE(buffer);
+    REQUIRE(reader.eof());
+    REQUIRE_THROWS_AS(reader.read(), osmium::io_error);
+
+    reader.close();
+    REQUIRE(reader.eof());
+}
+
+TEST_CASE("Can not read after close") {
+    osmium::io::File file{with_data_dir("t/io/data.osm")};
+    osmium::io::Reader reader{file};
+
+    SECTION("Get header") {
+        const auto header = reader.header();
+        REQUIRE(header.get("generator") == "testdata");
+        REQUIRE_FALSE(reader.eof());
+    }
+
+    REQUIRE_FALSE(reader.eof());
+
+    osmium::memory::Buffer buffer = reader.read();
+    REQUIRE(buffer);
+    REQUIRE_FALSE(reader.eof());
+
+    reader.close();
+    REQUIRE(reader.eof());
+    REQUIRE_THROWS_AS(reader.read(), osmium::io_error);
 }
 

@@ -97,7 +97,7 @@ namespace osmium {
             enum class status {
                 okay   = 0, // normal reading
                 error  = 1, // some error occurred while reading
-                closed = 2, // close() called successfully after eof
+                closed = 2, // close() called
                 eof    = 3  // eof of file was reached without error
             } m_status;
 
@@ -155,11 +155,11 @@ namespace osmium {
             static int execute(const std::string& command, const std::string& filename, int* childpid) {
                 int pipefd[2];
                 if (pipe(pipefd) < 0) {
-                    throw std::system_error(errno, std::system_category(), "opening pipe failed");
+                    throw std::system_error{errno, std::system_category(), "opening pipe failed"};
                 }
                 const pid_t pid = fork();
                 if (pid < 0) {
-                    throw std::system_error(errno, std::system_category(), "fork failed");
+                    throw std::system_error{errno, std::system_category(), "fork failed"};
                 }
                 if (pid == 0) { // child
                     // close all file descriptors except one end of the pipe
@@ -203,7 +203,7 @@ namespace osmium {
 #ifndef _WIN32
                     return execute("curl", filename, childpid);
 #else
-                    throw io_error("Reading OSM files from the network currently not supported on Windows.");
+                    throw io_error{"Reading OSM files from the network currently not supported on Windows."};
 #endif
                 } else {
                     return osmium::io::detail::open_for_reading(filename);
@@ -313,7 +313,7 @@ namespace osmium {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wold-style-cast"
                     if (pid < 0 || !WIFEXITED(status) || WEXITSTATUS(status) != 0) {
-                        throw std::system_error(errno, std::system_category(), "subprocess returned error");
+                        throw std::system_error{errno, std::system_category(), "subprocess returned error"};
                     }
 #pragma GCC diagnostic pop
                     m_childpid = 0;
@@ -329,30 +329,26 @@ namespace osmium {
              */
             osmium::io::Header header() {
                 if (m_status == status::error) {
-                    throw io_error("Can not get header from reader when in status 'error'");
+                    throw io_error{"Can not get header from reader when in status 'error'"};
                 }
 
                 try {
                     if (m_header_future.valid()) {
                         m_header = m_header_future.get();
-                        if (m_options.read_which_entities == osmium::osm_entity_bits::nothing) {
-                            m_status = status::eof;
-                        }
                     }
                 } catch (...) {
                     close();
                     m_status = status::error;
                     throw;
                 }
+
                 return m_header;
             }
 
             /**
              * Reads the next buffer from the input. An invalid buffer signals
-             * end-of-file. After end-of-file all read() calls will return an
-             * invalid buffer. An invalid buffer is also always returned if
-             * osmium::osm_entity_bits::nothing was set when the Reader was
-             * constructed.
+             * end-of-file. After end-of-file all read() calls will throw an
+             * osmium::io_error.
              *
              * @returns Buffer.
              * @throws Some form of osmium::io_error if there is an error.
@@ -360,9 +356,13 @@ namespace osmium {
             osmium::memory::Buffer read() {
                 osmium::memory::Buffer buffer;
 
-                if (m_status != status::okay ||
-                    m_options.read_which_entities == osmium::osm_entity_bits::nothing) {
-                    throw io_error("Can not read from reader when in status 'closed', 'eof', or 'error'");
+                if (m_status != status::okay) {
+                    throw io_error{"Can not read from reader when in status 'closed', 'eof', or 'error'"};
+                }
+
+                if (m_options.read_which_entities == osmium::osm_entity_bits::nothing) {
+                    m_status = status::eof;
+                    return buffer;
                 }
 
                 try {

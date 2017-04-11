@@ -485,6 +485,7 @@ TEST_CASE("Reading OSM XML 200: Using Reader asking for header only") {
     const osmium::io::Header header{reader.header()};
     REQUIRE(header.get("generator") == "testdata");
 
+    REQUIRE_FALSE(reader.read());
     REQUIRE_THROWS(reader.read());
 
     reader.close();
