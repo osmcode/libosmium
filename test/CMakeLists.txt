@@ -170,7 +170,7 @@ add_unit_test(io test_reader LIBS "${OSMIUM_XML_LIBRARIES};${OSMIUM_PBF_LIBRARIE
 add_unit_test(io test_reader_fileformat ENABLE_IF ${Threads_FOUND} LIBS ${CMAKE_THREAD_LIBS_INIT})
 add_unit_test(io test_reader_with_mock_decompression ENABLE_IF ${Threads_FOUND} LIBS ${OSMIUM_XML_LIBRARIES})
 add_unit_test(io test_reader_with_mock_parser ENABLE_IF ${Threads_FOUND} LIBS ${CMAKE_THREAD_LIBS_INIT})
-add_unit_test(io test_opl_parser)
+add_unit_test(io test_opl_parser ENABLE_IF ${Threads_FOUND} LIBS ${CMAKE_THREAD_LIBS_INIT})
 add_unit_test(io test_output_utils)
 add_unit_test(io test_output_iterator ENABLE_IF ${Threads_FOUND} LIBS ${CMAKE_THREAD_LIBS_INIT})
 add_unit_test(io test_string_table)
