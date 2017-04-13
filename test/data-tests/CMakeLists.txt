@@ -92,7 +92,9 @@ set_tests_properties(testdata-overview PROPERTIES
 #-----------------------------------------------------------------------------
 
 find_program(RUBY ruby)
-find_package(Gem COMPONENTS json)
+if(RUBY_FOUND)
+  find_package(Gem COMPONENTS json)
+endif()
 find_program(SPATIALITE spatialite)
 
 if(RUBY AND GEM_json_FOUND AND SPATIALITE)
