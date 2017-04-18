@@ -205,7 +205,8 @@ endif()
 #-----------------------------------------------------------------------------
 if(MSVC)
     set(USUAL_COMPILE_OPTIONS "/Ox")
-    set(USUAL_LINK_OPTIONS "/debug")
+    # do not show warnings caused by missing .pdb files for libraries
+    set(USUAL_LINK_OPTIONS "/debug /ignore:4099")
 else()
     set(USUAL_COMPILE_OPTIONS "-O3 -g")
     set(USUAL_LINK_OPTIONS "")
