@@ -232,6 +232,15 @@ set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${USUAL_COMPILE_OPTIONS}"
     CACHE STRING "Flags used by the compiler during RELWITHDEBINFO builds."
     FORCE)
 
+set(CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO "${USUAL_LINK_OPTIONS}"
+    CACHE STRING "Flags used by the linker during RELWITHDEBINFO builds."
+    FORCE)
+
+mark_as_advanced(
+    CMAKE_CXX_FLAGS_RELWITHDEBINFO
+    CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO
+)
+
 if(WITH_PROFILING)
     add_definitions(-fno-omit-frame-pointer)
 endif()
