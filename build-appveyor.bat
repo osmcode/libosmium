@@ -101,7 +101,8 @@ msbuild libosmium.sln ^
 /p:Configuration=%config% ^
 /toolsversion:14.0 ^
 /p:Platform=x64 ^
-/p:PlatformToolset=v140
+/p:PlatformToolset=v140 ^
+/logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 IF %ERRORLEVEL% NEQ 0 GOTO ERROR
 
 ctest --output-on-failure ^
