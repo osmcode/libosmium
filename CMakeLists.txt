@@ -21,7 +21,7 @@ set(CMAKE_CONFIGURATION_TYPES "Debug;Release;RelWithDebInfo;MinSizeRel;Dev;Cover
     "List of available configuration types"
     FORCE)
 
-project(libosmium)
+project(libosmium CXX)
 
 set(LIBOSMIUM_VERSION_MAJOR 2)
 set(LIBOSMIUM_VERSION_MINOR 12)
