@@ -184,11 +184,9 @@ namespace osmium {
                     return factory;
                 }
 
-                bool register_parser(osmium::io::file_format format, create_parser_type create_function) {
-                    if (! m_callbacks.insert(map_type::value_type(format, create_function)).second) {
-                        return false;
-                    }
-                    return true;
+                bool register_parser(osmium::io::file_format format, create_parser_type&& create_function) {
+                    const auto result = m_callbacks.emplace(format, std::forward<create_parser_type>(create_function));
+                    return result.second;
                 }
 
                 create_parser_type get_creator_function(const osmium::io::File& file) const {
