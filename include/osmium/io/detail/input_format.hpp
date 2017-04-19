@@ -60,6 +60,13 @@ namespace osmium {
                 osmium::io::read_meta read_metadata = read_meta::yes;
             };
 
+            struct parser_arguments {
+                future_string_queue_type& input_queue;
+                future_buffer_queue_type& output_queue;
+                std::promise<osmium::io::Header>& header_promise;
+                osmium::io::detail::reader_options options;
+            };
+
             class Parser {
 
                 future_buffer_queue_type& m_output_queue;
@@ -117,14 +124,11 @@ namespace osmium {
 
             public:
 
-                Parser(future_string_queue_type& input_queue,
-                       future_buffer_queue_type& output_queue,
-                       std::promise<osmium::io::Header>& header_promise,
-                       osmium::io::detail::reader_options options) :
-                    m_output_queue(output_queue),
-                    m_header_promise(header_promise),
-                    m_input_queue(input_queue),
-                    m_options(options),
+                Parser(parser_arguments& args) :
+                    m_output_queue(args.output_queue),
+                    m_header_promise(args.header_promise),
+                    m_input_queue(args.input_queue),
+                    m_options(args.options),
                     m_header_is_done(false) {
                 }
 
@@ -163,10 +167,7 @@ namespace osmium {
 
             public:
 
-                using create_parser_type = std::function<std::unique_ptr<Parser>(future_string_queue_type&,
-                                                                                 future_buffer_queue_type&,
-                                                                                 std::promise<osmium::io::Header>& header_promise,
-                                                                                 osmium::io::detail::reader_options options)>;
+                using create_parser_type = std::function<std::unique_ptr<Parser>(parser_arguments&)>;
 
             private:
 
@@ -192,15 +193,15 @@ namespace osmium {
                     return true;
                 }
 
-                create_parser_type get_creator_function(const osmium::io::File& file) {
-                    auto it = m_callbacks.find(file.format());
+                create_parser_type get_creator_function(const osmium::io::File& file) const {
+                    const auto it = m_callbacks.find(file.format());
                     if (it == m_callbacks.end()) {
-                        throw unsupported_file_format_error(
-                                std::string("Can not open file '") +
+                        throw unsupported_file_format_error{
+                                std::string{"Can not open file '"} +
                                 file.filename() +
                                 "' with type '" +
                                 as_string(file.format()) +
-                                "'. No support for reading this format in this program.");
+                                "'. No support for reading this format in this program."};
                     }
                     return it->second;
                 }

@@ -136,8 +136,13 @@ namespace osmium {
                                       std::promise<osmium::io::Header>&& header_promise,
                                       osmium::io::detail::reader_options options) {
                 std::promise<osmium::io::Header> promise = std::move(header_promise);
-                const auto parser = creator(input_queue, osmdata_queue, promise, options);
-                parser->parse();
+                osmium::io::detail::parser_arguments args = {
+                    input_queue,
+                    osmdata_queue,
+                    promise,
+                    options
+                };
+                creator(args)->parse();
             }
 
 #ifndef _WIN32
