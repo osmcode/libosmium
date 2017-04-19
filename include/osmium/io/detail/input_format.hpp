@@ -55,16 +55,12 @@ namespace osmium {
 
         namespace detail {
 
-            struct reader_options {
-                osmium::osm_entity_bits::type read_which_entities = osm_entity_bits::all;
-                osmium::io::read_meta read_metadata = read_meta::yes;
-            };
-
             struct parser_arguments {
                 future_string_queue_type& input_queue;
                 future_buffer_queue_type& output_queue;
                 std::promise<osmium::io::Header>& header_promise;
-                osmium::io::detail::reader_options options;
+                osmium::osm_entity_bits::type read_which_entities;
+                osmium::io::read_meta read_metadata;
             };
 
             class Parser {
@@ -72,7 +68,8 @@ namespace osmium {
                 future_buffer_queue_type& m_output_queue;
                 std::promise<osmium::io::Header>& m_header_promise;
                 queue_wrapper<std::string> m_input_queue;
-                reader_options m_options;
+                osmium::osm_entity_bits::type m_read_which_entities;
+                osmium::io::read_meta m_read_metadata;
                 bool m_header_is_done;
 
             protected:
@@ -86,11 +83,11 @@ namespace osmium {
                 }
 
                 osmium::osm_entity_bits::type read_types() const noexcept {
-                    return m_options.read_which_entities;
+                    return m_read_which_entities;
                 }
 
                 osmium::io::read_meta read_metadata() const noexcept {
-                    return m_options.read_metadata;
+                    return m_read_metadata;
                 }
 
                 bool header_is_done() const noexcept {
@@ -128,7 +125,8 @@ namespace osmium {
                     m_output_queue(args.output_queue),
                     m_header_promise(args.header_promise),
                     m_input_queue(args.input_queue),
-                    m_options(args.options),
+                    m_read_which_entities(args.read_which_entities),
+                    m_read_metadata(args.read_metadata),
                     m_header_is_done(false) {
                 }
 

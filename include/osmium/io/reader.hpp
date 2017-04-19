@@ -119,14 +119,15 @@ namespace osmium {
 
             size_t m_file_size;
 
-            osmium::io::detail::reader_options m_options;
+            osmium::osm_entity_bits::type m_read_which_entities = osmium::osm_entity_bits::all;
+            osmium::io::read_meta m_read_metadata = osmium::io::read_meta::yes;
 
             void set_option(osmium::osm_entity_bits::type value) noexcept {
-                m_options.read_which_entities = value;
+                m_read_which_entities = value;
             }
 
             void set_option(osmium::io::read_meta value) noexcept {
-                m_options.read_metadata = value;
+                m_read_metadata = value;
             }
 
             // This function will run in a separate thread.
@@ -134,13 +135,15 @@ namespace osmium {
                                       detail::future_string_queue_type& input_queue,
                                       detail::future_buffer_queue_type& osmdata_queue,
                                       std::promise<osmium::io::Header>&& header_promise,
-                                      osmium::io::detail::reader_options options) {
+                                      osmium::osm_entity_bits::type read_which_entities,
+                                      osmium::io::read_meta read_metadata) {
                 std::promise<osmium::io::Header> promise = std::move(header_promise);
                 osmium::io::detail::parser_arguments args = {
                     input_queue,
                     osmdata_queue,
                     promise,
-                    options
+                    read_which_entities,
+                    read_metadata
                 };
                 creator(args)->parse();
             }
@@ -263,7 +266,7 @@ namespace osmium {
 
                 std::promise<osmium::io::Header> header_promise;
                 m_header_future = header_promise.get_future();
-                m_thread = osmium::thread::thread_handler{parser_thread, std::ref(m_creator), std::ref(m_input_queue), std::ref(m_osmdata_queue), std::move(header_promise), m_options};
+                m_thread = osmium::thread::thread_handler{parser_thread, std::ref(m_creator), std::ref(m_input_queue), std::ref(m_osmdata_queue), std::move(header_promise), m_read_which_entities, m_read_metadata};
             }
 
             template <typename... TArgs>
@@ -365,7 +368,7 @@ namespace osmium {
                     throw io_error{"Can not read from reader when in status 'closed', 'eof', or 'error'"};
                 }
 
-                if (m_options.read_which_entities == osmium::osm_entity_bits::nothing) {
+                if (m_read_which_entities == osmium::osm_entity_bits::nothing) {
                     m_status = status::eof;
                     return buffer;
                 }
