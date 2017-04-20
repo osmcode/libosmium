@@ -628,8 +628,8 @@ namespace osmium {
                 }
 
                 void merge_two_rings(open_ring_its_type& open_ring_its, const location_to_ring_map& m1, const location_to_ring_map& m2) {
-                    auto& r1 = *m1.ring_it;
-                    auto& r2 = *m2.ring_it;
+                    std::list<detail::ProtoRing>::iterator r1 = *m1.ring_it;
+                    std::list<detail::ProtoRing>::iterator r2 = *m2.ring_it;
 
                     if (r1->get_node_ref_stop().location() == r2->get_node_ref_start().location()) {
                         r1->join_forward(*r2);
@@ -645,11 +645,11 @@ namespace osmium {
                         assert(false);
                     }
 
+                    open_ring_its.erase(std::find(open_ring_its.begin(), open_ring_its.end(), r2));
                     m_rings.erase(r2);
-                    open_ring_its.remove(r2);
 
                     if (r1->closed()) {
-                        open_ring_its.remove(r1);
+                        open_ring_its.erase(std::find(open_ring_its.begin(), open_ring_its.end(), r1));
                     }
                 }
 
@@ -854,12 +854,13 @@ namespace osmium {
                     // Join all (open) rings in the candidate to get one closed ring.
                     assert(chosen_cand->rings.size() > 1);
                     const auto& first_ring = chosen_cand->rings.front().first;
-                    for (auto it = chosen_cand->rings.begin() + 1; it != chosen_cand->rings.end(); ++it) {
+                    const ProtoRing& remaining_ring = first_ring.ring();
+                    for (auto it = std::next(chosen_cand->rings.begin()); it != chosen_cand->rings.end(); ++it) {
                         merge_two_rings(open_ring_its, first_ring, it->first);
                     }
 
                     if (debug()) {
-                        std::cerr << "    Merged to " << first_ring.ring() << "\n";
+                        std::cerr << "    Merged to " << remaining_ring << '\n';
                     }
 
                     return true;
