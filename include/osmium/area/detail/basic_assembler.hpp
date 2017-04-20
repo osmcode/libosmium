@@ -616,7 +616,7 @@ namespace osmium {
 
                     for (auto it = open_ring_its.begin(); it != open_ring_its.end(); ++it) {
                         if (debug()) {
-                            std::cerr << "      Ring: " << **it << "\n";
+                            std::cerr << "      " << **it << '\n';
                         }
                         xrings.emplace_back((*it)->get_node_ref_start().location(), it, true);
                         xrings.emplace_back((*it)->get_node_ref_stop().location(), it, false);
@@ -659,7 +659,7 @@ namespace osmium {
                     }
 
                     if (debug()) {
-                        std::cerr << "    Trying to merge " << open_ring_its.size() << " open rings\n";
+                        std::cerr << "    Trying to merge " << open_ring_its.size() << " open rings (try_to_merge)\n";
                     }
 
                     std::vector<location_to_ring_map> xrings = create_location_to_ring_map(open_ring_its);
@@ -721,8 +721,8 @@ namespace osmium {
                     }
 
                     const auto connections = make_range(std::equal_range(xrings.cbegin(),
-                                                                        xrings.cend(),
-                                                                        location_to_ring_map{cand.stop_location}));
+                                                                         xrings.cend(),
+                                                                         location_to_ring_map{cand.stop_location}));
 
                     assert(connections.begin() != connections.end());
 
@@ -779,7 +779,7 @@ namespace osmium {
                     assert(!open_ring_its.empty());
 
                     if (debug()) {
-                        std::cerr << "    Trying to merge " << open_ring_its.size() << " open rings\n";
+                        std::cerr << "    Trying to merge " << open_ring_its.size() << " open rings (join_connected_rings)\n";
                     }
 
                     std::vector<location_to_ring_map> xrings = create_location_to_ring_map(open_ring_its);
