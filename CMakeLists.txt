@@ -205,7 +205,8 @@ endif()
 #-----------------------------------------------------------------------------
 if(MSVC)
     set(USUAL_COMPILE_OPTIONS "/Ox")
-    set(USUAL_LINK_OPTIONS "/debug")
+    # do not show warnings caused by missing .pdb files for libraries
+    set(USUAL_LINK_OPTIONS "/debug /ignore:4099")
 else()
     set(USUAL_COMPILE_OPTIONS "-O3 -g")
     set(USUAL_LINK_OPTIONS "")
@@ -230,6 +231,15 @@ mark_as_advanced(
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${USUAL_COMPILE_OPTIONS}"
     CACHE STRING "Flags used by the compiler during RELWITHDEBINFO builds."
     FORCE)
+
+set(CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO "${USUAL_LINK_OPTIONS}"
+    CACHE STRING "Flags used by the linker during RELWITHDEBINFO builds."
+    FORCE)
+
+mark_as_advanced(
+    CMAKE_CXX_FLAGS_RELWITHDEBINFO
+    CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO
+)
 
 if(WITH_PROFILING)
     add_definitions(-fno-omit-frame-pointer)
