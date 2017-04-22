@@ -62,6 +62,10 @@ foreach(example ${EXAMPLES})
     target_link_libraries(osmium_${example} ${OSMIUM_IO_LIBRARIES} ${EXAMPLE_LIBS_${example}})
 endforeach()
 
+if (NOT CMAKE_VERSION VERSION_LESS 3.1 AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+   set_property(TARGET osmium_convert PROPERTY CXX_STANDARD 11)
+   target_compile_definitions(osmium_convert PRIVATE $<$<COMPILE_FEATURES:cxx_decltype_incomplete_return_types>:BOOST_RESULT_OF_USE_DECLTYPE>)
+endif()
 
 #-----------------------------------------------------------------------------
 message(STATUS "Configuring examples - done")
