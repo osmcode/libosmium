@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+  <maintainer type="person">
+    <email>andrew.aladev@hiqo-solutions.com</email>
+    <name>Andrew Aladev</name>
+  </maintainer>
+  <longdescription>
+    Fast and flexible C++ library for working with OpenStreetMap data.
+  </longdescription>
+  <use>
+    <flag name="gdalcpp">Also install gdalcpp headers.</flag>
+    <flag name="protozero">Also install protozero headers.</flag>
+    <flag name="utfcpp">Also install utfcpp headers.</flag>
+    <flag name="doc">Build documentation.</flag>
+    <flag name="test">Build and run tests.</flag>
+  </use>
+</pkgmetadata>
