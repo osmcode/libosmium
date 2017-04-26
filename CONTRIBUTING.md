@@ -10,3 +10,7 @@ Some rules for contributing to this project:
   you have added. Please read the [notes for developers](NOTES_FOR_DEVELOPERS.md)
   beforehand which contains some coding guidelines.
 
+
+### Releasing
+
+See https://github.com/osmcode/osmium-suite/blob/master/make_releases.md
