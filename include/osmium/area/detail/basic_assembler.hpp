@@ -334,7 +334,7 @@ namespace osmium {
                                 }
                                 if (segment->ring()->is_outer()) {
                                     if (debug()) {
-                                        std::cerr << "        Segment belongs to outer ring\n";
+                                        std::cerr << "        Segment belongs to outer ring (y=" << a.y() << " ring=" << *segment->ring() << ")\n";
                                     }
                                     outer_rings.emplace_back(a.y(), segment->ring());
                                 }
@@ -358,10 +358,10 @@ namespace osmium {
                                     std::cerr << "        Segment is below (nesting=" << nesting << ")\n";
                                 }
                                 if (segment->ring()->is_outer()) {
-                                    if (debug()) {
-                                        std::cerr << "        Segment belongs to outer ring\n";
-                                    }
                                     const int32_t y = int32_t(ay + (by - ay) * (lx - ax) / (bx - ax));
+                                    if (debug()) {
+                                        std::cerr << "        Segment belongs to outer ring (y=" << y << " ring=" << *segment->ring() << ")\n";
+                                    }
                                     outer_rings.emplace_back(y, segment->ring());
                                 }
                             }
