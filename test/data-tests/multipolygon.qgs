@@ -41,8 +41,8 @@
                 <legendlayerfile isInOverview="0" layerid="multipolygons20140221151811742" visible="1"/>
             </filegroup>
         </legendlayer>
-        <legendgroup embedded="1" drawingOrder="-1" open="true" checked="Qt::Checked" name="Overview" project="../../../osm-testdata/grid/tests.qgs"/>
-        <legendgroup embedded="1" drawingOrder="-1" open="true" checked="Qt::Checked" name="Test Framework" project="../../../osm-testdata/grid/tests.qgs"/>
+        <legendgroup embedded="1" drawingOrder="-1" open="true" checked="Qt::Checked" name="Overview" project="@OSM_TESTDATA@/grid/tests.qgs"/>
+        <legendgroup embedded="1" drawingOrder="-1" open="true" checked="Qt::Checked" name="Test Framework" project="@OSM_TESTDATA@/grid/tests.qgs"/>
     </legend>
     <projectlayers layercount="9">
         <maplayer minimumScale="-4.65661e-10" maximumScale="1e+08" simplifyDrawingHints="1" minLabelScale="0" maxLabelScale="1e+08" simplifyDrawingTol="1" geometry="Line" simplifyMaxScale="1" type="vector" hasScaleBasedVisibilityFlag="0" simplifyLocal="1" scaleBasedLabelVisibilityFlag="0">
@@ -69,7 +69,7 @@
             <provider encoding="System">spatialite</provider>
             <previewExpression>COALESCE( "OGC_FID", '&lt;NULL>' )</previewExpression>
             <vectorjoins/>
-            <renderer-v2 attr="problem_type" symbollevels="0" type="categorizedSymbol">
+            <renderer-v2 attr="problem" symbollevels="0" type="categorizedSymbol">
                 <categories>
                     <category symbol="0" value="intersection" label="intersection"/>
                     <category symbol="1" value="role_should_be_outer" label="role_should_be_outer"/>
@@ -310,7 +310,7 @@
                 <edittype labelontop="0" editable="1" type="0" name="OGC_FID"/>
                 <edittype labelontop="0" editable="1" type="0" name="id"/>
                 <edittype labelontop="0" editable="1" type="0" name="object_id"/>
-                <edittype labelontop="0" editable="1" type="0" name="problem_type"/>
+                <edittype labelontop="0" editable="1" type="0" name="problem"/>
                 <edittype labelontop="0" editable="1" type="0" name="type"/>
                 <edittype labelontop="0" editable="1" type="0" name="way_id"/>
             </edittypes>
@@ -546,7 +546,7 @@
             <provider encoding="System">spatialite</provider>
             <previewExpression>COALESCE( "OGC_FID", '&lt;NULL>' )</previewExpression>
             <vectorjoins/>
-            <renderer-v2 attr="problem_type" symbollevels="0" type="categorizedSymbol">
+            <renderer-v2 attr="problem" symbollevels="0" type="categorizedSymbol">
                 <categories>
                     <category symbol="0" value="intersection" label="intersection"/>
                     <category symbol="1" value="ring_not_closed" label="ring_not_closed"/>
@@ -795,7 +795,7 @@
                 <edittype labelontop="0" editable="1" type="0" name="id"/>
                 <edittype labelontop="0" editable="1" type="0" name="node_id"/>
                 <edittype labelontop="0" editable="1" type="0" name="object_id"/>
-                <edittype labelontop="0" editable="1" type="0" name="problem_type"/>
+                <edittype labelontop="0" editable="1" type="0" name="problem"/>
                 <edittype labelontop="0" editable="1" type="0" name="type"/>
             </edittypes>
             <editform>.</editform>

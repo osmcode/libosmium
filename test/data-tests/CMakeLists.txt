@@ -113,6 +113,7 @@ if(RUBY AND GEM_json_FOUND AND SPATIALITE)
                 -P ${CMAKE_CURRENT_SOURCE_DIR}/run-testdata-multipolygon.cmake)
 
     set_tests_properties(testdata-multipolygon PROPERTIES LABELS "data;slow")
+    configure_file(multipolygon.qgs ${CMAKE_CURRENT_BINARY_DIR}/multipolygon.qgs @ONLY)
 else()
     message(WARNING "Disabled testdata-multipolygon test because 'ruby' and/or 'json' ruby gem and/or 'spatialite' was not found")
 endif()
