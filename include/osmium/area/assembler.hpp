@@ -409,6 +409,7 @@ namespace osmium {
                     if (!assembler(*way, out_buffer)) {
                         okay = false;
                     }
+                    stats() += assembler.stats();
                 }
 
                 return okay;
