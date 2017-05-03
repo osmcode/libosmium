@@ -988,6 +988,7 @@ namespace osmium {
                             }
                             loc_done.insert(c.stop_location);
                             find_candidates(candidates, loc_done, xrings, c);
+                            loc_done.erase(c.stop_location);
                             if (debug()) {
                                 std::cerr << "          ...back\n";
                             }
