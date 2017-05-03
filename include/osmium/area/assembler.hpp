@@ -1086,7 +1086,7 @@ namespace osmium {
                 // Join all (open) rings in the candidate to get one closed ring.
                 assert(chosen_cand->rings.size() > 1);
                 const auto& first_ring = chosen_cand->rings.front().first;
-                const ProtoRing& remaining_ring = first_ring.ring();
+                const detail::ProtoRing& remaining_ring = first_ring.ring();
                 for (auto it = std::next(chosen_cand->rings.begin()); it != chosen_cand->rings.end(); ++it) {
                     merge_two_rings(open_ring_its, first_ring, it->first);
                 }
