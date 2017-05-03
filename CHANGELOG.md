@@ -8,6 +8,17 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+## [2.11.3] - 2017-05-03
+
+### Fixed
+
+- Two bugs in area assembler affecting very complex multipolygons and
+  multipolygons with overlapping or nearly overlapping lines.
+- Invalid use of iterators leading to undefined behaviour in area assembler
+  code.
+- Read OPL file correctly even if trailing newline in file is missing.
+
+
 ## [2.11.2] - 2017-04-10
 
 ### Fixed
@@ -538,7 +549,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   Doxygen (up to version 1.8.8). This version contains a workaround to fix
   this.
 
-[unreleased]: https://github.com/osmcode/libosmium/compare/v2.11.2...HEAD
+[unreleased]: https://github.com/osmcode/libosmium/compare/v2.11.3...HEAD
+[2.11.3]: https://github.com/osmcode/libosmium/compare/v2.11.2...v2.11.3
 [2.11.2]: https://github.com/osmcode/libosmium/compare/v2.11.1...v2.11.2
 [2.11.1]: https://github.com/osmcode/libosmium/compare/v2.11.0...v2.11.1
 [2.11.0]: https://github.com/osmcode/libosmium/compare/v2.10.3...v2.11.0
