@@ -474,17 +474,17 @@ namespace osmium {
 
             class rings_stack_element {
 
-                int32_t m_y;
+                double m_y;
                 detail::ProtoRing* m_ring_ptr;
 
             public:
 
-                rings_stack_element(int32_t y, detail::ProtoRing* ring_ptr) :
+                rings_stack_element(double y, detail::ProtoRing* ring_ptr) :
                     m_y(y),
                     m_ring_ptr(ring_ptr) {
                 }
 
-                int32_t y() const noexcept {
+                double y() const noexcept {
                     return m_y;
                 }
 
@@ -504,7 +504,7 @@ namespace osmium {
                     return m_y < rhs.m_y;
                 }
 
-            }; // class ring_stack_element
+            }; // class rings_stack_element
 
             using rings_stack = std::vector<rings_stack_element>;
 
@@ -592,7 +592,7 @@ namespace osmium {
                                 if (debug()) {
                                     std::cerr << "        Segment belongs to outer ring\n";
                                 }
-                                const int32_t y = int32_t(ay + (by - ay) * (lx - ax) / (bx - ax));
+                                const double y = ay + (by - ay) * (lx - ax) / double(bx - ax);
                                 outer_rings.emplace_back(y, segment->ring());
                             }
                         }
