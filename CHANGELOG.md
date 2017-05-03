@@ -13,6 +13,40 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 
 
+## [2.12.2] - 2017-05-3
+
+### Added
+
+- Add two argument (key, value) overload of `TagMatcher::operator()`.
+
+### Changed
+
+- Detect, report, and remove duplicate ways in multipolygon relations.
+- Change EOF behaviour of Reader: The `Reader::read()` function will now
+  always return an invalid buffer exactly once to signal EOF.
+- Update QGIS multipolygon project that is part of the test suite to show
+  more problem types.
+- Copy multipolygon QGIS file for tests to build dir in cmake step.
+- Some code cleanups and improved debug output in multipolygon code.
+- Refactor I/O code to simplify code.
+- Disable some warnings on MSVC.
+- Various small code and build script changes.
+
+### Fixed
+
+- Two bugs in area assembler affecting very complex multipolygons and
+  multipolygons with overlapping or nearly overlapping lines.
+- Invalid use of iterators leading to undefined behaviour in area assembler
+  code.
+- Area assembler stats were not correctly counting inner rings that are
+  areas in their own right.
+- Fix a thread problem valgrind found that might or might not be real.
+- Read OPL file correctly even if trailing newline in file is missing.
+- Include order for `osmium/index/map` headers and
+  `osmium/index/node_locations_map.hpp` (or
+  `osmium/handler/node_locations_for_ways.hpp`) doesn't matter any more.
+
+
 ## [2.12.1] - 2017-04-10
 
 ### Added
@@ -606,7 +640,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   Doxygen (up to version 1.8.8). This version contains a workaround to fix
   this.
 
-[unreleased]: https://github.com/osmcode/libosmium/compare/v2.12.1...HEAD
+[unreleased]: https://github.com/osmcode/libosmium/compare/v2.12.2...HEAD
+[2.12.2]: https://github.com/osmcode/libosmium/compare/v2.12.1...v2.12.2
 [2.12.1]: https://github.com/osmcode/libosmium/compare/v2.12.0...v2.12.1
 [2.12.0]: https://github.com/osmcode/libosmium/compare/v2.11.0...v2.12.0
 [2.11.0]: https://github.com/osmcode/libosmium/compare/v2.10.3...v2.11.0
