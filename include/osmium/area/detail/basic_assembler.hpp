@@ -273,7 +273,7 @@ namespace osmium {
                         return m_y < rhs.m_y;
                     }
 
-                }; // class ring_stack_element
+                }; // class rings_stack_element
 
                 using rings_stack = std::vector<rings_stack_element>;
 
