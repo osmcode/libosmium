@@ -88,7 +88,7 @@ int main(int argc, char* argv[]) {
     }
 
     const int remaining_args = argc - optind;
-    if (remaining_args > 2) {
+    if (remaining_args == 0 || remaining_args > 2) {
         std::cerr << "Usage: " << argv[0] << " [OPTIONS] [INFILE [OUTFILE]]\n";
         std::exit(1);
     }
