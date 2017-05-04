@@ -43,8 +43,14 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Dev")
     set(dev_build ON)
+    set(data_test_build ON)
 else()
     set(dev_build OFF)
+    set(data_test_build OFF)
+endif()
+
+if(CMAKE_BUILD_TYPE STREQUAL "Coverage")
+    set(data_test_build ON)
 endif()
 
 option(BUILD_EXAMPLES   "compile example programs" ON)
@@ -52,7 +58,8 @@ option(BUILD_TESTING    "compile unit tests, please run them with ctest" ON)
 
 option(BUILD_HEADERS    "compile every header file on its own" ${dev_build})
 option(BUILD_BENCHMARKS "compile benchmark programs" ${dev_build})
-option(BUILD_DATA_TESTS "compile data tests, please run them with ctest" ${dev_build})
+
+option(BUILD_DATA_TESTS "compile data tests, please run them with ctest" ${data_test_build})
 
 option(INSTALL_GDALCPP   "also install gdalcpp headers" OFF)
 option(INSTALL_PROTOZERO "also install protozero headers" OFF)
@@ -88,11 +95,12 @@ endif()
 #
 #-----------------------------------------------------------------------------
 
-include(CheckCXXCompilerFlag)
-check_cxx_compiler_flag("-fkeep-inline-functions" HAS_KEEP_INLINE_FUNCTIONS)
-if(HAS_KEEP_INLINE_FUNCTIONS)
-    set(extra_coverage_flags_ "-fkeep-inline-functions")
-endif()
+## This leads to all sorts of compile problems, so disable for now
+#include(CheckCXXCompilerFlag)
+#check_cxx_compiler_flag("-fkeep-inline-functions" HAS_KEEP_INLINE_FUNCTIONS)
+#if(HAS_KEEP_INLINE_FUNCTIONS)
+#    set(extra_coverage_flags_ "-fkeep-inline-functions")
+#endif()
 
 set(CMAKE_CXX_FLAGS_COVERAGE
     "-g -O0 -fno-inline-functions -fno-inline --coverage ${extra_coverage_flags_}"
@@ -103,8 +111,8 @@ set(CMAKE_EXE_LINKER_FLAGS_COVERAGE
     CACHE STRING "Flags used by the linker during coverage builds.")
 
 if(CMAKE_BUILD_TYPE STREQUAL "Coverage")
-    if(BUILD_EXAMPLES OR BUILD_HEADERS OR BUILD_BENCHMARKS OR BUILD_DATA_TESTS)
-        message(WARNING "Coverage builds don't work for anything but the unit tests")
+    if(BUILD_EXAMPLES OR BUILD_HEADERS OR BUILD_BENCHMARKS)
+        message(WARNING "Coverage builds don't work for anything but the tests")
     endif()
 
     if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
