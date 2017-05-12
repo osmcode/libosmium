@@ -271,9 +271,7 @@ namespace osmium {
                  * same segment. So if there are three, for instance, two will
                  * be removed and one will be left.
                  */
-                uint32_t erase_duplicate_segments(ProblemReporter* problem_reporter) {
-                    uint32_t duplicate_segments = 0;
-
+                void erase_duplicate_segments(ProblemReporter* problem_reporter, uint64_t& duplicate_segments, uint64_t& overlapping_segments) {
                     while (true) {
                         auto it = std::adjacent_find(m_segments.begin(), m_segments.end());
                         if (it == m_segments.end()) {
@@ -296,10 +294,16 @@ namespace osmium {
                                 problem_reporter->report_duplicate_segment(it->first(), it->second());
                             }
                         }
+
+                        if (it+2 != m_segments.end() && *it == *(it+2)) {
+                            ++overlapping_segments;
+                            if (problem_reporter) {
+                                problem_reporter->report_overlapping_segment(it->first(), it->second());
+                            }
+                        }
+
                         m_segments.erase(it, it+2);
                     }
-
-                    return duplicate_segments;
                 }
 
                 /**

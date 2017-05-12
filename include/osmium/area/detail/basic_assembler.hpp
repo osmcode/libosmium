@@ -1013,7 +1013,7 @@ namespace osmium {
                     // are two identical segments, they will both be removed. If
                     // there are three, two will be removed and one remains.
                     osmium::Timer timer_dupl;
-                    m_stats.duplicate_segments = m_segment_list.erase_duplicate_segments(m_config.problem_reporter);
+                    m_segment_list.erase_duplicate_segments(m_config.problem_reporter, m_stats.duplicate_segments, m_stats.overlapping_segments);
                     timer_dupl.stop();
 
                     // If there are no segments left at this point, this isn't
