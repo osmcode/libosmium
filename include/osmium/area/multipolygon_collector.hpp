@@ -81,7 +81,7 @@ namespace osmium {
 
             osmium::memory::Buffer m_output_buffer;
 
-            osmium::area::area_stats m_stats;
+            area_stats m_stats;
 
             static constexpr size_t initial_output_buffer_size = 1024 * 1024;
             static constexpr size_t max_buffer_size_for_flush = 100 * 1024;
@@ -109,7 +109,7 @@ namespace osmium {
                 m_output_buffer(initial_output_buffer_size, osmium::memory::Buffer::auto_grow::yes) {
             }
 
-            const osmium::area::area_stats& stats() const noexcept {
+            const area_stats& stats() const noexcept {
                 return m_stats;
             }
 

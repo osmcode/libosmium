@@ -51,7 +51,7 @@ namespace osmium {
             /**
              * Optional pointer to problem reporter.
              */
-            osmium::area::ProblemReporter* problem_reporter = nullptr;
+            ProblemReporter* problem_reporter = nullptr;
 
             /**
              * Debug level. If this is greater than zero, debug messages will
@@ -128,7 +128,7 @@ namespace osmium {
              * Constructor
              * @deprecated Use default constructor and set values afterwards.
              */
-            explicit AssemblerConfig(osmium::area::ProblemReporter* pr, bool d = false) :
+            explicit AssemblerConfig(ProblemReporter* pr, bool d = false) :
                 problem_reporter(pr),
                 debug_level(d) {
             }

@@ -111,7 +111,7 @@ namespace osmium {
                     });
                 }
 
-                uint32_t extract_segments_from_way_impl(osmium::area::ProblemReporter* problem_reporter, uint64_t& duplicate_nodes, const osmium::Way& way, role_type role) {
+                uint32_t extract_segments_from_way_impl(ProblemReporter* problem_reporter, uint64_t& duplicate_nodes, const osmium::Way& way, role_type role) {
                     uint32_t invalid_locations = 0;
 
                     osmium::NodeRef previous_nr;
@@ -221,7 +221,7 @@ namespace osmium {
                  * same node or different nodes with same location) are
                  * removed after reporting the duplicate node.
                  */
-                uint32_t extract_segments_from_way(osmium::area::ProblemReporter* problem_reporter, uint64_t& duplicate_nodes, const osmium::Way& way) {
+                uint32_t extract_segments_from_way(ProblemReporter* problem_reporter, uint64_t& duplicate_nodes, const osmium::Way& way) {
                     if (way.nodes().empty()) {
                         return 0;
                     }
@@ -233,7 +233,7 @@ namespace osmium {
                  * Extract all segments from all ways that make up this
                  * multipolygon relation and add them to the list.
                  */
-                uint32_t extract_segments_from_ways(osmium::area::ProblemReporter* problem_reporter,
+                uint32_t extract_segments_from_ways(ProblemReporter* problem_reporter,
                                                     uint64_t& duplicate_nodes,
                                                     uint64_t& duplicate_ways,
                                                     const osmium::Relation& relation,
@@ -271,7 +271,7 @@ namespace osmium {
                  * same segment. So if there are three, for instance, two will
                  * be removed and one will be left.
                  */
-                uint32_t erase_duplicate_segments(osmium::area::ProblemReporter* problem_reporter) {
+                uint32_t erase_duplicate_segments(ProblemReporter* problem_reporter) {
                     uint32_t duplicate_segments = 0;
 
                     while (true) {
@@ -309,7 +309,7 @@ namespace osmium {
                  *                         reported to this object.
                  * @returns true if there are intersections.
                  */
-                uint32_t find_intersections(osmium::area::ProblemReporter* problem_reporter) const {
+                uint32_t find_intersections(ProblemReporter* problem_reporter) const {
                     if (m_segments.empty()) {
                         return 0;
                     }
