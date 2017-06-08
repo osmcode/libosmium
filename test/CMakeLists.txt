@@ -183,6 +183,8 @@ add_unit_test(io test_writer ENABLE_IF ${Threads_FOUND} LIBS ${OSMIUM_XML_LIBRAR
 add_unit_test(io test_writer_with_mock_compression ENABLE_IF ${Threads_FOUND} LIBS ${OSMIUM_XML_LIBRARIES})
 add_unit_test(io test_writer_with_mock_encoder ENABLE_IF ${Threads_FOUND} LIBS ${OSMIUM_XML_LIBRARIES})
 
+add_unit_test(storage test_item_stash)
+
 add_unit_test(tags test_filter)
 add_unit_test(tags test_operators)
 add_unit_test(tags test_tag_list)
