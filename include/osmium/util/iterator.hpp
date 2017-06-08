@@ -44,7 +44,7 @@ namespace osmium {
 
         using iterator = It;
 
-        explicit iterator_range(P&& p) :
+        explicit iterator_range(P&& p) noexcept :
             P(std::forward<P>(p)) {
         }
 /*
@@ -56,15 +56,15 @@ namespace osmium {
             return this->second;
         }
 */
-        It begin() const {
+        It begin() const noexcept {
             return this->first;
         }
 
-        It end() const {
+        It end() const noexcept {
             return this->second;
         }
 
-        size_t empty() const {
+        bool empty() const noexcept {
             return begin() == end();
         }
 
@@ -74,9 +74,9 @@ namespace osmium {
      * Helper function to create iterator_range from std::pair.
      */
     template <typename P, typename It = typename P::first_type>
-    inline iterator_range<It> make_range(P&& p) {
+    inline iterator_range<It> make_range(P&& p) noexcept {
         static_assert(std::is_same<P, std::pair<It, It>>::value, "make_range needs pair of iterators as argument");
-        return iterator_range<It>(std::forward<P>(p));
+        return iterator_range<It>{std::forward<P>(p)};
     }
 
 } // namespace osmium
