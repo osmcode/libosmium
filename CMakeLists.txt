@@ -323,6 +323,7 @@ if(CPPCHECK)
     message(STATUS "Looking for cppcheck - found")
     set(CPPCHECK_OPTIONS
         --language=c++
+        --quiet
         -j4
         --inline-suppr
         --enable=warning,style,performance,portability,information,missingInclude
