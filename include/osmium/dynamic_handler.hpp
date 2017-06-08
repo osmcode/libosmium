@@ -115,7 +115,7 @@ auto _name_##_dispatch(THandler& handler, const osmium::_type_& object, long) ->
             public:
 
                 template <typename... TArgs>
-                HandlerWrapper(TArgs&&... args) :
+                explicit HandlerWrapper(TArgs&&... args) :
                     m_handler(std::forward<TArgs>(args)...) {
                 }
 
