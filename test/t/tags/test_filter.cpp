@@ -26,7 +26,7 @@ void check_filter(const osmium::TagList& tag_list,
 }
 
 const osmium::TagList& make_tag_list(osmium::memory::Buffer& buffer,
-                                     std::initializer_list<std::pair<const char*, const char*>> tags) {
+                                     const std::initializer_list<std::pair<const char*, const char*>>& tags) {
     const auto pos = osmium::builder::add_tag_list(buffer, osmium::builder::attr::_tags(tags));
     return buffer.get<osmium::TagList>(pos);
 }
