@@ -74,7 +74,7 @@ namespace osmium {
                 str[17] >= '0' && str[17] <= '9' &&
                 str[18] >= '0' && str[18] <= '9' &&
                 str[19] == 'Z') {
-                struct tm tm;
+                struct tm tm{};
                 tm.tm_year = (str[ 0] - '0') * 1000 +
                              (str[ 1] - '0') *  100 +
                              (str[ 2] - '0') *   10 +
