@@ -121,7 +121,7 @@ namespace osmium {
 
             public:
 
-                Parser(parser_arguments& args) :
+                explicit Parser(parser_arguments& args) :
                     m_output_queue(args.output_queue),
                     m_header_promise(args.header_promise),
                     m_input_queue(args.input_queue),

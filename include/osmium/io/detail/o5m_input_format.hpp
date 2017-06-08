@@ -589,7 +589,7 @@ namespace osmium {
 
             public:
 
-                O5mParser(parser_arguments& args) :
+                explicit O5mParser(parser_arguments& args) :
                     Parser(args),
                     m_header(),
                     m_buffer(buffer_size),

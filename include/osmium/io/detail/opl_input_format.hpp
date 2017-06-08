@@ -79,7 +79,7 @@ namespace osmium {
 
             public:
 
-                OPLParser(parser_arguments& args) :
+                explicit OPLParser(parser_arguments& args) :
                     Parser(args) {
                     set_header_value(osmium::io::Header{});
                 }

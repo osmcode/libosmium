@@ -192,7 +192,7 @@ namespace osmium {
 
             public:
 
-                PBFParser(parser_arguments& args) :
+                explicit PBFParser(parser_arguments& args) :
                     Parser(args),
                     m_input_buffer() {
                 }
