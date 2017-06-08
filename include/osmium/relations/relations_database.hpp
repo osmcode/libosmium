@@ -93,17 +93,7 @@ namespace osmium {
                  * a subset of them) and then count down for every member we
                  * find. When it is 0, the relation is complete.
                  */
-                unsigned int members = 0;
-
-                /**
-                 * Initialize an empty element. This is needed to
-                 * zero out relations that have been completed.
-                 */
-                element() noexcept = default;
-
-                explicit element(const osmium::ItemStash::handle_type& h) noexcept :
-                    handle(h) {
-                }
+                std::size_t members;
 
             }; // struct element
 
@@ -115,18 +105,18 @@ namespace osmium {
                 return m_stash.get<osmium::Relation>(m_elements[pos].handle);
             }
 
-            unsigned int& members(std::size_t pos) noexcept {
+            std::size_t& members(std::size_t pos) noexcept {
                 return m_elements[pos].members;
             }
 
-            const unsigned int& members(std::size_t pos) const noexcept {
+            const std::size_t& members(std::size_t pos) const noexcept {
                 return m_elements[pos].members;
             }
 
             void remove(std::size_t pos) {
                 auto& elem = m_elements[pos];
                 m_stash.remove_item(elem.handle);
-                elem = element{};
+                elem = element{osmium::ItemStash::handle_type{}, 0};
             }
 
         public:
@@ -289,7 +279,7 @@ namespace osmium {
             /**
              * Set the number of relation members that we want to track.
              */
-            void set_members(unsigned int value) noexcept {
+            void set_members(std::size_t value) noexcept {
                 m_relation_database->members(m_pos) = value;
             }
 
@@ -326,7 +316,7 @@ namespace osmium {
         }
 
         inline RelationHandle RelationsDatabase::add(const osmium::Relation& relation) {
-            m_elements.emplace_back(m_stash.add_item(relation));
+            m_elements.push_back(element{m_stash.add_item(relation), 0});
             return {this, m_elements.size() - 1};
         }
 

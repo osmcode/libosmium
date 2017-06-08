@@ -41,7 +41,7 @@ TEST_CASE("Fill relation database") {
 
     for (const auto& relation : buffer.select<osmium::Relation>()) {
         auto handle = rdb.add(relation);
-        handle.set_members(relation.id());
+        handle.set_members(relation.cmembers().size());
         handle.decrement_members();
         REQUIRE(handle.has_all_members() == (relation.id() == 1));
     }
