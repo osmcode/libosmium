@@ -304,7 +304,7 @@ namespace osmium {
              * rare case that a very large object will be added taking more
              * than the difference between committed() and capacity().
              */
-            OSMIUM_DEPRECATED void set_full_callback(std::function<void(Buffer&)> full) {
+            OSMIUM_DEPRECATED void set_full_callback(const std::function<void(Buffer&)>& full) {
                 assert(m_data && "This must be a valid buffer");
                 m_full = full;
             }
