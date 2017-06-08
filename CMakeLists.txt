@@ -322,7 +322,7 @@ find_program(CPPCHECK cppcheck)
 if(CPPCHECK)
     message(STATUS "Looking for cppcheck - found")
     set(CPPCHECK_OPTIONS
-        --enable=warning,style,performance,portability,information,missingInclude --force -Uassert)
+        --enable=warning,style,performance,portability,information,missingInclude --force -Uassert -DPROTOZERO_STRICT_API -DPROTOZERO_USE_BUILTIN_BSWAP -UPROTOZERO_USE_VIEW)
 
     # cpp doesn't find system includes for some reason, suppress that report
     set(CPPCHECK_OPTIONS ${CPPCHECK_OPTIONS} --suppress=missingIncludeSystem)
