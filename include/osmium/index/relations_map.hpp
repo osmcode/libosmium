@@ -172,7 +172,7 @@ namespace osmium {
 
             map_type m_map;
 
-            RelationsMapIndex(map_type&& map) :
+            explicit RelationsMapIndex(map_type&& map) :
                 m_map(std::move(map)) {
             }
 
