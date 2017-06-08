@@ -1,5 +1,5 @@
-#ifndef OSMIUM_AREA_ASSEMBLER_HPP
-#define OSMIUM_AREA_ASSEMBLER_HPP
+#ifndef OSMIUM_AREA_ASSEMBLER_LEGACY_HPP
+#define OSMIUM_AREA_ASSEMBLER_LEGACY_HPP
 
 /*
 
@@ -57,6 +57,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/tag.hpp>
 #include <osmium/osm/types.hpp>
 #include <osmium/osm/way.hpp>
+#include <osmium/tags/filter.hpp>
 #include <osmium/util/compatibility.hpp>
 
 namespace osmium {
@@ -67,7 +68,95 @@ namespace osmium {
          * Assembles area objects from closed ways or multipolygon relations
          * and their members.
          */
-        class Assembler : public detail::BasicAssemblerWithTags {
+        class AssemblerLegacy : public detail::BasicAssemblerWithTags {
+
+            void add_tags_to_area(osmium::builder::AreaBuilder& builder, const osmium::Way& way) const {
+                builder.add_item(way.tags());
+            }
+
+            void add_common_tags(osmium::builder::TagListBuilder& tl_builder, std::set<const osmium::Way*>& ways) const {
+                std::map<std::string, size_t> counter;
+                for (const osmium::Way* way : ways) {
+                    for (const auto& tag : way->tags()) {
+                        std::string kv{tag.key()};
+                        kv.append(1, '\0');
+                        kv.append(tag.value());
+                        ++counter[kv];
+                    }
+                }
+
+                const size_t num_ways = ways.size();
+                for (const auto& t_c : counter) {
+                    if (debug()) {
+                        std::cerr << "        tag " << t_c.first << " is used " << t_c.second << " times in " << num_ways << " ways\n";
+                    }
+                    if (t_c.second == num_ways) {
+                        const size_t len = std::strlen(t_c.first.c_str());
+                        tl_builder.add_tag(t_c.first.c_str(), t_c.first.c_str() + len + 1);
+                    }
+                }
+            }
+
+            struct MPFilter : public osmium::tags::KeyFilter {
+
+                MPFilter() : osmium::tags::KeyFilter(true) {
+                    add(false, "type");
+                    add(false, "created_by");
+                    add(false, "source");
+                    add(false, "note");
+                    add(false, "test:id");
+                    add(false, "test:section");
+                }
+
+            }; // struct MPFilter
+
+            static const MPFilter& filter() noexcept {
+                static const MPFilter filter;
+                return filter;
+            }
+
+            void add_tags_to_area(osmium::builder::AreaBuilder& builder, const osmium::Relation& relation) {
+                const auto count = std::count_if(relation.tags().cbegin(), relation.tags().cend(), std::cref(filter()));
+
+                if (debug()) {
+                    std::cerr << "  found " << count << " tags on relation (without ignored ones)\n";
+                }
+
+                if (count > 0) {
+                    if (debug()) {
+                        std::cerr << "    use tags from relation\n";
+                    }
+
+                    if (config().keep_type_tag) {
+                        builder.add_item(relation.tags());
+                    } else {
+                        copy_tags_without_type(builder, relation.tags());
+                    }
+                } else {
+                    ++stats().no_tags_on_relation;
+                    if (debug()) {
+                        std::cerr << "    use tags from outer ways\n";
+                    }
+                    std::set<const osmium::Way*> ways;
+                    for (const auto& ring : rings()) {
+                        if (ring.is_outer()) {
+                            ring.get_ways(ways);
+                        }
+                    }
+                    if (ways.size() == 1) {
+                        if (debug()) {
+                            std::cerr << "      only one outer way\n";
+                        }
+                        builder.add_item((*ways.cbegin())->tags());
+                    } else {
+                        if (debug()) {
+                            std::cerr << "      multiple outer ways, get common tags\n";
+                        }
+                        osmium::builder::TagListBuilder tl_builder{builder};
+                        add_common_tags(tl_builder, ways);
+                    }
+                }
+            }
 
             bool create_area(osmium::memory::Buffer& out_buffer, const osmium::Way& way) {
                 osmium::builder::AreaBuilder builder{out_buffer};
@@ -75,7 +164,7 @@ namespace osmium {
 
                 const bool area_okay = create_rings();
                 if (area_okay || config().create_empty_areas) {
-                    builder.add_item(way.tags());
+                    add_tags_to_area(builder, way);
                 }
                 if (area_okay) {
                     add_rings_to_area(builder);
@@ -95,11 +184,7 @@ namespace osmium {
 
                 const bool area_okay = create_rings();
                 if (area_okay || config().create_empty_areas) {
-                    if (config().keep_type_tag) {
-                        builder.add_item(relation.tags());
-                    } else {
-                        copy_tags_without_type(builder, relation.tags());
-                    }
+                    add_tags_to_area(builder, relation);
                 }
                 if (area_okay) {
                     add_rings_to_area(builder);
@@ -116,11 +201,11 @@ namespace osmium {
 
         public:
 
-            explicit Assembler(const config_type& config) :
+            explicit AssemblerLegacy(const config_type& config) :
                 detail::BasicAssemblerWithTags(config) {
             }
 
-            ~Assembler() noexcept = default;
+            ~AssemblerLegacy() noexcept = default;
 
             /**
              * Assemble an area from the given way.
@@ -131,6 +216,10 @@ namespace osmium {
              */
             bool operator()(const osmium::Way& way, osmium::memory::Buffer& out_buffer) {
                 if (!config().create_way_polygons) {
+                    return true;
+                }
+
+                if (way.tags().has_tag("area", "no")) {
                     return true;
                 }
 
@@ -218,22 +307,74 @@ namespace osmium {
                     std::cerr << "\nAssembling relation " << relation.id() << " containing " << members.size() << " way members with " << segment_list().size() << " nodes\n";
                 }
 
+                const size_t area_offset = out_buffer.committed();
+
                 // Now create the Area object and add the attributes and tags
                 // from the relation.
                 bool okay = create_area(out_buffer, relation, members);
                 if (okay) {
-                    out_buffer.commit();
+                    if ((config().create_new_style_polygons && stats().no_tags_on_relation == 0) ||
+                        (config().create_old_style_polygons && stats().no_tags_on_relation != 0)) {
+                        out_buffer.commit();
+                    } else {
+                        out_buffer.rollback();
+                    }
                 } else {
                     out_buffer.rollback();
+                }
+
+                const osmium::TagList& area_tags = out_buffer.get<osmium::Area>(area_offset).tags(); // tags of the area we just built
+
+                // Find all closed ways that are inner rings and check their
+                // tags. If they are not the same as the tags of the area we
+                // just built, add them to a list and later build areas for
+                // them, too.
+                std::vector<const osmium::Way*> ways_that_should_be_areas;
+                if (stats().wrong_role == 0) {
+                    detail::for_each_member(relation, members, [this, &ways_that_should_be_areas, &area_tags](const osmium::RelationMember& member, const osmium::Way& way) {
+                        if (!std::strcmp(member.role(), "inner")) {
+                            if (!way.nodes().empty() && way.is_closed() && way.tags().size() > 0) {
+                                const auto d = std::count_if(way.tags().cbegin(), way.tags().cend(), std::cref(filter()));
+                                if (d > 0) {
+                                    osmium::tags::KeyFilter::iterator way_fi_begin(std::cref(filter()), way.tags().cbegin(), way.tags().cend());
+                                    osmium::tags::KeyFilter::iterator way_fi_end(std::cref(filter()), way.tags().cend(), way.tags().cend());
+                                    osmium::tags::KeyFilter::iterator area_fi_begin(std::cref(filter()), area_tags.cbegin(), area_tags.cend());
+                                    osmium::tags::KeyFilter::iterator area_fi_end(std::cref(filter()), area_tags.cend(), area_tags.cend());
+
+                                    if (!std::equal(way_fi_begin, way_fi_end, area_fi_begin) || d != std::distance(area_fi_begin, area_fi_end)) {
+                                        ways_that_should_be_areas.push_back(&way);
+                                    } else {
+                                        ++stats().inner_with_same_tags;
+                                        if (config().problem_reporter) {
+                                            config().problem_reporter->report_inner_with_same_tags(way);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+
+                if (debug()) {
+                    std::cerr << "Done: " << stats() << "\n";
+                }
+
+                // Now build areas for all ways found in the last step.
+                for (const osmium::Way* way : ways_that_should_be_areas) {
+                    AssemblerLegacy assembler{config()};
+                    if (!assembler(*way, out_buffer)) {
+                        okay = false;
+                    }
+                    stats() += assembler.stats();
                 }
 
                 return okay;
             }
 
-        }; // class Assembler
+        }; // class AssemblerLegacy
 
     } // namespace area
 
 } // namespace osmium
 
-#endif // OSMIUM_AREA_ASSEMBLER_HPP
+#endif // OSMIUM_AREA_ASSEMBLER_LEGACY_HPP
