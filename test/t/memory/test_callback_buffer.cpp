@@ -66,10 +66,8 @@ TEST_CASE("Callback buffer with callback triggering sometimes") {
     REQUIRE(cb.buffer().committed() < 100);
     cb.possibly_flush();
     osmium::builder::add_node(cb.buffer(), _id(2));
-    REQUIRE(cb.buffer().committed() < 100);
     cb.possibly_flush();
     osmium::builder::add_node(cb.buffer(), _id(3));
-    REQUIRE(cb.buffer().committed() > 100);
     cb.possibly_flush();
 
     REQUIRE(std::distance(cb.buffer().begin(), cb.buffer().end()) == 0);
