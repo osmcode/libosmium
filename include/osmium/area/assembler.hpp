@@ -188,7 +188,7 @@ namespace osmium {
              *          area(s), true otherwise.
              */
             bool operator()(const osmium::Relation& relation, const std::vector<const osmium::Way*>& members, osmium::memory::Buffer& out_buffer) {
-                assert(relation.members().size() >= members.size());
+                assert(relation.cmembers().size() >= members.size());
 
                 if (config().problem_reporter) {
                     config().problem_reporter->set_object(osmium::item_type::relation, relation.id());

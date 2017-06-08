@@ -183,11 +183,18 @@ namespace osmium {
             return t == itemtype;
         }
 
+        /// Get a reference to the member list.
         RelationMemberList& members() {
             return osmium::detail::subitem_of_type<RelationMemberList>(begin(), end());
         }
 
+        /// Get a const reference to the member list.
         const RelationMemberList& members() const {
+            return osmium::detail::subitem_of_type<const RelationMemberList>(cbegin(), cend());
+        }
+
+        /// Get a const reference to the member list.
+        const RelationMemberList& cmembers() const {
             return osmium::detail::subitem_of_type<const RelationMemberList>(cbegin(), cend());
         }
 

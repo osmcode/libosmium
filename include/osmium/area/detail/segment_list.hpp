@@ -238,7 +238,7 @@ namespace osmium {
                                                     uint64_t& duplicate_ways,
                                                     const osmium::Relation& relation,
                                                     const std::vector<const osmium::Way*>& members) {
-                    assert(relation.members().size() >= members.size());
+                    assert(relation.cmembers().size() >= members.size());
 
                     const size_t num_segments = get_num_segments(members);
                     if (problem_reporter) {

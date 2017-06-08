@@ -403,6 +403,17 @@ namespace osmium {
             }
 
             /**
+             * Get a const reference to the object buing built.
+             *
+             * Note that this reference will be invalidated by every action
+             * on the builder that might make the buffer grow. This includes
+             * calls to set_user() and any time a new sub-builder is created.
+             */
+            const T& cobject() const noexcept {
+                return static_cast<const T&>(item());
+            }
+
+            /**
              * Set user name.
              *
              * @param user Pointer to user name.
@@ -410,7 +421,7 @@ namespace osmium {
              */
             TDerived& set_user(const char* user, const string_size_type length) {
                 const auto size_of_object = sizeof(T) + sizeof(string_size_type);
-                assert(object().user_size() == 1 && (size() <= size_of_object + osmium::memory::padded_length(1))
+                assert(cobject().user_size() == 1 && (size() <= size_of_object + osmium::memory::padded_length(1))
                        && "set_user() must be called at most once and before any sub-builders");
                 const auto available_space = min_size_for_user - sizeof(string_size_type) - 1;
                 if (length > available_space) {
@@ -581,6 +592,17 @@ namespace osmium {
                 return static_cast<Changeset&>(item());
             }
 
+            /**
+             * Get a const reference to the changeset buing built.
+             *
+             * Note that this reference will be invalidated by every action
+             * on the builder that might make the buffer grow. This includes
+             * calls to set_user() and any time a new sub-builder is created.
+             */
+            const Changeset& cobject() const noexcept {
+                return static_cast<const Changeset&>(item());
+            }
+
             OSMIUM_FORWARD(set_id)
             OSMIUM_FORWARD(set_uid)
             OSMIUM_FORWARD(set_uid_from_signed)
@@ -608,7 +630,7 @@ namespace osmium {
              * @param length Length of user name (without \0 termination).
              */
             ChangesetBuilder& set_user(const char* user, const string_size_type length) {
-                assert(object().user_size() == 1 && (size() <= sizeof(Changeset) + osmium::memory::padded_length(1))
+                assert(cobject().user_size() == 1 && (size() <= sizeof(Changeset) + osmium::memory::padded_length(1))
                        && "set_user() must be called at most once and before any sub-builders");
                 const auto available_space = min_size_for_user - 1;
                 if (length > available_space) {
