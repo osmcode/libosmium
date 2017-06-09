@@ -211,6 +211,8 @@ add_unit_test(util test_minmax)
 add_unit_test(util test_options)
 add_unit_test(util test_string)
 add_unit_test(util test_string_matcher)
+add_unit_test(util test_timer_disabled)
+add_unit_test(util test_timer_enabled)
 
 
 #-----------------------------------------------------------------------------
