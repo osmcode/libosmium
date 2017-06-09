@@ -157,5 +157,11 @@ TEST_CASE("Fill item stash until it compacts") {
 
     REQUIRE(stash.size() == num_items / 10);
     REQUIRE(stash.count_removed() == num_items / 10 * 9);
+
+    // trigger compaction
+    stash.add_item(node);
+
+    REQUIRE(stash.size() == num_items / 10 + 1);
+    REQUIRE(stash.count_removed() == 0);
 }
 
