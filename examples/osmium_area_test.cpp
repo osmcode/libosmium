@@ -93,10 +93,10 @@ void print_help() {
 
 int main(int argc, char* argv[]) {
     static struct option long_options[] = {
-        {"help",         no_argument, 0, 'h'},
-        {"dump-wkt",     no_argument, 0, 'w'},
-        {"dump-objects", no_argument, 0, 'o'},
-        {0, 0, 0, 0}
+        {"help",         no_argument, nullptr, 'h'},
+        {"dump-wkt",     no_argument, nullptr, 'w'},
+        {"dump-objects", no_argument, nullptr, 'o'},
+        {nullptr, 0, nullptr, 0}
     };
 
     // Initialize an empty DynamicHandler. Later it will be associated
@@ -107,7 +107,7 @@ int main(int argc, char* argv[]) {
 
     // Read options from command line.
     while (true) {
-        const int c = getopt_long(argc, argv, "hwo", long_options, 0);
+        const int c = getopt_long(argc, argv, "hwo", long_options, nullptr);
         if (c == -1) {
             break;
         }

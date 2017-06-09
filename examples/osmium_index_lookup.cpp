@@ -192,17 +192,17 @@ public:
         }
 
         static struct option long_options[] = {
-            {"array",  required_argument, 0, 'a'},
-            {"dump",         no_argument, 0, 'd'},
-            {"help",         no_argument, 0, 'h'},
-            {"list",   required_argument, 0, 'l'},
-            {"search", required_argument, 0, 's'},
-            {"type",   required_argument, 0, 't'},
-            {0, 0, 0, 0}
+            {"array",  required_argument, nullptr, 'a'},
+            {"dump",         no_argument, nullptr, 'd'},
+            {"help",         no_argument, nullptr, 'h'},
+            {"list",   required_argument, nullptr, 'l'},
+            {"search", required_argument, nullptr, 's'},
+            {"type",   required_argument, nullptr, 't'},
+            {nullptr, 0, nullptr, 0}
         };
 
         while (true) {
-            const int c = getopt_long(argc, argv, "a:dhl:s:t:", long_options, 0);
+            const int c = getopt_long(argc, argv, "a:dhl:s:t:", long_options, nullptr);
             if (c == -1) {
                 break;
             }
