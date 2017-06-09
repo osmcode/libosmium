@@ -918,7 +918,9 @@ namespace osmium {
                             if (debug()) {
                                 std::cerr << "  There are " << open_ring_its.size() << " open rings\n";
                             }
-                            while (try_to_merge(open_ring_its));
+                            while (try_to_merge(open_ring_its)) {
+                                // intentionally left blank
+                            }
 
                             if (!open_ring_its.empty()) {
                                 if (debug()) {

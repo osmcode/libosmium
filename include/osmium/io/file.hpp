@@ -192,7 +192,9 @@ namespace osmium {
             void detect_format_from_suffix(const std::string& name) {
                 std::vector<std::string> suffixes = detail::split(name, '.');
 
-                if (suffixes.empty()) return;
+                if (suffixes.empty()) {
+                    return;
+                }
 
                 // if the last suffix is one of a known set of compressions,
                 // set that compression
@@ -204,7 +206,9 @@ namespace osmium {
                     suffixes.pop_back();
                 }
 
-                if (suffixes.empty()) return;
+                if (suffixes.empty()) {
+                    return;
+                }
 
                 // if the last suffix is one of a known set of formats,
                 // set that format
@@ -233,17 +237,25 @@ namespace osmium {
                     suffixes.pop_back();
                 }
 
-                if (suffixes.empty()) return;
+                if (suffixes.empty()) {
+                    return;
+                }
 
                 if (suffixes.back() == "osm") {
-                    if (m_file_format == file_format::unknown) m_file_format = file_format::xml;
+                    if (m_file_format == file_format::unknown) {
+                        m_file_format = file_format::xml;
+                    }
                     suffixes.pop_back();
                 } else if (suffixes.back() == "osh") {
-                    if (m_file_format == file_format::unknown) m_file_format = file_format::xml;
+                    if (m_file_format == file_format::unknown) {
+                        m_file_format = file_format::xml;
+                    }
                     m_has_multiple_object_versions = true;
                     suffixes.pop_back();
                 } else if (suffixes.back() == "osc") {
-                    if (m_file_format == file_format::unknown) m_file_format = file_format::xml;
+                    if (m_file_format == file_format::unknown) {
+                        m_file_format = file_format::xml;
+                    }
                     m_has_multiple_object_versions = true;
                     set("xml_change_format", true);
                     suffixes.pop_back();

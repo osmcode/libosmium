@@ -491,6 +491,7 @@ if(CLANG_TIDY)
 
     list(APPEND CT_CHECKS "readability-*"
                          "-readability-identifier-naming"
+                         "-readability-implicit-bool-cast"
                          "-readability-named-parameter")
 
     string(REPLACE ";" "," ALL_CHECKS "${CT_CHECKS}")
