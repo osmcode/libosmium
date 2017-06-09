@@ -1,5 +1,6 @@
 #include "catch.hpp"
 
+#include <cstdint>
 #include <vector>
 
 #include <osmium/util/delta.hpp>
@@ -8,8 +9,26 @@ TEST_CASE("delta encode int") {
     osmium::util::DeltaEncode<int> x;
 
     REQUIRE(x.update(17) == 17);
+    REQUIRE(x.value() == 17);
     REQUIRE(x.update(10) == -7);
+    REQUIRE(x.value() == 10);
     REQUIRE(x.update(-10) == -20);
+    REQUIRE(x.value() == -10);
+    x.clear();
+    REQUIRE(x.value() == 0);
+}
+
+TEST_CASE("delta encode int with int32") {
+    osmium::util::DeltaEncode<int, int32_t> x;
+
+    REQUIRE(x.update(17) == 17);
+    REQUIRE(x.value() == 17);
+    REQUIRE(x.update(10) == -7);
+    REQUIRE(x.value() == 10);
+    REQUIRE(x.update(-10) == -20);
+    REQUIRE(x.value() == -10);
+    x.clear();
+    REQUIRE(x.value() == 0);
 }
 
 TEST_CASE("delta decode int") {
@@ -18,6 +37,18 @@ TEST_CASE("delta decode int") {
     REQUIRE(x.update(17) == 17);
     REQUIRE(x.update(10) == 27);
     REQUIRE(x.update(-40) == -13);
+    x.clear();
+    REQUIRE(x.update(17) == 17);
+}
+
+TEST_CASE("delta decode int with int32") {
+    osmium::util::DeltaDecode<int, int32_t> x;
+
+    REQUIRE(x.update(17) == 17);
+    REQUIRE(x.update(10) == 27);
+    REQUIRE(x.update(-40) == -13);
+    x.clear();
+    REQUIRE(x.update(17) == 17);
 }
 
 TEST_CASE("delta encode unsigned int") {
