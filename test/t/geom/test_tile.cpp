@@ -115,3 +115,29 @@ TEST_CASE("Check a random list of tiles") {
     }
 }
 
+TEST_CASE("Invalid tiles") {
+    osmium::geom::Tile tile{0, 0, 0};
+
+    REQUIRE(tile.valid());
+
+    SECTION("Zoom level out of bounds") {
+        tile.z = 100;
+    }
+    SECTION("x out of bounds") {
+        tile.x = 1;
+    }
+    SECTION("y out of bounds") {
+        tile.y = 1;
+    }
+    SECTION("x out of bounds") {
+        tile.z = 4;
+        tile.x = 100;
+    }
+    SECTION("y out of bounds") {
+        tile.z = 4;
+        tile.y = 100;
+    }
+
+    REQUIRE_FALSE(tile.valid());
+}
+
