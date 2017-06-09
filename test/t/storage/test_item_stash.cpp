@@ -130,3 +130,32 @@ TEST_CASE("Item stash") {
     REQUIRE(stash.count_removed() == 0);
 }
 
+TEST_CASE("Fill item stash until it compacts") {
+    auto buffer = generate_test_data();
+
+    osmium::ItemStash stash;
+    REQUIRE(stash.size() == 0);
+    REQUIRE(stash.count_removed() == 0);
+
+    const auto& node = buffer.get<osmium::Node>(0);
+
+    std::vector<osmium::ItemStash::handle_type> handles;
+    std::size_t num_items = 6 * 1000 * 1000;
+    for (std::size_t i = 0; i < num_items; ++i) {
+        auto handle = stash.add_item(node);
+        handles.push_back(handle);
+    }
+
+    REQUIRE(stash.size() == num_items);
+    REQUIRE(stash.count_removed() == 0);
+
+    for (std::size_t i = 0; i < num_items; ++i) {
+        if (i % 10 != 0) {
+            stash.remove_item(handles[i]);
+        }
+    }
+
+    REQUIRE(stash.size() == num_items / 10);
+    REQUIRE(stash.count_removed() == num_items / 10 * 9);
+}
+
