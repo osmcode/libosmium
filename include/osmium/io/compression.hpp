@@ -77,8 +77,7 @@ namespace osmium {
                 m_fsync(sync) {
             }
 
-            virtual ~Compressor() noexcept {
-            }
+            virtual ~Compressor() noexcept = default;
 
             virtual void write(const std::string& data) = 0;
 
@@ -103,8 +102,7 @@ namespace osmium {
             Decompressor(Decompressor&&) = delete;
             Decompressor& operator=(Decompressor&&) = delete;
 
-            virtual ~Decompressor() noexcept {
-            }
+            virtual ~Decompressor() noexcept = default;
 
             virtual std::string read() = 0;
 

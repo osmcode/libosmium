@@ -54,8 +54,7 @@ namespace osmium {
 
             public:
 
-                virtual ~HandlerWrapperBase() {
-                }
+                virtual ~HandlerWrapperBase() = default;
 
                 virtual void node(const osmium::Node&) {
                 }

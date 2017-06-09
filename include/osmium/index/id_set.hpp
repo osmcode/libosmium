@@ -57,8 +57,7 @@ namespace osmium {
 
         public:
 
-            virtual ~IdSet() {
-            }
+            virtual ~IdSet() = default;
 
             /**
              * Add the given Id to the set.
