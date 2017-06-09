@@ -3,7 +3,6 @@
 #include <osmium/util/options.hpp>
 
 TEST_CASE("Options") {
-
     osmium::util::Options o;
 
     SECTION("set a single value from string") {
@@ -52,11 +51,9 @@ TEST_CASE("Options") {
 
         REQUIRE(1 == o.size());
     }
-
 }
 
 TEST_CASE("Options with initializer list") {
-
     osmium::util::Options o{ { "foo", "true" }, { "bar", "17" } };
 
     REQUIRE(o.get("foo") == "true");
@@ -74,6 +71,44 @@ TEST_CASE("Options with initializer list") {
         o.set("new", "something");
         REQUIRE_FALSE(o.is_true("new"));
         REQUIRE(o.get("new") == "something");
+    }
+}
+
+TEST_CASE("Iterating over options") {
+    /*not const*/ osmium::util::Options o{ { "foo", "true" }, { "bar", "17" } };
+
+    auto it = o.begin();
+    REQUIRE(it->first == "bar");
+    REQUIRE(it->second == "17");
+    ++it;
+    REQUIRE(it->first == "foo");
+    REQUIRE(it->second == "true");
+    ++it;
+    REQUIRE(it == o.end());
+}
+
+TEST_CASE("Const iterating over options") {
+    const osmium::util::Options o{ { "foo", "true" }, { "bar", "17" } };
+
+    SECTION("begin/end") {
+        auto it = o.begin();
+        REQUIRE(it->first == "bar");
+        REQUIRE(it->second == "17");
+        ++it;
+        REQUIRE(it->first == "foo");
+        REQUIRE(it->second == "true");
+        ++it;
+        REQUIRE(it == o.end());
+    }
+    SECTION("cbegin/cend") {
+        auto it = o.cbegin();
+        REQUIRE(it->first == "bar");
+        REQUIRE(it->second == "17");
+        ++it;
+        REQUIRE(it->first == "foo");
+        REQUIRE(it->second == "true");
+        ++it;
+        REQUIRE(it == o.cend());
     }
 }
 
