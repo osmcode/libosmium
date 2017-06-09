@@ -33,6 +33,7 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <cassert>
 #include <cstdlib>
 #include <cstring>
 #include <string>
@@ -66,7 +67,8 @@ namespace osmium {
             return true;
         }
 
-        inline size_t get_max_queue_size(const char* queue_name, size_t default_value) noexcept {
+        inline std::size_t get_max_queue_size(const char* queue_name, std::size_t default_value) noexcept {
+            assert(queue_name);
             std::string name{"OSMIUM_MAX_"};
             name += queue_name;
             name += "_QUEUE_SIZE";
