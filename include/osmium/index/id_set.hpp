@@ -243,7 +243,7 @@ namespace osmium {
              *
              * @param id The Id to set.
              */
-            void set(T id) override final {
+            void set(T id) final {
                 (void)check_and_set(id);
             }
 
@@ -266,7 +266,7 @@ namespace osmium {
              *
              * @param id The Id to check.
              */
-            bool get(T id) const noexcept override final {
+            bool get(T id) const noexcept final {
                 if (chunk_id(id) >= m_data.size()) {
                     return false;
                 }
@@ -280,7 +280,7 @@ namespace osmium {
             /**
              * Is the set empty?
              */
-            bool empty() const noexcept override final {
+            bool empty() const noexcept final {
                 return m_size == 0;
             }
 
@@ -294,7 +294,7 @@ namespace osmium {
             /**
              * Clear the set.
              */
-            void clear() override final {
+            void clear() final {
                 m_data.clear();
                 m_size = 0;
             }
@@ -323,7 +323,7 @@ namespace osmium {
             /**
              * Add the given Id to the set.
              */
-            void set(T id) override final {
+            void set(T id) final {
                 m_data.push_back(id);
             }
 
@@ -332,7 +332,7 @@ namespace osmium {
              *
              * @param id The Id to check.
              */
-            bool get(T id) const noexcept override final {
+            bool get(T id) const noexcept final {
                 const auto it = std::find(m_data.cbegin(), m_data.cend(), id);
                 return it != m_data.cend();
             }
@@ -354,14 +354,14 @@ namespace osmium {
             /**
              * Is the set empty?
              */
-            bool empty() const noexcept override final {
+            bool empty() const noexcept final {
                 return m_data.empty();
             }
 
             /**
              * Clear the set.
              */
-            void clear() override final {
+            void clear() final {
                 m_data.clear();
             }
 
