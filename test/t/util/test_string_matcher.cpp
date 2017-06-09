@@ -35,7 +35,7 @@ TEST_CASE("String matcher: equal") {
     REQUIRE_FALSE(m.match("foobar"));
 }
 
-TEST_CASE("String matcher: prefix") {
+TEST_CASE("String matcher: prefix from const char*") {
     osmium::StringMatcher::prefix m{"foo"};
     REQUIRE(m.match("foo"));
     REQUIRE_FALSE(m.match("bar"));
@@ -43,8 +43,27 @@ TEST_CASE("String matcher: prefix") {
     REQUIRE_FALSE(m.match(""));
 }
 
-TEST_CASE("String matcher: substring") {
+TEST_CASE("String matcher: prefix from std::string") {
+    const std::string v{"foo"};
+    osmium::StringMatcher::prefix m{v};
+    REQUIRE(m.match("foo"));
+    REQUIRE_FALSE(m.match("bar"));
+    REQUIRE(m.match("foobar"));
+    REQUIRE_FALSE(m.match(""));
+}
+
+TEST_CASE("String matcher: substring from const char*") {
     osmium::StringMatcher::substring m{"foo"};
+    REQUIRE(m.match("foo"));
+    REQUIRE_FALSE(m.match("bar"));
+    REQUIRE(m.match("foobar"));
+    REQUIRE(m.match("barfoo"));
+    REQUIRE(m.match("xfoox"));
+}
+
+TEST_CASE("String matcher: substring from std::string") {
+    const std::string v{"foo"};
+    osmium::StringMatcher::substring m{v};
     REQUIRE(m.match("foo"));
     REQUIRE_FALSE(m.match("bar"));
     REQUIRE(m.match("foobar"));
@@ -94,7 +113,7 @@ TEST_CASE("String matcher: list with add") {
     REQUIRE_FALSE(m.match("bar"));
     m.add_string("foo");
     REQUIRE(m.match("foo"));
-    m.add_string("bar");
+    m.add_string(std::string{"bar"});
     REQUIRE(m.match("bar"));
     REQUIRE_FALSE(m.match("foobar"));
     REQUIRE_FALSE(m.match("baz"));
@@ -146,11 +165,25 @@ TEST_CASE("Construct StringMatcher from list") {
 
 TEST_CASE("Construct StringMatcher") {
     osmium::StringMatcher m{osmium::StringMatcher::equal{"foo"}};
+    REQUIRE(print(m) == "equal[foo]");
     REQUIRE(m("foo"));
     REQUIRE_FALSE(m("bar"));
 
     m = osmium::StringMatcher::list{{"foo", "bar"}};
     REQUIRE(m("foo"));
-    REQUIRE(m("bar"));
+    REQUIRE(m(std::string{"bar"}));
+    REQUIRE(print(m) == "list[[foo][bar]]");
+
+    m = osmium::StringMatcher::prefix{"foo"};
+    REQUIRE(m("foo"));
+    REQUIRE(m("foobar"));
+    REQUIRE_FALSE(m("barfoo"));
+    REQUIRE(print(m) == "prefix[foo]");
+
+    m = osmium::StringMatcher::substring{"foo"};
+    REQUIRE(m("foo"));
+    REQUIRE(m("foobar"));
+    REQUIRE(m(std::string{"barfoo"}));
+    REQUIRE(print(m) == "substring[foo]");
 }
 
