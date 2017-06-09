@@ -8,7 +8,7 @@ struct Handler1 : public osmium::handler::Handler {
 
     int& count;
 
-    Handler1(int& c) :
+    explicit Handler1(int& c) :
         count(c) {
     }
 
@@ -42,7 +42,7 @@ struct Handler2 : public osmium::handler::Handler {
 
     int& count;
 
-    Handler2(int& c) :
+    explicit Handler2(int& c) :
         count(c) {
     }
 
