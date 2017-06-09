@@ -487,7 +487,8 @@ if(CLANG_TIDY)
     list(APPEND CT_CHECKS "misc-*"
                          "-misc-argument-comment")
 
-    list(APPEND CT_CHECKS "modernize-*")
+    list(APPEND CT_CHECKS "modernize-*"
+                          "-modernize-make-unique") # not available in C++11
 
     list(APPEND CT_CHECKS "readability-*"
                          "-readability-identifier-naming"
