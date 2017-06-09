@@ -213,9 +213,8 @@ namespace osmium {
 #else
                     throw io_error{"Reading OSM files from the network currently not supported on Windows."};
 #endif
-                } else {
-                    return osmium::io::detail::open_for_reading(filename);
                 }
+                return osmium::io::detail::open_for_reading(filename);
             }
 
         public:

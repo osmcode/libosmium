@@ -374,30 +374,30 @@ namespace osmium {
                             std::cerr << "    Decided that this is an outer ring\n";
                         }
                         return nullptr;
-                    } else {
-                        if (debug()) {
-                            std::cerr << "    Decided that this is an inner ring\n";
-                        }
-                        assert(!outer_rings.empty());
-
-                        std::sort(outer_rings.rbegin(), outer_rings.rend());
-                        if (debug()) {
-                            for (const auto& o : outer_rings) {
-                                std::cerr << "        y=" << o.y() << " " << o.ring() << "\n";
-                            }
-                        }
-
-                        remove_duplicates(outer_rings);
-                        if (debug()) {
-                            std::cerr << "      after remove duplicates:\n";
-                            for (const auto& o : outer_rings) {
-                                std::cerr << "        y=" << o.y() << " " << o.ring() << "\n";
-                            }
-                        }
-
-                        assert(!outer_rings.empty());
-                        return outer_rings.front().ring_ptr();
                     }
+
+                    if (debug()) {
+                        std::cerr << "    Decided that this is an inner ring\n";
+                    }
+                    assert(!outer_rings.empty());
+
+                    std::sort(outer_rings.rbegin(), outer_rings.rend());
+                    if (debug()) {
+                        for (const auto& o : outer_rings) {
+                            std::cerr << "        y=" << o.y() << " " << o.ring() << "\n";
+                        }
+                    }
+
+                    remove_duplicates(outer_rings);
+                    if (debug()) {
+                        std::cerr << "      after remove duplicates:\n";
+                        for (const auto& o : outer_rings) {
+                            std::cerr << "        y=" << o.y() << " " << o.ring() << "\n";
+                        }
+                    }
+
+                    assert(!outer_rings.empty());
+                    return outer_rings.front().ring_ptr();
                 }
 
                 bool is_split_location(const osmium::Location& location) const noexcept {

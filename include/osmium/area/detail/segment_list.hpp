@@ -90,9 +90,11 @@ namespace osmium {
                 static role_type parse_role(const char* role) noexcept {
                     if (role[0] == '\0') {
                         return role_type::empty;
-                    } else if (!std::strcmp(role, "outer")) {
+                    }
+                    if (!std::strcmp(role, "outer")) {
                         return role_type::outer;
-                    } else if (!std::strcmp(role, "inner")) {
+                    }
+                    if (!std::strcmp(role, "inner")) {
                         return role_type::inner;
                     }
                     return role_type::unknown;
@@ -105,9 +107,8 @@ namespace osmium {
                     return std::accumulate(members.cbegin(), members.cend(), static_cast<size_t>(0), [](size_t sum, const osmium::Way* way) {
                         if (way->nodes().empty()) {
                             return sum;
-                        } else {
-                            return sum + way->nodes().size() - 1;
                         }
+                        return sum + way->nodes().size() - 1;
                     });
                 }
 

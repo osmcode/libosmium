@@ -539,9 +539,8 @@ namespace osmium {
                 assert(!range.empty());
                 if (range.begin()->is_available()) {
                     return std::make_pair(true, range.begin()->buffer_offset());
-                } else {
-                    return std::make_pair(false, 0);
                 }
+                return std::make_pair(false, 0);
             }
 
             template <typename TIter>
