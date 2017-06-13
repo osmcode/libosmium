@@ -233,7 +233,7 @@ TEST_CASE("KeyPrefixFilter matches some keys") {
 
 }
 
-TEST_CASE("Generic Filterw with regex matches some keys") {
+TEST_CASE("Generic Filter with regex matches some keys") {
     osmium::memory::Buffer buffer{10240};
 
     osmium::tags::Filter<std::regex> filter{false};
