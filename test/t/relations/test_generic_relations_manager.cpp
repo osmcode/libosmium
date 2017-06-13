@@ -33,7 +33,8 @@ public:
 
 TEST_CASE("Generic relations manager") {
     osmium::io::File file{with_data_dir("t/relations/data.osm")};
-    osmium::relations::GenericRelationsManager<TestAssembler> manager;
+    TestAssembler assembler;
+    osmium::relations::GenericRelationsManager<TestAssembler> manager{assembler};
 
     osmium::relations::read_relations(file, manager);
 

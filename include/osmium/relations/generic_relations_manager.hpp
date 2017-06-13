@@ -70,6 +70,8 @@ namespace osmium {
         template <typename TAssembler>
         class GenericRelationsManager : public osmium::handler::Handler {
 
+            TAssembler& m_assembler;
+
             // All relations and members we are interested in will be kept
             // in here.
             osmium::ItemStash m_stash;
@@ -134,14 +136,14 @@ namespace osmium {
                     members.push_back(&member_database(member.type()).get_object(member.ref()));
                 }
 
-                TAssembler assembler;
-                assembler(relation, members, m_output.buffer());
+                m_assembler(relation, members, m_output.buffer());
                 m_output.possibly_flush();
             }
 
         public:
 
-            explicit GenericRelationsManager(const osmium::TagsFilter& filter = osmium::TagsFilter{true}) :
+            explicit GenericRelationsManager(TAssembler& assembler, const osmium::TagsFilter& filter = osmium::TagsFilter{true}) :
+                m_assembler(assembler),
                 m_stash(),
                 m_relations_db(m_stash),
                 m_member_nodes_db(m_stash, m_relations_db),
