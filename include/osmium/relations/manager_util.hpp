@@ -43,6 +43,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/handler.hpp>
 #include <osmium/handler/check_order.hpp>
 #include <osmium/io/reader.hpp>
+#include <osmium/relations/relations_database.hpp>
 #include <osmium/util/progress_bar.hpp>
 #include <osmium/visitor.hpp>
 
@@ -67,43 +68,6 @@ namespace osmium {
             osmium::handler::CheckOrder m_check_order;
             TManager& m_manager;
 
-            // The following "template magic" functions are used to call the
-            // member_node(), member_way(), and member_relation() member
-            // functions on the manager if they exist.
-
-            template <typename T>
-            auto call_node(T& manager, const osmium::Node& node, std::int32_t)
-                -> decltype(manager.member_node(node), void()) {
-                m_check_order.node(node);
-                manager.member_node(node);
-            }
-
-            template <typename T>
-            void call_node(T& /*manager*/, const osmium::Node& /*node*/, std::int64_t) {
-            }
-
-            template <typename T>
-            auto call_way(T& manager, const osmium::Way& way, std::int32_t)
-                -> decltype(manager.member_way(way), void()) {
-                m_check_order.way(way);
-                manager.member_way(way);
-            }
-
-            template <typename T>
-            void call_way(T& /*manager*/, const osmium::Way& /*way*/, std::int64_t) {
-            }
-
-            template <typename T>
-            auto call_relation(T& manager, const osmium::Relation& relation, std::int32_t)
-                -> decltype(manager.member_relation(relation), void()) {
-                m_check_order.relation(relation);
-                manager.member_relation(relation);
-            }
-
-            template <typename T>
-            void call_relation(T& /*manager*/, const osmium::Relation& /*relation*/, std::int64_t) {
-            }
-
         public:
 
             explicit SecondPassHandlerWithCheckOrder(TManager& manager) noexcept :
@@ -111,38 +75,39 @@ namespace osmium {
             }
 
             /**
-             * Overwrites the function in the handler parent class. Calls
-             * the member_node() function on the manager, if it is available.
+             * Overwrites the function in the handler parent class.
              */
             void node(const osmium::Node& node) {
                 if (TNodes) {
-                    call_node(m_manager, node, 0);
+                    m_check_order.node(node);
+                    m_manager.handle_node(node);
                 }
             }
 
             /**
-             * Overwrites the function in the handler parent class. Calls
-             * the member_way() function on the manager, if it is available.
+             * Overwrites the function in the handler parent class.
              */
             void way(const osmium::Way& way) {
                 if (TWays) {
-                    call_way(m_manager, way, 0);
+                    m_check_order.way(way);
+                    m_manager.handle_way(way);
                 }
             }
 
             /**
-             * Overwrites the function in the handler parent class. Calls
-             * the member_relation() function on the manager, if it is available.
+             * Overwrites the function in the handler parent class.
              */
             void relation(const osmium::Relation& relation) {
                 if (TRelations) {
-                    call_relation(m_manager, relation, 0);
+                    m_check_order.relation(relation);
+                    m_manager.handle_relation(relation);
                 }
             }
 
             /**
-             * Overwrites the function in the handler parent class. Calls
-             * the flush_output() function on the manager.
+             * Overwrites the function in the handler parent class.
+             *
+             * Calls the flush_output() function on the manager.
              */
             void flush() {
                 m_manager.flush_output();

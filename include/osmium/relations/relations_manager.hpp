@@ -61,9 +61,11 @@ namespace osmium {
     namespace relations {
 
         /**
-         * This is used as a base class of the RelationsManager classes. It
+         * This is used as a base class of the RelationsManager class. It
          * keeps databases for the relations and the members that we need to
          * keep track of and handles the ouput buffer.
+         *
+         * This is a plain class unlike the RelationsManager class template.
          */
         class RelationsManagerBase : public osmium::handler::Handler {
 
@@ -206,14 +208,15 @@ namespace osmium {
         }; // class RelationsManagerBase
 
         /**
-         * This is a base class for RelationManager classes. It keeps track
-         * of all relations and all or some members of those relations. When
-         * all members are available it calls code to handle the completed
-         * relation.
+         * This is a base class for RelationManager classes. It keeps track of
+         * all interesting relations and all interesting members of those
+         * relations. When all members are available it calls code to handle
+         * the completed relation.
          *
          * This class is intended as a base class for classes that handle
-         * specific types of relations. Derive from this class and overwrite
-         * certain functions.
+         * specific types of relations. Derive from this class, implement
+         * the complete_relation() function and overwrite certain other
+         * functions as needed.
          *
          * @tparam TManager The derived class (Uses CRTP).
          * @tparam TNodes Are we interested in member nodes?
@@ -227,39 +230,6 @@ namespace osmium {
 
             using handler_pass2 = SecondPassHandlerWithCheckOrder<RelationsManager, TNodes, TWays, TRelations>;
             handler_pass2 m_handler_pass2;
-
-        protected:
-
-            void handle_relation(RelationHandle& rel_handle) {
-                static_cast<TManager*>(this)->complete_relation(*rel_handle);
-                possibly_flush();
-
-                for (const auto& member : rel_handle->members()) {
-                    if (member.ref() != 0) {
-                        member_database(member.type()).remove(member.ref(), rel_handle->id());
-                    }
-                }
-
-                rel_handle.remove();
-            }
-
-            void complete_relation(const osmium::Relation& /*relation*/) {
-            }
-
-        public:
-
-            RelationsManager() :
-                RelationsManagerBase(),
-                m_handler_pass2(*this) {
-            }
-
-            /**
-             * Return reference to second pass handler.
-             */
-            handler_pass2& handler(const std::function<void(osmium::memory::Buffer&&)>& callback = nullptr) {
-                set_callback(callback);
-                return m_handler_pass2;
-            }
 
             /**
              * This method is called from the first pass handler for every
@@ -276,16 +246,101 @@ namespace osmium {
 
             /**
              * This method is called for every member of every relation that
-             * should be kept. It should decide if the member is interesting or
+             * will be kept. It should decide if the member is interesting or
              * not and return true or false to signal that. Only interesting
              * members are later added to the relation.
              *
              * Overwrite this method in a child class. In the
              * MultipolygonManager class this is used for instance to only
-             * keep members of type way andignore all others.
+             * keep members of type way and ignore all others.
              */
             bool keep_member(const osmium::Relation& /*relation*/, const osmium::RelationMember& /*member*/, std::size_t /*n*/) const {
                 return true;
+            }
+
+            /**
+             * This method is called for all nodes during the second pass.
+             *
+             * Overwrite this method in a child class if you are interested
+             * in this.
+             */
+            void member_node(const osmium::Node& /*node*/) {
+            }
+
+            /**
+             * This method is called for all ways during the second pass.
+             *
+             * Overwrite this method in a child class if you are interested
+             * in this.
+             */
+            void member_way(const osmium::Way& /*way*/) {
+            }
+
+            /**
+             * This method is called for all relations during the second pass.
+             *
+             * Overwrite this method in a child class if you are interested
+             * in this.
+             */
+            void member_relation(const osmium::Relation& /*relation*/) {
+            }
+
+            /**
+             * This method is called for all nodes that are not a member of
+             * any relation.
+             *
+             * Overwrite this method in a child class if you are interested
+             * in this.
+             */
+            void node_not_in_any_relation(const osmium::Node& /*node*/) {
+            }
+
+            /**
+             * This method is called for all ways that are not a member of
+             * any relation.
+             *
+             * Overwrite this method in a child class if you are interested
+             * in this.
+             */
+            void way_not_in_any_relation(const osmium::Way& /*way*/) {
+            }
+
+            /**
+             * This method is called for all relations that are not a member of
+             * any relation.
+             *
+             * Overwrite this method in a child class if you are interested
+             * in this.
+             */
+            void relation_not_in_any_relation(const osmium::Relation& /*relation*/) {
+            }
+
+            void handle_complete_relation(RelationHandle& rel_handle) {
+                static_cast<TManager*>(this)->complete_relation(*rel_handle);
+                possibly_flush();
+
+                for (const auto& member : rel_handle->members()) {
+                    if (member.ref() != 0) {
+                        member_database(member.type()).remove(member.ref(), rel_handle->id());
+                    }
+                }
+
+                rel_handle.remove();
+            }
+
+        public:
+
+            RelationsManager() :
+                RelationsManagerBase(),
+                m_handler_pass2(*this) {
+            }
+
+            /**
+             * Return reference to second pass handler.
+             */
+            handler_pass2& handler(const std::function<void(osmium::memory::Buffer&&)>& callback = nullptr) {
+                set_callback(callback);
+                return m_handler_pass2;
             }
 
             /**
@@ -314,37 +369,37 @@ namespace osmium {
                 }
             }
 
-            /**
-             * Called for each node from the second pass handler. If the node
-             * is needed for some relation, it is stored in the members
-             * database.
-             */
-            void member_node(const osmium::Node& node) {
-                member_nodes_db().add(node, [this](RelationHandle& rel_handle) {
-                    handle_relation(rel_handle);
+            void handle_node(const osmium::Node& node) {
+                const bool added = member_nodes_db().add(node, [this](RelationHandle& rel_handle) {
+                    handle_complete_relation(rel_handle);
                 });
+                member_node(node);
+                if (! added) {
+                    node_not_in_any_relation(node);
+                }
+                possibly_flush();
             }
 
-            /**
-             * Called for each way from the second pass handler. If the way
-             * is needed for some relation, it is stored in the members
-             * database.
-             */
-            void member_way(const osmium::Way& way) {
-                member_ways_db().add(way, [this](RelationHandle& rel_handle) {
-                    handle_relation(rel_handle);
+            void handle_way(const osmium::Way& way) {
+                const bool added = member_ways_db().add(way, [this](RelationHandle& rel_handle) {
+                    handle_complete_relation(rel_handle);
                 });
+                member_way(way);
+                if (! added) {
+                    way_not_in_any_relation(way);
+                }
+                possibly_flush();
             }
 
-            /**
-             * Called for each relation from the second pass handler. If the
-             * relation is needed for some relation, it is stored in the
-             * members database.
-             */
-            void member_relation(const osmium::Relation& relation) {
-                member_relations_db().add(relation, [this](RelationHandle& rel_handle) {
-                    handle_relation(rel_handle);
+            void handle_relation(const osmium::Relation& relation) {
+                const bool added = member_relations_db().add(relation, [this](RelationHandle& rel_handle) {
+                    handle_complete_relation(rel_handle);
                 });
+                member_relation(relation);
+                if (! added) {
+                    relation_not_in_any_relation(relation);
+                }
+                possibly_flush();
             }
 
         }; // class RelationsManager
