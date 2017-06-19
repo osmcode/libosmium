@@ -53,12 +53,15 @@ namespace osmium {
         /**
          * This is a handler class used for the second pass of relation
          * managers. An object of this class is instantiated as a member
-         * of the Manager and used to re-direct the calls to the handler
-         * to the manager.
+         * of the Manager and used to re-direct all calls to the handler
+         * to the "parent" manager.
          *
          * @tparam TManager The manager we want to call functions on.
+         * @tparam TNodes Are we interested in member nodes?
+         * @tparam TWays Are we interested in member ways?
+         * @tparam TRelations Are we interested in member relations?
          */
-        template <typename TManager>
+        template <typename TManager, bool TNodes = true, bool TWays = true, bool TRelations = true>
         class SecondPassHandlerWithCheckOrder : public osmium::handler::Handler {
 
             osmium::handler::CheckOrder m_check_order;
@@ -112,7 +115,9 @@ namespace osmium {
              * the member_node() function on the manager, if it is available.
              */
             void node(const osmium::Node& node) {
-                call_node(m_manager, node, 0);
+                if (TNodes) {
+                    call_node(m_manager, node, 0);
+                }
             }
 
             /**
@@ -120,7 +125,9 @@ namespace osmium {
              * the member_way() function on the manager, if it is available.
              */
             void way(const osmium::Way& way) {
-                call_way(m_manager, way, 0);
+                if (TWays) {
+                    call_way(m_manager, way, 0);
+                }
             }
 
             /**
@@ -128,7 +135,9 @@ namespace osmium {
              * the member_relation() function on the manager, if it is available.
              */
             void relation(const osmium::Relation& relation) {
-                call_relation(m_manager, relation, 0);
+                if (TRelations) {
+                    call_relation(m_manager, relation, 0);
+                }
             }
 
             /**

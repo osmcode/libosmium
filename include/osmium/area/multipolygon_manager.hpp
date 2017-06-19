@@ -52,6 +52,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/relations/manager_util.hpp>
 #include <osmium/relations/members_database.hpp>
 #include <osmium/relations/relations_database.hpp>
+#include <osmium/relations/relations_manager.hpp>
 #include <osmium/storage/item_stash.hpp>
 #include <osmium/tags/taglist.hpp>
 #include <osmium/tags/tags_filter.hpp>
@@ -76,22 +77,10 @@ namespace osmium {
          * @pre The Ids of all objects must be unique in the input data.
          */
         template <typename TAssembler>
-        class MultipolygonManager : public osmium::handler::Handler {
+        class MultipolygonManager : public osmium::relations::RelationsManagerBase {
 
             using assembler_config_type = typename TAssembler::config_type;
             const assembler_config_type m_assembler_config;
-
-            // All relations and members we are interested in will be kept
-            // in here.
-            osmium::ItemStash m_stash;
-
-            /// Database of all relations we are interested in
-            relations::RelationsDatabase m_relations_db;
-
-            /// Database of all members we are interested in
-            relations::MembersDatabase<osmium::Way> m_members_db;
-
-            osmium::memory::CallbackBuffer m_output;
 
             area_stats m_stats;
 
@@ -104,7 +93,7 @@ namespace osmium {
                 for (const auto& member : relation.members()) {
                     if (member.ref() != 0) {
                         assert(member.type() == osmium::item_type::way);
-                        m_members_db.remove(member.ref(), relation.id());
+                        member_ways_db().remove(member.ref(), relation.id());
                     }
                 }
             }
@@ -150,9 +139,9 @@ namespace osmium {
                         }
 
                         TAssembler assembler{m_assembler_config};
-                        assembler(way, m_output.buffer());
+                        assembler(way, buffer());
                         m_stats += assembler.stats();
-                        m_output.possibly_flush();
+                        possibly_flush();
                     }
                 } catch (const osmium::invalid_location&) {
                     // XXX ignore
@@ -169,15 +158,15 @@ namespace osmium {
                 ways.reserve(relation.members().size());
                 for (const auto& member : relation.members()) {
                     if (member.ref() != 0) {
-                        ways.push_back(&m_members_db.get(member.ref()));
+                        ways.push_back(&member_ways_db().get(member.ref()));
                     }
                 }
 
                 try {
                     TAssembler assembler{m_assembler_config};
-                    assembler(relation, ways, m_output.buffer());
+                    assembler(relation, ways, buffer());
                     m_stats += assembler.stats();
-                    m_output.possibly_flush();
+                    possibly_flush();
                 } catch (const osmium::invalid_location&) {
                     // XXX ignore
                 }
@@ -195,29 +184,17 @@ namespace osmium {
              *               to build the area.
              */
             explicit MultipolygonManager(const assembler_config_type& assembler_config, const osmium::TagsFilter& filter = osmium::TagsFilter{true}) :
+                RelationsManagerBase(),
                 m_assembler_config(assembler_config),
-                m_stash(),
-                m_relations_db(m_stash),
-                m_members_db(m_stash, m_relations_db),
                 m_filter(filter),
                 m_handler_pass2(*this) {
-            }
-
-            /// Access the internal RelationsDatabase.
-            osmium::relations::RelationsDatabase& relations_db() noexcept {
-                return m_relations_db;
-            }
-
-            /// Access the internal MembersDatabase.
-            osmium::relations::MembersDatabase<osmium::Way>& members_db() noexcept {
-                return m_members_db;
             }
 
             /**
              * Return reference to second pass handler.
              */
             handler_pass2& handler(const std::function<void(osmium::memory::Buffer&&)>& callback = nullptr) {
-                m_output.set_callback(callback);
+                set_callback(callback);
                 return m_handler_pass2;
             }
 
@@ -238,12 +215,12 @@ namespace osmium {
              */
             void relation(const osmium::Relation& relation) {
                 if (keep_relation(relation)) {
-                    auto rel_handle = m_relations_db.add(relation);
+                    auto rel_handle = relations_db().add(relation);
 
                     int n = 0;
                     for (auto& member : rel_handle->members()) {
                         if (member.type() == osmium::item_type::way) {
-                            m_members_db.track(rel_handle, member.ref(), n);
+                            member_ways_db().track(rel_handle, member.ref(), n);
                         } else {
                             member.set_ref(0); // set member id to zero to indicate we are not interested
                         }
@@ -253,52 +230,18 @@ namespace osmium {
             }
 
             /**
-             * Sort the members database. This has to be called between the
-             * first and second pass.
-             */
-            void prepare() {
-                m_members_db.prepare();
-            }
-
-            /**
              * This function is called for each way from the second pass
              * handler. If the way is needed by some relation, it will be
              * stored in the members database. It will also build an area
              * for the way if possible.
              */
             void member_way(const osmium::Way& way) {
-                m_members_db.add(way, [this](relations::RelationHandle& rel_handle) {
+                member_ways_db().add(way, [this](relations::RelationHandle& rel_handle) {
                     complete_relation(*rel_handle);
                     remove_members(*rel_handle);
                     rel_handle.remove();
                 });
                 assemble_way(way);
-            }
-
-            /**
-             * Flush the output buffer. This is called by the second pass
-             * handler after all members are read.
-             */
-            void flush_output() {
-                m_output.flush();
-            }
-
-            /**
-             * Return the contents of the ouput buffer.
-             */
-            osmium::memory::Buffer read() {
-                return m_output.read();
-            }
-
-            /**
-             * Return the memory used by different components of the manager.
-             */
-            relations::relations_manager_memory_usage used_memory() const noexcept {
-                return {
-                    m_relations_db.used_memory(),
-                    m_members_db.used_memory(),
-                    m_stash.used_memory()
-                };
             }
 
         }; // class MultipolygonManager

@@ -51,6 +51,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/relations/manager_util.hpp>
 #include <osmium/relations/members_database.hpp>
 #include <osmium/relations/relations_database.hpp>
+#include <osmium/relations/relations_manager.hpp>
 #include <osmium/storage/item_stash.hpp>
 #include <osmium/tags/taglist.hpp>
 #include <osmium/tags/tags_filter.hpp>
@@ -68,213 +69,33 @@ namespace osmium {
          * @pre The Ids of all objects must be unique in the input data.
          */
         template <typename TAssembler>
-        class GenericRelationsManager : public osmium::handler::Handler {
+        class GenericRelationsManager : public osmium::relations::RelationsManager<GenericRelationsManager<TAssembler>, true, true, true> {
 
             TAssembler& m_assembler;
 
-            // All relations and members we are interested in will be kept
-            // in here.
-            osmium::ItemStash m_stash;
-
-            /// Database of all relations we are interested in
-            relations::RelationsDatabase m_relations_db;
-
-            /// Databases of all members we are interested in
-            relations::MembersDatabase<osmium::Node> m_member_nodes_db;
-            relations::MembersDatabase<osmium::Way> m_member_ways_db;
-            relations::MembersDatabase<osmium::Relation> m_member_relations_db;
-
-            osmium::memory::CallbackBuffer m_output;
-
             osmium::TagsFilter m_filter;
 
-            using handler_pass2 = SecondPassHandlerWithCheckOrder<GenericRelationsManager>;
-            handler_pass2 m_handler_pass2;
+        public:
 
-            relations::MembersDatabaseCommon& member_database(osmium::item_type type) {
-                switch (type) {
-                    case osmium::item_type::node:
-                        return m_member_nodes_db;
-                    case osmium::item_type::way:
-                        return m_member_ways_db;
-                    case osmium::item_type::relation:
-                        return m_member_relations_db;
-                    default:
-                        break;
-                }
-                throw std::logic_error{"Should not be here."};
+            explicit GenericRelationsManager(TAssembler& assembler, const osmium::TagsFilter& filter = osmium::TagsFilter{true}) :
+                RelationsManager<GenericRelationsManager<TAssembler>, true, true, true>(),
+                m_assembler(assembler),
+                m_filter(filter) {
             }
 
-            const relations::MembersDatabaseCommon& member_database(osmium::item_type type) const {
-                switch (type) {
-                    case osmium::item_type::node:
-                        return m_member_nodes_db;
-                    case osmium::item_type::way:
-                        return m_member_ways_db;
-                    case osmium::item_type::relation:
-                        return m_member_relations_db;
-                    default:
-                        break;
-                }
-                throw std::logic_error{"Should not be here."};
-            }
-
-            void handle_relation(RelationHandle& rel_handle) {
-                complete_relation(*rel_handle);
-
-                for (const auto& member : rel_handle->members()) {
-                    member_database(member.type()).remove(member.ref(), rel_handle->id());
-                }
-
-                rel_handle.remove();
+            bool keep_relation(const osmium::Relation& relation) const {
+                return osmium::tags::match_any_of(relation.tags(), m_filter);
             }
 
             void complete_relation(const osmium::Relation& relation) {
                 std::vector<const osmium::OSMObject*> members;
                 members.reserve(relation.members().size());
+
                 for (const auto& member : relation.members()) {
-                    members.push_back(&member_database(member.type()).get_object(member.ref()));
+                    members.push_back(&this->member_database(member.type()).get_object(member.ref()));
                 }
 
-                m_assembler(relation, members, m_output.buffer());
-                m_output.possibly_flush();
-            }
-
-        public:
-
-            explicit GenericRelationsManager(TAssembler& assembler, const osmium::TagsFilter& filter = osmium::TagsFilter{true}) :
-                m_assembler(assembler),
-                m_stash(),
-                m_relations_db(m_stash),
-                m_member_nodes_db(m_stash, m_relations_db),
-                m_member_ways_db(m_stash, m_relations_db),
-                m_member_relations_db(m_stash, m_relations_db),
-                m_filter(filter),
-                m_handler_pass2(*this) {
-            }
-
-            /// Access the internal RelationsDatabase.
-            osmium::relations::RelationsDatabase& relations_db() noexcept {
-                return m_relations_db;
-            }
-
-            /// Access the internal member ways database.
-            osmium::relations::MembersDatabase<osmium::Node>& member_nodes_db() noexcept {
-                return m_member_nodes_db;
-            }
-
-            /// Access the internal member ways database.
-            osmium::relations::MembersDatabase<osmium::Way>& member_ways_db() noexcept {
-                return m_member_ways_db;
-            }
-
-            /// Access the internal member ways database.
-            osmium::relations::MembersDatabase<osmium::Relation>& member_relations_db() noexcept {
-                return m_member_relations_db;
-            }
-
-            /**
-             * Return reference to second pass handler.
-             */
-            handler_pass2& handler(const std::function<void(osmium::memory::Buffer&&)>& callback = nullptr) {
-                m_output.set_callback(callback);
-                return m_handler_pass2;
-            }
-
-            /**
-             * Add the specified relation to the list of relations we want to
-             * build if it matches the filter specified when constructing the
-             * manager.
-             *
-             * This member function is named relation() so the manager can
-             * be used as a handler for the first pass through a data file.
-             *
-             * @param relation Relation we might want to build.
-             */
-            void relation(const osmium::Relation& relation) {
-                if (osmium::tags::match_any_of(relation.tags(), m_filter)) {
-                    auto rel_handle = m_relations_db.add(relation);
-
-                    int n = 0;
-                    for (const auto& member : rel_handle->members()) {
-                        member_database(member.type()).track(rel_handle, member.ref(), n);
-                        ++n;
-                    }
-                }
-            }
-
-            /**
-             * Sort the members databases. This has to be called after calling
-             * relation() for each relation we are interested in and before
-             * calling any of the member_node(), member_way(), and
-             * member_relation() function. Usually this is between the
-             * first and second pass reading through an OSM data file.
-             */
-            void prepare() {
-                m_member_nodes_db.prepare();
-                m_member_ways_db.prepare();
-                m_member_relations_db.prepare();
-            }
-
-            /**
-             * Called for each node from the second pass handler. If the node
-             * is needed for some relation, it is stored in the members
-             * database.
-             */
-            void member_node(const osmium::Node& node) {
-                m_member_nodes_db.add(node, [this](RelationHandle& rel_handle) {
-                    handle_relation(rel_handle);
-                });
-            }
-
-            /**
-             * Called for each way from the second pass handler. If the way
-             * is needed for some relation, it is stored in the members
-             * database.
-             */
-            void member_way(const osmium::Way& way) {
-                m_member_ways_db.add(way, [this](RelationHandle& rel_handle) {
-                    handle_relation(rel_handle);
-                });
-            }
-
-            /**
-             * Called for each relation from the second pass handler. If the
-             * relation is needed for some relation, it is stored in the
-             * members database.
-             */
-            void member_relation(const osmium::Relation& relation) {
-                m_member_relations_db.add(relation, [this](RelationHandle& rel_handle) {
-                    handle_relation(rel_handle);
-                });
-            }
-
-            /**
-             * Flush the output buffer. This is called by the second pass
-             * handler after all members are read.
-             */
-            void flush_output() {
-                m_output.flush();
-            }
-
-            /**
-             * Return the contents of the ouput buffer.
-             */
-            osmium::memory::Buffer read() {
-                return m_output.read();
-            }
-
-            /**
-             * Return the memory used by different components of the manager.
-             */
-            relations_manager_memory_usage used_memory() const noexcept {
-                return {
-                    m_relations_db.used_memory(),
-                      m_member_nodes_db.used_memory()
-                    + m_member_ways_db.used_memory()
-                    + m_member_relations_db.used_memory(),
-                    m_stash.used_memory()
-                };
+                m_assembler(relation, members, this->buffer());
             }
 
         }; // class GenericRelationsManager
