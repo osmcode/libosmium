@@ -355,14 +355,16 @@ namespace osmium {
 
             void add_comment_text(const char* text) {
                 assert(m_comment && "You have to always call both add_comment() and then add_comment_text() in that order for each comment!");
-                add_text(*m_comment, text, std::strlen(text));
+                osmium::ChangesetComment& comment = *m_comment;
                 m_comment = nullptr;
+                add_text(comment, text, std::strlen(text));
             }
 
             void add_comment_text(const std::string& text) {
                 assert(m_comment && "You have to always call both add_comment() and then add_comment_text() in that order for each comment!");
-                add_text(*m_comment, text.c_str(), text.size());
+                osmium::ChangesetComment& comment = *m_comment;
                 m_comment = nullptr;
+                add_text(comment, text.c_str(), text.size());
             }
 
         }; // class ChangesetDiscussionBuilder
