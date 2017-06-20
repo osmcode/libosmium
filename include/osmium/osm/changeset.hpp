@@ -62,8 +62,8 @@ namespace osmium {
 
         osmium::Timestamp m_date;
         osmium::user_id_type m_uid {0};
+        changeset_comment_size_type m_text_size;
         string_size_type m_user_size;
-        string_size_type m_text_size;
 
         ChangesetComment(const ChangesetComment&) = delete;
         ChangesetComment(ChangesetComment&&) = delete;
@@ -94,7 +94,7 @@ namespace osmium {
             m_user_size = size;
         }
 
-        void set_text_size(string_size_type size) noexcept {
+        void set_text_size(changeset_comment_size_type size) noexcept {
             m_text_size = size;
         }
 
@@ -105,8 +105,8 @@ namespace osmium {
         ChangesetComment(osmium::Timestamp date, osmium::user_id_type uid) noexcept :
             m_date(date),
             m_uid(uid),
-            m_user_size(0),
-            m_text_size(0) {
+            m_text_size(0),
+            m_user_size(0) {
         }
 
         osmium::Timestamp date() const noexcept {

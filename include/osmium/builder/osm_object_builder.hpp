@@ -316,14 +316,10 @@ namespace osmium {
             }
 
             void add_text(osmium::ChangesetComment& comment, const char* text, const size_t length) {
-                // XXX There is no limit on the length of a comment text. We
-                // limit it here to 2^16-2 characters, because that's all that
-                // will fit into our internal data structure. This is not ideal,
-                // and will have to be discussed and cleared up.
-                if (length > std::numeric_limits<osmium::string_size_type>::max() - 1) {
+                if (length > std::numeric_limits<osmium::changeset_comment_size_type>::max() - 1) {
                     throw std::length_error("OSM changeset comment is too long");
                 }
-                comment.set_text_size(osmium::string_size_type(length) + 1);
+                comment.set_text_size(osmium::changeset_comment_size_type(length) + 1);
                 add_size(append_with_zero(text, osmium::memory::item_size_type(length)));
                 add_padding(true);
             }
