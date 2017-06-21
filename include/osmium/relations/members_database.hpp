@@ -158,7 +158,7 @@ namespace osmium {
 
             osmium::ItemStash::handle_type get_handle(osmium::object_id_type id) const noexcept {
                 const auto range = find(id);
-                assert(range.begin() != range.end());
+                assert(!range.empty());
                 return range.begin()->object_handle;
             }
 
@@ -282,7 +282,6 @@ namespace osmium {
                 for (auto& elem : range) {
                     if (!elem.is_removed() && relation_id == m_relations_db[elem.relation_pos]->id()) {
                         elem.remove();
-                        return;
                     }
                 }
             }
@@ -346,17 +345,17 @@ namespace osmium {
                 assert(!m_init_phase && "Call MembersDatabase::prepare_for_lookup() before calling add().");
                 auto range = find(object.id());
 
-                if (count_not_removed(range) == 0) {
-                    // nothing found
+                if (range.empty()) {
+                    // No relation needs this object.
                     return false;
                 }
 
+                // At least one relation needs this object. Store it and
+                // "tell" all relations.
                 add_object(object, range);
 
                 for (auto& elem : range) {
-                    if (elem.is_removed()) {
-                        break;
-                    }
+                    assert(!elem.is_removed());
                     assert(elem.member_id == object.id());
 
                     auto rel_handle = m_relations_db[elem.relation_pos];
