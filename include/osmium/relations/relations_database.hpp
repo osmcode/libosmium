@@ -105,11 +105,11 @@ namespace osmium {
                 return m_stash.get<osmium::Relation>(m_elements[pos].handle);
             }
 
+            /**
+             * Access the number of members of the entry at the specified
+             * position. This returns a reference so it can be changed.
+             */
             std::size_t& members(std::size_t pos) noexcept {
-                return m_elements[pos].members;
-            }
-
-            const std::size_t& members(std::size_t pos) const noexcept {
                 return m_elements[pos].members;
             }
 

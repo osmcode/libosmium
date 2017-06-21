@@ -47,6 +47,13 @@ TEST_CASE("Fill relation database") {
     }
 
     REQUIRE(rdb.size() == 3);
+
+    int n = 0;
+    rdb.for_each_relation([&](const osmium::relations::RelationHandle& rel_handle) {
+        ++n;
+        REQUIRE(rel_handle->members().size() == (*rel_handle).id());
+    });
+    REQUIRE(n == 3);
 }
 
 TEST_CASE("Check need members and handle ops") {
