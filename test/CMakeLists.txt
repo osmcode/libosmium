@@ -188,7 +188,6 @@ add_unit_test(io test_writer_with_mock_encoder ENABLE_IF ${Threads_FOUND} LIBS $
 add_unit_test(relations test_members_database)
 add_unit_test(relations test_read_relations ENABLE_IF ${Threads_FOUND} LIBS ${OSMIUM_XML_LIBRARIES})
 add_unit_test(relations test_relations_database)
-add_unit_test(relations test_generic_relations_manager ENABLE_IF ${Threads_FOUND} LIBS ${OSMIUM_XML_LIBRARIES})
 
 add_unit_test(storage test_item_stash)
 
