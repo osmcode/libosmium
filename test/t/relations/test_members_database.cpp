@@ -56,7 +56,7 @@ TEST_CASE("Fill member database") {
         }
     }
 
-    mdb.prepare();
+    mdb.prepare_for_lookup();
 
     int n = 0;
     int match = 0;
@@ -121,7 +121,7 @@ TEST_CASE("Member database with duplicate member in relation") {
         }
     }
 
-    mdb.prepare();
+    mdb.prepare_for_lookup();
 
     REQUIRE(mdb.size() == 4);
     {

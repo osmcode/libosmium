@@ -17,7 +17,7 @@ public:
         ++count;
     }
 
-    void prepare() noexcept {
+    void prepare_for_lookup() noexcept {
         prep = true;
     }
 

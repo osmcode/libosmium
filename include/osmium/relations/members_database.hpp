@@ -134,8 +134,8 @@ namespace osmium {
             osmium::relations::RelationsDatabase& m_relations_db;
 
 #ifndef NDEBUG
-            // This is used only in debug builds to make sure the prepare()
-            // function is called at the right place.
+            // This is used only in debug builds to make sure the
+            // prepare_for_lookup() function is called at the right place.
             bool m_init_phase = true;
 #endif
 
@@ -242,7 +242,7 @@ namespace osmium {
              * @param member_num This is the nth member in the relation.
              */
             void track(RelationHandle& rel_handle, osmium::object_id_type member_id, std::size_t member_num) {
-                assert(m_init_phase && "Can not call MembersDatabase::track() after MembersDatabase::prepare().");
+                assert(m_init_phase && "Can not call MembersDatabase::track() after MembersDatabase::prepare_for_lookup().");
                 assert(rel_handle.relation_database() == &m_relations_db);
                 m_elements.emplace_back(rel_handle.pos(), member_id, member_num);
                 rel_handle.increment_members();
@@ -254,8 +254,8 @@ namespace osmium {
              * the first object with add() or querying the first object
              * with get(). You can only call this function once.
              */
-            void prepare() {
-                assert(m_init_phase && "Can not call MembersDatabase::prepare() twice.");
+            void prepare_for_lookup() {
+                assert(m_init_phase && "Can not call MembersDatabase::prepare_for_lookup() twice.");
                 std::sort(m_elements.begin(), m_elements.end());
 #ifndef NDEBUG
                 m_init_phase = false;
@@ -292,7 +292,7 @@ namespace osmium {
              * return a reference to it.
              */
             const osmium::OSMObject& get_object(osmium::object_id_type id) const {
-                assert(!m_init_phase && "Call MembersDatabase::prepare() before calling get_object().");
+                assert(!m_init_phase && "Call MembersDatabase::prepare_for_lookup() before calling get_object().");
                 return m_stash.get<osmium::OSMObject>(get_handle(id));
             }
 
@@ -339,11 +339,11 @@ namespace osmium {
              *             relation, this function is called with the relation
              *             as a parameter.
              * @returns true if the object was actually added, false if no
-             *          relation needed this object
+             *          relation needed this object.
              */
             template <typename TFunc>
             bool add(const TObject& object, TFunc&& func) {
-                assert(!m_init_phase && "Call MembersDatabase::prepare() before calling add().");
+                assert(!m_init_phase && "Call MembersDatabase::prepare_for_lookup() before calling add().");
                 auto range = find(object.id());
 
                 if (count_not_removed(range) == 0) {
@@ -376,7 +376,7 @@ namespace osmium {
              * return a reference to it.
              */
             const TObject& get(osmium::object_id_type id) const {
-                assert(!m_init_phase && "Call MembersDatabase::prepare() before calling get().");
+                assert(!m_init_phase && "Call MembersDatabase::prepare_for_lookup() before calling get().");
                 return m_stash.get<TObject>(get_handle(id));
             }
 

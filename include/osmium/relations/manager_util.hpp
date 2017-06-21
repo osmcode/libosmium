@@ -120,9 +120,9 @@ namespace osmium {
          * specified as parameters. Opens an osmium::io::Reader internally
          * with the file parameter.
          *
-         * After the file is read, the prepare() function is called on all
-         * the managers making them ready for querying the data they have
-         * stored.
+         * After the file is read, the prepare_for_lookup() function is called
+         * on all the managers making them ready for querying the data they
+         * have stored.
          *
          * @tparam TManager Any number of relation manager types.
          * @param file The file that should be opened with an osmium::io::Reader.
@@ -136,7 +136,7 @@ namespace osmium {
             osmium::apply(reader, std::forward<TManager>(managers)...);
             reader.close();
             (void)std::initializer_list<int>{
-                (std::forward<TManager>(managers).prepare(), 0)...
+                (std::forward<TManager>(managers).prepare_for_lookup(), 0)...
             };
         }
 
@@ -145,9 +145,9 @@ namespace osmium {
          * specified as parameters. Opens an osmium::io::Reader internally
          * with the file parameter.
          *
-         * After the file is read, the prepare() function is called on all
-         * the managers making them ready for querying the data they have
-         * stored.
+         * After the file is read, the prepare_for_lookup() function is called
+         * on all the managers making them ready for querying the data they
+         * have stored.
          *
          * @tparam TManager Any number of relation manager types.
          * @param progress_bar Reference to osmium::ProgressBar object that
@@ -166,7 +166,7 @@ namespace osmium {
             }
             reader.close();
             (void)std::initializer_list<int>{
-                (std::forward<TManager>(managers).prepare(), 0)...
+                (std::forward<TManager>(managers).prepare_for_lookup(), 0)...
             };
             progress_bar.file_done(file.size());
         }

@@ -61,11 +61,14 @@ namespace osmium {
     namespace relations {
 
         /**
-         * This is used as a base class of the RelationsManager class. It
-         * keeps databases for the relations and the members that we need to
-         * keep track of and handles the ouput buffer.
+         * This is a base class of the RelationsManager class template. It
+         * contains databases for the relations and the members that we need
+         * to keep track of and handles the ouput buffer. Unlike the
+         * RelationsManager class template this is a plain class.
          *
-         * This is a plain class unlike the RelationsManager class template.
+         * Usually it is better to use the RelationsManager class template
+         * as a basis for your code, but you can also use this class if you
+         * have special needs.
          */
         class RelationsManagerBase : public osmium::handler::Handler {
 
@@ -73,14 +76,15 @@ namespace osmium {
             // in here.
             osmium::ItemStash m_stash;
 
-            /// Database of all relations we are interested in
+            /// Database of all relations we are interested in.
             relations::RelationsDatabase m_relations_db;
 
-            /// Databases of all members we are interested in
+            /// Databases of all members we are interested in.
             relations::MembersDatabase<osmium::Node>     m_member_nodes_db;
             relations::MembersDatabase<osmium::Way>      m_member_ways_db;
             relations::MembersDatabase<osmium::Relation> m_member_relations_db;
 
+            /// Output buffer.
             osmium::memory::CallbackBuffer m_output;
 
         public:
@@ -118,7 +122,7 @@ namespace osmium {
              * Access the internal database containing members of the
              * specified type (non-const version of this function).
              *
-             * @param type node, way, or relation.
+             * @param type osmium::item_type::node, way, or relation.
              */
             relations::MembersDatabaseCommon& member_database(osmium::item_type type) {
                 switch (type) {
@@ -138,7 +142,7 @@ namespace osmium {
              * Access the internal database containing members of the
              * specified type (const version of this function).
              *
-             * @param type node, way, or relation.
+             * @param type osmium::item_type::node, way, or relation.
              */
             const relations::MembersDatabaseCommon& member_database(osmium::item_type type) const {
                 switch (type) {
@@ -155,16 +159,14 @@ namespace osmium {
             }
 
             /**
-             * Sort the members databases. This has to be called after calling
-             * relation() for each relation we are interested in and before
-             * calling any of the member_node(), member_way(), and
-             * member_relation() function. Usually this is between the
-             * first and second pass reading through an OSM data file.
+             * Sort the members databases to prepare them for reading. Usually
+             * this is called between the first and second pass reading through
+             * an OSM data file.
              */
-            void prepare() {
-                m_member_nodes_db.prepare();
-                m_member_ways_db.prepare();
-                m_member_relations_db.prepare();
+            void prepare_for_lookup() {
+                m_member_nodes_db.prepare_for_lookup();
+                m_member_ways_db.prepare_for_lookup();
+                m_member_relations_db.prepare_for_lookup();
             }
 
             /**
@@ -240,7 +242,7 @@ namespace osmium {
              * Storing relations takes a lot of memory, so it makes sense to
              * filter this as much as possible.
              */
-            bool keep_relation(const osmium::Relation& /*relation*/) const {
+            bool new_relation(const osmium::Relation& /*relation*/) const noexcept {
                 return true;
             }
 
@@ -254,35 +256,27 @@ namespace osmium {
              * MultipolygonManager class this is used for instance to only
              * keep members of type way and ignore all others.
              */
-            bool keep_member(const osmium::Relation& /*relation*/, const osmium::RelationMember& /*member*/, std::size_t /*n*/) const {
+            bool new_member(const osmium::Relation& /*relation*/, const osmium::RelationMember& /*member*/, std::size_t /*n*/) const noexcept {
                 return true;
             }
 
             /**
-             * This method is called for all nodes during the second pass.
+             * This method is called for each complete relation, ie when
+             * all members you have expressed interest in are available.
              *
-             * Overwrite this method in a child class if you are interested
-             * in this.
+             * You have to overwrite this in a child class.
              */
-            void member_node(const osmium::Node& /*node*/) {
+            void complete_relation(const osmium::Relation& /*relation*/) const noexcept {
             }
 
             /**
-             * This method is called for all ways during the second pass.
+             * This method is called for all nodes during the second pass
+             * before the relation member handling.
              *
              * Overwrite this method in a child class if you are interested
              * in this.
              */
-            void member_way(const osmium::Way& /*way*/) {
-            }
-
-            /**
-             * This method is called for all relations during the second pass.
-             *
-             * Overwrite this method in a child class if you are interested
-             * in this.
-             */
-            void member_relation(const osmium::Relation& /*relation*/) {
+            void before_node(const osmium::Node& /*node*/) const noexcept {
             }
 
             /**
@@ -292,7 +286,27 @@ namespace osmium {
              * Overwrite this method in a child class if you are interested
              * in this.
              */
-            void node_not_in_any_relation(const osmium::Node& /*node*/) {
+            void node_not_in_any_relation(const osmium::Node& /*node*/) const noexcept {
+            }
+
+            /**
+             * This method is called for all nodes during the second pass
+             * after the relation member handling.
+             *
+             * Overwrite this method in a child class if you are interested
+             * in this.
+             */
+            void after_node(const osmium::Node& /*node*/) const noexcept {
+            }
+
+            /**
+             * This method is called for all ways during the second pass
+             * before the relation member handling.
+             *
+             * Overwrite this method in a child class if you are interested
+             * in this.
+             */
+            void before_way(const osmium::Way& /*way*/) const noexcept {
             }
 
             /**
@@ -302,7 +316,27 @@ namespace osmium {
              * Overwrite this method in a child class if you are interested
              * in this.
              */
-            void way_not_in_any_relation(const osmium::Way& /*way*/) {
+            void way_not_in_any_relation(const osmium::Way& /*way*/) const noexcept {
+            }
+
+            /**
+             * This method is called for all ways during the second pass
+             * after the relation member handling.
+             *
+             * Overwrite this method in a child class if you are interested
+             * in this.
+             */
+            void after_way(const osmium::Way& /*way*/) const noexcept {
+            }
+
+            /**
+             * This method is called for all relations during the second pass
+             * before the relation member handling.
+             *
+             * Overwrite this method in a child class if you are interested
+             * in this.
+             */
+            void before_relation(const osmium::Relation& /*relation*/) const noexcept {
             }
 
             /**
@@ -312,7 +346,17 @@ namespace osmium {
              * Overwrite this method in a child class if you are interested
              * in this.
              */
-            void relation_not_in_any_relation(const osmium::Relation& /*relation*/) {
+            void relation_not_in_any_relation(const osmium::Relation& /*relation*/) const noexcept {
+            }
+
+            /**
+             * This method is called for all relations during the second pass
+             * after the relation member handling.
+             *
+             * Overwrite this method in a child class if you are interested
+             * in this.
+             */
+            void after_relation(const osmium::Relation& /*relation*/) const noexcept {
             }
 
             void handle_complete_relation(RelationHandle& rel_handle) {
@@ -345,7 +389,7 @@ namespace osmium {
 
             /**
              * Add the specified relation to the list of relations we want to
-             * build. This calls the keep_relation() and keep_member()
+             * build. This calls the new_relation() and new_member()
              * functions to actually decide what to keep.
              *
              * This member function is named relation() so the manager can
@@ -354,12 +398,12 @@ namespace osmium {
              * @param relation Relation we might want to build.
              */
             void relation(const osmium::Relation& relation) {
-                if (static_cast<TManager*>(this)->keep_relation(relation)) {
+                if (static_cast<TManager*>(this)->new_relation(relation)) {
                     auto rel_handle = relations_db().add(relation);
 
                     std::size_t n = 0;
                     for (auto& member : rel_handle->members()) {
-                        if (static_cast<TManager*>(this)->keep_member(relation, member, n)) {
+                        if (static_cast<TManager*>(this)->new_member(relation, member, n)) {
                             member_database(member.type()).track(rel_handle, member.ref(), n);
                         } else {
                             member.set_ref(0); // set member id to zero to indicate we are not interested
@@ -370,35 +414,38 @@ namespace osmium {
             }
 
             void handle_node(const osmium::Node& node) {
+                before_node(node);
                 const bool added = member_nodes_db().add(node, [this](RelationHandle& rel_handle) {
                     handle_complete_relation(rel_handle);
                 });
-                member_node(node);
                 if (! added) {
                     node_not_in_any_relation(node);
                 }
+                after_node(node);
                 possibly_flush();
             }
 
             void handle_way(const osmium::Way& way) {
+                before_way(way);
                 const bool added = member_ways_db().add(way, [this](RelationHandle& rel_handle) {
                     handle_complete_relation(rel_handle);
                 });
-                member_way(way);
                 if (! added) {
                     way_not_in_any_relation(way);
                 }
+                after_way(way);
                 possibly_flush();
             }
 
             void handle_relation(const osmium::Relation& relation) {
+                before_relation(relation);
                 const bool added = member_relations_db().add(relation, [this](RelationHandle& rel_handle) {
                     handle_complete_relation(rel_handle);
                 });
-                member_relation(relation);
                 if (! added) {
                     relation_not_in_any_relation(relation);
                 }
+                after_relation(relation);
                 possibly_flush();
             }
 

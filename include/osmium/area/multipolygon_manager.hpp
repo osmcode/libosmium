@@ -114,7 +114,7 @@ namespace osmium {
              * We are interested in all relations tagged with type=multipolygon
              * or type=boundary with at least one way member.
              */
-            bool keep_relation(const osmium::Relation& relation) const {
+            bool new_relation(const osmium::Relation& relation) const {
                 const char* type = relation.tags().get_value_by_key("type");
 
                 // ignore relations without "type" tag
@@ -131,7 +131,7 @@ namespace osmium {
                 return false;
             }
 
-            bool keep_member(const osmium::Relation& /*relation*/, const osmium::RelationMember& member, std::size_t /*n*/) const {
+            bool new_member(const osmium::Relation& /*relation*/, const osmium::RelationMember& member, std::size_t /*n*/) const {
                 return member.type() == osmium::item_type::way;
             }
 
@@ -158,7 +158,7 @@ namespace osmium {
                 }
             }
 
-            void member_way(const osmium::Way& way) {
+            void after_way(const osmium::Way& way) {
                 // you need at least 4 nodes to make up a polygon
                 if (way.nodes().size() <= 3) {
                     return;
