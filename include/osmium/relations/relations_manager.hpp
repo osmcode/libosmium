@@ -99,22 +99,22 @@ namespace osmium {
             }
 
             /// Access the internal RelationsDatabase.
-            osmium::relations::RelationsDatabase& relations_db() noexcept {
+            osmium::relations::RelationsDatabase& relations_database() noexcept {
                 return m_relations_db;
             }
 
             /// Access the internal database containing member nodes.
-            osmium::relations::MembersDatabase<osmium::Node>& member_nodes_db() noexcept {
+            osmium::relations::MembersDatabase<osmium::Node>& member_nodes_database() noexcept {
                 return m_member_nodes_db;
             }
 
             /// Access the internal database containing member ways.
-            osmium::relations::MembersDatabase<osmium::Way>& member_ways_db() noexcept {
+            osmium::relations::MembersDatabase<osmium::Way>& member_ways_database() noexcept {
                 return m_member_ways_db;
             }
 
             /// Access the internal database containing member relations.
-            osmium::relations::MembersDatabase<osmium::Relation>& member_relations_db() noexcept {
+            osmium::relations::MembersDatabase<osmium::Relation>& member_relations_database() noexcept {
                 return m_member_relations_db;
             }
 
@@ -403,7 +403,7 @@ namespace osmium {
              */
             void relation(const osmium::Relation& relation) {
                 if (derived().new_relation(relation)) {
-                    auto rel_handle = relations_db().add(relation);
+                    auto rel_handle = relations_database().add(relation);
 
                     std::size_t n = 0;
                     for (auto& member : rel_handle->members()) {
@@ -419,7 +419,7 @@ namespace osmium {
 
             void handle_node(const osmium::Node& node) {
                 derived().before_node(node);
-                const bool added = member_nodes_db().add(node, [this](RelationHandle& rel_handle) {
+                const bool added = member_nodes_database().add(node, [this](RelationHandle& rel_handle) {
                     handle_complete_relation(rel_handle);
                 });
                 if (! added) {
@@ -431,7 +431,7 @@ namespace osmium {
 
             void handle_way(const osmium::Way& way) {
                 derived().before_way(way);
-                const bool added = member_ways_db().add(way, [this](RelationHandle& rel_handle) {
+                const bool added = member_ways_database().add(way, [this](RelationHandle& rel_handle) {
                     handle_complete_relation(rel_handle);
                 });
                 if (! added) {
@@ -443,7 +443,7 @@ namespace osmium {
 
             void handle_relation(const osmium::Relation& relation) {
                 derived().before_relation(relation);
-                const bool added = member_relations_db().add(relation, [this](RelationHandle& rel_handle) {
+                const bool added = member_relations_database().add(relation, [this](RelationHandle& rel_handle) {
                     handle_complete_relation(rel_handle);
                 });
                 if (! added) {
