@@ -94,12 +94,25 @@ struct CallbackRM : public osmium::relations::RelationsManager<CallbackRM, true,
 
 };
 
-TEST_CASE("RelationsManager directly") {
+TEST_CASE("Use RelationsManager without any overloaded functions in derived class") {
     osmium::io::File file{with_data_dir("t/relations/data.osm")};
 
     EmptyRM manager;
 
     osmium::relations::read_relations(file, manager);
+
+    REQUIRE(manager.member_nodes_database().size()     == 2);
+    REQUIRE(manager.member_ways_database().size()      == 2);
+    REQUIRE(manager.member_relations_database().size() == 1);
+
+    REQUIRE(manager.member_database(osmium::item_type::node).size()     == 2);
+    REQUIRE(manager.member_database(osmium::item_type::way).size()      == 2);
+    REQUIRE(manager.member_database(osmium::item_type::relation).size() == 1);
+
+    const auto& m = manager;
+    REQUIRE(m.member_database(osmium::item_type::node).size()     == 2);
+    REQUIRE(m.member_database(osmium::item_type::way).size()      == 2);
+    REQUIRE(m.member_database(osmium::item_type::relation).size() == 1);
 
     osmium::io::Reader reader{file};
     osmium::apply(reader, manager.handler());
@@ -113,6 +126,10 @@ TEST_CASE("Relations manager derived class") {
 
     osmium::relations::read_relations(file, manager);
 
+    REQUIRE(manager.member_nodes_database().size()     == 2);
+    REQUIRE(manager.member_ways_database().size()      == 2);
+    REQUIRE(manager.member_relations_database().size() == 1);
+
     bool callback_called = false;
     osmium::io::Reader reader{file};
     osmium::apply(reader, manager.handler([&](osmium::memory::Buffer&&) {
@@ -124,9 +141,9 @@ TEST_CASE("Relations manager derived class") {
     REQUIRE(manager.count_new_rels      ==  3);
     REQUIRE(manager.count_new_members   ==  5);
     REQUIRE(manager.count_complete_rels ==  3);
-    REQUIRE(manager.count_before        == 10);
-    REQUIRE(manager.count_not_in_any    ==  5);
-    REQUIRE(manager.count_after         == 10);
+    REQUIRE(manager.count_before        == 11);
+    REQUIRE(manager.count_not_in_any    ==  6);
+    REQUIRE(manager.count_after         == 11);
 
     int n = 0;
     manager.relations_database().for_each_relation([&](const osmium::relations::RelationHandle&){
@@ -141,6 +158,10 @@ TEST_CASE("Relations manager with callback") {
     CallbackRM manager;
 
     osmium::relations::read_relations(file, manager);
+
+    REQUIRE(manager.member_nodes_database().size()     == 2);
+    REQUIRE(manager.member_ways_database().size()      == 0);
+    REQUIRE(manager.member_relations_database().size() == 0);
 
     bool callback_called = false;
     osmium::io::Reader reader{file};

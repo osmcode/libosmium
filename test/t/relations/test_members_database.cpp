@@ -83,6 +83,8 @@ TEST_CASE("Fill member database") {
 
         if (way.id() == 11) {
             REQUIRE(mdb.get(way.id()) == way);
+            const auto& object = mdb.get_object(way.id());
+            REQUIRE(object.id() == way.id());
         }
 
         ++n;
@@ -164,5 +166,26 @@ TEST_CASE("Member database with duplicate member in relation") {
         REQUIRE(counts.available == 0);
         REQUIRE(counts.removed   == 4);
     }
+}
+
+TEST_CASE("Remove non-existing object from members database doesn't do anything") {
+    const auto buffer = fill_buffer();
+
+    osmium::ItemStash stash;
+    osmium::relations::RelationsDatabase rdb{stash};
+    osmium::relations::MembersDatabase<osmium::Way> mdb{stash, rdb};
+
+    for (const auto& relation : buffer.select<osmium::Relation>()) {
+        auto handle = rdb.add(relation);
+        int n = 0;
+        for (const auto& member : relation.members()) {
+            mdb.track(handle, member.ref(), n);
+            ++n;
+        }
+    }
+
+    REQUIRE(mdb.size() == 6);
+    mdb.remove(100, 100);
+    REQUIRE(mdb.size() == 6);
 }
 
