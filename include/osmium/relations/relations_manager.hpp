@@ -453,6 +453,19 @@ namespace osmium {
                 possibly_flush();
             }
 
+            /**
+             * Call this function it will call your function back for every
+             * incomplete relation, that is all relations that have missing
+             * members in the input data. Usually you call this only after
+             * your second pass through the data if you are interested in
+             * any relations that have all or some of their members missing
+             * in the input data.
+             */
+            template <typename TFunc>
+            void for_each_incomplete_relation(TFunc&& func) {
+                relations_database().for_each_relation(std::forward<TFunc>(func));
+            }
+
         }; // class RelationsManager
 
     } // namespace relations

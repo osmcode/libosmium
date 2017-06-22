@@ -140,16 +140,16 @@ TEST_CASE("Relations manager derived class") {
 
     REQUIRE(manager.count_new_rels      ==  3);
     REQUIRE(manager.count_new_members   ==  5);
-    REQUIRE(manager.count_complete_rels ==  3);
-    REQUIRE(manager.count_before        == 11);
+    REQUIRE(manager.count_complete_rels ==  2);
+    REQUIRE(manager.count_before        == 10);
     REQUIRE(manager.count_not_in_any    ==  6);
-    REQUIRE(manager.count_after         == 11);
+    REQUIRE(manager.count_after         == 10);
 
     int n = 0;
-    manager.relations_database().for_each_relation([&](const osmium::relations::RelationHandle&){
+    manager.for_each_incomplete_relation([&](const osmium::relations::RelationHandle&){
         ++n;
     });
-    REQUIRE(n == 0);
+    REQUIRE(n == 1);
 }
 
 TEST_CASE("Relations manager with callback") {
