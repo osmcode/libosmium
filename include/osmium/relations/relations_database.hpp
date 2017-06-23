@@ -35,6 +35,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <cassert>
 #include <cstddef>
+#include <utility>
 #include <vector>
 
 #include <osmium/osm/relation.hpp>

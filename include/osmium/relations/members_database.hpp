@@ -37,7 +37,10 @@ DEALINGS IN THE SOFTWARE.
 #include <cassert>
 #include <cstddef>
 #include <limits>
+#include <type_traits>
+#include <vector>
 
+#include <osmium/osm/object.hpp>
 #include <osmium/osm/relation.hpp>
 #include <osmium/osm/types.hpp>
 #include <osmium/relations/relations_database.hpp>

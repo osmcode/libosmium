@@ -37,7 +37,6 @@ DEALINGS IN THE SOFTWARE.
 #include <cassert>
 #include <cstdint>
 #include <cstdlib>
-#include <cstring>
 #include <iostream>
 #include <iterator>
 #include <list>
@@ -47,12 +46,8 @@ DEALINGS IN THE SOFTWARE.
 #include <vector>
 
 #include <osmium/builder/osm_object_builder.hpp>
-#include <osmium/memory/buffer.hpp>
-#include <osmium/osm/area.hpp>
-#include <osmium/osm/item_type.hpp>
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/node_ref.hpp>
-#include <osmium/osm/relation.hpp>
 #include <osmium/osm/types.hpp>
 #include <osmium/osm/way.hpp>
 #include <osmium/util/iterator.hpp>

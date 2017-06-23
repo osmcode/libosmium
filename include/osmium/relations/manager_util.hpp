@@ -34,7 +34,6 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <cstddef>
-#include <cstdint>
 #include <initializer_list>
 #include <iomanip>
 #include <utility>
@@ -42,8 +41,10 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/fwd.hpp>
 #include <osmium/handler.hpp>
 #include <osmium/handler/check_order.hpp>
+#include <osmium/io/file.hpp>
 #include <osmium/io/reader.hpp>
-#include <osmium/relations/relations_database.hpp>
+#include <osmium/memory/buffer.hpp>
+#include <osmium/osm/entity_bits.hpp>
 #include <osmium/util/progress_bar.hpp>
 #include <osmium/visitor.hpp>
 

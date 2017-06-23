@@ -33,31 +33,22 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <algorithm>
 #include <cassert>
-#include <cstdint>
-#include <cstdlib>
-#include <cstring>
-#include <functional>
 #include <iostream>
-#include <iterator>
-#include <set>
-#include <string>
-#include <map>
-#include <utility>
 #include <vector>
 
+#include <osmium/area/assembler_config.hpp>
 #include <osmium/area/detail/basic_assembler_with_tags.hpp>
+#include <osmium/area/detail/segment_list.hpp>
+#include <osmium/area/problem_reporter.hpp>
+#include <osmium/area/stats.hpp>
 #include <osmium/builder/osm_object_builder.hpp>
 #include <osmium/memory/buffer.hpp>
-#include <osmium/osm/area.hpp>
 #include <osmium/osm/item_type.hpp>
-#include <osmium/osm/location.hpp>
+#include <osmium/osm/node_ref.hpp>
 #include <osmium/osm/relation.hpp>
 #include <osmium/osm/tag.hpp>
-#include <osmium/osm/types.hpp>
 #include <osmium/osm/way.hpp>
-#include <osmium/util/compatibility.hpp>
 
 namespace osmium {
 
