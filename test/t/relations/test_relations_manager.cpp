@@ -174,3 +174,24 @@ TEST_CASE("Relations manager with callback") {
     REQUIRE(callback_called);
 }
 
+TEST_CASE("Relations manager reading buffer without callback") {
+    osmium::io::File file{with_data_dir("t/relations/data.osm")};
+
+    CallbackRM manager;
+
+    osmium::relations::read_relations(file, manager);
+
+    REQUIRE(manager.member_nodes_database().size()     == 2);
+    REQUIRE(manager.member_ways_database().size()      == 0);
+    REQUIRE(manager.member_relations_database().size() == 0);
+
+    osmium::io::Reader reader{file};
+    osmium::apply(reader, manager.handler());
+    reader.close();
+
+    auto buffer = manager.read();
+    REQUIRE(std::distance(buffer.begin(), buffer.end()) == 2);
+
+    REQUIRE(manager.count_nodes == 2);
+}
+
