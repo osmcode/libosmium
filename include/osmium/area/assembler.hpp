@@ -188,6 +188,10 @@ namespace osmium {
              *          area(s), true otherwise.
              */
             bool operator()(const osmium::Relation& relation, const std::vector<const osmium::Way*>& members, osmium::memory::Buffer& out_buffer) {
+                if (!config().create_new_style_polygons) {
+                    return true;
+                }
+
                 assert(relation.cmembers().size() >= members.size());
 
                 if (config().problem_reporter) {

@@ -90,7 +90,9 @@ namespace osmium {
 
             /**
              * Create areas for (multi)polygons where the tags are on the
-             * outer way(s).
+             * outer way(s). This is ignored by the area::Assembler which
+             * doesn't support old-style multipolygons any more. Use the
+             * area::AssemblerLegacy if you need this.
              *
              * If this is set to false, those areas will simply be discarded.
              */
