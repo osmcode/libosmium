@@ -127,11 +127,7 @@ namespace osmium {
                     return false;
                 }
 
-                if ((!std::strcmp(type, "multipolygon")) || (!std::strcmp(type, "boundary"))) {
-                    return true;
-                }
-
-                return false;
+                return (!std::strcmp(type, "multipolygon")) || (!std::strcmp(type, "boundary"));
             }
 
             /**
