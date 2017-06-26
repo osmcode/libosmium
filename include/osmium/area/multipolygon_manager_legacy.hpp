@@ -123,10 +123,6 @@ namespace osmium {
                 return false;
             }
 
-            bool new_member(const osmium::Relation& /*relation*/, const osmium::RelationMember& member, std::size_t /*n*/) const {
-                return member.type() == osmium::item_type::way;
-            }
-
             /**
              * This is called when a relation is complete, ie. all members
              * were found in the input. It will build the area using the

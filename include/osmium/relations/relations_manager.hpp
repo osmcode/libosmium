@@ -233,6 +233,12 @@ namespace osmium {
             using handler_pass2 = SecondPassHandlerWithCheckOrder<RelationsManager, TNodes, TWays, TRelations>;
             handler_pass2 m_handler_pass2;
 
+            static bool wanted_type(osmium::item_type type) noexcept {
+                return (TNodes     && type == osmium::item_type::node) ||
+                       (TWays      && type == osmium::item_type::way) ||
+                       (TRelations && type == osmium::item_type::relation);
+            }
+
             /**
              * This method is called from the first pass handler for every
              * relation in the input, to check whether it should be kept.
@@ -407,7 +413,8 @@ namespace osmium {
 
                     std::size_t n = 0;
                     for (auto& member : rel_handle->members()) {
-                        if (derived().new_member(relation, member, n)) {
+                        if (wanted_type(member.type()) &&
+                            derived().new_member(relation, member, n)) {
                             member_database(member.type()).track(rel_handle, member.ref(), n);
                         } else {
                             member.set_ref(0); // set member id to zero to indicate we are not interested
