@@ -133,7 +133,8 @@ namespace osmium {
                 ways.reserve(relation.members().size());
                 for (const auto& member : relation.members()) {
                     if (member.ref() != 0) {
-                        ways.push_back(&this->member_ways_database().get(member.ref()));
+                        ways.push_back(this->get_member_way(member.ref()));
+                        assert(ways.back() != nullptr);
                     }
                 }
 

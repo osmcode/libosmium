@@ -82,9 +82,12 @@ TEST_CASE("Fill member database") {
         REQUIRE(added == (way.id() != 15));
 
         if (way.id() == 11) {
-            REQUIRE(mdb.get(way.id()) == way);
-            const auto& object = mdb.get_object(way.id());
-            REQUIRE(object.id() == way.id());
+            const auto* way_ptr = mdb.get(way.id());
+            REQUIRE(way_ptr);
+            REQUIRE(*way_ptr == way);
+            const auto* object = mdb.get_object(way.id());
+            REQUIRE(object);
+            REQUIRE(object->id() == way.id());
         }
 
         ++n;

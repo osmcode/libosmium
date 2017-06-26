@@ -85,8 +85,9 @@ struct CallbackRM : public osmium::relations::RelationsManager<CallbackRM, true,
         for (const auto& member : relation.members()) {
             if (member.type() == osmium::item_type::node) {
                 ++count_nodes;
-                const auto& node = member_nodes_database().get(member.ref());
-                buffer().add_item(node);
+                const auto* node = get_member_node(member.ref());
+                REQUIRE(node);
+                buffer().add_item(*node);
                 buffer().commit();
             }
         }
@@ -146,8 +147,17 @@ TEST_CASE("Relations manager derived class") {
     REQUIRE(manager.count_after         == 10);
 
     int n = 0;
-    manager.for_each_incomplete_relation([&](const osmium::relations::RelationHandle&){
+    manager.for_each_incomplete_relation([&](const osmium::relations::RelationHandle& handle){
         ++n;
+        REQUIRE(handle->id() == 31);
+        for (const auto& member : handle->members()) {
+            const auto* obj = manager.get_member_object(member);
+            if (member.ref() == 22) {
+                REQUIRE_FALSE(obj);
+            } else {
+                REQUIRE(obj);
+            }
+        }
     });
     REQUIRE(n == 1);
 }

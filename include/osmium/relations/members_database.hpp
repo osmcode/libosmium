@@ -159,12 +159,6 @@ namespace osmium {
                 });
             }
 
-            osmium::ItemStash::handle_type get_handle(osmium::object_id_type id) const noexcept {
-                const auto range = find(id);
-                assert(!range.empty());
-                return range.begin()->object_handle;
-            }
-
             void add_object(const osmium::OSMObject& object, iterator_range<iterator>& range) {
                 const auto handle = m_stash.add_item(object);
                 for (auto& elem : range) {
@@ -291,11 +285,20 @@ namespace osmium {
 
             /**
              * Find the object with the specified id in the database and
-             * return a reference to it.
+             * return a pointer to it. Returns nullptr if there is no object
+             * with that id in the database.
              */
-            const osmium::OSMObject& get_object(osmium::object_id_type id) const {
+            const osmium::OSMObject* get_object(osmium::object_id_type id) const {
                 assert(!m_init_phase && "Call MembersDatabase::prepare_for_lookup() before calling get_object().");
-                return m_stash.get<osmium::OSMObject>(get_handle(id));
+                const auto range = find(id);
+                if (range.empty()) {
+                    return nullptr;
+                }
+                const auto handle = range.begin()->object_handle;
+                if (handle.valid()) {
+                    return &m_stash.get<osmium::OSMObject>(handle);
+                }
+                return nullptr;
             }
 
         }; // class MembersDatabaseCommon
@@ -375,11 +378,12 @@ namespace osmium {
 
             /**
              * Find the object with the specified id in the database and
-             * return a reference to it.
+             * return a pointer to it. Returns nullptr if there is no object
+             * with that id in the database.
              */
-            const TObject& get(osmium::object_id_type id) const {
+            const TObject* get(osmium::object_id_type id) const {
                 assert(!m_init_phase && "Call MembersDatabase::prepare_for_lookup() before calling get().");
-                return m_stash.get<TObject>(get_handle(id));
+                return static_cast<const TObject*>(get_object(id));
             }
 
         }; // class MembersDatabase
