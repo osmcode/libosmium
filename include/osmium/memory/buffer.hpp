@@ -1,6 +1,7 @@
 #ifndef OSMIUM_MEMORY_BUFFER_HPP
 #define OSMIUM_MEMORY_BUFFER_HPP
 
+#include <iostream>
 /*
 
 This file is part of Osmium (http://osmcode.org/libosmium).
@@ -58,7 +59,7 @@ namespace osmium {
     struct buffer_is_full : public std::runtime_error {
 
         buffer_is_full() :
-            std::runtime_error("Osmium buffer is full") {
+            std::runtime_error{"Osmium buffer is full"} {
         }
 
     }; // struct buffer_is_full
@@ -163,7 +164,7 @@ namespace osmium {
                 m_written(size),
                 m_committed(size) {
                 if (size % align_bytes != 0) {
-                    throw std::invalid_argument("buffer size needs to be multiple of alignment");
+                    throw std::invalid_argument{"buffer size needs to be multiple of alignment"};
                 }
             }
 
@@ -176,7 +177,8 @@ namespace osmium {
              * @param committed The size of the initialized data. If this is 0, the buffer startes out empty.
              *
              * @throws std::invalid_argument if the capacity or committed isn't
-             *         a multiple of the alignment.
+             *         a multiple of the alignment or if committed is larger
+             *         than capacity.
              */
             explicit Buffer(unsigned char* data, size_t capacity, size_t committed) :
                 m_memory(),
@@ -185,10 +187,13 @@ namespace osmium {
                 m_written(committed),
                 m_committed(committed) {
                 if (capacity % align_bytes != 0) {
-                    throw std::invalid_argument("buffer capacity needs to be multiple of alignment");
+                    throw std::invalid_argument{"buffer capacity needs to be multiple of alignment"};
                 }
                 if (committed % align_bytes != 0) {
-                    throw std::invalid_argument("buffer parameter 'committed' needs to be multiple of alignment");
+                    throw std::invalid_argument{"buffer parameter 'committed' needs to be multiple of alignment"};
+                }
+                if (committed > capacity) {
+                    throw std::invalid_argument{"buffer parameter 'committed' can not be larger than capacity"};
                 }
             }
 
@@ -297,12 +302,7 @@ namespace osmium {
              * Callback functionality will be removed in the future. Either
              * detect the buffer_is_full exception or use a buffer with
              * auto_grow::yes. If you want to avoid growing buffers, check
-             * that the used size of the buffer (committed()) is small enough
-             * compared to the capacity (for instance small than 90% of the
-             * capacity) before adding anything to the Buffer. If the buffer
-             * is initialized with auto_grow::yes, it will still grow in the
-             * rare case that a very large object will be added taking more
-             * than the difference between committed() and capacity().
+             * the CallbackBuffer class.
              */
             OSMIUM_DEPRECATED void set_full_callback(const std::function<void(Buffer&)>& full) {
                 assert(m_data && "This must be a valid buffer");
@@ -310,7 +310,8 @@ namespace osmium {
             }
 
             /**
-             * Grow capacity of this buffer to the given size.
+             * Grow capacity of this buffer to the given size (which will be
+             * rounded up to the alignment needed).
              * This works only with internally memory-managed buffers.
              * If the given size is not larger than the current capacity,
              * nothing is done.
@@ -321,19 +322,15 @@ namespace osmium {
              *
              * @throws std::logic_error if the buffer doesn't use internal
              *         memory management.
-             * @throws std::invalid_argument if the size isn't a multiple
-             *         of the alignment.
              * @throws std::bad_alloc if there isn't enough memory available.
              */
             void grow(size_t size) {
                 assert(m_data && "This must be a valid buffer");
                 if (!m_memory) {
-                    throw std::logic_error("Can't grow Buffer if it doesn't use internal memory management.");
+                    throw std::logic_error{"Can't grow Buffer if it doesn't use internal memory management."};
                 }
+                size = calculate_capacity(size);
                 if (m_capacity < size) {
-                    if (size % align_bytes != 0) {
-                        throw std::invalid_argument("buffer capacity needs to be multiple of alignment");
-                    }
                     std::unique_ptr<unsigned char[]> memory(new unsigned char[size]);
                     std::copy_n(m_memory.get(), m_capacity, memory.get());
                     using std::swap;
@@ -459,7 +456,7 @@ namespace osmium {
                         }
                         grow(new_capacity);
                     } else {
-                        throw osmium::buffer_is_full();
+                        throw osmium::buffer_is_full{};
                     }
                 }
                 unsigned char* data = &m_data[m_written];
