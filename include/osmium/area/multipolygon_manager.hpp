@@ -123,7 +123,7 @@ namespace osmium {
                 }
 
                 if (((!std::strcmp(type, "multipolygon")) || (!std::strcmp(type, "boundary"))) && osmium::tags::match_any_of(relation.tags(), m_filter)) {
-                    return std::any_of(relation.members().begin(), relation.members().end(), [](const RelationMember& member) {
+                    return std::any_of(relation.members().cbegin(), relation.members().cend(), [](const RelationMember& member) {
                         return member.type() == osmium::item_type::way;
                     });
                 }
