@@ -205,3 +205,17 @@ TEST_CASE("Relations manager reading buffer without callback") {
     REQUIRE(manager.count_nodes == 2);
 }
 
+TEST_CASE("Access members via RelationsManager") {
+    EmptyRM manager;
+
+    manager.prepare_for_lookup();
+
+    REQUIRE(nullptr == manager.get_member_node(0));
+    REQUIRE(nullptr == manager.get_member_way(0));
+    REQUIRE(nullptr == manager.get_member_relation(0));
+
+    REQUIRE(nullptr == manager.get_member_node(17));
+    REQUIRE(nullptr == manager.get_member_way(17));
+    REQUIRE(nullptr == manager.get_member_relation(17));
+}
+

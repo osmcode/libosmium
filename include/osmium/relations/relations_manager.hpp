@@ -174,6 +174,61 @@ namespace osmium {
             }
 
             /**
+             * Get member object from relation member.
+             *
+             * @returns A pointer to the member object if it is available.
+             *          Returns nullptr otherwise.
+             */
+            const osmium::OSMObject* get_member_object(const osmium::RelationMember& member) const noexcept {
+                if (member.ref() == 0) {
+                    return nullptr;
+                }
+                return member_database(member.type()).get_object(member.ref());
+            }
+
+            /**
+             * Get node with specified ID from members database.
+             *
+             * @param id The node ID we are looking for.
+             * @returns A pointer to the member node if it is available.
+             *          Returns nullptr otherwise.
+             */
+            const osmium::Node* get_member_node(osmium::object_id_type id) const noexcept {
+                if (id == 0) {
+                    return nullptr;
+                }
+                return member_nodes_database().get(id);
+            }
+
+            /**
+             * Get way with specified ID from members database.
+             *
+             * @param id The way ID we are looking for.
+             * @returns A pointer to the member way if it is available.
+             *          Returns nullptr otherwise.
+             */
+            const osmium::Way* get_member_way(osmium::object_id_type id) const noexcept {
+                if (id == 0) {
+                    return nullptr;
+                }
+                return member_ways_database().get(id);
+            }
+
+            /**
+             * Get relation with specified ID from members database.
+             *
+             * @param id The relation ID we are looking for.
+             * @returns A pointer to the member relation if it is available.
+             *          Returns nullptr otherwise.
+             */
+            const osmium::Relation* get_member_relation(osmium::object_id_type id) const noexcept {
+                if (id == 0) {
+                    return nullptr;
+                }
+                return member_relations_database().get(id);
+            }
+
+            /**
              * Sort the members databases to prepare them for reading. Usually
              * this is called between the first and second pass reading through
              * an OSM data file.
@@ -473,61 +528,6 @@ namespace osmium {
                 }
                 derived().after_relation(relation);
                 possibly_flush();
-            }
-
-            /**
-             * Get member object from relation member.
-             *
-             * @returns A pointer to the member object if it is available.
-             *          Returns nullptr otherwise.
-             */
-            const osmium::OSMObject* get_member_object(const osmium::RelationMember& member) const noexcept {
-                if (member.ref() == 0) {
-                    return nullptr;
-                }
-                return member_database(member.type()).get_object(member.ref());
-            }
-
-            /**
-             * Get node with specified ID from members database.
-             *
-             * @param id The node ID we are looking for.
-             * @returns A pointer to the member node if it is available.
-             *          Returns nullptr otherwise.
-             */
-            const osmium::Node* get_member_node(osmium::object_id_type id) const noexcept {
-                if (id == 0) {
-                    return nullptr;
-                }
-                return member_nodes_database().get(id);
-            }
-
-            /**
-             * Get way with specified ID from members database.
-             *
-             * @param id The way ID we are looking for.
-             * @returns A pointer to the member way if it is available.
-             *          Returns nullptr otherwise.
-             */
-            const osmium::Way* get_member_way(osmium::object_id_type id) const noexcept {
-                if (id == 0) {
-                    return nullptr;
-                }
-                return member_ways_database().get(id);
-            }
-
-            /**
-             * Get relation with specified ID from members database.
-             *
-             * @param id The relation ID we are looking for.
-             * @returns A pointer to the member relation if it is available.
-             *          Returns nullptr otherwise.
-             */
-            const osmium::Relation* get_member_relation(osmium::object_id_type id) const noexcept {
-                if (id == 0) {
-                    return nullptr;
-                }
-                return member_relations_database().get(id);
             }
 
             /**
