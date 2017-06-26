@@ -195,13 +195,13 @@ int main(int argc, char* argv[]) {
     // If there were multipolgyon relations in the input, but some of their
     // members are not in the input file (which often happens for extracts)
     // this will write the IDs of the incomplete relations to stderr.
-    std::vector<osmium::object_id_type> incomplete_relations;
+    std::vector<osmium::object_id_type> incomplete_relations_ids;
     mp_manager.for_each_incomplete_relation([&](const osmium::relations::RelationHandle& handle){
-        incomplete_relations.push_back(handle->id());
+        incomplete_relations_ids.push_back(handle->id());
     });
-    if (!incomplete_relations.empty()) {
+    if (!incomplete_relations_ids.empty()) {
         std::cerr << "Warning! Some member ways missing for these multipolygon relations:";
-        for (const auto id : incomplete_relations) {
+        for (const auto id : incomplete_relations_ids) {
             std::cerr << " " << id;
         }
         std::cerr << "\n";
