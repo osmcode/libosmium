@@ -196,7 +196,7 @@ int main(int argc, char* argv[]) {
     // members are not in the input file (which often happens for extracts)
     // this will write the IDs of the incomplete relations to stderr.
     std::vector<osmium::object_id_type> incomplete_relations;
-    mp_manager.relations_database().for_each_relation([&](const osmium::relations::RelationHandle& handle){
+    mp_manager.for_each_incomplete_relation([&](const osmium::relations::RelationHandle& handle){
         incomplete_relations.push_back(handle->id());
     });
     if (!incomplete_relations.empty()) {
