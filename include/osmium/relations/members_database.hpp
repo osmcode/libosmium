@@ -287,6 +287,9 @@ namespace osmium {
              * Find the object with the specified id in the database and
              * return a pointer to it. Returns nullptr if there is no object
              * with that id in the database.
+             *
+             * Complexity: Logarithmic in the number of members tracked (as
+             *             returned by size()).
              */
             const osmium::OSMObject* get_object(osmium::object_id_type id) const {
                 assert(!m_init_phase && "Call MembersDatabase::prepare_for_lookup() before calling get_object().");
@@ -380,6 +383,9 @@ namespace osmium {
              * Find the object with the specified id in the database and
              * return a pointer to it. Returns nullptr if there is no object
              * with that id in the database.
+             *
+             * Complexity: Logarithmic in the number of members tracked (as
+             *             returned by size()).
              */
             const TObject* get(osmium::object_id_type id) const {
                 assert(!m_init_phase && "Call MembersDatabase::prepare_for_lookup() before calling get().");

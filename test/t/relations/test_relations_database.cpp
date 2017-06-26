@@ -82,7 +82,11 @@ TEST_CASE("Check need members and handle ops") {
 
     REQUIRE(rdb.size() == 3);
 
-    const auto rels = rdb.get_relations();
+    std::vector<const osmium::Relation*> rels;
+    rdb.for_each_relation([&](const osmium::relations::RelationHandle& rel_handle) {
+        rels.push_back(&*rel_handle);
+    });
+
     REQUIRE(rels.size() == 2);
 
     osmium::object_id_type n = 2;
@@ -95,6 +99,7 @@ TEST_CASE("Check need members and handle ops") {
     REQUIRE(rdb[2]->id() == 3);
 
     rdb[1].remove();
-    REQUIRE(rdb.get_relations().size() == 1);
+
+    REQUIRE(rdb.count_relations() == 1);
 }
 

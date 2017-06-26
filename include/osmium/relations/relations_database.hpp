@@ -33,6 +33,7 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <algorithm>
 #include <cassert>
 #include <cstddef>
 #include <utility>
@@ -137,6 +138,8 @@ namespace osmium {
              * Return an estimate of the number of bytes currently needed for
              * the RelationsDatabase. This does NOT include the memory used
              * in the stash. Used for debugging.
+             *
+             * Complexity: Constant.
              */
             std::size_t used_memory() const noexcept {
                 return sizeof(element) * m_elements.capacity() +
@@ -157,6 +160,8 @@ namespace osmium {
              * Insert a relation into the database. The relation is copied
              * into the stash.
              *
+             * Complexity: Amortized constant.
+             *
              * @param relation The relation to be copied into the database.
              * @returns A handle to the relation.
              */
@@ -165,28 +170,21 @@ namespace osmium {
             /**
              * Return a handle to the relation at the specified position in
              * the database.
+             *
+             * Complexity: Constant.
              */
             RelationHandle operator[](std::size_t pos) noexcept;
 
             /**
-             * Get a vector with pointers to all relations that were not
-             * removed (probably because members were missing in the input
-             * data, so they never got completed).
+             * Return the number of non-removed relations in the database.
              *
-             * The relation pointers point into the stash with which the
-             * RelationsDatabase was created and will be invalidated by any
-             * modifying operations on that stash.
+             * Complexity: Linear in the number of relations (as returned
+             *             by size()).
              */
-            std::vector<const osmium::Relation*> get_relations() const {
-                std::vector<const osmium::Relation*> relations;
-
-                for (const auto& elem : m_elements) {
-                    if (elem.handle.valid()) {
-                        relations.push_back(&m_stash.get<osmium::Relation>(elem.handle));
-                    }
-                }
-
-                return relations;
+            std::size_t count_relations() const noexcept {
+                return std::count_if(m_elements.cbegin(), m_elements.cend(), [&](const element& elem) {
+                    return elem.handle.valid();
+                });
             }
 
             /**

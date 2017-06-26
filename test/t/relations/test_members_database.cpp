@@ -160,7 +160,7 @@ TEST_CASE("Member database with duplicate member in relation") {
     REQUIRE(n == 1);
 
     REQUIRE(rdb.size() == 1);
-    REQUIRE(rdb.get_relations().empty());
+    REQUIRE(rdb.count_relations() == 0);
 
     REQUIRE(mdb.size() == 4);
     {
