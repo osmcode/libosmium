@@ -39,7 +39,7 @@ DEALINGS IN THE SOFTWARE.
 #include <ostream>
 #include <vector>
 
-#ifdef OSMIUM_ITEM_STORAGE_COMPACT_DEBUG
+#ifdef OSMIUM_ITEM_STORAGE_GC_DEBUG
 # include <iostream>
 # include <chrono>
 #endif
@@ -116,8 +116,8 @@ namespace osmium {
         std::vector<std::size_t> m_index;
         std::size_t m_count_items = 0;
         std::size_t m_count_removed = 0;
-#ifdef OSMIUM_ITEM_STORAGE_COMPACT_DEBUG
-        int64_t m_compact_time = 0;
+#ifdef OSMIUM_ITEM_STORAGE_GC_DEBUG
+        int64_t m_gc_time = 0;
 #endif
 
         class cleanup_helper {
@@ -158,16 +158,16 @@ namespace osmium {
             return offset;
         }
 
-        // This function decides whether it makes sense to compact the
+        // This function decides whether it makes sense to garbage collect the
         // database. The values here are the result of some experimentation
         // with real data. We need to balance the memory use with the time
-        // spent on compacting. We don't need to compact if there is enough
-        // space in the buffer anyway (*4). On the other hand, if there
-        // aren't enough removed objects we would just compact again and
-        // again, then it is better to let the buffer grow (*3). The checks
-        // (*1) and (*2) make sure there is minimum and maximum for the number
-        // of removed objects.
-        bool should_compact() const noexcept {
+        // spent on garbage collecting. We don't need to garbage collect if
+        // there is enough space in the buffer anyway (*4). On the other hand,
+        // if there aren't enough removed objects we would just call the
+        // garbage collection again and again, then it is better to let the
+        // buffer grow (*3). The checks (*1) and (*2) make sure there is
+        // minimum and maximum for the number of removed objects.
+        bool should_gc() const noexcept {
             if (m_count_removed < 10 * 1000) { // *1
                 return false;
             }
@@ -210,7 +210,7 @@ namespace osmium {
 
         /**
          * The number of removed items currently still taking up memory in
-         * the stash. You can call compact() to remove them.
+         * the stash. You can call garbage_collect() to remove them.
          *
          * Complexity: Constant.
          */
@@ -236,8 +236,8 @@ namespace osmium {
          * Complexity: Amortized constant.
          */
         handle_type add_item(const osmium::memory::Item& item) {
-            if (should_compact()) {
-                compact();
+            if (should_gc()) {
+                garbage_collect();
             }
             ++m_count_items;
             const auto offset = m_buffer.committed();
@@ -283,16 +283,16 @@ namespace osmium {
         }
 
         /**
-         * Compact the memory used by the ItemStash. This will free up memory
-         * for adding new items. No memory is actually returned to the OS.
-         * Usually you do not need to call this, because add_item() will
+         * Garbage collect the memory used by the ItemStash. This will free up
+         * memory for adding new items. No memory is actually returned to the
+         * OS. Usually you do not need to call this, because add_item() will
          * call it for you as necessary.
          *
          * Complexity: Linear in size() + count_removed().
          */
-        void compact() {
-#ifdef OSMIUM_ITEM_STORAGE_COMPACT_DEBUG
-            std::cerr << "COMPACT items=" << m_count_items << " removed=" << m_count_removed << " buffer.committed=" << m_buffer.committed() << " buffer.capacity=" << m_buffer.capacity() << "\n";
+        void garbage_collect() {
+#ifdef OSMIUM_ITEM_STORAGE_GC_DEBUG
+            std::cerr << "GC items=" << m_count_items << " removed=" << m_count_removed << " buffer.committed=" << m_buffer.committed() << " buffer.capacity=" << m_buffer.capacity() << "\n";
             using clock = std::chrono::high_resolution_clock;
             std::chrono::time_point<clock> start = clock::now();
 #endif
@@ -301,12 +301,12 @@ namespace osmium {
             cleanup_helper helper{m_index};
             m_buffer.purge_removed(&helper);
 
-#ifdef OSMIUM_ITEM_STORAGE_COMPACT_DEBUG
+#ifdef OSMIUM_ITEM_STORAGE_GC_DEBUG
             std::chrono::time_point<clock> stop = clock::now();
             const int64_t time = std::chrono::duration_cast<std::chrono::microseconds>(stop - start).count();
-            m_compact_time += time;
+            m_gc_time += time;
             std::cerr << "        time=" << time
-                      << "us total=" << m_compact_time << "us\n";
+                      << "us total=" << m_gc_time << "us\n";
 #endif
         }
 

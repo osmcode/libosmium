@@ -107,7 +107,7 @@ TEST_CASE("Item stash") {
     REQUIRE(count_valid   == 120);
     REQUIRE(count_invalid ==  60);
 
-    stash.compact();
+    stash.garbage_collect();
     REQUIRE(stash.size() == 120);
     REQUIRE(stash.count_removed() == 0);
 
@@ -130,7 +130,7 @@ TEST_CASE("Item stash") {
     REQUIRE(stash.count_removed() == 0);
 }
 
-TEST_CASE("Fill item stash until it compacts") {
+TEST_CASE("Fill item stash until it garbage collects") {
     auto buffer = generate_test_data();
 
     osmium::ItemStash stash;
