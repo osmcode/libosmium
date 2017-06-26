@@ -39,6 +39,7 @@ DEALINGS IN THE SOFTWARE.
 #include <cstdint>
 #include <cstring>
 #include <stdexcept>
+#include <type_traits>
 #include <vector>
 
 #include <osmium/handler.hpp>
@@ -294,14 +295,18 @@ namespace osmium {
          * @tparam TNodes Are we interested in member nodes?
          * @tparam TWays Are we interested in member ways?
          * @tparam TRelations Are we interested in member relations?
+         * @tparam TCheckOrder Should the order of the input data be checked?
          *
          * @pre The Ids of all objects must be unique in the input data.
          */
-        template <typename TManager, bool TNodes, bool TWays, bool TRelations>
+        template <typename TManager, bool TNodes, bool TWays, bool TRelations, bool TCheckOrder = true>
         class RelationsManager : public RelationsManagerBase {
 
-            using handler_pass2 = SecondPassHandlerWithCheckOrder<RelationsManager, TNodes, TWays, TRelations>;
-            handler_pass2 m_handler_pass2;
+            using check_order_handler = typename std::conditional<TCheckOrder, osmium::handler::CheckOrder, osmium::handler::Handler>::type;
+
+            check_order_handler m_check_order_handler;
+
+            SecondPassHandler<RelationsManager> m_handler_pass2;
 
             static bool wanted_type(osmium::item_type type) noexcept {
                 return (TNodes     && type == osmium::item_type::node) ||
@@ -456,13 +461,14 @@ namespace osmium {
 
             RelationsManager() :
                 RelationsManagerBase(),
+                m_check_order_handler(),
                 m_handler_pass2(*this) {
             }
 
             /**
              * Return reference to second pass handler.
              */
-            handler_pass2& handler(const std::function<void(osmium::memory::Buffer&&)>& callback = nullptr) {
+            SecondPassHandler<RelationsManager>& handler(const std::function<void(osmium::memory::Buffer&&)>& callback = nullptr) {
                 set_callback(callback);
                 return m_handler_pass2;
             }
@@ -495,39 +501,48 @@ namespace osmium {
             }
 
             void handle_node(const osmium::Node& node) {
-                derived().before_node(node);
-                const bool added = member_nodes_database().add(node, [this](RelationHandle& rel_handle) {
-                    handle_complete_relation(rel_handle);
-                });
-                if (! added) {
-                    derived().node_not_in_any_relation(node);
+                if (TNodes) {
+                    m_check_order_handler.node(node);
+                    derived().before_node(node);
+                    const bool added = member_nodes_database().add(node, [this](RelationHandle& rel_handle) {
+                        handle_complete_relation(rel_handle);
+                    });
+                    if (! added) {
+                        derived().node_not_in_any_relation(node);
+                    }
+                    derived().after_node(node);
+                    possibly_flush();
                 }
-                derived().after_node(node);
-                possibly_flush();
             }
 
             void handle_way(const osmium::Way& way) {
-                derived().before_way(way);
-                const bool added = member_ways_database().add(way, [this](RelationHandle& rel_handle) {
-                    handle_complete_relation(rel_handle);
-                });
-                if (! added) {
-                    derived().way_not_in_any_relation(way);
+                if (TWays) {
+                    m_check_order_handler.way(way);
+                    derived().before_way(way);
+                    const bool added = member_ways_database().add(way, [this](RelationHandle& rel_handle) {
+                        handle_complete_relation(rel_handle);
+                    });
+                    if (! added) {
+                        derived().way_not_in_any_relation(way);
+                    }
+                    derived().after_way(way);
+                    possibly_flush();
                 }
-                derived().after_way(way);
-                possibly_flush();
             }
 
             void handle_relation(const osmium::Relation& relation) {
-                derived().before_relation(relation);
-                const bool added = member_relations_database().add(relation, [this](RelationHandle& rel_handle) {
-                    handle_complete_relation(rel_handle);
-                });
-                if (! added) {
-                    derived().relation_not_in_any_relation(relation);
+                if (TRelations) {
+                    m_check_order_handler.relation(relation);
+                    derived().before_relation(relation);
+                    const bool added = member_relations_database().add(relation, [this](RelationHandle& rel_handle) {
+                        handle_complete_relation(rel_handle);
+                    });
+                    if (! added) {
+                        derived().relation_not_in_any_relation(relation);
+                    }
+                    derived().after_relation(relation);
+                    possibly_flush();
                 }
-                derived().after_relation(relation);
-                possibly_flush();
             }
 
             /**

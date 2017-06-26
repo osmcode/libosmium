@@ -59,19 +59,15 @@ namespace osmium {
          * to the "parent" manager.
          *
          * @tparam TManager The manager we want to call functions on.
-         * @tparam TNodes Are we interested in member nodes?
-         * @tparam TWays Are we interested in member ways?
-         * @tparam TRelations Are we interested in member relations?
          */
-        template <typename TManager, bool TNodes = true, bool TWays = true, bool TRelations = true>
-        class SecondPassHandlerWithCheckOrder : public osmium::handler::Handler {
+        template <typename TManager>
+        class SecondPassHandler : public osmium::handler::Handler {
 
-            osmium::handler::CheckOrder m_check_order;
             TManager& m_manager;
 
         public:
 
-            explicit SecondPassHandlerWithCheckOrder(TManager& manager) noexcept :
+            explicit SecondPassHandler(TManager& manager) noexcept :
                 m_manager(manager) {
             }
 
@@ -79,30 +75,21 @@ namespace osmium {
              * Overwrites the function in the handler parent class.
              */
             void node(const osmium::Node& node) {
-                if (TNodes) {
-                    m_check_order.node(node);
-                    m_manager.handle_node(node);
-                }
+                m_manager.handle_node(node);
             }
 
             /**
              * Overwrites the function in the handler parent class.
              */
             void way(const osmium::Way& way) {
-                if (TWays) {
-                    m_check_order.way(way);
-                    m_manager.handle_way(way);
-                }
+                m_manager.handle_way(way);
             }
 
             /**
              * Overwrites the function in the handler parent class.
              */
             void relation(const osmium::Relation& relation) {
-                if (TRelations) {
-                    m_check_order.relation(relation);
-                    m_manager.handle_relation(relation);
-                }
+                m_manager.handle_relation(relation);
             }
 
             /**
@@ -114,7 +101,7 @@ namespace osmium {
                 m_manager.flush_output();
             }
 
-        }; // class SecondPassHandlerWithCheckOrder
+        }; // class SecondPassHandler
 
         /**
          * Read relations from file and feed them into all the managers
