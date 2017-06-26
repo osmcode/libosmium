@@ -46,15 +46,7 @@ namespace osmium {
         explicit iterator_range(P&& p) noexcept :
             P(std::forward<P>(p)) {
         }
-/*
-        It begin() {
-            return this->first;
-        }
 
-        It end() {
-            return this->second;
-        }
-*/
         It begin() const noexcept {
             return this->first;
         }
