@@ -164,3 +164,26 @@ TEST_CASE("set tags on node") {
     REQUIRE(std::string{"pub"} == node.get_value_by_key("amenity", "default"));
 }
 
+TEST_CASE("Setting diff flags on node") {
+    osmium::memory::Buffer buffer{1000};
+
+    osmium::builder::add_node(buffer, _id(17));
+
+    osmium::Node& node = buffer.get<osmium::Node>(0);
+
+    REQUIRE(node.diff() == osmium::diff_indicator_type::none);
+    REQUIRE(node.diff_as_char() == '*');
+
+    node.set_diff(osmium::diff_indicator_type::left);
+    REQUIRE(node.diff() == osmium::diff_indicator_type::left);
+    REQUIRE(node.diff_as_char() == '-');
+
+    node.set_diff(osmium::diff_indicator_type::right);
+    REQUIRE(node.diff() == osmium::diff_indicator_type::right);
+    REQUIRE(node.diff_as_char() == '+');
+
+    node.set_diff(osmium::diff_indicator_type::both);
+    REQUIRE(node.diff() == osmium::diff_indicator_type::both);
+    REQUIRE(node.diff_as_char() == ' ');
+}
+
