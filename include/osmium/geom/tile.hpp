@@ -62,7 +62,7 @@ namespace osmium {
         }
 
         /**
-         * Returns the width or hight of a tile in web mercator coordinates for
+         * Returns the width or height of a tile in web mercator coordinates for
          * the given zoom level.
          */
         inline constexpr double tile_extent_in_zoom(uint32_t zoom) noexcept {
@@ -108,7 +108,7 @@ namespace osmium {
             uint32_t z;
 
             /**
-             * Create a tile with the given zoom level and x any y tile
+             * Create a tile with the given zoom level and x and y tile
              * coordinates.
              *
              * The values are not checked for validity.
