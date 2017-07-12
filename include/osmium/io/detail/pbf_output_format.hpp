@@ -185,7 +185,7 @@ namespace osmium {
                     pbf_blob_header.add_string(FileFormat::BlobHeader::required_string_type, m_blob_type == pbf_blob_type::data ? "OSMData" : "OSMHeader");
                     pbf_blob_header.add_int32(FileFormat::BlobHeader::required_int32_datasize, static_cast_with_assert<int32_t>(blob_data.size()));
 
-                    uint32_t sz = htonl(static_cast_with_assert<uint32_t>(blob_header_data.size()));
+                    const uint32_t sz = htonl(static_cast_with_assert<uint32_t>(blob_header_data.size()));
 
                     // write to output: the 4-byte BlobHeader-Size followed by the BlobHeader followed by the Blob
                     std::string output;
@@ -566,7 +566,7 @@ namespace osmium {
                     }
 
                     switch_primitive_block_type(OSMFormat::PrimitiveGroup::repeated_Node_nodes);
-                    protozero::pbf_builder<OSMFormat::Node> pbf_node{ m_primitive_block.group(), OSMFormat::PrimitiveGroup::repeated_Node_nodes };
+                    protozero::pbf_builder<OSMFormat::Node> pbf_node{m_primitive_block.group(), OSMFormat::PrimitiveGroup::repeated_Node_nodes};
 
                     pbf_node.add_sint64(OSMFormat::Node::required_sint64_id, node.id());
                     add_meta(node, pbf_node);
@@ -577,7 +577,7 @@ namespace osmium {
 
                 void way(const osmium::Way& way) {
                     switch_primitive_block_type(OSMFormat::PrimitiveGroup::repeated_Way_ways);
-                    protozero::pbf_builder<OSMFormat::Way> pbf_way{ m_primitive_block.group(), OSMFormat::PrimitiveGroup::repeated_Way_ways };
+                    protozero::pbf_builder<OSMFormat::Way> pbf_way{m_primitive_block.group(), OSMFormat::PrimitiveGroup::repeated_Way_ways};
 
                     pbf_way.add_int64(OSMFormat::Way::required_int64_id, way.id());
                     add_meta(way, pbf_way);
@@ -610,7 +610,7 @@ namespace osmium {
 
                 void relation(const osmium::Relation& relation) {
                     switch_primitive_block_type(OSMFormat::PrimitiveGroup::repeated_Relation_relations);
-                    protozero::pbf_builder<OSMFormat::Relation> pbf_relation { m_primitive_block.group(), OSMFormat::PrimitiveGroup::repeated_Relation_relations };
+                    protozero::pbf_builder<OSMFormat::Relation> pbf_relation{m_primitive_block.group(), OSMFormat::PrimitiveGroup::repeated_Relation_relations};
 
                     pbf_relation.add_int64(OSMFormat::Relation::required_int64_id, relation.id());
                     add_meta(relation, pbf_relation);
