@@ -116,6 +116,7 @@ namespace osmium {
             std::vector<std::thread> m_threads;
             thread_joiner m_joiner;
             int m_num_threads;
+            bool m_all_workers_down;
 
             void worker_thread() {
                 osmium::thread::set_thread_name("_osmium_worker");
@@ -146,7 +147,8 @@ namespace osmium {
                 m_work_queue(max_queue_size, "work"),
                 m_threads(),
                 m_joiner(m_threads),
-                m_num_threads(detail::get_pool_size(num_threads, osmium::config::get_pool_threads(), std::thread::hardware_concurrency())) {
+                m_num_threads(detail::get_pool_size(num_threads, osmium::config::get_pool_threads(), std::thread::hardware_concurrency())),
+                m_all_workers_down(false) {
 
                 try {
                     for (int i = 0; i < m_num_threads; ++i) {
@@ -168,9 +170,12 @@ namespace osmium {
             }
 
             void shutdown_all_workers() {
-                for (int i = 0; i < m_num_threads; ++i) {
-                    // The special function wrapper makes a worker shut down.
-                    m_work_queue.push(function_wrapper{0});
+                if (!m_all_workers_down) {
+                    for (int i = 0; i < m_num_threads; ++i) {
+                        // The special function wrapper makes a worker shut down.
+                        m_work_queue.push(function_wrapper{0});
+                    }
+                    m_all_workers_down = true;
                 }
             }
 
