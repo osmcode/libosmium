@@ -130,6 +130,11 @@ namespace osmium {
                 }
             }
 
+        public:
+
+            static constexpr int default_num_threads = 0;
+            static constexpr int default_queue_size = 0;
+
             /**
              * Create thread pool with the given number of threads. If
              * num_threads is 0, the number of threads is read from
@@ -141,9 +146,12 @@ namespace osmium {
              * given number, ie it will leave a number of cores unused.
              *
              * In all cases the minimum number of threads in the pool is 1.
+             *
+             * If max_queue_size is 0, the queue size is read from
+             * the environment variable OSMIUM_MAX_WORK_QUEUE_SIZE.
              */
-            explicit Pool(int num_threads, size_t max_queue_size) :
-                m_work_queue(max_queue_size, "work"),
+            explicit Pool(int num_threads = default_num_threads, size_t max_queue_size = default_queue_size) :
+                m_work_queue(max_queue_size > 0 ? max_queue_size : detail::get_work_queue_size(), "work"),
                 m_threads(),
                 m_joiner(m_threads),
                 m_num_threads(detail::get_pool_size(num_threads, osmium::config::get_pool_threads(), std::thread::hardware_concurrency())) {
@@ -158,12 +166,8 @@ namespace osmium {
                 }
             }
 
-        public:
-
-            static constexpr int default_num_threads = 0;
-
-            static Pool& instance() {
-                static Pool pool(default_num_threads, detail::get_work_queue_size());
+            static Pool& default_instance() {
+                static Pool pool{};
                 return pool;
             }
 
@@ -176,6 +180,10 @@ namespace osmium {
 
             ~Pool() {
                 shutdown_all_workers();
+            }
+
+            int num_threads() const noexcept {
+                return m_num_threads;
             }
 
             size_t queue_size() const {

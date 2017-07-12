@@ -48,6 +48,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/io/header.hpp>
 #include <osmium/memory/buffer.hpp>
 #include <osmium/osm/entity_bits.hpp>
+#include <osmium/thread/pool.hpp>
 
 namespace osmium {
 
@@ -56,6 +57,7 @@ namespace osmium {
         namespace detail {
 
             struct parser_arguments {
+                osmium::thread::Pool& pool;
                 future_string_queue_type& input_queue;
                 future_buffer_queue_type& output_queue;
                 std::promise<osmium::io::Header>& header_promise;
@@ -65,6 +67,7 @@ namespace osmium {
 
             class Parser {
 
+                osmium::thread::Pool& m_pool;
                 future_buffer_queue_type& m_output_queue;
                 std::promise<osmium::io::Header>& m_header_promise;
                 queue_wrapper<std::string> m_input_queue;
@@ -73,6 +76,10 @@ namespace osmium {
                 bool m_header_is_done;
 
             protected:
+
+                osmium::thread::Pool& get_pool() {
+                    return m_pool;
+                }
 
                 std::string get_input() {
                     return m_input_queue.pop();
@@ -122,6 +129,7 @@ namespace osmium {
             public:
 
                 explicit Parser(parser_arguments& args) :
+                    m_pool(args.pool),
                     m_output_queue(args.output_queue),
                     m_header_promise(args.header_promise),
                     m_input_queue(args.input_queue),
