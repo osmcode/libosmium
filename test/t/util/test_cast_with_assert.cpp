@@ -31,7 +31,7 @@ TEST_CASE("static_cast_with_assert: cast int32_t -> int16_t should not trigger a
 
 TEST_CASE("static_cast_with_assert: cast int32_t -> int16_t should trigger assert for large int") {
     const int32_t f = 100000;
-    REQUIRE_THROWS_AS(osmium::static_cast_with_assert<int16_t>(f), assert_error);
+    REQUIRE_THROWS_AS(osmium::static_cast_with_assert<int16_t>(f), const assert_error&);
 }
 
 
@@ -49,7 +49,7 @@ TEST_CASE("static_cast_with_assert: cast int16_t -> uint16_t should not trigger 
 
 TEST_CASE("static_cast_with_assert: cast int16_t -> uint16_t should trigger assert for negative int") {
     const int16_t f = -1;
-    REQUIRE_THROWS_AS(osmium::static_cast_with_assert<uint16_t>(f), assert_error);
+    REQUIRE_THROWS_AS(osmium::static_cast_with_assert<uint16_t>(f), const assert_error&);
 }
 
 
@@ -67,7 +67,7 @@ TEST_CASE("static_cast_with_assert: cast uint32_t -> uint16_t should not trigger
 
 TEST_CASE("static_cast_with_assert: cast uint32_t -> uint16_t should trigger assert for large int") {
     const uint32_t f = 100000;
-    REQUIRE_THROWS_AS(osmium::static_cast_with_assert<uint16_t>(f), assert_error);
+    REQUIRE_THROWS_AS(osmium::static_cast_with_assert<uint16_t>(f), const assert_error&);
 }
 
 
@@ -79,6 +79,6 @@ TEST_CASE("static_cast_with_assert: cast uint16_t -> int16_t should not trigger 
 
 TEST_CASE("static_cast_with_assert: cast uint16_t -> int16_t should trigger assert for large int") {
     const uint16_t f = 65000;
-    REQUIRE_THROWS_AS(osmium::static_cast_with_assert<int16_t>(f), assert_error);
+    REQUIRE_THROWS_AS(osmium::static_cast_with_assert<int16_t>(f), const assert_error&);
 }
 

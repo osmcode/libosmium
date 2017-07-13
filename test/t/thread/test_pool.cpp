@@ -65,7 +65,7 @@ TEST_CASE("thread") {
     SECTION("can throw from job in thread pool") {
         auto future = pool.submit(test_job_throw {});
 
-        REQUIRE_THROWS_AS(future.get(), std::runtime_error);
+        REQUIRE_THROWS_AS(future.get(), const std::runtime_error&);
     }
 
 }

@@ -13,8 +13,8 @@ TEST_CASE("Location") {
     SECTION("instantiation_with_default_parameters") {
         osmium::Location loc;
         REQUIRE(!loc);
-        REQUIRE_THROWS_AS(loc.lon(), osmium::invalid_location);
-        REQUIRE_THROWS_AS(loc.lat(), osmium::invalid_location);
+        REQUIRE_THROWS_AS(loc.lon(), const osmium::invalid_location&);
+        REQUIRE_THROWS_AS(loc.lat(), const osmium::invalid_location&);
     }
 
     SECTION("instantiation_with_double_parameters") {
@@ -106,7 +106,7 @@ TEST_CASE("Location") {
     SECTION("output_to_iterator_undefined_location") {
         char buffer[100];
         osmium::Location loc;
-        REQUIRE_THROWS_AS(loc.as_string(buffer, ','), osmium::invalid_location);
+        REQUIRE_THROWS_AS(loc.as_string(buffer, ','), const osmium::invalid_location&);
     }
 
     SECTION("output_to_string_comman_separator") {
@@ -133,7 +133,7 @@ TEST_CASE("Location") {
     SECTION("output_to_string_undefined_location") {
         std::string s;
         osmium::Location loc;
-        REQUIRE_THROWS_AS(loc.as_string(std::back_inserter(s), ','), osmium::invalid_location);
+        REQUIRE_THROWS_AS(loc.as_string(std::back_inserter(s), ','), const osmium::invalid_location&);
     }
 
     SECTION("output_defined") {
@@ -188,10 +188,10 @@ void F(const char* s) {
     strm += s;
     const char* x = strm.c_str();
     const char** data = &x;
-    REQUIRE_THROWS_AS(osmium::detail::string_to_location_coordinate(data), osmium::invalid_location);
+    REQUIRE_THROWS_AS(osmium::detail::string_to_location_coordinate(data), const osmium::invalid_location&);
     ++x;
     data = &x;
-    REQUIRE_THROWS_AS(osmium::detail::string_to_location_coordinate(data), osmium::invalid_location);
+    REQUIRE_THROWS_AS(osmium::detail::string_to_location_coordinate(data), const osmium::invalid_location&);
 }
 
 TEST_CASE("Parsing coordinates from strings") {
@@ -381,8 +381,8 @@ TEST_CASE("set lon/lat from string") {
 
 TEST_CASE("set lon/lat from string with trailing characters") {
     osmium::Location loc;
-    REQUIRE_THROWS_AS(loc.set_lon("1.2x"), osmium::invalid_location);
-    REQUIRE_THROWS_AS(loc.set_lat("3.4e1 "), osmium::invalid_location);
+    REQUIRE_THROWS_AS(loc.set_lon("1.2x"), const osmium::invalid_location&);
+    REQUIRE_THROWS_AS(loc.set_lat("3.4e1 "), const osmium::invalid_location&);
 }
 
 TEST_CASE("set lon/lat from string with trailing characters using partial") {

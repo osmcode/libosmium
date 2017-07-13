@@ -35,13 +35,13 @@ TEST_CASE("Parse OPL: space") {
     std::string d{"a b \t c"};
 
     const char* s = d.data();
-    REQUIRE_THROWS_AS(oid::opl_parse_space(&s), osmium::opl_error);
+    REQUIRE_THROWS_AS(oid::opl_parse_space(&s), const osmium::opl_error&);
 
     s = d.data() + 1;
     oid::opl_parse_space(&s);
     REQUIRE(*s == 'b');
 
-    REQUIRE_THROWS_AS(oid::opl_parse_space(&s), osmium::opl_error);
+    REQUIRE_THROWS_AS(oid::opl_parse_space(&s), const osmium::opl_error&);
 
     ++s;
     oid::opl_parse_space(&s);

@@ -54,7 +54,7 @@ TEST_CASE("Writer") {
             writer(std::move(buffer));
             writer.close();
 
-            REQUIRE_THROWS_AS(writer(osmium::memory::Buffer{}), osmium::io_error);
+            REQUIRE_THROWS_AS(writer(osmium::memory::Buffer{}), const osmium::io_error&);
         }
 
         SECTION("Writer item") {

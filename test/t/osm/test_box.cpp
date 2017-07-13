@@ -16,7 +16,7 @@ TEST_CASE("Starting with default constructed box") {
         REQUIRE(!b);
         REQUIRE(!b.bottom_left());
         REQUIRE(!b.top_right());
-        REQUIRE_THROWS_AS(b.size(), osmium::invalid_location);
+        REQUIRE_THROWS_AS(b.size(), const osmium::invalid_location&);
     }
 
     SECTION("extend with undefined") {

@@ -29,7 +29,7 @@ TEST_CASE("CheckOrder handler: Nodes must be in order") {
     REQUIRE(osmium::opl_parse("n2", buffer));
 
     osmium::handler::CheckOrder handler;
-    REQUIRE_THROWS_AS(osmium::apply(buffer, handler), osmium::out_of_order_error);
+    REQUIRE_THROWS_AS(osmium::apply(buffer, handler), const osmium::out_of_order_error&);
 }
 
 TEST_CASE("CheckOrder handler: Ways must be in order") {
@@ -39,7 +39,7 @@ TEST_CASE("CheckOrder handler: Ways must be in order") {
     REQUIRE(osmium::opl_parse("w2", buffer));
 
     osmium::handler::CheckOrder handler;
-    REQUIRE_THROWS_AS(osmium::apply(buffer, handler), osmium::out_of_order_error);
+    REQUIRE_THROWS_AS(osmium::apply(buffer, handler), const osmium::out_of_order_error&);
 }
 
 TEST_CASE("CheckOrder handler: Relations must be in order") {
@@ -49,7 +49,7 @@ TEST_CASE("CheckOrder handler: Relations must be in order") {
     REQUIRE(osmium::opl_parse("r2", buffer));
 
     osmium::handler::CheckOrder handler;
-    REQUIRE_THROWS_AS(osmium::apply(buffer, handler), osmium::out_of_order_error);
+    REQUIRE_THROWS_AS(osmium::apply(buffer, handler), const osmium::out_of_order_error&);
 }
 
 TEST_CASE("CheckOrder handler: Same id twice is not allowed") {
@@ -59,7 +59,7 @@ TEST_CASE("CheckOrder handler: Same id twice is not allowed") {
     REQUIRE(osmium::opl_parse("n3", buffer));
 
     osmium::handler::CheckOrder handler;
-    REQUIRE_THROWS_AS(osmium::apply(buffer, handler), osmium::out_of_order_error);
+    REQUIRE_THROWS_AS(osmium::apply(buffer, handler), const osmium::out_of_order_error&);
 }
 
 TEST_CASE("CheckOrder handler: Nodes after ways") {
@@ -69,7 +69,7 @@ TEST_CASE("CheckOrder handler: Nodes after ways") {
     REQUIRE(osmium::opl_parse("n30", buffer));
 
     osmium::handler::CheckOrder handler;
-    REQUIRE_THROWS_AS(osmium::apply(buffer, handler), osmium::out_of_order_error);
+    REQUIRE_THROWS_AS(osmium::apply(buffer, handler), const osmium::out_of_order_error&);
 }
 
 TEST_CASE("CheckOrder handler: Nodes after relations") {
@@ -79,7 +79,7 @@ TEST_CASE("CheckOrder handler: Nodes after relations") {
     REQUIRE(osmium::opl_parse("n30", buffer));
 
     osmium::handler::CheckOrder handler;
-    REQUIRE_THROWS_AS(osmium::apply(buffer, handler), osmium::out_of_order_error);
+    REQUIRE_THROWS_AS(osmium::apply(buffer, handler), const osmium::out_of_order_error&);
 }
 
 TEST_CASE("CheckOrder handler: Ways after relations") {
@@ -89,6 +89,6 @@ TEST_CASE("CheckOrder handler: Ways after relations") {
     REQUIRE(osmium::opl_parse("w30", buffer));
 
     osmium::handler::CheckOrder handler;
-    REQUIRE_THROWS_AS(osmium::apply(buffer, handler), osmium::out_of_order_error);
+    REQUIRE_THROWS_AS(osmium::apply(buffer, handler), const osmium::out_of_order_error&);
 }
 

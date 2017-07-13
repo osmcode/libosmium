@@ -42,12 +42,12 @@ TEST_CASE("file_size") {
 #endif
 
     SECTION("illegal fd should throw") {
-        REQUIRE_THROWS_AS(osmium::util::file_size(-1), std::system_error);
+        REQUIRE_THROWS_AS(osmium::util::file_size(-1), const std::system_error&);
     }
 
     SECTION("unused fd should throw") {
         // its unlikely that fd 1000 is open...
-        REQUIRE_THROWS_AS(osmium::util::file_size(1000), std::system_error);
+        REQUIRE_THROWS_AS(osmium::util::file_size(1000), const std::system_error&);
     }
 
 }
@@ -59,12 +59,12 @@ TEST_CASE("resize_file") {
 #endif
 
     SECTION("illegal fd should throw") {
-        REQUIRE_THROWS_AS(osmium::util::resize_file(-1, 10), std::system_error);
+        REQUIRE_THROWS_AS(osmium::util::resize_file(-1, 10), const std::system_error&);
     }
 
     SECTION("unused fd should throw") {
         // its unlikely that fd 1000 is open...
-        REQUIRE_THROWS_AS(osmium::util::resize_file(1000, 10), std::system_error);
+        REQUIRE_THROWS_AS(osmium::util::resize_file(1000, 10), const std::system_error&);
     }
 
 }

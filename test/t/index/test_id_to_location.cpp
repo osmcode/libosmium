@@ -24,17 +24,17 @@ void test_func_all(TIndex& index) {
     const osmium::Location loc1{1.2, 4.5};
     const osmium::Location loc2{3.5, -7.2};
 
-    REQUIRE_THROWS_AS(index.get(id1), osmium::not_found);
+    REQUIRE_THROWS_AS(index.get(id1), const osmium::not_found&);
 
     index.set(id1, loc1);
     index.set(id2, loc2);
 
     index.sort();
 
-    REQUIRE_THROWS_AS(index.get(0), osmium::not_found);
-    REQUIRE_THROWS_AS(index.get(1), osmium::not_found);
-    REQUIRE_THROWS_AS(index.get(5), osmium::not_found);
-    REQUIRE_THROWS_AS(index.get(100), osmium::not_found);
+    REQUIRE_THROWS_AS(index.get(0), const osmium::not_found&);
+    REQUIRE_THROWS_AS(index.get(1), const osmium::not_found&);
+    REQUIRE_THROWS_AS(index.get(5), const osmium::not_found&);
+    REQUIRE_THROWS_AS(index.get(100), const osmium::not_found&);
     REQUIRE_THROWS_WITH(index.get(0), "id 0 not found");
     REQUIRE_THROWS_WITH(index.get(1), "id 1 not found");
 
@@ -62,10 +62,10 @@ void test_func_real(TIndex& index) {
     REQUIRE(loc1 == index.get_noexcept(id1));
     REQUIRE(loc2 == index.get_noexcept(id2));
 
-    REQUIRE_THROWS_AS(index.get(0), osmium::not_found);
-    REQUIRE_THROWS_AS(index.get(1), osmium::not_found);
-    REQUIRE_THROWS_AS(index.get(5), osmium::not_found);
-    REQUIRE_THROWS_AS(index.get(100), osmium::not_found);
+    REQUIRE_THROWS_AS(index.get(0), const osmium::not_found&);
+    REQUIRE_THROWS_AS(index.get(1), const osmium::not_found&);
+    REQUIRE_THROWS_AS(index.get(5), const osmium::not_found&);
+    REQUIRE_THROWS_AS(index.get(100), const osmium::not_found&);
 
     REQUIRE(index.get_noexcept(0) == osmium::Location{});
     REQUIRE(index.get_noexcept(1) == osmium::Location{});
@@ -74,13 +74,13 @@ void test_func_real(TIndex& index) {
 
     index.clear();
 
-    REQUIRE_THROWS_AS(index.get(id1), osmium::not_found);
-    REQUIRE_THROWS_AS(index.get(id2), osmium::not_found);
+    REQUIRE_THROWS_AS(index.get(id1), const osmium::not_found&);
+    REQUIRE_THROWS_AS(index.get(id2), const osmium::not_found&);
 
-    REQUIRE_THROWS_AS(index.get(0), osmium::not_found);
-    REQUIRE_THROWS_AS(index.get(1), osmium::not_found);
-    REQUIRE_THROWS_AS(index.get(5), osmium::not_found);
-    REQUIRE_THROWS_AS(index.get(100), osmium::not_found);
+    REQUIRE_THROWS_AS(index.get(0), const osmium::not_found&);
+    REQUIRE_THROWS_AS(index.get(1), const osmium::not_found&);
+    REQUIRE_THROWS_AS(index.get(5), const osmium::not_found&);
+    REQUIRE_THROWS_AS(index.get(100), const osmium::not_found&);
 
     REQUIRE(index.get_noexcept(id1) == osmium::Location{});
     REQUIRE(index.get_noexcept(id2) == osmium::Location{});
@@ -187,8 +187,8 @@ TEST_CASE("Map Id to location: Dynamic map choice") {
     const std::vector<std::string> map_type_names = map_factory.map_types();
     REQUIRE(map_type_names.size() >= 5);
 
-    REQUIRE_THROWS_AS(map_factory.create_map(""), osmium::map_factory_error);
-    REQUIRE_THROWS_AS(map_factory.create_map("does not exist"), osmium::map_factory_error);
+    REQUIRE_THROWS_AS(map_factory.create_map(""), const osmium::map_factory_error&);
+    REQUIRE_THROWS_AS(map_factory.create_map("does not exist"), const osmium::map_factory_error&);
     REQUIRE_THROWS_WITH(map_factory.create_map(""), "Need non-empty map type name");
     REQUIRE_THROWS_WITH(map_factory.create_map("does not exist"), "Support for map type 'does not exist' not compiled into this binary");
 
