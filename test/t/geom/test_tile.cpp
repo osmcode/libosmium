@@ -52,7 +52,7 @@ TEST_CASE("Tile from x0.0 y0.0 at zoom 4") {
 
     osmium::geom::Tile t{4, l};
 
-    auto n = 1 << (4-1);
+    const auto n = 1 << (4-1);
     REQUIRE(t.x == n);
     REQUIRE(t.y == n);
     REQUIRE(t.z == 4);

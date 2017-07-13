@@ -133,7 +133,7 @@ TEST_CASE("Setting attributes from bad data on strings should fail") {
 TEST_CASE("set large id") {
     osmium::memory::Buffer buffer{10000};
 
-    int64_t id = 3000000000l;
+    const int64_t id = 3000000000l;
     osmium::builder::add_node(buffer, _id(id));
 
     osmium::Node& node = buffer.get<osmium::Node>(0);

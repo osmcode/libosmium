@@ -7,29 +7,25 @@
 #include "wnl_helper.hpp"
 
 TEST_CASE("WKT geometry for point") {
+    const osmium::geom::WKTFactory<> factory;
+    const std::string wkt{factory.create_point(osmium::Location{3.2, 4.2})};
+    REQUIRE(wkt == "POINT(3.2 4.2)");
+}
 
-    osmium::geom::WKTFactory<> factory;
-
-    SECTION("point") {
-        const std::string wkt{factory.create_point(osmium::Location{3.2, 4.2})};
-        REQUIRE(wkt == "POINT(3.2 4.2)");
-    }
-
-    SECTION("empty point") {
-        REQUIRE_THROWS_AS(factory.create_point(osmium::Location()), const osmium::invalid_location&);
-    }
-
+TEST_CASE("WKT geometry for empty point") {
+    const osmium::geom::WKTFactory<> factory;
+    REQUIRE_THROWS_AS(factory.create_point(osmium::Location()), const osmium::invalid_location&);
 }
 
 TEST_CASE("WKT geometry for point in ekwt") {
-    osmium::geom::WKTFactory<> factory(7, osmium::geom::wkt_type::ewkt);
+    const osmium::geom::WKTFactory<> factory{7, osmium::geom::wkt_type::ewkt};
 
     const std::string wkt{factory.create_point(osmium::Location{3.2, 4.2})};
     REQUIRE(wkt == "SRID=4326;POINT(3.2 4.2)");
 }
 
 TEST_CASE("WKT geometry for point in ekwt in web mercator") {
-    osmium::geom::WKTFactory<osmium::geom::MercatorProjection> factory(2, osmium::geom::wkt_type::ewkt);
+    const osmium::geom::WKTFactory<osmium::geom::MercatorProjection> factory{2, osmium::geom::wkt_type::ewkt};
 
     const std::string wkt{factory.create_point(osmium::Location{3.2, 4.2})};
     REQUIRE(wkt == "SRID=3857;POINT(356222.37 467961.14)");

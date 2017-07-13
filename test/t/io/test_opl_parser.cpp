@@ -12,7 +12,7 @@
 namespace oid = osmium::io::detail;
 
 TEST_CASE("Parse OPL: base exception") {
-    osmium::opl_error e{"foo"};
+    const osmium::opl_error e{"foo"};
     REQUIRE(e.data == nullptr);
     REQUIRE(e.line == 0);
     REQUIRE(e.column == 0);
@@ -32,7 +32,7 @@ TEST_CASE("Parse OPL: exception with line and column") {
 }
 
 TEST_CASE("Parse OPL: space") {
-    std::string d{"a b \t c"};
+    const std::string d{"a b \t c"};
 
     const char* s = d.data();
     REQUIRE_THROWS_AS(oid::opl_parse_space(&s), const osmium::opl_error&);
@@ -58,7 +58,7 @@ TEST_CASE("Parse OPL: check for space") {
 }
 
 TEST_CASE("Parse OPL: skip section") {
-    std::string d{"abcd efgh"};
+    const std::string d{"abcd efgh"};
     const char* skip1 = d.data() + 4;
     const char* skip2 = d.data() + 9;
     const char* s = d.data();
@@ -245,7 +245,7 @@ TEST_CASE("Parse OPL: parse string") {
 
 template <typename T = int64_t>
 T test_parse_int(const char* s) {
-    auto r = oid::opl_parse_int<T>(&s);
+    const auto r = oid::opl_parse_int<T>(&s);
     REQUIRE(*s == 'x');
     return r;
 }
@@ -916,28 +916,28 @@ TEST_CASE("Parse line") {
     SECTION("Node") {
         REQUIRE(oid::opl_parse_line(0, "n12 v3", buffer));
         REQUIRE(buffer.written() > 0);
-        auto& item = buffer.get<osmium::memory::Item>(0);
+        const auto& item = buffer.get<osmium::memory::Item>(0);
         REQUIRE(item.type() == osmium::item_type::node);
     }
 
     SECTION("Way") {
         REQUIRE(oid::opl_parse_line(0, "w12 v3", buffer));
         REQUIRE(buffer.written() > 0);
-        auto& item = buffer.get<osmium::memory::Item>(0);
+        const auto& item = buffer.get<osmium::memory::Item>(0);
         REQUIRE(item.type() == osmium::item_type::way);
     }
 
     SECTION("Relation") {
         REQUIRE(oid::opl_parse_line(0, "r12 v3", buffer));
         REQUIRE(buffer.written() > 0);
-        auto& item = buffer.get<osmium::memory::Item>(0);
+        const auto& item = buffer.get<osmium::memory::Item>(0);
         REQUIRE(item.type() == osmium::item_type::relation);
     }
 
     SECTION("Changeset") {
         REQUIRE(oid::opl_parse_line(0, "c12", buffer));
         REQUIRE(buffer.written() > 0);
-        auto& item = buffer.get<osmium::memory::Item>(0);
+        const auto& item = buffer.get<osmium::memory::Item>(0);
         REQUIRE(item.type() == osmium::item_type::changeset);
     }
 

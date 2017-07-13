@@ -131,9 +131,9 @@ TEST_CASE("KeyValueFilter") {
             { "source", "GPS" }
         });
 
-        REQUIRE( osmium::tags::match_any_of(tag_list, filter));
-        REQUIRE(!osmium::tags::match_all_of(tag_list, filter));
-        REQUIRE(!osmium::tags::match_none_of(tag_list, filter));
+        REQUIRE(     osmium::tags::match_any_of(tag_list, filter));
+        REQUIRE_FALSE(osmium::tags::match_all_of(tag_list, filter));
+        REQUIRE_FALSE(osmium::tags::match_none_of(tag_list, filter));
     }
 
     SECTION("KeyValueFilter matches against taglist with_all") {
@@ -147,9 +147,9 @@ TEST_CASE("KeyValueFilter") {
             { "name", "Main Street" }
         });
 
-        REQUIRE( osmium::tags::match_any_of(tag_list, filter));
-        REQUIRE( osmium::tags::match_all_of(tag_list, filter));
-        REQUIRE(!osmium::tags::match_none_of(tag_list, filter));
+        REQUIRE(      osmium::tags::match_any_of(tag_list, filter));
+        REQUIRE(      osmium::tags::match_all_of(tag_list, filter));
+        REQUIRE_FALSE(osmium::tags::match_none_of(tag_list, filter));
     }
 
     SECTION("KeyValueFilter matches against taglist with none") {
@@ -163,9 +163,9 @@ TEST_CASE("KeyValueFilter") {
             { "name", "Main Street" }
         });
 
-        REQUIRE(!osmium::tags::match_any_of(tag_list, filter));
-        REQUIRE(!osmium::tags::match_all_of(tag_list, filter));
-        REQUIRE( osmium::tags::match_none_of(tag_list, filter));
+        REQUIRE_FALSE(osmium::tags::match_any_of(tag_list, filter));
+        REQUIRE_FALSE(osmium::tags::match_all_of(tag_list, filter));
+        REQUIRE(      osmium::tags::match_none_of(tag_list, filter));
     }
 
     SECTION("KeyValueFilter matches against taglist with any called with rvalue") {

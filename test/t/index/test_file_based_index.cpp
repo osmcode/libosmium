@@ -13,7 +13,7 @@
 
 TEST_CASE("File based index") {
 
-    int fd = osmium::detail::create_tmp_file();
+    const int fd = osmium::detail::create_tmp_file();
 
     REQUIRE(osmium::util::file_size(fd) == 0);
 
@@ -27,7 +27,7 @@ TEST_CASE("File based index") {
         constexpr const size_t S = sizeof(index_type::element_type);
 
         {
-            index_type index(fd);
+            index_type index{fd};
 
             REQUIRE(index.size() == 0);
 
@@ -63,7 +63,7 @@ TEST_CASE("File based index") {
         }
 
         {
-            index_type index(fd);
+            index_type index{fd};
             REQUIRE(osmium::util::file_size(fd) >= (6 * S));
 
             REQUIRE(index.size() == 7);
@@ -97,7 +97,7 @@ TEST_CASE("File based index") {
         constexpr const size_t S = sizeof(index_type::element_type);
 
         {
-            index_type index(fd);
+            index_type index{fd};
 
             REQUIRE(index.size() == 0);
 
@@ -133,7 +133,7 @@ TEST_CASE("File based index") {
         }
 
         {
-            index_type index(fd);
+            index_type index{fd};
             REQUIRE(osmium::util::file_size(fd) >= (2 * S));
 
             REQUIRE(index.size() == 2);

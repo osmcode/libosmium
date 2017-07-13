@@ -6,7 +6,7 @@ struct assert_error : public std::runtime_error {
     explicit assert_error(const char* what_arg) : std::runtime_error(what_arg) {
     }
 };
-#define assert(x) if (!(x)) { throw(assert_error(#x)); }
+#define assert(x) if (!(x)) { throw assert_error{#x}; }
 
 #include <osmium/util/cast.hpp>
 

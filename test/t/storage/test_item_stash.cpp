@@ -33,7 +33,7 @@ osmium::memory::Buffer generate_test_data() {
 
 
 TEST_CASE("Item stash handle") {
-    auto handle = osmium::ItemStash::handle_type{};
+    const auto handle = osmium::ItemStash::handle_type{};
     REQUIRE_FALSE(handle.valid());
 
     std::stringstream ss;
@@ -42,7 +42,7 @@ TEST_CASE("Item stash handle") {
 }
 
 TEST_CASE("Item stash") {
-    auto buffer = generate_test_data();
+    const auto buffer = generate_test_data();
 
     osmium::ItemStash stash;
     REQUIRE(stash.size() == 0);
@@ -131,7 +131,7 @@ TEST_CASE("Item stash") {
 }
 
 TEST_CASE("Fill item stash until it garbage collects") {
-    auto buffer = generate_test_data();
+    const auto buffer = generate_test_data();
 
     osmium::ItemStash stash;
     REQUIRE(stash.size() == 0);

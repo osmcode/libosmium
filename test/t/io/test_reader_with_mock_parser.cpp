@@ -62,7 +62,7 @@ TEST_CASE("Test Reader using MockParser") {
         osmium::io::Reader reader{with_data_dir("t/io/data.osm")};
         auto header = reader.header();
         REQUIRE(reader.read());
-        REQUIRE(!reader.read());
+        REQUIRE_FALSE(reader.read());
         REQUIRE(reader.eof());
         reader.close();
     }
@@ -99,7 +99,7 @@ TEST_CASE("Test Reader using MockParser") {
             REQUIRE(std::string{e.what()} == "error in user code");
         }
         REQUIRE(reader.read());
-        REQUIRE(!reader.read());
+        REQUIRE_FALSE(reader.read());
         REQUIRE(reader.eof());
         reader.close();
     }

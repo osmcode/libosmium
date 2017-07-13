@@ -11,8 +11,8 @@ TEST_CASE("Buffer basics") {
     osmium::memory::Buffer empty_buffer1{1024};
     osmium::memory::Buffer empty_buffer2{2048};
 
-    REQUIRE(!invalid_buffer1);
-    REQUIRE(!invalid_buffer2);
+    REQUIRE_FALSE(invalid_buffer1);
+    REQUIRE_FALSE(invalid_buffer2);
     REQUIRE(empty_buffer1);
     REQUIRE(empty_buffer2);
 
@@ -107,19 +107,19 @@ TEST_CASE("Create buffer from existing data with good alignment and committed va
 TEST_CASE("Create buffer from existing data with bad alignment fails") {
     std::array<unsigned char, 128> data;
 
-    auto l1 = [&](){
+    const auto l1 = [&](){
         osmium::memory::Buffer buffer{data.data(), 127};
     };
 
-    auto l2 = [&](){
+    const auto l2 = [&](){
         osmium::memory::Buffer buffer{data.data(), 127, 120};
     };
 
-    auto l3 = [&](){
+    const auto l3 = [&](){
         osmium::memory::Buffer buffer{data.data(), 128, 127};
     };
 
-    auto l4 = [&](){
+    const auto l4 = [&](){
         osmium::memory::Buffer buffer{data.data(), 32, 128};
     };
 

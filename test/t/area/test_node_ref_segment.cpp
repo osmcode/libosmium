@@ -135,11 +135,11 @@ TEST_CASE("Ordering of NodeRefSegements") {
     REQUIRE(node_ref1 < node_ref3);
     REQUIRE(node_ref1 >= node_ref1);
 
-    REQUIRE( osmium::location_less()(node_ref1, node_ref2));
-    REQUIRE(!osmium::location_less()(node_ref2, node_ref3));
-    REQUIRE( osmium::location_less()(node_ref1, node_ref3));
-    REQUIRE( osmium::location_less()(node_ref3, node_ref4));
-    REQUIRE(!osmium::location_less()(node_ref1, node_ref1));
+    REQUIRE(      osmium::location_less()(node_ref1, node_ref2));
+    REQUIRE_FALSE(osmium::location_less()(node_ref2, node_ref3));
+    REQUIRE(      osmium::location_less()(node_ref1, node_ref3));
+    REQUIRE(      osmium::location_less()(node_ref3, node_ref4));
+    REQUIRE_FALSE(osmium::location_less()(node_ref1, node_ref1));
 }
 
 TEST_CASE("More ordering of NodeRefSegments") {

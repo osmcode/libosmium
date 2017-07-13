@@ -43,7 +43,7 @@ TEST_CASE("Writer") {
 
         osmium::io::Reader reader_check{filename};
         osmium::memory::Buffer buffer_check = reader_check.read();
-        REQUIRE(!buffer_check);
+        REQUIRE_FALSE(buffer_check);
     }
 
     SECTION("Successful writes") {
@@ -75,7 +75,7 @@ TEST_CASE("Writer") {
         }
 
         osmium::io::Reader reader_check{filename};
-        osmium::memory::Buffer buffer_check = reader_check.read();
+        const osmium::memory::Buffer buffer_check = reader_check.read();
         REQUIRE(buffer_check);
         REQUIRE(buffer_check.committed() > 0);
         REQUIRE(buffer_check.select<osmium::OSMObject>().size() == num);

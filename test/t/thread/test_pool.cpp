@@ -15,7 +15,7 @@ struct test_job_with_result {
 
 struct test_job_throw {
     OSMIUM_NORETURN void operator()() const {
-        throw std::runtime_error("exception in pool thread");
+        throw std::runtime_error{"exception in pool thread"};
     }
 };
 
@@ -57,13 +57,13 @@ TEST_CASE("thread") {
     }
 
     SECTION("can send job to thread pool") {
-        auto future = pool.submit(test_job_with_result {});
+        auto future = pool.submit(test_job_with_result{});
 
         REQUIRE(future.get() == 42);
     }
 
     SECTION("can throw from job in thread pool") {
-        auto future = pool.submit(test_job_throw {});
+        auto future = pool.submit(test_job_throw{});
 
         REQUIRE_THROWS_AS(future.get(), const std::runtime_error&);
     }

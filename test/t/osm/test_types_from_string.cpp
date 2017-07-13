@@ -19,27 +19,27 @@ TEST_CASE("set ID from string") {
 }
 
 TEST_CASE("set type and ID from string") {
-    auto n17 = osmium::string_to_object_id("n17", osmium::osm_entity_bits::nwr);
+    const auto n17 = osmium::string_to_object_id("n17", osmium::osm_entity_bits::nwr);
     REQUIRE(n17.first == osmium::item_type::node);
     REQUIRE(n17.second == 17);
 
-    auto w42 = osmium::string_to_object_id("w42", osmium::osm_entity_bits::nwr);
+    const auto w42 = osmium::string_to_object_id("w42", osmium::osm_entity_bits::nwr);
     REQUIRE(w42.first == osmium::item_type::way);
     REQUIRE(w42.second == 42);
 
-    auto r_2 = osmium::string_to_object_id("r-2", osmium::osm_entity_bits::nwr);
+    const auto r_2 = osmium::string_to_object_id("r-2", osmium::osm_entity_bits::nwr);
     REQUIRE(r_2.first == osmium::item_type::relation);
     REQUIRE(r_2.second == -2);
 
-    auto d3 = osmium::string_to_object_id("3", osmium::osm_entity_bits::nwr);
+    const auto d3 = osmium::string_to_object_id("3", osmium::osm_entity_bits::nwr);
     REQUIRE(d3.first == osmium::item_type::undefined);
     REQUIRE(d3.second == 3);
 
-    auto u3 = osmium::string_to_object_id("3", osmium::osm_entity_bits::nwr, osmium::item_type::undefined);
+    const auto u3 = osmium::string_to_object_id("3", osmium::osm_entity_bits::nwr, osmium::item_type::undefined);
     REQUIRE(u3.first == osmium::item_type::undefined);
     REQUIRE(u3.second == 3);
 
-    auto n3 = osmium::string_to_object_id("3", osmium::osm_entity_bits::nwr, osmium::item_type::node);
+    const auto n3 = osmium::string_to_object_id("3", osmium::osm_entity_bits::nwr, osmium::item_type::node);
     REQUIRE(n3.first == osmium::item_type::node);
     REQUIRE(n3.second == 3);
 

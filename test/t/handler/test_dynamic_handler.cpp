@@ -82,7 +82,7 @@ osmium::memory::Buffer fill_buffer() {
 }
 
 TEST_CASE("Base test: static handler") {
-    auto buffer = fill_buffer();
+    const auto buffer = fill_buffer();
 
     int count = 0;
     Handler1 h1{count};
@@ -96,7 +96,7 @@ TEST_CASE("Base test: static handler") {
 }
 
 TEST_CASE("Dynamic handler") {
-    auto buffer = fill_buffer();
+    const auto buffer = fill_buffer();
 
     osmium::handler::DynamicHandler handler;
     int count = 0;

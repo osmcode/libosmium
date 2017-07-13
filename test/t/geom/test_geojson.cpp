@@ -87,7 +87,7 @@ TEST_CASE("GeoJSON area geometry") {
     SECTION("area_1outer_0inner") {
         const osmium::Area& area = create_test_area_1outer_0inner(buffer);
 
-        REQUIRE(!area.is_multipolygon());
+        REQUIRE_FALSE(area.is_multipolygon());
         REQUIRE(std::distance(area.cbegin(), area.cend()) == 2);
         REQUIRE(area.subitems<osmium::OuterRing>().size() == area.num_rings().first);
 
@@ -98,7 +98,7 @@ TEST_CASE("GeoJSON area geometry") {
     SECTION("area_1outer_1inner") {
         const osmium::Area& area = create_test_area_1outer_1inner(buffer);
 
-        REQUIRE(!area.is_multipolygon());
+        REQUIRE_FALSE(area.is_multipolygon());
         REQUIRE(std::distance(area.cbegin(), area.cend()) == 3);
         REQUIRE(area.subitems<osmium::OuterRing>().size() == area.num_rings().first);
         REQUIRE(area.subitems<osmium::InnerRing>().size() == area.num_rings().second);

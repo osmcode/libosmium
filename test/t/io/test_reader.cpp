@@ -183,7 +183,7 @@ TEST_CASE("Reader should fail with nonexistent file (pbf)") {
 TEST_CASE("Reader should work when there is an exception in main thread before getting header") {
     try {
         osmium::io::Reader reader{with_data_dir("t/io/data.osm")};
-        REQUIRE(!reader.eof());
+        REQUIRE_FALSE(reader.eof());
         throw std::runtime_error{"foo"};
     } catch (...) {
     }
@@ -192,7 +192,7 @@ TEST_CASE("Reader should work when there is an exception in main thread before g
 TEST_CASE("Reader should work when there is an exception in main thread while reading") {
     try {
         osmium::io::Reader reader{with_data_dir("t/io/data.osm")};
-        REQUIRE(!reader.eof());
+        REQUIRE_FALSE(reader.eof());
         auto header = reader.header();
         throw std::runtime_error{"foo"};
     } catch (...) {
