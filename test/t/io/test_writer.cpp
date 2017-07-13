@@ -46,7 +46,7 @@ TEST_CASE("Writer") {
         REQUIRE(!buffer_check);
     }
 
-    SECTION("Successfull writes") {
+    SECTION("Successful writes") {
 
         SECTION("Writer buffer") {
             filename = "test-writer-out-buffer.osm";
