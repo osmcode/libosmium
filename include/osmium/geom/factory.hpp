@@ -165,6 +165,11 @@ namespace osmium {
 
         public:
 
+            GeometryFactory<TGeomImpl, TProjection>() :
+                m_projection(),
+                m_impl(m_projection.epsg()) {
+            }
+
             /**
              * Constructor for default initialized projection.
              */
