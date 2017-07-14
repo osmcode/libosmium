@@ -219,3 +219,30 @@ TEST_CASE("Access members via RelationsManager") {
     REQUIRE(nullptr == manager.get_member_relation(17));
 }
 
+TEST_CASE("Handle duplicate members correctly") {
+    osmium::io::File file{with_data_dir("t/relations/dupl_member.osm")};
+
+    TestRM manager;
+
+    osmium::relations::read_relations(file, manager);
+
+    auto c = manager.member_nodes_database().count();
+    REQUIRE(c.tracked   == 5);
+    REQUIRE(c.available == 0);
+    REQUIRE(c.removed   == 0);
+
+    osmium::io::Reader reader{file};
+    osmium::apply(reader, manager.handler());
+    reader.close();
+
+    c = manager.member_nodes_database().count();
+    REQUIRE(c.tracked   == 0);
+    REQUIRE(c.available == 0);
+    REQUIRE(c.removed   == 5);
+
+    REQUIRE(manager.count_new_rels      == 2);
+    REQUIRE(manager.count_new_members   == 5);
+    REQUIRE(manager.count_complete_rels == 2);
+    REQUIRE(manager.count_not_in_any    == 2); // 2 relations
+}
+

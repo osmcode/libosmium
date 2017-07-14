@@ -261,7 +261,7 @@ namespace osmium {
 
             /**
              * Remove the entry with the specified member_id and relation_id
-             * from the database. If the entry doesn't exists, nothing happens.
+             * from the database. If the entry doesn't exist, nothing happens.
              */
             void remove(osmium::object_id_type member_id, osmium::object_id_type relation_id) {
                 const auto range = find(member_id);
@@ -279,6 +279,7 @@ namespace osmium {
                 for (auto& elem : range) {
                     if (!elem.is_removed() && relation_id == m_relations_db[elem.relation_pos]->id()) {
                         elem.remove();
+                        break;
                     }
                 }
             }

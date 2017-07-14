@@ -76,6 +76,7 @@ namespace osmium {
 
             explicit handle_type(std::size_t new_value) noexcept :
                 value(new_value) {
+                assert(new_value > 0);
             }
 
         public:
@@ -110,7 +111,7 @@ namespace osmium {
     private:
 
         static constexpr const std::size_t initial_buffer_size = 1024 * 1024;
-        static constexpr const std::size_t removed_item = std::numeric_limits<std::size_t>::max();
+        static constexpr const std::size_t removed_item_offset = std::numeric_limits<std::size_t>::max();
 
         osmium::memory::Buffer m_buffer;
         std::vector<std::size_t> m_index;
@@ -142,18 +143,20 @@ namespace osmium {
 
         }; // cleanup_helper
 
-        std::size_t& get_item_impl(handle_type handle) noexcept {
+        std::size_t& get_item_offset_ref(handle_type handle) noexcept {
             assert(handle.valid() && "handle must be valid");
             assert(handle.value <= m_index.size());
             auto& offset = m_index[handle.value - 1];
+            assert(offset != removed_item_offset);
             assert(offset < m_buffer.committed());
             return offset;
         }
 
-        const std::size_t& get_item_impl(handle_type handle) const noexcept {
+        std::size_t get_item_offset(handle_type handle) const noexcept {
             assert(handle.valid() && "handle must be valid");
             assert(handle.value <= m_index.size());
             const auto& offset = m_index[handle.value - 1];
+            assert(offset != removed_item_offset);
             assert(offset < m_buffer.committed());
             return offset;
         }
@@ -259,7 +262,7 @@ namespace osmium {
          *      item.
          */
         osmium::memory::Item& get_item(handle_type handle) const {
-            return m_buffer.get<osmium::memory::Item>(get_item_impl(handle));
+            return m_buffer.get<osmium::memory::Item>(get_item_offset(handle));
         }
 
         /**
@@ -323,12 +326,11 @@ namespace osmium {
          *      item.
          */
         void remove_item(handle_type handle) {
-            auto& offset = get_item_impl(handle);
-            assert(offset != removed_item && "can not call remove_item() on already removed item");
+            auto& offset = get_item_offset_ref(handle);
             auto& item = m_buffer.get<osmium::memory::Item>(offset);
             assert(!item.removed() && "can not call remove_item() on already removed item");
             item.set_removed(true);
-            offset = removed_item;
+            offset = removed_item_offset;
             --m_count_items;
             ++m_count_removed;
         }

@@ -743,8 +743,8 @@ namespace osmium {
                         if (it_read != it_write) {
                             assert(it_read.data() >= data());
                             assert(it_write.data() >= data());
-                            size_t old_offset = static_cast<size_t>(it_read.data() - data());
-                            size_t new_offset = static_cast<size_t>(it_write.data() - data());
+                            const auto old_offset = static_cast<std::size_t>(it_read.data() - data());
+                            const auto new_offset = static_cast<std::size_t>(it_write.data() - data());
                             callback->moving_in_buffer(old_offset, new_offset);
                             std::memmove(it_write.data(), it_read.data(), it_read->padded_size());
                         }
