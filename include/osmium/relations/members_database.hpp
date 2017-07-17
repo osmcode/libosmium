@@ -37,6 +37,7 @@ DEALINGS IN THE SOFTWARE.
 #include <cassert>
 #include <cstddef>
 #include <limits>
+#include <tuple>
 #include <type_traits>
 #include <vector>
 
@@ -63,9 +64,10 @@ namespace osmium {
             struct element {
 
                 /**
-                 * Position of the parent relation in the relations database.
+                 * Special value used for member_num to mark the element as
+                 * removed.
                  */
-                std::size_t relation_pos;
+                static const size_t removed_value = std::numeric_limits<std::size_t>::max();
 
                 /**
                  * Object ID of this relation member. Can be a node, way,
@@ -80,10 +82,9 @@ namespace osmium {
                 std::size_t member_num;
 
                 /**
-                 * Special value used for member_num to mark the element as
-                 * removed.
+                 * Position of the parent relation in the relations database.
                  */
-                static const size_t removed_value = std::numeric_limits<std::size_t>::max();
+                std::size_t relation_pos;
 
                 /**
                  * Handle to the stash where the object is stored.
@@ -94,9 +95,9 @@ namespace osmium {
                 osmium::ItemStash::handle_type object_handle;
 
                 explicit element(std::size_t rel_pos, osmium::object_id_type memb_id, std::size_t memb_num) noexcept :
-                    relation_pos(rel_pos),
                     member_id(memb_id),
-                    member_num(memb_num) {
+                    member_num(memb_num),
+                    relation_pos(rel_pos) {
                 }
 
                 /**
@@ -105,9 +106,9 @@ namespace osmium {
                  * equal_range algorithm.
                  */
                 explicit element(osmium::object_id_type m_id) noexcept :
-                    relation_pos(0),
                     member_id(m_id),
-                    member_num(0) {
+                    member_num(0),
+                    relation_pos(0) {
                 }
 
                 bool is_removed() const noexcept {
@@ -118,16 +119,19 @@ namespace osmium {
                     member_num = removed_value;
                 }
 
-                /**
-                 * Compares two element objects by only looking at the
-                 * member id. Used to sort a vector of element objects
-                 * and to later find them using binary search.
-                 */
                 bool operator<(const element& other) const noexcept {
-                    return member_id < other.member_id;
+                    return std::tie(member_id, member_num, relation_pos) <
+                           std::tie(other.member_id, other.member_num, other.relation_pos);
                 }
 
             }; // struct element
+
+            // comparison function only comparing member_id.
+            struct compare_member_id {
+                bool operator()(const element& a, const element& b) const noexcept {
+                    return a.member_id < b.member_id;
+                }
+            };
 
             std::vector<element> m_elements;
 
@@ -146,11 +150,11 @@ namespace osmium {
             using const_iterator = std::vector<element>::const_iterator;
 
             iterator_range<iterator> find(osmium::object_id_type id) {
-                return make_range(std::equal_range(m_elements.begin(), m_elements.end(), element{id}));
+                return make_range(std::equal_range(m_elements.begin(), m_elements.end(), element{id}, compare_member_id{}));
             }
 
             iterator_range<const_iterator> find(osmium::object_id_type id) const {
-                return make_range(std::equal_range(m_elements.cbegin(), m_elements.cend(), element{id}));
+                return make_range(std::equal_range(m_elements.cbegin(), m_elements.cend(), element{id}, compare_member_id{}));
             }
 
             static typename iterator_range<iterator>::iterator::difference_type count_not_removed(const iterator_range<iterator>& range) noexcept {
