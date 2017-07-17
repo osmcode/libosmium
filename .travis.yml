@@ -174,12 +174,12 @@ matrix:
 
 
     - os: osx
-      osx_image: xcode8
+      osx_image: xcode8.3
       compiler: xcode8-clang-release
       env: COMPILER='clang++' BUILD_TYPE='Release'
 
     - os: osx
-      osx_image: xcode8
+      osx_image: xcode8.3
       compiler: xcode8-clang-dev
       env: COMPILER='clang++' BUILD_TYPE='Dev'
 
