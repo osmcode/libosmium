@@ -61,6 +61,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/io/header.hpp>
 #include <osmium/memory/buffer.hpp>
 #include <osmium/osm/entity_bits.hpp>
+#include <osmium/thread/pool.hpp>
 #include <osmium/thread/util.hpp>
 #include <osmium/util/config.hpp>
 
@@ -92,6 +93,8 @@ namespace osmium {
 
             osmium::io::File m_file;
 
+            osmium::thread::Pool* m_pool = nullptr;
+
             detail::ParserFactory::create_parser_type m_creator;
 
             enum class status {
@@ -122,6 +125,10 @@ namespace osmium {
             osmium::osm_entity_bits::type m_read_which_entities = osmium::osm_entity_bits::all;
             osmium::io::read_meta m_read_metadata = osmium::io::read_meta::yes;
 
+            void set_option(osmium::thread::Pool& pool) noexcept {
+                m_pool = &pool;
+            }
+
             void set_option(osmium::osm_entity_bits::type value) noexcept {
                 m_read_which_entities = value;
             }
@@ -131,7 +138,8 @@ namespace osmium {
             }
 
             // This function will run in a separate thread.
-            static void parser_thread(const detail::ParserFactory::create_parser_type& creator,
+            static void parser_thread(osmium::thread::Pool& pool,
+                                      const detail::ParserFactory::create_parser_type& creator,
                                       detail::future_string_queue_type& input_queue,
                                       detail::future_buffer_queue_type& osmdata_queue,
                                       std::promise<osmium::io::Header>&& header_promise,
@@ -139,6 +147,7 @@ namespace osmium {
                                       osmium::io::read_meta read_metadata) {
                 std::promise<osmium::io::Header> promise = std::move(header_promise);
                 osmium::io::detail::parser_arguments args = {
+                    pool,
                     input_queue,
                     osmdata_queue,
                     promise,
@@ -263,9 +272,13 @@ namespace osmium {
                     (set_option(args), 0)...
                 };
 
+                if (!m_pool) {
+                    m_pool = &thread::Pool::default_instance();
+                }
+
                 std::promise<osmium::io::Header> header_promise;
                 m_header_future = header_promise.get_future();
-                m_thread = osmium::thread::thread_handler{parser_thread, std::ref(m_creator), std::ref(m_input_queue), std::ref(m_osmdata_queue), std::move(header_promise), m_read_which_entities, m_read_metadata};
+                m_thread = osmium::thread::thread_handler{parser_thread, std::ref(*m_pool), std::ref(m_creator), std::ref(m_input_queue), std::ref(m_osmdata_queue), std::move(header_promise), m_read_which_entities, m_read_metadata};
             }
 
             template <typename... TArgs>

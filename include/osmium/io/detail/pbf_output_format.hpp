@@ -434,7 +434,7 @@ namespace osmium {
 
                     primitive_block.add_message(OSMFormat::PrimitiveBlock::repeated_PrimitiveGroup_primitivegroup, m_primitive_block.group_data());
 
-                    m_output_queue.push(osmium::thread::Pool::instance().submit(
+                    m_output_queue.push(m_pool.submit(
                         SerializeBlob{std::move(primitive_block_data),
                                       pbf_blob_type::data,
                                       m_options.use_compression}
@@ -480,8 +480,8 @@ namespace osmium {
 
             public:
 
-                PBFOutputFormat(const osmium::io::File& file, future_string_queue_type& output_queue) :
-                    OutputFormat(output_queue),
+                PBFOutputFormat(osmium::thread::Pool& pool, const osmium::io::File& file, future_string_queue_type& output_queue) :
+                    OutputFormat(pool, output_queue),
                     m_options(),
                     m_primitive_block(m_options) {
                     m_options.use_dense_nodes = file.is_not_false("pbf_dense_nodes");
@@ -543,7 +543,7 @@ namespace osmium {
                         pbf_header_block.add_string(OSMFormat::HeaderBlock::optional_string_osmosis_replication_base_url, osmosis_replication_base_url);
                     }
 
-                    m_output_queue.push(osmium::thread::Pool::instance().submit(
+                    m_output_queue.push(m_pool.submit(
                         SerializeBlob{std::move(data),
                                       pbf_blob_type::header,
                                       m_options.use_compression}
@@ -643,8 +643,8 @@ namespace osmium {
             // we want the register_output_format() function to run, setting
             // the variable is only a side-effect, it will never be used
             const bool registered_pbf_output = osmium::io::detail::OutputFormatFactory::instance().register_output_format(osmium::io::file_format::pbf,
-                [](const osmium::io::File& file, future_string_queue_type& output_queue) {
-                    return new osmium::io::detail::PBFOutputFormat(file, output_queue);
+                [](osmium::thread::Pool& pool, const osmium::io::File& file, future_string_queue_type& output_queue) {
+                    return new osmium::io::detail::PBFOutputFormat(pool, file, output_queue);
             });
 
             // dummy function to silence the unused variable warning from above

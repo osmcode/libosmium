@@ -48,12 +48,58 @@ TEST_CASE("number of threads in pool") {
 
 }
 
+TEST_CASE("if zero number of threads requested, threads configured") {
+    osmium::thread::Pool pool{0};
+    REQUIRE(pool.num_threads() > 0);
+}
+
+TEST_CASE("if any negative number of threads requested, threads configured") {
+    osmium::thread::Pool pool{-1};
+    REQUIRE(pool.num_threads() > 0);
+}
+
+TEST_CASE("if outlier negative number of threads requested, threads configured") {
+    osmium::thread::Pool pool{-100};
+    REQUIRE(pool.num_threads() > 0);
+}
+
+TEST_CASE("if outlier positive number of threads requested, threads configured") {
+    osmium::thread::Pool pool{1000};
+    REQUIRE(pool.num_threads() > 0);
+}
+
 TEST_CASE("thread") {
 
-    auto& pool = osmium::thread::Pool::instance();
+    auto& pool = osmium::thread::Pool::default_instance();
 
     SECTION("can get access to thread pool") {
         REQUIRE(pool.queue_empty());
+    }
+
+    SECTION("can send job to thread pool") {
+        auto future = pool.submit(test_job_with_result{});
+
+        REQUIRE(future.get() == 42);
+    }
+
+    SECTION("can throw from job in thread pool") {
+        auto future = pool.submit(test_job_throw{});
+
+        REQUIRE_THROWS_AS(future.get(), const std::runtime_error&);
+    }
+
+}
+
+TEST_CASE("thread (user-provided pool)") {
+
+    osmium::thread::Pool pool{7};
+
+    SECTION("can get access to thread pool") {
+        REQUIRE(pool.queue_empty());
+    }
+    
+    SECTION("can access user-provided number of threads") {
+        REQUIRE(pool.num_threads() == 7);
     }
 
     SECTION("can send job to thread pool") {

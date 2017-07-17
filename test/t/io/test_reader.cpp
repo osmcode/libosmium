@@ -54,6 +54,15 @@ TEST_CASE("Reader can be initialized with string") {
     osmium::apply(reader, handler);
 }
 
+TEST_CASE("Reader can be initialized with user-provided pool") {
+    osmium::thread::Pool pool{4};
+    osmium::io::File file{with_data_dir("t/io/data.osm")};
+    osmium::io::Reader reader{file, pool};
+    osmium::handler::Handler handler;
+
+    osmium::apply(reader, handler);
+}
+
 TEST_CASE("Reader should throw after eof") {
     osmium::io::File file{with_data_dir("t/io/data.osm")};
     osmium::io::Reader reader{file};
