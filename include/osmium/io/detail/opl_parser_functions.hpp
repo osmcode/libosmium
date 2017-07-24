@@ -599,8 +599,7 @@ namespace osmium {
 
                 const char* tags_begin = nullptr;
 
-                osmium::Location location1;
-                osmium::Location location2;
+                osmium::Box box;
                 std::string user;
                 while (**data) {
                     opl_parse_space(data);
@@ -630,22 +629,22 @@ namespace osmium {
                             break;
                         case 'x':
                             if (opl_non_empty(*data)) {
-                                location1.set_lon_partial(data);
+                                box.bottom_left().set_lon_partial(data);
                             }
                             break;
                         case 'y':
                             if (opl_non_empty(*data)) {
-                                location1.set_lat_partial(data);
+                                box.bottom_left().set_lat_partial(data);
                             }
                             break;
                         case 'X':
                             if (opl_non_empty(*data)) {
-                                location2.set_lon_partial(data);
+                                box.top_right().set_lon_partial(data);
                             }
                             break;
                         case 'Y':
                             if (opl_non_empty(*data)) {
-                                location2.set_lat_partial(data);
+                                box.top_right().set_lat_partial(data);
                             }
                             break;
                         case 'T':
@@ -661,13 +660,7 @@ namespace osmium {
 
                 }
 
-                if (location1.valid() && location2.valid()) {
-                    osmium::Box box;
-                    box.extend(location1);
-                    box.extend(location2);
-                    builder.set_bounds(box);
-                }
-
+                builder.set_bounds(box);
                 builder.set_user(user);
 
                 if (tags_begin) {
