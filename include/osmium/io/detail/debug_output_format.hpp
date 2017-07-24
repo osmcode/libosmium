@@ -288,9 +288,9 @@ namespace osmium {
                     }
                     const auto& bl = box.bottom_left();
                     const auto& tr = box.top_right();
-                    bl.as_string(std::back_inserter(*m_out));
+                    bl.as_string_without_check(std::back_inserter(*m_out));
                     *m_out += ' ';
-                    tr.as_string(std::back_inserter(*m_out));
+                    tr.as_string_without_check(std::back_inserter(*m_out));
                     if (!box.valid()) {
                         write_error(" INVALID BOX!");
                     }
