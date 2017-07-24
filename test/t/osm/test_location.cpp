@@ -260,6 +260,7 @@ TEST_CASE("Parsing coordinates from strings") {
     C("179.9999999",  1799999999);
     C("179.99999999", 1800000000);
     C("200.123",      2001230000);
+    C("214.7483647",  2147483647);
 
     C("8.109E-4" , 8109);
     C("8.1090E-4" , 8109);
@@ -332,6 +333,12 @@ TEST_CASE("Parsing coordinates from strings") {
     C("1.1e2:", 1100000000, ":");
 }
 
+TEST_CASE("Parsing min coordinate from string") {
+    const char* minval = "-214.7483648";
+    const char** data = &minval;
+    REQUIRE(osmium::detail::string_to_location_coordinate(data) == -2147483648l);
+}
+
 TEST_CASE("Writing zero coordinate into string") {
     std::string buffer;
     osmium::detail::append_location_coordinate_to_string(std::back_inserter(buffer), 0);
@@ -369,6 +376,15 @@ TEST_CASE("Writing coordinate into string") {
     CW(  40101010, "4.010101");
     CW( 494561234, "49.4561234");
     CW(1799999999, "179.9999999");
+
+    CW(2147483647, "214.7483647");
+}
+
+TEST_CASE("Writing min coordinate into string") {
+    std::string buffer;
+
+    osmium::detail::append_location_coordinate_to_string(std::back_inserter(buffer), -2147483648l);
+    REQUIRE(buffer == "-214.7483648");
 }
 
 TEST_CASE("set lon/lat from string") {

@@ -33,6 +33,7 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <algorithm>
 #include <cmath>
 #include <cstdint>
 #include <cstring>
@@ -198,6 +199,12 @@ namespace osmium {
         // Convert integer as used by location for coordinates into a string.
         template <typename T>
         inline T append_location_coordinate_to_string(T iterator, int32_t value) {
+            // need to special-case this, because later `value = -value` would overflow.
+            if (value == std::numeric_limits<int32_t>::min()) {
+                static const char minresult[] = "-214.7483648";
+                return std::copy_n(minresult, sizeof(minresult) - 1, iterator);
+            }
+
             // handle negative values
             if (value < 0) {
                 *iterator++ = '-';
