@@ -336,6 +336,9 @@ namespace osmium {
         /**
          * Check whether the coordinates of this location
          * are defined.
+         *
+         * @deprecated Use is_defined() or is_undefined() or is_valid() which
+         *             have all slightly different meanings.
          */
         explicit constexpr operator bool() const noexcept {
             return m_x != undefined_coordinate && m_y != undefined_coordinate;
@@ -344,12 +347,32 @@ namespace osmium {
         /**
          * Check whether the coordinates are inside the
          * usual bounds (-180<=lon<=180, -90<=lat<=90).
+         *
+         * See also is_defined() and is_undefined().
          */
         constexpr bool valid() const noexcept {
             return m_x >= -180 * detail::coordinate_precision
                 && m_x <=  180 * detail::coordinate_precision
                 && m_y >=  -90 * detail::coordinate_precision
                 && m_y <=   90 * detail::coordinate_precision;
+        }
+
+        /**
+         * Returns true if at least one of the coordinates is defined.
+         *
+         * See also is_undefined() and is_valid().
+         */
+        constexpr bool is_defined() const noexcept {
+            return m_x != undefined_coordinate || m_y != undefined_coordinate;
+        }
+
+        /**
+         * Returns true if both coordinates are undefined.
+         *
+         * See also is_defined() and is_valid().
+         */
+        constexpr bool is_undefined() const noexcept {
+            return m_x == undefined_coordinate && m_y == undefined_coordinate;
         }
 
         constexpr int32_t x() const noexcept {

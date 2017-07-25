@@ -11,13 +11,17 @@
 TEST_CASE("Location instantiation with default parameters") {
     const osmium::Location loc;
     REQUIRE_FALSE(loc);
+    REQUIRE_FALSE(loc.is_defined());
+    REQUIRE(loc.is_undefined());
     REQUIRE_THROWS_AS(loc.lon(), const osmium::invalid_location&);
     REQUIRE_THROWS_AS(loc.lat(), const osmium::invalid_location&);
 }
 
 TEST_CASE("Location instantiation with double parameters") {
     const osmium::Location loc1{1.2, 4.5};
-    REQUIRE(!!loc1);
+    REQUIRE(bool(loc1));
+    REQUIRE(loc1.is_defined());
+    REQUIRE_FALSE(loc1.is_undefined());
     REQUIRE(12000000 == loc1.x());
     REQUIRE(45000000 == loc1.y());
     REQUIRE(1.2 == loc1.lon());
@@ -385,8 +389,20 @@ TEST_CASE("Writing min coordinate into string") {
 
 TEST_CASE("set lon/lat from string") {
     osmium::Location loc;
+    REQUIRE(loc.is_undefined());
+    REQUIRE_FALSE(loc.is_defined());
+    REQUIRE_FALSE(loc.valid());
+
     loc.set_lon("1.2");
+    REQUIRE_FALSE(loc.is_undefined());
+    REQUIRE(loc.is_defined());
+    REQUIRE_FALSE(loc.valid());
+
     loc.set_lat("3.4");
+    REQUIRE_FALSE(loc.is_undefined());
+    REQUIRE(loc.is_defined());
+    REQUIRE(loc.valid());
+
     REQUIRE(loc.lon() == Approx(1.2));
     REQUIRE(loc.lat() == Approx(3.4));
 }
