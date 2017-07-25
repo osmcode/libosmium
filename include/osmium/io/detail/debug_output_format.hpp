@@ -282,7 +282,8 @@ namespace osmium {
 
                 void write_box(const osmium::Box& box) {
                     write_fieldname("box l/b/r/t");
-                    if (!box) {
+                    if (box.bottom_left().is_undefined() &&
+                        box.top_right().is_undefined()) {
                         write_error("BOX NOT SET!\n");
                         return;
                     }

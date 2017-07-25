@@ -141,14 +141,15 @@ namespace osmium {
                 }
 
                 void write_location(const osmium::Location& location, const char x, const char y) {
+                    const bool not_undefined = !location.is_undefined();
                     *m_out += ' ';
                     *m_out += x;
-                    if (location) {
+                    if (not_undefined) {
                         osmium::detail::append_location_coordinate_to_string(std::back_inserter(*m_out), location.x());
                     }
                     *m_out += ' ';
                     *m_out += y;
-                    if (location) {
+                    if (not_undefined) {
                         osmium::detail::append_location_coordinate_to_string(std::back_inserter(*m_out), location.y());
                     }
                 }

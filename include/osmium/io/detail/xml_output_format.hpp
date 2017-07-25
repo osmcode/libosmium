@@ -396,7 +396,8 @@ namespace osmium {
                         write_attribute("uid", changeset.uid());
                     }
 
-                    if (changeset.bounds()) {
+                    if (!changeset.bounds().bottom_left().is_undefined() ||
+                        !changeset.bounds().top_right().is_undefined()) {
                         detail::append_lat_lon_attributes(*m_out, "min_lat", "min_lon", changeset.bounds().bottom_left());
                         detail::append_lat_lon_attributes(*m_out, "max_lat", "max_lon", changeset.bounds().top_right());
                     }
