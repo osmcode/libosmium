@@ -7,6 +7,7 @@
 #include <osmium/index/map/dense_mem_array.hpp>
 #include <osmium/index/map/dense_mmap_array.hpp>
 #include <osmium/index/map/dummy.hpp>
+#include <osmium/index/map/flex_mem.hpp>
 #include <osmium/index/map/sparse_file_array.hpp>
 #include <osmium/index/map/sparse_mem_array.hpp>
 #include <osmium/index/map/sparse_mem_map.hpp>
@@ -180,12 +181,64 @@ TEST_CASE("Map Id to location: SparseMemArray") {
     test_func_real<index_type>(index2);
 }
 
+TEST_CASE("Map Id to location: FlexMem sparse") {
+    using index_type = osmium::index::map::FlexMem<osmium::unsigned_object_id_type, osmium::Location>;
+
+    index_type index1;
+    test_func_all<index_type>(index1);
+
+    index_type index2;
+    test_func_real<index_type>(index2);
+}
+
+TEST_CASE("Map Id to location: FlexMem dense") {
+    using index_type = osmium::index::map::FlexMem<osmium::unsigned_object_id_type, osmium::Location>;
+
+    index_type index1{true};
+    test_func_all<index_type>(index1);
+
+    index_type index2{true};
+    test_func_real<index_type>(index2);
+}
+
+TEST_CASE("Map Id to location: FlexMem switch") {
+    using index_type = osmium::index::map::FlexMem<osmium::unsigned_object_id_type, osmium::Location>;
+
+    const osmium::Location loc1{1.1, 1.2};
+    const osmium::Location loc2{2.2, -9.4};
+
+    index_type index;
+
+    REQUIRE(index.size() == 0);
+
+    index.set(17, loc1);
+    index.set(99, loc2);
+
+    REQUIRE_FALSE(index.is_dense());
+    REQUIRE(index.size() == 2);
+    REQUIRE(index.get_noexcept(0) == osmium::Location{});
+    REQUIRE(index.get_noexcept(1) == osmium::Location{});
+    REQUIRE(index.get_noexcept(17) == loc1);
+    REQUIRE(index.get_noexcept(99) == loc2);
+    REQUIRE(index.get_noexcept(2000000000) == osmium::Location{});
+
+    index.switch_to_dense();
+
+    REQUIRE(index.is_dense());
+    REQUIRE(index.size() >= 2);
+    REQUIRE(index.get_noexcept(0) == osmium::Location{});
+    REQUIRE(index.get_noexcept(1) == osmium::Location{});
+    REQUIRE(index.get_noexcept(17) == loc1);
+    REQUIRE(index.get_noexcept(99) == loc2);
+    REQUIRE(index.get_noexcept(2000000000) == osmium::Location{});
+}
+
 TEST_CASE("Map Id to location: Dynamic map choice") {
     using map_type = osmium::index::map::Map<osmium::unsigned_object_id_type, osmium::Location>;
     const auto& map_factory = osmium::index::MapFactory<osmium::unsigned_object_id_type, osmium::Location>::instance();
 
     const std::vector<std::string> map_type_names = map_factory.map_types();
-    REQUIRE(map_type_names.size() >= 5);
+    REQUIRE(map_type_names.size() >= 6);
 
     REQUIRE_THROWS_AS(map_factory.create_map(""), const osmium::map_factory_error&);
     REQUIRE_THROWS_AS(map_factory.create_map("does not exist"), const osmium::map_factory_error&);
