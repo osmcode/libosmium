@@ -113,7 +113,7 @@ namespace osmium {
                 }
 
                 // if filename is a URL, default to XML format
-                const std::string protocol = m_filename.substr(0, m_filename.find_first_of(':'));
+                const std::string protocol{m_filename.substr(0, m_filename.find_first_of(':'))};
                 if (protocol == "http" || protocol == "https") {
                     m_file_format = file_format::xml;
                 }
@@ -176,7 +176,7 @@ namespace osmium {
                     if (pos == std::string::npos) {
                         set(option, true);
                     } else {
-                        std::string value = option.substr(pos+1);
+                        std::string value{option.substr(pos+1)};
                         option.erase(pos);
                         set(option, value);
                     }
@@ -270,7 +270,7 @@ namespace osmium {
              */
             const File& check() const {
                 if (m_file_format == file_format::unknown) {
-                    std::string msg = "Could not detect file format";
+                    std::string msg{"Could not detect file format"};
                     if (!m_format_string.empty())  {
                         msg += " from format string '";
                         msg += m_format_string;
@@ -284,7 +284,7 @@ namespace osmium {
                         msg += "'";
                     }
                     msg += ".";
-                    throw io_error(msg);
+                    throw io_error{msg};
                 }
                 return *this;
             }

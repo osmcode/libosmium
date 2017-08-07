@@ -193,7 +193,7 @@ namespace osmium {
             } else if (!std::strcmp("false", visible)) {
                 set_visible(false);
             } else {
-                throw std::invalid_argument("Unknown value for visible attribute (allowed is 'true' or 'false')");
+                throw std::invalid_argument{"Unknown value for visible attribute (allowed is 'true' or 'false')"};
             }
             return *this;
         }
@@ -468,7 +468,7 @@ namespace osmium {
      * ordering by timestamp is not necessary as there shouldn't be two
      * objects with the same type, id, and version. But this can happen when
      * creating diff files from extracts, so we take the timestamp into
-     * account  here.
+     * account here.
      *
      * Note that we use the absolute value of the id for a better ordering
      * of objects with negative id. If the IDs have the same absolute value,

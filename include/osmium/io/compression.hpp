@@ -185,10 +185,10 @@ namespace osmium {
                 create_decompressor_type_fd create_decompressor_fd,
                 create_decompressor_type_buffer create_decompressor_buffer) {
 
-                compression_map_type::value_type cc(compression,
+                compression_map_type::value_type cc{compression,
                                                     std::make_tuple(create_compressor,
                                                                     create_decompressor_fd,
-                                                                    create_decompressor_buffer));
+                                                                    create_decompressor_buffer)};
 
                 return m_callbacks.insert(cc).second;
             }
@@ -238,7 +238,7 @@ namespace osmium {
 
             void close() final {
                 if (m_fd >= 0) {
-                    int fd = m_fd;
+                    const int fd = m_fd;
                     m_fd = -1;
                     if (do_fsync()) {
                         osmium::io::detail::reliable_fsync(fd);
@@ -285,15 +285,15 @@ namespace osmium {
 
                 if (m_buffer) {
                     if (m_buffer_size != 0) {
-                        size_t size = m_buffer_size;
+                        const size_t size = m_buffer_size;
                         m_buffer_size = 0;
                         buffer.append(m_buffer, size);
                     }
                 } else {
                     buffer.resize(osmium::io::Decompressor::input_buffer_size);
-                    auto nread = ::read(m_fd, const_cast<char*>(buffer.data()), osmium::io::Decompressor::input_buffer_size);
+                    const auto nread = ::read(m_fd, const_cast<char*>(buffer.data()), osmium::io::Decompressor::input_buffer_size);
                     if (nread < 0) {
-                        throw std::system_error(errno, std::system_category(), "Read failed");
+                        throw std::system_error{errno, std::system_category(), "Read failed"};
                     }
                     buffer.resize(std::string::size_type(nread));
                 }
@@ -306,7 +306,7 @@ namespace osmium {
 
             void close() final {
                 if (m_fd >= 0) {
-                    int fd = m_fd;
+                    const int fd = m_fd;
                     m_fd = -1;
                     osmium::io::detail::reliable_close(fd);
                 }
@@ -319,9 +319,9 @@ namespace osmium {
             // we want the register_compression() function to run, setting
             // the variable is only a side-effect, it will never be used
             const bool registered_no_compression = osmium::io::CompressionFactory::instance().register_compression(osmium::io::file_compression::none,
-                [](int fd, fsync sync) { return new osmium::io::NoCompressor(fd, sync); },
-                [](int fd) { return new osmium::io::NoDecompressor(fd); },
-                [](const char* buffer, size_t size) { return new osmium::io::NoDecompressor(buffer, size); }
+                [](int fd, fsync sync) { return new osmium::io::NoCompressor{fd, sync}; },
+                [](int fd) { return new osmium::io::NoDecompressor{fd}; },
+                [](const char* buffer, size_t size) { return new osmium::io::NoDecompressor{buffer, size}; }
             );
 
             // dummy function to silence the unused variable warning from above
