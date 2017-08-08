@@ -119,7 +119,9 @@ namespace osmium {
              *
              */
             void add_padding(bool self = false) {
-                const auto padding = osmium::memory::align_bytes - (size() % osmium::memory::align_bytes);
+                // We know the padding is only a very small number, so it will
+                // always fit.
+                const auto padding = static_cast<osmium::memory::item_size_type>(osmium::memory::align_bytes - (size() % osmium::memory::align_bytes));
                 if (padding != osmium::memory::align_bytes) {
                     std::fill_n(reserve_space(padding), padding, 0);
                     if (self) {
@@ -131,7 +133,7 @@ namespace osmium {
                 }
             }
 
-            void add_size(uint32_t size) {
+            void add_size(osmium::memory::item_size_type size) {
                 item().add_size(size);
                 if (m_parent) {
                     m_parent->add_size(size);
