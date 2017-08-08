@@ -471,15 +471,16 @@ namespace osmium {
      * account here.
      *
      * Note that we use the absolute value of the id for a better ordering
-     * of objects with negative id. If the IDs have the same absolute value,
-     * the positive ID comes first.
+     * of objects with negative id. All the negative IDs come first, then the
+     * positive IDs. IDs are ordered by their absolute values. (This is the
+     * same ordering JOSM uses.)
      *
      * See object_order_type_id_reverse_version if you need a different
      * ordering.
      */
     inline bool operator<(const OSMObject& lhs, const OSMObject& rhs) noexcept {
-        return const_tie(lhs.type(), lhs.positive_id(), lhs.id() < 0, lhs.version(), lhs.timestamp()) <
-               const_tie(rhs.type(), rhs.positive_id(), rhs.id() < 0, rhs.version(), rhs.timestamp());
+        return const_tie(lhs.type(), lhs.id() > 0, lhs.positive_id(), lhs.version(), lhs.timestamp()) <
+               const_tie(rhs.type(), rhs.id() > 0, rhs.positive_id(), rhs.version(), rhs.timestamp());
     }
 
     inline bool operator>(const OSMObject& lhs, const OSMObject& rhs) noexcept {
