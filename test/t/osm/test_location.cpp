@@ -1,5 +1,6 @@
 #include "catch.hpp"
 
+#include <limits>
 #include <sstream>
 #include <type_traits>
 
@@ -336,7 +337,7 @@ TEST_CASE("Parsing coordinates from strings") {
 TEST_CASE("Parsing min coordinate from string") {
     const char* minval = "-214.7483648";
     const char** data = &minval;
-    REQUIRE(osmium::detail::string_to_location_coordinate(data) == -2147483648l);
+    REQUIRE(osmium::detail::string_to_location_coordinate(data) == std::numeric_limits<int32_t>::min());
 }
 
 TEST_CASE("Writing zero coordinate into string") {
@@ -383,7 +384,7 @@ TEST_CASE("Writing coordinate into string") {
 TEST_CASE("Writing min coordinate into string") {
     std::string buffer;
 
-    osmium::detail::append_location_coordinate_to_string(std::back_inserter(buffer), -2147483648l);
+    osmium::detail::append_location_coordinate_to_string(std::back_inserter(buffer), std::numeric_limits<int32_t>::min());
     REQUIRE(buffer == "-214.7483648");
 }
 
