@@ -57,7 +57,7 @@ namespace osmium {
                 const size_t size = osmium::util::file_size(fd);
 
                 if (size % sizeof(T) != 0) {
-                    throw std::runtime_error("Index file has wrong size (must be multiple of " + std::to_string(sizeof(T)) + ").");
+                    throw std::runtime_error{"Index file has wrong size (must be multiple of " + std::to_string(sizeof(T)) + ")."};
                 }
 
                 return size / sizeof(T);

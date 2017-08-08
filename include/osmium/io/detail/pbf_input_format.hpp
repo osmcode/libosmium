@@ -77,14 +77,14 @@ namespace osmium {
                  */
                 std::string read_from_input_queue(size_t size) {
                     while (m_input_buffer.size() < size) {
-                        const std::string new_data = get_input();
+                        const std::string new_data{get_input()};
                         if (input_done()) {
-                            throw osmium::pbf_error("truncated data (EOF encountered)");
+                            throw osmium::pbf_error{"truncated data (EOF encountered)"};
                         }
                         m_input_buffer += new_data;
                     }
 
-                    std::string output { m_input_buffer.substr(size) };
+                    std::string output{m_input_buffer.substr(size)};
                     m_input_buffer.resize(size);
 
                     using std::swap;
@@ -101,7 +101,7 @@ namespace osmium {
                     uint32_t size_in_network_byte_order;
 
                     try {
-                        const std::string input_data = read_from_input_queue(sizeof(size_in_network_byte_order));
+                        const std::string input_data{read_from_input_queue(sizeof(size_in_network_byte_order))};
                         size_in_network_byte_order = *reinterpret_cast<const uint32_t*>(input_data.data());
                     } catch (const osmium::pbf_error&) {
                         return 0; // EOF
@@ -109,7 +109,7 @@ namespace osmium {
 
                     const uint32_t size = ntohl(size_in_network_byte_order);
                     if (size > static_cast<uint32_t>(max_blob_header_size)) {
-                        throw osmium::pbf_error("invalid BlobHeader size (> max_blob_header_size)");
+                        throw osmium::pbf_error{"invalid BlobHeader size (> max_blob_header_size)"};
                     }
 
                     return size;
@@ -137,11 +137,11 @@ namespace osmium {
                     }
 
                     if (blob_header_datasize == 0) {
-                        throw osmium::pbf_error("PBF format error: BlobHeader.datasize missing or zero.");
+                        throw osmium::pbf_error{"PBF format error: BlobHeader.datasize missing or zero."};
                     }
 
                     if (std::strncmp(expected_type, blob_header_type.data(), blob_header_type.size())) {
-                        throw osmium::pbf_error("blob does not have expected type (OSMHeader in first blob, OSMData in following blobs)");
+                        throw osmium::pbf_error{"blob does not have expected type (OSMHeader in first blob, OSMData in following blobs)"};
                     }
 
                     return blob_header_datasize;
@@ -155,30 +155,29 @@ namespace osmium {
                         return 0;
                     }
 
-                    const std::string blob_header = read_from_input_queue(size);
+                    const std::string blob_header{read_from_input_queue(size)};
 
                     return decode_blob_header(protozero::pbf_message<FileFormat::BlobHeader>(blob_header), expected_type);
                 }
 
                 std::string read_from_input_queue_with_check(size_t size) {
                     if (size > max_uncompressed_blob_size) {
-                        throw osmium::pbf_error(std::string("invalid blob size: " +
-                                                std::to_string(size)));
+                        throw osmium::pbf_error{std::string{"invalid blob size: "} +
+                                                std::to_string(size)};
                     }
                     return read_from_input_queue(size);
                 }
 
                 // Parse the header in the PBF OSMHeader blob.
                 void parse_header_blob() {
-                    osmium::io::Header header;
                     const auto size = check_type_and_get_blob_size("OSMHeader");
-                    header = decode_header(read_from_input_queue_with_check(size));
+                    osmium::io::Header header{decode_header(read_from_input_queue_with_check(size))};
                     set_header_value(header);
                 }
 
                 void parse_data_blobs() {
                     while (const auto size = check_type_and_get_blob_size("OSMData")) {
-                        std::string input_buffer = read_from_input_queue_with_check(size);
+                        std::string input_buffer{read_from_input_queue_with_check(size)};
 
                         PBFDataBlobDecoder data_blob_parser{std::move(input_buffer), read_types(), read_metadata()};
 

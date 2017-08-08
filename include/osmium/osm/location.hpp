@@ -400,7 +400,7 @@ namespace osmium {
          */
         double lon() const {
             if (!valid()) {
-                throw osmium::invalid_location("invalid location");
+                throw osmium::invalid_location{"invalid location"};
             }
             return fix_to_double(m_x);
         }
@@ -419,7 +419,7 @@ namespace osmium {
          */
         double lat() const {
             if (!valid()) {
-                throw osmium::invalid_location("invalid location");
+                throw osmium::invalid_location{"invalid location"};
             }
             return fix_to_double(m_y);
         }
@@ -479,7 +479,7 @@ namespace osmium {
         template <typename T>
         T as_string(T iterator, const char separator = ',') const {
             if (!valid()) {
-                throw osmium::invalid_location("invalid location");
+                throw osmium::invalid_location{"invalid location"};
             }
             return as_string_without_check(iterator, separator);
         }

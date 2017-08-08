@@ -115,7 +115,7 @@ namespace osmium {
         inline Coordinates transform(const CRS& src, const CRS& dest, Coordinates c) {
             const int result = pj_transform(src.get(), dest.get(), 1, 1, &c.x, &c.y, nullptr);
             if (result != 0) {
-                throw osmium::projection_error{std::string("projection failed: ") + pj_strerrno(result)};
+                throw osmium::projection_error{std::string{"projection failed: "} + pj_strerrno(result)};
             }
             return c;
         }

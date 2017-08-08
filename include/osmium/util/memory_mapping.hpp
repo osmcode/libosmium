@@ -139,7 +139,7 @@ namespace osmium {
 
             static size_t check_size(size_t size) {
                 if (size == 0) {
-                    throw std::runtime_error("Zero-sized mapping is not allowed.");
+                    throw std::runtime_error{"Zero-sized mapping is not allowed."};
                 }
                 return size;
             }
@@ -285,7 +285,7 @@ namespace osmium {
                 if (is_valid()) {
                     return reinterpret_cast<T*>(m_addr);
                 }
-                throw std::runtime_error("invalid memory mapping");
+                throw std::runtime_error{"invalid memory mapping"};
             }
 
         }; // class MemoryMapping
@@ -364,7 +364,10 @@ namespace osmium {
              * a mapping_mode as second argument instead.
              */
             OSMIUM_DEPRECATED TypedMemoryMapping(size_t size, bool writable, int fd, off_t offset = 0) :
-                m_mapping(sizeof(T) * size, writable ? MemoryMapping::mapping_mode::write_shared : MemoryMapping::mapping_mode::readonly, fd, sizeof(T) * offset) {
+                m_mapping(sizeof(T) * size,
+                          writable ? MemoryMapping::mapping_mode::write_shared : MemoryMapping::mapping_mode::readonly,
+                          fd,
+                          sizeof(T) * offset) {
             }
 
             /// You can not copy construct a TypedMemoryMapping.
@@ -555,7 +558,7 @@ inline osmium::util::MemoryMapping::MemoryMapping(size_t size, mapping_mode mode
     m_addr(::mmap(nullptr, m_size, get_protection(), get_flags(), m_fd, m_offset)) {
     assert(!(fd == -1 && mode == mapping_mode::readonly));
     if (!is_valid()) {
-        throw std::system_error(errno, std::system_category(), "mmap failed");
+        throw std::system_error{errno, std::system_category(), "mmap failed"};
     }
 }
 
@@ -582,7 +585,7 @@ inline osmium::util::MemoryMapping& osmium::util::MemoryMapping::operator=(osmiu
 inline void osmium::util::MemoryMapping::unmap() {
     if (is_valid()) {
         if (::munmap(m_addr, m_size) != 0) {
-            throw std::system_error(errno, std::system_category(), "munmap failed");
+            throw std::system_error{errno, std::system_category(), "munmap failed"};
         }
         make_invalid();
     }
@@ -594,7 +597,7 @@ inline void osmium::util::MemoryMapping::resize(size_t new_size) {
 #ifdef __linux__
         m_addr = ::mremap(m_addr, m_size, new_size, MREMAP_MAYMOVE);
         if (!is_valid()) {
-            throw std::system_error(errno, std::system_category(), "mremap failed");
+            throw std::system_error{errno, std::system_category(), "mremap failed"};
         }
         m_size = new_size;
 #else
@@ -606,7 +609,7 @@ inline void osmium::util::MemoryMapping::resize(size_t new_size) {
         resize_fd(m_fd);
         m_addr = ::mmap(nullptr, new_size, get_protection(), get_flags(), m_fd, m_offset);
         if (!is_valid()) {
-            throw std::system_error(errno, std::system_category(), "mmap (remap) failed");
+            throw std::system_error{errno, std::system_category(), "mmap (remap) failed"};
         }
     }
 }
@@ -673,11 +676,20 @@ inline HANDLE osmium::util::MemoryMapping::create_file_mapping() const noexcept 
     if (m_fd != -1) {
         _setmode(m_fd, _O_BINARY);
     }
-    return CreateFileMapping(get_handle(), nullptr, get_protection(), osmium::util::dword_hi(static_cast<uint64_t>(m_size) + m_offset), osmium::util::dword_lo(static_cast<uint64_t>(m_size) + m_offset), nullptr);
+    return CreateFileMapping(get_handle(),
+                             nullptr,
+                             get_protection(),
+                             osmium::util::dword_hi(static_cast<uint64_t>(m_size) + m_offset),
+                             osmium::util::dword_lo(static_cast<uint64_t>(m_size) + m_offset),
+                             nullptr);
 }
 
 inline void* osmium::util::MemoryMapping::map_view_of_file() const noexcept {
-    return MapViewOfFile(m_handle, get_flags(), osmium::util::dword_hi(m_offset), osmium::util::dword_lo(m_offset), m_size);
+    return MapViewOfFile(m_handle,
+                         get_flags(),
+                         osmium::util::dword_hi(m_offset),
+                         osmium::util::dword_lo(m_offset),
+                         m_size);
 }
 
 inline bool osmium::util::MemoryMapping::is_valid() const noexcept {
@@ -697,12 +709,12 @@ inline osmium::util::MemoryMapping::MemoryMapping(size_t size, MemoryMapping::ma
     m_addr(nullptr) {
 
     if (!m_handle) {
-        throw std::system_error(GetLastError(), std::system_category(), "CreateFileMapping failed");
+        throw std::system_error{GetLastError(), std::system_category(), "CreateFileMapping failed"};
     }
 
     m_addr = map_view_of_file();
     if (!is_valid()) {
-        throw std::system_error(GetLastError(), std::system_category(), "MapViewOfFile failed");
+        throw std::system_error{GetLastError(), std::system_category(), "MapViewOfFile failed"};
     }
 }
 
@@ -732,15 +744,15 @@ inline osmium::util::MemoryMapping& osmium::util::MemoryMapping::operator=(osmiu
 
 inline void osmium::util::MemoryMapping::unmap() {
     if (is_valid()) {
-        if (! UnmapViewOfFile(m_addr)) {
-            throw std::system_error(GetLastError(), std::system_category(), "UnmapViewOfFile failed");
+        if (!UnmapViewOfFile(m_addr)) {
+            throw std::system_error{GetLastError(), std::system_category(), "UnmapViewOfFile failed"};
         }
         make_invalid();
     }
 
     if (m_handle) {
-        if (! CloseHandle(m_handle)) {
-            throw std::system_error(GetLastError(), std::system_category(), "CloseHandle failed");
+        if (!CloseHandle(m_handle)) {
+            throw std::system_error{GetLastError(), std::system_category(), "CloseHandle failed"};
         }
         m_handle = nullptr;
     }
@@ -754,12 +766,12 @@ inline void osmium::util::MemoryMapping::resize(size_t new_size) {
 
     m_handle = create_file_mapping();
     if (!m_handle) {
-        throw std::system_error(GetLastError(), std::system_category(), "CreateFileMapping failed");
+        throw std::system_error{GetLastError(), std::system_category(), "CreateFileMapping failed"};
     }
 
     m_addr = map_view_of_file();
     if (!is_valid()) {
-        throw std::system_error(GetLastError(), std::system_category(), "MapViewOfFile failed");
+        throw std::system_error{GetLastError(), std::system_category(), "MapViewOfFile failed"};
     }
 }
 

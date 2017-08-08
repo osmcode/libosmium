@@ -158,7 +158,7 @@ namespace osmium {
                 }
                 try {
                     if (!way.nodes().front().location() || !way.nodes().back().location()) {
-                        throw osmium::invalid_location("invalid location");
+                        throw osmium::invalid_location{"invalid location"};
                     }
                     if (way.ends_have_same_location()) {
                         // way is closed and has enough nodes, build simple multipolygon

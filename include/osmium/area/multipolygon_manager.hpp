@@ -163,7 +163,7 @@ namespace osmium {
 
                 try {
                     if (!way.nodes().front().location() || !way.nodes().back().location()) {
-                        throw osmium::invalid_location("invalid location");
+                        throw osmium::invalid_location{"invalid location"};
                     }
                     if (way.ends_have_same_location()) {
                         if (way.tags().has_tag("area", "no")) {
