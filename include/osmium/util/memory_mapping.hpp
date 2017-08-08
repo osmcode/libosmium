@@ -700,6 +700,13 @@ inline void osmium::util::MemoryMapping::make_invalid() noexcept {
     m_addr = nullptr;
 }
 
+// GetLastError() returns a DWORD (A 32-bit unsigned integer), but the error
+// code for std::system_error is an int. So we convert this here and hope
+// it all works.
+inline int last_error() noexcept {
+    return static_cast<int>(GetLastError());
+}
+
 inline osmium::util::MemoryMapping::MemoryMapping(size_t size, MemoryMapping::mapping_mode mode, int fd, off_t offset) :
     m_size(check_size(size)),
     m_offset(offset),
@@ -709,12 +716,12 @@ inline osmium::util::MemoryMapping::MemoryMapping(size_t size, MemoryMapping::ma
     m_addr(nullptr) {
 
     if (!m_handle) {
-        throw std::system_error{GetLastError(), std::system_category(), "CreateFileMapping failed"};
+        throw std::system_error{last_error(), std::system_category(), "CreateFileMapping failed"};
     }
 
     m_addr = map_view_of_file();
     if (!is_valid()) {
-        throw std::system_error{GetLastError(), std::system_category(), "MapViewOfFile failed"};
+        throw std::system_error{last_error(), std::system_category(), "MapViewOfFile failed"};
     }
 }
 
@@ -745,14 +752,14 @@ inline osmium::util::MemoryMapping& osmium::util::MemoryMapping::operator=(osmiu
 inline void osmium::util::MemoryMapping::unmap() {
     if (is_valid()) {
         if (!UnmapViewOfFile(m_addr)) {
-            throw std::system_error{GetLastError(), std::system_category(), "UnmapViewOfFile failed"};
+            throw std::system_error{last_error(), std::system_category(), "UnmapViewOfFile failed"};
         }
         make_invalid();
     }
 
     if (m_handle) {
         if (!CloseHandle(m_handle)) {
-            throw std::system_error{GetLastError(), std::system_category(), "CloseHandle failed"};
+            throw std::system_error{last_error(), std::system_category(), "CloseHandle failed"};
         }
         m_handle = nullptr;
     }
@@ -766,12 +773,12 @@ inline void osmium::util::MemoryMapping::resize(size_t new_size) {
 
     m_handle = create_file_mapping();
     if (!m_handle) {
-        throw std::system_error{GetLastError(), std::system_category(), "CreateFileMapping failed"};
+        throw std::system_error{last_error(), std::system_category(), "CreateFileMapping failed"};
     }
 
     m_addr = map_view_of_file();
     if (!is_valid()) {
-        throw std::system_error{GetLastError(), std::system_category(), "MapViewOfFile failed"};
+        throw std::system_error{last_error(), std::system_category(), "MapViewOfFile failed"};
     }
 }
 
