@@ -24,5 +24,5 @@ add_test(NAME examples_location_cache_search
 
 set_tests_properties(examples_location_cache_search PROPERTIES
                      DEPENDS examples_location_cache_create
-                     PASS_REGULAR_EXPRESSION "12 \\(7.14,1.04\\)\n$")
+                     PASS_REGULAR_EXPRESSION "^12 \\(7.14,1.04\\)\n$")
 

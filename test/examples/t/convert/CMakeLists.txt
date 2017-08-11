@@ -3,7 +3,7 @@ add_test(NAME examples_convert_help
          COMMAND osmium_convert -h)
 
 set_tests_properties(examples_convert_help PROPERTIES
-                     PASS_REGULAR_EXPRESSION "osmium_convert .*OUTFILE")
+                     PASS_REGULAR_EXPRESSION "^osmium_convert .*OUTFILE")
 
 
 add_test(NAME examples_convert_xml_debug
