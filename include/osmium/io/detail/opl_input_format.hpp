@@ -33,19 +33,16 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <cstdlib>
-#include <future>
+#include <cstdint>
 #include <memory>
 #include <string>
 #include <utility>
 
 #include <osmium/io/detail/input_format.hpp>
 #include <osmium/io/detail/opl_parser_functions.hpp>
-#include <osmium/io/detail/queue_util.hpp>
 #include <osmium/io/file_format.hpp>
 #include <osmium/io/header.hpp>
 #include <osmium/memory/buffer.hpp>
-#include <osmium/osm/entity_bits.hpp>
 #include <osmium/thread/util.hpp>
 
 namespace osmium {
@@ -91,7 +88,7 @@ namespace osmium {
 
                     std::string rest;
                     while (!input_done()) {
-                        std::string input = get_input();
+                        std::string input{get_input()};
                         std::string::size_type ppos = 0;
 
                         if (!rest.empty()) {

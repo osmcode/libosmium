@@ -49,6 +49,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/node_ref.hpp>
 #include <osmium/osm/relation.hpp>
+#include <osmium/osm/types.hpp>
 #include <osmium/osm/way.hpp>
 
 namespace osmium {
@@ -103,8 +104,8 @@ namespace osmium {
                 /**
                  * Calculate the number of segments in all the ways together.
                  */
-                static size_t get_num_segments(const std::vector<const osmium::Way*>& members) noexcept {
-                    return std::accumulate(members.cbegin(), members.cend(), static_cast<size_t>(0), [](size_t sum, const osmium::Way* way) {
+                static std::size_t get_num_segments(const std::vector<const osmium::Way*>& members) noexcept {
+                    return std::accumulate(members.cbegin(), members.cend(), static_cast<std::size_t>(0), [](std::size_t sum, const osmium::Way* way) {
                         if (way->nodes().empty()) {
                             return sum;
                         }
@@ -156,7 +157,7 @@ namespace osmium {
                 SegmentList& operator=(SegmentList&&) = delete;
 
                 /// The number of segments in the list.
-                size_t size() const noexcept {
+                std::size_t size() const noexcept {
                     return m_segments.size();
                 }
 
@@ -176,12 +177,12 @@ namespace osmium {
                     return m_segments.back();
                 }
 
-                const NodeRefSegment& operator[](size_t n) const noexcept {
+                const NodeRefSegment& operator[](std::size_t n) const noexcept {
                     assert(n < m_segments.size());
                     return m_segments[n];
                 }
 
-                NodeRefSegment& operator[](size_t n) noexcept {
+                NodeRefSegment& operator[](std::size_t n) noexcept {
                     assert(n < m_segments.size());
                     return m_segments[n];
                 }
@@ -241,7 +242,7 @@ namespace osmium {
                                                     const std::vector<const osmium::Way*>& members) {
                     assert(relation.cmembers().size() >= members.size());
 
-                    const size_t num_segments = get_num_segments(members);
+                    const std::size_t num_segments = get_num_segments(members);
                     if (problem_reporter) {
                         problem_reporter->set_nodes(num_segments);
                     }
@@ -321,7 +322,7 @@ namespace osmium {
 
                     uint32_t found_intersections = 0;
 
-                    for (auto it1 = m_segments.cbegin(); it1 != m_segments.cend()-1; ++it1) {
+                    for (auto it1 = m_segments.cbegin(); it1 != m_segments.cend() - 1; ++it1) {
                         const NodeRefSegment& s1 = *it1;
                         for (auto it2 = it1+1; it2 != m_segments.end(); ++it2) {
                             const NodeRefSegment& s2 = *it2;
@@ -333,7 +334,7 @@ namespace osmium {
                             }
 
                             if (y_range_overlap(s1, s2)) {
-                                osmium::Location intersection = calculate_intersection(s1, s2);
+                                osmium::Location intersection{calculate_intersection(s1, s2)};
                                 if (intersection) {
                                     ++found_intersections;
                                     if (m_debug) {

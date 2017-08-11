@@ -35,10 +35,11 @@ DEALINGS IN THE SOFTWARE.
 
 #include <algorithm>
 #include <cassert>
+#include <cstddef>
 #include <cstring>
+#include <iterator>
 #include <memory>
 #include <type_traits>
-#include <unordered_set>
 #include <vector>
 
 #include <osmium/osm/item_type.hpp>
@@ -143,7 +144,7 @@ namespace osmium {
             }
 
             IdSetDenseIterator<T> operator++(int) noexcept {
-                IdSetDenseIterator<T> tmp(*this);
+                IdSetDenseIterator<T> tmp{*this};
                 operator++();
                 return tmp;
             }

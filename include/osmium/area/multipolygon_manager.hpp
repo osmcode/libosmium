@@ -41,10 +41,6 @@ DEALINGS IN THE SOFTWARE.
 #include <vector>
 
 #include <osmium/area/stats.hpp>
-#include <osmium/handler.hpp>
-#include <osmium/handler/check_order.hpp>
-#include <osmium/memory/buffer.hpp>
-#include <osmium/memory/callback_buffer.hpp>
 #include <osmium/osm/item_type.hpp>
 #include <osmium/osm/relation.hpp>
 #include <osmium/osm/tag.hpp>

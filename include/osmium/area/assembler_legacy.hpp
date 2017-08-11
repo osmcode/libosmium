@@ -77,7 +77,7 @@ namespace osmium {
             }
 
             void add_common_tags(osmium::builder::TagListBuilder& tl_builder, std::set<const osmium::Way*>& ways) const {
-                std::map<std::string, size_t> counter;
+                std::map<std::string, std::size_t> counter;
                 for (const osmium::Way* way : ways) {
                     for (const auto& tag : way->tags()) {
                         std::string kv{tag.key()};
@@ -87,13 +87,13 @@ namespace osmium {
                     }
                 }
 
-                const size_t num_ways = ways.size();
+                const std::size_t num_ways = ways.size();
                 for (const auto& t_c : counter) {
                     if (debug()) {
                         std::cerr << "        tag " << t_c.first << " is used " << t_c.second << " times in " << num_ways << " ways\n";
                     }
                     if (t_c.second == num_ways) {
-                        const size_t len = std::strlen(t_c.first.c_str());
+                        const std::size_t len = std::strlen(t_c.first.c_str());
                         tl_builder.add_tag(t_c.first.c_str(), t_c.first.c_str() + len + 1);
                     }
                 }
@@ -309,7 +309,7 @@ namespace osmium {
                     std::cerr << "\nAssembling relation " << relation.id() << " containing " << members.size() << " way members with " << segment_list().size() << " nodes\n";
                 }
 
-                const size_t area_offset = out_buffer.committed();
+                const std::size_t area_offset = out_buffer.committed();
 
                 // Now create the Area object and add the attributes and tags
                 // from the relation.

@@ -33,7 +33,10 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <algorithm>
 #include <cassert>
+#include <cstdint>
+#include <cstddef>
 #include <cstring>
 #include <initializer_list>
 #include <limits>
@@ -43,24 +46,24 @@ DEALINGS IN THE SOFTWARE.
 #include <utility>
 
 #include <osmium/builder/builder.hpp>
+#include <osmium/memory/item.hpp>
+#include <osmium/osm/area.hpp>
+#include <osmium/osm/box.hpp>
+#include <osmium/osm/changeset.hpp>
 #include <osmium/osm/item_type.hpp>
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/node.hpp>
 #include <osmium/osm/node_ref.hpp>
 #include <osmium/osm/object.hpp>
-#include <osmium/osm/tag.hpp>
-#include <osmium/osm/types.hpp>
-#include <osmium/memory/item.hpp>
-#include <osmium/osm/area.hpp>
-#include <osmium/osm/changeset.hpp>
 #include <osmium/osm/relation.hpp>
+#include <osmium/osm/tag.hpp>
 #include <osmium/osm/timestamp.hpp>
+#include <osmium/osm/types.hpp>
 #include <osmium/osm/way.hpp>
+#include <osmium/util/cast.hpp>
 #include <osmium/util/compatibility.hpp>
 
 namespace osmium {
-
-    class Node;
 
     namespace memory {
         class Buffer;
@@ -111,7 +114,7 @@ namespace osmium {
              * @param value Pointer to tag value.
              * @param value_length Length of value (not including the \0 byte).
              */
-            void add_tag(const char* key, const size_t key_length, const char* value, const size_t value_length) {
+            void add_tag(const char* key, const std::size_t key_length, const char* value, const std::size_t value_length) {
                 if (key_length > osmium::max_osm_string_length) {
                     throw std::length_error{"OSM tag key is too long"};
                 }
@@ -223,7 +226,7 @@ namespace osmium {
              * @param length Length of role (without \0 termination).
              * @throws std:length_error If role is longer than osmium::max_osm_string_length
              */
-            void add_role(osmium::RelationMember& member, const char* role, const size_t length) {
+            void add_role(osmium::RelationMember& member, const char* role, const std::size_t length) {
                 if (length > osmium::max_osm_string_length) {
                     throw std::length_error{"OSM relation member role is too long"};
                 }
@@ -261,7 +264,7 @@ namespace osmium {
              * @throws std:length_error If role_length is greater than
              *         osmium::max_osm_string_length
              */
-            void add_member(osmium::item_type type, object_id_type ref, const char* role, const size_t role_length, const osmium::OSMObject* full_member = nullptr) {
+            void add_member(osmium::item_type type, object_id_type ref, const char* role, const std::size_t role_length, const osmium::OSMObject* full_member = nullptr) {
                 osmium::RelationMember* member = reserve_space_for<osmium::RelationMember>();
                 new (member) osmium::RelationMember{ref, type, full_member != nullptr};
                 add_size(sizeof(RelationMember));
@@ -307,7 +310,7 @@ namespace osmium {
 
             osmium::ChangesetComment* m_comment = nullptr;
 
-            void add_user(osmium::ChangesetComment& comment, const char* user, const size_t length) {
+            void add_user(osmium::ChangesetComment& comment, const char* user, const std::size_t length) {
                 if (length > osmium::max_osm_string_length) {
                     throw std::length_error{"OSM user name is too long"};
                 }
@@ -315,7 +318,7 @@ namespace osmium {
                 add_size(append_with_zero(user, osmium::memory::item_size_type(length)));
             }
 
-            void add_text(osmium::ChangesetComment& comment, const char* text, const size_t length) {
+            void add_text(osmium::ChangesetComment& comment, const char* text, const std::size_t length) {
                 if (length > std::numeric_limits<osmium::changeset_comment_size_type>::max() - 1) {
                     throw std::length_error{"OSM changeset comment is too long"};
                 }
@@ -377,7 +380,7 @@ namespace osmium {
 
             using type = TDerived;
 
-            constexpr static const size_t min_size_for_user = osmium::memory::padded_length(sizeof(string_size_type) + 1);
+            constexpr static const std::size_t min_size_for_user = osmium::memory::padded_length(sizeof(string_size_type) + 1);
 
         public:
 
@@ -567,7 +570,7 @@ namespace osmium {
 
             using type = ChangesetBuilder;
 
-            constexpr static const size_t min_size_for_user = osmium::memory::padded_length(1);
+            constexpr static const std::size_t min_size_for_user = osmium::memory::padded_length(1);
 
         public:
 

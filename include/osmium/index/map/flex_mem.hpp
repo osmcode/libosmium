@@ -34,7 +34,9 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <algorithm>
-#include <cstdlib>
+#include <cstddef>
+#include <cstdint>
+#include <utility>
 #include <vector>
 
 #include <osmium/index/map.hpp>

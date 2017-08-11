@@ -61,7 +61,7 @@ namespace osmium {
         object_id_type   m_ref;
         item_type        m_type;
         uint16_t         m_flags;
-        string_size_type m_role_size {0};
+        string_size_type m_role_size = 0;
 
         RelationMember(const RelationMember&) = delete;
         RelationMember(RelationMember&&) = delete;

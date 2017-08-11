@@ -161,7 +161,7 @@ namespace osmium {
                 area_stats m_stats;
 
                 // The number of members the multipolygon relation has
-                size_t m_num_members = 0;
+                std::size_t m_num_members = 0;
 
                 template <typename TBuilder>
                 static void build_ring_from_proto_ring(osmium::builder::AreaBuilder& builder, const ProtoRing& ring) {
@@ -971,7 +971,7 @@ namespace osmium {
                     return m_rings;
                 }
 
-                void set_num_members(size_t size) noexcept {
+                void set_num_members(std::size_t size) noexcept {
                     m_num_members = size;
                 }
 

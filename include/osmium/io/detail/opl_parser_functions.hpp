@@ -81,7 +81,7 @@ namespace osmium {
         }
 
         explicit opl_error(const char* what, const char* d = nullptr) :
-            io_error(std::string("OPL error: ") + what),
+            io_error(std::string{"OPL error: "} + what),
             data(d),
             msg("OPL error: ") {
             msg.append(what);
@@ -291,7 +291,7 @@ namespace osmium {
                     ++*data;
                     return;
                 }
-                std::string msg = "expected '";
+                std::string msg{"expected '"};
                 msg += c;
                 msg += "'";
                 throw opl_error{msg, *data};

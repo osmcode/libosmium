@@ -446,14 +446,14 @@ namespace osmium {
                 ~XMLOutputFormat() noexcept final = default;
 
                 void write_header(const osmium::io::Header& header) final {
-                    std::string out = "<?xml version='1.0' encoding='UTF-8'?>\n";
+                    std::string out{"<?xml version='1.0' encoding='UTF-8'?>\n"};
 
                     if (m_options.use_change_ops) {
                         out += "<osmChange version=\"0.6\" generator=\"";
                     } else {
                         out += "<osm version=\"0.6\"";
 
-                        std::string xml_josm_upload = header.get("xml_josm_upload");
+                        const std::string xml_josm_upload{header.get("xml_josm_upload")};
                         if (xml_josm_upload == "true" || xml_josm_upload == "false") {
                             out += " upload=\"";
                             out += xml_josm_upload;

@@ -43,7 +43,6 @@ DEALINGS IN THE SOFTWARE.
 #include <type_traits>
 #include <vector>
 
-#include <osmium/util/compatibility.hpp>
 #include <osmium/util/string.hpp>
 
 namespace osmium {
@@ -245,7 +244,7 @@ namespace osmium {
             }
 
             std::unique_ptr<map_type> create_map(const std::string& config_string) const {
-                std::vector<std::string> config = osmium::split_string(config_string, ',');
+                std::vector<std::string> config{osmium::split_string(config_string, ',')};
 
                 if (config.empty()) {
                     throw map_factory_error{"Need non-empty map type name"};

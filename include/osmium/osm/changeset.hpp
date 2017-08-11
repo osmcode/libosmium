@@ -61,7 +61,7 @@ namespace osmium {
         friend class osmium::builder::ChangesetDiscussionBuilder;
 
         osmium::Timestamp m_date;
-        osmium::user_id_type m_uid {0};
+        osmium::user_id_type m_uid = 0;
         changeset_comment_size_type m_text_size;
         string_size_type m_user_size;
 

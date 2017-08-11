@@ -37,7 +37,6 @@ DEALINGS IN THE SOFTWARE.
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
-#include <future>
 #include <memory>
 #include <string>
 #include <type_traits>
@@ -50,7 +49,6 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/io/detail/pbf.hpp> // IWYU pragma: export
 #include <osmium/io/detail/pbf_decoder.hpp>
 #include <osmium/io/detail/protobuf_tags.hpp>
-#include <osmium/io/detail/queue_util.hpp>
 #include <osmium/io/file_format.hpp>
 #include <osmium/io/header.hpp>
 #include <osmium/osm/entity_bits.hpp>
