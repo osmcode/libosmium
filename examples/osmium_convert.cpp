@@ -108,8 +108,8 @@ int main(int argc, char* argv[]) {
     // This declares the input and output files using either the suffix of
     // the file names or the format in the 2nd argument. It does not yet open
     // the files.
-    osmium::io::File input_file{input_file_name, input_format};
-    osmium::io::File output_file{output_file_name, output_format};
+    const osmium::io::File input_file{input_file_name, input_format};
+    const osmium::io::File output_file{output_file_name, output_format};
 
     // Input and output files can be OSM data files (without history) or
     // OSM history files. History files are detected if they use the '.osh'
