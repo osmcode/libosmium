@@ -6,7 +6,7 @@
   indexes to find objects and object relations.
 
   Note that this example programm will only work with small and medium sized
-  OSM file, not with the planet.
+  OSM files, not with the planet.
 
   You can use the osmium_index example program to inspect the indexes.
 

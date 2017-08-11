@@ -67,7 +67,7 @@ namespace osmium {
          * @returns file size
          * @throws std::system_error If system call failed
          */
-        inline size_t file_size(int fd) {
+        inline std::size_t file_size(int fd) {
 #ifdef _MSC_VER
             // Windows implementation
             // https://msdn.microsoft.com/en-us/library/dfbc2kec.aspx
@@ -75,14 +75,14 @@ namespace osmium {
             if (size == -1L) {
                 throw std::system_error{errno, std::system_category(), "Could not get file size"};
             }
-            return size_t(size);
+            return static_cast<std::size_t>(size);
 #else
             // Unix implementation
             struct stat s;
             if (::fstat(fd, &s) != 0) {
                 throw std::system_error{errno, std::system_category(), "Could not get file size"};
             }
-            return size_t(s.st_size);
+            return static_cast<std::size_t>(s.st_size);
 #endif
         }
 
@@ -94,7 +94,7 @@ namespace osmium {
          * @returns file size
          * @throws std::system_error If system call failed
          */
-        inline size_t file_size(const char* name) {
+        inline std::size_t file_size(const char* name) {
 #ifdef _MSC_VER
             // Windows implementation
             // https://msdn.microsoft.com/en-us/library/14h5k7ff.aspx
@@ -109,7 +109,7 @@ namespace osmium {
                 throw std::system_error{errno, std::system_category(), std::string{"Could not get file size of file '"} + name + "'"};
             }
 #endif
-            return size_t(s.st_size);
+            return static_cast<std::size_t>(s.st_size);
         }
 
         /**
@@ -120,7 +120,7 @@ namespace osmium {
          * @returns file size
          * @throws std::system_error If system call failed
          */
-        inline size_t file_size(const std::string& name) {
+        inline std::size_t file_size(const std::string& name) {
             return file_size(name.c_str());
         }
 
@@ -132,7 +132,7 @@ namespace osmium {
          * @param new_size New size
          * @throws std::system_error If ftruncate(2) call failed
          */
-        inline void resize_file(int fd, size_t new_size) {
+        inline void resize_file(int fd, std::size_t new_size) {
 #ifdef _WIN32
             // https://msdn.microsoft.com/en-us/library/whx354w1.aspx
             if (::_chsize_s(fd, static_cast_with_assert<__int64>(new_size)) != 0) {
@@ -146,7 +146,7 @@ namespace osmium {
         /**
          * Get the page size for this system.
          */
-        inline size_t get_pagesize() {
+        inline std::size_t get_pagesize() {
 #ifdef _WIN32
             // Windows implementation
             SYSTEM_INFO si;
@@ -154,7 +154,7 @@ namespace osmium {
             return si.dwPageSize;
 #else
             // Unix implementation
-            return size_t(::sysconf(_SC_PAGESIZE));
+            return static_cast<std::size_t>(::sysconf(_SC_PAGESIZE));
 #endif
         }
 
@@ -164,17 +164,17 @@ namespace osmium {
          * @param fd Open file descriptor.
          * @returns File offset or 0 if it is not available.
          */
-        inline size_t file_offset(int fd) {
+        inline std::size_t file_offset(int fd) {
 #ifdef _MSC_VER
             // https://msdn.microsoft.com/en-us/library/1yee101t.aspx
-            auto offset = _lseeki64(fd, 0, SEEK_CUR);
+            const auto offset = _lseeki64(fd, 0, SEEK_CUR);
 #else
-            auto offset = ::lseek(fd, 0, SEEK_CUR);
+            const auto offset = ::lseek(fd, 0, SEEK_CUR);
 #endif
             if (offset == -1) {
                 return 0;
             }
-            return size_t(offset);
+            return static_cast<std::size_t>(offset);
         }
 
         /**

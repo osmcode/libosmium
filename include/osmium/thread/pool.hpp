@@ -76,8 +76,8 @@ namespace osmium {
                 return num_threads;
             }
 
-            inline size_t get_work_queue_size() noexcept {
-                const size_t n = osmium::config::get_max_queue_size("WORK", 10);
+            inline std::size_t get_work_queue_size() noexcept {
+                const std::size_t n = osmium::config::get_max_queue_size("WORK", 10);
                 return n > 2 ? n : 2;
             }
 
@@ -150,7 +150,7 @@ namespace osmium {
              * If max_queue_size is 0, the queue size is read from
              * the environment variable OSMIUM_MAX_WORK_QUEUE_SIZE.
              */
-            explicit Pool(int num_threads = default_num_threads, size_t max_queue_size = default_queue_size) :
+            explicit Pool(int num_threads = default_num_threads, std::size_t max_queue_size = default_queue_size) :
                 m_work_queue(max_queue_size > 0 ? max_queue_size : detail::get_work_queue_size(), "work"),
                 m_threads(),
                 m_joiner(m_threads),
@@ -186,7 +186,7 @@ namespace osmium {
                 return m_num_threads;
             }
 
-            size_t queue_size() const {
+            std::size_t queue_size() const {
                 return m_work_queue.size();
             }
 
@@ -196,11 +196,10 @@ namespace osmium {
 
             template <typename TFunction>
             std::future<typename std::result_of<TFunction()>::type> submit(TFunction&& func) {
-
                 using result_type = typename std::result_of<TFunction()>::type;
 
-                std::packaged_task<result_type()> task(std::forward<TFunction>(func));
-                std::future<result_type> future_result(task.get_future());
+                std::packaged_task<result_type()> task{std::forward<TFunction>(func)};
+                std::future<result_type> future_result{task.get_future()};
                 m_work_queue.push(std::move(task));
 
                 return future_result;
