@@ -26,4 +26,9 @@
         <tag k="test:id" v="701"/>
         <tag k="landuse" v="forest"/>
     </relation>
+    <relation id="701901" version="1" timestamp="2014-01-01T00:00:00Z" uid="1" user="test" changeset="1">
+        <member type="way" ref="701802" role="outer"/> <!-- missing member -->
+        <tag k="type" v="multipolygon"/>
+        <tag k="landuse" v="forest"/>
+    </relation>
 </osm>
