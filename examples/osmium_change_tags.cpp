@@ -119,7 +119,7 @@ public:
         m_buffer.commit();
     }
 
-    // The way handler is called for each node in the input data.
+    // The way handler is called for each way in the input data.
     void way(const osmium::Way& way) {
         {
             osmium::builder::WayBuilder builder{m_buffer};
@@ -132,7 +132,7 @@ public:
         m_buffer.commit();
     }
 
-    // The relation handler is called for each node in the input data.
+    // The relation handler is called for each relation in the input data.
     void relation(const osmium::Relation& relation) {
         {
             osmium::builder::RelationBuilder builder{m_buffer};
