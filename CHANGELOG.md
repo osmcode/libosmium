@@ -8,6 +8,14 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+## [2.11.4] - 2017-08-15
+
+### Fixed
+
+- Output coordinate with value of -2^31 correctly.
+- Buffers larger than 2^32 bytes do now work.
+
+
 ## [2.11.3] - 2017-05-03
 
 ### Fixed
