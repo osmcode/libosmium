@@ -62,7 +62,8 @@ namespace osmium {
         constexpr const item_size_type align_bytes = 8;
 
         inline constexpr std::size_t padded_length(std::size_t length) noexcept {
-            return (length + align_bytes - 1) & ~(align_bytes - 1);
+            return (length + static_cast<std::size_t>(align_bytes) - 1) &
+                   ~(static_cast<std::size_t>(align_bytes) - 1);
         }
 
         /**
