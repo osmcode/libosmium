@@ -3,6 +3,14 @@ add_test(NAME examples_location_cache_create
          COMMAND osmium_location_cache_create ${CMAKE_CURRENT_SOURCE_DIR}/data.osm ${CMAKE_CURRENT_BINARY_DIR}/locations.idx)
 
 
+# Fails with message if index file doesn't exist
+add_test(NAME examples_location_cache_no_file
+         COMMAND osmium_location_cache_use ${CMAKE_CURRENT_SOURCE_DIR}/way.osm ${CMAKE_CURRENT_BINARY_DIR}/file_does_not_exist)
+
+set_tests_properties(examples_location_cache_no_file PROPERTIES
+                     PASS_REGULAR_EXPRESSION "Can not open location cache file")
+
+
 add_test(NAME examples_location_cache_use
          COMMAND osmium_location_cache_use ${CMAKE_CURRENT_SOURCE_DIR}/way.osm ${CMAKE_CURRENT_BINARY_DIR}/locations.idx)
 
