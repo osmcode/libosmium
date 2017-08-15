@@ -123,7 +123,7 @@ TEST_CASE("Create box from doubles") {
     REQUIRE(b.top_right() == (osmium::Location{3.45, 4.56}));
 }
 
-TEST_CASE("Relationship between boxes") {
+TEST_CASE("Relationship between boxes: contains") {
     osmium::Box outer;
     outer.extend(osmium::Location{1, 1});
     outer.extend(osmium::Location{10, 10});
@@ -141,5 +141,32 @@ TEST_CASE("Relationship between boxes") {
 
     REQUIRE_FALSE(osmium::geom::contains(overlap, inner));
     REQUIRE_FALSE(osmium::geom::contains(inner, overlap));
+}
+
+TEST_CASE("Relationship between boxes: overlaps") {
+    osmium::Box outer;
+    outer.extend(osmium::Location{1, 1});
+    outer.extend(osmium::Location{10, 10});
+
+    osmium::Box inner;
+    inner.extend(osmium::Location{2, 2});
+    inner.extend(osmium::Location{4, 4});
+
+    osmium::Box overlap;
+    overlap.extend(osmium::Location{3, 3});
+    overlap.extend(osmium::Location{5, 5});
+
+    osmium::Box outside;
+    overlap.extend(osmium::Location{30, 30});
+    overlap.extend(osmium::Location{50, 50});
+
+    REQUIRE(osmium::geom::overlaps(inner, outer));
+    REQUIRE(osmium::geom::overlaps(outer, inner));
+
+    REQUIRE(osmium::geom::overlaps(overlap, inner));
+    REQUIRE(osmium::geom::overlaps(inner, overlap));
+
+    REQUIRE_FALSE(osmium::geom::overlaps(outside, inner));
+    REQUIRE_FALSE(osmium::geom::overlaps(inner, outside));
 }
 
