@@ -8,10 +8,70 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+- New `RelationsManager` class superseeds the `relations::Collector` class.
+  The new class is much more modular and easier to extend. If you are using
+  the Collector class, you are encouraged to switch.
+- New `MultipolygonManager` based on the `RelationsManager` class superseeds
+  the `MultipolygonCollector` class. The examples have been changed to use the
+  new class and all users are encouraged to switch. There is also a
+  `MultipolygonManagerLegacy` class if you still need old-style multipolygon
+  support (see below).
+- New `FlexMem` index class that works with input files of any size and
+  stores the index in memory. This should now be used as the default index
+  for node location stores. Several example programs now use this index.
+- New `CallbackBuffer` class, basically a convenient wrapper around the
+  `Buffer` class with an additional callback function that is called whenever
+  the buffer is full.
+- Introduce new `ItemStash` class for storing OSM objects in memory.
+- New `osmium::geom::overlaps()` function to check if two `Box` objects
+  overlap.
+- Add function `IdSet::used_memory()` to get estimate of memory used in the
+  set.
+- New `is_defined()` and `is_undefined()` methods on `Location` class.
+- Tests for all provided example programs. (Some tests currently fail
+  on Windows for the `osmium_index_lookup` program.)
+
 ### Changed
+
+- The area `Assembler` now doesn't work with old-style multipolygons (those
+  are multipolygon relations with the tags on the outer ways(s) instead of
+  on the relation) any more. Because old-style multipolygons are now (mostly)
+  gone from the OSM database this is usually what you want. The new
+  `AssemblerLegacy` class can be used if you actually need support for
+  old-style multipolygons, for instance if you are working with historical
+  data. (In that case you also need to use the `MultipolygonManagerLegacy`
+  class instead of the `MultipolygonManager` class.)
+- Changes for consistent ordering of OSM data: OSM data can come in any order,
+  but usual OSM files are ordered by type, ID, and version. These changes
+  extend this ordering to negative IDs which are sometimes used for objects
+  that have not been uploaded to the OSM server yet. The negative IDs are
+  ordered now before the positive ones, both in order of their absolute value.
+  This is the same ordering as JOSM uses.
+- Multipolygon assembler now checks for three or more overlapping segments
+  which are always an error and can report them.
+- Enable use of user-provided `thread::Pool` instances in `Reader` and
+  `Writer` for special use cases.
+- Growing a `Buffer` will now work with any capacity parameter, it is
+  always rounded up for proper alignment. Buffer constructor with three
+  arguments will now check that commmitted is not larger than capacity.
+- Updated embedded protozero to 1.5.2.
+- Update version of Catch unit test framework to 1.9.7.
+- And, as always, lots of small code cleanups and more tests.
 
 ### Fixed
 
+- Buffers larger than 2^32 bytes do now work.
+- Output coordinate with value of -2^31 correctly.
+- Changeset comments with more than 2^16 characters are now allowed. The new
+  maximum size is 2^32.
+- `ChangesetDiscussionBuilder::add_comment_text()` could fail silently instead
+  of throwing an exception.
+- Changeset bounding boxes are now always output to OSM files (any format)
+  if at least one of the corners is defined. This is needed to handle broken
+  data from the main OSM database which contains such cases. The OPL reader
+  has also been fixed to handle this case.
+- In the example `osmium_location_cache_create`, the index file written is
+  always truncated first.
 
 ## [2.12.2] - 2017-05-03
 
