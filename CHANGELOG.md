@@ -8,6 +8,15 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+### Changed
+
+### Fixed
+
+
+## [2.13.0] - 2017-08-15
+
+### Added
+
 - New `RelationsManager` class superseeds the `relations::Collector` class.
   The new class is much more modular and easier to extend. If you are using
   the Collector class, you are encouraged to switch.
@@ -72,6 +81,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   has also been fixed to handle this case.
 - In the example `osmium_location_cache_create`, the index file written is
   always truncated first.
+
 
 ## [2.12.2] - 2017-05-03
 
@@ -700,7 +710,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   Doxygen (up to version 1.8.8). This version contains a workaround to fix
   this.
 
-[unreleased]: https://github.com/osmcode/libosmium/compare/v2.12.2...HEAD
+[unreleased]: https://github.com/osmcode/libosmium/compare/v2.13.0...HEAD
+[2.13.0]: https://github.com/osmcode/libosmium/compare/v2.12.2...v2.13.0
 [2.12.2]: https://github.com/osmcode/libosmium/compare/v2.12.1...v2.12.2
 [2.12.1]: https://github.com/osmcode/libosmium/compare/v2.12.0...v2.12.1
 [2.12.0]: https://github.com/osmcode/libosmium/compare/v2.11.0...v2.12.0
