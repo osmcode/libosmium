@@ -33,7 +33,7 @@
 #include <osmium/visitor.hpp>
 
 // For the location index. There are different types of indexes available.
-// This will work for all input files.
+// This will work for all input files keeping the index in memory.
 #include <osmium/index/map/flex_mem.hpp>
 
 // For the NodeLocationForWays handler
