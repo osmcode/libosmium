@@ -25,32 +25,32 @@ TEST_CASE("Location instantiation with double parameters") {
     REQUIRE_FALSE(loc1.is_undefined());
     REQUIRE(12000000 == loc1.x());
     REQUIRE(45000000 == loc1.y());
-    REQUIRE(1.2 == loc1.lon());
-    REQUIRE(4.5 == loc1.lat());
+    REQUIRE(1.2 == Approx(loc1.lon()));
+    REQUIRE(4.5 == Approx(loc1.lat()));
 
     const osmium::Location loc2{loc1};
-    REQUIRE(4.5 == loc2.lat());
+    REQUIRE(4.5 == Approx(loc2.lat()));
 
     const osmium::Location loc3 = loc1;
-    REQUIRE(4.5 == loc3.lat());
+    REQUIRE(4.5 == Approx(loc3.lat()));
 }
 
 TEST_CASE("Location instantiation with double parameters constructor with universal initializer") {
     const osmium::Location loc{2.2, 3.3};
-    REQUIRE(2.2 == loc.lon());
-    REQUIRE(3.3 == loc.lat());
+    REQUIRE(2.2 == Approx(loc.lon()));
+    REQUIRE(3.3 == Approx(loc.lat()));
 }
 
 TEST_CASE("Location instantiation with double parameters constructor with initializer list") {
     const osmium::Location loc({4.4, 5.5});
-    REQUIRE(4.4 == loc.lon());
-    REQUIRE(5.5 == loc.lat());
+    REQUIRE(4.4 == Approx(loc.lon()));
+    REQUIRE(5.5 == Approx(loc.lat()));
 }
 
 TEST_CASE("Location instantiation with double parameters operator equal") {
     const osmium::Location loc = {5.5, 6.6};
-    REQUIRE(5.5 == loc.lon());
-    REQUIRE(6.6 == loc.lat());
+    REQUIRE(5.5 == Approx(loc.lon()));
+    REQUIRE(6.6 == Approx(loc.lat()));
 }
 
 TEST_CASE("Location equality") {
