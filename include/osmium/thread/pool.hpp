@@ -56,7 +56,7 @@ namespace osmium {
 
             // Maximum number of allowed pool threads (just to keep the user
             // from setting something silly).
-            constexpr const int max_pool_threads = 256;
+            constexpr const int max_pool_threads = 32;
 
             inline int get_pool_size(int num_threads, int user_setting, unsigned hardware_concurrency) {
                 if (num_threads == 0) {

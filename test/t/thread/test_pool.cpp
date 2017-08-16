@@ -43,8 +43,8 @@ TEST_CASE("number of threads in pool") {
     REQUIRE(osmium::thread::detail::get_pool_size( 0,  8, 16) ==  8);
 
     // outliers
-    REQUIRE(osmium::thread::detail::get_pool_size(-100, 0, 16) ==   1);
-    REQUIRE(osmium::thread::detail::get_pool_size(1000, 0, 16) == 256);
+    REQUIRE(osmium::thread::detail::get_pool_size(-100, 0, 16) ==  1);
+    REQUIRE(osmium::thread::detail::get_pool_size(1000, 0, 16) == 32);
 
 }
 
