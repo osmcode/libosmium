@@ -139,7 +139,7 @@ namespace osmium {
 
             static std::size_t check_size(std::size_t size) {
                 if (size == 0) {
-                    throw std::runtime_error{"Zero-sized mapping is not allowed."};
+                    return osmium::util::get_pagesize();
                 }
                 return size;
             }

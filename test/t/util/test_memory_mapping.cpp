@@ -32,8 +32,9 @@ TEST_CASE("Anonymous mapping: simple memory mapping should work") {
     mapping.unmap(); // second unmap is okay
 }
 
-TEST_CASE("Anonymous mapping: memory mapping of zero length should fail") {
-    REQUIRE_THROWS(osmium::util::MemoryMapping(0, osmium::util::MemoryMapping::mapping_mode::write_private));
+TEST_CASE("Anonymous mapping: memory mapping of zero length should result in memory mapping of pagesize length") {
+    osmium::util::MemoryMapping mapping{0, osmium::util::MemoryMapping::mapping_mode::write_private};
+    REQUIRE(mapping.size() == osmium::util::get_pagesize());
 }
 
 TEST_CASE("Anonymous mapping: moving a memory mapping should work") {
@@ -138,6 +139,21 @@ TEST_CASE("File-based mapping: writing to a mapped file should work") {
         REQUIRE(mapping.size() >= 100);
         REQUIRE(*mapping.get_addr<int>() == 1234);
 
+        mapping.unmap();
+    }
+
+    REQUIRE(0 == close(fd));
+    REQUIRE(0 == unlink(filename));
+}
+
+TEST_CASE("File-based mapping: Reading from a zero-sized mapped file should work") {
+    char filename[] = "test_mmap_read_zero_XXXXXX";
+    const int fd = mkstemp(filename);
+    REQUIRE(fd > 0);
+
+    {
+        osmium::util::MemoryMapping mapping{0, osmium::util::MemoryMapping::mapping_mode::readonly, fd};
+        REQUIRE(mapping.size() > 0);
         mapping.unmap();
     }
 
