@@ -47,6 +47,7 @@ DEALINGS IN THE SOFTWARE.
 #  endif
 # include <io.h>
 # include <windows.h>
+# include <crtdbg.h>
 #endif
 
 #ifndef _MSC_VER
@@ -67,15 +68,28 @@ namespace osmium {
             // https://docs.microsoft.com/en-us/cpp/c-runtime-library/parameter-validation
             class disable_invalid_parameter_handler {
 
+                static void invalid_parameter_handler(
+                        const wchar_t* expression,
+                        const wchar_t* function,
+                        const wchar_t* file,
+                        unsigned int line,
+                        uintptr_t pReserved
+                        ) {
+                    // do nothing
+                }
+
                 _invalid_parameter_handler old_handler;
+                int old_report_mode;
 
             public:
 
                 disable_invalid_parameter_handler() :
-                    old_handler(_set_invalid_parameter_handler(nullptr)) {
+                    old_handler(_set_invalid_parameter_handler(invalid_parameter_handler)),
+                    old_report_mode(_CrtSetReportMode(_CRT_ASSERT, 0)) {
                 }
 
                 ~disable_invalid_parameter_handler() {
+                    _CrtSetReportMode(_CRT_ASSERT, old_report_mode);
                     _set_invalid_parameter_handler(old_handler);
                 }
 
