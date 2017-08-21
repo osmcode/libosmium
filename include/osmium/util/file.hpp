@@ -95,7 +95,7 @@ namespace osmium {
         inline std::size_t file_size(int fd) {
 #ifdef _MSC_VER
             // Windows implementation
-            disable_invalid_parameter_handler diph;
+            detail::disable_invalid_parameter_handler diph;
             // https://msdn.microsoft.com/en-us/library/dfbc2kec.aspx
             const auto size = ::_filelengthi64(fd);
             if (size < 0) {
@@ -161,7 +161,7 @@ namespace osmium {
          */
         inline void resize_file(int fd, std::size_t new_size) {
 #ifdef _WIN32
-            disable_invalid_parameter_handler diph;
+            detail::disable_invalid_parameter_handler diph;
             // https://msdn.microsoft.com/en-us/library/whx354w1.aspx
             if (::_chsize_s(fd, static_cast_with_assert<__int64>(new_size)) != 0) {
 #else
@@ -194,7 +194,7 @@ namespace osmium {
          */
         inline std::size_t file_offset(int fd) {
 #ifdef _MSC_VER
-            disable_invalid_parameter_handler diph;
+            detail::disable_invalid_parameter_handler diph;
             // https://msdn.microsoft.com/en-us/library/1yee101t.aspx
             const auto offset = _lseeki64(fd, 0, SEEK_CUR);
 #else
@@ -211,7 +211,7 @@ namespace osmium {
          */
         inline bool isatty(int fd) {
 #ifdef _MSC_VER
-            disable_invalid_parameter_handler diph;
+            detail::disable_invalid_parameter_handler diph;
             // https://msdn.microsoft.com/en-us/library/f4s0ddew.aspx
             return _isatty(fd) != 0;
 #else
