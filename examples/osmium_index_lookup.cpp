@@ -243,7 +243,7 @@ public:
             std::exit(2);
         }
 
-        if (m_dump && !m_ids.empty()) {
+        if (m_dump == !m_ids.empty()) {
             std::cerr << "Need option --dump or --search, but not both\n";
             std::exit(2);
         }
