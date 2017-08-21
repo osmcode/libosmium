@@ -76,7 +76,7 @@ namespace osmium {
                 }
 
                 ~disable_invalid_parameter_handler() {
-                    _set_invalid_parameter_handler(old_handler) {
+                    _set_invalid_parameter_handler(old_handler);
                 }
 
             }; // class disable_invalid_parameter_handler
