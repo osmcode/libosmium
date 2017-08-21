@@ -53,7 +53,7 @@ namespace osmium {
         template <typename T>
         class mmap_vector_file : public mmap_vector_base<T> {
 
-            std::size_t filesize(int fd) const {
+            static std::size_t filesize(int fd) {
                 const auto size = osmium::util::file_size(fd);
 
                 if (size % sizeof(T) != 0) {
