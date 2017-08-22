@@ -81,14 +81,6 @@ namespace osmium {
                     return m_pool;
                 }
 
-                std::string get_input() {
-                    return m_input_queue.pop();
-                }
-
-                bool input_done() const {
-                    return m_input_queue.has_reached_end_of_data();
-                }
-
                 osmium::osm_entity_bits::type read_types() const noexcept {
                     return m_read_which_entities;
                 }
@@ -147,6 +139,14 @@ namespace osmium {
                 virtual ~Parser() noexcept = default;
 
                 virtual void run() = 0;
+
+                std::string get_input() {
+                    return m_input_queue.pop();
+                }
+
+                bool input_done() const {
+                    return m_input_queue.has_reached_end_of_data();
+                }
 
                 void parse() {
                     try {

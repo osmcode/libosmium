@@ -1052,6 +1052,16 @@ TEST_CASE("Parse OPL using Reader") {
     REQUIRE(node.id() == 1);
 }
 
+TEST_CASE("Parse OPL with CRLF line ending using Reader") {
+    osmium::io::File file{with_data_dir("t/io/data-cr.opl")};
+    osmium::io::Reader reader{file};
+
+    const auto buffer = reader.read();
+    REQUIRE(buffer);
+    const auto& node = buffer.get<osmium::Node>(0);
+    REQUIRE(node.id() == 1);
+}
+
 TEST_CASE("Parse OPL with missing newline using Reader") {
     osmium::io::File file{with_data_dir("t/io/data-nonl.opl")};
     osmium::io::Reader reader{file};
@@ -1060,5 +1070,161 @@ TEST_CASE("Parse OPL with missing newline using Reader") {
     REQUIRE(buffer);
     const auto& node = buffer.get<osmium::Node>(0);
     REQUIRE(node.id() == 1);
+}
+
+class lbl_tester {
+
+    std::vector<std::string> m_inputs;
+    std::vector<std::string> m_outputs;
+
+public:
+
+    lbl_tester(const std::initializer_list<std::string>& inputs,
+               const std::initializer_list<std::string>& outputs) :
+        m_inputs(inputs),
+        m_outputs(outputs) {
+    }
+
+    bool input_done() {
+        return m_inputs.empty();
+    }
+
+    std::string get_input() {
+        REQUIRE_FALSE(m_inputs.empty());
+        std::string data = std::move(m_inputs.front());
+        m_inputs.erase(m_inputs.begin());
+        return data;
+    }
+
+    void parse_line(const char *data) {
+        REQUIRE_FALSE(m_outputs.empty());
+        REQUIRE(m_outputs.front() == data);
+        m_outputs.erase(m_outputs.begin());
+    }
+
+    void check() {
+        REQUIRE(m_inputs.empty());
+        REQUIRE(m_outputs.empty());
+    }
+
+}; // class lbl_tester
+
+void check_lbl(const std::initializer_list<std::string>& in,
+               const std::initializer_list<std::string>& out) {
+    lbl_tester tester{in, out};
+    osmium::io::detail::line_by_line(tester);
+    tester.check();
+}
+
+TEST_CASE("line_by_line for OPL parser 1") {
+    check_lbl({""}, {});
+}
+
+TEST_CASE("line_by_line for OPL parser 2") {
+    check_lbl({"\n"}, {});
+}
+
+TEST_CASE("line_by_line for OPL parser 3") {
+    check_lbl({"foo\n"}, {"foo"});
+}
+
+TEST_CASE("line_by_line for OPL parser 4") {
+    check_lbl({"foo"}, {"foo"});
+}
+
+TEST_CASE("line_by_line for OPL parser 5") {
+    check_lbl({"foo\nbar\n"}, {"foo", "bar"});
+}
+
+TEST_CASE("line_by_line for OPL parser 6") {
+    check_lbl({"foo\nbar"}, {"foo", "bar"});
+}
+
+TEST_CASE("line_by_line for OPL parser 7") {
+    check_lbl({"foo\nbar\nbaz\n"}, {"foo", "bar", "baz"});
+}
+
+TEST_CASE("line_by_line for OPL parser 8") {
+    check_lbl({"foo\n", "bar\n"}, {"foo", "bar"});
+}
+
+TEST_CASE("line_by_line for OPL parser 9") {
+    check_lbl({"foo\nb", "ar\n"}, {"foo", "bar"});
+}
+
+TEST_CASE("line_by_line for OPL parser 10") {
+    check_lbl({"foo\nb", "ar\n", "baz\n"}, {"foo", "bar", "baz"});
+}
+
+TEST_CASE("line_by_line for OPL parser 11") {
+    check_lbl({"foo", "\nbar\n"}, {"foo", "bar"});
+}
+
+TEST_CASE("line_by_line for OPL parser 12") {
+    check_lbl({"foo", "\nbar"}, {"foo", "bar"});
+}
+
+TEST_CASE("line_by_line for OPL parser 13") {
+    check_lbl({"foo", "\nbar", "\n"}, {"foo", "bar"});
+}
+
+TEST_CASE("line_by_line for OPL parser 14") {
+    check_lbl({"foo\n", "b", "ar\n"}, {"foo", "bar"});
+}
+
+TEST_CASE("line_by_line for OPL parser 15") {
+    check_lbl({"foo\n", "ba", "r\n"}, {"foo", "bar"});
+}
+
+TEST_CASE("line_by_line for OPL parser 16") {
+    check_lbl({"foo", "\n", "bar\n"}, {"foo", "bar"});
+}
+
+TEST_CASE("line_by_line for OPL parser 17") {
+    check_lbl({"foo\r\nbar\r\n"}, {"foo", "bar"});
+}
+
+TEST_CASE("line_by_line for OPL parser 18") {
+    check_lbl({"foo\r\nb", "ar\r\n"}, {"foo", "bar"});
+}
+
+TEST_CASE("line_by_line for OPL parser 19") {
+    check_lbl({"foo\r\nb", "ar\n", "baz\r\n"}, {"foo", "bar", "baz"});
+}
+
+TEST_CASE("line_by_line for OPL parser 20") {
+    check_lbl({"foo", "\r\nbar\r\n"}, {"foo", "bar"});
+}
+
+TEST_CASE("line_by_line for OPL parser 21") {
+    check_lbl({"foo\r", "\nbar"}, {"foo", "bar"});
+}
+
+TEST_CASE("line_by_line for OPL parser 22") {
+    check_lbl({"foo", "\r\nbar\r", "\n"}, {"foo", "bar"});
+}
+
+TEST_CASE("line_by_line for OPL parser 23") {
+    check_lbl({"foo\r\n", "b", "ar\r\n"}, {"foo", "bar"});
+}
+
+TEST_CASE("line_by_line for OPL parser 24") {
+    check_lbl({"foo\n", "ba", "r\r\n"}, {"foo", "bar"});
+}
+
+TEST_CASE("line_by_line for OPL parser 25") {
+    check_lbl({"foo", "\n", "bar\r\n"}, {"foo", "bar"});
+}
+
+TEST_CASE("line_by_line for OPL parser 26") {
+    check_lbl({"foo", "\n\r", "bar\r"}, {"foo", "bar"});
+}
+
+TEST_CASE("line_by_line for OPL parser 27") {
+    check_lbl({"foo\r", "bar\n\r"}, {"foo", "bar"});
+}
+
+TEST_CASE("line_by_line for OPL parser 28") {
+    check_lbl({"foo\nb", "ar"}, {"foo", "bar"});
 }
 
