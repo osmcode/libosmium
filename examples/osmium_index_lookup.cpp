@@ -315,19 +315,24 @@ int main(int argc, char* argv[]) {
         std::exit(2);
     }
 
-    // Depending on the type of index, we have different implementations.
-    if (options.type_is("location")) {
-        // index id -> location
-        const auto index = create<osmium::Location>(options.dense_format(), fd);
-        return run(*index, options);
-    } else if (options.type_is("id")) {
-        // index id -> id
-        const auto index = create<osmium::unsigned_object_id_type>(options.dense_format(), fd);
-        return run(*index, options);
-    } else {
-        // index id -> offset
-        const auto index = create<std::size_t>(options.dense_format(), fd);
-        return run(*index, options);
+    try {
+        // Depending on the type of index, we have different implementations.
+        if (options.type_is("location")) {
+            // index id -> location
+            const auto index = create<osmium::Location>(options.dense_format(), fd);
+            return run(*index, options);
+        } else if (options.type_is("id")) {
+            // index id -> id
+            const auto index = create<osmium::unsigned_object_id_type>(options.dense_format(), fd);
+            return run(*index, options);
+        } else {
+            // index id -> offset
+            const auto index = create<std::size_t>(options.dense_format(), fd);
+            return run(*index, options);
+        }
+    } catch(const std::exception& e) {
+        std::cerr << "Error: " << e.what() << '\n';
+        std::exit(1);
     }
 }
 
