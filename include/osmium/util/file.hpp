@@ -84,13 +84,13 @@ namespace osmium {
             public:
 
                 disable_invalid_parameter_handler() :
-                    old_handler(_set_invalid_parameter_handler(invalid_parameter_handler)),
+                    old_handler(_set_thread_local_invalid_parameter_handler(invalid_parameter_handler)),
                     old_report_mode(_CrtSetReportMode(_CRT_ASSERT, 0)) {
                 }
 
                 ~disable_invalid_parameter_handler() {
                     _CrtSetReportMode(_CRT_ASSERT, old_report_mode);
-                    _set_invalid_parameter_handler(old_handler);
+                    _set_thread_local_invalid_parameter_handler(old_handler);
                 }
 
             }; // class disable_invalid_parameter_handler
