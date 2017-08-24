@@ -33,6 +33,10 @@
 #include <sys/types.h> // for open
 #include <vector>      // for std::vector
 
+#ifdef _WIN32
+# include <io.h>       // for _setmode
+#endif
+
 // Disk-based indexes
 #include <osmium/index/map/dense_file_array.hpp>
 #include <osmium/index/map/sparse_file_array.hpp>
@@ -308,12 +312,16 @@ int main(int argc, char* argv[]) {
     Options options{argc, argv};
 
     // Open the index file.
-    const int fd = open(options.filename(), O_RDWR);
+    const int fd = ::open(options.filename(), O_RDWR);
     if (fd < 0) {
         std::cerr << "Can not open file '" << options.filename()
                   << "': " << std::strerror(errno) << '\n';
         std::exit(2);
     }
+
+#ifdef _WIN32
+    _setmode(fd, _O_BINARY);
+#endif
 
     try {
         // Depending on the type of index, we have different implementations.

@@ -36,6 +36,10 @@
 #include <sys/stat.h>  // for open
 #include <sys/types.h> // for open
 
+#ifdef _WIN32
+# include <io.h>       // for _setmode
+#endif
+
 #ifdef _MSC_VER
 # include <direct.h>
 #endif
@@ -72,6 +76,9 @@ public:
             std::cerr << "Can't open index file '" << filename << "': " << std::strerror(errno) << "\n";
             std::exit(2);
         }
+#ifdef _WIN32
+        _setmode(m_fd, _O_BINARY);
+#endif
     }
 
     ~IndexFile() {
@@ -113,6 +120,10 @@ int main(int argc, char* argv[]) {
         std::cerr << "Can't open data file '" << data_file << "': " << std::strerror(errno) << "\n";
         std::exit(2);
     }
+
+#ifdef _WIN32
+    _setmode(data_fd, _O_BINARY);
+#endif
 
     // These indexes store the offset in the data file where each node, way,
     // or relation is stored.
