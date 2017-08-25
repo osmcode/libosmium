@@ -8,9 +8,29 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+- New "blackhole" file format which throws away all data written into it.
+  Used for benchmarking.
+
 ### Changed
 
+- When reading OPL files, CRLF file endings are now handled correctly.
+- Reduce the max number of threads allowed for the `Pool` to 32. This should
+  still be plenty and might help with test failures on some architectures.
+
 ### Fixed
+
+- Tests now run correctly independent of git `core.autocrlf` setting.
+- Set binary mode for all files on Windows in example code.
+- Low-level file functions now set an invalid parameter handler on Windows
+  to properly handle errors.
+- Restore earlier behaviour allowing zero-length mmap. It is important to
+  allow zero-length memory mapping, because it is possible that such an index
+  is empty, for instance when one type of object is missing from an input
+  file as in https://github.com/osmcode/osmium-tool/issues/65. Drawback is
+  that files must be opened read-write for this to work, even if we only
+  want to read from them.
+- Use Approx() to compare floating point values in tests.
+- Fix broken `Item` test on 32 bit platforms.
 
 
 ## [2.13.0] - 2017-08-15
