@@ -235,6 +235,9 @@ namespace osmium {
                 } else if (suffixes.back() == "debug") {
                     m_file_format = file_format::debug;
                     suffixes.pop_back();
+                } else if (suffixes.back() == "blackhole") {
+                    m_file_format = file_format::blackhole;
+                    suffixes.pop_back();
                 }
 
                 if (suffixes.empty()) {

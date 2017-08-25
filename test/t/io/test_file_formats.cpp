@@ -189,6 +189,46 @@ TEST_CASE("Override file format by suffix 'osh.opl.gz'") {
     f.check();
 }
 
+TEST_CASE("File format by suffix 'blackhole'") {
+    const osmium::io::File f{"test.blackhole"};
+    REQUIRE(osmium::io::file_format::blackhole == f.format());
+    REQUIRE(osmium::io::file_compression::none == f.compression());
+    REQUIRE(false == f.has_multiple_object_versions());
+    f.check();
+}
+
+TEST_CASE("Override file format by suffix 'blackhole'") {
+    const osmium::io::File f{"test", "blackhole"};
+    REQUIRE(osmium::io::file_format::blackhole == f.format());
+    REQUIRE(osmium::io::file_compression::none == f.compression());
+    REQUIRE(false == f.has_multiple_object_versions());
+    f.check();
+}
+
+TEST_CASE("Override file format by suffix 'osm.blackhole'") {
+    const osmium::io::File f{"test", "osm.blackhole"};
+    REQUIRE(osmium::io::file_format::blackhole == f.format());
+    REQUIRE(osmium::io::file_compression::none == f.compression());
+    REQUIRE(false == f.has_multiple_object_versions());
+    f.check();
+}
+
+TEST_CASE("Override file format by suffix 'osm.blackhole.bz2'") {
+    const osmium::io::File f{"test", "osm.blackhole.bz2"};
+    REQUIRE(osmium::io::file_format::blackhole == f.format());
+    REQUIRE(osmium::io::file_compression::bzip2 == f.compression());
+    REQUIRE(false == f.has_multiple_object_versions());
+    f.check();
+}
+
+TEST_CASE("Override file format by suffix 'osh.blackhole.gz'") {
+    const osmium::io::File f{"test", "osh.blackhole.gz"};
+    REQUIRE(osmium::io::file_format::blackhole == f.format());
+    REQUIRE(osmium::io::file_compression::gzip == f.compression());
+    REQUIRE(true == f.has_multiple_object_versions());
+    f.check();
+}
+
 TEST_CASE("Override file format by suffix 'osh.pbf'") {
     const osmium::io::File f{"test", "osh.pbf"};
     REQUIRE(osmium::io::file_format::pbf == f.format());

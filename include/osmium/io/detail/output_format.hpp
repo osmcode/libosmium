@@ -197,6 +197,36 @@ namespace osmium {
 
             }; // class OutputFormatFactory
 
+            class BlackholeOutputFormat : public osmium::io::detail::OutputFormat {
+
+            public:
+
+                BlackholeOutputFormat(osmium::thread::Pool& pool, const osmium::io::File& /*file*/, future_string_queue_type& output_queue) :
+                    OutputFormat(pool, output_queue) {
+                }
+
+                BlackholeOutputFormat(const BlackholeOutputFormat&) = delete;
+                BlackholeOutputFormat& operator=(const BlackholeOutputFormat&) = delete;
+
+                ~BlackholeOutputFormat() noexcept final = default;
+
+                void write_buffer(osmium::memory::Buffer&& /*buffer*/) final {
+                }
+
+            }; // class BlackholeOutputFormat
+
+            // we want the register_output_format() function to run, setting
+            // the variable is only a side-effect, it will never be used
+            const bool registered_blackhole_output = osmium::io::detail::OutputFormatFactory::instance().register_output_format(osmium::io::file_format::blackhole,
+                [](osmium::thread::Pool& pool, const osmium::io::File& file, future_string_queue_type& output_queue) {
+                    return new osmium::io::detail::BlackholeOutputFormat(pool, file, output_queue);
+            });
+
+            // dummy function to silence the unused variable warning from above
+            inline bool get_registered_blackhole_output() noexcept {
+                return registered_blackhole_output;
+            }
+
         } // namespace detail
 
     } // namespace io
