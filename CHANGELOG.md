@@ -8,6 +8,15 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+### Changed
+
+### Fixed
+
+
+## [2.13.1] - 2017-08-25
+
+### Added
+
 - New "blackhole" file format which throws away all data written into it.
   Used for benchmarking.
 
@@ -730,7 +739,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   Doxygen (up to version 1.8.8). This version contains a workaround to fix
   this.
 
-[unreleased]: https://github.com/osmcode/libosmium/compare/v2.13.0...HEAD
+[unreleased]: https://github.com/osmcode/libosmium/compare/v2.13.1...HEAD
+[2.13.1]: https://github.com/osmcode/libosmium/compare/v2.13.0...v2.13.1
 [2.13.0]: https://github.com/osmcode/libosmium/compare/v2.12.2...v2.13.0
 [2.12.2]: https://github.com/osmcode/libosmium/compare/v2.12.1...v2.12.2
 [2.12.1]: https://github.com/osmcode/libosmium/compare/v2.12.0...v2.12.1
