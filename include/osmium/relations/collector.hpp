@@ -336,7 +336,7 @@ namespace osmium {
                 const size_t offset = m_relations_buffer.committed();
                 m_relations_buffer.add_item(relation);
 
-                RelationMeta relation_meta(offset);
+                RelationMeta relation_meta{offset};
 
                 int n = 0;
                 for (auto& member : m_relations_buffer.get<osmium::Relation>(offset).members()) {
@@ -354,7 +354,7 @@ namespace osmium {
                     m_relations_buffer.rollback();
                 } else {
                     m_relations_buffer.commit();
-                    m_relations.push_back(std::move(relation_meta));
+                    m_relations.push_back(relation_meta);
                 }
             }
 
@@ -411,7 +411,7 @@ namespace osmium {
                         const size_t relation_offset = member_meta.relation_pos();
                         static_cast<TCollector*>(this)->complete_relation(relation_meta);
                         clear_member_metas(relation_meta);
-                        m_relations[relation_offset] = RelationMeta();
+                        m_relations[relation_offset] = RelationMeta{};
                         possibly_purge_removed_members();
                     }
                 }
