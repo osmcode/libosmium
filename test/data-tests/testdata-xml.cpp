@@ -148,7 +148,7 @@ TEST_CASE("Reading OSM XML 100: Using Reader asking for header only") {
 // =============================================
 
 TEST_CASE("Reading OSM XML 101: Direct") {
-    REQUIRE_THROWS_AS(read_xml("101-missing_version"), osmium::format_version_error);
+    REQUIRE_THROWS_AS(read_xml("101-missing_version"), const osmium::format_version_error&);
     try {
         read_xml("101-missing_version");
     } catch (const osmium::format_version_error& e) {
@@ -162,13 +162,13 @@ TEST_CASE("Reading OSM XML 101: Using Reader") {
         const osmium::io::Header header{reader.header()};
         osmium::memory::Buffer buffer = reader.read();
         reader.close();
-    }(), osmium::format_version_error);
+    }(), const osmium::format_version_error&);
 }
 
 // =============================================
 
 TEST_CASE("Reading OSM XML 102: Direct") {
-    REQUIRE_THROWS_AS(read_xml("102-wrong_version"), osmium::format_version_error);
+    REQUIRE_THROWS_AS(read_xml("102-wrong_version"), const osmium::format_version_error&);
     try {
         read_xml("102-wrong_version");
     } catch (const osmium::format_version_error& e) {
@@ -183,13 +183,13 @@ TEST_CASE("Reading OSM XML 102: Using Reader") {
         const osmium::io::Header header{reader.header()};
         osmium::memory::Buffer buffer = reader.read();
         reader.close();
-    }(), osmium::format_version_error);
+    }(), const osmium::format_version_error&);
 }
 
 // =============================================
 
 TEST_CASE("Reading OSM XML 103: Direct") {
-    REQUIRE_THROWS_AS(read_xml("103-old_version"), osmium::format_version_error);
+    REQUIRE_THROWS_AS(read_xml("103-old_version"), const osmium::format_version_error&);
     try {
         read_xml("103-old_version");
     } catch (const osmium::format_version_error& e) {
@@ -203,13 +203,13 @@ TEST_CASE("Reading OSM XML 103: Using Reader") {
         const osmium::io::Header header{reader.header()};
         osmium::memory::Buffer buffer = reader.read();
         reader.close();
-    }(), osmium::format_version_error);
+    }(), const osmium::format_version_error&);
 }
 
 // =============================================
 
 TEST_CASE("Reading OSM XML 104: Direct") {
-    REQUIRE_THROWS_AS(read_xml("104-empty_file"), osmium::xml_error);
+    REQUIRE_THROWS_AS(read_xml("104-empty_file"), const osmium::xml_error&);
     try {
         read_xml("104-empty_file");
     } catch (const osmium::xml_error& e) {
@@ -224,13 +224,13 @@ TEST_CASE("Reading OSM XML 104: Using Reader") {
         const osmium::io::Header header{reader.header()};
         osmium::memory::Buffer buffer = reader.read();
         reader.close();
-    }(), osmium::xml_error);
+    }(), const osmium::xml_error&);
 }
 
 // =============================================
 
 TEST_CASE("Reading OSM XML 105: Direct") {
-    REQUIRE_THROWS_AS(read_xml("105-incomplete_xml_file"), osmium::xml_error);
+    REQUIRE_THROWS_AS(read_xml("105-incomplete_xml_file"), const osmium::xml_error&);
 }
 
 TEST_CASE("Reading OSM XML 105: Using Reader") {
@@ -239,7 +239,7 @@ TEST_CASE("Reading OSM XML 105: Using Reader") {
         const osmium::io::Header header{reader.header()};
         osmium::memory::Buffer buffer = reader.read();
         reader.close();
-    }(), osmium::xml_error);
+    }(), const osmium::xml_error&);
 }
 
 // =============================================
@@ -270,7 +270,7 @@ TEST_CASE("Reading OSM XML 120: Using Reader") {
 // =============================================
 
 TEST_CASE("Reading OSM XML 121: Direct") {
-    REQUIRE_THROWS_AS(read_gz_file("121-truncated_gzip_file", "osm.gz"), osmium::gzip_error);
+    REQUIRE_THROWS_AS(read_gz_file("121-truncated_gzip_file", "osm.gz"), const osmium::gzip_error&);
 }
 
 TEST_CASE("Reading OSM XML 121: Using Reader") {
@@ -286,7 +286,7 @@ TEST_CASE("Reading OSM XML 121: Using Reader") {
 // =============================================
 
 TEST_CASE("Reading OSM XML 122: Direct") {
-    REQUIRE_THROWS_AS(read_xml("122-no_osm_element"), osmium::xml_error);
+    REQUIRE_THROWS_AS(read_xml("122-no_osm_element"), const osmium::xml_error&);
 }
 
 TEST_CASE("Reading OSM XML 122: Using Reader") {
@@ -295,7 +295,7 @@ TEST_CASE("Reading OSM XML 122: Using Reader") {
         const osmium::io::Header header{reader.header()};
         osmium::memory::Buffer buffer = reader.read();
         reader.close();
-    }(), osmium::xml_error);
+    }(), const osmium::xml_error&);
 }
 
 // =============================================
