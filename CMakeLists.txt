@@ -477,6 +477,7 @@ if(CLANG_TIDY)
 #    list(APPEND CT_CHECKS "clang-analyzer-*")
 
     list(APPEND CT_CHECKS "google-*"
+                         "-google-build-using-namespace"
                          "-google-explicit-constructor"
                          "-google-readability-casting"
                          "-google-readability-function")
@@ -485,7 +486,9 @@ if(CLANG_TIDY)
                          "-llvm-include-order")
 
     list(APPEND CT_CHECKS "misc-*"
-                         "-misc-argument-comment")
+                         "-misc-argument-comment"
+                         "-misc-macro-parentheses"
+                         "-misc-unused-parameters")
 
     list(APPEND CT_CHECKS "modernize-*"
                           "-modernize-make-unique") # not available in C++11
