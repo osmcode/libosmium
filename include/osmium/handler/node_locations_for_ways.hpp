@@ -99,7 +99,7 @@ namespace osmium {
         public:
 
             explicit NodeLocationsForWays(TStoragePosIDs& storage_pos,
-                                          TStorageNegIDs& storage_neg = get_dummy()) :
+                                          TStorageNegIDs& storage_neg = get_dummy()) noexcept :
                 m_storage_pos(storage_pos),
                 m_storage_neg(storage_neg) {
             }
@@ -107,8 +107,8 @@ namespace osmium {
             NodeLocationsForWays(const NodeLocationsForWays&) = delete;
             NodeLocationsForWays& operator=(const NodeLocationsForWays&) = delete;
 
-            NodeLocationsForWays(NodeLocationsForWays&&) = default;
-            NodeLocationsForWays& operator=(NodeLocationsForWays&&) = default;
+            NodeLocationsForWays(NodeLocationsForWays&&) noexcept = default;
+            NodeLocationsForWays& operator=(NodeLocationsForWays&&) noexcept = default;
 
             ~NodeLocationsForWays() noexcept = default;
 

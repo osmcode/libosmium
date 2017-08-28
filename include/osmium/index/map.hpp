@@ -103,8 +103,8 @@ namespace osmium {
 
             protected:
 
-                Map(Map&&) = default;
-                Map& operator=(Map&&) = default;
+                Map(Map&&) noexcept = default;
+                Map& operator=(Map&&) noexcept = default;
 
             public:
 
@@ -114,7 +114,7 @@ namespace osmium {
                 /// The "value" type, usually a Location or size_t.
                 using value_type = TValue;
 
-                Map() = default;
+                Map() noexcept = default;
 
                 virtual ~Map() noexcept = default;
 

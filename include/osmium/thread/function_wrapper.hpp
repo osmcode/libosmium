@@ -49,7 +49,8 @@ namespace osmium {
 
             struct impl_base {
 
-                virtual ~impl_base() = default;
+                virtual ~impl_base() noexcept = default;
+
                 virtual bool call() {
                     return true;
                 }
