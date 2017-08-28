@@ -209,10 +209,10 @@ after_success:
       curl -S -f https://codecov.io/bash -o codecov
       chmod +x codecov
       gcov-${COMPILER#g++-} -p $(find test/CMakeFiles -name '*.o')
-      ./codecov -Z -c -F unit_tests
+      ./codecov -Z -c -X gcov -F unit_tests
       gcov-${COMPILER#g++-} -p $(find test/data-tests -name '*.o')
-      ./codecov -Z -c -F data_tests
+      ./codecov -Z -c -X gcov -F data_tests
       gcov-${COMPILER#g++-} -p $(find examples -name '*.o')
-      ./codecov -Z -c -F examples
+      ./codecov -Z -c -X gcov -F examples
     fi
 
