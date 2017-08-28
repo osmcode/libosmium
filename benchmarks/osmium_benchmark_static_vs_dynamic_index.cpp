@@ -84,8 +84,12 @@ int main(int argc, char* argv[]) {
 
             const double duration = std::chrono::duration<double, std::milli>(end-start).count();
 
-            if (duration < static_min) static_min = duration;
-            if (duration > static_max) static_max = duration;
+            if (duration < static_min) {
+                static_min = duration;
+            }
+            if (duration > static_max) {
+                static_max = duration;
+            }
             static_sum += duration;
         }
 
@@ -107,8 +111,12 @@ int main(int argc, char* argv[]) {
 
             const double duration = std::chrono::duration<double, std::milli>(end-start).count();
 
-            if (duration < dynamic_min) dynamic_min = duration;
-            if (duration > dynamic_max) dynamic_max = duration;
+            if (duration < dynamic_min) {
+                dynamic_min = duration;
+            }
+            if (duration > dynamic_max) {
+                dynamic_max = duration;
+            }
             dynamic_sum += duration;
         }
     }
