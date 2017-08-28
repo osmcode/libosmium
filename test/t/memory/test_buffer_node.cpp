@@ -6,7 +6,7 @@
 void check_node_1(const osmium::Node& node) {
     REQUIRE(1 == node.id());
     REQUIRE(3 == node.version());
-    REQUIRE(true == node.visible());
+    REQUIRE(node.visible());
     REQUIRE(333 == node.changeset());
     REQUIRE(21 == node.uid());
     REQUIRE(123 == uint32_t(node.timestamp()));
@@ -25,7 +25,7 @@ void check_node_1(const osmium::Node& node) {
 void check_node_2(const osmium::Node& node) {
     REQUIRE(2 == node.id());
     REQUIRE(3 == node.version());
-    REQUIRE(true == node.visible());
+    REQUIRE(node.visible());
     REQUIRE(333 == node.changeset());
     REQUIRE(21 == node.uid());
     REQUIRE(123 == uint32_t(node.timestamp()));

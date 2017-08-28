@@ -5,11 +5,11 @@
 
 #include <osmium/index/relations_map.hpp>
 
-static_assert(std::is_default_constructible<osmium::index::RelationsMapIndex>::value == false, "RelationsMapIndex should not be default constructible");
-static_assert(std::is_copy_constructible<osmium::index::RelationsMapIndex>::value == false, "RelationsMapIndex should not be copy constructible");
-static_assert(std::is_copy_constructible<osmium::index::RelationsMapStash>::value == false, "RelationsMapStash should not be copy constructible");
-static_assert(std::is_copy_assignable<osmium::index::RelationsMapIndex>::value == false, "RelationsMapIndex should not be copy assignable");
-static_assert(std::is_copy_assignable<osmium::index::RelationsMapStash>::value == false, "RelationsMapStash should not be copy assignable");
+static_assert(!std::is_default_constructible<osmium::index::RelationsMapIndex>::value, "RelationsMapIndex should not be default constructible");
+static_assert(!std::is_copy_constructible<osmium::index::RelationsMapIndex>::value, "RelationsMapIndex should not be copy constructible");
+static_assert(!std::is_copy_constructible<osmium::index::RelationsMapStash>::value, "RelationsMapStash should not be copy constructible");
+static_assert(!std::is_copy_assignable<osmium::index::RelationsMapIndex>::value, "RelationsMapIndex should not be copy assignable");
+static_assert(!std::is_copy_assignable<osmium::index::RelationsMapStash>::value, "RelationsMapStash should not be copy assignable");
 
 TEST_CASE("RelationsMapStash lvalue") {
     osmium::index::RelationsMapStash stash;

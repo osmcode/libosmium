@@ -40,7 +40,7 @@ TEST_CASE("Build area") {
 
     REQUIRE(17 == area.id());
     REQUIRE(3 == area.version());
-    REQUIRE(true == area.visible());
+    REQUIRE(area.visible());
     REQUIRE(333 == area.changeset());
     REQUIRE(21 == area.uid());
     REQUIRE(std::string("foo") == area.user());

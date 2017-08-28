@@ -32,8 +32,8 @@ TEST_CASE("Build node") {
     REQUIRE(17l == node.id());
     REQUIRE(17ul == node.positive_id());
     REQUIRE(3 == node.version());
-    REQUIRE(true == node.visible());
-    REQUIRE(false == node.deleted());
+    REQUIRE(node.visible());
+    REQUIRE_FALSE(node.deleted());
     REQUIRE(333 == node.changeset());
     REQUIRE(21 == node.uid());
     REQUIRE(std::string{"foo"} == node.user());
@@ -46,8 +46,8 @@ TEST_CASE("Build node") {
     REQUIRE(crc32().checksum() == 0x7dc553f9);
 
     node.set_visible(false);
-    REQUIRE(false == node.visible());
-    REQUIRE(true == node.deleted());
+    REQUIRE_FALSE(node.visible());
+    REQUIRE(node.deleted());
 }
 
 TEST_CASE("default values for node attributes") {
@@ -59,7 +59,7 @@ TEST_CASE("default values for node attributes") {
     REQUIRE(0l == node.id());
     REQUIRE(0ul == node.positive_id());
     REQUIRE(0 == node.version());
-    REQUIRE(true == node.visible());
+    REQUIRE(node.visible());
     REQUIRE(0 == node.changeset());
     REQUIRE(0 == node.uid());
     REQUIRE(std::string{} == node.user());
@@ -84,7 +84,7 @@ TEST_CASE("set node attributes from strings") {
     REQUIRE(-17l == node.id());
     REQUIRE(17ul == node.positive_id());
     REQUIRE(3 == node.version());
-    REQUIRE(true == node.visible());
+    REQUIRE(node.visible());
     REQUIRE(333 == node.changeset());
     REQUIRE(std::string{"2014-03-17T16:23:08Z"} == node.timestamp().to_iso());
     REQUIRE(21 == node.uid());
@@ -106,7 +106,7 @@ TEST_CASE("set node attributes from strings using set_attribute()") {
     REQUIRE(-17l == node.id());
     REQUIRE(17ul == node.positive_id());
     REQUIRE(3 == node.version());
-    REQUIRE(true == node.visible());
+    REQUIRE(node.visible());
     REQUIRE(333 == node.changeset());
     REQUIRE(std::string{"2014-03-17T16:23:08Z"} == node.timestamp().to_iso());
     REQUIRE(21 == node.uid());

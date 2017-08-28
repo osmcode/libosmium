@@ -30,7 +30,7 @@ TEST_CASE("Build relation") {
 
     REQUIRE(17 == relation.id());
     REQUIRE(3 == relation.version());
-    REQUIRE(true == relation.visible());
+    REQUIRE(relation.visible());
     REQUIRE(333 == relation.changeset());
     REQUIRE(21 == relation.uid());
     REQUIRE(std::string("foo") == relation.user());
