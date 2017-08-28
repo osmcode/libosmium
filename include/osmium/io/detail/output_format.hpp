@@ -175,10 +175,7 @@ namespace osmium {
                 }
 
                 bool register_output_format(osmium::io::file_format format, create_output_type create_function) {
-                    if (! m_callbacks.insert(map_type::value_type(format, create_function)).second) {
-                        return false;
-                    }
-                    return true;
+                    return m_callbacks.insert(map_type::value_type(format, create_function)).second;
                 }
 
                 std::unique_ptr<osmium::io::detail::OutputFormat> create_output(osmium::thread::Pool& pool, const osmium::io::File& file, future_string_queue_type& output_queue) {

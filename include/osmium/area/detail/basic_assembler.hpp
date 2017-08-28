@@ -623,8 +623,8 @@ namespace osmium {
                 }
 
                 void merge_two_rings(open_ring_its_type& open_ring_its, const location_to_ring_map& m1, const location_to_ring_map& m2) {
-                    std::list<ProtoRing>::iterator r1 = *m1.ring_it;
-                    std::list<ProtoRing>::iterator r2 = *m2.ring_it;
+                    const auto r1 = *m1.ring_it;
+                    const auto r2 = *m2.ring_it;
 
                     if (r1->get_node_ref_stop().location() == r2->get_node_ref_start().location()) {
                         r1->join_forward(*r2);
