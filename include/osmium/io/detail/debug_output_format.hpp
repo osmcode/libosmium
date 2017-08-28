@@ -144,7 +144,8 @@ namespace osmium {
                             *m_out += '-';
                             *m_out += color_reset;
                             return;
-                        } else if (m_diff_char == '+') {
+                        }
+                        if (m_diff_char == '+') {
                             *m_out += color_backg_green;
                             *m_out += color_white;
                             *m_out += color_bold;

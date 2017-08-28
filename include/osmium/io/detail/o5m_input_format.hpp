@@ -263,10 +263,10 @@ namespace osmium {
                             throw o5m_error{"string format error"};
                         }
                         return *dataptr;
-                    } else { // get from reference table
-                        auto index = protozero::decode_varint(dataptr, end);
-                        return m_reference_table.get(index);
                     }
+                    // get from reference table
+                    const auto index = protozero::decode_varint(dataptr, end);
+                    return m_reference_table.get(index);
                 }
 
                 std::pair<osmium::user_id_type, const char*> decode_user(const char** dataptr, const char* const end) {
