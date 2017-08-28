@@ -417,7 +417,7 @@ namespace osmium {
                                 }
 
                                 NodeRef nr;
-                                check_attributes(attrs, [this, &nr](const XML_Char* name, const XML_Char* value) {
+                                check_attributes(attrs, [&nr](const XML_Char* name, const XML_Char* value) {
                                     if (!std::strcmp(name, "ref")) {
                                         nr.set_ref(osmium::string_to_object_id(value));
                                     } else if (!std::strcmp(name, "lon")) {
@@ -446,7 +446,7 @@ namespace osmium {
                                 object_id_type ref = 0;
                                 bool ref_is_set = false;
                                 const char* role = "";
-                                check_attributes(attrs, [&](const XML_Char* name, const XML_Char* value) {
+                                check_attributes(attrs, [&type, &ref, &ref_is_set, &role](const XML_Char* name, const XML_Char* value) {
                                     if (!std::strcmp(name, "type")) {
                                         type = char_to_item_type(value[0]);
                                     } else if (!std::strcmp(name, "ref")) {
