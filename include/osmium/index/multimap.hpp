@@ -59,8 +59,8 @@ namespace osmium {
 
             protected:
 
-                Multimap(Multimap&&) = default;
-                Multimap& operator=(Multimap&&) = default;
+                Multimap(Multimap&&) noexcept = default;
+                Multimap& operator=(Multimap&&) noexcept = default;
 
             public:
 

@@ -98,17 +98,17 @@ namespace osmium {
 
             function_wrapper() = default;
 
-            function_wrapper(function_wrapper&& other) :
+            function_wrapper(const function_wrapper&) = delete;
+            function_wrapper& operator=(const function_wrapper&) = delete;
+
+            function_wrapper(function_wrapper&& other) noexcept :
                 impl(std::move(other.impl)) {
             }
 
-            function_wrapper& operator=(function_wrapper&& other) {
+            function_wrapper& operator=(function_wrapper&& other) noexcept {
                 impl = std::move(other.impl);
                 return *this;
             }
-
-            function_wrapper(const function_wrapper&) = delete;
-            function_wrapper& operator=(const function_wrapper&) = delete;
 
             ~function_wrapper() = default;
 

@@ -100,8 +100,8 @@ namespace osmium {
             thread_handler(const thread_handler&) = delete;
             thread_handler& operator=(const thread_handler&) = delete;
 
-            thread_handler(thread_handler&&) = default;
-            thread_handler& operator=(thread_handler&&) = default;
+            thread_handler(thread_handler&&) noexcept = default;
+            thread_handler& operator=(thread_handler&&) noexcept = default;
 
             ~thread_handler() {
                 if (m_thread.joinable()) {

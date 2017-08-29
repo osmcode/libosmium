@@ -78,15 +78,15 @@ namespace osmium {
 
             protected:
 
-                ItemHelper() = default;
+                ItemHelper() noexcept = default;
 
-                ~ItemHelper() = default;
+                ItemHelper(const ItemHelper&) noexcept = default;
+                ItemHelper(ItemHelper&&) noexcept = default;
 
-                ItemHelper(const ItemHelper&) = default;
-                ItemHelper(ItemHelper&&) = default;
+                ItemHelper& operator=(const ItemHelper&) noexcept = default;
+                ItemHelper& operator=(ItemHelper&&) noexcept = default;
 
-                ItemHelper& operator=(const ItemHelper&) = default;
-                ItemHelper& operator=(ItemHelper&&) = default;
+                ~ItemHelper() noexcept = default;
 
             public:
 

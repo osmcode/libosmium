@@ -202,12 +202,12 @@ namespace osmium {
              * Move construct a mapping from another one. The other mapping
              * will be marked as invalid.
              */
-            MemoryMapping(MemoryMapping&& other);
+            MemoryMapping(MemoryMapping&& other) noexcept;
 
             /**
              * Move a mapping. The other mapping will be marked as invalid.
              */
-            MemoryMapping& operator=(MemoryMapping&& other);
+            MemoryMapping& operator=(MemoryMapping&& other) noexcept;
 
             /**
              * Releases the mapping by calling unmap(). Will never throw.
@@ -373,7 +373,7 @@ namespace osmium {
             /// You can not copy construct a TypedMemoryMapping.
             TypedMemoryMapping(const TypedMemoryMapping&) = delete;
 
-            /// You can not copy a MemoryMapping.
+            /// You can not copy a TypedMemoryMapping.
             TypedMemoryMapping& operator=(const TypedMemoryMapping&) = delete;
 
             /**
@@ -562,7 +562,7 @@ inline osmium::util::MemoryMapping::MemoryMapping(std::size_t size, mapping_mode
     }
 }
 
-inline osmium::util::MemoryMapping::MemoryMapping(MemoryMapping&& other) :
+inline osmium::util::MemoryMapping::MemoryMapping(MemoryMapping&& other) noexcept :
     m_size(other.m_size),
     m_offset(other.m_offset),
     m_fd(other.m_fd),
@@ -571,7 +571,7 @@ inline osmium::util::MemoryMapping::MemoryMapping(MemoryMapping&& other) :
     other.make_invalid();
 }
 
-inline osmium::util::MemoryMapping& osmium::util::MemoryMapping::operator=(osmium::util::MemoryMapping&& other) {
+inline osmium::util::MemoryMapping& osmium::util::MemoryMapping::operator=(osmium::util::MemoryMapping&& other) noexcept {
     unmap();
     m_size         = other.m_size;
     m_offset       = other.m_offset;
@@ -725,7 +725,7 @@ inline osmium::util::MemoryMapping::MemoryMapping(std::size_t size, MemoryMappin
     }
 }
 
-inline osmium::util::MemoryMapping::MemoryMapping(MemoryMapping&& other) :
+inline osmium::util::MemoryMapping::MemoryMapping(MemoryMapping&& other) noexcept :
     m_size(other.m_size),
     m_offset(other.m_offset),
     m_fd(other.m_fd),
@@ -736,7 +736,7 @@ inline osmium::util::MemoryMapping::MemoryMapping(MemoryMapping&& other) :
     other.m_handle = nullptr;
 }
 
-inline osmium::util::MemoryMapping& osmium::util::MemoryMapping::operator=(osmium::util::MemoryMapping&& other) {
+inline osmium::util::MemoryMapping& osmium::util::MemoryMapping::operator=(osmium::util::MemoryMapping&& other) noexcept {
     unmap();
     m_size         = other.m_size;
     m_offset       = other.m_offset;

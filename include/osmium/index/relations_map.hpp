@@ -187,8 +187,8 @@ namespace osmium {
             RelationsMapIndex(const RelationsMapIndex&) = delete;
             RelationsMapIndex& operator=(const RelationsMapIndex&) = delete;
 
-            RelationsMapIndex(RelationsMapIndex&&) = default;
-            RelationsMapIndex& operator=(RelationsMapIndex&&) = default;
+            RelationsMapIndex(RelationsMapIndex&&) noexcept = default;
+            RelationsMapIndex& operator=(RelationsMapIndex&&) noexcept = default;
 
             /**
              * Find the given relation id in the index and call the given
@@ -321,8 +321,8 @@ namespace osmium {
             RelationsMapStash(const RelationsMapStash&) = delete;
             RelationsMapStash& operator=(const RelationsMapStash&) = delete;
 
-            RelationsMapStash(RelationsMapStash&&) = default;
-            RelationsMapStash& operator=(RelationsMapStash&&) = default;
+            RelationsMapStash(RelationsMapStash&&) noexcept = default;
+            RelationsMapStash& operator=(RelationsMapStash&&) noexcept = default;
 
             /**
              * Add mapping from member to parent relation in the stash.
