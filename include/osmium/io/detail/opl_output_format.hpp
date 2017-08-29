@@ -167,14 +167,6 @@ namespace osmium {
                     m_options(options) {
                 }
 
-                OPLOutputBlock(const OPLOutputBlock&) = default;
-                OPLOutputBlock& operator=(const OPLOutputBlock&) = default;
-
-                OPLOutputBlock(OPLOutputBlock&&) = default;
-                OPLOutputBlock& operator=(OPLOutputBlock&&) = default;
-
-                ~OPLOutputBlock() noexcept = default;
-
                 std::string operator()() {
                     osmium::apply(m_input_buffer->cbegin(), m_input_buffer->cend(), *this);
 

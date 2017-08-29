@@ -75,14 +75,6 @@ namespace osmium {
                 destination.set_buffer_size(buffer_size);
             }
 
-            OutputIterator(const OutputIterator&) = default;
-            OutputIterator(OutputIterator&&) = default;
-
-            OutputIterator& operator=(const OutputIterator&) = default;
-            OutputIterator& operator=(OutputIterator&&) = default;
-
-            ~OutputIterator() = default;
-
             /**
              * @deprecated
              * Calling OutputIterator<Writer>::flush() is usually not

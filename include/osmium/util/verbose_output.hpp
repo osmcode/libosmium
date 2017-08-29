@@ -93,13 +93,6 @@ namespace osmium {
                 m_newline(true) {
             }
 
-            ~VerboseOutput() = default;
-
-            VerboseOutput(const VerboseOutput&) = default;
-            VerboseOutput& operator=(const VerboseOutput&) = default;
-            VerboseOutput(VerboseOutput&&) = default;
-            VerboseOutput& operator=(VerboseOutput&&) = default;
-
             time_t runtime() const noexcept {
                 return time(nullptr) - m_start;
             }

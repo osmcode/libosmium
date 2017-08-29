@@ -879,14 +879,6 @@ namespace osmium {
                     m_read_metadata(read_metadata) {
                 }
 
-                PBFDataBlobDecoder(const PBFDataBlobDecoder&) = default;
-                PBFDataBlobDecoder& operator=(const PBFDataBlobDecoder&) = default;
-
-                PBFDataBlobDecoder(PBFDataBlobDecoder&&) = default;
-                PBFDataBlobDecoder& operator=(PBFDataBlobDecoder&&) = default;
-
-                ~PBFDataBlobDecoder() noexcept = default;
-
                 osmium::memory::Buffer operator()() {
                     std::string output;
                     PBFPrimitiveBlockDecoder decoder{decode_blob(*m_input_buffer, output), m_read_types, m_read_metadata};

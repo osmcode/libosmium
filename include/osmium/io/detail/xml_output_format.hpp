@@ -247,14 +247,6 @@ namespace osmium {
                     m_options(options) {
                 }
 
-                XMLOutputBlock(const XMLOutputBlock&) = default;
-                XMLOutputBlock& operator=(const XMLOutputBlock&) = default;
-
-                XMLOutputBlock(XMLOutputBlock&&) = default;
-                XMLOutputBlock& operator=(XMLOutputBlock&&) = default;
-
-                ~XMLOutputBlock() noexcept = default;
-
                 std::string operator()() {
                     osmium::apply(m_input_buffer->cbegin(), m_input_buffer->cend(), *this);
 

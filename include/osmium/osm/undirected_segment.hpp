@@ -56,14 +56,6 @@ namespace osmium {
             }
         }
 
-        UndirectedSegment(const UndirectedSegment&) = default;
-        UndirectedSegment(UndirectedSegment&&) = default;
-
-        UndirectedSegment& operator=(const UndirectedSegment&) = default;
-        UndirectedSegment& operator=(UndirectedSegment&&) = default;
-
-        ~UndirectedSegment() = default;
-
     }; // class UndirectedSegment
 
     /**

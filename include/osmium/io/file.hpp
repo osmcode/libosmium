@@ -145,14 +145,6 @@ namespace osmium {
                 }
             }
 
-            File(const File&) = default;
-            File& operator=(const File&) = default;
-
-            File(File&&) = default;
-            File& operator=(File&&) = default;
-
-            ~File() = default;
-
             const char* buffer() const noexcept {
                 return m_buffer;
             }

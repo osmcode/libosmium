@@ -327,14 +327,6 @@ namespace osmium {
             m_y(double_to_fix(lat)) {
         }
 
-        Location(const Location&) noexcept = default;
-        Location(Location&&) noexcept = default;
-
-        Location& operator=(const Location&) noexcept = default;
-        Location& operator=(Location&&) noexcept = default;
-
-        ~Location() noexcept = default;
-
         /**
          * Check whether the coordinates of this location
          * are defined.

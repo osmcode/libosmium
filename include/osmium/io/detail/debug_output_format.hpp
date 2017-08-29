@@ -323,14 +323,6 @@ namespace osmium {
                     m_utf8_suffix(options.use_color ? color_blue : "") {
                 }
 
-                DebugOutputBlock(const DebugOutputBlock&) = default;
-                DebugOutputBlock& operator=(const DebugOutputBlock&) = default;
-
-                DebugOutputBlock(DebugOutputBlock&&) = default;
-                DebugOutputBlock& operator=(DebugOutputBlock&&) = default;
-
-                ~DebugOutputBlock() noexcept = default;
-
                 std::string operator()() {
                     osmium::apply(m_input_buffer->cbegin(), m_input_buffer->cend(), *this);
 

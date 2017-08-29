@@ -55,14 +55,6 @@ namespace osmium {
             m_second(location2) {
         }
 
-        constexpr Segment(const Segment&) = default;
-        constexpr Segment(Segment&&) = default;
-
-        Segment& operator=(const Segment&) = default;
-        Segment& operator=(Segment&&) = default;
-
-        ~Segment() = default;
-
         /// Return first Location of Segment.
         constexpr osmium::Location first() const noexcept {
             return m_first;

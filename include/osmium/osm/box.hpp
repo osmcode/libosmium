@@ -91,14 +91,6 @@ namespace osmium {
             );
         }
 
-        Box(const Box&) noexcept = default;
-        Box(Box&&) noexcept = default;
-
-        Box& operator=(const Box&) noexcept = default;
-        Box& operator=(Box&&) noexcept = default;
-
-        ~Box() noexcept = default;
-
         /**
          * Extend this bounding box by the specified location. If the
          * location is invalid, the bounding box is unchanged. If the
