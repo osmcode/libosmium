@@ -50,8 +50,6 @@ namespace osmium {
 
     namespace thread {
 
-        static const std::chrono::milliseconds max_wait{10};
-
         /**
          *  A thread-safe queue.
          */
@@ -142,6 +140,7 @@ namespace osmium {
              * this call will block if the queue is full.
              */
             void push(T value) {
+                constexpr const std::chrono::milliseconds max_wait{10};
 #ifdef OSMIUM_DEBUG_QUEUE_SIZE
                 ++m_push_counter;
 #endif
