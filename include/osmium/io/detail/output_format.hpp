@@ -33,9 +33,9 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <array>
 #include <cstdint>
 #include <functional>
-#include <map>
 #include <memory>
 #include <string>
 #include <utility>
@@ -121,7 +121,7 @@ namespace osmium {
 
             public:
 
-                OutputFormat(osmium::thread::Pool& pool, future_string_queue_type& output_queue) :
+                OutputFormat(osmium::thread::Pool& pool, future_string_queue_type& output_queue) noexcept :
                     m_pool(pool),
                     m_output_queue(output_queue) {
                 }
@@ -159,29 +159,36 @@ namespace osmium {
 
             private:
 
-                using map_type = std::map<osmium::io::file_format, create_output_type>;
+                std::array<create_output_type, static_cast<std::size_t>(file_format::last) + 1> m_callbacks;
 
-                map_type m_callbacks;
-
-                OutputFormatFactory() :
+                OutputFormatFactory() noexcept :
                     m_callbacks() {
+                }
+
+                create_output_type& callbacks(const osmium::io::file_format format) noexcept {
+                    return m_callbacks[static_cast<std::size_t>(format)];
+                }
+
+                const create_output_type& callbacks(const osmium::io::file_format format) const noexcept {
+                    return m_callbacks[static_cast<std::size_t>(format)];
                 }
 
             public:
 
-                static OutputFormatFactory& instance() {
+                static OutputFormatFactory& instance() noexcept {
                     static OutputFormatFactory factory;
                     return factory;
                 }
 
-                bool register_output_format(osmium::io::file_format format, create_output_type create_function) {
-                    return m_callbacks.insert(map_type::value_type(format, create_function)).second;
+                bool register_output_format(const osmium::io::file_format format, create_output_type&& create_function) {
+                    callbacks(format) = std::forward<create_output_type>(create_function);
+                    return true;
                 }
 
-                std::unique_ptr<osmium::io::detail::OutputFormat> create_output(osmium::thread::Pool& pool, const osmium::io::File& file, future_string_queue_type& output_queue) {
-                    const auto it = m_callbacks.find(file.format());
-                    if (it != m_callbacks.end()) {
-                        return std::unique_ptr<osmium::io::detail::OutputFormat>((it->second)(pool, file, output_queue));
+                std::unique_ptr<osmium::io::detail::OutputFormat> create_output(osmium::thread::Pool& pool, const osmium::io::File& file, future_string_queue_type& output_queue) const {
+                    const auto func = callbacks(file.format());
+                    if (func) {
+                        return std::unique_ptr<osmium::io::detail::OutputFormat>((func)(pool, file, output_queue));
                     }
 
                     throw unsupported_file_format_error{

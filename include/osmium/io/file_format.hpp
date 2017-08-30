@@ -47,7 +47,8 @@ namespace osmium {
             json      = 4,
             o5m       = 5,
             debug     = 6,
-            blackhole = 7
+            blackhole = 7,
+            last      = 7 // must have the same value as the last real value
         };
 
         enum class read_meta {
@@ -55,7 +56,7 @@ namespace osmium {
             yes = 1
         };
 
-        inline const char* as_string(file_format format) {
+        inline const char* as_string(const file_format format) noexcept {
             switch (format) {
                 case file_format::xml:
                     return "XML";
