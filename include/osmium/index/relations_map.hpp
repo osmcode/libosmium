@@ -187,8 +187,8 @@ namespace osmium {
             RelationsMapIndex(const RelationsMapIndex&) = delete;
             RelationsMapIndex& operator=(const RelationsMapIndex&) = delete;
 
-            RelationsMapIndex(RelationsMapIndex&&) noexcept = default;
-            RelationsMapIndex& operator=(RelationsMapIndex&&) noexcept = default;
+            RelationsMapIndex(RelationsMapIndex&&) noexcept(std::is_nothrow_move_constructible<map_type>::value);
+            RelationsMapIndex& operator=(RelationsMapIndex&&) noexcept(std::is_nothrow_move_assignable<map_type>::value);
 
             /**
              * Find the given relation id in the index and call the given
@@ -256,6 +256,11 @@ namespace osmium {
 
         }; // class RelationsMapIndex
 
+        // defined outside the class on purpose
+        // see https://akrzemi1.wordpress.com/2015/09/11/declaring-the-move-constructor/
+        inline RelationsMapIndex::RelationsMapIndex(RelationsMapIndex&&) noexcept(std::is_nothrow_move_constructible<map_type>::value) = default;
+        inline RelationsMapIndex& RelationsMapIndex::operator=(RelationsMapIndex&&) noexcept(std::is_nothrow_move_assignable<map_type>::value) = default;
+
         class RelationsMapIndexes {
 
             friend class RelationsMapStash;
@@ -321,8 +326,8 @@ namespace osmium {
             RelationsMapStash(const RelationsMapStash&) = delete;
             RelationsMapStash& operator=(const RelationsMapStash&) = delete;
 
-            RelationsMapStash(RelationsMapStash&&) noexcept = default;
-            RelationsMapStash& operator=(RelationsMapStash&&) noexcept = default;
+            RelationsMapStash(RelationsMapStash&&) noexcept(std::is_nothrow_move_constructible<map_type>::value);
+            RelationsMapStash& operator=(RelationsMapStash&&) noexcept(std::is_nothrow_move_assignable<map_type>::value);
 
             /**
              * Add mapping from member to parent relation in the stash.
@@ -430,6 +435,11 @@ namespace osmium {
             }
 
         }; // class RelationsMapStash
+
+        // defined outside the class on purpose
+        // see https://akrzemi1.wordpress.com/2015/09/11/declaring-the-move-constructor/
+        inline RelationsMapStash::RelationsMapStash(RelationsMapStash&&) noexcept(std::is_nothrow_move_constructible<map_type>::value) = default;
+        inline RelationsMapStash& RelationsMapStash::operator=(RelationsMapStash&&) noexcept(std::is_nothrow_move_assignable<map_type>::value) = default;
 
     } // namespace index
 
