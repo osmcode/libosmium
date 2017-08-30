@@ -302,9 +302,8 @@ int run(const IndexAccess<TValue>& index, const Options& options) {
     if (options.do_dump()) {
         index.dump();
         return 0;
-    } else {
-        return index.search(options.search_keys()) ? 0 : 1;
     }
+    return index.search(options.search_keys()) ? 0 : 1;
 }
 
 int main(int argc, char* argv[]) {

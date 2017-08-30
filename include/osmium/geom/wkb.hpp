@@ -168,9 +168,9 @@ namespace osmium {
 
                     if (m_out_type == out_type::hex) {
                         return convert_to_hex(data);
-                    } else {
-                        return data;
                     }
+
+                    return data;
                 }
 
                 /* LineString */
@@ -194,9 +194,9 @@ namespace osmium {
 
                     if (m_out_type == out_type::hex) {
                         return convert_to_hex(data);
-                    } else {
-                        return data;
                     }
+
+                    return data;
                 }
 
                 /* MultiPolygon */
@@ -254,9 +254,9 @@ namespace osmium {
 
                     if (m_out_type == out_type::hex) {
                         return convert_to_hex(data);
-                    } else {
-                        return data;
                     }
+
+                    return data;
                 }
 
             }; // class WKBFactoryImpl

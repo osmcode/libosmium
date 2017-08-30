@@ -161,7 +161,9 @@ namespace osmium {
             Coordinates operator()(osmium::Location location) const {
                 if (m_epsg == 4326) {
                     return Coordinates{location.lon(), location.lat()};
-                } else if (m_epsg == 3857) {
+                }
+
+                if (m_epsg == 3857) {
                     return Coordinates{detail::lon_to_x(location.lon()),
                                        detail::lat_to_y(location.lat())};
                 }
