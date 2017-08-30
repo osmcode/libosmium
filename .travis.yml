@@ -10,6 +10,8 @@ sudo: false
 
 dist: trusty
 
+#-----------------------------------------------------------------------------
+
 cache:
   directories:
     - $HOME/.ccache
@@ -19,6 +21,8 @@ env:
     - CCACHE_TEMPDIR=/tmp/.ccache-temp
     - CCACHE_COMPRESS=1
     - CASHER_TIME_OUT=1000
+
+#-----------------------------------------------------------------------------
 
 matrix:
   include:
@@ -252,3 +256,4 @@ after_success:
       ./codecov -Z -c -X gcov -F examples
     fi
 
+#-----------------------------------------------------------------------------
