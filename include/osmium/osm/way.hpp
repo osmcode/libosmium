@@ -62,7 +62,7 @@ namespace osmium {
             return t == itemtype;
         }
 
-        WayNodeList():
+        WayNodeList() noexcept :
             NodeRefList(itemtype) {
         }
 

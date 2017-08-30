@@ -131,7 +131,7 @@ namespace osmium {
 
     public:
 
-        ChangesetDiscussion() :
+        ChangesetDiscussion() noexcept :
             osmium::memory::Collection<ChangesetComment, osmium::item_type::changeset_discussion>() {
         }
 

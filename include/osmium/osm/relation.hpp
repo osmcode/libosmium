@@ -158,7 +158,7 @@ namespace osmium {
                    t == osmium::item_type::relation_member_list_with_full_members;
         }
 
-        RelationMemberList() :
+        RelationMemberList() noexcept :
             osmium::memory::Collection<RelationMember, osmium::item_type::relation_member_list>() {
         }
 

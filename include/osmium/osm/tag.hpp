@@ -114,7 +114,7 @@ namespace osmium {
 
     public:
 
-        TagList() :
+        TagList() noexcept :
             osmium::memory::Collection<Tag, osmium::item_type::tag_list>() {
         }
 

@@ -131,7 +131,7 @@ namespace osmium {
                 return t == itemtype;
             }
 
-            Collection() :
+            Collection() noexcept :
                 Item(sizeof(Collection<TMember, TCollectionItemType>), TCollectionItemType) {
             }
 
