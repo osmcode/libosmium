@@ -138,6 +138,10 @@ namespace osmium {
 
         public:
 
+            // This is not "= default" on purpose because some compilers don't
+            // like it and complain that "default initialization of an object
+            // of const type 'const osmium::geom::MercatorProjection' requires
+            // a user-provided default constructor".
             MercatorProjection() {
             }
 
