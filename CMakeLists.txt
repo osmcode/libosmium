@@ -427,7 +427,7 @@ endif()
 #
 #-----------------------------------------------------------------------------
 message(STATUS "Looking for clang-tidy")
-find_program(CLANG_TIDY NAMES clang-tidy clang-tidy-3.9 clang-tidy-3.8 clang-tidy-3.7 clang-tidy-3.6 clang-tidy-3.5)
+find_program(CLANG_TIDY NAMES clang-tidy clang-tidy-5.0 clang-tidy-4.0 clang-tidy-3.9 clang-tidy-3.8 clang-tidy-3.7)
 
 if(CLANG_TIDY)
     message(STATUS "Looking for clang-tidy - found")
