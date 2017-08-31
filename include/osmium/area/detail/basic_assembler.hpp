@@ -73,14 +73,14 @@ namespace osmium {
                 open_ring_its_type::iterator ring_it;
                 bool start;
 
-                location_to_ring_map(const osmium::Location& l, const open_ring_its_type::iterator& r, bool s) noexcept :
-                    location(l),
-                    ring_it(r),
+                location_to_ring_map(osmium::Location l, open_ring_its_type::iterator r, const bool s) noexcept :
+                    location(std::move(l)),
+                    ring_it(std::move(r)),
                     start(s) {
                 }
 
-                explicit location_to_ring_map(const osmium::Location& l) noexcept :
-                    location(l),
+                explicit location_to_ring_map(osmium::Location l) noexcept :
+                    location(std::move(l)),
                     ring_it(),
                     start(false) {
                 }

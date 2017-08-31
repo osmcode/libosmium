@@ -93,9 +93,9 @@ namespace osmium {
              *               needed on closed ways or multipolygon relations
              *               to build the area.
              */
-            explicit MultipolygonManager(const assembler_config_type& assembler_config, const osmium::TagsFilter& filter = osmium::TagsFilter{true}) :
-                m_assembler_config(assembler_config),
-                m_filter(filter) {
+            explicit MultipolygonManager(assembler_config_type assembler_config, osmium::TagsFilter filter = osmium::TagsFilter{true}) :
+                m_assembler_config(std::move(assembler_config)),
+                m_filter(std::move(filter)) {
             }
 
             /**

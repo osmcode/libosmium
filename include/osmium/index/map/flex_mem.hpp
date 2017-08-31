@@ -92,7 +92,7 @@ namespace osmium {
 
                     entry(uint64_t i, TValue v) :
                         id(i),
-                        value(v) {
+                        value(std::move(v)) {
                     }
 
                     bool operator<(const entry other) const noexcept {
