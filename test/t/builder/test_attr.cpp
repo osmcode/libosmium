@@ -101,6 +101,14 @@ TEST_CASE("create node using builders") {
         REQUIRE(node.tags().size() == 0);
     }
 
+}
+
+TEST_CASE("create node with tags using builders") {
+
+    using namespace osmium::builder::attr;
+
+    osmium::memory::Buffer buffer{1024 * 10};
+
     SECTION("add tags using _tag") {
         std::pair<const char*, const char*> t1 = {"name", "Node Inn"};
         std::pair<std::string, std::string> t2 = {"phone", "+1-123-555-4567"};
