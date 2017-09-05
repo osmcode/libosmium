@@ -158,7 +158,7 @@ namespace osmium {
 
                 try {
                     for (int i = 0; i < m_num_threads; ++i) {
-                        m_threads.push_back(std::thread(&Pool::worker_thread, this));
+                        m_threads.emplace_back(&Pool::worker_thread, this);
                     }
                 } catch (...) {
                     shutdown_all_workers();

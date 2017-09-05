@@ -242,7 +242,7 @@ namespace osmium {
             }
 
             list& add_string(const char* str) {
-                m_strings.push_back(str);
+                m_strings.emplace_back(str);
                 return *this;
             }
 
