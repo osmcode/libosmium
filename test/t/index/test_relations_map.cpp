@@ -57,7 +57,6 @@ TEST_CASE("RelationsMapStash rvalue") {
 TEST_CASE("RelationsMapStash reverse index") {
     osmium::index::RelationsMapStash stash;
     REQUIRE(stash.empty());
-    REQUIRE(stash.size() == 0);
 
     stash.add(1, 2);
     stash.add(2, 3);
@@ -84,7 +83,6 @@ TEST_CASE("RelationsMapStash reverse index") {
 TEST_CASE("RelationsMapStash both indexes") {
     osmium::index::RelationsMapStash stash;
     REQUIRE(stash.empty());
-    REQUIRE(stash.size() == 0);
 
     stash.add(1, 2);
     stash.add(2, 3);

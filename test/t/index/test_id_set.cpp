@@ -42,7 +42,6 @@ TEST_CASE("Basic functionality of IdSetDense") {
 
     s.clear();
     REQUIRE(s.empty());
-    REQUIRE(s.size() == 0);
 }
 
 TEST_CASE("Iterating over IdSetDense") {

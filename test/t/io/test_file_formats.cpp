@@ -30,7 +30,7 @@ TEST_CASE("File format from dash (stdin/stdout)") {
 
 TEST_CASE("File format from dash with osm.bz2") {
     const osmium::io::File f{"-", "osm.bz2"};
-    REQUIRE("" == f.filename());
+    REQUIRE(f.filename().empty());
     REQUIRE(osmium::io::file_format::xml == f.format());
     REQUIRE(osmium::io::file_compression::bzip2 == f.compression());
     REQUIRE_FALSE(f.has_multiple_object_versions());

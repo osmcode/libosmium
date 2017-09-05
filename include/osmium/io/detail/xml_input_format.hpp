@@ -332,7 +332,7 @@ namespace osmium {
                                         m_header.set("generator", value);
                                     }
                                 });
-                                if (m_header.get("version") == "") {
+                                if (m_header.get("version").empty()) {
                                     throw osmium::format_version_error{};
                                 }
                             } else {

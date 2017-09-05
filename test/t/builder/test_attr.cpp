@@ -31,7 +31,7 @@ TEST_CASE("create node using builders") {
         REQUIRE(node.uid() == 0);
         REQUIRE(std::string(node.user()) == "");
         REQUIRE(node.location() == osmium::Location{});
-        REQUIRE(node.tags().size() == 0);
+        REQUIRE(node.tags().empty());
     }
 
     SECTION("add node with complete info but no tags") {
@@ -55,7 +55,7 @@ TEST_CASE("create node using builders") {
         REQUIRE(node.uid() == 222);
         REQUIRE(std::string(node.user()) == "foo");
         REQUIRE(node.location() == loc);
-        REQUIRE(node.tags().size() == 0);
+        REQUIRE(node.tags().empty());
         REQUIRE(std::distance(node.cbegin(), node.cend()) == 0);
     }
 
@@ -98,7 +98,7 @@ TEST_CASE("create node using builders") {
         REQUIRE(node.uid() == 222);
         REQUIRE(std::string(node.user()) == "foo");
         REQUIRE(node.location() == loc);
-        REQUIRE(node.tags().size() == 0);
+        REQUIRE(node.tags().empty());
     }
 
 }
@@ -250,8 +250,8 @@ TEST_CASE("create way using builders") {
         REQUIRE(way.changeset() == 21);
         REQUIRE(way.uid() == 222);
         REQUIRE(std::string(way.user()) == "foo");
-        REQUIRE(way.tags().size() == 0);
-        REQUIRE(way.nodes().size() == 0);
+        REQUIRE(way.tags().empty());
+        REQUIRE(way.nodes().empty());
         REQUIRE(std::distance(way.cbegin(), way.cend()) == 0);
     }
 

@@ -140,7 +140,7 @@ namespace osmium {
                 m_buffer(buffer),
                 m_buffer_size(size),
                 m_format_string(format) {
-                if (format != "") {
+                if (!format.empty()) {
                     parse_format(format);
                 }
             }

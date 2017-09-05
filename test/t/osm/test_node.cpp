@@ -65,7 +65,7 @@ TEST_CASE("default values for node attributes") {
     REQUIRE(std::string{} == node.user());
     REQUIRE(0 == uint32_t(node.timestamp()));
     REQUIRE(osmium::Location() == node.location());
-    REQUIRE(0 == node.tags().size());
+    REQUIRE(node.tags().empty());
 }
 
 TEST_CASE("set node attributes from strings") {

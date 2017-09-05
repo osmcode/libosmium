@@ -67,7 +67,7 @@ namespace osmium {
              * @throws system_error if the file can't be opened.
              */
             inline int open_for_writing(const std::string& filename, osmium::io::overwrite allow_overwrite = osmium::io::overwrite::no) {
-                if (filename == "" || filename == "-") {
+                if (filename.empty() || filename == "-") {
 #ifdef _WIN32
                     _setmode(1, _O_BINARY);
 #endif
@@ -99,7 +99,7 @@ namespace osmium {
              * @throws system_error if the file can't be opened.
              */
             inline int open_for_reading(const std::string& filename) {
-                if (filename == "" || filename == "-") {
+                if (filename.empty() || filename == "-") {
                     return 0; // stdin
                 }
 

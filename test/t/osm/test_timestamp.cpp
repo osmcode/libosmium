@@ -9,14 +9,14 @@
 TEST_CASE("Timestamp can be default initialized to invalid value") {
     const osmium::Timestamp t;
     REQUIRE(0 == uint32_t(t));
-    REQUIRE("" == t.to_iso());
+    REQUIRE(t.to_iso().empty());
     REQUIRE_FALSE(t.valid());
 }
 
 TEST_CASE("Timestamp invalid value is zero") {
     const osmium::Timestamp t{static_cast<time_t>(0)};
     REQUIRE(0 == uint32_t(t));
-    REQUIRE("" == t.to_iso());
+    REQUIRE(t.to_iso().empty());
     REQUIRE_FALSE(t.valid());
 }
 

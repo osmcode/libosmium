@@ -7,7 +7,7 @@ TEST_CASE("Set a single option value from string") {
 
     o.set("foo", "bar");
     REQUIRE("bar" == o.get("foo"));
-    REQUIRE("" == o.get("empty"));
+    REQUIRE(o.get("empty").empty());
     REQUIRE("default" == o.get("empty", "default"));
 
     REQUIRE_FALSE(o.is_true("foo"));
@@ -26,7 +26,7 @@ TEST_CASE("Set option values from booleans") {
     o.set("f", false);
     REQUIRE("true" == o.get("t"));
     REQUIRE("false" == o.get("f"));
-    REQUIRE("" == o.get("empty"));
+    REQUIRE(o.get("empty").empty());
 
     REQUIRE(o.is_true("t"));
     REQUIRE_FALSE(o.is_true("f"));

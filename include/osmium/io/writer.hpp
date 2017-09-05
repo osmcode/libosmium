@@ -248,7 +248,7 @@ namespace osmium {
 
                 m_output = osmium::io::detail::OutputFormatFactory::instance().create_output(*options.pool, m_file, m_output_queue);
 
-                if (options.header.get("generator") == "") {
+                if (options.header.get("generator").empty()) {
                     options.header.set("generator", "libosmium/" LIBOSMIUM_VERSION_STRING);
                 }
 
