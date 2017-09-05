@@ -221,10 +221,9 @@ namespace osmium {
             /**
              * Return the number of items in this range.
              *
-             * Note that this methods has worst-case complexity O(n) with n
-             * being the number of items in the underlying range.
+             * Complexity: Linear in the number of items.
              */
-            size_t size() const {
+            size_t size() const noexcept {
                 if (m_begin == m_end) {
                     return 0;
                 }
@@ -234,10 +233,9 @@ namespace osmium {
             /**
              * Is this range empty?
              *
-             * Note that this methods has worst-case complexity O(n) with n
-             * being the number of items in the underlying range.
+             * Complexity: Linear in the number of items.
              */
-            bool empty() const {
+            bool empty() const noexcept {
                 return size() == 0;
             }
 
