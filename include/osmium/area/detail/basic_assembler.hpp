@@ -813,8 +813,8 @@ namespace osmium {
                             ++m_stats.open_rings;
                             if (m_config.problem_reporter) {
                                 for (auto& it : open_ring_its) {
-                                    m_config.problem_reporter->report_ring_not_closed(it->get_node_ref_start());
-                                    m_config.problem_reporter->report_ring_not_closed(it->get_node_ref_stop());
+                                    m_config.problem_reporter->report_ring_not_closed(it->get_node_ref_start(), nullptr);
+                                    m_config.problem_reporter->report_ring_not_closed(it->get_node_ref_stop(), nullptr);
                                 }
                             }
                         }

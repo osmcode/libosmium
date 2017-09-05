@@ -91,7 +91,7 @@ namespace osmium {
                        << " node_id2=" << nr2.ref() << " location2=" << nr2.location() << "\n";
             }
 
-            void report_ring_not_closed(const osmium::NodeRef& nr, const osmium::Way* way = nullptr) override {
+            void report_ring_not_closed(const osmium::NodeRef& nr, const osmium::Way* way) override {
                 header("ring not closed");
                 *m_out << "node_id=" << nr.ref() << " location=" << nr.location();
                 if (way) {

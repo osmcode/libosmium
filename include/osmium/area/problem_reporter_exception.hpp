@@ -90,7 +90,7 @@ namespace osmium {
                 throw std::runtime_error{m_sstream.str()};
             }
 
-            void report_ring_not_closed(const osmium::NodeRef& nr, const osmium::Way* way = nullptr) override {
+            void report_ring_not_closed(const osmium::NodeRef& nr, const osmium::Way* way) override {
                 m_sstream.str("");
                 ProblemReporterStream::report_ring_not_closed(nr, way);
                 throw std::runtime_error{m_sstream.str()};
