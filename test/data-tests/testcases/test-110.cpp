@@ -30,7 +30,7 @@ public:
         if (way.id() == 110800) {
             REQUIRE(way.version() == 1);
             REQUIRE(way.nodes().size() == 2);
-            REQUIRE(!way.is_closed());
+            REQUIRE_FALSE(way.is_closed());
 
             const char *test_id = way.tags().get_value_by_key("test:id");
             REQUIRE(test_id);

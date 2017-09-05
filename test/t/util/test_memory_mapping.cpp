@@ -133,7 +133,7 @@ TEST_CASE("File-based mapping: writing to a mapped file should work") {
 
     {
         osmium::util::MemoryMapping mapping{100, osmium::util::MemoryMapping::mapping_mode::readonly, fd};
-        REQUIRE(!mapping.writable());
+        REQUIRE_FALSE(mapping.writable());
 
         REQUIRE(!!mapping);
         REQUIRE(mapping.size() >= 100);
@@ -184,7 +184,7 @@ TEST_CASE("File-based mapping: writing to a privately mapped file should work") 
 
     {
         osmium::util::MemoryMapping mapping{100, osmium::util::MemoryMapping::mapping_mode::readonly, fd};
-        REQUIRE(!mapping.writable());
+        REQUIRE_FALSE(mapping.writable());
 
         REQUIRE(!!mapping);
         REQUIRE(mapping.size() >= 100);
@@ -350,7 +350,7 @@ TEST_CASE("Typed file-based mapping: writing to a mapped file should work") {
 
     {
         osmium::util::TypedMemoryMapping<uint32_t> mapping{100, osmium::util::MemoryMapping::mapping_mode::readonly, fd};
-        REQUIRE(!mapping.writable());
+        REQUIRE_FALSE(mapping.writable());
 
         REQUIRE(!!mapping);
         REQUIRE(mapping.size() >= 100);

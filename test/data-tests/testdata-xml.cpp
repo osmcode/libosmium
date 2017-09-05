@@ -122,7 +122,7 @@ TEST_CASE("Reading OSM XML 100: Direct") {
 
     REQUIRE(r.header.get("generator") == "testdata");
     REQUIRE(0 == r.buffer.committed());
-    REQUIRE(! r.buffer);
+    REQUIRE_FALSE(r.buffer);
 }
 
 TEST_CASE("Reading OSM XML 100: Using Reader") {
@@ -133,7 +133,7 @@ TEST_CASE("Reading OSM XML 100: Using Reader") {
 
     osmium::memory::Buffer buffer = reader.read();
     REQUIRE(0 == buffer.committed());
-    REQUIRE(! buffer);
+    REQUIRE_FALSE(buffer);
     reader.close();
 }
 
@@ -252,7 +252,7 @@ TEST_CASE("Reading OSM XML 120: Direct") {
     header_buffer_type r = parse_xml(data);
     REQUIRE(r.header.get("generator") == "testdata");
     REQUIRE(0 == r.buffer.committed());
-    REQUIRE(! r.buffer);
+    REQUIRE_FALSE(r.buffer);
 }
 
 TEST_CASE("Reading OSM XML 120: Using Reader") {
@@ -263,7 +263,7 @@ TEST_CASE("Reading OSM XML 120: Using Reader") {
 
     osmium::memory::Buffer buffer = reader.read();
     REQUIRE(0 == buffer.committed());
-    REQUIRE(! buffer);
+    REQUIRE_FALSE(buffer);
     reader.close();
 }
 
@@ -508,7 +508,7 @@ TEST_CASE("Reading OSM XML 200: Using Reader asking for ways") {
 
     osmium::memory::Buffer buffer = reader.read();
     REQUIRE(0 == buffer.committed());
-    REQUIRE(! buffer);
+    REQUIRE_FALSE(buffer);
     reader.close();
 }
 
