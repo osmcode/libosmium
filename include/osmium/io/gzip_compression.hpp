@@ -42,6 +42,7 @@ DEALINGS IN THE SOFTWARE.
  * @attention If you include this file, you'll need to link with `libz`.
  */
 
+#include <cerrno>
 #include <cstddef>
 #include <string>
 
@@ -49,7 +50,6 @@ DEALINGS IN THE SOFTWARE.
 # include <unistd.h>
 #endif
 
-#include <errno.h>
 #include <zlib.h>
 
 #include <osmium/io/compression.hpp>
