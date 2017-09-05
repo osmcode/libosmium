@@ -66,7 +66,7 @@ TEST_CASE("WayNodeList") {
 
         const osmium::WayNodeList& nrl = buffer.get<osmium::WayNodeList>(0);
         REQUIRE(nrl.empty());
-        REQUIRE(nrl.size() == 0);
+        REQUIRE(nrl.size() == 0); // NOLINT clang-tidy: readability-container-size-empty
     }
 
     SECTION("Change a WayNodeList") {

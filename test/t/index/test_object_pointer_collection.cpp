@@ -29,7 +29,7 @@ TEST_CASE("Create ObjectPointerCollection") {
 
     osmium::ObjectPointerCollection collection;
     REQUIRE(collection.empty());
-    REQUIRE(collection.size() == 0);
+    REQUIRE(collection.size() == 0); // NOLINT clang-tidy: readability-container-size-empty
 
     osmium::apply(buffer, collection);
 
@@ -81,6 +81,5 @@ TEST_CASE("Create ObjectPointerCollection") {
     collection.clear();
 
     REQUIRE(collection.empty());
-    REQUIRE(collection.size() == 0);
 }
 
