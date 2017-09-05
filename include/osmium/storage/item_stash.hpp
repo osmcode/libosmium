@@ -1,5 +1,5 @@
-#ifndef OSMIUM_ITEM_STASH_HPP
-#define OSMIUM_ITEM_STASH_HPP
+#ifndef OSMIUM_STORAGE_ITEM_STASH_HPP
+#define OSMIUM_STORAGE_ITEM_STASH_HPP
 
 /*
 
@@ -339,4 +339,4 @@ namespace osmium {
 
 } // namespace osmium
 
-#endif // OSMIUM_ITEM_STASH_HPP
+#endif // OSMIUM_STORAGE_ITEM_STASH_HPP
