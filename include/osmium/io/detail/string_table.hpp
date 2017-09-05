@@ -153,7 +153,7 @@ namespace osmium {
                         return *this;
                     }
 
-                    const_iterator operator++(int) {
+                    const const_iterator operator++(int) {
                         const_iterator tmp{*this};
                         operator++();
                         return tmp;
