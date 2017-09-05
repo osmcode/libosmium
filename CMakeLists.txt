@@ -480,7 +480,8 @@ if(CLANG_TIDY)
                          "-google-build-using-namespace"
                          "-google-explicit-constructor"
                          "-google-readability-casting"
-                         "-google-readability-function")
+                         "-google-readability-function"
+                         "-google-runtime-references")
 
     list(APPEND CT_CHECKS "llvm-*"
                          "-llvm-include-order")
@@ -496,7 +497,8 @@ if(CLANG_TIDY)
     list(APPEND CT_CHECKS "readability-*"
                          "-readability-identifier-naming"
                          "-readability-implicit-bool-cast"
-                         "-readability-named-parameter")
+                         "-readability-named-parameter"
+                         "-readability-redundant-member-init")
 
     string(REPLACE ";" "," ALL_CHECKS "${CT_CHECKS}")
 
