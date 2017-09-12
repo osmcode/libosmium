@@ -230,11 +230,11 @@ namespace osmium {
 #ifndef NDEBUG
                 auto result =
 #endif
-#ifndef _MSC_VER
-                              gmtime_r(&sse, &tm);
+#ifndef _WIN32
+                gmtime_r(&sse, &tm);
                 assert(result != nullptr);
 #else
-                              gmtime_s(&tm, &sse);
+                gmtime_s(&tm, &sse);
                 assert(result == 0);
 #endif
 
