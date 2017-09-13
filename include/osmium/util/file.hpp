@@ -174,7 +174,7 @@ namespace osmium {
          * @throws std::system_error If ftruncate(2) call failed
          */
         inline void resize_file(int fd, std::size_t new_size) {
-#ifdef _WIN32
+#ifdef _MSC_VER
             detail::disable_invalid_parameter_handler diph;
             // https://msdn.microsoft.com/en-us/library/whx354w1.aspx
             if (::_chsize_s(fd, static_cast_with_assert<__int64>(new_size)) != 0) {

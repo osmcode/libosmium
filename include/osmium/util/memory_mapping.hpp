@@ -146,8 +146,8 @@ namespace osmium {
 
 #ifdef _WIN32
             HANDLE get_handle() const noexcept;
-            HANDLE osmium::util::MemoryMapping::create_file_mapping() const noexcept;
-            void* osmium::util::MemoryMapping::map_view_of_file() const noexcept;
+            HANDLE create_file_mapping() const noexcept;
+            void* map_view_of_file() const noexcept;
 #endif
 
             int resize_fd(int fd) {
