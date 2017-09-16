@@ -105,7 +105,7 @@ namespace osmium {
                 return *this;
             }
 
-            const OutputIterator operator++(int) noexcept {
+            OutputIterator operator++(int) noexcept {
                 return *this;
             }
 
