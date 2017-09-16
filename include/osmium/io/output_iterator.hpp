@@ -97,6 +97,10 @@ namespace osmium {
                 return *this;
             }
 
+            const OutputIterator& operator*() const noexcept {
+                return *this;
+            }
+
             OutputIterator& operator++() noexcept {
                 return *this;
             }
