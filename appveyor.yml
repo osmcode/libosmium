@@ -6,12 +6,14 @@
 
 environment:
   matrix:
+  - config: MSYS2
+    autocrlf: true
   - config: Dev
+    autocrlf: true
+  - config: RelWithDebInfo
     autocrlf: true
   - config: Dev
     autocrlf: false
-  - config: RelWithDebInfo
-    autocrlf: true
   - config: RelWithDebInfo
     autocrlf: false
 
@@ -25,13 +27,26 @@ init:
   - git config --global core.autocrlf %autocrlf%
   - git config --get core.autocrlf
 
+install:
+  -  cd c:\projects
+  -  git clone https://github.com/osmcode/osm-testdata
+  -  if [%config%]==[MSYS2] (
+        C:\msys64\usr\bin\pacman --noconfirm --sync --refresh --refresh --sysupgrade --sysupgrade
+       && C:\msys64\usr\bin\pacman -Rc --noconfirm mingw-w64-x86_64-gcc-libs
+     )
+
 # clone directory
 clone_folder: c:\projects\libosmium
 
 platform: x64
 
 build_script:
-  - build-appveyor.bat
+  -  cd c:\projects\libosmium
+  - if [%config%]==[MSYS2] (
+        build-msys2.bat
+    ) else (
+        build-appveyor.bat
+    )
 
 # remove garbage VS messages
 # http://help.appveyor.com/discussions/problems/4569-the-target-_convertpdbfiles-listed-in-a-beforetargets-attribute-at-c-does-not-exist-in-the-project-and-will-be-ignored
