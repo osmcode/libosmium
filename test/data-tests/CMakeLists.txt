@@ -110,6 +110,7 @@ if(RUBY AND GEM_json_FOUND AND SPATIALITE)
             COMMAND ${CMAKE_COMMAND}
                 -D OSM_TESTDATA=${OSM_TESTDATA}
                 -D RUBY=${RUBY}
+                -D EXECUTABLE=$<TARGET_FILE:testdata-multipolygon>
                 -P ${CMAKE_CURRENT_SOURCE_DIR}/run-testdata-multipolygon.cmake)
 
     set_tests_properties(testdata-multipolygon PROPERTIES LABELS "data;slow")
