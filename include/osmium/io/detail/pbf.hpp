@@ -36,11 +36,11 @@ DEALINGS IN THE SOFTWARE.
 #include <cstdint>
 #include <string>
 
-// needed for htonl and ntohl
+// needed for htonl and ntohl or their equivalent in protozero
 #ifndef _WIN32
 # include <netinet/in.h>
 #else
-# include <winsock2.h>
+# include <protozero/byteswap.hpp>
 #endif
 
 #include <osmium/io/error.hpp>
