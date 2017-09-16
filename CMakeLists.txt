@@ -495,6 +495,7 @@ if(CLANG_TIDY)
                           "-modernize-make-unique") # not available in C++11
 
     list(APPEND CT_CHECKS "readability-*"
+                         "-readability-avoid-const-params-in-decls"
                          "-readability-identifier-naming"
                          "-readability-implicit-bool-cast"
                          "-readability-named-parameter"
