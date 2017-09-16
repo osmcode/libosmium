@@ -93,15 +93,15 @@ namespace osmium {
                 return this->operator=(diff.curr());
             }
 
-            OutputIterator& operator*() {
+            OutputIterator& operator*() noexcept {
                 return *this;
             }
 
-            OutputIterator& operator++() {
+            OutputIterator& operator++() noexcept {
                 return *this;
             }
 
-            OutputIterator& operator++(int) {
+            const OutputIterator operator++(int) noexcept {
                 return *this;
             }
 
