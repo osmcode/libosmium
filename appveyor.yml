@@ -28,12 +28,12 @@ init:
   - git config --get core.autocrlf
 
 install:
-  -  cd c:\projects
-  -  git clone https://github.com/osmcode/osm-testdata
-  -  if [%config%]==[MSYS2] (
-        C:\msys64\usr\bin\pacman --noconfirm --sync --refresh --refresh --sysupgrade --sysupgrade
+  - cd c:\projects
+  - git clone https://github.com/osmcode/osm-testdata
+  - if [%config%]==[MSYS2] (
+          C:\msys64\usr\bin\pacman --noconfirm --sync --refresh --refresh --sysupgrade --sysupgrade
        && C:\msys64\usr\bin\pacman -Rc --noconfirm mingw-w64-x86_64-gcc-libs
-     )
+    )
 
 # clone directory
 clone_folder: c:\projects\libosmium
@@ -41,7 +41,7 @@ clone_folder: c:\projects\libosmium
 platform: x64
 
 build_script:
-  -  cd c:\projects\libosmium
+  - cd c:\projects\libosmium
   - if [%config%]==[MSYS2] (
         build-msys2.bat
     ) else (
@@ -52,3 +52,4 @@ build_script:
 # http://help.appveyor.com/discussions/problems/4569-the-target-_convertpdbfiles-listed-in-a-beforetargets-attribute-at-c-does-not-exist-in-the-project-and-will-be-ignored
 before_build:
   - del "C:\Program Files (x86)\MSBuild\14.0\Microsoft.Common.targets\ImportAfter\Xamarin.Common.targets"
+

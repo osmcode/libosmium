@@ -102,16 +102,16 @@ if(RUBY AND GEM_json_FOUND AND SPATIALITE)
     add_executable(testdata-multipolygon testdata-multipolygon.cpp)
     set_pthread_on_target(testdata-multipolygon)
     target_link_libraries(testdata-multipolygon
-                        ${OSMIUM_XML_LIBRARIES}
-                        ${GDAL_LIBRARIES}
+                          ${OSMIUM_XML_LIBRARIES}
+                          ${GDAL_LIBRARIES}
     )
 
     add_test(NAME testdata-multipolygon
-            COMMAND ${CMAKE_COMMAND}
-                -D OSM_TESTDATA=${OSM_TESTDATA}
-                -D RUBY=${RUBY}
-                -D EXECUTABLE=$<TARGET_FILE:testdata-multipolygon>
-                -P ${CMAKE_CURRENT_SOURCE_DIR}/run-testdata-multipolygon.cmake)
+             COMMAND ${CMAKE_COMMAND}
+                 -D OSM_TESTDATA=${OSM_TESTDATA}
+                 -D RUBY=${RUBY}
+                 -D EXECUTABLE=$<TARGET_FILE:testdata-multipolygon>
+                 -P ${CMAKE_CURRENT_SOURCE_DIR}/run-testdata-multipolygon.cmake)
 
     set_tests_properties(testdata-multipolygon PROPERTIES LABELS "data;slow")
     configure_file(multipolygon.qgs ${CMAKE_CURRENT_BINARY_DIR}/multipolygon.qgs @ONLY)
