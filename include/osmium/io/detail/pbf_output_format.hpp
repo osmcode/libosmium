@@ -185,7 +185,12 @@ namespace osmium {
                     pbf_blob_header.add_string(FileFormat::BlobHeader::required_string_type, m_blob_type == pbf_blob_type::data ? "OSMData" : "OSMHeader");
                     pbf_blob_header.add_int32(FileFormat::BlobHeader::required_int32_datasize, static_cast_with_assert<int32_t>(blob_data.size()));
 
+                    #ifndef _WIN32
                     const uint32_t sz = htonl(static_cast_with_assert<uint32_t>(blob_header_data.size()));
+                    #else
+                    uint32_t sz = static_cast_with_assert<uint32_t>(blob_header_data.size());
+                    protozero::detail::byteswap_inplace(&sz);
+                    #endif
 
                     // write to output: the 4-byte BlobHeader-Size followed by the BlobHeader followed by the Blob
                     std::string output;

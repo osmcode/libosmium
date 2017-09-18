@@ -131,10 +131,6 @@ if(Osmium_USE_PBF)
             ${ZLIB_LIBRARIES}
             ${CMAKE_THREAD_LIBS_INIT}
         )
-        if(WIN32)
-            # This is needed for the ntohl() function
-            list(APPEND OSMIUM_PBF_LIBRARIES ws2_32)
-        endif()
         list(APPEND OSMIUM_INCLUDE_DIRS
             ${ZLIB_INCLUDE_DIR}
             ${PROTOZERO_INCLUDE_DIR}
