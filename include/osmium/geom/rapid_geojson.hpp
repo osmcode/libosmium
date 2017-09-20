@@ -37,6 +37,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/geom/coordinates.hpp>
 #include <osmium/geom/factory.hpp>
+#include "rapidjson/document.h"
 
 namespace osmium {
 
@@ -55,11 +56,17 @@ namespace osmium {
 
             public:
 
-                using point_type        = void;
-                using linestring_type   = void;
-                using polygon_type      = void;
-                using multipolygon_type = void;
-                using ring_type         = void;
+                // using point_type        = void;
+                // using linestring_type   = void;
+                // using polygon_type      = void;
+                // using multipolygon_type = void;
+                // using ring_type         = void;
+
+                using point_type        = rapidjson::Document;
+                using linestring_type   = rapidjson::Document;
+                using polygon_type      = rapidjson::Document;
+                using multipolygon_type = rapidjson::Document;
+                using ring_type         = rapidjson::Document;
 
                 RapidGeoJSONFactoryImpl(int /* srid */, TWriter& writer) :
                     m_writer(&writer) {
@@ -69,23 +76,25 @@ namespace osmium {
 
                 // { "type": "Point", "coordinates": [100.0, 0.0] }
                 point_type make_point(const osmium::geom::Coordinates& xy) const {
-                    m_writer->String("geometry");
-                    m_writer->StartObject();
-                    m_writer->String("type");
-                    m_writer->String("Point");
-                    m_writer->String("coordinates");
-                    m_writer->StartArray();
-                    m_writer->Double(xy.x);
-                    m_writer->Double(xy.y);
-                    m_writer->EndArray();
-                    m_writer->EndObject();
+                    rapidjson::Document document;
+                    document.SetObject();
+                    rapidjson::Document::AllocatorType& allocator = document.GetAllocator();
+
+                    document.AddMember("type", "Point", allocator);
+
+                    rapidjson::Value coordinates(rapidjson::kArrayType);
+                    coordinates.PushBack(xy.x, allocator);
+                    coordinates.PushBack(xy.y, allocator);
+
+                    document.AddMember("coordinates", coordinates, allocator);
+
+                    return document;
                 }
 
                 /* LineString */
 
                 // { "type": "LineString", "coordinates": [ [100.0, 0.0], [101.0, 1.0] ] }
                 void linestring_start() {
-                    m_writer->String("geometry");
                     m_writer->StartObject();
                     m_writer->String("type");
                     m_writer->String("LineString");
@@ -109,7 +118,6 @@ namespace osmium {
 
                 // { "type": "Polygon", "coordinates": [[[100.0, 0.0], [101.0, 1.0]]] }
                 void polygon_start() {
-                    m_writer->String("geometry");
                     m_writer->StartObject();
                     m_writer->String("type");
                     m_writer->String("Polygon");
@@ -134,7 +142,6 @@ namespace osmium {
                 /* MultiPolygon */
 
                 void multipolygon_start() {
-                    m_writer->String("geometry");
                     m_writer->StartObject();
                     m_writer->String("type");
                     m_writer->String("MultiPolygon");
