@@ -59,7 +59,8 @@ namespace osmium {
                 using multipolygon_type = rapidjson::Document;
                 using ring_type         = rapidjson::Document;
 
-                RapidGeoJSONDocumentFactoryImpl(int /* srid */) : {}
+                // RapidGeoJSONDocumentFactoryImpl(int /* srid */) :
+                // {}
 
                 /* Point */
 
@@ -77,7 +78,6 @@ namespace osmium {
 
                     document.AddMember("coordinates", coordinates, allocator);
 
-                    document.Accept(*m_writer);
                     return document;
                 }
 
@@ -91,6 +91,12 @@ namespace osmium {
                 }
 
                 linestring_type linestring_finish(size_t /* num_points */) {
+                    rapidjson::Document document;
+                    document.SetObject();
+                    rapidjson::Document::AllocatorType& allocator = document.GetAllocator();
+
+                    document.AddMember("type", "LineString", allocator);
+                    return document;
                 }
 
                 /* Polygon */
@@ -103,6 +109,12 @@ namespace osmium {
                 }
 
                 polygon_type polygon_finish(size_t /* num_points */) {
+                    rapidjson::Document document;
+                    document.SetObject();
+                    rapidjson::Document::AllocatorType& allocator = document.GetAllocator();
+
+                    document.AddMember("type", "Polygon", allocator);
+                    return document;
                 }
 
                 /* MultiPolygon */
@@ -132,14 +144,20 @@ namespace osmium {
                 }
 
                 multipolygon_type multipolygon_finish() {
+                    rapidjson::Document document;
+                    document.SetObject();
+                    rapidjson::Document::AllocatorType& allocator = document.GetAllocator();
+
+                    document.AddMember("type", "MultiPolygon", allocator);
+                    return document;
                 }
 
             }; // class RapidGeoJSONDocumentFactoryImpl
 
         } // namespace detail
 
-        template <typename TWriter, typename TProjection = IdentityProjection>
-        using RapidGeoJSONDocumentFactory = GeometryFactory<detail::RapidGeoJSONDocumentFactoryImpl<TWriter>, TProjection>;
+        template <typename TProjection = IdentityProjection>
+        using RapidGeoJSONDocumentFactory = GeometryFactory<detail::RapidGeoJSONDocumentFactoryImpl, TProjection>;
 
     } // namespace geom
 
