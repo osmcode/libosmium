@@ -126,11 +126,11 @@ namespace osmium {
                     rapidjson::Value outer_ring = rapidjson::Value(rapidjson::kArrayType);
                     m_coordinates.PushBack(outer_ring, allocator);
 
-                    m_document.AddMember("type", "LineString", allocator);
+                    m_document.AddMember("type", "Polygon", allocator);
                 }
 
                 void polygon_add_location(const osmium::geom::Coordinates& xy) {
-                    rapidjson::Value outer_ring = m_coordinates[0].GetArray();
+                    rapidjson::Value& outer_ring = m_coordinates[0];
                     rapidjson::Document::AllocatorType& allocator = m_document.GetAllocator();
 
                     rapidjson::Value point(rapidjson::kArrayType);

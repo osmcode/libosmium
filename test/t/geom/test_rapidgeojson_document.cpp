@@ -26,6 +26,16 @@ void verify_coords(std::vector<std::vector<double>> expected, const rapidjson::V
     }
 }
 
+void verify_poly_coords(std::vector<std::vector<std::vector<double>>> expected, const rapidjson::Value& coordinates) {
+    for (int x = 0; x < expected.size(); x++) {
+        for (int y = 0; y < expected[x].size(); y++) {
+            for (int z = 0; z < expected[x][y].size(); z++) {
+                REQUIRE(coordinates[x].GetArray()[y].GetArray()[z].GetDouble() == expected[x][y][z]);
+            }
+        }
+    }
+}
+
 TEST_CASE("RapidGeoJSON Document point geometry") {
 
     SECTION("point") {
@@ -49,7 +59,6 @@ TEST_CASE("RapidGeoJSON Document point geometry") {
     SECTION("empty_point") {
         REQUIRE_THROWS_AS(factory.create_point(osmium::Location{}), const osmium::invalid_location&);
     }
-
 }
 
 TEST_CASE("RapidGeoJSON Document linestring geometry") {
@@ -63,11 +72,7 @@ TEST_CASE("RapidGeoJSON Document linestring geometry") {
 
         const rapidjson::Value& coordinates = document["coordinates"];
 
-        std::vector<std::vector<double>> expected {
-            {3.2, 4.2},
-            {3.5, 4.7},
-            {3.6, 4.9}
-        };
+        std::vector<std::vector<double>> expected { {3.2, 4.2}, {3.5, 4.7}, {3.6, 4.9} };
         verify_coords(expected, coordinates);
     }
 
@@ -85,11 +90,7 @@ TEST_CASE("RapidGeoJSON Document linestring geometry") {
         REQUIRE(std::string{"LineString"} == document["type"].GetString());
         const rapidjson::Value& coordinates = document["coordinates"];
 
-        std::vector<std::vector<double>> expected {
-            {3.6, 4.9},
-            {3.5, 4.7},
-            {3.2, 4.2}
-        };
+        std::vector<std::vector<double>> expected { {3.6, 4.9}, {3.5, 4.7}, {3.2, 4.2} };
         verify_coords(expected, coordinates);
     }
 
@@ -100,21 +101,94 @@ TEST_CASE("RapidGeoJSON Document linestring geometry") {
         REQUIRE(std::string{"LineString"} == document["type"].GetString());
         const rapidjson::Value& coordinates = document["coordinates"];
 
-        // REQUIRE(coordinates[0].GetArray()[0].GetDouble() == 3.2);
-        // REQUIRE(coordinates[0].GetArray()[1].GetDouble() == 4.2);
-        // REQUIRE(coordinates[1].GetArray()[0].GetDouble() == 3.5);
-        // REQUIRE(coordinates[1].GetArray()[1].GetDouble() == 4.7);
-        // REQUIRE(coordinates[2].GetArray()[0].GetDouble() == 3.2);
-        // REQUIRE(coordinates[2].GetArray()[1].GetDouble() == 4.2);
-
-        // REQUIRE(std::string{"{\"type\":\"LineString\",\"coordinates\":[[3.2,4.2],[3.5,4.7],[3.5,4.7],[3.6,4.9]]}"} == json);
+        std::vector<std::vector<double>> expected { {3.2, 4.2}, {3.5, 4.7}, {3.5, 4.7}, {3.6, 4.9} };
+        verify_coords(expected, coordinates);
     }
 
     SECTION("linestring, all, backwards") {
-        // const auto& wnl = create_test_wnl_okay(buffer);
-        // const std::string json{factory.create_linestring(wnl, osmium::geom::use_nodes::all, osmium::geom::direction::backward)};
-        // REQUIRE(std::string{"{\"type\":\"LineString\",\"coordinates\":[[3.6,4.9],[3.5,4.7],[3.5,4.7],[3.2,4.2]]}"} == json);
+        const auto& wnl = create_test_wnl_okay(buffer);
+        const rapidjson::Document document = factory.create_linestring(wnl, osmium::geom::use_nodes::all, osmium::geom::direction::backward);
+        const rapidjson::Value& coordinates = document["coordinates"];
+        std::vector<std::vector<double>> expected { {3.6, 4.9}, {3.5, 4.7}, {3.5, 4.7}, {3.2, 4.2} };
+        verify_coords(expected, coordinates);
     }
 
+    SECTION("linestring with two same locations") {
+        const auto& wnl = create_test_wnl_same_location(buffer);
 
+        REQUIRE_THROWS_AS(factory.create_linestring(wnl), const osmium::geometry_error&);
+        REQUIRE_THROWS_AS(factory.create_linestring(wnl, osmium::geom::use_nodes::unique, osmium::geom::direction::backward), const osmium::geometry_error&);
+
+        {
+            const rapidjson::Document document = factory.create_linestring(wnl, osmium::geom::use_nodes::all);
+            const rapidjson::Value& coordinates = document["coordinates"];
+            std::vector<std::vector<double>> expected {{3.5, 4.7}, {3.5, 4.7} };
+            verify_coords(expected, coordinates);
+        }
+
+        {
+            const rapidjson::Document document = factory.create_linestring(wnl, osmium::geom::use_nodes::all, osmium::geom::direction::backward);
+            const rapidjson::Value& coordinates = document["coordinates"];
+            std::vector<std::vector<double>> expected {{3.5, 4.7}, {3.5, 4.7} };
+            verify_coords(expected, coordinates);
+        }
+    }
+
+    SECTION("linestring with undefined location") {
+        const auto& wnl = create_test_wnl_undefined_location(buffer);
+        REQUIRE_THROWS_AS(factory.create_linestring(wnl), const osmium::invalid_location&);
+    }
+}
+
+TEST_CASE("GeoJSON polygon geometry") {
+    osmium::memory::Buffer buffer{1000};
+    const auto& wnl = create_test_wnl_closed(buffer);
+
+    SECTION("unique forwards (default)") {
+        rapidjson::Document document = factory.create_polygon(wnl);
+        const rapidjson::Value& coordinates = document["coordinates"];
+        const std::string json = to_string(document);
+
+        std::vector<std::vector<std::vector<double>>> expected { { {3.0, 3.0}, {4.1, 4.1}, {3.6, 4.1}, {3.1, 3.5}, {3.0, 3.0} } };
+
+        verify_poly_coords(expected, coordinates);
+        REQUIRE(std::string{"Polygon"} == document["type"].GetString());
+        REQUIRE(json == "{\"type\":\"Polygon\",\"coordinates\":[[[3.0,3.0],[4.1,4.1],[3.6,4.1],[3.1,3.5],[3.0,3.0]]]}");
+    }
+
+    SECTION("unique backwards") {
+        rapidjson::Document document = factory.create_polygon(wnl, osmium::geom::use_nodes::unique, osmium::geom::direction::backward);
+        const rapidjson::Value& coordinates = document["coordinates"];
+        const std::string json = to_string(document);
+
+        std::vector<std::vector<std::vector<double>>> expected { { {3.0, 3.0}, {3.1, 3.5}, {3.6, 4.1}, {4.1, 4.1}, {3.0, 3.0} } };
+
+        verify_poly_coords(expected, coordinates);
+        REQUIRE(std::string{"Polygon"} == document["type"].GetString());
+        REQUIRE(json == "{\"type\":\"Polygon\",\"coordinates\":[[[3.0,3.0],[3.1,3.5],[3.6,4.1],[4.1,4.1],[3.0,3.0]]]}");
+    }
+
+    SECTION("all forwards") {
+        rapidjson::Document document = factory.create_polygon(wnl, osmium::geom::use_nodes::all);
+        const rapidjson::Value& coordinates = document["coordinates"];
+        const std::string json = to_string(document);
+
+        std::vector<std::vector<std::vector<double>>> expected { { {3.0, 3.0}, {4.1, 4.1}, {4.1, 4.1}, {3.6, 4.1}, {3.1, 3.5}, {3.0, 3.0} } };
+
+        verify_poly_coords(expected, coordinates);
+        REQUIRE(std::string{"Polygon"} == document["type"].GetString());
+        REQUIRE(json == "{\"type\":\"Polygon\",\"coordinates\":[[[3.0,3.0],[4.1,4.1],[4.1,4.1],[3.6,4.1],[3.1,3.5],[3.0,3.0]]]}");
+    }
+
+    SECTION("all backwards") {
+        rapidjson::Document document = factory.create_polygon(wnl, osmium::geom::use_nodes::all, osmium::geom::direction::backward);
+        const rapidjson::Value& coordinates = document["coordinates"];
+        const std::string json = to_string(document);
+
+        std::vector<std::vector<std::vector<double>>> expected { { {3.0, 3.0}, {3.1, 3.5}, {3.6, 4.1}, {4.1, 4.1}, {4.1, 4.1}, {3.0, 3.0} } };
+
+        verify_poly_coords(expected, coordinates);
+        REQUIRE(std::string{"Polygon"} == document["type"].GetString());
+        REQUIRE(json == "{\"type\":\"Polygon\",\"coordinates\":[[[3.0,3.0],[3.1,3.5],[3.6,4.1],[4.1,4.1],[4.1,4.1],[3.0,3.0]]]}");
+    }
 }
