@@ -29,7 +29,6 @@ TEST_CASE("RapidGeoJSON point geometry") {
 
         const std::string json2 = stream.GetString();
         REQUIRE(std::string{"{\"type\":\"Point\",\"coordinates\":[3.2,4.2]}"} == json2);
-
     }
 
     SECTION("empty_point") {

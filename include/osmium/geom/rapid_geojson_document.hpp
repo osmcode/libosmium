@@ -50,7 +50,8 @@ namespace osmium {
              * RapidJSON (https://github.com/miloyip/rapidjson) JSON writer.
              */
             class RapidGeoJSONDocumentFactoryImpl {
-
+                rapidjson::Document m_document;
+                rapidjson::Value m_coordinates;
             public:
 
                 using point_type        = rapidjson::Document;
@@ -59,8 +60,9 @@ namespace osmium {
                 using multipolygon_type = rapidjson::Document;
                 using ring_type         = rapidjson::Document;
 
-                // RapidGeoJSONDocumentFactoryImpl(int /* srid */) :
-                // {}
+                RapidGeoJSONDocumentFactoryImpl(int /* srid */) :
+                    m_coordinates(rapidjson::kArrayType)
+                {}
 
                 /* Point */
 
@@ -85,35 +87,64 @@ namespace osmium {
 
                 // { "type": "LineString", "coordinates": [ [100.0, 0.0], [101.0, 1.0] ] }
                 void linestring_start() {
+                    m_document = rapidjson::Document();
+                    m_document.SetObject();
+                    m_coordinates = rapidjson::Value(rapidjson::kArrayType);
+                    rapidjson::Document::AllocatorType& allocator = m_document.GetAllocator();
+
+                    m_document.AddMember("type", "LineString", allocator);
                 }
 
                 void linestring_add_location(const osmium::geom::Coordinates& xy) {
+                    rapidjson::Document::AllocatorType& allocator = m_document.GetAllocator();
+                    rapidjson::Value point(rapidjson::kArrayType);
+                    point.PushBack(xy.x, allocator);
+                    point.PushBack(xy.y, allocator);
+
+                    m_coordinates.PushBack(point, allocator);
                 }
 
                 linestring_type linestring_finish(size_t /* num_points */) {
-                    rapidjson::Document document;
-                    document.SetObject();
-                    rapidjson::Document::AllocatorType& allocator = document.GetAllocator();
+                    m_document.AddMember("coordinates", m_coordinates, m_document.GetAllocator());
 
-                    document.AddMember("type", "LineString", allocator);
+                    rapidjson::Document document;
+                    document.CopyFrom(m_document, document.GetAllocator());
                     return document;
                 }
 
                 /* Polygon */
 
                 // { "type": "Polygon", "coordinates": [[[100.0, 0.0], [101.0, 1.0]]] }
+                // Naive Polygon -- Only handles single outer ring (this works for OSM Polygon cases)
                 void polygon_start() {
+                    m_document = rapidjson::Document();
+                    m_document.SetObject();
+                    m_coordinates = rapidjson::Value(rapidjson::kArrayType);
+
+                    rapidjson::Document::AllocatorType& allocator = m_document.GetAllocator();
+
+                    rapidjson::Value outer_ring = rapidjson::Value(rapidjson::kArrayType);
+                    m_coordinates.PushBack(outer_ring, allocator);
+
+                    m_document.AddMember("type", "LineString", allocator);
                 }
 
                 void polygon_add_location(const osmium::geom::Coordinates& xy) {
+                    rapidjson::Value outer_ring = m_coordinates[0].GetArray();
+                    rapidjson::Document::AllocatorType& allocator = m_document.GetAllocator();
+
+                    rapidjson::Value point(rapidjson::kArrayType);
+                    point.PushBack(xy.x, allocator);
+                    point.PushBack(xy.y, allocator);
+
+                    outer_ring.PushBack(point, allocator);
                 }
 
                 polygon_type polygon_finish(size_t /* num_points */) {
-                    rapidjson::Document document;
-                    document.SetObject();
-                    rapidjson::Document::AllocatorType& allocator = document.GetAllocator();
+                    m_document.AddMember("coordinates", m_coordinates, m_document.GetAllocator());
 
-                    document.AddMember("type", "Polygon", allocator);
+                    rapidjson::Document document;
+                    document.CopyFrom(m_document, document.GetAllocator());
                     return document;
                 }
 
