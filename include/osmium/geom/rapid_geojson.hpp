@@ -69,7 +69,6 @@ namespace osmium {
 
                 // { "type": "Point", "coordinates": [100.0, 0.0] }
                 point_type make_point(const osmium::geom::Coordinates& xy) const {
-                    m_writer->String("geometry");
                     m_writer->StartObject();
                     m_writer->String("type");
                     m_writer->String("Point");
@@ -85,7 +84,6 @@ namespace osmium {
 
                 // { "type": "LineString", "coordinates": [ [100.0, 0.0], [101.0, 1.0] ] }
                 void linestring_start() {
-                    m_writer->String("geometry");
                     m_writer->StartObject();
                     m_writer->String("type");
                     m_writer->String("LineString");
@@ -109,7 +107,6 @@ namespace osmium {
 
                 // { "type": "Polygon", "coordinates": [[[100.0, 0.0], [101.0, 1.0]]] }
                 void polygon_start() {
-                    m_writer->String("geometry");
                     m_writer->StartObject();
                     m_writer->String("type");
                     m_writer->String("Polygon");
@@ -134,7 +131,6 @@ namespace osmium {
                 /* MultiPolygon */
 
                 void multipolygon_start() {
-                    m_writer->String("geometry");
                     m_writer->StartObject();
                     m_writer->String("type");
                     m_writer->String("MultiPolygon");
