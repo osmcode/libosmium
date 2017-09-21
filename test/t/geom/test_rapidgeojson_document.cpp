@@ -1,11 +1,10 @@
 
 #include "catch.hpp"
 
-#include <osmium/geom/rapid_geojson_document.hpp>
-#include <rapidjson/writer.h>
 #include <rapidjson/stringbuffer.h>
-#include <vector>
+#include <rapidjson/writer.h>
 
+#include <osmium/geom/rapid_geojson_document.hpp>
 #include "area_helper.hpp"
 #include "wnl_helper.hpp"
 

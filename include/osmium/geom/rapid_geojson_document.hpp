@@ -35,9 +35,10 @@ DEALINGS IN THE SOFTWARE.
 
 #include <cstddef>
 
+#include "rapidjson/document.h"
+
 #include <osmium/geom/coordinates.hpp>
 #include <osmium/geom/factory.hpp>
-#include "rapidjson/document.h"
 
 namespace osmium {
 
@@ -46,8 +47,15 @@ namespace osmium {
         namespace detail {
 
             /**
-             * A geometry factory implementation that can be used with the
-             * RapidJSON (https://github.com/miloyip/rapidjson) JSON writer.
+             * A geometry factory implementation that returns rapidjson::Document
+             * objects for geometry values.
+             *
+             * Useful for doing subsequent structural manipulation on the JSON
+             * values returned, for example injecting Tag data into the structure
+             * or including the elements in other GeoJSON structures.
+             *
+             * RapidJSON documents can then be serialized using one of the RapidJSON
+             * Stream/Writer implementations. See http://rapidjson.org/ for more info.
              */
             class RapidGeoJSONDocumentFactoryImpl {
                 rapidjson::Document m_document;
