@@ -36,6 +36,19 @@ void verify_poly_coords(std::vector<std::vector<std::vector<double>>> expected, 
     }
 }
 
+void verify_multi_poly_coords(std::vector<std::vector<std::vector<std::vector<double>>>> expected, const rapidjson::Value& coordinates) {
+
+    for (int w = 0; w < expected.size(); w++) {
+        for (int x = 0; x < expected[w].size(); x++) {
+            for (int y = 0; y < expected[w][x].size(); y++) {
+                for (int z = 0; z < expected[w][x][y].size(); z++) {
+                    REQUIRE(coordinates[w].GetArray()[x].GetArray()[y].GetArray()[z].GetDouble() == expected[w][x][y][z]);
+                }
+            }
+        }
+    }
+}
+
 TEST_CASE("RapidGeoJSON Document point geometry") {
 
     SECTION("point") {
@@ -191,4 +204,70 @@ TEST_CASE("GeoJSON polygon geometry") {
         REQUIRE(std::string{"Polygon"} == document["type"].GetString());
         REQUIRE(json == "{\"type\":\"Polygon\",\"coordinates\":[[[3.0,3.0],[3.1,3.5],[3.6,4.1],[4.1,4.1],[4.1,4.1],[3.0,3.0]]]}");
     }
+}
+
+TEST_CASE("RapidGeoJSON Document MultiPolygon geometry (OSM Areas)") {
+    osmium::memory::Buffer buffer{1000};
+
+    SECTION("area_1outer_0inner") {
+        const osmium::Area& area = create_test_area_1outer_0inner(buffer);
+
+        REQUIRE_FALSE(area.is_multipolygon());
+        REQUIRE(std::distance(area.cbegin(), area.cend()) == 2);
+        REQUIRE(area.subitems<osmium::OuterRing>().size() == area.num_rings().first);
+
+        rapidjson::Document document = factory.create_multipolygon(area);
+        REQUIRE(std::string{"MultiPolygon"} == document["type"].GetString());
+        const std::string json = to_string(document);
+        const rapidjson::Value& coordinates = document["coordinates"];
+
+        std::vector<std::vector<std::vector<std::vector<double>>>> expected {{{{3.2,4.2},{3.5,4.7},{3.6,4.9},{3.2,4.2}}}};
+        verify_multi_poly_coords(expected, coordinates);
+        REQUIRE(std::string{"{\"type\":\"MultiPolygon\",\"coordinates\":[[[[3.2,4.2],[3.5,4.7],[3.6,4.9],[3.2,4.2]]]]}"} == json);
+    }
+
+    SECTION("area_1outer_1inner") {
+        const osmium::Area& area = create_test_area_1outer_1inner(buffer);
+
+        REQUIRE_FALSE(area.is_multipolygon());
+        REQUIRE(std::distance(area.cbegin(), area.cend()) == 3);
+        REQUIRE(area.subitems<osmium::OuterRing>().size() == area.num_rings().first);
+        REQUIRE(area.subitems<osmium::InnerRing>().size() == area.num_rings().second);
+
+        rapidjson::Document document = factory.create_multipolygon(area);
+        REQUIRE(std::string{"MultiPolygon"} == document["type"].GetString());
+        const std::string json = to_string(document);
+        const rapidjson::Value& coordinates = document["coordinates"];
+
+        std::vector<std::vector<std::vector<std::vector<double>>>> expected {{{{0.1,0.1},{9.1,0.1},{9.1,9.1},{0.1,9.1},{0.1,0.1}},{{1.0,1.0},{8.0,1.0},{8.0,8.0},{1.0,8.0},{1.0,1.0}}}};
+        verify_multi_poly_coords(expected, coordinates);
+
+        REQUIRE(std::string{"{\"type\":\"MultiPolygon\",\"coordinates\":[[[[0.1,0.1],[9.1,0.1],[9.1,9.1],[0.1,9.1],[0.1,0.1]],[[1.0,1.0],[8.0,1.0],[8.0,8.0],[1.0,8.0],[1.0,1.0]]]]}"} == json);
+    }
+
+        SECTION("area_2outer_2inner") {
+        const osmium::Area& area = create_test_area_2outer_2inner(buffer);
+
+        REQUIRE(area.is_multipolygon());
+        REQUIRE(std::distance(area.cbegin(), area.cend()) == 5);
+        REQUIRE(area.subitems<osmium::OuterRing>().size() == area.num_rings().first);
+        REQUIRE(area.subitems<osmium::InnerRing>().size() == area.num_rings().second);
+
+        rapidjson::Document document = factory.create_multipolygon(area);
+        REQUIRE(std::string{"MultiPolygon"} == document["type"].GetString());
+        const std::string json = to_string(document);
+        const rapidjson::Value& coordinates = document["coordinates"];
+
+        std::vector<std::vector<std::vector<std::vector<double>>>> expected {
+            {{{0.1,0.1},{9.1,0.1},{9.1,9.1},{0.1,9.1},{0.1,0.1}},
+             {{1.0,1.0},{4.0,1.0},{4.0,4.0},{1.0,4.0},{1.0,1.0}},
+             {{5.0,5.0},{5.0,7.0},{7.0,7.0},{5.0,5.0}}},
+            {{{10.0,10.0},{11.0,10.0},{11.0,11.0},{10.0,11.0},{10.0,10.0}}}
+        };
+        verify_multi_poly_coords(expected, coordinates);
+
+        REQUIRE(std::string{"{\"type\":\"MultiPolygon\",\"coordinates\":[[[[0.1,0.1],[9.1,0.1],[9.1,9.1],[0.1,9.1],[0.1,0.1]],[[1.0,1.0],[4.0,1.0],[4.0,4.0],[1.0,4.0],[1.0,1.0]],[[5.0,5.0],[5.0,7.0],[7.0,7.0],[5.0,5.0]]],[[[10.0,10.0],[11.0,10.0],[11.0,11.0],[10.0,11.0],[10.0,10.0]]]]}"} == json);
+    }
+
+
 }

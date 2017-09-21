@@ -52,6 +52,8 @@ namespace osmium {
             class RapidGeoJSONDocumentFactoryImpl {
                 rapidjson::Document m_document;
                 rapidjson::Value m_coordinates;
+                rapidjson::Value m_polygon;
+                rapidjson::Value m_ring;
             public:
 
                 using point_type        = rapidjson::Document;
@@ -61,7 +63,10 @@ namespace osmium {
                 using ring_type         = rapidjson::Document;
 
                 RapidGeoJSONDocumentFactoryImpl(int /* srid */) :
-                    m_coordinates(rapidjson::kArrayType)
+                    m_coordinates(rapidjson::kArrayType),
+                    m_polygon(rapidjson::kArrayType),
+                    m_ring(rapidjson::kArrayType)
+
                 {}
 
                 /* Point */
@@ -151,35 +156,51 @@ namespace osmium {
                 /* MultiPolygon */
 
                 void multipolygon_start() {
+                    m_document = rapidjson::Document();
+                    m_document.SetObject();
+                    m_coordinates = rapidjson::Value(rapidjson::kArrayType);
+                    m_document.AddMember("type", "MultiPolygon", m_document.GetAllocator());
                 }
 
                 void multipolygon_polygon_start() {
+                    m_polygon = rapidjson::Value(rapidjson::kArrayType);
                 }
 
                 void multipolygon_polygon_finish() {
+                    m_coordinates.PushBack(m_polygon, m_document.GetAllocator());
                 }
 
                 void multipolygon_outer_ring_start() {
+                    m_ring = rapidjson::Value(rapidjson::kArrayType);
                 }
 
                 void multipolygon_outer_ring_finish() {
+                    m_polygon.PushBack(m_ring, m_document.GetAllocator());
                 }
 
                 void multipolygon_inner_ring_start() {
+                    m_ring = rapidjson::Value(rapidjson::kArrayType);
                 }
 
                 void multipolygon_inner_ring_finish() {
+                    m_polygon.PushBack(m_ring, m_document.GetAllocator());
                 }
 
                 void multipolygon_add_location(const osmium::geom::Coordinates& xy) {
+                    rapidjson::Document::AllocatorType& allocator = m_document.GetAllocator();
+
+                    rapidjson::Value point(rapidjson::kArrayType);
+                    point.PushBack(xy.x, allocator);
+                    point.PushBack(xy.y, allocator);
+
+                    m_ring.PushBack(point, allocator);
                 }
 
                 multipolygon_type multipolygon_finish() {
-                    rapidjson::Document document;
-                    document.SetObject();
-                    rapidjson::Document::AllocatorType& allocator = document.GetAllocator();
+                    m_document.AddMember("coordinates", m_coordinates, m_document.GetAllocator());
 
-                    document.AddMember("type", "MultiPolygon", allocator);
+                    rapidjson::Document document;
+                    document.CopyFrom(m_document, document.GetAllocator());
                     return document;
                 }
 
