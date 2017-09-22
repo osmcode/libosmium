@@ -263,5 +263,22 @@ TEST_CASE("RapidGeoJSON area geometry") {
         const std::string json = stream.GetString();
         REQUIRE(std::string{"{\"type\":\"MultiPolygon\",\"coordinates\":[[[[0.1,0.1],[9.1,0.1],[9.1,9.1],[0.1,9.1],[0.1,0.1]],[[1.0,1.0],[4.0,1.0],[4.0,4.0],[1.0,4.0],[1.0,1.0]],[[5.0,5.0],[5.0,7.0],[7.0,7.0],[5.0,5.0]]],[[[10.0,10.0],[11.0,10.0],[11.0,11.0],[10.0,11.0],[10.0,10.0]]]]}"} == json);
     }
+}
 
+TEST_CASE("Embedding Geometry in a GeoJSON Feature") {
+    osmium::memory::Buffer buffer{1000};
+    const auto& wnl = create_test_wnl_closed(buffer);
+
+    SECTION("Embedding Polygon") {
+        rapidjson::StringBuffer stream;
+        writer_type writer{stream};
+        osmium::geom::RapidGeoJSONFactory<writer_type> factory{writer};
+
+        writer.StartObject();
+        writer.String("geometry");
+        factory.create_polygon(wnl);
+        writer.EndObject();
+        const std::string json = stream.GetString();
+        REQUIRE(json == "{\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[3.0,3.0],[4.1,4.1],[3.6,4.1],[3.1,3.5],[3.0,3.0]]]}}");
+    }
 }
