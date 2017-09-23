@@ -119,8 +119,8 @@ namespace osmium {
                 return *static_cast<ItemIterator<TMember>*>(this);
             }
 
-            const ItemIterator<TMember> operator++(int) noexcept {
-                ItemIterator<TMember> tmp{*this};
+            ItemIterator<TMember> operator++(int) noexcept {
+                ItemIterator<TMember> tmp(*this);
                 operator++();
                 return tmp;
             }

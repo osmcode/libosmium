@@ -74,8 +74,8 @@ namespace osmium {
                 return *static_cast<CollectionIterator<TMember>*>(this);
             }
 
-            const CollectionIterator<TMember> operator++(int) {
-                CollectionIterator<TMember> tmp{*this};
+            CollectionIterator<TMember> operator++(int) {
+                CollectionIterator<TMember> tmp(*this);
                 operator++();
                 return tmp;
             }

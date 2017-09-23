@@ -104,8 +104,8 @@ namespace osmium {
                 return *this;
             }
 
-            const InputIterator operator++(int) {
-                InputIterator tmp{*this};
+            InputIterator operator++(int) {
+                InputIterator tmp(*this);
                 operator++();
                 return tmp;
             }

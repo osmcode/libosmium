@@ -143,7 +143,7 @@ namespace osmium {
                 return *this;
             }
 
-            const IdSetDenseIterator<T> operator++(int) noexcept {
+            IdSetDenseIterator<T> operator++(int) noexcept {
                 IdSetDenseIterator<T> tmp{*this};
                 operator++();
                 return tmp;
