@@ -37,7 +37,13 @@ DEALINGS IN THE SOFTWARE.
 
 #include <zlib.h>
 
-#include <protozero/types.hpp>
+#include <protozero/version.hpp>
+
+#if PROTOZERO_VERSION_CODE >= 10600
+# include <protozero/data_view.hpp>
+#else
+# include <protozero/types.hpp>
+#endif
 
 #include <osmium/io/error.hpp>
 #include <osmium/util/cast.hpp>
