@@ -128,11 +128,11 @@ namespace osmium {
                     size_t blob_header_datasize = 0;
 
                     while (pbf_blob_header.next()) {
-                        switch (pbf_blob_header.tag()) {
-                            case FileFormat::BlobHeader::required_string_type:
+                        switch (pbf_blob_header.tag_and_type()) {
+                            case protozero::tag_and_type(FileFormat::BlobHeader::required_string_type, protozero::pbf_wire_type::length_delimited):
                                 blob_header_type = pbf_blob_header.get_view();
                                 break;
-                            case FileFormat::BlobHeader::required_int32_datasize:
+                            case protozero::tag_and_type(FileFormat::BlobHeader::required_int32_datasize, protozero::pbf_wire_type::varint):
                                 blob_header_datasize = pbf_blob_header.get_int32();
                                 break;
                             default:
