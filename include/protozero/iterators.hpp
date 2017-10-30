@@ -16,6 +16,7 @@ documentation.
  * @brief Contains the iterators for access to packed repeated fields.
  */
 
+#include <algorithm>
 #include <cstring>
 #include <iterator>
 #include <utility>
@@ -61,8 +62,8 @@ public:
     /**
      * Create iterator range from two iterators.
      *
-     * @param first_iterator Iterator to beginning or range.
-     * @param last_iterator Iterator to end or range.
+     * @param first_iterator Iterator to beginning of range.
+     * @param last_iterator Iterator to end of range.
      */
     constexpr iterator_range(iterator&& first_iterator, iterator&& last_iterator) :
         P(std::forward<iterator>(first_iterator),
@@ -89,9 +90,22 @@ public:
         return this->second;
     }
 
-    /// Return true if this range is empty.
-    constexpr std::size_t empty() const noexcept {
+    /**
+     * Return true if this range is empty.
+     *
+     * Complexity: Constant.
+     */
+    constexpr bool empty() const noexcept {
         return begin() == end();
+    }
+
+    /**
+     * Get the size of the range, ie the number of elements it contains.
+     *
+     * Complexity: Constant or linear depending on the underlaying iterator.
+     */
+    std::size_t size() const noexcept {
+        return T::range_size(begin(), end());
     }
 
     /**
@@ -146,10 +160,7 @@ template <typename T>
 class const_fixed_iterator {
 
     /// Pointer to current iterator position
-    const char* m_data;
-
-    /// Pointer to end iterator position
-    const char* m_end;
+    const char* m_data = nullptr;
 
 public:
 
@@ -159,14 +170,14 @@ public:
     using pointer           = value_type*;
     using reference         = value_type&;
 
-    const_fixed_iterator() noexcept :
-        m_data(nullptr),
-        m_end(nullptr) {
+    static std::size_t range_size(const const_fixed_iterator& begin, const const_fixed_iterator& end) noexcept {
+        return static_cast<std::size_t>(end.m_data - begin.m_data) / sizeof(T);
     }
 
-    const_fixed_iterator(const char* data, const char* end) noexcept :
-        m_data(data),
-        m_end(end) {
+    const_fixed_iterator() noexcept = default;
+
+    explicit const_fixed_iterator(const char* data) noexcept :
+        m_data(data) {
     }
 
     const_fixed_iterator(const const_fixed_iterator&) noexcept = default;
@@ -192,13 +203,13 @@ public:
     }
 
     const_fixed_iterator operator++(int) {
-        const const_fixed_iterator tmp(*this);
+        const const_fixed_iterator tmp{*this};
         ++(*this);
         return tmp;
     }
 
     bool operator==(const const_fixed_iterator& rhs) const noexcept {
-        return m_data == rhs.m_data && m_end == rhs.m_end;
+        return m_data == rhs.m_data;
     }
 
     bool operator!=(const const_fixed_iterator& rhs) const noexcept {
@@ -217,10 +228,10 @@ class const_varint_iterator {
 protected:
 
     /// Pointer to current iterator position
-    const char* m_data;
+    const char* m_data = nullptr;
 
     /// Pointer to end iterator position
-    const char* m_end;
+    const char* m_end = nullptr;
 
 public:
 
@@ -230,10 +241,16 @@ public:
     using pointer           = value_type*;
     using reference         = value_type&;
 
-    const_varint_iterator() noexcept :
-        m_data(nullptr),
-        m_end(nullptr) {
+    static std::size_t range_size(const const_varint_iterator& begin, const const_varint_iterator& end) noexcept {
+        // We know that each varint contains exactly one byte with the most
+        // significant bit not set. We can use this to quickly figure out
+        // how many varints there are without actually decoding the varints.
+        return static_cast<std::size_t>(std::count_if(begin.m_data, end.m_data, [](char c) {
+            return (static_cast<unsigned char>(c) & 0x80) == 0;
+        }));
     }
+
+    const_varint_iterator() noexcept = default;
 
     const_varint_iterator(const char* data, const char* end) noexcept :
         m_data(data),
@@ -259,7 +276,7 @@ public:
     }
 
     const_varint_iterator operator++(int) {
-        const const_varint_iterator tmp(*this);
+        const const_varint_iterator tmp{*this};
         ++(*this);
         return tmp;
     }
@@ -298,10 +315,10 @@ public:
     }
 
     const_svarint_iterator(const const_svarint_iterator&) = default;
-    const_svarint_iterator(const_svarint_iterator&&) = default;
+    const_svarint_iterator(const_svarint_iterator&&) noexcept = default;
 
     const_svarint_iterator& operator=(const const_svarint_iterator&) = default;
-    const_svarint_iterator& operator=(const_svarint_iterator&&) = default;
+    const_svarint_iterator& operator=(const_svarint_iterator&&) noexcept = default;
 
     ~const_svarint_iterator() = default;
 
@@ -316,7 +333,7 @@ public:
     }
 
     const_svarint_iterator operator++(int) {
-        const const_svarint_iterator tmp(*this);
+        const const_svarint_iterator tmp{*this};
         ++(*this);
         return tmp;
     }
