@@ -9,6 +9,7 @@ Libosmium works on Linux, Mac OSX and Windows.
 [![Travis Build Status](https://secure.travis-ci.org/osmcode/libosmium.svg)](https://travis-ci.org/osmcode/libosmium)
 [![Appveyor Build Status](https://ci.appveyor.com/api/projects/status/github/osmcode/libosmium?svg=true)](https://ci.appveyor.com/project/Mapbox/libosmium)
 [![Coverage Status](https://codecov.io/gh/osmcode/libosmium/branch/master/graph/badge.svg)](https://codecov.io/gh/osmcode/libosmium)
+[![Packaging status](https://repology.org/badge/tiny-repos/libosmium.svg)](https://repology.org/metapackage/libosmium)
 
 Please see the [Libosmium manual](http://osmcode.org/libosmium/manual.html)
 for more details than this README can provide.
