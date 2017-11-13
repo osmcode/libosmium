@@ -38,6 +38,7 @@ DEALINGS IN THE SOFTWARE.
 #include <cstdint>
 #include <cstring>
 #include <future>
+#include <limits>
 #include <memory>
 #include <string>
 #include <utility>
@@ -63,7 +64,6 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/types.hpp>
 #include <osmium/osm/way.hpp>
 #include <osmium/thread/util.hpp>
-#include <osmium/util/cast.hpp>
 #include <osmium/util/delta.hpp>
 
 namespace osmium {
@@ -275,6 +275,9 @@ namespace osmium {
                     const char* start = data;
 
                     const auto uid = protozero::decode_varint(&data, end);
+                    if (uid > std::numeric_limits<user_id_type>::max()) {
+                        throw o5m_error{"uid out of range"};
+                    }
 
                     if (data == end) {
                         throw o5m_error{"missing user name"};
@@ -285,7 +288,7 @@ namespace osmium {
                     if (uid == 0 && update_pointer) {
                         m_reference_table.add("\0\0", 2);
                         *dataptr = data;
-                        return std::make_pair(0, "");
+                        return {0, ""};
                     }
 
                     while (*data++) {
@@ -299,7 +302,7 @@ namespace osmium {
                         *dataptr = data;
                     }
 
-                    return std::make_pair(static_cast_with_assert<osmium::user_id_type>(uid), user);
+                    return {static_cast<osmium::user_id_type>(uid), user};
                 }
 
                 void decode_tags(osmium::builder::Builder& parent, const char** dataptr, const char* const end) {
@@ -338,8 +341,13 @@ namespace osmium {
                     if (**dataptr == 0x00) { // no info section
                         ++*dataptr;
                     } else { // has info section
-                        object.set_version(static_cast_with_assert<object_version_type>(protozero::decode_varint(dataptr, end)));
-                        auto timestamp = m_delta_timestamp.update(zvarint(dataptr, end));
+                        const auto version = protozero::decode_varint(dataptr, end);
+                        if (version > std::numeric_limits<object_version_type>::max()) {
+                            throw o5m_error{"object version too large"};
+                        }
+                        object.set_version(static_cast<object_version_type>(version));
+
+                        const auto timestamp = m_delta_timestamp.update(zvarint(dataptr, end));
                         if (timestamp != 0) { // has timestamp
                             object.set_timestamp(timestamp);
                             object.set_changeset(m_delta_changeset.update(zvarint(dataptr, end)));
@@ -438,7 +446,7 @@ namespace osmium {
                         *dataptr = data;
                     }
 
-                    return std::make_pair(member_type, role);
+                    return {member_type, role};
                 }
 
                 void decode_relation(const char* data, const char* const end) {
