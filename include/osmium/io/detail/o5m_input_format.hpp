@@ -137,7 +137,7 @@ namespace osmium {
                     if (m_table.empty() || index == 0 || index > number_of_entries) {
                         throw o5m_error{"reference to non-existing string in table"};
                     }
-                    auto entry = (current_entry + number_of_entries - index) % number_of_entries;
+                    const auto entry = (current_entry + number_of_entries - index) % number_of_entries;
                     return &m_table[entry * entry_size];
                 }
 
@@ -270,11 +270,11 @@ namespace osmium {
                 }
 
                 std::pair<osmium::user_id_type, const char*> decode_user(const char** dataptr, const char* const end) {
-                    bool update_pointer = (**dataptr == 0x00);
+                    const bool update_pointer = (**dataptr == 0x00);
                     const char* data = decode_string(dataptr, end);
                     const char* start = data;
 
-                    auto uid = protozero::decode_varint(&data, end);
+                    const auto uid = protozero::decode_varint(&data, end);
 
                     if (data == end) {
                         throw o5m_error{"missing user name"};
@@ -306,7 +306,7 @@ namespace osmium {
                     osmium::builder::TagListBuilder builder{parent};
 
                     while (*dataptr != end) {
-                        bool update_pointer = (**dataptr == 0x00);
+                        const bool update_pointer = (**dataptr == 0x00);
                         const char* data = decode_string(dataptr, end);
                         const char* start = data;
 
@@ -368,8 +368,8 @@ namespace osmium {
                         builder.set_visible(false);
                         builder.set_location(osmium::Location{});
                     } else {
-                        auto lon = m_delta_lon.update(zvarint(&data, end));
-                        auto lat = m_delta_lat.update(zvarint(&data, end));
+                        const auto lon = m_delta_lon.update(zvarint(&data, end));
+                        const auto lat = m_delta_lat.update(zvarint(&data, end));
                         builder.set_location(osmium::Location{lon, lat});
 
                         if (data != end) {
@@ -389,7 +389,7 @@ namespace osmium {
                         // no reference section, object is deleted
                         builder.set_visible(false);
                     } else {
-                        auto reference_section_length = protozero::decode_varint(&data, end);
+                        const auto reference_section_length = protozero::decode_varint(&data, end);
                         if (reference_section_length > 0) {
                             const char* const end_refs = data + reference_section_length;
                             if (end_refs > end) {
@@ -417,7 +417,7 @@ namespace osmium {
                 }
 
                 std::pair<osmium::item_type, const char*> decode_role(const char** dataptr, const char* const end) {
-                    bool update_pointer = (**dataptr == 0x00);
+                    const bool update_pointer = (**dataptr == 0x00);
                     const char* data = decode_string(dataptr, end);
                     const char* start = data;
 
@@ -452,7 +452,7 @@ namespace osmium {
                         // no reference section, object is deleted
                         builder.set_visible(false);
                     } else {
-                        auto reference_section_length = protozero::decode_varint(&data, end);
+                        const auto reference_section_length = protozero::decode_varint(&data, end);
                         if (reference_section_length > 0) {
                             const char* const end_refs = data + reference_section_length;
                             if (end_refs > end) {
@@ -480,23 +480,23 @@ namespace osmium {
                 }
 
                 void decode_bbox(const char* data, const char* const end) {
-                    auto sw_lon = zvarint(&data, end);
-                    auto sw_lat = zvarint(&data, end);
-                    auto ne_lon = zvarint(&data, end);
-                    auto ne_lat = zvarint(&data, end);
+                    const auto sw_lon = zvarint(&data, end);
+                    const auto sw_lat = zvarint(&data, end);
+                    const auto ne_lon = zvarint(&data, end);
+                    const auto ne_lat = zvarint(&data, end);
 
                     m_header.add_box(osmium::Box{osmium::Location{sw_lon, sw_lat},
                                                  osmium::Location{ne_lon, ne_lat}});
                 }
 
                 void decode_timestamp(const char* data, const char* const end) {
-                    auto timestamp = osmium::Timestamp(zvarint(&data, end)).to_iso();
+                    const auto timestamp = osmium::Timestamp(zvarint(&data, end)).to_iso();
                     m_header.set("o5m_timestamp", timestamp);
                     m_header.set("timestamp", timestamp);
                 }
 
                 void flush() {
-                    osmium::memory::Buffer buffer(buffer_size);
+                    osmium::memory::Buffer buffer{buffer_size};
                     using std::swap;
                     swap(m_buffer, buffer);
                     send_to_output_queue(std::move(buffer));
