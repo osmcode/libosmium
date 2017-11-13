@@ -169,7 +169,7 @@ namespace osmium {
              * @returns the number of bytes read
              * @throws std::system_error On error.
              */
-            inline ssize_t reliable_read(const int fd, char* input_buffer, const size_t size) {
+            inline int64_t reliable_read(const int fd, char* input_buffer, const unsigned int size) {
                 int64_t nread = 0;
 
                 do {
