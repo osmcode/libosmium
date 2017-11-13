@@ -516,7 +516,7 @@ namespace osmium {
                         case context::ignored_changeset:
                             break;
                         case context::in_object:
-                            assert(false); // should never be here
+                            throw xml_error{"xml file nested too deep"};
                             break;
                     }
                 }
