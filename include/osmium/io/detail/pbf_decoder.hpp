@@ -248,7 +248,7 @@ namespace osmium {
                     }
                 }
 
-                int32_t convert_pbf_coordinate(int64_t c) const {
+                int32_t convert_pbf_coordinate(int64_t c) const noexcept {
                     return int32_t((c * m_granularity + m_lon_offset) / resolution_convert);
                 }
 

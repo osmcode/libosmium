@@ -185,12 +185,12 @@ namespace osmium {
                     pbf_blob_header.add_string(FileFormat::BlobHeader::required_string_type, m_blob_type == pbf_blob_type::data ? "OSMData" : "OSMHeader");
                     pbf_blob_header.add_int32(FileFormat::BlobHeader::required_int32_datasize, static_cast_with_assert<int32_t>(blob_data.size()));
 
-                    #ifndef _WIN32
+#ifndef _WIN32
                     const uint32_t sz = htonl(static_cast_with_assert<uint32_t>(blob_header_data.size()));
-                    #else
+#else
                     uint32_t sz = static_cast_with_assert<uint32_t>(blob_header_data.size());
                     protozero::detail::byteswap_inplace(&sz);
-                    #endif
+#endif
 
                     // write to output: the 4-byte BlobHeader-Size followed by the BlobHeader followed by the Blob
                     std::string output;
@@ -274,7 +274,7 @@ namespace osmium {
                     m_delta_lon.clear();
                 }
 
-                std::size_t size() const {
+                std::size_t size() const noexcept {
                     return m_ids.size() * 3 * sizeof(int64_t);
                 }
 
@@ -372,7 +372,7 @@ namespace osmium {
                     }
                 }
 
-                protozero::pbf_builder<OSMFormat::PrimitiveGroup>& group() {
+                protozero::pbf_builder<OSMFormat::PrimitiveGroup>& group() noexcept {
                     ++m_count;
                     return m_pbf_primitive_group;
                 }
@@ -386,15 +386,15 @@ namespace osmium {
                     return m_stringtable.add(s);
                 }
 
-                int count() const {
+                int count() const noexcept {
                     return m_count;
                 }
 
-                OSMFormat::PrimitiveGroup type() const {
+                OSMFormat::PrimitiveGroup type() const noexcept {
                     return m_type;
                 }
 
-                std::size_t size() const {
+                std::size_t size() const noexcept {
                     return m_pbf_primitive_group_data.size() + m_stringtable.size() + m_dense_nodes.size();
                 }
 
@@ -406,7 +406,7 @@ namespace osmium {
                  */
                 constexpr static std::size_t max_used_blob_size = max_uncompressed_blob_size * 95 / 100;
 
-                bool can_add(OSMFormat::PrimitiveGroup type) const {
+                bool can_add(OSMFormat::PrimitiveGroup type) const noexcept {
                     if (type != m_type) {
                         return false;
                     }

@@ -649,7 +649,7 @@ namespace osmium {
                 void run() final {
                     osmium::thread::set_thread_name("_osmium_xml_in");
 
-                    ExpatXMLParser<XMLParser> parser(this);
+                    ExpatXMLParser<XMLParser> parser{this};
 
                     while (!input_done()) {
                         const std::string data{get_input()};
