@@ -63,7 +63,6 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/timestamp.hpp>
 #include <osmium/osm/types.hpp>
 #include <osmium/osm/way.hpp>
-#include <osmium/util/cast.hpp>
 #include <osmium/util/delta.hpp>
 
 namespace osmium {
@@ -198,7 +197,7 @@ namespace osmium {
                                     if (version < 0) {
                                         throw osmium::pbf_error{"object version must not be negative"};
                                     }
-                                    object.set_version(static_cast_with_assert<object_version_type>(version));
+                                    object.set_version(static_cast<object_version_type>(version));
                                 }
                                 break;
                             case protozero::tag_and_type(OSMFormat::Info::optional_int64_timestamp, protozero::pbf_wire_type::varint):
@@ -207,10 +206,10 @@ namespace osmium {
                             case protozero::tag_and_type(OSMFormat::Info::optional_int64_changeset, protozero::pbf_wire_type::varint):
                                 {
                                     const auto changeset_id = pbf_info.get_int64();
-                                    if (changeset_id < 0) {
-                                        throw osmium::pbf_error{"object changeset_id must not be negative"};
+                                    if (changeset_id < 0 || changeset_id >= std::numeric_limits<changeset_id_type>::max()) {
+                                        throw osmium::pbf_error{"object changeset_id must be between 0 and 2^32-1"};
                                     }
-                                    object.set_changeset(static_cast_with_assert<changeset_id_type>(changeset_id));
+                                    object.set_changeset(static_cast<changeset_id_type>(changeset_id));
                                 }
                                 break;
                             case protozero::tag_and_type(OSMFormat::Info::optional_int32_uid, protozero::pbf_wire_type::varint):
@@ -642,8 +641,8 @@ namespace osmium {
 
                             const auto changeset_id = dense_changeset.update(changesets.front());
                             changesets.drop_front();
-                            if (changeset_id < 0) {
-                                throw osmium::pbf_error{"object changeset_id must not be negative"};
+                            if (changeset_id < 0 || changeset_id >= std::numeric_limits<changeset_id_type>::max()) {
+                                throw osmium::pbf_error{"object changeset_id must be between 0 and 2^32-1"};
                             }
                             node.set_changeset(static_cast<osmium::changeset_id_type>(changeset_id));
 
