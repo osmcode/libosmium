@@ -132,10 +132,14 @@ namespace osmium {
                     if (write_count > max_write) {
                         write_count = max_write;
                     }
-                    const auto length = ::write(fd, output_buffer + offset, static_cast<unsigned int>(write_count));
-                    if (length < 0) {
-                        throw std::system_error{errno, std::system_category(), "Write failed"};
-                    }
+
+                    int64_t length = 0;
+                    do {
+                        length = ::write(fd, output_buffer + offset, static_cast<unsigned int>(write_count));
+                        if (length < 0 && errno != EINTR) {
+                            throw std::system_error{errno, std::system_category(), "Write failed"};
+                        }
+                    } while (length < 0);
                     offset += static_cast<size_t>(length);
                 } while (offset < size);
             }
@@ -152,6 +156,30 @@ namespace osmium {
              */
             inline void reliable_write(const int fd, const char* output_buffer, const size_t size) {
                 reliable_write(fd, reinterpret_cast<const unsigned char*>(output_buffer), size);
+            }
+
+            /**
+             * Reads a maximum of size bytes from the file descriptor into the
+             * input_buffer. This is just a wrapper around read(2) catching
+             * errors.
+             *
+             * @param fd File descriptor.
+             * @param input_buffer Buffer for data to be read. Must be at least size bytes long.
+             * @param size Maximum number of bytes to read.
+             * @returns the number of bytes read
+             * @throws std::system_error On error.
+             */
+            inline ssize_t reliable_read(const int fd, char* input_buffer, const size_t size) {
+                int64_t nread = 0;
+
+                do {
+                    nread = ::read(fd, input_buffer, size);
+                    if (nread < 0 && errno != EINTR) {
+                        throw std::system_error{errno, std::system_category(), "Read failed"};
+                    }
+                } while (nread < 0);
+
+                return nread;
             }
 
             inline void reliable_fsync(const int fd) {

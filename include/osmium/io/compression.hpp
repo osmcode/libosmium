@@ -290,10 +290,7 @@ namespace osmium {
                     }
                 } else {
                     buffer.resize(osmium::io::Decompressor::input_buffer_size);
-                    const auto nread = ::read(m_fd, const_cast<char*>(buffer.data()), osmium::io::Decompressor::input_buffer_size);
-                    if (nread < 0) {
-                        throw std::system_error{errno, std::system_category(), "Read failed"};
-                    }
+                    const auto nread = detail::reliable_read(m_fd, const_cast<char*>(buffer.data()), osmium::io::Decompressor::input_buffer_size);
                     buffer.resize(std::string::size_type(nread));
                 }
 
