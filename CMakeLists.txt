@@ -402,21 +402,22 @@ if(BUILD_HEADERS)
     file(MAKE_DIRECTORY header_check)
 
     foreach(hpp ${ALL_HPPS})
-        string(REPLACE ".hpp" "" tmp ${hpp})
-        string(REPLACE "/" "__" libname ${tmp})
+        if(GDAL_FOUND OR NOT ("${hpp}" STREQUAL "osmium/area/problem_reporter_ogr.hpp") OR ("${hpp}" STREQUAL "osmium/geom/ogr.hpp"))
+            string(REPLACE ".hpp" "" tmp ${hpp})
+            string(REPLACE "/" "__" libname ${tmp})
 
-        # Create a dummy .cpp file that includes the header file we want to
-        # check.
-        set(DUMMYCPP ${CMAKE_BINARY_DIR}/header_check/${libname}.cpp)
-        file(WRITE ${DUMMYCPP} "#include <${hpp}> // IWYU pragma: keep\n")
+            # Create a dummy .cpp file that includes the header file we want to
+            # check.
+            set(DUMMYCPP ${CMAKE_BINARY_DIR}/header_check/${libname}.cpp)
+            file(WRITE ${DUMMYCPP} "#include <${hpp}> // IWYU pragma: keep\n")
 
-        # There is no way in CMake to just compile but not link a C++ file,
-        # so we pretend to build a library here.
-        add_library(${libname} STATIC ${DUMMYCPP} include/${hpp})
+            # There is no way in CMake to just compile but not link a C++ file,
+            # so we pretend to build a library here.
+            add_library(${libname} STATIC ${DUMMYCPP} include/${hpp})
 
-        #### this is better but only supported from cmake 3.0:
-        ###add_library(${libname} OBJECT ${DUMMYCPP} include/${hpp})
-
+            #### this is better but only supported from cmake 3.0:
+            ###add_library(${libname} OBJECT ${DUMMYCPP} include/${hpp})
+        endif()
     endforeach()
 endif()
 
