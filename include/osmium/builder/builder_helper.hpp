@@ -103,7 +103,7 @@ namespace osmium {
          * @deprecated
          * Use osmium::builder::add_tag_list() instead.
          */
-        OSMIUM_DEPRECATED inline const osmium::TagList& build_tag_list_from_func(osmium::memory::Buffer& buffer, std::function<void(osmium::builder::TagListBuilder&)> func) {
+        OSMIUM_DEPRECATED inline const osmium::TagList& build_tag_list_from_func(osmium::memory::Buffer& buffer, const std::function<void(osmium::builder::TagListBuilder&)>& func) {
             const size_t pos = buffer.committed();
             {
                 osmium::builder::TagListBuilder tl_builder(buffer);

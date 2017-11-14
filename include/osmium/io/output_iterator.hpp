@@ -90,7 +90,8 @@ namespace osmium {
             }
 
             OutputIterator& operator=(const osmium::DiffObject& diff) {
-                return this->operator=(diff.curr());
+                this->operator=(diff.curr());
+                return *this;
             }
 
             OutputIterator& operator*() noexcept {
@@ -105,7 +106,7 @@ namespace osmium {
                 return *this;
             }
 
-            OutputIterator operator++(int) noexcept {
+            OutputIterator operator++(int) const noexcept {
                 return *this;
             }
 
