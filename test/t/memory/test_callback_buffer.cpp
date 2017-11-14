@@ -5,7 +5,7 @@
 #include <osmium/builder/attr.hpp>
 #include <osmium/memory/callback_buffer.hpp>
 
-using namespace osmium::builder::attr;
+using namespace osmium::builder::attr; // NOLINT clang-tidy: google-build-using-namespace
 
 TEST_CASE("Callback buffer") {
     osmium::memory::CallbackBuffer cb;

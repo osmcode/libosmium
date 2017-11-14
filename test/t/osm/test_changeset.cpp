@@ -6,7 +6,7 @@
 #include <osmium/osm/changeset.hpp>
 #include <osmium/osm/crc.hpp>
 
-using namespace osmium::builder::attr;
+using namespace osmium::builder::attr; // NOLINT clang-tidy: google-build-using-namespace
 
 TEST_CASE("Build changeset") {
     osmium::memory::Buffer buffer{10 * 1000};

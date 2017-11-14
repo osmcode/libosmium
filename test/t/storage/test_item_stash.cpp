@@ -7,7 +7,7 @@
 #include <osmium/storage/item_stash.hpp>
 
 osmium::memory::Buffer generate_test_data() {
-    using namespace osmium::builder::attr;
+    using namespace osmium::builder::attr; // NOLINT clang-tidy: google-build-using-namespace
 
     osmium::memory::Buffer buffer{1024 * 1024, osmium::memory::Buffer::auto_grow::yes};
 

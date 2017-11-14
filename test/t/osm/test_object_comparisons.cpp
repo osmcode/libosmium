@@ -9,7 +9,7 @@
 #include <osmium/osm.hpp>
 #include <osmium/osm/object_comparisons.hpp>
 
-using namespace osmium::builder::attr;
+using namespace osmium::builder::attr; // NOLINT clang-tidy: google-build-using-namespace
 
 TEST_CASE("Object ID comparisons") {
     osmium::object_id_type a =   0;

@@ -7,7 +7,7 @@
 #include <osmium/osm/object_comparisons.hpp>
 #include <osmium/visitor.hpp>
 
-using namespace osmium::builder::attr;
+using namespace osmium::builder::attr; // NOLINT clang-tidy: google-build-using-namespace
 
 TEST_CASE("Create ObjectPointerCollection") {
     osmium::memory::Buffer buffer{1024, osmium::memory::Buffer::auto_grow::yes};

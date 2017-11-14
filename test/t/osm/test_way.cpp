@@ -7,7 +7,7 @@
 #include <osmium/osm/crc.hpp>
 #include <osmium/osm/way.hpp>
 
-using namespace osmium::builder::attr;
+using namespace osmium::builder::attr; // NOLINT clang-tidy: google-build-using-namespace
 
 TEST_CASE("Build way") {
     osmium::memory::Buffer buffer{10000};

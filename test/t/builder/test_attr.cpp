@@ -15,7 +15,7 @@
 
 TEST_CASE("create node using builders") {
 
-    using namespace osmium::builder::attr;
+    using namespace osmium::builder::attr; // NOLINT clang-tidy: google-build-using-namespace
 
     osmium::memory::Buffer buffer{1024 * 10};
 
@@ -105,7 +105,7 @@ TEST_CASE("create node using builders") {
 
 TEST_CASE("create node with tags using builders") {
 
-    using namespace osmium::builder::attr;
+    using namespace osmium::builder::attr; // NOLINT clang-tidy: google-build-using-namespace
 
     osmium::memory::Buffer buffer{1024 * 10};
 
@@ -230,7 +230,7 @@ TEST_CASE("create node with tags using builders") {
 
 TEST_CASE("create way using builders") {
 
-    using namespace osmium::builder::attr;
+    using namespace osmium::builder::attr; // NOLINT clang-tidy: google-build-using-namespace
 
     osmium::memory::Buffer buffer{1024 * 10};
 
@@ -265,7 +265,7 @@ TEST_CASE("create way with nodes") {
         { 8, osmium::Location{8.8, 0.8} }
     };
 
-    using namespace osmium::builder::attr;
+    using namespace osmium::builder::attr; // NOLINT clang-tidy: google-build-using-namespace
 
     osmium::memory::Buffer wbuffer{1024 * 10};
     osmium::builder::add_way(wbuffer,
@@ -386,7 +386,7 @@ TEST_CASE("create way with nodes") {
 
 TEST_CASE("create relation using builders") {
 
-    using namespace osmium::builder::attr;
+    using namespace osmium::builder::attr; // NOLINT clang-tidy: google-build-using-namespace
 
     osmium::memory::Buffer buffer{1024 * 10};
 
@@ -546,7 +546,7 @@ TEST_CASE("create relation using builders") {
 
 TEST_CASE("create area using builders") {
 
-    using namespace osmium::builder::attr;
+    using namespace osmium::builder::attr; // NOLINT clang-tidy: google-build-using-namespace
 
     osmium::memory::Buffer buffer{1024 * 10};
 

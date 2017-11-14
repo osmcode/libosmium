@@ -8,7 +8,7 @@
 #include <osmium/memory/buffer.hpp>
 #include <osmium/osm/tag.hpp>
 
-using namespace osmium::builder::attr;
+using namespace osmium::builder::attr; // NOLINT clang-tidy: google-build-using-namespace
 
 TEST_CASE("create tag list") {
     osmium::memory::Buffer buffer{10240};
