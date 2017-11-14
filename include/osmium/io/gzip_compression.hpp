@@ -53,9 +53,9 @@ DEALINGS IN THE SOFTWARE.
 #include <zlib.h>
 
 #include <osmium/io/compression.hpp>
+#include <osmium/io/detail/read_write.hpp>
 #include <osmium/io/error.hpp>
 #include <osmium/io/file_compression.hpp>
-#include <osmium/io/detail/read_write.hpp>
 #include <osmium/io/writer_options.hpp>
 #include <osmium/util/cast.hpp>
 #include <osmium/util/compatibility.hpp>

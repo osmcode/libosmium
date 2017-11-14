@@ -16,6 +16,12 @@
 
 */
 
+#include <osmium/handler.hpp>
+#include <osmium/handler/node_locations_for_ways.hpp>
+#include <osmium/index/map/all.hpp>
+#include <osmium/io/any_input.hpp>
+#include <osmium/visitor.hpp>
+
 #include <algorithm>
 #include <chrono>
 #include <cmath>
@@ -23,13 +29,6 @@
 #include <iostream>
 #include <limits>
 #include <string>
-
-#include <osmium/index/map/all.hpp>
-#include <osmium/handler/node_locations_for_ways.hpp>
-#include <osmium/visitor.hpp>
-
-#include <osmium/io/any_input.hpp>
-#include <osmium/handler.hpp>
 
 using static_index_type = osmium::index::map::SparseMemArray<osmium::unsigned_object_id_type, osmium::Location>;
 const std::string location_store{"sparse_mem_array"};

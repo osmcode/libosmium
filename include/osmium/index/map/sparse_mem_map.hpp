@@ -33,15 +33,15 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <osmium/index/index.hpp>
+#include <osmium/index/map.hpp>
+#include <osmium/io/detail/read_write.hpp>
+
 #include <algorithm> // IWYU pragma: keep (for std::copy)
 #include <cstddef>
 #include <iterator>
 #include <map>
 #include <vector>
-
-#include <osmium/index/map.hpp>
-#include <osmium/index/index.hpp>
-#include <osmium/io/detail/read_write.hpp>
 
 #define OSMIUM_HAS_INDEX_MAP_SPARSE_MEM_MAP
 

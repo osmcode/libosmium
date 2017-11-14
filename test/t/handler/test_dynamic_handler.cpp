@@ -1,7 +1,7 @@
 #include "catch.hpp"
 
-#include <osmium/dynamic_handler.hpp>
 #include <osmium/builder/attr.hpp>
+#include <osmium/dynamic_handler.hpp>
 #include <osmium/visitor.hpp>
 
 struct Handler1 : public osmium::handler::Handler {

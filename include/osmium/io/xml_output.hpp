@@ -41,7 +41,7 @@ DEALINGS IN THE SOFTWARE.
  * @attention If you include this file, you'll need to enable multithreading.
  */
 
-#include <osmium/io/writer.hpp> // IWYU pragma: export
 #include <osmium/io/detail/xml_output_format.hpp> // IWYU pragma: export
+#include <osmium/io/writer.hpp> // IWYU pragma: export
 
 #endif // OSMIUM_IO_XML_OUTPUT_HPP

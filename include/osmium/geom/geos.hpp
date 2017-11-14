@@ -72,8 +72,8 @@ DEALINGS IN THE SOFTWARE.
 #include <geos/geom/PrecisionModel.h>
 #include <geos/util/GEOSException.h>
 
-#include <osmium/geom/factory.hpp>
 #include <osmium/geom/coordinates.hpp>
+#include <osmium/geom/factory.hpp>
 #include <osmium/util/compatibility.hpp>
 
 // MSVC doesn't support throw_with_nested yet

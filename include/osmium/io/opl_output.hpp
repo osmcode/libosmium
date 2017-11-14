@@ -33,7 +33,7 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <osmium/io/writer.hpp> // IWYU pragma: export
 #include <osmium/io/detail/opl_output_format.hpp> // IWYU pragma: export
+#include <osmium/io/writer.hpp> // IWYU pragma: export
 
 #endif // OSMIUM_IO_OPL_OUTPUT_HPP

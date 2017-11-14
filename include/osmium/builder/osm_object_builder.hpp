@@ -33,18 +33,6 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <algorithm>
-#include <cassert>
-#include <cstdint>
-#include <cstddef>
-#include <cstring>
-#include <initializer_list>
-#include <limits>
-#include <new>
-#include <stdexcept>
-#include <string>
-#include <utility>
-
 #include <osmium/builder/builder.hpp>
 #include <osmium/memory/item.hpp>
 #include <osmium/osm/area.hpp>
@@ -62,6 +50,18 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/way.hpp>
 #include <osmium/util/cast.hpp>
 #include <osmium/util/compatibility.hpp>
+
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <initializer_list>
+#include <limits>
+#include <new>
+#include <stdexcept>
+#include <string>
+#include <utility>
 
 namespace osmium {
 

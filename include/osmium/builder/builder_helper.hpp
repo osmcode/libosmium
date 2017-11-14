@@ -33,15 +33,15 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <cstddef>
-#include <initializer_list>
-#include <functional>
-#include <map>
-#include <utility>
-
 #include <osmium/builder/osm_object_builder.hpp>
 #include <osmium/memory/buffer.hpp>
 #include <osmium/util/compatibility.hpp>
+
+#include <cstddef>
+#include <functional>
+#include <initializer_list>
+#include <map>
+#include <utility>
 
 namespace osmium {
 

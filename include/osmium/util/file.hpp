@@ -37,17 +37,17 @@ DEALINGS IN THE SOFTWARE.
 #include <cstddef>
 #include <cstdio>
 #include <string>
-#include <system_error>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <system_error>
 
 #ifdef _WIN32
 #  ifndef WIN32_LEAN_AND_MEAN
 #   define WIN32_LEAN_AND_MEAN // Prevent winsock.h inclusion; avoid winsock2.h conflict
 #  endif
+# include <crtdbg.h>
 # include <io.h>
 # include <windows.h>
-# include <crtdbg.h>
 #endif
 
 #ifndef _MSC_VER

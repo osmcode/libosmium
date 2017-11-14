@@ -34,6 +34,8 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <osmium/index/map.hpp> // IWYU pragma: keep
+#include <osmium/osm/location.hpp>
+#include <osmium/osm/types.hpp>
 
 #define OSMIUM_WANT_NODE_LOCATION_MAPS
 

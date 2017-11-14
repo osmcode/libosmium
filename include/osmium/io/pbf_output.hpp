@@ -42,7 +42,7 @@ DEALINGS IN THE SOFTWARE.
  *            `libz`, and enable multithreading.
  */
 
-#include <osmium/io/writer.hpp> // IWYU pragma: export
 #include <osmium/io/detail/pbf_output_format.hpp> // IWYU pragma: export
+#include <osmium/io/writer.hpp> // IWYU pragma: export
 
 #endif // OSMIUM_IO_PBF_OUTPUT_HPP

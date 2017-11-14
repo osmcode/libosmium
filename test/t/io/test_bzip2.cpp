@@ -1,9 +1,9 @@
 #include "catch.hpp"
 #include "utils.hpp"
 
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <fcntl.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 #include <osmium/io/bzip2_compression.hpp>
 

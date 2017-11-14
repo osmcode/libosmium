@@ -39,7 +39,7 @@ DEALINGS IN THE SOFTWARE.
  * Include this file if you want to read OSM o5m and o5c files.
  */
 
-#include <osmium/io/reader.hpp> // IWYU pragma: export
 #include <osmium/io/detail/o5m_input_format.hpp> // IWYU pragma: export
+#include <osmium/io/reader.hpp> // IWYU pragma: export
 
 #endif // OSMIUM_IO_O5M_INPUT_HPP

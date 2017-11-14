@@ -4,9 +4,9 @@
 #include <algorithm>
 
 #include <osmium/io/any_compression.hpp>
+#include <osmium/io/output_iterator.hpp>
 #include <osmium/io/xml_input.hpp>
 #include <osmium/io/xml_output.hpp>
-#include <osmium/io/output_iterator.hpp>
 #include <osmium/memory/buffer.hpp>
 
 TEST_CASE("Writer") {

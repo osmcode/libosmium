@@ -33,16 +33,16 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <osmium/area/detail/node_ref_segment.hpp>
+#include <osmium/osm/location.hpp>
+#include <osmium/osm/node_ref.hpp>
+
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
 #include <iostream>
 #include <set>
 #include <vector>
-
-#include <osmium/osm/location.hpp>
-#include <osmium/osm/node_ref.hpp>
-#include <osmium/area/detail/node_ref_segment.hpp>
 
 namespace osmium {
 

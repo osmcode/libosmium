@@ -42,7 +42,7 @@ DEALINGS IN THE SOFTWARE.
  *            `libexpat`, and enable multithreading.
  */
 
-#include <osmium/io/reader.hpp> // IWYU pragma: export
 #include <osmium/io/detail/xml_input_format.hpp> // IWYU pragma: export
+#include <osmium/io/reader.hpp> // IWYU pragma: export
 
 #endif // OSMIUM_IO_XML_INPUT_HPP

@@ -3,8 +3,8 @@
 #include <boost/crc.hpp>
 
 #include <osmium/builder/attr.hpp>
-#include <osmium/osm/crc.hpp>
 #include <osmium/osm/area.hpp>
+#include <osmium/osm/crc.hpp>
 
 using namespace osmium::builder::attr;
 

@@ -4,9 +4,9 @@
 
 #include <boost/crc.hpp>
 
+#include <osmium/geom/relations.hpp>
 #include <osmium/osm/box.hpp>
 #include <osmium/osm/crc.hpp>
-#include <osmium/geom/relations.hpp>
 
 TEST_CASE("Default constructor creates invalid box") {
     const osmium::Box b;

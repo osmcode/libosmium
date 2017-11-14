@@ -1,15 +1,13 @@
 
 #include "catch.hpp"
 
-#include <osmium/osm/types.hpp>
-#include <osmium/osm/location.hpp>
 #include <osmium/index/detail/tmpfile.hpp>
-#include <osmium/util/file.hpp>
-
 #include <osmium/index/map/dense_file_array.hpp>
 #include <osmium/index/map/sparse_file_array.hpp>
-
 #include <osmium/index/node_locations_map.hpp>
+#include <osmium/osm/location.hpp>
+#include <osmium/osm/types.hpp>
+#include <osmium/util/file.hpp>
 
 TEST_CASE("File based dense index") {
     const int fd = osmium::detail::create_tmp_file();

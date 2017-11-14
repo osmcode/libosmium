@@ -1,8 +1,8 @@
 #include "catch.hpp"
 
-#include <osmium/io/xml_output.hpp>
 #include <osmium/io/output_iterator.hpp>
 #include <osmium/io/writer.hpp>
+#include <osmium/io/xml_output.hpp>
 
 TEST_CASE("Output iterator should be copy constructable") {
     const osmium::io::Header header;

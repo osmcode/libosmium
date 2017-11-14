@@ -33,15 +33,15 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <osmium/io/error.hpp>
+#include <osmium/io/file_compression.hpp>
+#include <osmium/io/file_format.hpp>
+#include <osmium/util/options.hpp>
+
 #include <cstddef>
 #include <sstream>
 #include <string>
 #include <vector>
-
-#include <osmium/io/error.hpp>
-#include <osmium/io/file_format.hpp>
-#include <osmium/io/file_compression.hpp>
-#include <osmium/util/options.hpp>
 
 namespace osmium {
 

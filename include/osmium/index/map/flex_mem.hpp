@@ -33,14 +33,14 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <osmium/index/index.hpp>
+#include <osmium/index/map.hpp>
+
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>
 #include <utility>
 #include <vector>
-
-#include <osmium/index/map.hpp>
-#include <osmium/index/index.hpp>
 
 #define OSMIUM_HAS_INDEX_MAP_FLEX_MEM
 

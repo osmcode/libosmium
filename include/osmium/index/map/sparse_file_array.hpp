@@ -33,12 +33,12 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <string>
-#include <vector>
-
+#include <osmium/index/detail/create_map_with_fd.hpp>
 #include <osmium/index/detail/mmap_vector_file.hpp>
 #include <osmium/index/detail/vector_map.hpp>
-#include <osmium/index/detail/create_map_with_fd.hpp>
+
+#include <string>
+#include <vector>
 
 #define OSMIUM_HAS_INDEX_MAP_SPARSE_FILE_ARRAY
 

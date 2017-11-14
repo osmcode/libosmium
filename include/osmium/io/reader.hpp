@@ -53,9 +53,9 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/io/compression.hpp>
 #include <osmium/io/detail/input_format.hpp>
+#include <osmium/io/detail/queue_util.hpp>
 #include <osmium/io/detail/read_thread.hpp>
 #include <osmium/io/detail/read_write.hpp>
-#include <osmium/io/detail/queue_util.hpp>
 #include <osmium/io/error.hpp>
 #include <osmium/io/file.hpp>
 #include <osmium/io/header.hpp>

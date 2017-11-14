@@ -33,8 +33,8 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <osmium/io/reader.hpp>
 #include <osmium/io/input_iterator.hpp>
+#include <osmium/io/reader.hpp>
 
 namespace std {
 

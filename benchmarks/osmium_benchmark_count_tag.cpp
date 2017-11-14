@@ -4,14 +4,14 @@
 
 */
 
+#include <osmium/handler.hpp>
+#include <osmium/io/any_input.hpp>
+#include <osmium/visitor.hpp>
+
 #include <cstdint>
 #include <cstdlib>
 #include <iostream>
 #include <string>
-
-#include <osmium/io/any_input.hpp>
-#include <osmium/handler.hpp>
-#include <osmium/visitor.hpp>
 
 struct CountHandler : public osmium::handler::Handler {
 
