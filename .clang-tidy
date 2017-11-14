@@ -1,0 +1,37 @@
+---
+Checks: '*,-cert-dcl21-cpp,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-cppcoreguidelines-pro-type-reinterpret-cast,-google-runtime-references,-modernize-make-unique,-readability-avoid-const-params-in-decls,-readability-implicit-bool-cast'
+#
+#  For a list of check options, see:
+#  http://clang.llvm.org/extra/clang-tidy/checks/list.html
+#
+#  Disabled checks:
+#
+#  cert-dcl21-cpp
+#    It is unclear whether this is still a good recommendation in modern C++.
+#
+#  cppcoreguidelines-pro-bounds-pointer-arithmetic
+#    This is a low-level library, it needs to do pointer arithmetic.
+#
+#  cppcoreguidelines-pro-bounds-array-to-pointer-decay
+#    Limited use and many false positives including for all asserts
+#
+#  cppcoreguidelines-pro-type-reinterpret-cast
+#    This is a low-level library, it needs to do reinterpret-casts.
+#
+#  google-runtime-references
+#    This is just a matter of preference, and we can't change the interfaces
+#    now anyways.
+#
+#  modernize-make-unique
+#    This is a C++11 library and C++ doesn't have std::make_unique.
+#
+#  readability-avoid-const-params-in-decls
+#    This is header only library, so the declaration and implementation are
+#    often the same and we want to have the const in implementations.
+#
+#  readability-implicit-bool-cast
+#    I don't think this makes the code more readable.
+#
+#WarningsAsErrors: '*'
+HeaderFilterRegex: '\/include\/osmium\/.*'
+...

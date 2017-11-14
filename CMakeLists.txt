@@ -428,10 +428,10 @@ endif()
 #
 #-----------------------------------------------------------------------------
 message(STATUS "Looking for clang-tidy")
-find_program(CLANG_TIDY NAMES clang-tidy clang-tidy-5.0 clang-tidy-4.0 clang-tidy-3.9 clang-tidy-3.8 clang-tidy-3.7)
+find_program(CLANG_TIDY NAMES clang-tidy clang-tidy-5.0)
 
 if(CLANG_TIDY)
-    message(STATUS "Looking for clang-tidy - found")
+    message(STATUS "Looking for clang-tidy - found ${CLANG_TIDY}")
 
     if(BUILD_EXAMPLES)
         file(GLOB CT_ALL_EXAMPLES examples/*.cpp)
@@ -468,47 +468,9 @@ if(CLANG_TIDY)
         ${CT_ALL_BENCHMARKS}
         ${CT_ALL_DATA_TESTS})
 
-    # For a list of check options, see:
-    # http://clang.llvm.org/extra/clang-tidy/checks/list.html
-
-    list(APPEND CT_CHECKS "cert-*"
-                         "-cert-err60-cpp") # even the std lib doesn't do this
-
-    # disabled, because it is slow
-#    list(APPEND CT_CHECKS "clang-analyzer-*")
-
-    list(APPEND CT_CHECKS "google-*"
-                         "-google-build-using-namespace"
-                         "-google-explicit-constructor"
-                         "-google-readability-casting"
-                         "-google-readability-function"
-                         "-google-runtime-references")
-
-    list(APPEND CT_CHECKS "llvm-*"
-                         "-llvm-include-order")
-
-    list(APPEND CT_CHECKS "misc-*"
-                         "-misc-argument-comment"
-                         "-misc-macro-parentheses"
-                         "-misc-unused-parameters")
-
-    list(APPEND CT_CHECKS "modernize-*"
-                          "-modernize-make-unique") # not available in C++11
-
-    list(APPEND CT_CHECKS "readability-*"
-                         "-readability-avoid-const-params-in-decls"
-                         "-readability-identifier-naming"
-                         "-readability-implicit-bool-cast"
-                         "-readability-named-parameter"
-                         "-readability-redundant-member-init")
-
-    string(REPLACE ";" "," ALL_CHECKS "${CT_CHECKS}")
-
     add_custom_target(clang-tidy
         ${CLANG_TIDY}
         -p ${CMAKE_BINARY_DIR}
-        -header-filter='include/osmium/.*'
-        -checks="${ALL_CHECKS}"
         ${CT_CHECK_FILES}
     )
 else()
