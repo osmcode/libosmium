@@ -111,8 +111,12 @@ namespace osmium {
             }
 
             TValue update(TDelta delta) noexcept {
-                m_value = static_cast_with_assert<TValue>(
-                              static_cast_with_assert<TDelta>(m_value) + delta);
+                // Do not check for overflow. With real data this should not
+                // happen and if somebody is trying to trick us they can only
+                // create values this way they would also be able to generate
+                // without having an overflow.
+                m_value = static_cast<TValue>(
+                              static_cast<TDelta>(m_value) + delta);
                 return m_value;
             }
 
