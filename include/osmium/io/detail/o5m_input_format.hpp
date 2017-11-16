@@ -319,6 +319,10 @@ namespace osmium {
                             }
                         }
 
+                        if (data == end) {
+                            throw o5m_error{"no null byte in tag value"};
+                        }
+
                         const char* value = data;
                         while (*data++) {
                             if (data == end) {
