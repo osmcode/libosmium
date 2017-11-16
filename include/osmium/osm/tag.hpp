@@ -114,9 +114,7 @@ namespace osmium {
 
     public:
 
-        TagList() noexcept :
-            osmium::memory::Collection<Tag, osmium::item_type::tag_list>() {
-        }
+        TagList() noexcept = default;
 
         /**
          * Get tag value for the given tag key. If the key is not set, returns

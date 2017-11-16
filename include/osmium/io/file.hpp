@@ -73,10 +73,10 @@ namespace osmium {
 
         private:
 
-            std::string m_filename;
+            std::string m_filename{};
 
-            const char* m_buffer;
-            size_t m_buffer_size;
+            const char* m_buffer = nullptr;
+            size_t m_buffer_size = 0;
 
             std::string m_format_string;
 
@@ -101,10 +101,7 @@ namespace osmium {
              *               of the filename.
              */
             explicit File(const std::string& filename = "", const std::string& format = "") :
-                Options(),
                 m_filename(filename),
-                m_buffer(nullptr),
-                m_buffer_size(0),
                 m_format_string(format) {
 
                 // stdin/stdout
@@ -135,8 +132,6 @@ namespace osmium {
              *               parse_format() function for details.
              */
             explicit File(const char* buffer, size_t size, const std::string& format = "") :
-                Options(),
-                m_filename(),
                 m_buffer(buffer),
                 m_buffer_size(size),
                 m_format_string(format) {

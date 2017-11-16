@@ -157,16 +157,14 @@ namespace osmium {
         class Bzip2Decompressor : public Decompressor {
 
             FILE* m_file;
-            int m_bzerror;
+            int m_bzerror = BZ_OK;
             BZFILE* m_bzfile;
-            bool m_stream_end {false};
+            bool m_stream_end = false;
 
         public:
 
             explicit Bzip2Decompressor(int fd) :
-                Decompressor(),
                 m_file(fdopen(::dup(fd), "rb")),
-                m_bzerror(BZ_OK),
                 m_bzfile(::BZ2_bzReadOpen(&m_bzerror, m_file, 0, 0, nullptr, 0)) {
                 if (!m_bzfile) {
                     detail::throw_bzip2_error(m_bzfile, "read open failed", m_bzerror);

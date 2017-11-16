@@ -64,7 +64,7 @@ namespace osmium {
 
             class PBFParser : public Parser {
 
-                std::string m_input_buffer;
+                std::string m_input_buffer{};
 
                 /**
                  * Read the given number of bytes from the input queue.
@@ -196,8 +196,7 @@ namespace osmium {
             public:
 
                 explicit PBFParser(parser_arguments& args) :
-                    Parser(args),
-                    m_input_buffer() {
+                    Parser(args) {
                 }
 
                 ~PBFParser() noexcept final = default;

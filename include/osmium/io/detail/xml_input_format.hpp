@@ -148,28 +148,28 @@ namespace osmium {
                     in_object
                 }; // enum class context
 
-                context m_context;
-                context m_last_context;
+                context m_context = context::root;
+                context m_last_context = context::root;
 
                 /**
                  * This is used only for change files which contain create, modify,
                  * and delete sections.
                  */
-                bool m_in_delete_section;
+                bool m_in_delete_section = false;
 
-                osmium::io::Header m_header;
+                osmium::io::Header m_header{};
 
                 osmium::memory::Buffer m_buffer;
 
-                std::unique_ptr<osmium::builder::NodeBuilder>                m_node_builder;
-                std::unique_ptr<osmium::builder::WayBuilder>                 m_way_builder;
-                std::unique_ptr<osmium::builder::RelationBuilder>            m_relation_builder;
-                std::unique_ptr<osmium::builder::ChangesetBuilder>           m_changeset_builder;
-                std::unique_ptr<osmium::builder::ChangesetDiscussionBuilder> m_changeset_discussion_builder;
+                std::unique_ptr<osmium::builder::NodeBuilder>                m_node_builder{};
+                std::unique_ptr<osmium::builder::WayBuilder>                 m_way_builder{};
+                std::unique_ptr<osmium::builder::RelationBuilder>            m_relation_builder{};
+                std::unique_ptr<osmium::builder::ChangesetBuilder>           m_changeset_builder{};
+                std::unique_ptr<osmium::builder::ChangesetDiscussionBuilder> m_changeset_discussion_builder{};
 
-                std::unique_ptr<osmium::builder::TagListBuilder>             m_tl_builder;
-                std::unique_ptr<osmium::builder::WayNodeListBuilder>         m_wnl_builder;
-                std::unique_ptr<osmium::builder::RelationMemberListBuilder>  m_rml_builder;
+                std::unique_ptr<osmium::builder::TagListBuilder>             m_tl_builder{};
+                std::unique_ptr<osmium::builder::WayNodeListBuilder>         m_wnl_builder{};
+                std::unique_ptr<osmium::builder::RelationMemberListBuilder>  m_rml_builder{};
 
                 std::string m_comment_text;
 
@@ -629,19 +629,7 @@ namespace osmium {
 
                 explicit XMLParser(parser_arguments& args) :
                     Parser(args),
-                    m_context(context::root),
-                    m_last_context(context::root),
-                    m_in_delete_section(false),
-                    m_header(),
-                    m_buffer(buffer_size),
-                    m_node_builder(),
-                    m_way_builder(),
-                    m_relation_builder(),
-                    m_changeset_builder(),
-                    m_changeset_discussion_builder(),
-                    m_tl_builder(),
-                    m_wnl_builder(),
-                    m_rml_builder() {
+                    m_buffer(buffer_size) {
                 }
 
                 ~XMLParser() noexcept final = default;

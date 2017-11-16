@@ -68,27 +68,21 @@ namespace osmium {
         class Header : public osmium::util::Options {
 
             /// Bounding boxes
-            std::vector<osmium::Box> m_boxes;
+            std::vector<osmium::Box> m_boxes{};
 
             /**
              * Are there possibly multiple versions of the same object in
              * this stream of objects? This should be true for history files
              * and for change files, but not for normal OSM data files.
              */
-            bool m_has_multiple_object_versions;
+            bool m_has_multiple_object_versions = false;
 
         public:
 
-            Header() :
-                Options(),
-                m_boxes(),
-                m_has_multiple_object_versions(false) {
-            }
+            Header() = default;
 
             explicit Header(const std::initializer_list<osmium::util::Options::value_type>& values) :
-                Options(values),
-                m_boxes(),
-                m_has_multiple_object_versions(false) {
+                Options(values) {
             }
 
             /**

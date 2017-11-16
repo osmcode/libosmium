@@ -74,17 +74,17 @@ namespace osmium {
             class NodeRefSegment {
 
                 // First node in order described above.
-                osmium::NodeRef m_first;
+                osmium::NodeRef m_first{};
 
                 // Second node in order described above.
-                osmium::NodeRef m_second;
+                osmium::NodeRef m_second{};
 
                 // Way this segment was from.
-                const osmium::Way* m_way;
+                const osmium::Way* m_way = nullptr;
 
                 // The ring this segment is part of. Initially nullptr, this
                 // will be filled in once we know which ring the segment is in.
-                ProtoRing* m_ring;
+                ProtoRing* m_ring = nullptr;
 
                 // The role of this segment from the member role.
                 role_type m_role;
@@ -99,10 +99,6 @@ namespace osmium {
             public:
 
                 NodeRefSegment() noexcept :
-                    m_first(),
-                    m_second(),
-                    m_way(nullptr),
-                    m_ring(nullptr),
                     m_role(role_type::unknown) {
                 }
 
@@ -110,7 +106,6 @@ namespace osmium {
                     m_first(nr1),
                     m_second(nr2),
                     m_way(way),
-                    m_ring(nullptr),
                     m_role(role) {
                     if (nr2.location() < nr1.location()) {
                         using std::swap;

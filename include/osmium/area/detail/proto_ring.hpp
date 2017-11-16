@@ -64,18 +64,18 @@ namespace osmium {
             private:
 
                 // Segments in this ring.
-                segments_type m_segments;
+                segments_type m_segments{};
 
                 // If this is an outer ring, these point to it's inner rings
                 // (if any).
-                std::vector<ProtoRing*> m_inner;
+                std::vector<ProtoRing*> m_inner{};
 
                 // The smallest segment. Will be kept current whenever a new
                 // segment is added to the ring.
                 NodeRefSegment* m_min_segment;
 
                 // If this is an inner ring, points to the outer ring.
-                ProtoRing* m_outer_ring;
+                ProtoRing* m_outer_ring = nullptr;
 
 #ifdef OSMIUM_DEBUG_RING_NO
                 static int64_t next_num() noexcept {
@@ -91,10 +91,7 @@ namespace osmium {
             public:
 
                 explicit ProtoRing(NodeRefSegment* segment) noexcept :
-                    m_segments(),
-                    m_inner(),
                     m_min_segment(segment),
-                    m_outer_ring(nullptr),
 #ifdef OSMIUM_DEBUG_RING_NO
                     m_num(next_num()),
 #endif

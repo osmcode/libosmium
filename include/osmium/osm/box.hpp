@@ -48,8 +48,8 @@ namespace osmium {
      */
     class Box {
 
-        osmium::Location m_bottom_left;
-        osmium::Location m_top_right;
+        osmium::Location m_bottom_left{};
+        osmium::Location m_top_right{};
 
     public:
 
@@ -57,10 +57,7 @@ namespace osmium {
          * Create undefined Box. Use the extend() function
          * to add actual bounds.
          */
-        constexpr Box() noexcept :
-            m_bottom_left(),
-            m_top_right() {
-        }
+        constexpr Box() noexcept = default;
 
         /**
          * Create box from minimum and maximum coordinates.

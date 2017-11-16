@@ -70,8 +70,8 @@ namespace osmium {
 
             struct location_to_ring_map {
                 osmium::Location location;
-                open_ring_its_type::iterator ring_it;
-                bool start;
+                open_ring_its_type::iterator ring_it{};
+                bool start{false};
 
                 location_to_ring_map(osmium::Location l, open_ring_its_type::iterator r, const bool s) noexcept :
                     location(l),
@@ -80,9 +80,7 @@ namespace osmium {
                 }
 
                 explicit location_to_ring_map(osmium::Location l) noexcept :
-                    location(l),
-                    ring_it(),
-                    start(false) {
+                    location(l) {
                 }
 
                 const ProtoRing& ring() const noexcept {
@@ -689,13 +687,12 @@ namespace osmium {
 
                 struct candidate {
                     int64_t sum;
-                    std::vector<std::pair<location_to_ring_map, bool>> rings;
+                    std::vector<std::pair<location_to_ring_map, bool>> rings{};
                     osmium::Location start_location;
                     osmium::Location stop_location;
 
                     explicit candidate(location_to_ring_map& ring, bool reverse) :
                         sum(ring.ring().sum()),
-                        rings(),
                         start_location(ring.ring().get_node_ref_start().location()),
                         stop_location(ring.ring().get_node_ref_stop().location()) {
                         rings.emplace_back(ring, reverse);

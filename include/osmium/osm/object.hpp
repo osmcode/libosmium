@@ -66,12 +66,12 @@ namespace osmium {
         template <typename TDerived, typename T>
         friend class osmium::builder::OSMObjectBuilder;
 
-        object_id_type      m_id;
+        object_id_type      m_id = 0;
         bool                m_deleted : 1;
         object_version_type m_version : 31;
-        osmium::Timestamp   m_timestamp;
-        user_id_type        m_uid;
-        changeset_id_type   m_changeset;
+        osmium::Timestamp   m_timestamp{};
+        user_id_type        m_uid = 0;
+        changeset_id_type   m_changeset = 0;
 
         size_t sizeof_object() const noexcept {
             return sizeof(OSMObject) + (type() == item_type::node ? sizeof(osmium::Location) : 0) + sizeof(string_size_type);
@@ -101,12 +101,8 @@ namespace osmium {
 
         OSMObject(osmium::memory::item_size_type size, osmium::item_type type) :
             OSMEntity(size, type),
-            m_id(0),
             m_deleted(false),
-            m_version(0),
-            m_timestamp(),
-            m_uid(0),
-            m_changeset(0) {
+            m_version(0) {
         }
 
         void set_user_size(string_size_type size) {

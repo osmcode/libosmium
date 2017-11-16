@@ -154,7 +154,6 @@ namespace osmium {
         public:
 
             explicit GzipDecompressor(int fd) :
-                Decompressor(),
                 m_gzfile(::gzdopen(fd, "r")) {
                 if (!m_gzfile) {
                     detail::throw_gzip_error(m_gzfile, "read initialization failed");

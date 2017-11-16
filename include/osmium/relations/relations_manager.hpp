@@ -75,7 +75,7 @@ namespace osmium {
 
             // All relations and members we are interested in will be kept
             // in here.
-            osmium::ItemStash m_stash;
+            osmium::ItemStash m_stash{};
 
             /// Database of all relations we are interested in.
             relations::RelationsDatabase m_relations_db;
@@ -86,17 +86,15 @@ namespace osmium {
             relations::MembersDatabase<osmium::Relation> m_member_relations_db;
 
             /// Output buffer.
-            osmium::memory::CallbackBuffer m_output;
+            osmium::memory::CallbackBuffer m_output{};
 
         public:
 
             RelationsManagerBase() :
-                m_stash(),
                 m_relations_db(m_stash),
                 m_member_nodes_db(m_stash, m_relations_db),
                 m_member_ways_db(m_stash, m_relations_db),
-                m_member_relations_db(m_stash, m_relations_db),
-                m_output() {
+                m_member_relations_db(m_stash, m_relations_db) {
             }
 
             /// Access the internal RelationsDatabase.

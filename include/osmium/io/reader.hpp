@@ -102,9 +102,9 @@ namespace osmium {
                 error  = 1, // some error occurred while reading
                 closed = 2, // close() called
                 eof    = 3  // eof of file was reached without error
-            } m_status;
+            } m_status = status::okay;
 
-            int m_childpid;
+            int m_childpid = 0;
 
             detail::future_string_queue_type m_input_queue;
 
@@ -115,10 +115,10 @@ namespace osmium {
             detail::future_buffer_queue_type m_osmdata_queue;
             detail::queue_wrapper<osmium::memory::Buffer> m_osmdata_queue_wrapper;
 
-            std::future<osmium::io::Header> m_header_future;
-            osmium::io::Header m_header;
+            std::future<osmium::io::Header> m_header_future{};
+            osmium::io::Header m_header{};
 
-            osmium::thread::thread_handler m_thread;
+            osmium::thread::thread_handler m_thread{};
 
             std::size_t m_file_size;
 
@@ -254,8 +254,6 @@ namespace osmium {
             explicit Reader(const osmium::io::File& file, TArgs&&... args) :
                 m_file(file.check()),
                 m_creator(detail::ParserFactory::instance().get_creator_function(m_file)),
-                m_status(status::okay),
-                m_childpid(0),
                 m_input_queue(detail::get_input_queue_size(), "raw_input"),
                 m_decompressor(m_file.buffer() ?
                     osmium::io::CompressionFactory::instance().create_decompressor(file.compression(), m_file.buffer(), m_file.buffer_size()) :
@@ -263,9 +261,6 @@ namespace osmium {
                 m_read_thread_manager(*m_decompressor, m_input_queue),
                 m_osmdata_queue(detail::get_osmdata_queue_size(), "parser_results"),
                 m_osmdata_queue_wrapper(m_osmdata_queue),
-                m_header_future(),
-                m_header(),
-                m_thread(),
                 m_file_size(m_decompressor->file_size()) {
 
                 (void)std::initializer_list<int>{

@@ -147,11 +147,11 @@ namespace osmium {
 
                 static constexpr std::size_t buffer_size = 2 * 1000 * 1000;
 
-                osmium::io::Header m_header;
+                osmium::io::Header m_header{};
 
                 osmium::memory::Buffer m_buffer;
 
-                std::string m_input;
+                std::string m_input{};
 
                 const char* m_data;
                 const char* m_end;
@@ -603,9 +603,7 @@ namespace osmium {
 
                 explicit O5mParser(parser_arguments& args) :
                     Parser(args),
-                    m_header(),
                     m_buffer(buffer_size),
-                    m_input(),
                     m_data(m_input.data()),
                     m_end(m_data) {
                 }

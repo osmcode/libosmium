@@ -84,7 +84,7 @@ namespace osmium {
 
                 using slist_type = std::vector<NodeRefSegment>;
 
-                slist_type m_segments;
+                slist_type m_segments{};
 
                 bool m_debug;
 
@@ -144,7 +144,6 @@ namespace osmium {
             public:
 
                 explicit SegmentList(bool debug) noexcept :
-                    m_segments(),
                     m_debug(debug) {
                 }
 

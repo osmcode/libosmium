@@ -113,7 +113,7 @@ namespace osmium {
             }; // class thread_joiner
 
             osmium::thread::Queue<function_wrapper> m_work_queue;
-            std::vector<std::thread> m_threads;
+            std::vector<std::thread> m_threads{};
             thread_joiner m_joiner;
             int m_num_threads;
 
@@ -152,7 +152,6 @@ namespace osmium {
              */
             explicit Pool(int num_threads = default_num_threads, std::size_t max_queue_size = default_queue_size) :
                 m_work_queue(max_queue_size > 0 ? max_queue_size : detail::get_work_queue_size(), "work"),
-                m_threads(),
                 m_joiner(m_threads),
                 m_num_threads(detail::get_pool_size(num_threads, osmium::config::get_pool_threads(), std::thread::hardware_concurrency())) {
 

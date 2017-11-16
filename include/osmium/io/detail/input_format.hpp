@@ -177,11 +177,9 @@ namespace osmium {
 
             private:
 
-                std::array<create_parser_type, static_cast<std::size_t>(file_format::last) + 1> m_callbacks;
+                std::array<create_parser_type, static_cast<std::size_t>(file_format::last) + 1> m_callbacks{};
 
-                ParserFactory() noexcept :
-                    m_callbacks() {
-                }
+                ParserFactory() noexcept = default;
 
                 create_parser_type& callbacks(const osmium::io::file_format format) noexcept {
                     return m_callbacks[static_cast<std::size_t>(format)];

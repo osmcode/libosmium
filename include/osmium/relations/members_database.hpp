@@ -133,7 +133,7 @@ namespace osmium {
                 }
             };
 
-            std::vector<element> m_elements;
+            std::vector<element> m_elements{};
 
         protected:
 
@@ -171,7 +171,6 @@ namespace osmium {
             }
 
             MembersDatabaseCommon(osmium::ItemStash& stash, osmium::relations::RelationsDatabase& relations_db) :
-                m_elements(),
                 m_stash(stash),
                 m_relations_db(relations_db) {
             }
