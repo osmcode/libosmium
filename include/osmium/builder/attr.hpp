@@ -364,17 +364,17 @@ namespace osmium {
 
             template <typename TTagIterator>
             inline constexpr detail::tags_from_iterator_pair<TTagIterator> _tags(TTagIterator first, TTagIterator last) {
-                return detail::tags_from_iterator_pair<TTagIterator>(first, last);
+                return {first, last};
             }
 
             template <typename TContainer>
             inline detail::tags_from_iterator_pair<typename TContainer::const_iterator> _tags(const TContainer& container) {
-                return detail::tags_from_iterator_pair<typename TContainer::const_iterator>(std::begin(container), std::end(container));
+                return {std::begin(container), std::end(container)};
             }
 
             using tag_ilist = std::initializer_list<std::pair<const char*, const char*>>;
             inline detail::tags_from_iterator_pair<tag_ilist::const_iterator> _tags(const tag_ilist& container) {
-                return detail::tags_from_iterator_pair<tag_ilist::const_iterator>(std::begin(container), std::end(container));
+                return {std::begin(container), std::end(container)};
             }
 
 
@@ -388,22 +388,22 @@ namespace osmium {
 
             template <typename TIdIterator>
             inline constexpr detail::nodes_from_iterator_pair<TIdIterator> _nodes(TIdIterator first, TIdIterator last) {
-                return detail::nodes_from_iterator_pair<TIdIterator>(first, last);
+                return {first, last};
             }
 
             template <typename TContainer>
             inline detail::nodes_from_iterator_pair<typename TContainer::const_iterator> _nodes(const TContainer& container) {
-                return detail::nodes_from_iterator_pair<typename TContainer::const_iterator>(std::begin(container), std::end(container));
+                return {std::begin(container), std::end(container)};
             }
 
             using object_id_ilist = std::initializer_list<osmium::object_id_type>;
             inline detail::nodes_from_iterator_pair<object_id_ilist::const_iterator> _nodes(const object_id_ilist& container) {
-                return detail::nodes_from_iterator_pair<object_id_ilist::const_iterator>(std::begin(container), std::end(container));
+                return {std::begin(container), std::end(container)};
             }
 
             using node_ref_ilist = std::initializer_list<osmium::NodeRef>;
             inline detail::nodes_from_iterator_pair<node_ref_ilist::const_iterator> _nodes(const node_ref_ilist& container) {
-                return detail::nodes_from_iterator_pair<node_ref_ilist::const_iterator>(std::begin(container), std::end(container));
+                return {std::begin(container), std::end(container)};
             }
 
 
@@ -422,17 +422,17 @@ namespace osmium {
 
             template <typename TMemberIterator>
             inline constexpr detail::members_from_iterator_pair<TMemberIterator> _members(TMemberIterator first, TMemberIterator last) {
-                return detail::members_from_iterator_pair<TMemberIterator>(first, last);
+                return {first, last};
             }
 
             template <typename TContainer>
             inline detail::members_from_iterator_pair<typename TContainer::const_iterator> _members(const TContainer& container) {
-                return detail::members_from_iterator_pair<typename TContainer::const_iterator>(std::begin(container), std::end(container));
+                return {std::begin(container), std::end(container)};
             }
 
             using member_ilist = std::initializer_list<member_type>;
             inline detail::members_from_iterator_pair<member_ilist::const_iterator> _members(const member_ilist& container) {
-                return detail::members_from_iterator_pair<member_ilist::const_iterator>(std::begin(container), std::end(container));
+                return {std::begin(container), std::end(container)};
             }
 
 
@@ -450,58 +450,58 @@ namespace osmium {
 
             template <typename TCommentIterator>
             inline constexpr detail::comments_from_iterator_pair<TCommentIterator> _comments(TCommentIterator first, TCommentIterator last) {
-                return detail::comments_from_iterator_pair<TCommentIterator>(first, last);
+                return {first, last};
             }
 
             template <typename TContainer>
             inline detail::comments_from_iterator_pair<typename TContainer::const_iterator> _comments(const TContainer& container) {
-                return detail::comments_from_iterator_pair<typename TContainer::const_iterator>(std::begin(container), std::end(container));
+                return {std::begin(container), std::end(container)};
             }
 
             using comment_ilist = std::initializer_list<comment_type>;
             inline detail::comments_from_iterator_pair<comment_ilist::const_iterator> _comments(const comment_ilist& container) {
-                return detail::comments_from_iterator_pair<comment_ilist::const_iterator>(std::begin(container), std::end(container));
+                return {std::begin(container), std::end(container)};
             }
 
 
             template <typename TIdIterator>
             inline constexpr detail::outer_ring_from_iterator_pair<TIdIterator> _outer_ring(TIdIterator first, TIdIterator last) {
-                return detail::outer_ring_from_iterator_pair<TIdIterator>(first, last);
+                return {first, last};
             }
 
             template <typename TContainer>
             inline detail::outer_ring_from_iterator_pair<typename TContainer::const_iterator> _outer_ring(const TContainer& container) {
-                return detail::outer_ring_from_iterator_pair<typename TContainer::const_iterator>(std::begin(container), std::end(container));
+                return {std::begin(container), std::end(container)};
             }
 
             using object_id_ilist = std::initializer_list<osmium::object_id_type>;
             inline detail::outer_ring_from_iterator_pair<object_id_ilist::const_iterator> _outer_ring(const object_id_ilist& container) {
-                return detail::outer_ring_from_iterator_pair<object_id_ilist::const_iterator>(std::begin(container), std::end(container));
+                return {std::begin(container), std::end(container)};
             }
 
             using node_ref_ilist = std::initializer_list<osmium::NodeRef>;
             inline detail::outer_ring_from_iterator_pair<node_ref_ilist::const_iterator> _outer_ring(const node_ref_ilist& container) {
-                return detail::outer_ring_from_iterator_pair<node_ref_ilist::const_iterator>(std::begin(container), std::end(container));
+                return {std::begin(container), std::end(container)};
             }
 
             template <typename TIdIterator>
             inline constexpr detail::inner_ring_from_iterator_pair<TIdIterator> _inner_ring(TIdIterator first, TIdIterator last) {
-                return detail::inner_ring_from_iterator_pair<TIdIterator>(first, last);
+                return {first, last};
             }
 
             template <typename TContainer>
             inline detail::inner_ring_from_iterator_pair<typename TContainer::const_iterator> _inner_ring(const TContainer& container) {
-                return detail::inner_ring_from_iterator_pair<typename TContainer::const_iterator>(std::begin(container), std::end(container));
+                return {std::begin(container), std::end(container)};
             }
 
             using object_id_ilist = std::initializer_list<osmium::object_id_type>;
             inline detail::inner_ring_from_iterator_pair<object_id_ilist::const_iterator> _inner_ring(const object_id_ilist& container) {
-                return detail::inner_ring_from_iterator_pair<object_id_ilist::const_iterator>(std::begin(container), std::end(container));
+                return {std::begin(container), std::end(container)};
             }
 
             using node_ref_ilist = std::initializer_list<osmium::NodeRef>;
             inline detail::inner_ring_from_iterator_pair<node_ref_ilist::const_iterator> _inner_ring(const node_ref_ilist& container) {
-                return detail::inner_ring_from_iterator_pair<node_ref_ilist::const_iterator>(std::begin(container), std::end(container));
+                return {std::begin(container), std::end(container)};
             }
 
 

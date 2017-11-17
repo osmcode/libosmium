@@ -257,7 +257,7 @@ namespace osmium {
      * Timestamp.
      */
     inline constexpr Timestamp start_of_time() noexcept {
-        return Timestamp(1);
+        return {1};
     }
 
     /**
@@ -265,7 +265,7 @@ namespace osmium {
      * Timestamp.
      */
     inline constexpr Timestamp end_of_time() noexcept {
-        return Timestamp(std::numeric_limits<uint32_t>::max());
+        return {std::numeric_limits<uint32_t>::max()};
     }
 
     template <typename TChar, typename TTraits>

@@ -582,7 +582,7 @@ namespace osmium {
              */
             iterator begin() {
                 assert(m_data && "This must be a valid buffer");
-                return iterator(m_data, m_data + m_committed);
+                return {m_data, m_data + m_committed};
             }
 
             /**
@@ -597,7 +597,7 @@ namespace osmium {
             template <typename T>
             t_iterator<T> get_iterator(std::size_t offset) {
                 assert(m_data && "This must be a valid buffer");
-                return t_iterator<T>(m_data + offset, m_data + m_committed);
+                return {m_data + offset, m_data + m_committed};
             }
 
             /**
@@ -611,7 +611,7 @@ namespace osmium {
              */
             iterator get_iterator(std::size_t offset) {
                 assert(m_data && "This must be a valid buffer");
-                return iterator(m_data + offset, m_data + m_committed);
+                return {m_data + offset, m_data + m_committed};
             }
 
             /**
@@ -625,7 +625,7 @@ namespace osmium {
             template <typename T>
             t_iterator<T> end() {
                 assert(m_data && "This must be a valid buffer");
-                return t_iterator<T>(m_data + m_committed, m_data + m_committed);
+                return {m_data + m_committed, m_data + m_committed};
             }
 
             /**
@@ -638,40 +638,40 @@ namespace osmium {
              */
             iterator end() {
                 assert(m_data && "This must be a valid buffer");
-                return iterator(m_data + m_committed, m_data + m_committed);
+                return {m_data + m_committed, m_data + m_committed};
             }
 
             template <typename T>
             t_const_iterator<T> cbegin() const {
                 assert(m_data && "This must be a valid buffer");
-                return t_const_iterator<T>(m_data, m_data + m_committed);
+                return {m_data, m_data + m_committed};
             }
 
             const_iterator cbegin() const {
                 assert(m_data && "This must be a valid buffer");
-                return const_iterator(m_data, m_data + m_committed);
+                return {m_data, m_data + m_committed};
             }
 
             template <typename T>
             t_const_iterator<T> get_iterator(std::size_t offset) const {
                 assert(m_data && "This must be a valid buffer");
-                return t_const_iterator<T>(m_data + offset, m_data + m_committed);
+                return {m_data + offset, m_data + m_committed};
             }
 
             const_iterator get_iterator(std::size_t offset) const {
                 assert(m_data && "This must be a valid buffer");
-                return const_iterator(m_data + offset, m_data + m_committed);
+                return {m_data + offset, m_data + m_committed};
             }
 
             template <typename T>
             t_const_iterator<T> cend() const {
                 assert(m_data && "This must be a valid buffer");
-                return t_const_iterator<T>(m_data + m_committed, m_data + m_committed);
+                return {m_data + m_committed, m_data + m_committed};
             }
 
             const_iterator cend() const {
                 assert(m_data && "This must be a valid buffer");
-                return const_iterator(m_data + m_committed, m_data + m_committed);
+                return {m_data + m_committed, m_data + m_committed};
             }
 
             template <typename T>
