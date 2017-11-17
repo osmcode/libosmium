@@ -5,7 +5,7 @@
 #include <osmium/io/xml_output.hpp>
 
 TEST_CASE("Output iterator should be copy constructable") {
-    const osmium::io::Header header;
+    const osmium::io::Header header{};
     osmium::io::Writer writer{"test.osm", header, osmium::io::overwrite::allow};
 
     osmium::io::OutputIterator<osmium::io::Writer> out1{writer};
@@ -13,7 +13,7 @@ TEST_CASE("Output iterator should be copy constructable") {
 }
 
 TEST_CASE("Output iterator should be copy assignable") {
-    const osmium::io::Header header;
+    const osmium::io::Header header{};
     osmium::io::Writer writer1{"test1.osm", header, osmium::io::overwrite::allow};
     osmium::io::Writer writer2{"test2.osm", header, osmium::io::overwrite::allow};
 
@@ -24,7 +24,7 @@ TEST_CASE("Output iterator should be copy assignable") {
 }
 
 TEST_CASE("Output iterator should be incrementable") {
-    const osmium::io::Header header;
+    const osmium::io::Header header{};
     osmium::io::Writer writer{"test.osm", header, osmium::io::overwrite::allow};
     osmium::io::OutputIterator<osmium::io::Writer> out{writer};
 
