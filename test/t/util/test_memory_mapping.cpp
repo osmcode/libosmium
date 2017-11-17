@@ -45,7 +45,7 @@ TEST_CASE("Anonymous mapping: moving a memory mapping should work") {
     REQUIRE(!!mapping1);
     osmium::util::MemoryMapping mapping2{std::move(mapping1)};
     REQUIRE(!!mapping2);
-    REQUIRE(!mapping1);
+    REQUIRE(!mapping1); // NOLINT clang-tidy (use after move okay, we are checking our own code)
     mapping1.unmap();
 
     const auto* addr2 = mapping2.get_addr<int>();
@@ -67,7 +67,7 @@ TEST_CASE("Anonymous mapping: move assignment should work") {
 
     mapping2 = std::move(mapping1);
     REQUIRE(!!mapping2);
-    REQUIRE(!mapping1);
+    REQUIRE(!mapping1); // NOLINT clang-tidy (use after move okay, we are checking our own code)
 
     const auto* addr2 = mapping2.get_addr<int>();
     REQUIRE(*addr2 == 42);
@@ -270,7 +270,7 @@ TEST_CASE("Typed anonymous mapping: moving a memory mapping should work") {
     REQUIRE(!!mapping1);
     osmium::util::TypedMemoryMapping<uint32_t> mapping2{std::move(mapping1)};
     REQUIRE(!!mapping2);
-    REQUIRE(!mapping1);
+    REQUIRE(!mapping1); // NOLINT clang-tidy (use after move okay, we are checking our own code)
     mapping1.unmap();
 
     const auto addr2 = mapping2.begin();
@@ -292,7 +292,7 @@ TEST_CASE("Typed anonymous mapping: move assignment should work") {
 
     mapping2 = std::move(mapping1);
     REQUIRE(!!mapping2);
-    REQUIRE(!mapping1);
+    REQUIRE(!mapping1); // NOLINT clang-tidy (use after move okay, we are checking our own code)
 
     const auto addr2 = mapping2.begin();
     REQUIRE(*addr2 == 42);
