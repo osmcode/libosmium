@@ -80,7 +80,7 @@ namespace osmium {
      * @returns Index.
      */
     inline unsigned int item_type_to_nwr_index(item_type type) noexcept {
-        unsigned int i = static_cast<unsigned int>(type);
+        const auto i = static_cast<unsigned int>(type);
         assert(i >= 1 && i <= 3);
         return i - 1;
     }

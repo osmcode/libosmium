@@ -265,7 +265,7 @@ namespace osmium {
              *         osmium::max_osm_string_length
              */
             void add_member(osmium::item_type type, object_id_type ref, const char* role, const std::size_t role_length, const osmium::OSMObject* full_member = nullptr) {
-                osmium::RelationMember* member = reserve_space_for<osmium::RelationMember>();
+                auto* member = reserve_space_for<osmium::RelationMember>();
                 new (member) osmium::RelationMember{ref, type, full_member != nullptr};
                 add_size(sizeof(RelationMember));
                 add_role(*member, role, role_length);

@@ -528,7 +528,7 @@ namespace osmium {
 
                 void decode_data() {
                     while (ensure_bytes_available(1)) {
-                        dataset_type ds_type = dataset_type(*m_data++);
+                        const auto ds_type = static_cast<dataset_type>(*m_data++);
                         if (ds_type > dataset_type::jump) {
                             if (ds_type == dataset_type::reset) {
                                 reset();

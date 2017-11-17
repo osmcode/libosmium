@@ -24,7 +24,7 @@ TEST_CASE("Build node") {
         _location(3.5, 4.7)
     );
 
-    osmium::Node& node = buffer.get<osmium::Node>(0);
+    auto& node = buffer.get<osmium::Node>(0);
 
     REQUIRE(osmium::item_type::node == node.type());
     REQUIRE(node.type_is_in(osmium::osm_entity_bits::node));
@@ -73,7 +73,7 @@ TEST_CASE("set node attributes from strings") {
 
     osmium::builder::add_node(buffer, _id(0));
 
-    osmium::Node& node = buffer.get<osmium::Node>(0);
+    auto& node = buffer.get<osmium::Node>(0);
     node.set_id("-17")
         .set_version("3")
         .set_visible("true")
@@ -95,7 +95,7 @@ TEST_CASE("set node attributes from strings using set_attribute()") {
 
     osmium::builder::add_node(buffer, _id(0));
 
-    osmium::Node& node = buffer.get<osmium::Node>(0);
+    auto& node = buffer.get<osmium::Node>(0);
     node.set_attribute("id", "-17")
         .set_attribute("version", "3")
         .set_attribute("visible", "true")
@@ -117,7 +117,7 @@ TEST_CASE("Setting attributes from bad data on strings should fail") {
 
     osmium::builder::add_node(buffer, _id(0));
 
-    osmium::Node& node = buffer.get<osmium::Node>(0);
+    auto& node = buffer.get<osmium::Node>(0);
     REQUIRE_THROWS(node.set_id("bar"));
     REQUIRE_THROWS(node.set_id("123x"));
     REQUIRE_THROWS(node.set_version("123x"));
@@ -136,7 +136,7 @@ TEST_CASE("set large id") {
     const int64_t id = 3000000000l;
     osmium::builder::add_node(buffer, _id(id));
 
-    osmium::Node& node = buffer.get<osmium::Node>(0);
+    auto& node = buffer.get<osmium::Node>(0);
     REQUIRE(id == node.id());
     REQUIRE(static_cast<osmium::unsigned_object_id_type>(id) == node.positive_id());
 
@@ -169,7 +169,7 @@ TEST_CASE("Setting diff flags on node") {
 
     osmium::builder::add_node(buffer, _id(17));
 
-    osmium::Node& node = buffer.get<osmium::Node>(0);
+    auto& node = buffer.get<osmium::Node>(0);
 
     REQUIRE(node.diff() == osmium::diff_indicator_type::none);
     REQUIRE(node.diff_as_char() == '*');
