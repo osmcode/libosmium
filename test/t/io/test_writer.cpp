@@ -9,14 +9,20 @@
 #include <osmium/io/xml_output.hpp>
 #include <osmium/memory/buffer.hpp>
 
-TEST_CASE("Writer") {
-    osmium::io::Header header;
-    header.set("generator", "test_writer.cpp");
-
+static osmium::memory::Buffer get_buffer() {
     osmium::io::Reader reader{with_data_dir("t/io/data.osm")};
     osmium::memory::Buffer buffer = reader.read();
     REQUIRE(buffer);
     REQUIRE(buffer.committed() > 0);
+
+    return buffer;
+}
+
+TEST_CASE("Writer") {
+    osmium::io::Header header;
+    header.set("generator", "test_writer.cpp");
+
+    auto buffer = get_buffer();
     const auto num = std::distance(buffer.select<osmium::OSMObject>().cbegin(), buffer.select<osmium::OSMObject>().cend());
     REQUIRE(num > 0);
     REQUIRE(buffer.select<osmium::OSMObject>().cbegin()->id() == 1);
@@ -111,40 +117,47 @@ TEST_CASE("Writer") {
 
 }
 
-TEST_CASE("Writer with user-provided pool") {
+TEST_CASE("Writer with user-provided pool with default number of threads") {
     osmium::io::Header header;
     header.set("generator", "test_writer.cpp");
+    auto buffer = get_buffer();
 
-    osmium::io::Reader reader{with_data_dir("t/io/data.osm")};
-    osmium::memory::Buffer buffer = reader.read();
-    REQUIRE(buffer);
-    REQUIRE(buffer.committed() > 0);
-
-    SECTION("with default number of threads") {
-        osmium::thread::Pool pool;
-        osmium::io::Writer writer{"test-writer-pool-with-default-threads.osm", pool, header, osmium::io::overwrite::allow};
-        writer(std::move(buffer));
-        writer.close();
-    }
-
-    SECTION("with negative number of threads") {
-        osmium::thread::Pool pool{-2};
-        osmium::io::Writer writer{"test-writer-pool-with-negative-threads.osm", header, pool, osmium::io::overwrite::allow};
-        writer(std::move(buffer));
-        writer.close();
-    }
-
-    SECTION("with outlier negative number of threads") {
-        osmium::thread::Pool pool{-1000};
-        osmium::io::Writer writer{"test-writer-pool-with-outlier-negative-threads.osm", header, osmium::io::overwrite::allow, pool};
-        writer(std::move(buffer));
-        writer.close();
-    }
-
-    SECTION("with outlier positive number of threads") {
-        osmium::thread::Pool pool{1000};
-        osmium::io::Writer writer{"test-writer-pool-with-outlier-positive-threads.osm", header, osmium::io::overwrite::allow, pool};
-        writer(std::move(buffer));
-        writer.close();
-    }
+    osmium::thread::Pool pool;
+    osmium::io::Writer writer{"test-writer-pool-with-default-threads.osm", pool, header, osmium::io::overwrite::allow};
+    writer(std::move(buffer));
+    writer.close();
 }
+
+TEST_CASE("Writer with user-provided pool with negative number of threads") {
+    osmium::io::Header header;
+    header.set("generator", "test_writer.cpp");
+    auto buffer = get_buffer();
+
+    osmium::thread::Pool pool{-2};
+    osmium::io::Writer writer{"test-writer-pool-with-negative-threads.osm", header, pool, osmium::io::overwrite::allow};
+    writer(std::move(buffer));
+    writer.close();
+}
+
+TEST_CASE("Writer with user-provided pool with outlier negative number of threads") {
+    osmium::io::Header header;
+    header.set("generator", "test_writer.cpp");
+    auto buffer = get_buffer();
+
+    osmium::thread::Pool pool{-1000};
+    osmium::io::Writer writer{"test-writer-pool-with-outlier-negative-threads.osm", header, osmium::io::overwrite::allow, pool};
+    writer(std::move(buffer));
+    writer.close();
+}
+
+TEST_CASE("Writer with user-provided pool with outlier positive number of threads") {
+    osmium::io::Header header;
+    header.set("generator", "test_writer.cpp");
+    auto buffer = get_buffer();
+
+    osmium::thread::Pool pool{1000};
+    osmium::io::Writer writer{"test-writer-pool-with-outlier-positive-threads.osm", header, osmium::io::overwrite::allow, pool};
+    writer(std::move(buffer));
+    writer.close();
+}
+
