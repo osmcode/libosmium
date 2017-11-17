@@ -58,7 +58,7 @@ namespace osmium {
 
                 ~Dummy() noexcept final = default;
 
-                void set(const TId, const TValue) final {
+                void set(const TId /*id*/, const TValue /*value*/) final {
                     // intentionally left blank
                 }
 

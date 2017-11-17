@@ -42,7 +42,7 @@ namespace std {
         return osmium::io::InputIterator<osmium::io::Reader>(reader);
     }
 
-    inline osmium::io::InputIterator<osmium::io::Reader> end(osmium::io::Reader&) {
+    inline osmium::io::InputIterator<osmium::io::Reader> end(osmium::io::Reader& /*reader*/) {
         return osmium::io::InputIterator<osmium::io::Reader>();
     }
 

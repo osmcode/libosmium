@@ -56,19 +56,19 @@ namespace osmium {
 
                 virtual ~HandlerWrapperBase() = default;
 
-                virtual void node(const osmium::Node&) {
+                virtual void node(const osmium::Node& /*node*/) {
                 }
 
-                virtual void way(const osmium::Way&) {
+                virtual void way(const osmium::Way& /*way*/) {
                 }
 
-                virtual void relation(const osmium::Relation&) {
+                virtual void relation(const osmium::Relation& /*relation*/) {
                 }
 
-                virtual void area(const osmium::Area&) {
+                virtual void area(const osmium::Area& /*area*/) {
                 }
 
-                virtual void changeset(const osmium::Changeset&) {
+                virtual void changeset(const osmium::Changeset& /*changeset*/) {
                 }
 
                 virtual void flush() {

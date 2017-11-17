@@ -118,7 +118,7 @@ namespace osmium {
 
                 virtual ~Map() noexcept = default;
 
-                virtual void reserve(const size_t) {
+                virtual void reserve(const size_t /*size*/) {
                     // default implementation is empty
                 }
 
@@ -264,7 +264,7 @@ namespace osmium {
 
             template <typename TId, typename TValue, template<typename, typename> class TMap>
             struct create_map {
-                TMap<TId, TValue>* operator()(const std::vector<std::string>&) {
+                TMap<TId, TValue>* operator()(const std::vector<std::string>& /*config_string*/) {
                     return new TMap<TId, TValue>();
                 }
             };
