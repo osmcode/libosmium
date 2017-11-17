@@ -24,204 +24,179 @@ env:
 
 #-----------------------------------------------------------------------------
 
+# Save common build configurations as shortcuts, so we can reference them later.
+addons_shortcuts:
+  addons_clang35: &clang35
+    apt:
+      sources: [ 'ubuntu-toolchain-r-test', 'boost-latest' ]
+      packages: [ 'libboost1.55-all-dev', 'libgdal-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin', 'clang-3.5']
+  addons_clang38: &clang38
+    apt:
+      sources: [ 'ubuntu-toolchain-r-test', 'boost-latest' ]
+      packages: [ 'libboost1.55-all-dev', 'libgdal-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin', 'clang-3.8']
+  addons_clang39: &clang39
+    apt:
+      sources: [ 'ubuntu-toolchain-r-test', 'boost-latest' ]
+      packages: [ 'libboost1.55-all-dev', 'libgdal-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin', 'clang-3.9']
+  addons_clang40: &clang40
+    apt:
+      sources: [ 'ubuntu-toolchain-r-test', 'boost-latest', 'llvm-toolchain-trusty-4.0' ]
+      packages: [ 'libboost1.55-all-dev', 'libgdal-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin', 'clang-4.0']
+  addons_clang50: &clang50
+    apt:
+      sources: [ 'ubuntu-toolchain-r-test', 'boost-latest', 'llvm-toolchain-trusty-5.0' ]
+      packages: [ 'libboost1.55-all-dev', 'libgdal-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin', 'clang-5.0', 'clang-tidy-5.0']
+  addons_gcc48: &gcc48
+    apt:
+      sources: [ 'ubuntu-toolchain-r-test', 'boost-latest' ]
+      packages: [ 'libboost1.55-all-dev', 'libgdal-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin', 'g++-4.8', 'gcc-4.8' ]
+  addons_gcc49: &gcc49
+    apt:
+      sources: [ 'ubuntu-toolchain-r-test', 'boost-latest' ]
+      packages: [ 'libboost1.55-all-dev', 'libgdal-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin', 'g++-4.9', 'gcc-4.9' ]
+  addons_gcc5: &gcc5
+    apt:
+      sources: [ 'ubuntu-toolchain-r-test', 'boost-latest' ]
+      packages: [ 'libboost1.55-all-dev', 'libgdal-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin', 'g++-5', 'gcc-5' ]
+  addons_gcc6: &gcc6
+    apt:
+      sources: [ 'ubuntu-toolchain-r-test', 'boost-latest' ]
+      packages: [ 'libboost1.55-all-dev', 'libgdal-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin', 'g++-6', 'gcc-6' ]
+
+#-----------------------------------------------------------------------------
+
 matrix:
   include:
 
     # 1/ Linux Clang Builds
     - os: linux
       compiler: linux-clang35-release
-      addons:
-        apt:
-          sources: ['ubuntu-toolchain-r-test', 'boost-latest']
-          packages: ['clang-3.5', 'libboost1.55-all-dev', 'libgdal-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin']
-      env: COMPILER='clang++-3.5' BUILD_TYPE='Release'
+      env: CXX='clang++-3.5' BUILD_TYPE='Release'
+      addons: *clang35
 
     - os: linux
       compiler: linux-clang35-dev
-      addons:
-        apt:
-          sources: ['ubuntu-toolchain-r-test', 'boost-latest']
-          packages: ['clang-3.5', 'libboost1.55-all-dev', 'libgdal-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin']
-      env: COMPILER='clang++-3.5' BUILD_TYPE='Dev'
-
+      env: CXX='clang++-3.5' BUILD_TYPE='Dev'
+      addons: *clang35
 
     - os: linux
       compiler: linux-clang38-release
-      addons:
-        apt:
-          sources: ['ubuntu-toolchain-r-test', 'boost-latest']
-          packages: ['clang-3.8', 'libboost1.55-all-dev', 'libgdal-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin']
-      env: COMPILER='clang++-3.8' BUILD_TYPE='Release'
+      env: CXX='clang++-3.8' BUILD_TYPE='Release'
+      addons: *clang38
 
     - os: linux
       compiler: linux-clang38-dev
-      addons:
-        apt:
-          sources: ['ubuntu-toolchain-r-test', 'boost-latest']
-          packages: ['clang-3.8', 'libboost1.55-all-dev', 'libgdal-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin']
-      env: COMPILER='clang++-3.8' BUILD_TYPE='Dev'
-
+      env: CXX='clang++-3.8' BUILD_TYPE='Dev'
+      addons: *clang38
 
     - os: linux
       compiler: linux-clang39-release
-      addons:
-        apt:
-          sources: ['ubuntu-toolchain-r-test', 'boost-latest']
-          packages: ['clang-3.9', 'libboost1.55-all-dev', 'libgdal-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin']
-      env: COMPILER='clang++-3.9' BUILD_TYPE='Release'
+      env: CXX='clang++-3.9' BUILD_TYPE='Release'
+      addons: *clang39
 
     - os: linux
       compiler: linux-clang39-dev
-      addons:
-        apt:
-          sources: ['ubuntu-toolchain-r-test', 'boost-latest']
-          packages: ['clang-3.9', 'libboost1.55-all-dev', 'libgdal-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin']
-      env: COMPILER='clang++-3.9' BUILD_TYPE='Dev'
-
+      env: CXX='clang++-3.9' BUILD_TYPE='Dev'
+      addons: *clang39
 
     - os: linux
       compiler: linux-clang40-release
-      addons:
-        apt:
-          sources: ['llvm-toolchain-trusty-4.0', 'ubuntu-toolchain-r-test', 'boost-latest']
-          packages: ['clang-4.0', 'libboost1.55-all-dev', 'libgdal-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin']
-      env: COMPILER='clang++-4.0' BUILD_TYPE='Release'
+      env: CXX='clang++-4.0' BUILD_TYPE='Release'
+      addons: *clang40
 
     - os: linux
       compiler: linux-clang40-dev
-      addons:
-        apt:
-          sources: ['llvm-toolchain-trusty-4.0', 'ubuntu-toolchain-r-test', 'boost-latest']
-          packages: ['clang-4.0', 'libboost1.55-all-dev', 'libgdal-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin']
-      env: COMPILER='clang++-4.0' BUILD_TYPE='Dev'
-
+      env: CXX='clang++-4.0' BUILD_TYPE='Dev'
+      addons: *clang40
 
     - os: linux
       compiler: linux-clang50-release
-      addons:
-        apt:
-          sources: ['llvm-toolchain-trusty-5.0', 'ubuntu-toolchain-r-test', 'boost-latest']
-          packages: ['clang-5.0', 'libboost1.55-all-dev', 'libgdal-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin']
-      env: COMPILER='clang++-5.0' BUILD_TYPE='Release'
+      env: CXX='clang++-5.0' BUILD_TYPE='Release'
+      addons: *clang50
 
     - os: linux
       compiler: linux-clang50-dev
-      addons:
-        apt:
-          sources: ['llvm-toolchain-trusty-5.0', 'ubuntu-toolchain-r-test', 'boost-latest']
-          packages: ['clang-5.0', 'libboost1.55-all-dev', 'libgdal-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin']
-      env: COMPILER='clang++-5.0' BUILD_TYPE='Dev'
-
+      env: CXX='clang++-5.0' BUILD_TYPE='Dev'
+      addons: *clang50
 
     # 2/ Linux GCC Builds
     - os: linux
       compiler: linux-gcc48-release
-      addons:
-        apt:
-          sources: ['ubuntu-toolchain-r-test', 'boost-latest']
-          packages: ['g++-4.8', 'libboost1.55-all-dev', 'libgdal-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin']
-      env: COMPILER='g++-4.8' COMPILER_FLAGS='-Wno-return-type' BUILD_TYPE='Release'
+      env: CXX='g++-4.8' BUILD_TYPE='Release'
+           CXXFLAGS='-Wno-return-type'
+      addons: *gcc48
 
     - os: linux
       compiler: linux-gcc48-dev
-      addons:
-        apt:
-          sources: ['ubuntu-toolchain-r-test', 'boost-latest']
-          packages: ['g++-4.8', 'libboost1.55-all-dev', 'libgdal-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin']
-      env: COMPILER='g++-4.8' COMPILER_FLAGS='-Wno-return-type' BUILD_TYPE='Dev'
-
+      env: CXX='g++-4.8' BUILD_TYPE='Dev'
+           CXXFLAGS='-Wno-return-type'
+      addons: *gcc48
 
     - os: linux
       compiler: linux-gcc49-release
-      addons:
-        apt:
-          sources: ['ubuntu-toolchain-r-test', 'boost-latest']
-          packages: ['g++-4.9', 'libboost1.55-all-dev', 'libgdal-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin']
-      env: COMPILER='g++-4.9' BUILD_TYPE='Release'
+      env: CXX='g++-4.9' BUILD_TYPE='Release'
+      addons: *gcc49
 
     - os: linux
       compiler: linux-gcc49-dev
-      addons:
-        apt:
-          sources: ['ubuntu-toolchain-r-test', 'boost-latest']
-          packages: ['g++-4.9', 'libboost1.55-all-dev', 'libgdal-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin']
-      env: COMPILER='g++-4.9' BUILD_TYPE='Dev'
-
+      env: CXX='g++-4.9' BUILD_TYPE='Dev'
+      addons: *gcc49
 
     - os: linux
       compiler: linux-gcc5-release
-      addons:
-        apt:
-          sources: ['ubuntu-toolchain-r-test', 'boost-latest']
-          packages: ['g++-5', 'libboost1.55-all-dev', 'libgdal-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin']
-      env: COMPILER='g++-5' BUILD_TYPE='Release'
+      env: CXX='g++-5' BUILD_TYPE='Release'
+      addons: *gcc5
 
     - os: linux
       compiler: linux-gcc5-dev
-      addons:
-        apt:
-          sources: ['ubuntu-toolchain-r-test', 'boost-latest']
-          packages: ['g++-5', 'libboost1.55-all-dev', 'libgdal-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin']
-      env: COMPILER='g++-5' BUILD_TYPE='Dev'
-
+      env: CXX='g++-5' BUILD_TYPE='Dev'
+      addons: *gcc5
 
     - os: linux
       compiler: linux-gcc6-release
-      addons:
-        apt:
-          sources: ['ubuntu-toolchain-r-test', 'boost-latest']
-          packages: ['g++-6', 'libboost1.55-all-dev', 'libgdal-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin']
-      env: COMPILER='g++-6' BUILD_TYPE='Release'
+      env: CXX='g++-6' BUILD_TYPE='Release'
+      addons: *gcc6
 
     - os: linux
       compiler: linux-gcc6-dev
-      addons:
-        apt:
-          sources: ['ubuntu-toolchain-r-test', 'boost-latest']
-          packages: ['g++-6', 'libboost1.55-all-dev', 'libgdal-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin']
-      env: COMPILER='g++-6' BUILD_TYPE='Dev'
+      env: CXX='g++-6' BUILD_TYPE='Dev'
+      addons: *gcc6
 
     - os: linux
       compiler: linux-gcc6-coverage
-      addons:
-        apt:
-          sources: ['ubuntu-toolchain-r-test', 'boost-latest']
-          packages: ['g++-6', 'libboost1.55-all-dev', 'libgdal-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin']
-      env: COMPILER='g++-6' BUILD_TYPE='Coverage'
-
+      env: CXX='g++-6' BUILD_TYPE='Coverage'
+      addons: *gcc6
 
     # 3/ OSX Clang Builds
     - os: osx
       osx_image: xcode6.4
       compiler: xcode64-clang-release
-      env: COMPILER='clang++' BUILD_TYPE='Release'
+      env: CXX='clang++' BUILD_TYPE='Release'
 
     - os: osx
       osx_image: xcode6.4
       compiler: xcode64-clang-dev
-      env: COMPILER='clang++' BUILD_TYPE='Dev'
-
+      env: CXX='clang++' BUILD_TYPE='Dev'
 
     - os: osx
       osx_image: xcode7
       compiler: xcode7-clang-release
-      env: COMPILER='clang++' BUILD_TYPE='Release'
+      env: CXX='clang++' BUILD_TYPE='Release'
 
     - os: osx
       osx_image: xcode7
       compiler: xcode7-clang-dev
-      env: COMPILER='clang++' BUILD_TYPE='Dev'
-
+      env: CXX='clang++' BUILD_TYPE='Dev'
 
     - os: osx
       osx_image: xcode8.3
       compiler: xcode8-clang-release
-      env: COMPILER='clang++' BUILD_TYPE='Release'
+      env: CXX='clang++' BUILD_TYPE='Release'
 
     - os: osx
       osx_image: xcode8.3
       compiler: xcode8-clang-dev
-      env: COMPILER='clang++' BUILD_TYPE='Dev'
+      env: CXX='clang++' BUILD_TYPE='Dev'
 
 
 install:
@@ -238,7 +213,7 @@ install:
 before_script:
   - cd ${TRAVIS_BUILD_DIR}
   - mkdir build && cd build
-  - CXX=${COMPILER} CXXFLAGS=${COMPILER_FLAGS} cmake -LA .. -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DBUILD_WITH_CCACHE=1 -DOSM_TESTDATA="${TRAVIS_BUILD_DIR}/deps/osm-testdata"
+  - cmake -LA .. -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DBUILD_WITH_CCACHE=1 -DOSM_TESTDATA="${TRAVIS_BUILD_DIR}/deps/osm-testdata"
 
 script:
   - make VERBOSE=1 && ctest --output-on-failure
@@ -248,11 +223,11 @@ after_success:
     if [ "${BUILD_TYPE}" = "Coverage" ]; then
       curl -S -f https://codecov.io/bash -o codecov
       chmod +x codecov
-      gcov-${COMPILER#g++-} -p $(find test/CMakeFiles -name '*.o')
+      gcov-${CXX#g++-} -p $(find test/CMakeFiles -name '*.o')
       ./codecov -Z -c -X gcov -F unit_tests
-      gcov-${COMPILER#g++-} -p $(find test/data-tests -name '*.o')
+      gcov-${CXX#g++-} -p $(find test/data-tests -name '*.o')
       ./codecov -Z -c -X gcov -F data_tests
-      gcov-${COMPILER#g++-} -p $(find examples -name '*.o')
+      gcov-${CXX#g++-} -p $(find examples -name '*.o')
       ./codecov -Z -c -X gcov -F examples
     fi
 
