@@ -40,7 +40,7 @@ DEALINGS IN THE SOFTWARE.
  *
  */
 
-#include <osmium/io/reader.hpp> // IWYU pragma: export
 #include <osmium/io/detail/opl_input_format.hpp> // IWYU pragma: export
+#include <osmium/io/reader.hpp> // IWYU pragma: export
 
 #endif // OSMIUM_IO_OPL_INPUT_HPP

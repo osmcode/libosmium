@@ -42,8 +42,8 @@
 
 // For the location index. There are different types of index implementation
 // available. These implementations put the index on disk. See below.
-#include <osmium/index/map/sparse_file_array.hpp>
 #include <osmium/index/map/dense_file_array.hpp>
+#include <osmium/index/map/sparse_file_array.hpp>
 
 // For the NodeLocationForWays handler
 #include <osmium/handler/node_locations_for_ways.hpp>
