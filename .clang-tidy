@@ -22,6 +22,9 @@ Checks: '*,-cert-dcl21-cpp,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-cpp
 #    This is just a matter of preference, and we can't change the interfaces
 #    now anyways.
 #
+#  hicpp-invalid-access-moved
+#    Create false positives.
+#
 #  modernize-make-unique
 #    This is a C++11 library and C++ doesn't have std::make_unique.
 #
