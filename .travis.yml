@@ -119,13 +119,6 @@ matrix:
       env: CC='clang-5.0' CXX='clang++-5.0' BUILD_TYPE='Dev'
       addons: *clang50
 
-    - os: linux
-      compiler: linux-clang50-dev
-      env: CC='clang-5.0' CXX='clang++-5.0' BUILD_TYPE='Dev'
-           CXXFLAGS="-fsanitize=address,undefined,integer -fno-sanitize-recover=all -fno-omit-frame-pointer"
-           LDFLAGS="-fsanitize=address,undefined,integer"
-      addons: *clang50
-
     # 2/ Linux GCC Builds
     - os: linux
       compiler: linux-gcc48-release
