@@ -1,5 +1,5 @@
 ---
-Checks: '*,-cert-dcl21-cpp,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-cppcoreguidelines-pro-type-reinterpret-cast,-cppcoreguidelines-pro-type-static-cast-downcast,-google-runtime-references,-hicpp-invalid-access-moved,-hicpp-no-assembler,-misc-unused-parameters,-modernize-make-unique,-modernize-raw-string-literal,-readability-avoid-const-params-in-decls,-readability-implicit-bool-cast'
+Checks: '*,-cert-dcl21-cpp,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-cppcoreguidelines-pro-bounds-constant-array-index,-cppcoreguidelines-pro-type-const-cast,-cppcoreguidelines-pro-type-reinterpret-cast,-cppcoreguidelines-pro-type-static-cast-downcast,-cppcoreguidelines-pro-type-vararg,-google-runtime-references,-hicpp-invalid-access-moved,-hicpp-no-assembler,-misc-macro-parentheses,-misc-unused-parameters,-modernize-make-unique,-modernize-raw-string-literal,-readability-avoid-const-params-in-decls,-readability-implicit-bool-cast'
 #
 #  For a list of check options, see:
 #  http://clang.llvm.org/extra/clang-tidy/checks/list.html
@@ -13,13 +13,23 @@ Checks: '*,-cert-dcl21-cpp,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-cpp
 #    This is a low-level library, it needs to do pointer arithmetic.
 #
 #  cppcoreguidelines-pro-bounds-array-to-pointer-decay
-#    Limited use and many false positives including for all asserts
+#    Limited use and many false positives including for all asserts.
+#
+#  cppcoreguidelines-pro-bounds-constant-array-index
+#    Is needed for low-level code.
+#
+#  cppcoreguidelines-pro-type-const-cast
+#    When you need it, you need it.
 #
 #  cppcoreguidelines-pro-type-reinterpret-cast
 #    This is a low-level library, it needs to do reinterpret-casts.
 #
 #  cppcoreguidelines-pro-type-static-cast-downcast
 #    This is needed and totally okay if we are sure about the types.
+#
+#  cppcoreguidelines-pro-type-vararg
+#    We need some of these functions at least and for some functions it isn't
+#    even clear that those are vararg functions.
 #
 #  google-runtime-references
 #    This is just a matter of preference, and we can't change the interfaces
@@ -30,6 +40,10 @@ Checks: '*,-cert-dcl21-cpp,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-cpp
 #
 #  hicpp-no-assembler
 #    Reports are from macros we don't have any control over.
+#
+#  misc-macro-parentheses
+#    False positive in the only place where it reports something and
+#    disabling locally doesn't work.
 #
 #  misc-unused-parameters
 #    Can't be fixed, because then Doxygen will complain. (In file
