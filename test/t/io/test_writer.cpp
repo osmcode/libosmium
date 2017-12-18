@@ -54,40 +54,62 @@ TEST_CASE("Writer: Empty writes") {
     REQUIRE_FALSE(buffer_check);
 }
 
-TEST_CASE("Writer: Successful writes") {
+TEST_CASE("Writer: Successful writes writing buffer") {
     auto buffer = get_buffer();
 
     const auto num = std::distance(buffer.select<osmium::OSMObject>().cbegin(), buffer.select<osmium::OSMObject>().cend());
     REQUIRE(num > 0);
     REQUIRE(buffer.select<osmium::OSMObject>().cbegin()->id() == 1);
 
-    std::string filename;
+    std::string filename = "test-writer-out-buffer.osm";
+    osmium::io::Writer writer{filename, osmium::io::Header{}, osmium::io::overwrite::allow};
+    writer(std::move(buffer));
+    writer.close();
 
-    SECTION("Writer buffer") {
-        filename = "test-writer-out-buffer.osm";
-        osmium::io::Writer writer{filename, osmium::io::Header{}, osmium::io::overwrite::allow};
-        writer(std::move(buffer));
-        writer.close();
+    REQUIRE_THROWS_AS(writer(osmium::memory::Buffer{}), const osmium::io_error&);
 
-        REQUIRE_THROWS_AS(writer(osmium::memory::Buffer{}), const osmium::io_error&);
+    osmium::io::Reader reader_check{filename};
+    const osmium::memory::Buffer buffer_check = reader_check.read();
+    REQUIRE(buffer_check);
+    REQUIRE(buffer_check.committed() > 0);
+    REQUIRE(buffer_check.select<osmium::OSMObject>().size() == num);
+    REQUIRE(buffer_check.select<osmium::OSMObject>().cbegin()->id() == 1);
+}
+
+TEST_CASE("Writer: Successful writes writing items") {
+    auto buffer = get_buffer();
+
+    const auto num = std::distance(buffer.select<osmium::OSMObject>().cbegin(), buffer.select<osmium::OSMObject>().cend());
+    REQUIRE(num > 0);
+    REQUIRE(buffer.select<osmium::OSMObject>().cbegin()->id() == 1);
+
+    std::string filename = "test-writer-out-item.osm";
+    osmium::io::Writer writer{filename, osmium::io::overwrite::allow};
+    for (const auto& item : buffer) {
+        writer(item);
     }
+    writer.close();
 
-    SECTION("Writer item") {
-        filename = "test-writer-out-item.osm";
-        osmium::io::Writer writer{filename, osmium::io::overwrite::allow};
-        for (const auto& item : buffer) {
-            writer(item);
-        }
-        writer.close();
-    }
+    osmium::io::Reader reader_check{filename};
+    const osmium::memory::Buffer buffer_check = reader_check.read();
+    REQUIRE(buffer_check);
+    REQUIRE(buffer_check.committed() > 0);
+    REQUIRE(buffer_check.select<osmium::OSMObject>().size() == num);
+    REQUIRE(buffer_check.select<osmium::OSMObject>().cbegin()->id() == 1);
+}
 
-    SECTION("Writer output iterator") {
-        filename = "test-writer-out-iterator.osm";
-        osmium::io::Writer writer{filename, osmium::io::overwrite::allow};
-        auto it = osmium::io::make_output_iterator(writer);
-        std::copy(buffer.cbegin(), buffer.cend(), it);
-        writer.close();
-    }
+TEST_CASE("Writer: Successful writes using output iterator") {
+    auto buffer = get_buffer();
+
+    const auto num = std::distance(buffer.select<osmium::OSMObject>().cbegin(), buffer.select<osmium::OSMObject>().cend());
+    REQUIRE(num > 0);
+    REQUIRE(buffer.select<osmium::OSMObject>().cbegin()->id() == 1);
+
+    std::string filename = "test-writer-out-iterator.osm";
+    osmium::io::Writer writer{filename, osmium::io::overwrite::allow};
+    auto it = osmium::io::make_output_iterator(writer);
+    std::copy(buffer.cbegin(), buffer.cend(), it);
+    writer.close();
 
     osmium::io::Reader reader_check{filename};
     const osmium::memory::Buffer buffer_check = reader_check.read();
