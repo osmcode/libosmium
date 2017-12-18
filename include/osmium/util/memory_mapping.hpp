@@ -519,11 +519,11 @@ namespace osmium {
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 
 inline bool osmium::util::MemoryMapping::is_valid() const noexcept {
-    return m_addr != MAP_FAILED;
+    return m_addr != MAP_FAILED; // NOLINT clang-tidy: cppcoreguidelines-pro-type-cstyle-cast
 }
 
 inline void osmium::util::MemoryMapping::make_invalid() noexcept {
-    m_addr = MAP_FAILED;
+    m_addr = MAP_FAILED; // NOLINT clang-tidy: cppcoreguidelines-pro-type-cstyle-cast
 }
 
 #pragma GCC diagnostic pop
