@@ -117,6 +117,12 @@ namespace osmium {
                 }
             }
 
+            Bzip2Compressor(const Bzip2Compressor&) = delete;
+            Bzip2Compressor& operator=(const Bzip2Compressor&) = delete;
+
+            Bzip2Compressor(Bzip2Compressor&&) = delete;
+            Bzip2Compressor& operator=(Bzip2Compressor&&) = delete;
+
             ~Bzip2Compressor() noexcept final {
                 try {
                     close();
@@ -170,6 +176,12 @@ namespace osmium {
                     detail::throw_bzip2_error(m_bzfile, "read open failed", m_bzerror);
                 }
             }
+
+            Bzip2Decompressor(const Bzip2Decompressor&) = delete;
+            Bzip2Decompressor& operator=(const Bzip2Decompressor&) = delete;
+
+            Bzip2Decompressor(Bzip2Decompressor&&) = delete;
+            Bzip2Decompressor& operator=(Bzip2Decompressor&&) = delete;
 
             ~Bzip2Decompressor() noexcept final {
                 try {
@@ -256,6 +268,12 @@ namespace osmium {
                     throw bzip2_error{message, result};
                 }
             }
+
+            Bzip2BufferDecompressor(const Bzip2BufferDecompressor&) = delete;
+            Bzip2BufferDecompressor& operator=(const Bzip2BufferDecompressor&) = delete;
+
+            Bzip2BufferDecompressor(Bzip2BufferDecompressor&&) = delete;
+            Bzip2BufferDecompressor& operator=(Bzip2BufferDecompressor&&) = delete;
 
             ~Bzip2BufferDecompressor() noexcept final {
                 try {

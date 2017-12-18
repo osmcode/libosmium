@@ -27,6 +27,12 @@ public:
         }
     }
 
+    MockDecompressor(const MockDecompressor&) = delete;
+    MockDecompressor& operator=(const MockDecompressor&) = delete;
+
+    MockDecompressor(MockDecompressor&&) = delete;
+    MockDecompressor& operator=(MockDecompressor&&) = delete;
+
     ~MockDecompressor() noexcept final = default;
 
     void add_node(std::string& s, int i) {

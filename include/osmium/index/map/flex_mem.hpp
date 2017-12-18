@@ -179,8 +179,6 @@ namespace osmium {
                     m_dense(use_dense) {
                 }
 
-                ~FlexMem() noexcept final = default;
-
                 bool is_dense() const noexcept {
                     return m_dense;
                 }

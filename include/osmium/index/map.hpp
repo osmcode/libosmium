@@ -216,6 +216,8 @@ namespace osmium {
             MapFactory(MapFactory&&) = delete;
             MapFactory& operator=(MapFactory&&) = delete;
 
+            ~MapFactory() = default;
+
         public:
 
             static MapFactory<id_type, value_type>& instance() {

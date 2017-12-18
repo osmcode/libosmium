@@ -115,6 +115,12 @@ namespace osmium {
             m_enable(max_size > 0 && enable) {
         }
 
+        ProgressBar(const ProgressBar&) = delete;
+        ProgressBar& operator=(const ProgressBar&) = delete;
+
+        ProgressBar(ProgressBar&&) noexcept = default;
+        ProgressBar& operator=(ProgressBar&&) = default;
+
         ~ProgressBar() {
             if (m_do_cleanup) {
                 try {

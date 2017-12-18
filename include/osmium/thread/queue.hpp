@@ -122,6 +122,12 @@ namespace osmium {
             {
             }
 
+            Queue(const Queue&) = delete;
+            Queue& operator=(const Queue&) = delete;
+
+            Queue(Queue&&) = delete;
+            Queue& operator=(Queue&&) = delete;
+
             ~Queue() {
 #ifdef OSMIUM_DEBUG_QUEUE_SIZE
                 std::cerr << "queue '" << m_name

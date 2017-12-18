@@ -23,6 +23,12 @@ public:
         }
     }
 
+    MockCompressor(const MockCompressor&) = delete;
+    MockCompressor& operator=(const MockCompressor&) = delete;
+
+    MockCompressor(MockCompressor&&) = delete;
+    MockCompressor& operator=(MockCompressor&&) = delete;
+
     ~MockCompressor() noexcept final = default;
 
     void write(const std::string&) final {

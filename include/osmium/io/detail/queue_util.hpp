@@ -110,6 +110,12 @@ namespace osmium {
                     m_has_reached_end_of_data(false) {
                 }
 
+                queue_wrapper(const queue_wrapper&) = delete;
+                queue_wrapper& operator=(const queue_wrapper&) = delete;
+
+                queue_wrapper(queue_wrapper&&) = delete;
+                queue_wrapper& operator=(queue_wrapper&&) = delete;
+
                 ~queue_wrapper() noexcept {
                     drain();
                 }

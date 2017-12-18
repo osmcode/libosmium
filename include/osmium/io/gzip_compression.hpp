@@ -114,6 +114,12 @@ namespace osmium {
                 }
             }
 
+            GzipCompressor(const GzipCompressor&) = delete;
+            GzipCompressor& operator=(const GzipCompressor&) = delete;
+
+            GzipCompressor(GzipCompressor&&) = delete;
+            GzipCompressor& operator=(GzipCompressor&&) = delete;
+
             ~GzipCompressor() noexcept final {
                 try {
                     close();
@@ -159,6 +165,12 @@ namespace osmium {
                     detail::throw_gzip_error(m_gzfile, "read initialization failed");
                 }
             }
+
+            GzipDecompressor(const GzipDecompressor&) = delete;
+            GzipDecompressor& operator=(const GzipDecompressor&) = delete;
+
+            GzipDecompressor(GzipDecompressor&&) = delete;
+            GzipDecompressor& operator=(GzipDecompressor&&) = delete;
 
             ~GzipDecompressor() noexcept final {
                 try {

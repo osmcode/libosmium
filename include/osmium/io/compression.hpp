@@ -223,6 +223,12 @@ namespace osmium {
                 m_fd(fd) {
             }
 
+            NoCompressor(const NoCompressor&) = delete;
+            NoCompressor& operator=(const NoCompressor&) = delete;
+
+            NoCompressor(NoCompressor&&) = delete;
+            NoCompressor& operator=(NoCompressor&&) = delete;
+
             ~NoCompressor() noexcept final {
                 try {
                     close();
@@ -265,6 +271,12 @@ namespace osmium {
                 m_buffer(buffer),
                 m_buffer_size(size) {
             }
+
+            NoDecompressor(const NoDecompressor&) = delete;
+            NoDecompressor& operator=(const NoDecompressor&) = delete;
+
+            NoDecompressor(NoDecompressor&&) = delete;
+            NoDecompressor& operator=(NoDecompressor&&) = delete;
 
             ~NoDecompressor() noexcept final {
                 try {

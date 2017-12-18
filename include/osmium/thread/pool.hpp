@@ -102,6 +102,12 @@ namespace osmium {
                     m_threads(threads) {
                 }
 
+                thread_joiner(const thread_joiner&) = delete;
+                thread_joiner& operator=(const thread_joiner&) = delete;
+
+                thread_joiner(thread_joiner&&) = delete;
+                thread_joiner& operator=(thread_joiner&&) = delete;
+
                 ~thread_joiner() {
                     for (auto& thread : m_threads) {
                         if (thread.joinable()) {
@@ -176,6 +182,12 @@ namespace osmium {
                     m_work_queue.push(function_wrapper{0});
                 }
             }
+
+            Pool(const Pool&) = delete;
+            Pool& operator=(const Pool&) = delete;
+
+            Pool(Pool&&) = delete;
+            Pool& operator=(Pool&&) = delete;
 
             ~Pool() {
                 shutdown_all_workers();
