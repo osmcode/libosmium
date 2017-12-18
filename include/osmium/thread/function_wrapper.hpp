@@ -88,7 +88,7 @@ namespace osmium {
             // The integer parameter is only used to signal that we want
             // the special function wrapper that makes the worker thread
             // shut down.
-            explicit function_wrapper(int) :
+            explicit function_wrapper(int /*dummy*/) :
                 impl(new impl_base()) {
             }
 

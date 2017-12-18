@@ -197,9 +197,15 @@ namespace osmium {
                     // but they can be misused. See
                     // https://en.wikipedia.org/wiki/Billion_laughs
                     // The handler will just throw an error.
-                    static void entity_declaration_handler(void*,
-                            const XML_Char*, int, const XML_Char*, int, const XML_Char*,
-                            const XML_Char*, const XML_Char*, const XML_Char*) {
+                    static void entity_declaration_handler(void* /*userData*/,
+                            const XML_Char* /*entityName*/,
+                            int /*is_parameter_entity*/,
+                            const XML_Char* /*value*/,
+                            int /*value_length*/,
+                            const XML_Char* /*base*/,
+                            const XML_Char* /*systemId*/,
+                            const XML_Char* /*publicId*/,
+                            const XML_Char* /*notationName*/) {
                         throw osmium::xml_error{"XML entities are not supported"};
                     }
 

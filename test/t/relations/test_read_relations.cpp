@@ -14,7 +14,7 @@ public:
     int count = 0;
     bool prep = false;
 
-    void relation(const osmium::Relation&) noexcept {
+    void relation(const osmium::Relation& /*relation*/) noexcept {
         ++count;
     }
 

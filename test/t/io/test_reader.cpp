@@ -13,7 +13,7 @@ struct CountHandler : public osmium::handler::Handler {
 
     int count = 0;
 
-    void node(const osmium::Node&) {
+    void node(const osmium::Node& /*node*/) {
         ++count;
     }
 

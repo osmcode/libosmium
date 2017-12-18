@@ -98,12 +98,12 @@ auto _name_##_dispatch(THandler& handler, const osmium::_type_& object, long) ->
             OSMIUM_DYNAMIC_HANDLER_DISPATCH(area, Area)
 
             template <typename THandler>
-            auto flush_dispatch(THandler& handler, int) -> decltype(handler.flush(), void()) {
+            auto flush_dispatch(THandler& handler, int /*dispatch*/) -> decltype(handler.flush(), void()) {
                 handler.flush();
             }
 
             template <typename THandler>
-            void flush_dispatch(THandler&, long) {
+            void flush_dispatch(THandler&, long /*dispatch*/) {
             }
 
             template <typename THandler>

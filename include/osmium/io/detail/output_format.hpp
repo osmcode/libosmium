@@ -134,10 +134,10 @@ namespace osmium {
 
                 virtual ~OutputFormat() noexcept = default;
 
-                virtual void write_header(const osmium::io::Header&) {
+                virtual void write_header(const osmium::io::Header& /*header*/) {
                 }
 
-                virtual void write_buffer(osmium::memory::Buffer&&) = 0;
+                virtual void write_buffer(osmium::memory::Buffer&& /*buffer*/) = 0;
 
                 virtual void write_end() {
                 }

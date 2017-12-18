@@ -516,7 +516,7 @@ namespace osmium {
             struct changeset_handler : public entity_handler {
 
                 template <typename TDummy>
-                static void set_value(osmium::Changeset&, const TDummy&) noexcept {
+                static void set_value(osmium::Changeset& /*changeset*/, const TDummy& /*dummy*/) noexcept {
                 }
 
                 static void set_value(osmium::Changeset& changeset, attr::_cid id) noexcept {
@@ -548,7 +548,7 @@ namespace osmium {
             struct object_handler : public entity_handler {
 
                 template <typename TDummy>
-                static void set_value(osmium::OSMObject&, const TDummy&) noexcept {
+                static void set_value(osmium::OSMObject& /*object*/, const TDummy& /*dummy*/) noexcept {
                 }
 
                 static void set_value(osmium::OSMObject& object, attr::_id id) noexcept {
@@ -601,7 +601,7 @@ namespace osmium {
             // ==============================================================
 
             template <typename... TArgs>
-            inline constexpr const char* get_user(const attr::_user& user, const TArgs&...) noexcept {
+            inline constexpr const char* get_user(const attr::_user& user, const TArgs&... /*args*/) noexcept {
                 return user.value;
             }
 
@@ -611,7 +611,7 @@ namespace osmium {
 
             template <typename TFirst, typename... TRest>
             inline constexpr typename std::enable_if<!std::is_same<attr::_user, TFirst>::value, const char*>::type
-            get_user(const TFirst&, const TRest&... args) noexcept {
+            get_user(const TFirst& /*first*/, const TRest&... args) noexcept {
                 return get_user(args...);
             }
 
@@ -625,7 +625,7 @@ namespace osmium {
             struct tags_handler {
 
                 template <typename TDummy>
-                static void set_value(TagListBuilder&, const TDummy&) noexcept {
+                static void set_value(TagListBuilder& /*tlb*/, const TDummy& /*dummy*/) noexcept {
                 }
 
                 static void set_value(TagListBuilder& builder, const attr::_tag& tag) {
@@ -644,7 +644,7 @@ namespace osmium {
             struct nodes_handler {
 
                 template <typename TDummy>
-                static void set_value(WayNodeListBuilder&, const TDummy&) noexcept {
+                static void set_value(WayNodeListBuilder& /*wnlb*/, const TDummy& /*dummy*/) noexcept {
                 }
 
                 static void set_value(WayNodeListBuilder& builder, const attr::_node& node_ref) {
@@ -663,7 +663,7 @@ namespace osmium {
             struct members_handler {
 
                 template <typename TDummy>
-                static void set_value(RelationMemberListBuilder&, const TDummy&) noexcept {
+                static void set_value(RelationMemberListBuilder& /*rmlb*/, const TDummy& /*dummy*/) noexcept {
                 }
 
                 static void set_value(RelationMemberListBuilder& builder, const attr::_member& member) {
@@ -682,7 +682,7 @@ namespace osmium {
             struct discussion_handler {
 
                 template <typename TDummy>
-                static void set_value(ChangesetDiscussionBuilder&, const TDummy&) noexcept {
+                static void set_value(ChangesetDiscussionBuilder& /*cdb*/, const TDummy& /*dummy*/) noexcept {
                 }
 
                 static void set_value(ChangesetDiscussionBuilder& builder, const attr::_comment& comment) {
@@ -703,7 +703,7 @@ namespace osmium {
             struct ring_handler {
 
                 template <typename TDummy>
-                static void set_value(AreaBuilder&, const TDummy&) noexcept {
+                static void set_value(AreaBuilder& /*ab*/, const TDummy& /*dummy*/) noexcept {
                 }
 
                 template <typename TIterator>
@@ -728,7 +728,7 @@ namespace osmium {
 
             template <typename TBuilder, typename THandler, typename... TArgs>
             inline typename std::enable_if<!is_handled_by<THandler, TArgs...>::value>::type
-            add_list(osmium::builder::Builder&, const TArgs&...) noexcept {
+            add_list(osmium::builder::Builder& /*parent*/, const TArgs&... /*args*/) noexcept {
             }
 
             template <typename TBuilder, typename THandler, typename... TArgs>

@@ -12,23 +12,23 @@ struct Handler1 : public osmium::handler::Handler {
         count(c) {
     }
 
-    void node(const osmium::Node&) noexcept {
+    void node(const osmium::Node& /*node*/) noexcept {
         ++count;
     }
 
-    void way(const osmium::Way&) noexcept {
+    void way(const osmium::Way& /*way*/) noexcept {
         ++count;
     }
 
-    void relation(const osmium::Relation&) noexcept {
+    void relation(const osmium::Relation& /*relation*/) noexcept {
         ++count;
     }
 
-    void area(const osmium::Area&) noexcept {
+    void area(const osmium::Area& /*area*/) noexcept {
         ++count;
     }
 
-    void changeset(const osmium::Changeset&) noexcept {
+    void changeset(const osmium::Changeset& /*changeset*/) noexcept {
         ++count;
     }
 
@@ -46,23 +46,23 @@ struct Handler2 : public osmium::handler::Handler {
         count(c) {
     }
 
-    void node(const osmium::Node&) noexcept {
+    void node(const osmium::Node& /*node*/) noexcept {
         count += 2;
     }
 
-    void way(const osmium::Way&) noexcept {
+    void way(const osmium::Way& /*way*/) noexcept {
         count += 2;
     }
 
-    void relation(const osmium::Relation&) noexcept {
+    void relation(const osmium::Relation& /*relation*/) noexcept {
         count += 2;
     }
 
-    void area(const osmium::Area&) noexcept {
+    void area(const osmium::Area& /*area*/) noexcept {
         count += 2;
     }
 
-    void changeset(const osmium::Changeset&) noexcept {
+    void changeset(const osmium::Changeset& /*changeset*/) noexcept {
         count += 2;
     }
 

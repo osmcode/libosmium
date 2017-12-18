@@ -187,8 +187,8 @@ namespace osmium {
             RelationsMapIndex(const RelationsMapIndex&) = delete;
             RelationsMapIndex& operator=(const RelationsMapIndex&) = delete;
 
-            RelationsMapIndex(RelationsMapIndex&&) noexcept(std::is_nothrow_move_constructible<map_type>::value);
-            RelationsMapIndex& operator=(RelationsMapIndex&&) noexcept(std::is_nothrow_move_assignable<map_type>::value);
+            RelationsMapIndex(RelationsMapIndex&& /*other*/) noexcept(std::is_nothrow_move_constructible<map_type>::value);
+            RelationsMapIndex& operator=(RelationsMapIndex&& /*other*/) noexcept(std::is_nothrow_move_assignable<map_type>::value);
 
             /**
              * Find the given relation id in the index and call the given
@@ -326,8 +326,8 @@ namespace osmium {
             RelationsMapStash(const RelationsMapStash&) = delete;
             RelationsMapStash& operator=(const RelationsMapStash&) = delete;
 
-            RelationsMapStash(RelationsMapStash&&) noexcept(std::is_nothrow_move_constructible<map_type>::value);
-            RelationsMapStash& operator=(RelationsMapStash&&) noexcept(std::is_nothrow_move_assignable<map_type>::value);
+            RelationsMapStash(RelationsMapStash&& /*other*/) noexcept(std::is_nothrow_move_constructible<map_type>::value);
+            RelationsMapStash& operator=(RelationsMapStash&& /*other*/) noexcept(std::is_nothrow_move_assignable<map_type>::value);
 
             /**
              * Add mapping from member to parent relation in the stash.

@@ -84,7 +84,7 @@ namespace osmium {
 
         template <>
         struct match_value<void> {
-            bool operator()(const bool, const char*) const noexcept {
+            bool operator()(const bool /*rule_value*/, const char* /*tag_value*/) const noexcept {
                 return true;
             }
         }; // struct match_value<void>

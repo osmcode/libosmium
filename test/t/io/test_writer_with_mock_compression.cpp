@@ -31,7 +31,7 @@ public:
 
     ~MockCompressor() noexcept final = default;
 
-    void write(const std::string&) final {
+    void write(const std::string& /*data*/) final {
         if (m_fail_in == "write") {
             throw std::logic_error{"write"};
         }

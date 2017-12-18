@@ -26,11 +26,11 @@ struct CountHandler : public osmium::handler::Handler {
         }
     }
 
-    void way(const osmium::Way&) {
+    void way(const osmium::Way& /*way*/) {
         ++all;
     }
 
-    void relation(const osmium::Relation&) {
+    void relation(const osmium::Relation& /*relation*/) {
         ++all;
     }
 
