@@ -7,7 +7,7 @@
 #include <vector>
 
 TEST_CASE("Timestamp can be default initialized to invalid value") {
-    const osmium::Timestamp t;
+    const osmium::Timestamp t{};
     REQUIRE(0 == uint32_t(t));
     REQUIRE(t.to_iso().empty());
     REQUIRE_FALSE(t.valid());

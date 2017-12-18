@@ -72,7 +72,7 @@ namespace osmium {
 
             friend class ItemStash;
 
-            std::size_t value = 0;
+            std::size_t value;
 
             explicit handle_type(std::size_t new_value) noexcept :
                 value(new_value) {
@@ -81,8 +81,10 @@ namespace osmium {
 
         public:
 
-            /// The defalt constructor creates an invalid handle.
-            handle_type() noexcept = default;
+            /// The default constructor creates an invalid handle.
+            handle_type() noexcept :
+                value(0) {
+            }
 
             /// Is this a valid handle?
             bool valid() const noexcept {

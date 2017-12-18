@@ -118,7 +118,7 @@ namespace osmium {
             return static_cast<std::size_t>(size);
 #else
             // Unix implementation
-            struct stat s{};
+            struct stat s; // NOLINT clang-tidy
             if (::fstat(fd, &s) != 0) {
                 throw std::system_error{errno, std::system_category(), "Could not get file size"};
             }
@@ -145,7 +145,7 @@ namespace osmium {
             }
 #else
             // Unix implementation
-            struct stat s{};
+            struct stat s; // NOLINT clang-tidy
             if (::stat(name, &s) != 0) {
                 throw std::system_error{errno, std::system_category(), std::string{"Could not get file size of file '"} + name + "'"};
             }
