@@ -190,7 +190,7 @@ namespace osmium {
                 void check_header_magic() {
                     static const unsigned char header_magic[] = { 0xff, 0xe0, 0x04, 'o', '5' };
 
-                    if (std::strncmp(reinterpret_cast<const char*>(header_magic), m_data, sizeof(header_magic))) {
+                    if (std::strncmp(reinterpret_cast<const char*>(header_magic), m_data, sizeof(header_magic)) != 0) {
                         throw o5m_error{"wrong header magic"};
                     }
 

@@ -144,7 +144,7 @@ namespace osmium {
                         throw osmium::pbf_error{"PBF format error: BlobHeader.datasize missing or zero."};
                     }
 
-                    if (std::strncmp(expected_type, blob_header_type.data(), blob_header_type.size())) {
+                    if (std::strncmp(expected_type, blob_header_type.data(), blob_header_type.size()) != 0) {
                         throw osmium::pbf_error{"blob does not have expected type (OSMHeader in first blob, OSMData in following blobs)"};
                     }
 

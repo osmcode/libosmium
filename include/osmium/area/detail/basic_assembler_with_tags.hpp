@@ -68,7 +68,7 @@ namespace osmium {
                 static void copy_tags_without_type(osmium::builder::AreaBuilder& builder, const osmium::TagList& tags) {
                     osmium::builder::TagListBuilder tl_builder{builder};
                     for (const osmium::Tag& tag : tags) {
-                        if (std::strcmp(tag.key(), "type")) {
+                        if (std::strcmp(tag.key(), "type") != 0) {
                             tl_builder.add_tag(tag.key(), tag.value());
                         }
                     }

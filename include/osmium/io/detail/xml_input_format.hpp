@@ -325,7 +325,7 @@ namespace osmium {
                                 check_attributes(attrs, [this](const XML_Char* name, const XML_Char* value) {
                                     if (!std::strcmp(name, "version")) {
                                         m_header.set("version", value);
-                                        if (std::strcmp(value, "0.6")) {
+                                        if (std::strcmp(value, "0.6") != 0) {
                                             throw osmium::format_version_error{value};
                                         }
                                     } else if (!std::strcmp(name, "generator")) {
