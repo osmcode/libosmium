@@ -187,7 +187,8 @@ namespace osmium {
                 while (true) {
                     if (*s == '\0' || *s == ' ' || *s == '\t' || *s == ',' || *s == '=') {
                         break;
-                    } else if (*s == '%') {
+                    }
+                    if (*s == '%') {
                         ++s;
                         opl_parse_escaped(&s, result);
                     } else {
