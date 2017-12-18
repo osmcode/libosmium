@@ -62,13 +62,13 @@ namespace osmium {
         protected:
 
             // Type of object we are currently working on
-            osmium::item_type m_object_type;
+            osmium::item_type m_object_type = osmium::item_type::undefined;
 
             // ID of the relation/way we are currently working on
-            osmium::object_id_type m_object_id;
+            osmium::object_id_type m_object_id = 0;
 
             // Number of nodes in the area
-            size_t m_nodes;
+            size_t m_nodes = 0;
 
         public:
 

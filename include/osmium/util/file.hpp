@@ -118,7 +118,7 @@ namespace osmium {
             return static_cast<std::size_t>(size);
 #else
             // Unix implementation
-            struct stat s;
+            struct stat s{};
             if (::fstat(fd, &s) != 0) {
                 throw std::system_error{errno, std::system_category(), "Could not get file size"};
             }
@@ -139,13 +139,13 @@ namespace osmium {
 #ifdef _MSC_VER
             // Windows implementation
             // https://msdn.microsoft.com/en-us/library/14h5k7ff.aspx
-            struct _stat64 s;
+            struct _stat64 s{};
             if (::_stati64(name, &s) != 0) {
                 throw std::system_error{errno, std::system_category(), std::string{"Could not get file size of file '"} + name + "'"};
             }
 #else
             // Unix implementation
-            struct stat s;
+            struct stat s{};
             if (::stat(name, &s) != 0) {
                 throw std::system_error{errno, std::system_category(), std::string{"Could not get file size of file '"} + name + "'"};
             }
