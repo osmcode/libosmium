@@ -106,7 +106,7 @@ TEST_CASE("Node in Buffer") {
         for (const osmium::memory::Item& item : buffer) {
             REQUIRE(osmium::item_type::node == item.type());
 
-            const osmium::Node& node = static_cast<const osmium::Node&>(item);
+            const auto& node = static_cast<const osmium::Node&>(item);
 
             switch (item_no) {
                 case 0:

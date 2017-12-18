@@ -76,7 +76,7 @@ TEST_CASE("WayNodeList") {
             {3, {1.0, 1.0}}
         }));
 
-        osmium::WayNodeList& nrl = buffer.get<osmium::WayNodeList>(0);
+        auto& nrl = buffer.get<osmium::WayNodeList>(0);
         REQUIRE(nrl.size() == 3);
 
         REQUIRE(nrl[1].location() == osmium::Location(0.0, 1.0));

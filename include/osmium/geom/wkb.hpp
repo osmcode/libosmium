@@ -143,7 +143,7 @@ namespace osmium {
                     if (size > std::numeric_limits<uint32_t>::max()) {
                         throw geometry_error{"Too many points in geometry"};
                     }
-                    const uint32_t s = static_cast<uint32_t>(size);
+                    const auto s = static_cast<uint32_t>(size);
                     std::copy_n(reinterpret_cast<const char*>(&s), sizeof(uint32_t), &m_data[offset]);
                 }
 
