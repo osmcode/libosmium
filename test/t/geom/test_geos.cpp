@@ -5,10 +5,10 @@
 
 #include "catch.hpp"
 
-#include <osmium/geom/mercator_projection.hpp>
-
 #include "area_helper.hpp"
 #include "wnl_helper.hpp"
+
+#include <osmium/geom/mercator_projection.hpp>
 
 TEST_CASE("GEOS geometry factory - create point") {
     osmium::geom::GEOSFactory<> factory;

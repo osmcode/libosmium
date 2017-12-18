@@ -1,14 +1,4 @@
 
-#include <cstring>
-#include <iostream>
-#include <fstream>
-#include <map>
-#include <string>
-
-#include <gdalcpp.hpp>
-
-#include <osmium/index/map/sparse_mem_array.hpp>
-
 #include <osmium/area/assembler_legacy.hpp>
 #include <osmium/area/multipolygon_collector.hpp>
 #include <osmium/area/problem_reporter_ogr.hpp>
@@ -16,8 +6,17 @@
 #include <osmium/geom/wkt.hpp>
 #include <osmium/handler.hpp>
 #include <osmium/handler/node_locations_for_ways.hpp>
+#include <osmium/index/map/sparse_mem_array.hpp>
 #include <osmium/io/xml_input.hpp>
 #include <osmium/visitor.hpp>
+
+#include <gdalcpp.hpp>
+
+#include <cstring>
+#include <iostream>
+#include <fstream>
+#include <map>
+#include <string>
 
 using index_type = osmium::index::map::SparseMemArray<osmium::unsigned_object_id_type, osmium::Location>;
 using location_handler_type = osmium::handler::NodeLocationsForWays<index_type>;

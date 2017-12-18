@@ -31,8 +31,8 @@
 #include <osmium/io/any_output.hpp>
 
 // We want to use the builder interface
-#include <osmium/builder/osm_object_builder.hpp>
 #include <osmium/builder/attr.hpp>
+#include <osmium/builder/osm_object_builder.hpp>
 
 int main(int argc, char* argv[]) {
     if (argc != 2) {

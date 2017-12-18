@@ -1,10 +1,9 @@
-
-#include <catch.hpp>
-
-#include <sstream>
+#include "catch.hpp"
 
 #include <osmium/builder/attr.hpp>
 #include <osmium/storage/item_stash.hpp>
+
+#include <sstream>
 
 osmium::memory::Buffer generate_test_data() {
     using namespace osmium::builder::attr; // NOLINT clang-tidy: google-build-using-namespace

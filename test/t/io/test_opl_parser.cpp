@@ -1,13 +1,13 @@
-
-#include <algorithm>
-#include <cstring>
-
 #include "catch.hpp"
+
 #include "utils.hpp"
 
 #include <osmium/io/detail/opl_input_format.hpp>
 #include <osmium/io/opl_input.hpp>
 #include <osmium/opl.hpp>
+
+#include <algorithm>
+#include <cstring>
 
 namespace oid = osmium::io::detail;
 

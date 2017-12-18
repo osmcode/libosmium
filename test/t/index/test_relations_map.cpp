@@ -1,9 +1,8 @@
-
 #include "catch.hpp"
 
-#include <type_traits>
-
 #include <osmium/index/relations_map.hpp>
+
+#include <type_traits>
 
 static_assert(!std::is_default_constructible<osmium::index::RelationsMapIndex>::value, "RelationsMapIndex should not be default constructible");
 static_assert(!std::is_copy_constructible<osmium::index::RelationsMapIndex>::value, "RelationsMapIndex should not be copy constructible");

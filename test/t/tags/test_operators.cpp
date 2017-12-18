@@ -1,10 +1,10 @@
 #include "catch.hpp"
 
-#include <iterator>
-
 #include <osmium/builder/osm_object_builder.hpp>
 #include <osmium/memory/buffer.hpp>
 #include <osmium/osm/tag.hpp>
+
+#include <iterator>
 
 TEST_CASE("Equality comparison of tags") {
     osmium::memory::Buffer buffer1{10240};

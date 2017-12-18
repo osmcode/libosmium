@@ -1,10 +1,10 @@
 #include "catch.hpp"
 
-#include <osmium/geom/mercator_projection.hpp>
-#include <osmium/geom/wkt.hpp>
-
 #include "area_helper.hpp"
 #include "wnl_helper.hpp"
+
+#include <osmium/geom/mercator_projection.hpp>
+#include <osmium/geom/wkt.hpp>
 
 TEST_CASE("WKT geometry for point") {
     const osmium::geom::WKTFactory<> factory;

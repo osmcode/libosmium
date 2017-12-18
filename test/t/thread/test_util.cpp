@@ -1,9 +1,9 @@
-#include <catch.hpp>
+#include "catch.hpp"
+
+#include <osmium/thread/util.hpp>
 
 #include <stdexcept>
 #include <type_traits>
-
-#include <osmium/thread/util.hpp>
 
 TEST_CASE("check_for_exception") {
     std::promise<int> p;

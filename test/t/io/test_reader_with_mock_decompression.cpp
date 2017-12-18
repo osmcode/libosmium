@@ -1,11 +1,11 @@
-
 #include "catch.hpp"
-#include "utils.hpp"
 
-#include <string>
+#include "utils.hpp"
 
 #include <osmium/io/compression.hpp>
 #include <osmium/io/xml_input.hpp>
+
+#include <string>
 
 // The MockDecompressor behaves like other Decompressor classes, but "invents"
 // OSM data in XML format that can be read. Through a parameter to the

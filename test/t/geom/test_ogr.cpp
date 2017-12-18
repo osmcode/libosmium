@@ -1,9 +1,9 @@
 #include "catch.hpp"
 
-#include <osmium/geom/ogr.hpp>
-
 #include "area_helper.hpp"
 #include "wnl_helper.hpp"
+
+#include <osmium/geom/ogr.hpp>
 
 TEST_CASE("OGR point geometry") {
     osmium::geom::OGRFactory<> factory;

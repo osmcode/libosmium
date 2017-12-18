@@ -1,13 +1,13 @@
 #include "catch.hpp"
 
-#include <algorithm>
-#include <functional>
-#include <vector>
-
 #include <osmium/builder/attr.hpp>
 #include <osmium/builder/osm_object_builder.hpp>
 #include <osmium/osm.hpp>
 #include <osmium/osm/object_comparisons.hpp>
+
+#include <algorithm>
+#include <functional>
+#include <vector>
 
 using namespace osmium::builder::attr; // NOLINT clang-tidy: google-build-using-namespace
 

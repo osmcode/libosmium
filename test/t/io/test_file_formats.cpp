@@ -1,8 +1,8 @@
 #include "catch.hpp"
 
-#include <iterator>
-
 #include <osmium/io/file.hpp>
+
+#include <iterator>
 
 TEST_CASE("Default file format") {
     const osmium::io::File f;

@@ -1,13 +1,13 @@
-
 #include "catch.hpp"
-#include "utils.hpp"
 
-#include <stdexcept>
-#include <string>
+#include "utils.hpp"
 
 #include <osmium/io/compression.hpp>
 #include <osmium/io/xml_input.hpp>
 #include <osmium/io/xml_output.hpp>
+
+#include <stdexcept>
+#include <string>
 
 class MockCompressor : public osmium::io::Compressor {
 

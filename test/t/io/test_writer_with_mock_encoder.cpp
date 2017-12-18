@@ -1,15 +1,15 @@
-
 #include "catch.hpp"
-#include "utils.hpp"
 
-#include <stdexcept>
-#include <string>
+#include "utils.hpp"
 
 #include <osmium/io/compression.hpp>
 #include <osmium/io/detail/output_format.hpp>
 #include <osmium/io/detail/queue_util.hpp>
 #include <osmium/io/writer.hpp>
 #include <osmium/io/xml_input.hpp>
+
+#include <stdexcept>
+#include <string>
 
 class MockOutputFormat : public osmium::io::detail::OutputFormat {
 

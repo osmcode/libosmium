@@ -1,10 +1,10 @@
 #include "catch.hpp"
 
-#include <boost/crc.hpp>
-
 #include <osmium/builder/attr.hpp>
 #include <osmium/osm/crc.hpp>
 #include <osmium/osm/node.hpp>
+
+#include <boost/crc.hpp>
 
 using namespace osmium::builder::attr; // NOLINT clang-tidy: google-build-using-namespace
 

@@ -1,13 +1,14 @@
 #include "catch.hpp"
-#include "utils.hpp"
 
-#include <algorithm>
+#include "utils.hpp"
 
 #include <osmium/io/any_compression.hpp>
 #include <osmium/io/output_iterator.hpp>
 #include <osmium/io/xml_input.hpp>
 #include <osmium/io/xml_output.hpp>
 #include <osmium/memory/buffer.hpp>
+
+#include <algorithm>
 
 static osmium::memory::Buffer get_buffer() {
     osmium::io::Reader reader{with_data_dir("t/io/data.osm")};

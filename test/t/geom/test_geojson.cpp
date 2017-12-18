@@ -1,9 +1,9 @@
 #include "catch.hpp"
 
-#include <osmium/geom/geojson.hpp>
-
 #include "area_helper.hpp"
 #include "wnl_helper.hpp"
+
+#include <osmium/geom/geojson.hpp>
 
 TEST_CASE("GeoJSON point geometry") {
     osmium::geom::GeoJSONFactory<> factory;

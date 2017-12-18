@@ -1,5 +1,9 @@
-
 #include "catch.hpp"
+
+#include <osmium/builder/attr.hpp>
+#include <osmium/memory/buffer.hpp>
+#include <osmium/osm.hpp>
+#include <osmium/osm/types.hpp>
 
 #include <cstdint>
 #include <initializer_list>
@@ -7,11 +11,6 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
-
-#include <osmium/builder/attr.hpp>
-#include <osmium/memory/buffer.hpp>
-#include <osmium/osm.hpp>
-#include <osmium/osm/types.hpp>
 
 TEST_CASE("create node using builders") {
 

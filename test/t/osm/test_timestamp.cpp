@@ -1,10 +1,10 @@
 #include "catch.hpp"
 
+#include <osmium/osm/timestamp.hpp>
+
 #include <sstream>
 #include <string>
 #include <vector>
-
-#include <osmium/osm/timestamp.hpp>
 
 TEST_CASE("Timestamp can be default initialized to invalid value") {
     const osmium::Timestamp t;

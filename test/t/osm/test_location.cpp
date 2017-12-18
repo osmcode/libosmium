@@ -1,10 +1,10 @@
 #include "catch.hpp"
 
+#include <osmium/osm/location.hpp>
+
 #include <limits>
 #include <sstream>
 #include <type_traits>
-
-#include <osmium/osm/location.hpp>
 
 // fails on MSVC and doesn't really matter
 // static_assert(std::is_literal_type<osmium::Location>::value, "osmium::Location not literal type");

@@ -1,12 +1,12 @@
 #include "catch.hpp"
 
-#include <map>
-#include <vector>
-
 #include <osmium/builder/attr.hpp>
 #include <osmium/builder/builder_helper.hpp>
 #include <osmium/memory/buffer.hpp>
 #include <osmium/osm/tag.hpp>
+
+#include <map>
+#include <vector>
 
 using namespace osmium::builder::attr; // NOLINT clang-tidy: google-build-using-namespace
 

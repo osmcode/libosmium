@@ -1,8 +1,6 @@
-
 #include "catch.hpp"
-#include "utils.hpp"
 
-#include <string>
+#include "utils.hpp"
 
 #include <osmium/builder/attr.hpp>
 #include <osmium/builder/osm_object_builder.hpp>
@@ -14,6 +12,8 @@
 #include <osmium/io/reader.hpp>
 #include <osmium/thread/queue.hpp>
 #include <osmium/thread/util.hpp>
+
+#include <string>
 
 class MockParser : public osmium::io::detail::Parser {
 

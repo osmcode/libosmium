@@ -1,10 +1,10 @@
 #include "catch.hpp"
 
-#include <random>
-
 #include <osmium/geom/factory.hpp>
 #include <osmium/geom/mercator_projection.hpp>
 #include <osmium/geom/projection.hpp>
+
+#include <random>
 
 TEST_CASE("Indentity Projection") {
     osmium::geom::IdentityProjection projection;

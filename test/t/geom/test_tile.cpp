@@ -1,10 +1,10 @@
 #include "catch.hpp"
 
-#include <sstream>
+#include "test_tile_data.hpp"
 
 #include <osmium/geom/tile.hpp>
 
-#include "test_tile_data.hpp"
+#include <sstream>
 
 TEST_CASE("Helper functions") {
     REQUIRE(osmium::geom::num_tiles_in_zoom(0) == 1);

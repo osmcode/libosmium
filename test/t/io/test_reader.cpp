@@ -1,4 +1,5 @@
 #include "catch.hpp"
+
 #include "utils.hpp"
 
 #include <osmium/handler.hpp>

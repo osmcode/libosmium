@@ -1,11 +1,11 @@
 #include "catch.hpp"
 
+#include <osmium/util/file.hpp>
+#include <osmium/util/memory_mapping.hpp>
+
 #include <cstdlib>
 #include <limits>
 #include <utility>
-
-#include <osmium/util/file.hpp>
-#include <osmium/util/memory_mapping.hpp>
 
 #if defined(_MSC_VER) || (defined(__GNUC__) && defined(_WIN32))
 #include "win_mkstemp.hpp"

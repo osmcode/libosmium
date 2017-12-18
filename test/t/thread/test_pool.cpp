@@ -1,11 +1,11 @@
 #include "catch.hpp"
 
+#include <osmium/thread/pool.hpp>
+#include <osmium/util/compatibility.hpp>
+
 #include <chrono>
 #include <stdexcept>
 #include <thread>
-
-#include <osmium/thread/pool.hpp>
-#include <osmium/util/compatibility.hpp>
 
 struct test_job_with_result {
     int operator()() const {

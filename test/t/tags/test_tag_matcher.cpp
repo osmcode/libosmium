@@ -1,10 +1,10 @@
 #include "catch.hpp"
 
-#include <type_traits>
-
 #include <osmium/builder/attr.hpp>
 #include <osmium/memory/buffer.hpp>
 #include <osmium/tags/matcher.hpp>
+
+#include <type_traits>
 
 static_assert(std::is_default_constructible<osmium::TagMatcher>::value, "TagMatcher should be default constructible");
 static_assert(std::is_copy_constructible<osmium::TagMatcher>::value, "TagMatcher should be copy constructible");

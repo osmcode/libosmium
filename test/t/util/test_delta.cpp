@@ -1,9 +1,9 @@
 #include "catch.hpp"
 
+#include <osmium/util/delta.hpp>
+
 #include <cstdint>
 #include <vector>
-
-#include <osmium/util/delta.hpp>
 
 TEST_CASE("delta encode int") {
     osmium::util::DeltaEncode<int> x;

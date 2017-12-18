@@ -1,9 +1,9 @@
 #include "catch.hpp"
 
-#include <iterator>
-
 #include <osmium/builder/attr.hpp>
 #include <osmium/memory/callback_buffer.hpp>
+
+#include <iterator>
 
 using namespace osmium::builder::attr; // NOLINT clang-tidy: google-build-using-namespace
 
