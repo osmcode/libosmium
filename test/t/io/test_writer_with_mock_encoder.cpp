@@ -10,6 +10,7 @@
 
 #include <stdexcept>
 #include <string>
+#include <utility>
 
 class MockOutputFormat : public osmium::io::detail::OutputFormat {
 
@@ -17,9 +18,9 @@ class MockOutputFormat : public osmium::io::detail::OutputFormat {
 
 public:
 
-    MockOutputFormat(osmium::thread::Pool& pool, const osmium::io::File& /*file*/, osmium::io::detail::future_string_queue_type& output_queue, const std::string& fail_in) :
+    MockOutputFormat(osmium::thread::Pool& pool, const osmium::io::File& /*file*/, osmium::io::detail::future_string_queue_type& output_queue, std::string fail_in) :
         OutputFormat(pool, output_queue),
-        m_fail_in(fail_in) {
+        m_fail_in(std::move(fail_in)) {
     }
 
     void write_header(const osmium::io::Header& /*header*/) final {

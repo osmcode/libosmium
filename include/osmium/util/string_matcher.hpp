@@ -39,6 +39,7 @@ DEALINGS IN THE SOFTWARE.
 #include <iosfwd>
 #include <regex>
 #include <string>
+#include <utility>
 #include <vector>
 
 // std::regex isn't implemented properly in glibc++ (before the version
@@ -122,8 +123,8 @@ namespace osmium {
 
         public:
 
-            explicit equal(const std::string& str) :
-                m_str(str) {
+            explicit equal(std::string str) :
+                m_str(std::move(str)) {
             }
 
             explicit equal(const char* str) :
@@ -150,8 +151,8 @@ namespace osmium {
 
         public:
 
-            explicit prefix(const std::string& str) :
-                m_str(str) {
+            explicit prefix(std::string str) :
+                m_str(std::move(str)) {
             }
 
             explicit prefix(const char* str) :
@@ -178,8 +179,8 @@ namespace osmium {
 
         public:
 
-            explicit substring(const std::string& str) :
-                m_str(str) {
+            explicit substring(std::string str) :
+                m_str(std::move(str)) {
             }
 
             explicit substring(const char* str) :
@@ -207,8 +208,8 @@ namespace osmium {
 
         public:
 
-            explicit regex(const std::regex& regex) :
-                m_regex(regex) {
+            explicit regex(std::regex regex) :
+                m_regex(std::move(regex)) {
             }
 
             bool match(const char* test_string) const noexcept {
@@ -234,8 +235,8 @@ namespace osmium {
 
             explicit list() = default;
 
-            explicit list(const std::vector<std::string>& strings) :
-                m_strings(strings) {
+            explicit list(std::vector<std::string> strings) :
+                m_strings(std::move(strings)) {
             }
 
             list& add_string(const char* str) {

@@ -14,6 +14,7 @@
 #include <osmium/thread/util.hpp>
 
 #include <string>
+#include <utility>
 
 class MockParser : public osmium::io::detail::Parser {
 
@@ -22,9 +23,9 @@ class MockParser : public osmium::io::detail::Parser {
 public:
 
     MockParser(osmium::io::detail::parser_arguments& args,
-               const std::string& fail_in) :
+               std::string fail_in) :
         Parser(args),
-        m_fail_in(fail_in) {
+        m_fail_in(std::move(fail_in)) {
     }
 
     void run() final {

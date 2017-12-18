@@ -112,11 +112,11 @@ namespace osmium {
              * @param max_buffer_size If the buffer grows beyond this size the
              *                        callback will be called.
              */
-            explicit CallbackBuffer(const callback_func_type& callback, std::size_t initial_buffer_size = default_initial_buffer_size, std::size_t max_buffer_size = default_max_buffer_size) :
+            explicit CallbackBuffer(callback_func_type callback, std::size_t initial_buffer_size = default_initial_buffer_size, std::size_t max_buffer_size = default_max_buffer_size) :
                 m_buffer(initial_buffer_size, osmium::memory::Buffer::auto_grow::yes),
                 m_initial_buffer_size(initial_buffer_size),
                 m_max_buffer_size(max_buffer_size),
-                m_callback(callback) {
+                m_callback(std::move(callback)) {
             }
 
             /**

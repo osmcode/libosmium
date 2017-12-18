@@ -8,6 +8,7 @@
 
 #include <stdexcept>
 #include <string>
+#include <utility>
 
 class MockCompressor : public osmium::io::Compressor {
 
@@ -15,9 +16,9 @@ class MockCompressor : public osmium::io::Compressor {
 
 public:
 
-    explicit MockCompressor(const std::string& fail_in) :
+    explicit MockCompressor(std::string fail_in) :
         Compressor(osmium::io::fsync::no),
-        m_fail_in(fail_in) {
+        m_fail_in(std::move(fail_in)) {
         if (m_fail_in == "constructor") {
             throw std::logic_error{"constructor"};
         }

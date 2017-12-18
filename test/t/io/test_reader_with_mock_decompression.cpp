@@ -6,6 +6,7 @@
 #include <osmium/io/xml_input.hpp>
 
 #include <string>
+#include <utility>
 
 // The MockDecompressor behaves like other Decompressor classes, but "invents"
 // OSM data in XML format that can be read. Through a parameter to the
@@ -19,9 +20,9 @@ class MockDecompressor : public osmium::io::Decompressor {
 
 public:
 
-    explicit MockDecompressor(const std::string& fail_in) :
+    explicit MockDecompressor(std::string fail_in) :
         Decompressor(),
-        m_fail_in(fail_in) {
+        m_fail_in(std::move(fail_in)) {
         if (m_fail_in == "constructor") {
             throw std::runtime_error{"error constructor"};
         }
