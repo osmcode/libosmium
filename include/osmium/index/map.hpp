@@ -33,6 +33,8 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <osmium/util/string.hpp>
+
 #include <algorithm>
 #include <cstddef>
 #include <functional>
@@ -42,8 +44,6 @@ DEALINGS IN THE SOFTWARE.
 #include <string>
 #include <type_traits>
 #include <vector>
-
-#include <osmium/util/string.hpp>
 
 namespace osmium {
 

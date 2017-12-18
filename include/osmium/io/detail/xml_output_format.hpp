@@ -33,11 +33,6 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <iterator>
-#include <memory>
-#include <string>
-#include <utility>
-
 #include <osmium/handler.hpp>
 #include <osmium/io/detail/output_format.hpp>
 #include <osmium/io/detail/queue_util.hpp>
@@ -61,6 +56,11 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/way.hpp>
 #include <osmium/thread/pool.hpp>
 #include <osmium/visitor.hpp>
+
+#include <iterator>
+#include <memory>
+#include <string>
+#include <utility>
 
 namespace osmium {
 

@@ -33,17 +33,17 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <cstdint>
-#include <memory>
-#include <string>
-#include <utility>
-
 #include <osmium/io/detail/input_format.hpp>
 #include <osmium/io/detail/opl_parser_functions.hpp>
 #include <osmium/io/file_format.hpp>
 #include <osmium/io/header.hpp>
 #include <osmium/memory/buffer.hpp>
 #include <osmium/thread/util.hpp>
+
+#include <cstdint>
+#include <memory>
+#include <string>
+#include <utility>
 
 namespace osmium {
 

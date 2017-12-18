@@ -33,11 +33,11 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <osmium/memory/item.hpp>
+
 #include <iosfwd>
 #include <iterator>
 #include <type_traits>
-
-#include <osmium/memory/item.hpp>
 
 namespace osmium {
 

@@ -33,11 +33,11 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <initializer_list>
-#include <vector>
-
 #include <osmium/osm/box.hpp>
 #include <osmium/util/options.hpp>
+
+#include <initializer_list>
+#include <vector>
 
 namespace osmium {
 

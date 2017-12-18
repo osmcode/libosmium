@@ -33,12 +33,12 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <cassert>
-#include <cstdint>
-
 #include <osmium/geom/coordinates.hpp>
 #include <osmium/geom/mercator_projection.hpp>
 #include <osmium/osm/location.hpp>
+
+#include <cassert>
+#include <cstdint>
 
 namespace osmium {
 

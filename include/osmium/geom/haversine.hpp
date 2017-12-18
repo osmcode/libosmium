@@ -33,13 +33,13 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <cmath>
-#include <iterator>
-
 #include <osmium/geom/coordinates.hpp>
 #include <osmium/geom/util.hpp>
 #include <osmium/osm/node_ref.hpp>
 #include <osmium/osm/way.hpp>
+
+#include <cmath>
+#include <iterator>
 
 namespace osmium {
 

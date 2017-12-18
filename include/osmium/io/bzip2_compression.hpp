@@ -42,17 +42,6 @@ DEALINGS IN THE SOFTWARE.
  * @attention If you include this file, you'll need to link with `libbz2`.
  */
 
-#include <cerrno>
-#include <cstdio>
-#include <string>
-#include <system_error>
-
-#include <bzlib.h>
-
-#ifndef _MSC_VER
-# include <unistd.h>
-#endif
-
 #include <osmium/io/compression.hpp>
 #include <osmium/io/detail/read_write.hpp>
 #include <osmium/io/error.hpp>
@@ -60,6 +49,17 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/io/writer_options.hpp>
 #include <osmium/util/cast.hpp>
 #include <osmium/util/compatibility.hpp>
+
+#include <bzlib.h>
+
+#include <cerrno>
+#include <cstdio>
+#include <string>
+#include <system_error>
+
+#ifndef _MSC_VER
+# include <unistd.h>
+#endif
 
 namespace osmium {
 

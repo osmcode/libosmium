@@ -42,15 +42,15 @@ DEALINGS IN THE SOFTWARE.
  * @attention If you include this file, you'll need to link with `libgdal`.
  */
 
+#include <osmium/geom/coordinates.hpp>
+#include <osmium/geom/factory.hpp>
+
+#include <ogr_geometry.h>
+
 #include <cassert>
 #include <cstddef>
 #include <memory>
 #include <utility>
-
-#include <ogr_geometry.h>
-
-#include <osmium/geom/coordinates.hpp>
-#include <osmium/geom/factory.hpp>
 
 namespace osmium {
 

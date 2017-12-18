@@ -33,15 +33,15 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <osmium/io/compression.hpp>
+#include <osmium/io/detail/queue_util.hpp>
+#include <osmium/thread/util.hpp>
+
 #include <exception>
 #include <future>
 #include <memory>
 #include <string>
 #include <utility>
-
-#include <osmium/io/compression.hpp>
-#include <osmium/io/detail/queue_util.hpp>
-#include <osmium/thread/util.hpp>
 
 namespace osmium {
 

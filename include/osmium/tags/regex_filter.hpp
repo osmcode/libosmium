@@ -33,10 +33,10 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <osmium/tags/filter.hpp>
+
 #include <regex>
 #include <string>
-
-#include <osmium/tags/filter.hpp>
 
 namespace osmium {
 

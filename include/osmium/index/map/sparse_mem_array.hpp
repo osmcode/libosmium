@@ -33,9 +33,9 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <vector>
-
 #include <osmium/index/detail/vector_map.hpp>
+
+#include <vector>
 
 #define OSMIUM_HAS_INDEX_MAP_SPARSE_MEM_ARRAY
 

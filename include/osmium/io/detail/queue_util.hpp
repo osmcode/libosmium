@@ -33,14 +33,14 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <osmium/memory/buffer.hpp>
+#include <osmium/thread/queue.hpp>
+
 #include <cassert>
 #include <exception>
 #include <future>
 #include <string>
 #include <utility>
-
-#include <osmium/memory/buffer.hpp>
-#include <osmium/thread/queue.hpp>
 
 namespace osmium {
 

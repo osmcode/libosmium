@@ -35,15 +35,15 @@ DEALINGS IN THE SOFTWARE.
 
 #ifdef OSMIUM_WITH_SPARSEHASH
 
-#include <cstddef>
-#include <utility>
-#include <vector>
-
-#include <google/sparsetable>
-
 #include <osmium/index/index.hpp>
 #include <osmium/index/map.hpp>
 #include <osmium/io/detail/read_write.hpp>
+
+#include <google/sparsetable>
+
+#include <cstddef>
+#include <utility>
+#include <vector>
 
 #define OSMIUM_HAS_INDEX_MAP_SPARSE_MEM_TABLE
 

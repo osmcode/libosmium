@@ -33,13 +33,13 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <cstring>
-
 #include <osmium/area/assembler_config.hpp>
 #include <osmium/area/detail/basic_assembler.hpp>
 #include <osmium/area/stats.hpp>
 #include <osmium/builder/osm_object_builder.hpp>
 #include <osmium/osm/tag.hpp>
+
+#include <cstring>
 
 namespace osmium {
 

@@ -33,15 +33,15 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <cassert>
-#include <cstddef>
-#include <iterator>
-
 #include <osmium/memory/item.hpp>
 #include <osmium/osm/box.hpp>
 #include <osmium/osm/item_type.hpp>
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/node_ref.hpp>
+
+#include <cassert>
+#include <cstddef>
+#include <iterator>
 
 namespace osmium {
 

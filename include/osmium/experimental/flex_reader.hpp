@@ -33,10 +33,6 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <string>
-#include <utility>
-#include <vector>
-
 #include <osmium/area/assembler.hpp>
 #include <osmium/area/multipolygon_collector.hpp>
 #include <osmium/handler/node_locations_for_ways.hpp> // IWYU pragma: keep
@@ -46,6 +42,10 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/memory/buffer.hpp>
 #include <osmium/osm/entity_bits.hpp>
 #include <osmium/visitor.hpp>
+
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace osmium {
 

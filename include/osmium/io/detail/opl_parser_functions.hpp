@@ -33,15 +33,6 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <cstdint>
-#include <cstdlib>
-#include <iterator>
-#include <limits>
-#include <stdexcept>
-#include <string>
-
-#include <utf8.h>
-
 #include <osmium/builder/osm_object_builder.hpp>
 #include <osmium/io/error.hpp>
 #include <osmium/memory/buffer.hpp>
@@ -55,6 +46,15 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/timestamp.hpp>
 #include <osmium/osm/types.hpp>
 #include <osmium/osm/way.hpp>
+
+#include <utf8.h>
+
+#include <cstdint>
+#include <cstdlib>
+#include <iterator>
+#include <limits>
+#include <stdexcept>
+#include <string>
 
 namespace osmium {
 

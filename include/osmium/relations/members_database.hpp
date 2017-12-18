@@ -33,6 +33,13 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <osmium/osm/object.hpp>
+#include <osmium/osm/relation.hpp>
+#include <osmium/osm/types.hpp>
+#include <osmium/relations/relations_database.hpp>
+#include <osmium/storage/item_stash.hpp>
+#include <osmium/util/iterator.hpp>
+
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
@@ -40,13 +47,6 @@ DEALINGS IN THE SOFTWARE.
 #include <tuple>
 #include <type_traits>
 #include <vector>
-
-#include <osmium/osm/object.hpp>
-#include <osmium/osm/relation.hpp>
-#include <osmium/osm/types.hpp>
-#include <osmium/relations/relations_database.hpp>
-#include <osmium/storage/item_stash.hpp>
-#include <osmium/util/iterator.hpp>
 
 namespace osmium {
 

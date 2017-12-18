@@ -33,11 +33,6 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <cstddef>
-#include <stdexcept>
-#include <string>
-#include <utility>
-
 #include <osmium/geom/coordinates.hpp>
 #include <osmium/memory/collection.hpp>
 #include <osmium/memory/item.hpp>
@@ -49,6 +44,11 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/node_ref_list.hpp>
 #include <osmium/osm/types.hpp>
 #include <osmium/osm/way.hpp>
+
+#include <cstddef>
+#include <stdexcept>
+#include <string>
+#include <utility>
 
 namespace osmium {
 

@@ -33,15 +33,15 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <osmium/area/detail/vector.hpp>
+#include <osmium/osm/location.hpp>
+#include <osmium/osm/node_ref.hpp>
+
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
 #include <iosfwd>
 #include <utility>
-
-#include <osmium/area/detail/vector.hpp>
-#include <osmium/osm/location.hpp>
-#include <osmium/osm/node_ref.hpp>
 
 namespace osmium {
 

@@ -33,6 +33,8 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <osmium/io/writer_options.hpp>
+
 #include <cerrno>
 #include <cstddef>
 #include <fcntl.h>
@@ -44,8 +46,6 @@ DEALINGS IN THE SOFTWARE.
 #else
 # include <io.h>
 #endif
-
-#include <osmium/io/writer_options.hpp>
 
 namespace osmium {
 

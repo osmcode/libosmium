@@ -33,11 +33,11 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <cstddef>
-#include <iterator>
-
 #include <osmium/osm/diff_object.hpp>
 #include <osmium/util/compatibility.hpp>
+
+#include <cstddef>
+#include <iterator>
 
 namespace osmium {
 

@@ -33,14 +33,14 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <osmium/osm/relation.hpp>
+#include <osmium/storage/item_stash.hpp>
+
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
 #include <utility>
 #include <vector>
-
-#include <osmium/osm/relation.hpp>
-#include <osmium/storage/item_stash.hpp>
 
 namespace osmium {
 

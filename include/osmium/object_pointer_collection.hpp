@@ -33,14 +33,14 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <algorithm>
-#include <utility>
-#include <vector>
+#include <osmium/handler.hpp>
+#include <osmium/osm/object.hpp>
 
 #include <boost/iterator/indirect_iterator.hpp>
 
-#include <osmium/handler.hpp>
-#include <osmium/osm/object.hpp>
+#include <algorithm>
+#include <utility>
+#include <vector>
 
 // IWYU pragma: no_forward_declare osmium::OSMObject
 

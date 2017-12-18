@@ -33,14 +33,14 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <osmium/index/index.hpp>
+#include <osmium/util/memory_mapping.hpp>
+
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
 #include <new> // IWYU pragma: keep
 #include <stdexcept>
-
-#include <osmium/index/index.hpp>
-#include <osmium/util/memory_mapping.hpp>
 
 namespace osmium {
 

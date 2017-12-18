@@ -33,6 +33,9 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <osmium/util/compatibility.hpp>
+#include <osmium/util/minmax.hpp> // IWYU pragma: keep
+
 #include <cassert>
 #include <cstdint>
 #include <ctime>
@@ -41,9 +44,6 @@ DEALINGS IN THE SOFTWARE.
 #include <stdexcept>
 #include <string>
 #include <type_traits>
-
-#include <osmium/util/compatibility.hpp>
-#include <osmium/util/minmax.hpp> // IWYU pragma: keep
 
 namespace osmium {
 

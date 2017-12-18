@@ -33,13 +33,6 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <array>
-#include <cstdint>
-#include <functional>
-#include <memory>
-#include <string>
-#include <utility>
-
 #include <osmium/handler.hpp>
 #include <osmium/io/detail/queue_util.hpp>
 #include <osmium/io/error.hpp>
@@ -47,6 +40,13 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/io/file_format.hpp>
 #include <osmium/memory/buffer.hpp>
 #include <osmium/thread/pool.hpp>
+
+#include <array>
+#include <cstdint>
+#include <functional>
+#include <memory>
+#include <string>
+#include <utility>
 
 namespace osmium {
 

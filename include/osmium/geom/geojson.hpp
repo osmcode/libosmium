@@ -33,13 +33,13 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <osmium/geom/coordinates.hpp>
+#include <osmium/geom/factory.hpp>
+
 #include <cassert>
 #include <cstddef>
 #include <string>
 #include <utility>
-
-#include <osmium/geom/coordinates.hpp>
-#include <osmium/geom/factory.hpp>
 
 namespace osmium {
 

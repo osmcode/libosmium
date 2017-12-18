@@ -33,6 +33,11 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <osmium/osm/entity_bits.hpp>
+#include <osmium/osm/item_type.hpp>
+#include <osmium/osm/types.hpp>
+#include <osmium/util/cast.hpp>
+
 #include <cassert>
 #include <cctype>
 #include <cstdlib>
@@ -40,11 +45,6 @@ DEALINGS IN THE SOFTWARE.
 #include <stdexcept>
 #include <string>
 #include <utility>
-
-#include <osmium/osm/entity_bits.hpp>
-#include <osmium/osm/item_type.hpp>
-#include <osmium/osm/types.hpp>
-#include <osmium/util/cast.hpp>
 
 namespace osmium {
 

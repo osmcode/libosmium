@@ -33,10 +33,6 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <cassert>
-#include <iostream>
-#include <vector>
-
 #include <osmium/area/assembler_config.hpp>
 #include <osmium/area/detail/basic_assembler_with_tags.hpp>
 #include <osmium/area/detail/segment_list.hpp>
@@ -49,6 +45,10 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/relation.hpp>
 #include <osmium/osm/tag.hpp>
 #include <osmium/osm/way.hpp>
+
+#include <cassert>
+#include <iostream>
+#include <vector>
 
 namespace osmium {
 

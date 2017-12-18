@@ -33,14 +33,14 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <osmium/index/multimap.hpp>
+#include <osmium/io/detail/read_write.hpp>
+
 #include <algorithm>
 #include <cstddef>
 #include <map>
 #include <utility>
 #include <vector>
-
-#include <osmium/index/multimap.hpp>
-#include <osmium/io/detail/read_write.hpp>
 
 namespace osmium {
 

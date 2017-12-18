@@ -33,10 +33,6 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <cstdint>
-#include <cstdlib>
-#include <iterator>
-
 #include <osmium/memory/collection.hpp> // IWYU pragma: keep
 #include <osmium/memory/item.hpp>
 #include <osmium/osm/entity.hpp>
@@ -44,6 +40,10 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/object.hpp>
 #include <osmium/osm/types.hpp>
 #include <osmium/util/compatibility.hpp>
+
+#include <cstdint>
+#include <cstdlib>
+#include <iterator>
 
 namespace osmium {
 

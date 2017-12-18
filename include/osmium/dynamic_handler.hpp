@@ -33,10 +33,10 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <osmium/handler.hpp>
+
 #include <memory>
 #include <utility>
-
-#include <osmium/handler.hpp>
 
 namespace osmium {
 

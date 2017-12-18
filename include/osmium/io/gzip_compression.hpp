@@ -42,16 +42,6 @@ DEALINGS IN THE SOFTWARE.
  * @attention If you include this file, you'll need to link with `libz`.
  */
 
-#include <cerrno>
-#include <cstddef>
-#include <string>
-
-#ifndef _MSC_VER
-# include <unistd.h>
-#endif
-
-#include <zlib.h>
-
 #include <osmium/io/compression.hpp>
 #include <osmium/io/detail/read_write.hpp>
 #include <osmium/io/error.hpp>
@@ -59,6 +49,16 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/io/writer_options.hpp>
 #include <osmium/util/cast.hpp>
 #include <osmium/util/compatibility.hpp>
+
+#include <zlib.h>
+
+#include <cerrno>
+#include <cstddef>
+#include <string>
+
+#ifndef _MSC_VER
+# include <unistd.h>
+#endif
 
 namespace osmium {
 

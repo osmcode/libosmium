@@ -33,15 +33,15 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <algorithm>
-#include <cstddef>
-#include <cstdint>
-#include <string>
-
 #include <osmium/geom/coordinates.hpp>
 #include <osmium/geom/factory.hpp>
 #include <osmium/util/cast.hpp>
 #include <osmium/util/endian.hpp>
+
+#include <algorithm>
+#include <cstddef>
+#include <cstdint>
+#include <string>
 
 namespace osmium {
 

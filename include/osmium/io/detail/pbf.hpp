@@ -33,8 +33,8 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <cstdint>
-#include <string>
+#include <osmium/io/error.hpp>
+#include <osmium/osm/location.hpp>
 
 // needed for htonl and ntohl or their equivalent in protozero
 #ifndef _WIN32
@@ -43,8 +43,8 @@ DEALINGS IN THE SOFTWARE.
 # include <protozero/byteswap.hpp>
 #endif
 
-#include <osmium/io/error.hpp>
-#include <osmium/osm/location.hpp>
+#include <cstdint>
+#include <string>
 
 namespace osmium {
 

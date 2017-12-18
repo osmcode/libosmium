@@ -33,13 +33,6 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <cstring>
-#include <vector>
-
 #include <osmium/area/stats.hpp>
 #include <osmium/osm/item_type.hpp>
 #include <osmium/osm/relation.hpp>
@@ -52,6 +45,13 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/storage/item_stash.hpp>
 #include <osmium/tags/taglist.hpp>
 #include <osmium/tags/tags_filter.hpp>
+
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <vector>
 
 namespace osmium {
 

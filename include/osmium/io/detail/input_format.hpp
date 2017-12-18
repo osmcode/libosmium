@@ -33,14 +33,6 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <array>
-#include <exception>
-#include <functional>
-#include <future>
-#include <memory>
-#include <string>
-#include <utility>
-
 #include <osmium/io/detail/queue_util.hpp>
 #include <osmium/io/error.hpp>
 #include <osmium/io/file.hpp>
@@ -49,6 +41,14 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/memory/buffer.hpp>
 #include <osmium/osm/entity_bits.hpp>
 #include <osmium/thread/pool.hpp>
+
+#include <array>
+#include <exception>
+#include <functional>
+#include <future>
+#include <memory>
+#include <string>
+#include <utility>
 
 namespace osmium {
 

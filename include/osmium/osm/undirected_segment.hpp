@@ -33,10 +33,10 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <iosfwd>
-
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/segment.hpp>
+
+#include <iosfwd>
 
 namespace osmium {
 

@@ -33,10 +33,10 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <osmium/osm/item_type.hpp>
+
 #include <cassert>
 #include <type_traits>
-
-#include <osmium/osm/item_type.hpp>
 
 namespace osmium {
 

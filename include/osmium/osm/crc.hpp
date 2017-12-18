@@ -33,8 +33,6 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <cstdint>
-
 #include <osmium/osm/area.hpp>
 #include <osmium/osm/box.hpp>
 #include <osmium/osm/changeset.hpp>
@@ -49,6 +47,8 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/timestamp.hpp>
 #include <osmium/osm/way.hpp>
 #include <osmium/util/endian.hpp>
+
+#include <cstdint>
 
 namespace osmium {
 

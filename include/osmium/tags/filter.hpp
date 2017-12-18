@@ -33,16 +33,16 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <osmium/memory/collection.hpp>
+#include <osmium/osm/tag.hpp>
+
+#include <boost/iterator/filter_iterator.hpp>
+
 #include <cstddef>
 #include <cstring>
 #include <string>
 #include <type_traits>
 #include <vector>
-
-#include <boost/iterator/filter_iterator.hpp>
-
-#include <osmium/memory/collection.hpp>
-#include <osmium/osm/tag.hpp>
 
 namespace osmium {
 

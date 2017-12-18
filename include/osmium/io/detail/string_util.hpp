@@ -33,14 +33,14 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <utf8.h>
+
 #include <cassert>
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
 #include <string>
 #include <utility>
-
-#include <utf8.h>
 
 namespace osmium {
 

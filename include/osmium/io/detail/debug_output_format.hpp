@@ -33,16 +33,6 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <cinttypes>
-#include <cmath>
-#include <cstring>
-#include <iterator>
-#include <memory>
-#include <string>
-#include <utility>
-
-#include <boost/crc.hpp>
-
 #include <osmium/io/detail/output_format.hpp>
 #include <osmium/io/detail/queue_util.hpp>
 #include <osmium/io/detail/string_util.hpp>
@@ -67,6 +57,16 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/thread/pool.hpp>
 #include <osmium/util/minmax.hpp>
 #include <osmium/visitor.hpp>
+
+#include <boost/crc.hpp>
+
+#include <cinttypes>
+#include <cmath>
+#include <cstring>
+#include <iterator>
+#include <memory>
+#include <string>
+#include <utility>
 
 namespace osmium {
 

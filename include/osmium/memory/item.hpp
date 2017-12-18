@@ -33,10 +33,10 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <osmium/util/cast.hpp>
+
 #include <cstddef>
 #include <cstdint>
-
-#include <osmium/util/cast.hpp>
 
 namespace osmium {
 

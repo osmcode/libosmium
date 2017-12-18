@@ -33,13 +33,13 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <osmium/osm/location.hpp>
+#include <osmium/util/double.hpp>
+
 #include <cmath>
 #include <iosfwd>
 #include <limits>
 #include <string>
-
-#include <osmium/osm/location.hpp>
-#include <osmium/util/double.hpp>
 
 namespace osmium {
 

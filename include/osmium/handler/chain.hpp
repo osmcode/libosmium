@@ -33,9 +33,9 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <tuple>
-
 #include <osmium/handler.hpp>
+
+#include <tuple>
 
 #define OSMIUM_CHAIN_HANDLER_CALL(_func_, _type_) \
     template <int N, int SIZE, typename THandlers> \

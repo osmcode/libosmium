@@ -33,17 +33,17 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <osmium/thread/function_wrapper.hpp>
+#include <osmium/thread/queue.hpp>
+#include <osmium/thread/util.hpp>
+#include <osmium/util/config.hpp>
+
 #include <cstddef>
 #include <future>
 #include <thread>
 #include <type_traits>
 #include <utility>
 #include <vector>
-
-#include <osmium/thread/function_wrapper.hpp>
-#include <osmium/thread/queue.hpp>
-#include <osmium/thread/util.hpp>
-#include <osmium/util/config.hpp>
 
 namespace osmium {
 

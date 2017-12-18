@@ -33,14 +33,14 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <osmium/util/compatibility.hpp>
+#include <osmium/util/file.hpp>
+
 #include <cassert>
 #include <cerrno>
 #include <cstddef>
 #include <stdexcept>
 #include <system_error>
-
-#include <osmium/util/compatibility.hpp>
-#include <osmium/util/file.hpp>
 
 #ifndef _WIN32
 # include <sys/mman.h>

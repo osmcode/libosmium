@@ -52,14 +52,9 @@ DEALINGS IN THE SOFTWARE.
  * @attention If you include this file, you'll need to link with `libgeos`.
  */
 
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <iterator>
-#include <memory>
-#include <string>
-#include <utility>
-#include <vector>
+#include <osmium/geom/coordinates.hpp>
+#include <osmium/geom/factory.hpp>
+#include <osmium/util/compatibility.hpp>
 
 #include <geos/geom/Coordinate.h>
 #include <geos/geom/CoordinateSequence.h>
@@ -72,9 +67,14 @@ DEALINGS IN THE SOFTWARE.
 #include <geos/geom/PrecisionModel.h>
 #include <geos/util/GEOSException.h>
 
-#include <osmium/geom/coordinates.hpp>
-#include <osmium/geom/factory.hpp>
-#include <osmium/util/compatibility.hpp>
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <iterator>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
 // MSVC doesn't support throw_with_nested yet
 #ifdef _MSC_VER

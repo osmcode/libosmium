@@ -33,12 +33,13 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <boost/variant.hpp>
+
 #include <cstring>
 #include <iosfwd>
+#include <regex>
 #include <string>
 #include <vector>
-
-#include <regex>
 
 // std::regex isn't implemented properly in glibc++ (before the version
 // delivered with GCC 4.9) and libc++ before the version 3.6, so the use is
@@ -62,8 +63,6 @@ DEALINGS IN THE SOFTWARE.
 #  pragma message("Disabling regex functionality")
 # endif
 #endif
-
-#include <boost/variant.hpp>
 
 namespace osmium {
 

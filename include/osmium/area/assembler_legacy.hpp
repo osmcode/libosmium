@@ -33,18 +33,6 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <algorithm>
-#include <cassert>
-#include <cstring>
-#include <functional>
-#include <iostream>
-#include <iterator>
-#include <set>
-#include <string>
-#include <map>
-#include <utility>
-#include <vector>
-
 #include <osmium/area/assembler_config.hpp>
 #include <osmium/area/detail/basic_assembler_with_tags.hpp>
 #include <osmium/area/detail/proto_ring.hpp>
@@ -61,6 +49,18 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/tag.hpp>
 #include <osmium/osm/way.hpp>
 #include <osmium/tags/filter.hpp>
+
+#include <algorithm>
+#include <cassert>
+#include <cstring>
+#include <functional>
+#include <iostream>
+#include <iterator>
+#include <set>
+#include <string>
+#include <map>
+#include <utility>
+#include <vector>
 
 namespace osmium {
 

@@ -33,6 +33,12 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <osmium/io/detail/read_write.hpp>
+#include <osmium/io/error.hpp>
+#include <osmium/io/file_compression.hpp>
+#include <osmium/io/writer_options.hpp>
+#include <osmium/util/file.hpp>
+
 #include <atomic>
 #include <cerrno>
 #include <cstddef>
@@ -49,12 +55,6 @@ DEALINGS IN THE SOFTWARE.
 #else
 # include <io.h>
 #endif
-
-#include <osmium/io/detail/read_write.hpp>
-#include <osmium/io/error.hpp>
-#include <osmium/io/file_compression.hpp>
-#include <osmium/io/writer_options.hpp>
-#include <osmium/util/file.hpp>
 
 namespace osmium {
 

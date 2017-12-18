@@ -33,9 +33,8 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <string>
-
-#include <zlib.h>
+#include <osmium/io/error.hpp>
+#include <osmium/util/cast.hpp>
 
 #include <protozero/version.hpp>
 
@@ -45,8 +44,9 @@ DEALINGS IN THE SOFTWARE.
 # include <protozero/types.hpp>
 #endif
 
-#include <osmium/io/error.hpp>
-#include <osmium/util/cast.hpp>
+#include <zlib.h>
+
+#include <string>
 
 namespace osmium {
 

@@ -42,10 +42,6 @@ DEALINGS IN THE SOFTWARE.
  * @attention If you include this file, you'll need to link with `libgdal`.
  */
 
-#include <memory>
-
-#include <gdalcpp.hpp>
-
 #include <osmium/area/problem_reporter.hpp>
 #include <osmium/geom/factory.hpp>
 #include <osmium/geom/ogr.hpp>
@@ -55,6 +51,10 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/node_ref_list.hpp>
 #include <osmium/osm/types.hpp>
 #include <osmium/osm/way.hpp>
+
+#include <gdalcpp.hpp>
+
+#include <memory>
 
 namespace osmium {
 

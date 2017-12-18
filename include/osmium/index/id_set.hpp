@@ -33,6 +33,9 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <osmium/osm/item_type.hpp>
+#include <osmium/osm/types.hpp>
+
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
@@ -41,9 +44,6 @@ DEALINGS IN THE SOFTWARE.
 #include <memory>
 #include <type_traits>
 #include <vector>
-
-#include <osmium/osm/item_type.hpp>
-#include <osmium/osm/types.hpp>
 
 namespace osmium {
 

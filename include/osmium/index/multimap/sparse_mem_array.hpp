@@ -33,9 +33,9 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <vector>
-
 #include <osmium/index/detail/vector_multimap.hpp>
+
+#include <vector>
 
 namespace osmium {
 

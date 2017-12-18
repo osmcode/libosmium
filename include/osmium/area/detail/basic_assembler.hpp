@@ -33,6 +33,20 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <osmium/area/assembler_config.hpp>
+#include <osmium/area/detail/node_ref_segment.hpp>
+#include <osmium/area/detail/proto_ring.hpp>
+#include <osmium/area/detail/segment_list.hpp>
+#include <osmium/area/problem_reporter.hpp>
+#include <osmium/area/stats.hpp>
+#include <osmium/builder/osm_object_builder.hpp>
+#include <osmium/osm/location.hpp>
+#include <osmium/osm/node_ref.hpp>
+#include <osmium/osm/types.hpp>
+#include <osmium/osm/way.hpp>
+#include <osmium/util/iterator.hpp>
+#include <osmium/util/timer.hpp>
+
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
@@ -44,21 +58,6 @@ DEALINGS IN THE SOFTWARE.
 #include <unordered_set>
 #include <utility>
 #include <vector>
-
-#include <osmium/builder/osm_object_builder.hpp>
-#include <osmium/osm/location.hpp>
-#include <osmium/osm/node_ref.hpp>
-#include <osmium/osm/types.hpp>
-#include <osmium/osm/way.hpp>
-#include <osmium/util/iterator.hpp>
-#include <osmium/util/timer.hpp>
-
-#include <osmium/area/assembler_config.hpp>
-#include <osmium/area/detail/node_ref_segment.hpp>
-#include <osmium/area/detail/proto_ring.hpp>
-#include <osmium/area/detail/segment_list.hpp>
-#include <osmium/area/problem_reporter.hpp>
-#include <osmium/area/stats.hpp>
 
 namespace osmium {
 

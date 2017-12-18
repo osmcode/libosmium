@@ -33,11 +33,11 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <osmium/osm/tag.hpp>
+
 #include <algorithm>
 #include <functional>
 #include <utility> // IWYU pragma: keep
-
-#include <osmium/osm/tag.hpp>
 
 namespace osmium {
 

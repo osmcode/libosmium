@@ -33,13 +33,13 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <cassert>
-#include <cstdlib>
-#include <tuple>
-
 #include <osmium/osm/object.hpp>
 #include <osmium/osm/timestamp.hpp>
 #include <osmium/util/misc.hpp>
+
+#include <cassert>
+#include <cstdlib>
+#include <tuple>
 
 namespace osmium {
 

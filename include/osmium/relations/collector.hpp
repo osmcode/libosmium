@@ -33,6 +33,18 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <osmium/handler.hpp>
+#include <osmium/handler/check_order.hpp>
+#include <osmium/memory/buffer.hpp>
+#include <osmium/osm/item_type.hpp>
+#include <osmium/osm/object.hpp>
+#include <osmium/osm/relation.hpp>
+#include <osmium/osm/types.hpp>
+#include <osmium/relations/detail/member_meta.hpp>
+#include <osmium/relations/detail/relation_meta.hpp>
+#include <osmium/util/iterator.hpp>
+#include <osmium/visitor.hpp>
+
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
@@ -42,19 +54,6 @@ DEALINGS IN THE SOFTWARE.
 #include <iostream>
 #include <utility>
 #include <vector>
-
-#include <osmium/osm/item_type.hpp>
-#include <osmium/osm/object.hpp>
-#include <osmium/osm/relation.hpp>
-#include <osmium/osm/types.hpp>
-#include <osmium/handler.hpp>
-#include <osmium/handler/check_order.hpp>
-#include <osmium/memory/buffer.hpp>
-#include <osmium/util/iterator.hpp>
-#include <osmium/visitor.hpp>
-
-#include <osmium/relations/detail/relation_meta.hpp>
-#include <osmium/relations/detail/member_meta.hpp>
 
 namespace osmium {
 

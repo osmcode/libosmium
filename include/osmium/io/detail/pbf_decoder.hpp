@@ -33,19 +33,6 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <cstdint>
-#include <cstring>
-#include <limits>
-#include <memory>
-#include <stdexcept>
-#include <string>
-#include <utility>
-#include <vector>
-
-#include <protozero/iterators.hpp>
-#include <protozero/pbf_message.hpp>
-#include <protozero/types.hpp>
-
 #include <osmium/builder/osm_object_builder.hpp>
 #include <osmium/io/detail/pbf.hpp> // IWYU pragma: export
 #include <osmium/io/detail/protobuf_tags.hpp>
@@ -64,6 +51,19 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/types.hpp>
 #include <osmium/osm/way.hpp>
 #include <osmium/util/delta.hpp>
+
+#include <protozero/iterators.hpp>
+#include <protozero/pbf_message.hpp>
+#include <protozero/types.hpp>
+
+#include <cstdint>
+#include <cstring>
+#include <limits>
+#include <memory>
+#include <stdexcept>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace osmium {
 

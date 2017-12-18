@@ -33,13 +33,13 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <cstdint>
-#include <cstdlib>
-#include <iosfwd>
-
 #include <osmium/memory/item.hpp>
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/types.hpp>
+
+#include <cstdint>
+#include <cstdlib>
+#include <iosfwd>
 
 namespace osmium {
 

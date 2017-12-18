@@ -33,11 +33,6 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <cassert>
-#include <cstdlib>
-#include <iterator>
-#include <utility>
-
 #include <osmium/memory/collection.hpp>
 #include <osmium/memory/item.hpp>
 #include <osmium/memory/item_iterator.hpp>
@@ -47,6 +42,11 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/object.hpp>
 #include <osmium/osm/types.hpp>
 #include <osmium/util/compatibility.hpp>
+
+#include <cassert>
+#include <cstdlib>
+#include <iterator>
+#include <utility>
 
 namespace osmium {
 

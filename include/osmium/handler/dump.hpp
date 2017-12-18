@@ -33,10 +33,6 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <iomanip>
-#include <iostream>
-#include <string>
-
 #include <osmium/handler.hpp>
 #include <osmium/memory/collection.hpp>
 #include <osmium/memory/item.hpp>
@@ -53,6 +49,10 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/timestamp.hpp>
 #include <osmium/osm/way.hpp>
 #include <osmium/visitor.hpp>
+
+#include <iomanip>
+#include <iostream>
+#include <string>
 
 namespace osmium {
 

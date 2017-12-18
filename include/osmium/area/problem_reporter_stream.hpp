@@ -33,14 +33,14 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <ostream>
-
 #include <osmium/area/problem_reporter.hpp>
 #include <osmium/osm/item_type.hpp>
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/node_ref.hpp>
 #include <osmium/osm/types.hpp>
 #include <osmium/osm/way.hpp>
+
+#include <ostream>
 
 namespace osmium {
 

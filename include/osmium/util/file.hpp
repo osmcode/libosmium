@@ -33,6 +33,8 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <osmium/util/cast.hpp>
+
 #include <cerrno>
 #include <cstddef>
 #include <cstdio>
@@ -53,8 +55,6 @@ DEALINGS IN THE SOFTWARE.
 #ifndef _MSC_VER
 # include <unistd.h>
 #endif
-
-#include <osmium/util/cast.hpp>
 
 namespace osmium {
 

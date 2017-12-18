@@ -33,15 +33,6 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <cassert>
-#include <cstring>
-#include <future>
-#include <memory>
-#include <string>
-#include <utility>
-
-#include <expat.h>
-
 #include <osmium/builder/builder.hpp>
 #include <osmium/builder/osm_object_builder.hpp>
 #include <osmium/io/detail/input_format.hpp>
@@ -65,6 +56,15 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/way.hpp>
 #include <osmium/thread/util.hpp>
 #include <osmium/util/cast.hpp>
+
+#include <expat.h>
+
+#include <cassert>
+#include <cstring>
+#include <future>
+#include <memory>
+#include <string>
+#include <utility>
 
 namespace osmium {
 

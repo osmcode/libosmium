@@ -33,10 +33,10 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <cstddef>
-
 #include <osmium/index/index.hpp>
 #include <osmium/index/map.hpp>
+
+#include <cstddef>
 
 namespace osmium {
 

@@ -33,11 +33,11 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <cstdint>
-#include <iosfwd>
-
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/node_ref.hpp>
+
+#include <cstdint>
+#include <iosfwd>
 
 namespace osmium {
 

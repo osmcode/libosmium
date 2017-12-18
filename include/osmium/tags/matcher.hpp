@@ -33,11 +33,11 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <type_traits>
-#include <utility>
-
 #include <osmium/osm/tag.hpp>
 #include <osmium/util/string_matcher.hpp>
+
+#include <type_traits>
+#include <utility>
 
 namespace osmium {
 

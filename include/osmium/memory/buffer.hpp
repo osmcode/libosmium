@@ -1,7 +1,6 @@
 #ifndef OSMIUM_MEMORY_BUFFER_HPP
 #define OSMIUM_MEMORY_BUFFER_HPP
 
-#include <iostream>
 /*
 
 This file is part of Osmium (http://osmcode.org/libosmium).
@@ -34,6 +33,11 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <osmium/memory/item.hpp>
+#include <osmium/memory/item_iterator.hpp>
+#include <osmium/osm/entity.hpp>
+#include <osmium/util/compatibility.hpp>
+
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
@@ -43,11 +47,6 @@ DEALINGS IN THE SOFTWARE.
 #include <memory>
 #include <stdexcept>
 #include <utility>
-
-#include <osmium/memory/item.hpp>
-#include <osmium/memory/item_iterator.hpp>
-#include <osmium/osm/entity.hpp>
-#include <osmium/util/compatibility.hpp>
 
 namespace osmium {
 

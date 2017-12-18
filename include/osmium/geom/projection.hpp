@@ -42,15 +42,15 @@ DEALINGS IN THE SOFTWARE.
  * @attention If you include this file, you'll need to link with `libproj`.
  */
 
-#include <memory>
-#include <string>
-
-#include <proj_api.h>
-
 #include <osmium/geom/coordinates.hpp>
 #include <osmium/geom/mercator_projection.hpp>
 #include <osmium/geom/util.hpp>
 #include <osmium/osm/location.hpp>
+
+#include <proj_api.h>
+
+#include <memory>
+#include <string>
 
 namespace osmium {
 

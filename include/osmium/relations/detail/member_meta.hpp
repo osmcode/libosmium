@@ -33,11 +33,11 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <osmium/osm/types.hpp>
+
 #include <cstddef>
 #include <iosfwd>
 #include <limits>
-
-#include <osmium/osm/types.hpp>
 
 namespace osmium {
 

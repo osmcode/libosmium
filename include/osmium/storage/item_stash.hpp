@@ -33,6 +33,9 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <osmium/memory/buffer.hpp>
+#include <osmium/memory/item.hpp>
+
 #include <cassert>
 #include <cstdlib>
 #include <limits>
@@ -43,9 +46,6 @@ DEALINGS IN THE SOFTWARE.
 # include <iostream>
 # include <chrono>
 #endif
-
-#include <osmium/memory/buffer.hpp>
-#include <osmium/memory/item.hpp>
 
 namespace osmium {
 

@@ -33,16 +33,16 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <limits>
-#include <stdexcept>
-#include <string>
-
 #include <osmium/handler.hpp>
 #include <osmium/osm/node.hpp>
 #include <osmium/osm/object_comparisons.hpp>
 #include <osmium/osm/relation.hpp>
 #include <osmium/osm/types.hpp>
 #include <osmium/osm/way.hpp>
+
+#include <limits>
+#include <stdexcept>
+#include <string>
 
 namespace osmium {
 

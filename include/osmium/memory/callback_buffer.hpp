@@ -33,11 +33,11 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <osmium/memory/buffer.hpp>
+
 #include <cstddef>
 #include <functional>
 #include <utility>
-
-#include <osmium/memory/buffer.hpp>
 
 namespace osmium {
 

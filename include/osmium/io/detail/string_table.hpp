@@ -33,6 +33,8 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <osmium/io/detail/pbf.hpp>
+
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
@@ -42,8 +44,6 @@ DEALINGS IN THE SOFTWARE.
 #include <string>
 #include <unordered_map>
 #include <utility>
-
-#include <osmium/io/detail/pbf.hpp>
 
 namespace osmium {
 

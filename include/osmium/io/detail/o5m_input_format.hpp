@@ -33,19 +33,6 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <algorithm>
-#include <cstddef>
-#include <cstdint>
-#include <cstring>
-#include <future>
-#include <limits>
-#include <memory>
-#include <string>
-#include <utility>
-
-#include <protozero/exception.hpp>
-#include <protozero/varint.hpp>
-
 #include <osmium/builder/osm_object_builder.hpp>
 #include <osmium/io/detail/input_format.hpp>
 #include <osmium/io/detail/queue_util.hpp>
@@ -65,6 +52,19 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/way.hpp>
 #include <osmium/thread/util.hpp>
 #include <osmium/util/delta.hpp>
+
+#include <protozero/exception.hpp>
+#include <protozero/varint.hpp>
+
+#include <algorithm>
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <future>
+#include <limits>
+#include <memory>
+#include <string>
+#include <utility>
 
 namespace osmium {
 

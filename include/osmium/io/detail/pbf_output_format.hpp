@@ -33,19 +33,6 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <cassert>
-#include <cmath>
-#include <cstdint>
-#include <cstdlib>
-#include <memory>
-#include <string>
-#include <utility>
-#include <vector>
-
-#include <protozero/pbf_builder.hpp>
-#include <protozero/pbf_writer.hpp>
-#include <protozero/types.hpp>
-
 #include <osmium/handler.hpp>
 #include <osmium/io/detail/output_format.hpp>
 #include <osmium/io/detail/pbf.hpp> // IWYU pragma: export
@@ -73,6 +60,19 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/util/cast.hpp>
 #include <osmium/util/delta.hpp>
 #include <osmium/visitor.hpp>
+
+#include <protozero/pbf_builder.hpp>
+#include <protozero/pbf_writer.hpp>
+#include <protozero/types.hpp>
+
+#include <cassert>
+#include <cmath>
+#include <cstdint>
+#include <cstdlib>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace osmium {
 

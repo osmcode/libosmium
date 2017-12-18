@@ -33,16 +33,6 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <cassert>
-#include <cstddef>
-#include <exception>
-#include <functional>
-#include <future>
-#include <initializer_list>
-#include <memory>
-#include <string>
-#include <utility>
-
 #include <osmium/io/compression.hpp>
 #include <osmium/io/detail/output_format.hpp>
 #include <osmium/io/detail/queue_util.hpp>
@@ -57,6 +47,16 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/thread/util.hpp>
 #include <osmium/util/config.hpp>
 #include <osmium/version.hpp>
+
+#include <cassert>
+#include <cstddef>
+#include <exception>
+#include <functional>
+#include <future>
+#include <initializer_list>
+#include <memory>
+#include <string>
+#include <utility>
 
 namespace osmium {
 

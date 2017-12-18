@@ -33,11 +33,6 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <cstddef>
-#include <initializer_list>
-#include <iomanip>
-#include <utility>
-
 #include <osmium/fwd.hpp>
 #include <osmium/handler.hpp>
 #include <osmium/handler/check_order.hpp>
@@ -47,6 +42,11 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/entity_bits.hpp>
 #include <osmium/util/progress_bar.hpp>
 #include <osmium/visitor.hpp>
+
+#include <cstddef>
+#include <initializer_list>
+#include <iomanip>
+#include <utility>
 
 namespace osmium {
 
