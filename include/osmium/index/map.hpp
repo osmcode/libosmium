@@ -98,9 +98,6 @@ namespace osmium {
                 static_assert(std::is_integral<TId>::value && std::is_unsigned<TId>::value,
                               "TId template parameter for class Map must be unsigned integral type");
 
-                Map(const Map&) = delete;
-                Map& operator=(const Map&) = delete;
-
             protected:
 
                 Map(Map&&) noexcept = default;
@@ -115,6 +112,9 @@ namespace osmium {
                 using value_type = TValue;
 
                 Map() noexcept = default;
+
+                Map(const Map&) = delete;
+                Map& operator=(const Map&) = delete;
 
                 virtual ~Map() noexcept = default;
 
@@ -210,15 +210,15 @@ namespace osmium {
 
             MapFactory() = default;
 
+            ~MapFactory() = default;
+
+        public:
+
             MapFactory(const MapFactory&) = delete;
             MapFactory& operator=(const MapFactory&) = delete;
 
             MapFactory(MapFactory&&) = delete;
             MapFactory& operator=(MapFactory&&) = delete;
-
-            ~MapFactory() = default;
-
-        public:
 
             static MapFactory<id_type, value_type>& instance() {
                 static MapFactory<id_type, value_type> factory;

@@ -60,12 +60,6 @@ namespace osmium {
             Builder* m_parent;
             std::size_t m_item_offset;
 
-            Builder(const Builder&) = delete;
-            Builder(Builder&&) = delete;
-
-            Builder& operator=(const Builder&) = delete;
-            Builder& operator=(Builder&&) = delete;
-
         protected:
 
             explicit Builder(osmium::memory::Buffer& buffer, Builder* parent, osmium::memory::item_size_type size) :
@@ -202,6 +196,12 @@ namespace osmium {
             }
 
         public:
+
+            Builder(const Builder&) = delete;
+            Builder(Builder&&) = delete;
+
+            Builder& operator=(const Builder&) = delete;
+            Builder& operator=(Builder&&) = delete;
 
             /// Return the buffer this builder is using.
             osmium::memory::Buffer& buffer() noexcept {

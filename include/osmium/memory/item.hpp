@@ -133,18 +133,18 @@ namespace osmium {
                 m_padding(0) {
             }
 
-            Item(const Item&) = delete;
-            Item(Item&&) = delete;
-
-            Item& operator=(const Item&) = delete;
-            Item& operator=(Item&&) = delete;
-
             Item& set_type(const item_type item_type) noexcept {
                 m_type = item_type;
                 return *this;
             }
 
         public:
+
+            Item(const Item&) = delete;
+            Item(Item&&) = delete;
+
+            Item& operator=(const Item&) = delete;
+            Item& operator=(Item&&) = delete;
 
             constexpr static bool is_compatible_to(osmium::item_type /*t*/) noexcept {
                 return true;

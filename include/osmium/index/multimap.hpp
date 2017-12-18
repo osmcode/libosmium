@@ -54,9 +54,6 @@ namespace osmium {
 
                 using element_type = typename std::pair<TId, TValue>;
 
-                Multimap(const Multimap&) = delete;
-                Multimap& operator=(const Multimap&) = delete;
-
             protected:
 
                 Multimap(Multimap&&) noexcept = default;
@@ -71,6 +68,9 @@ namespace osmium {
                 using value_type = TValue;
 
                 Multimap() = default;
+
+                Multimap(const Multimap&) = delete;
+                Multimap& operator=(const Multimap&) = delete;
 
                 virtual ~Multimap() noexcept = default;
 

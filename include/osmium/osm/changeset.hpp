@@ -65,12 +65,6 @@ namespace osmium {
         changeset_comment_size_type m_text_size;
         string_size_type m_user_size;
 
-        ChangesetComment(const ChangesetComment&) = delete;
-        ChangesetComment(ChangesetComment&&) = delete;
-
-        ChangesetComment& operator=(const ChangesetComment&) = delete;
-        ChangesetComment& operator=(ChangesetComment&&) = delete;
-
         unsigned char* endpos() {
             return data() + osmium::memory::padded_length(sizeof(ChangesetComment) + m_user_size + m_text_size);
         }
@@ -108,6 +102,12 @@ namespace osmium {
             m_text_size(0),
             m_user_size(0) {
         }
+
+        ChangesetComment(const ChangesetComment&) = delete;
+        ChangesetComment(ChangesetComment&&) = delete;
+
+        ChangesetComment& operator=(const ChangesetComment&) = delete;
+        ChangesetComment& operator=(ChangesetComment&&) = delete;
 
         osmium::Timestamp date() const noexcept {
             return m_date;

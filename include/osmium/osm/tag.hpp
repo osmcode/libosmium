@@ -47,12 +47,6 @@ namespace osmium {
 
     class Tag : public osmium::memory::detail::ItemHelper {
 
-        Tag(const Tag&) = delete;
-        Tag(Tag&&) = delete;
-
-        Tag& operator=(const Tag&) = delete;
-        Tag& operator=(Tag&&) = delete;
-
         template <typename TMember>
         friend class osmium::memory::CollectionIterator;
 
@@ -73,6 +67,12 @@ namespace osmium {
         }
 
     public:
+
+        Tag(const Tag&) = delete;
+        Tag(Tag&&) = delete;
+
+        Tag& operator=(const Tag&) = delete;
+        Tag& operator=(Tag&&) = delete;
 
         static constexpr item_type collection_type = item_type::tag_list;
 

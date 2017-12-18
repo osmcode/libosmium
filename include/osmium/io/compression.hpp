@@ -152,12 +152,6 @@ namespace osmium {
 
             CompressionFactory() = default;
 
-            CompressionFactory(const CompressionFactory&) = delete;
-            CompressionFactory& operator=(const CompressionFactory&) = delete;
-
-            CompressionFactory(CompressionFactory&&) = delete;
-            CompressionFactory& operator=(CompressionFactory&&) = delete;
-
             const callbacks_type& find_callbacks(osmium::io::file_compression compression) const {
                 const auto it = m_callbacks.find(compression);
 
@@ -172,6 +166,12 @@ namespace osmium {
             }
 
         public:
+
+            CompressionFactory(const CompressionFactory&) = delete;
+            CompressionFactory& operator=(const CompressionFactory&) = delete;
+
+            CompressionFactory(CompressionFactory&&) = delete;
+            CompressionFactory& operator=(CompressionFactory&&) = delete;
 
             static CompressionFactory& instance() {
                 static CompressionFactory factory;

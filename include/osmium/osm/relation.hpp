@@ -63,12 +63,6 @@ namespace osmium {
         uint16_t         m_flags;
         string_size_type m_role_size = 0;
 
-        RelationMember(const RelationMember&) = delete;
-        RelationMember(RelationMember&&) = delete;
-
-        RelationMember& operator=(const RelationMember&) = delete;
-        RelationMember& operator=(RelationMember&&) = delete;
-
         unsigned char* endpos() {
             return data() + osmium::memory::padded_length(sizeof(RelationMember) + m_role_size);
         }
@@ -107,6 +101,12 @@ namespace osmium {
             m_type(type),
             m_flags(full ? 1 : 0) {
         }
+
+        RelationMember(const RelationMember&) = delete;
+        RelationMember(RelationMember&&) = delete;
+
+        RelationMember& operator=(const RelationMember&) = delete;
+        RelationMember& operator=(RelationMember&&) = delete;
 
         object_id_type ref() const noexcept {
             return m_ref;
