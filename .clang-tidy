@@ -1,5 +1,5 @@
 ---
-Checks: '*,-cert-dcl21-cpp,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-cppcoreguidelines-pro-type-reinterpret-cast,-google-runtime-references,-hicpp-invalid-access-moved,-hicpp-no-assembler,-modernize-make-unique,-modernize-raw-string-literal,-readability-avoid-const-params-in-decls,-readability-implicit-bool-cast'
+Checks: '*,-cert-dcl21-cpp,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-cppcoreguidelines-pro-type-reinterpret-cast,-google-runtime-references,-hicpp-invalid-access-moved,-hicpp-no-assembler,-misc-unused-parameters,-modernize-make-unique,-modernize-raw-string-literal,-readability-avoid-const-params-in-decls,-readability-implicit-bool-cast'
 #
 #  For a list of check options, see:
 #  http://clang.llvm.org/extra/clang-tidy/checks/list.html
@@ -27,6 +27,10 @@ Checks: '*,-cert-dcl21-cpp,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-cpp
 #
 #  hicpp-no-assembler
 #    Reports are from macros we don't have any control over.
+#
+#  misc-unused-parameters
+#    Can't be fixed, because then Doxygen will complain. (In file
+#    include/osmium/area/problem_reporter.hpp).
 #
 #  modernize-make-unique
 #    This is a C++11 library and C++ doesn't have std::make_unique.
