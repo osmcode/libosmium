@@ -110,6 +110,29 @@ namespace osmium {
                     return str;
                 }
 
+                /* Polygon */
+                void polygon_start() {
+                    m_str = m_srid_prefix;
+                    m_str += "POLYGON((";
+                }
+
+                void polygon_add_location(const osmium::geom::Coordinates& xy) {
+                    xy.append_to_string(m_str, ' ', m_precision);
+                    m_str += ',';
+                }
+
+                polygon_type polygon_finish(size_t /* num_points */) {
+                    assert(!m_str.empty());
+                    std::string str;
+
+                    using std::swap;
+                    swap(str, m_str);
+
+                    str.back() = ')';
+                    str += ")";
+                    return str;
+                }
+
                 /* MultiPolygon */
 
                 void multipolygon_start() {

@@ -60,6 +60,30 @@ TEST_CASE("WKT geometry factory") {
         }
     }
 
+    SECTION("polygon") {
+        const auto& wnl = create_test_wnl_closed(buffer);
+
+        SECTION("unique forwards (default)") {
+            const std::string wkt{factory.create_polygon(wnl)};
+            REQUIRE(wkt == "POLYGON((3 3,4.1 4.1,3.6 4.1,3.1 3.5,3 3))");
+        }
+
+        SECTION("unique backwards") {
+            const std::string wkt{factory.create_polygon(wnl, osmium::geom::use_nodes::unique, osmium::geom::direction::backward)};
+            REQUIRE(wkt == "POLYGON((3 3,3.1 3.5,3.6 4.1,4.1 4.1,3 3))");
+        }
+
+        SECTION("all forwards") {
+            const std::string wkt{factory.create_polygon(wnl,  osmium::geom::use_nodes::all)};
+            REQUIRE(wkt == "POLYGON((3 3,4.1 4.1,4.1 4.1,3.6 4.1,3.1 3.5,3 3))");
+        }
+
+        SECTION("all backwards") {
+            const std::string wkt{factory.create_polygon(wnl, osmium::geom::use_nodes::all, osmium::geom::direction::backward)};
+            REQUIRE(wkt == "POLYGON((3 3,3.1 3.5,3.6 4.1,4.1 4.1,4.1 4.1,3 3))");
+        }
+    }
+
     SECTION("empty linestring") {
         const auto& wnl = create_test_wnl_empty(buffer);
 
