@@ -181,14 +181,14 @@ namespace osmium {
              * @param offset Offset into the file where the mapping should start
              * @throws std::system_error if the mapping fails
              */
-            MemoryMapping(std::size_t size, mapping_mode mode, int fd=-1, off_t offset=0);
+            MemoryMapping(std::size_t size, mapping_mode mode, int fd = -1, off_t offset = 0);
 
             /**
              * @deprecated
              * For backwards compatibility only. Use the constructor taking
              * a mapping_mode as second argument instead.
              */
-            OSMIUM_DEPRECATED MemoryMapping(std::size_t size, bool writable=true, int fd=-1, off_t offset=0) :
+            OSMIUM_DEPRECATED MemoryMapping(std::size_t size, bool writable = true, int fd = -1, off_t offset = 0) :
                 MemoryMapping(size, writable ? mapping_mode::write_shared : mapping_mode::readonly, fd, offset)  {
             }
 
@@ -380,12 +380,12 @@ namespace osmium {
              * Move construct a mapping from another one. The other mapping
              * will be marked as invalid.
              */
-            TypedMemoryMapping(TypedMemoryMapping&& other) = default;
+            TypedMemoryMapping(TypedMemoryMapping&& other) noexcept = default;
 
             /**
              * Move a mapping. The other mapping will be marked as invalid.
              */
-            TypedMemoryMapping& operator=(TypedMemoryMapping&& other) = default;
+            TypedMemoryMapping& operator=(TypedMemoryMapping&& other) noexcept = default;
 
             /**
              * Releases the mapping by calling unmap(). Will never throw.
