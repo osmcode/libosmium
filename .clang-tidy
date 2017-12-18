@@ -1,5 +1,5 @@
 ---
-Checks: '*,-cert-dcl21-cpp,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-cppcoreguidelines-pro-type-reinterpret-cast,-google-runtime-references,-modernize-make-unique,-readability-avoid-const-params-in-decls,-readability-implicit-bool-cast'
+Checks: '*,-cert-dcl21-cpp,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-cppcoreguidelines-pro-type-reinterpret-cast,-google-runtime-references,-hicpp-invalid-access-moved,-modernize-make-unique,-readability-avoid-const-params-in-decls,-readability-implicit-bool-cast'
 #
 #  For a list of check options, see:
 #  http://clang.llvm.org/extra/clang-tidy/checks/list.html
@@ -23,7 +23,7 @@ Checks: '*,-cert-dcl21-cpp,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-cpp
 #    now anyways.
 #
 #  hicpp-invalid-access-moved
-#    Create false positives.
+#    Creates false positives.
 #
 #  modernize-make-unique
 #    This is a C++11 library and C++ doesn't have std::make_unique.
