@@ -245,14 +245,12 @@ namespace osmium {
 
                 StringStore m_strings;
                 std::unordered_map<const char*, size_t, djb2_hash, str_equal> m_index;
-                uint32_t m_size;
+                uint32_t m_size = 0;
 
             public:
 
                 explicit StringTable(size_t size = default_stringtable_chunk_size) :
-                    m_strings(size),
-                    m_index(),
-                    m_size(0) {
+                    m_strings(size) {
                     m_strings.add("");
                 }
 

@@ -87,7 +87,7 @@ namespace osmium {
                 ProtoRing* m_ring = nullptr;
 
                 // The role of this segment from the member role.
-                role_type m_role;
+                role_type m_role = role_type::unknown;
 
                 // Nodes have to be reversed to get the intended order.
                 bool m_reverse = false;
@@ -98,9 +98,7 @@ namespace osmium {
 
             public:
 
-                NodeRefSegment() noexcept :
-                    m_role(role_type::unknown) {
-                }
+                NodeRefSegment() noexcept = default;
 
                 NodeRefSegment(const osmium::NodeRef& nr1, const osmium::NodeRef& nr2, role_type role, const osmium::Way* way) noexcept :
                     m_first(nr1),

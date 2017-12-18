@@ -109,10 +109,10 @@ namespace osmium {
         private:
 
             std::unique_ptr<unsigned char[]> m_memory;
-            unsigned char* m_data;
-            std::size_t m_capacity;
-            std::size_t m_written;
-            std::size_t m_committed;
+            unsigned char* m_data = nullptr;
+            std::size_t m_capacity = 0;
+            std::size_t m_written = 0;
+            std::size_t m_committed = 0;
 #ifndef NDEBUG
             uint8_t m_builder_count = 0;
 #endif
@@ -139,11 +139,7 @@ namespace osmium {
              * buffer.
              */
             Buffer() noexcept :
-                m_memory(),
-                m_data(nullptr),
-                m_capacity(0),
-                m_written(0),
-                m_committed(0) {
+                m_memory() {
             }
 
             /**
@@ -212,8 +208,6 @@ namespace osmium {
                 m_memory(new unsigned char[calculate_capacity(capacity)]),
                 m_data(m_memory.get()),
                 m_capacity(calculate_capacity(capacity)),
-                m_written(0),
-                m_committed(0),
                 m_auto_grow(auto_grow) {
             }
 

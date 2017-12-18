@@ -124,16 +124,14 @@ namespace osmium {
             return f;
         }
 
-        uint32_t m_timestamp;
+        uint32_t m_timestamp = 0;
 
     public:
 
         /**
          * Default construct an invalid Timestamp.
          */
-        constexpr Timestamp() noexcept :
-            m_timestamp(0) {
-        }
+        constexpr Timestamp() noexcept = default;
 
         /**
          * Construct a Timestamp from any integer type containing the seconds

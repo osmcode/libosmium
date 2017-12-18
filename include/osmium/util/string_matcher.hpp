@@ -232,9 +232,7 @@ namespace osmium {
 
         public:
 
-            explicit list() :
-                m_strings() {
-            }
+            explicit list() = default;
 
             explicit list(const std::vector<std::string>& strings) :
                 m_strings(strings) {

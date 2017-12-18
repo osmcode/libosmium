@@ -65,9 +65,9 @@ namespace osmium {
      */
     class DiffObject {
 
-        const osmium::OSMObject* m_prev;
-        const osmium::OSMObject* m_curr;
-        const osmium::OSMObject* m_next;
+        const osmium::OSMObject* m_prev = nullptr;
+        const osmium::OSMObject* m_curr = nullptr;
+        const osmium::OSMObject* m_next = nullptr;
 
     public:
 
@@ -75,11 +75,7 @@ namespace osmium {
          * Default construct an empty DiffObject. Most methods of this class
          * can not be called on empty DiffObjects.
          */
-        DiffObject() noexcept :
-            m_prev(nullptr),
-            m_curr(nullptr),
-            m_next(nullptr) {
-        }
+        DiffObject() noexcept = default;
 
         /**
          * Construct a non-empty DiffObject from the given OSMObjects. All

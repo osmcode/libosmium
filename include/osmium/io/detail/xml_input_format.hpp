@@ -112,8 +112,7 @@ namespace osmium {
         std::string version;
 
         explicit format_version_error() :
-            io_error("Can not read file without version (missing version attribute on osm element)."),
-            version() {
+            io_error("Can not read file without version (missing version attribute on osm element).") {
         }
 
         explicit format_version_error(const char* v) :

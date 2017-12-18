@@ -48,7 +48,7 @@ namespace osmium {
 
         osmium::StringMatcher m_key_matcher;
         osmium::StringMatcher m_value_matcher;
-        bool m_result;
+        bool m_result = true;
 
     public:
 
@@ -57,8 +57,7 @@ namespace osmium {
          */
         TagMatcher() :
             m_key_matcher(osmium::StringMatcher::always_false{}),
-            m_value_matcher(osmium::StringMatcher::always_false{}),
-            m_result(true) {
+            m_value_matcher(osmium::StringMatcher::always_false{}) {
         }
 
         /**
@@ -71,8 +70,7 @@ namespace osmium {
             std::is_convertible<TKey, osmium::StringMatcher>::value, int>::type = 0>
         TagMatcher(TKey&& key_matcher) :
             m_key_matcher(std::forward<TKey>(key_matcher)),
-            m_value_matcher(osmium::StringMatcher::always_true{}),
-            m_result(true) {
+            m_value_matcher(osmium::StringMatcher::always_true{}) {
         }
 
         /**
