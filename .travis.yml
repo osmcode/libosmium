@@ -200,8 +200,6 @@ matrix:
 
 
 install:
-  - DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
-  - mkdir -p ${DEPS_DIR} && cd ${DEPS_DIR}
   - git clone --quiet --depth 1 https://github.com/mapbox/protozero.git
   - git clone --quiet --depth 1 https://github.com/osmcode/osm-testdata.git
   - |
@@ -214,7 +212,7 @@ install:
 before_script:
   - cd ${TRAVIS_BUILD_DIR}
   - mkdir build && cd build
-  - cmake -LA .. -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DBUILD_WITH_CCACHE=1 -DOSM_TESTDATA="${TRAVIS_BUILD_DIR}/deps/osm-testdata"
+  - cmake -LA .. -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DBUILD_WITH_CCACHE=1 -DOSM_TESTDATA="${TRAVIS_BUILD_DIR}/osm-testdata"
 
 script:
   - make VERBOSE=1 && ctest --output-on-failure
