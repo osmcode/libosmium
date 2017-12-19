@@ -4,8 +4,8 @@
 #include "catch.hpp"
 
 #include <osmium/io/detail/queue_util.hpp>
-#include <osmium/io/xml_input.hpp>
 #include <osmium/io/gzip_compression.hpp>
+#include <osmium/io/xml_input.hpp>
 #include <osmium/visitor.hpp>
 
 #include <cassert>
