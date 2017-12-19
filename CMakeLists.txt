@@ -62,7 +62,6 @@ option(BUILD_BENCHMARKS "compile benchmark programs" ${dev_build})
 option(BUILD_DATA_TESTS "compile data tests, please run them with ctest" ${data_test_build})
 
 option(INSTALL_GDALCPP   "also install gdalcpp headers" OFF)
-option(INSTALL_PROTOZERO "also install protozero headers" OFF)
 option(INSTALL_UTFCPP    "also install utfcpp headers" OFF)
 
 option(WITH_PROFILING    "add flags needed for profiling" OFF)
@@ -490,10 +489,6 @@ install(DIRECTORY include/osmium DESTINATION include)
 
 if(INSTALL_GDALCPP)
     install(FILES include/gdalcpp.hpp DESTINATION include)
-endif()
-
-if(INSTALL_PROTOZERO)
-    install(DIRECTORY include/protozero DESTINATION include)
 endif()
 
 if(INSTALL_UTFCPP)

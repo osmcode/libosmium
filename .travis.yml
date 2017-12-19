@@ -202,6 +202,7 @@ matrix:
 install:
   - DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
   - mkdir -p ${DEPS_DIR} && cd ${DEPS_DIR}
+  - git clone --quiet --depth 1 https://github.com/mapbox/protozero.git
   - git clone --quiet --depth 1 https://github.com/osmcode/osm-testdata.git
   - |
     if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then

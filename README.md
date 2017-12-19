@@ -32,8 +32,10 @@ manual.
 The following external (header-only) libraries are included in the libosmium
 repository:
 * [gdalcpp](https://github.com/joto/gdalcpp)
-* [protozero](https://github.com/mapbox/protozero)
 * [utfcpp](http://utfcpp.sourceforge.net/)
+
+Note that [protozero](https://github.com/mapbox/protozero) was included in
+earlier versions of libosmium, but isn't any more.
 
 
 ## Directories
