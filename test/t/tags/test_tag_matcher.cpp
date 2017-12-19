@@ -23,6 +23,29 @@ TEST_CASE("Tag matcher") {
     }));
     const osmium::TagList& tag_list = buffer.get<osmium::TagList>(pos);
 
+    SECTION("Matching nothing (default constructor)") {
+        osmium::TagMatcher m{};
+        REQUIRE_FALSE(m(tag_list));
+
+        REQUIRE_FALSE(m(*tag_list.begin()));
+    }
+
+    SECTION("Matching nothing (bool)") {
+        osmium::TagMatcher m{false};
+        REQUIRE_FALSE(m(tag_list));
+
+        REQUIRE_FALSE(m(*tag_list.begin()));
+    }
+
+    SECTION("Matching everything") {
+        osmium::TagMatcher m{true};
+        REQUIRE(m(tag_list));
+
+        REQUIRE(m(*tag_list.begin()));
+        REQUIRE(m(*std::next(tag_list.begin())));
+        REQUIRE(m(*std::next(std::next(tag_list.begin()))));
+    }
+
     SECTION("Matching keys only") {
         osmium::TagMatcher m{osmium::StringMatcher::equal{"highway"}};
         REQUIRE(m(tag_list));
