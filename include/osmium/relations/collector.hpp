@@ -551,7 +551,9 @@ namespace osmium {
 
             template <typename TSource>
             void read_relations(TSource& source) {
-                read_relations(std::begin(source), std::end(source));
+                using std::begin;
+                using std::end;
+                read_relations(begin(source), end(source));
                 source.close();
             }
 

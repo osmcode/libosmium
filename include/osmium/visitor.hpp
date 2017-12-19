@@ -224,7 +224,9 @@ namespace osmium {
 
     template <typename TContainer, typename... THandlers>
     inline void apply(TContainer& c, THandlers&&... handlers) {
-        apply(std::begin(c), std::end(c), std::forward<THandlers>(handlers)...);
+        using std::begin;
+        using std::end;
+        apply(begin(c), end(c), std::forward<THandlers>(handlers)...);
     }
 
     template <typename... THandlers>

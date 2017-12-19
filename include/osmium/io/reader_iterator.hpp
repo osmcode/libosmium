@@ -36,16 +36,20 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/io/input_iterator.hpp>
 #include <osmium/io/reader.hpp>
 
-namespace std {
+namespace osmium {
 
-    inline osmium::io::InputIterator<osmium::io::Reader> begin(osmium::io::Reader& reader) {
-        return osmium::io::InputIterator<osmium::io::Reader>(reader);
-    }
+    namespace io {
 
-    inline osmium::io::InputIterator<osmium::io::Reader> end(osmium::io::Reader& /*reader*/) {
-        return osmium::io::InputIterator<osmium::io::Reader>();
-    }
+        inline InputIterator<Reader> begin(Reader& reader) {
+            return InputIterator<Reader>(reader);
+        }
 
-} // namespace std
+        inline InputIterator<Reader> end(Reader& /*reader*/) {
+            return InputIterator<Reader>();
+        }
+
+    } // namespace io
+
+} // namespace osmium
 
 #endif // OSMIUM_IO_READER_ITERATOR_HPP
