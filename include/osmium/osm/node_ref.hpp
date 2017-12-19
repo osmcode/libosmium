@@ -54,7 +54,13 @@ namespace osmium {
 
     public:
 
-        constexpr NodeRef(const osmium::object_id_type ref = 0, const osmium::Location& location = Location()) noexcept :
+        /**
+         * Constructor for NodeRef
+         *
+         * This is not explicit to allow implicit construction from an object
+         * ID.
+         */
+        constexpr NodeRef(const osmium::object_id_type ref = 0, const osmium::Location& location = Location{}) noexcept : // NOLINT clang-tidy: google-explicit-constructor, hicpp-explicit-conversions
             m_ref(ref),
             m_location(location) {
         }

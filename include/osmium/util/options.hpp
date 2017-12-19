@@ -77,7 +77,7 @@ namespace osmium {
              *   Options options{ { "foo", "true" }, { "bar", "17" } };
              * @endcode
              */
-            explicit Options(const std::initializer_list<value_type>& values) :
+            Options(const std::initializer_list<value_type>& values) :
                 m_options(values) {
             }
 

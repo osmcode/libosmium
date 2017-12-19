@@ -96,7 +96,7 @@ namespace osmium {
 
         static constexpr item_type collection_type = item_type::relation_member_list;
 
-        RelationMember(const object_id_type ref = 0, const item_type type = item_type(), const bool full = false) noexcept :
+        explicit RelationMember(const object_id_type ref = 0, const item_type type = item_type(), const bool full = false) noexcept :
             m_ref(ref),
             m_type(type),
             m_flags(full ? 1 : 0) {

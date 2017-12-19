@@ -67,7 +67,7 @@ namespace osmium {
                 using multipolygon_type = std::string;
                 using ring_type         = std::string;
 
-                WKTFactoryImpl(int srid, int precision = 7, wkt_type wtype = wkt_type::wkt) :
+                explicit WKTFactoryImpl(int srid, int precision = 7, wkt_type wtype = wkt_type::wkt) :
                     m_precision(precision),
                     m_wkt_type(wtype) {
                     if (m_wkt_type == wkt_type::ewkt) {

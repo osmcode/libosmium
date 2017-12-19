@@ -60,7 +60,7 @@ namespace osmium {
                 using multipolygon_type = std::string;
                 using ring_type         = std::string;
 
-                GeoJSONFactoryImpl(int /* srid */, int precision = 7) :
+                explicit GeoJSONFactoryImpl(int /*srid*/, int precision = 7) :
                     m_precision(precision) {
                 }
 
@@ -86,7 +86,7 @@ namespace osmium {
                     m_str += ',';
                 }
 
-                linestring_type linestring_finish(size_t /* num_points */) {
+                linestring_type linestring_finish(size_t /*num_points*/) {
                     assert(!m_str.empty());
                     std::string str;
 
@@ -108,7 +108,7 @@ namespace osmium {
                     m_str += ',';
                 }
 
-                polygon_type polygon_finish(size_t /* num_points */) {
+                polygon_type polygon_finish(size_t /*num_points*/) {
                     assert(!m_str.empty());
                     std::string str;
 

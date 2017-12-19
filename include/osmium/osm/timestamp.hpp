@@ -143,7 +143,7 @@ namespace osmium {
          * like @code node.set_timestamp(123); @endcode work.
          */
         template <typename T, typename std::enable_if<std::is_integral<T>::value, int>::type = 0>
-        constexpr Timestamp(T timestamp) noexcept :
+        constexpr Timestamp(T timestamp) noexcept : // NOLINT clang-tidy: google-explicit-constructor, hicpp-explicit-conversions
             m_timestamp(uint32_t(timestamp)) {
         }
 
@@ -200,7 +200,7 @@ namespace osmium {
          *
          * @deprecated You should call seconds_since_epoch() explicitly instead.
          */
-        OSMIUM_DEPRECATED constexpr operator time_t() const noexcept {
+        OSMIUM_DEPRECATED constexpr operator time_t() const noexcept { // NOLINT clang-tidy: google-explicit-constructor
             return static_cast<time_t>(m_timestamp);
         }
 
