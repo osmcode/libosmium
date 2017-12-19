@@ -200,8 +200,8 @@ matrix:
 
 
 install:
-  - git clone --quiet --depth 1 https://github.com/mapbox/protozero.git
-  - git clone --quiet --depth 1 https://github.com/osmcode/osm-testdata.git
+  - git clone --quiet --depth 1 https://github.com/mapbox/protozero.git ../protozero
+  - git clone --quiet --depth 1 https://github.com/osmcode/osm-testdata.git ../osm-testdata
   - |
     if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
       brew remove gdal
