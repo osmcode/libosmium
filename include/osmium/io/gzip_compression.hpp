@@ -266,7 +266,7 @@ namespace osmium {
                         throw osmium::gzip_error{message, result};
                     }
 
-                    output.resize(static_cast<unsigned long>(m_zstream.next_out - reinterpret_cast<const unsigned char*>(output.data())));
+                    output.resize(static_cast<std::size_t>(m_zstream.next_out - reinterpret_cast<const unsigned char*>(output.data())));
                 }
 
                 return output;
