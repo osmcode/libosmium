@@ -120,6 +120,12 @@ namespace osmium {
                     set_header_value(osmium::io::Header{});
                 }
 
+                OPLParser(const OPLParser&) = delete;
+                OPLParser& operator=(const OPLParser&) = delete;
+
+                OPLParser(OPLParser&&) = delete;
+                OPLParser& operator=(OPLParser&&) = delete;
+
                 ~OPLParser() noexcept final = default;
 
                 void parse_line(const char* data) {
