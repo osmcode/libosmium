@@ -102,15 +102,15 @@ namespace osmium {
                 bool ignore_value;
                 bool result;
 
-                explicit Rule(bool r, bool ignore, const key_type& k, const value_type& v) :
-                    key(k),
-                    value(v),
+                explicit Rule(bool r, bool ignore, key_type k, value_type v) :
+                    key(std::move(k)),
+                    value(std::move(v)),
                     ignore_value(ignore),
                     result(r) {
                 }
 
-                explicit Rule(bool r, bool ignore, const key_type& k) :
-                    key(k),
+                explicit Rule(bool r, bool ignore, key_type k) :
+                    key(std::move(k)),
                     value(),
                     ignore_value(ignore),
                     result(r) {

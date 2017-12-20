@@ -100,9 +100,9 @@ namespace osmium {
              *               empty the format will be deduced from the suffix
              *               of the filename.
              */
-            explicit File(const std::string& filename = "", const std::string& format = "") :
-                m_filename(filename),
-                m_format_string(format) {
+            explicit File(std::string filename = "", std::string format = "") :
+                m_filename(std::move(filename)),
+                m_format_string(std::move(format)) {
 
                 // stdin/stdout
                 if (m_filename == "-") {
@@ -115,10 +115,10 @@ namespace osmium {
                     m_file_format = file_format::xml;
                 }
 
-                if (format.empty()) {
+                if (m_format_string.empty()) {
                     detect_format_from_suffix(m_filename);
                 } else {
-                    parse_format(format);
+                    parse_format(m_format_string);
                 }
             }
 
