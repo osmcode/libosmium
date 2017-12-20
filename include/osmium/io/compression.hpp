@@ -173,6 +173,8 @@ namespace osmium {
             CompressionFactory(CompressionFactory&&) = delete;
             CompressionFactory& operator=(CompressionFactory&&) = delete;
 
+            ~CompressionFactory() noexcept = default;
+
             static CompressionFactory& instance() {
                 static CompressionFactory factory;
                 return factory;

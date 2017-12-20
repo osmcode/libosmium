@@ -141,10 +141,12 @@ namespace osmium {
         public:
 
             Item(const Item&) = delete;
-            Item(Item&&) = delete;
-
             Item& operator=(const Item&) = delete;
+
+            Item(Item&&) = delete;
             Item& operator=(Item&&) = delete;
+
+            ~Item() noexcept = default;
 
             constexpr static bool is_compatible_to(osmium::item_type /*t*/) noexcept {
                 return true;

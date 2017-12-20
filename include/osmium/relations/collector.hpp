@@ -207,9 +207,7 @@ namespace osmium {
             Collector() :
                 m_handler_pass2(*static_cast<TCollector*>(this)),
                 m_relations_buffer(initial_buffer_size, osmium::memory::Buffer::auto_grow::yes),
-                m_members_buffer(initial_buffer_size, osmium::memory::Buffer::auto_grow::yes),
-                m_relations(),
-                m_member_meta() {
+                m_members_buffer(initial_buffer_size, osmium::memory::Buffer::auto_grow::yes) {
             }
 
         protected:

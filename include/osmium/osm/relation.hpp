@@ -103,10 +103,12 @@ namespace osmium {
         }
 
         RelationMember(const RelationMember&) = delete;
-        RelationMember(RelationMember&&) = delete;
-
         RelationMember& operator=(const RelationMember&) = delete;
+
+        RelationMember(RelationMember&&) = delete;
         RelationMember& operator=(RelationMember&&) = delete;
+
+        ~RelationMember() noexcept = default;
 
         object_id_type ref() const noexcept {
             return m_ref;

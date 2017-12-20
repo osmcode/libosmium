@@ -127,9 +127,9 @@ namespace osmium {
                 }
 
                 OutputFormat(const OutputFormat&) = delete;
-                OutputFormat(OutputFormat&&) = delete;
-
                 OutputFormat& operator=(const OutputFormat&) = delete;
+
+                OutputFormat(OutputFormat&&) = delete;
                 OutputFormat& operator=(OutputFormat&&) = delete;
 
                 virtual ~OutputFormat() noexcept = default;
@@ -161,9 +161,7 @@ namespace osmium {
 
                 std::array<create_output_type, static_cast<std::size_t>(file_format::last) + 1> m_callbacks;
 
-                OutputFormatFactory() noexcept :
-                    m_callbacks() {
-                }
+                OutputFormatFactory() noexcept = default;
 
                 create_output_type& callbacks(const osmium::io::file_format format) noexcept {
                     return m_callbacks[static_cast<std::size_t>(format)];
@@ -211,6 +209,9 @@ namespace osmium {
 
                 BlackholeOutputFormat(const BlackholeOutputFormat&) = delete;
                 BlackholeOutputFormat& operator=(const BlackholeOutputFormat&) = delete;
+
+                BlackholeOutputFormat(BlackholeOutputFormat&&) = delete;
+                BlackholeOutputFormat& operator=(BlackholeOutputFormat&&) = delete;
 
                 ~BlackholeOutputFormat() noexcept final = default;
 

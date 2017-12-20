@@ -72,6 +72,12 @@ public:
         m_layer_mpoly.add_field("from_type", OFTString, 1);
     }
 
+    TestHandler(const TestHandler&) = delete;
+    TestHandler& operator=(const TestHandler&) = delete;
+
+    TestHandler(TestHandler&&) = delete;
+    TestHandler& operator=(TestHandler&&) = delete;
+
     ~TestHandler() {
         m_out << "\n]\n";
     }

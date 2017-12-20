@@ -88,9 +88,7 @@ namespace osmium {
 
         public:
 
-            thread_handler() :
-                m_thread() {
-            }
+            thread_handler() = default;
 
             template <typename TFunction, typename... TArgs>
             explicit thread_handler(TFunction&& f, TArgs&&... args) :

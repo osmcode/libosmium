@@ -104,10 +104,12 @@ namespace osmium {
         }
 
         ChangesetComment(const ChangesetComment&) = delete;
-        ChangesetComment(ChangesetComment&&) = delete;
-
         ChangesetComment& operator=(const ChangesetComment&) = delete;
+
+        ChangesetComment(ChangesetComment&&) = delete;
         ChangesetComment& operator=(ChangesetComment&&) = delete;
+
+        ~ChangesetComment() noexcept = default;
 
         osmium::Timestamp date() const noexcept {
             return m_date;

@@ -69,10 +69,12 @@ namespace osmium {
     public:
 
         Tag(const Tag&) = delete;
-        Tag(Tag&&) = delete;
-
         Tag& operator=(const Tag&) = delete;
+
+        Tag(Tag&&) = delete;
         Tag& operator=(Tag&&) = delete;
+
+        ~Tag() noexcept = default;
 
         static constexpr item_type collection_type = item_type::tag_list;
 

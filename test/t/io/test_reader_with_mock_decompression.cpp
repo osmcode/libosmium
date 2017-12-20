@@ -21,7 +21,6 @@ class MockDecompressor : public osmium::io::Decompressor {
 public:
 
     explicit MockDecompressor(std::string fail_in) :
-        Decompressor(),
         m_fail_in(std::move(fail_in)) {
         if (m_fail_in == "constructor") {
             throw std::runtime_error{"error constructor"};

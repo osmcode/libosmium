@@ -190,6 +190,8 @@ namespace osmium {
             RelationsMapIndex(RelationsMapIndex&& /*other*/) noexcept(std::is_nothrow_move_constructible<map_type>::value);
             RelationsMapIndex& operator=(RelationsMapIndex&& /*other*/) noexcept(std::is_nothrow_move_assignable<map_type>::value);
 
+            ~RelationsMapIndex() noexcept = default;
+
             /**
              * Find the given relation id in the index and call the given
              * function with all parent relation ids.
@@ -328,6 +330,8 @@ namespace osmium {
 
             RelationsMapStash(RelationsMapStash&& /*other*/) noexcept(std::is_nothrow_move_constructible<map_type>::value);
             RelationsMapStash& operator=(RelationsMapStash&& /*other*/) noexcept(std::is_nothrow_move_assignable<map_type>::value);
+
+            ~RelationsMapStash() noexcept = default;
 
             /**
              * Add mapping from member to parent relation in the stash.

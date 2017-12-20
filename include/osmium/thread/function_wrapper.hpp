@@ -49,6 +49,14 @@ namespace osmium {
 
             struct impl_base {
 
+                impl_base() noexcept = default;
+
+                impl_base(const impl_base&) noexcept = default;
+                impl_base& operator=(const impl_base&) noexcept = default;
+
+                impl_base(impl_base&&) noexcept = default;
+                impl_base& operator=(impl_base&&) noexcept = default;
+
                 virtual ~impl_base() noexcept = default;
 
                 virtual bool call() {
