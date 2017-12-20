@@ -432,11 +432,6 @@ namespace osmium {
                     m_options.locations_on_ways = file.is_true("locations_on_ways");
                 }
 
-                XMLOutputFormat(const XMLOutputFormat&) = delete;
-                XMLOutputFormat& operator=(const XMLOutputFormat&) = delete;
-
-                ~XMLOutputFormat() noexcept final = default;
-
                 void write_header(const osmium::io::Header& header) final {
                     std::string out{"<?xml version='1.0' encoding='UTF-8'?>\n"};
 

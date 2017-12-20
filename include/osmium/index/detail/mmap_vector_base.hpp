@@ -76,8 +76,6 @@ namespace osmium {
                 std::fill_n(data(), capacity, osmium::index::empty_value<T>());
             }
 
-            ~mmap_vector_base() noexcept = default;
-
             using value_type      = T;
             using pointer         = value_type*;
             using const_pointer   = const value_type*;

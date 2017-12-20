@@ -70,11 +70,6 @@ namespace osmium {
                 m_index_r2r(r2r) {
             }
 
-            ObjectRelations(const ObjectRelations&) = delete;
-            ObjectRelations& operator=(const ObjectRelations&) = delete;
-
-            ~ObjectRelations() noexcept = default;
-
             void way(const osmium::Way& way) {
                 for (const auto& node_ref : way.nodes()) {
                     m_index_n2w.set(node_ref.positive_ref(), way.positive_id());

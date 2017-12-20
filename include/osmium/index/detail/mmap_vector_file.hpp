@@ -78,8 +78,6 @@ namespace osmium {
                     filesize(fd)) {
             }
 
-            ~mmap_vector_file() noexcept = default;
-
         }; // class mmap_vector_file
 
     } // namespace detail

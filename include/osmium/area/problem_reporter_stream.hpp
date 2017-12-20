@@ -56,8 +56,6 @@ namespace osmium {
                 m_out(&out) {
             }
 
-            ~ProblemReporterStream() override = default;
-
             void header(const char* msg) {
                 *m_out << "DATA PROBLEM: " << msg << " on " << item_type_to_char(m_object_type) << m_object_id << " (with " << m_nodes << " nodes): ";
             }

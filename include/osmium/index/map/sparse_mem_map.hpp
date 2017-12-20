@@ -70,8 +70,6 @@ namespace osmium {
 
                 SparseMemMap() = default;
 
-                ~SparseMemMap() noexcept final = default;
-
                 void set(const TId id, const TValue value) final {
                     m_elements[id] = value;
                 }

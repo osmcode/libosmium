@@ -524,14 +524,6 @@ namespace osmium {
                     m_options.format_as_diff = file.is_true("diff");
                 }
 
-                DebugOutputFormat(const DebugOutputFormat&) = delete;
-                DebugOutputFormat& operator=(const DebugOutputFormat&) = delete;
-
-                DebugOutputFormat(DebugOutputFormat&&) = delete;
-                DebugOutputFormat& operator=(DebugOutputFormat&&) = delete;
-
-                ~DebugOutputFormat() noexcept final = default;
-
                 void write_header(const osmium::io::Header& header) final {
                     if (m_options.format_as_diff) {
                         return;

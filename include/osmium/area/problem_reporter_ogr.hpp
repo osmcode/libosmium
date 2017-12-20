@@ -137,8 +137,6 @@ namespace osmium {
                 ;
             }
 
-            ~ProblemReporterOGR() override = default;
-
             void report_duplicate_node(osmium::object_id_type node_id1, osmium::object_id_type node_id2, osmium::Location location) override {
                 write_point("duplicate_node", node_id1, node_id2, location);
             }

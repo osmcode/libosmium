@@ -493,14 +493,6 @@ namespace osmium {
                     m_options.locations_on_ways = file.is_true("locations_on_ways");
                 }
 
-                PBFOutputFormat(const PBFOutputFormat&) = delete;
-                PBFOutputFormat& operator=(const PBFOutputFormat&) = delete;
-
-                PBFOutputFormat(PBFOutputFormat&&) = delete;
-                PBFOutputFormat& operator=(PBFOutputFormat&&) = delete;
-
-                ~PBFOutputFormat() noexcept final = default;
-
                 void write_header(const osmium::io::Header& header) final {
                     std::string data;
                     protozero::pbf_builder<OSMFormat::HeaderBlock> pbf_header_block{data};

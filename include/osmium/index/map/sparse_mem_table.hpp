@@ -88,8 +88,6 @@ namespace osmium {
                     m_elements(grow_size) {
                 }
 
-                ~SparseMemTable() noexcept final = default;
-
                 void set(const TId id, const TValue value) final {
                     if (id >= m_elements.size()) {
                         m_elements.resize(id + m_grow_size);

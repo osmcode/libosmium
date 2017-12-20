@@ -284,11 +284,6 @@ namespace osmium {
                     m_options.format_as_diff    = file.is_true("diff");
                 }
 
-                OPLOutputFormat(const OPLOutputFormat&) = delete;
-                OPLOutputFormat& operator=(const OPLOutputFormat&) = delete;
-
-                ~OPLOutputFormat() noexcept final = default;
-
                 void write_buffer(osmium::memory::Buffer&& buffer) final {
                     m_output_queue.push(m_pool.submit(OPLOutputBlock{std::move(buffer), m_options}));
                 }
