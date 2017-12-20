@@ -10,6 +10,7 @@
 
 #include <cassert>
 #include <cstdlib>
+#include <cstring>
 #include <future>
 #include <iostream>
 #include <iterator>
@@ -314,7 +315,7 @@ TEST_CASE("Reading OSM XML 140: Using Reader") {
         const char* uc = t["unicode_char"];
 
         const auto len = atoi(t["unicode_utf8_length"]);
-        REQUIRE(len == strlen(uc));
+        REQUIRE(len == std::strlen(uc));
 
         REQUIRE(S_(uc) == t["unicode_xml"]);
 
