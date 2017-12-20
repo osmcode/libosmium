@@ -111,7 +111,7 @@ auto _name_##_dispatch(THandler& handler, const osmium::_type_& object, long) ->
             }
 
             template <typename THandler>
-            void flush_dispatch(THandler& /*handler*/, long /*dispatch*/) {
+            void flush_dispatch(THandler& /*handler*/, long /*dispatch*/) { // NOLINT clang-tidy: google-runtime-int
             }
 
             template <typename THandler>

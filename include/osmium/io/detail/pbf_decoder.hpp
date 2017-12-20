@@ -749,8 +749,8 @@ namespace osmium {
                 if (!zlib_data.empty() && raw_size != 0) {
                     return osmium::io::detail::zlib_uncompress_string(
                         zlib_data.data(),
-                        static_cast<unsigned long>(zlib_data.size()),
-                        static_cast<unsigned long>(raw_size),
+                        static_cast<unsigned long>(zlib_data.size()), // NOLINT clang-tidy: google-runtime-int
+                        static_cast<unsigned long>(raw_size), // NOLINT clang-tidy: google-runtime-int
                         output
                     );
                 }
