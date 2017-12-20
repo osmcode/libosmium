@@ -303,7 +303,7 @@ namespace osmium {
                         throw bzip2_error{message, result};
                     }
 
-                    output.resize(static_cast<unsigned long>(m_bzstream.next_out - output.data()));
+                    output.resize(static_cast<std::size_t>(m_bzstream.next_out - output.data()));
                 }
 
                 return output;

@@ -75,8 +75,8 @@ namespace osmium {
      */
     struct xml_error : public io_error {
 
-        unsigned long line;
-        unsigned long column;
+        uint64_t line = 0;
+        uint64_t column = 0;
         XML_Error error_code;
         std::string error_string;
 
@@ -95,8 +95,6 @@ namespace osmium {
 
         explicit xml_error(const std::string& message) :
             io_error(message),
-            line(0),
-            column(0),
             error_code(),
             error_string(message) {
         }

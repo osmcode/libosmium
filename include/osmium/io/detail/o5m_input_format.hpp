@@ -163,7 +163,7 @@ namespace osmium {
                 }
 
                 bool ensure_bytes_available(std::size_t need_bytes) {
-                    if ((m_end - m_data) >= long(need_bytes)) {
+                    if ((m_end - m_data) >= static_cast<int64_t>(need_bytes)) {
                         return true;
                     }
 

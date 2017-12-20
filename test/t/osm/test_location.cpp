@@ -169,7 +169,7 @@ TEST_CASE("Location hash") {
     }
 }
 
-void C(const char* s, long v, const char* r = "") {
+void C(const char* s, int32_t v, const char* r = "") {
     std::string strm{"-"};
     strm += s;
     REQUIRE(std::atof(strm.c_str() + 1) == Approx( v / 10000000.0));
@@ -346,7 +346,7 @@ TEST_CASE("Writing zero coordinate into string") {
     REQUIRE(buffer == "0");
 }
 
-void CW(long v, const char* s) {
+void CW(int32_t v, const char* s) {
     std::string buffer;
 
     osmium::detail::append_location_coordinate_to_string(std::back_inserter(buffer), v);
