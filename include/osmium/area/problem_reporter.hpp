@@ -74,6 +74,12 @@ namespace osmium {
 
             ProblemReporter() = default;
 
+            ProblemReporter(const ProblemReporter&) = default;
+            ProblemReporter& operator=(const ProblemReporter&) = default;
+
+            ProblemReporter(ProblemReporter&&) noexcept = default;
+            ProblemReporter& operator=(ProblemReporter&&) noexcept = default;
+
             virtual ~ProblemReporter() = default;
 
             /**

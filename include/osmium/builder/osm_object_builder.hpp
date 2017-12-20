@@ -85,6 +85,12 @@ namespace osmium {
                 new (&item()) TagList{};
             }
 
+            TagListBuilder(const TagListBuilder&) = delete;
+            TagListBuilder& operator=(const TagListBuilder&) = delete;
+
+            TagListBuilder(TagListBuilder&&) = delete;
+            TagListBuilder& operator=(TagListBuilder&&) = delete;
+
             ~TagListBuilder() {
                 add_padding();
             }
@@ -196,6 +202,12 @@ namespace osmium {
                 new (&item()) T{};
             }
 
+            NodeRefListBuilder(const NodeRefListBuilder&) = delete;
+            NodeRefListBuilder& operator=(const NodeRefListBuilder&) = delete;
+
+            NodeRefListBuilder(NodeRefListBuilder&&) = delete;
+            NodeRefListBuilder& operator=(NodeRefListBuilder&&) = delete;
+
             ~NodeRefListBuilder() {
                 add_padding();
             }
@@ -246,6 +258,12 @@ namespace osmium {
                 Builder(parent.buffer(), &parent, sizeof(RelationMemberList)) {
                 new (&item()) RelationMemberList{};
             }
+
+            RelationMemberListBuilder(const RelationMemberListBuilder&) = delete;
+            RelationMemberListBuilder& operator=(const RelationMemberListBuilder&) = delete;
+
+            RelationMemberListBuilder(RelationMemberListBuilder&&) = delete;
+            RelationMemberListBuilder& operator=(RelationMemberListBuilder&&) = delete;
 
             ~RelationMemberListBuilder() {
                 add_padding();
@@ -338,6 +356,12 @@ namespace osmium {
                 Builder(parent.buffer(), &parent, sizeof(ChangesetDiscussion)) {
                 new (&item()) ChangesetDiscussion{};
             }
+
+            ChangesetDiscussionBuilder(const ChangesetDiscussionBuilder&) = delete;
+            ChangesetDiscussionBuilder& operator=(const ChangesetDiscussionBuilder&) = delete;
+
+            ChangesetDiscussionBuilder(ChangesetDiscussionBuilder&&) = delete;
+            ChangesetDiscussionBuilder& operator=(ChangesetDiscussionBuilder&&) = delete;
 
             ~ChangesetDiscussionBuilder() {
                 assert(!m_comment && "You have to always call both add_comment() and then add_comment_text() in that order for each comment!");

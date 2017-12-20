@@ -64,6 +64,12 @@ public:
         return m_fd;
     }
 
+    IndexAccess(const IndexAccess&) = delete;
+    IndexAccess& operator=(const IndexAccess&) = delete;
+
+    IndexAccess(IndexAccess&&) = delete;
+    IndexAccess& operator=(IndexAccess&&) = delete;
+
     virtual ~IndexAccess() = default;
 
     virtual void dump() const = 0;

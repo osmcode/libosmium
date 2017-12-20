@@ -608,6 +608,12 @@ namespace osmium {
                     m_end(m_data) {
                 }
 
+                O5mParser(const O5mParser&) = default;
+                O5mParser& operator=(const O5mParser&) = default;
+
+                O5mParser(O5mParser&&) noexcept = default;
+                O5mParser& operator=(O5mParser&&) noexcept = default;
+
                 ~O5mParser() noexcept final = default;
 
                 void run() final {

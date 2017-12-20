@@ -199,6 +199,12 @@ namespace osmium {
                     Parser(args) {
                 }
 
+                PBFParser(const PBFParser&) = delete;
+                PBFParser& operator=(const PBFParser&) = delete;
+
+                PBFParser(PBFParser&&) = delete;
+                PBFParser& operator=(PBFParser&&) = delete;
+
                 ~PBFParser() noexcept final = default;
 
                 void run() final {

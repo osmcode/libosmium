@@ -111,8 +111,6 @@ namespace osmium {
                 detail::BasicAssemblerWithTags(config) {
             }
 
-            ~Assembler() noexcept = default;
-
             /**
              * Assemble an area from the given way.
              * The resulting area is put into the out_buffer.

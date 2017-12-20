@@ -58,6 +58,14 @@ namespace osmium {
 
         public:
 
+            IdSet() = default;
+
+            IdSet(const IdSet&) = default;
+            IdSet& operator=(const IdSet&) = default;
+
+            IdSet(IdSet&&) noexcept = default;
+            IdSet& operator=(IdSet&&) noexcept = default;
+
             virtual ~IdSet() = default;
 
             /**

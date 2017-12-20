@@ -1166,8 +1166,6 @@ namespace osmium {
 #endif
                 }
 
-                ~BasicAssembler() noexcept = default;
-
                 const AssemblerConfig& config() const noexcept {
                     return m_config;
                 }

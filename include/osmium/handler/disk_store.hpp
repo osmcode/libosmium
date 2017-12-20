@@ -78,11 +78,6 @@ namespace osmium {
                 m_relation_index(relation_index) {
             }
 
-            DiskStore(const DiskStore&) = delete;
-            DiskStore& operator=(const DiskStore&) = delete;
-
-            ~DiskStore() noexcept = default;
-
             void node(const osmium::Node& node) {
                 m_node_index.set(node.positive_id(), m_offset);
                 m_offset += node.byte_size();

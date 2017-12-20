@@ -76,6 +76,12 @@ namespace osmium {
                 m_fsync(sync) {
             }
 
+            Compressor(const Compressor&) = default;
+            Compressor& operator=(const Compressor&) = default;
+
+            Compressor(Compressor&&) noexcept = default;
+            Compressor& operator=(Compressor&&) noexcept = default;
+
             virtual ~Compressor() noexcept = default;
 
             virtual void write(const std::string& data) = 0;

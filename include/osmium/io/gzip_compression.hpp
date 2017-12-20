@@ -229,6 +229,12 @@ namespace osmium {
                 }
             }
 
+            GzipBufferDecompressor(const GzipBufferDecompressor&) = delete;
+            GzipBufferDecompressor& operator=(const GzipBufferDecompressor&) = delete;
+
+            GzipBufferDecompressor(GzipBufferDecompressor&&) = delete;
+            GzipBufferDecompressor& operator=(GzipBufferDecompressor&&) = delete;
+
             ~GzipBufferDecompressor() noexcept final {
                 try {
                     close();

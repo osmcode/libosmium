@@ -637,6 +637,12 @@ namespace osmium {
                     m_buffer(buffer_size) {
                 }
 
+                XMLParser(const XMLParser&) = default;
+                XMLParser& operator=(const XMLParser&) = default;
+
+                XMLParser(XMLParser&&) noexcept = default;
+                XMLParser& operator=(XMLParser&&) noexcept = default;
+
                 ~XMLParser() noexcept final = default;
 
                 void run() final {

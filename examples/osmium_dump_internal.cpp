@@ -81,6 +81,12 @@ public:
 #endif
     }
 
+    IndexFile(const IndexFile&) = delete;
+    IndexFile& operator=(const IndexFile&) = delete;
+
+    IndexFile(IndexFile&&) = delete;
+    IndexFile& operator=(IndexFile&&) = delete;
+
     ~IndexFile() {
         if (m_fd >= 0) {
             close(m_fd);
