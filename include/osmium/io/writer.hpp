@@ -272,8 +272,8 @@ namespace osmium {
             Writer(const Writer&) = delete;
             Writer& operator=(const Writer&) = delete;
 
-            Writer(Writer&&) = default;
-            Writer& operator=(Writer&&) = default;
+            Writer(Writer&&) = delete;
+            Writer& operator=(Writer&&) = delete;
 
             ~Writer() noexcept {
                 try {
