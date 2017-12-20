@@ -58,7 +58,7 @@ namespace osmium {
 
         protected:
 
-            size_t m_size;
+            size_t m_size = 0;
             osmium::util::TypedMemoryMapping<T> m_mapping;
 
         public:
@@ -72,7 +72,6 @@ namespace osmium {
             }
 
             explicit mmap_vector_base(size_t capacity = mmap_vector_size_increment) :
-                m_size(0),
                 m_mapping(capacity) {
                 std::fill_n(data(), capacity, osmium::index::empty_value<T>());
             }

@@ -51,7 +51,7 @@ namespace osmium {
         class RelationMeta {
 
             /// The relation we are assembling.
-            size_t m_relation_offset;
+            size_t m_relation_offset = 0;
 
             /**
              * The number of members still needed before the relation is
@@ -67,9 +67,7 @@ namespace osmium {
              * Initialize an empty RelationMeta. This is needed to zero out
              * relations that have been completed.
              */
-            RelationMeta() noexcept :
-                m_relation_offset(0) {
-            }
+            RelationMeta() noexcept = default;
 
             explicit RelationMeta(size_t relation_offset) noexcept :
                 m_relation_offset(relation_offset) {
