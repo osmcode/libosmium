@@ -114,3 +114,27 @@ TEST_CASE("Tag matcher") {
     }
 }
 
+TEST_CASE("Copy and move tag matcher") {
+    osmium::TagMatcher m1{"highway"};
+    osmium::TagMatcher c1{true};
+    osmium::TagMatcher c2{false};
+
+    auto m2 = m1;
+
+    REQUIRE(m2("highway", "residential"));
+    REQUIRE_FALSE(m2("name", "High Street"));
+
+    c1 = m1;
+    REQUIRE(c1("highway", "residential"));
+    REQUIRE_FALSE(c1("name", "High Street"));
+
+    auto m3 = std::move(m2);
+
+    REQUIRE(m3("highway", "residential"));
+    REQUIRE_FALSE(m3("name", "High Street"));
+
+    c1 = std::move(c2);
+    REQUIRE_FALSE(c1("highway", "residential"));
+    REQUIRE_FALSE(c1("name", "High Street"));
+}
+

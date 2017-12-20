@@ -68,7 +68,7 @@ namespace osmium {
          */
         template <typename TKey, typename std::enable_if<
             std::is_convertible<TKey, osmium::StringMatcher>::value, int>::type = 0>
-        explicit TagMatcher(TKey&& key_matcher) :
+        explicit TagMatcher(TKey&& key_matcher) : // NOLINT clang-tidy: misc-forwarding-reference-overload (false positive due to enable_if)
             m_key_matcher(std::forward<TKey>(key_matcher)),
             m_value_matcher(osmium::StringMatcher::always_true{}) {
         }
