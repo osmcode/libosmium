@@ -201,6 +201,7 @@ add_unit_test(tags test_tag_matcher)
 add_unit_test(tags test_tags_filter)
 
 add_unit_test(thread test_pool ENABLE_IF ${Threads_FOUND} LIBS ${CMAKE_THREAD_LIBS_INIT})
+add_unit_test(thread test_queue ENABLE_IF ${Threads_FOUND} LIBS ${CMAKE_THREAD_LIBS_INIT})
 add_unit_test(thread test_util ENABLE_IF ${Threads_FOUND} LIBS ${CMAKE_THREAD_LIBS_INIT})
 
 add_unit_test(util test_cast_with_assert)

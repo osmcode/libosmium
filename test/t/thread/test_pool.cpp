@@ -97,7 +97,7 @@ TEST_CASE("thread (user-provided pool)") {
     SECTION("can get access to thread pool") {
         REQUIRE(pool.queue_empty());
     }
-    
+
     SECTION("can access user-provided number of threads") {
         REQUIRE(pool.num_threads() == 7);
     }

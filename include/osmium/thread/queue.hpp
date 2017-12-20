@@ -107,10 +107,7 @@ namespace osmium {
             explicit Queue(std::size_t max_size = 0, std::string name = "") :
                 m_max_size(max_size),
                 m_name(std::move(name)),
-                m_mutex(),
-                m_queue(),
-                m_data_available(),
-                m_space_available()
+                m_queue()
 #ifdef OSMIUM_DEBUG_QUEUE_SIZE
                 ,
                 m_largest_size(0),
@@ -128,8 +125,8 @@ namespace osmium {
             Queue(Queue&&) = delete;
             Queue& operator=(Queue&&) = delete;
 
-            ~Queue() {
 #ifdef OSMIUM_DEBUG_QUEUE_SIZE
+            ~Queue() {
                 std::cerr << "queue '" << m_name
                           << "' with max_size=" << m_max_size
                           << " had largest size " << m_largest_size
@@ -138,8 +135,10 @@ namespace osmium {
                           << " push() calls and was empty " << m_empty_counter
                           << " times in " << m_pop_counter
                           << " pop() calls\n";
-#endif
             }
+#else
+            ~Queue() = default;
+#endif
 
             /**
              * Push an element onto the queue. If the queue has a max size,
