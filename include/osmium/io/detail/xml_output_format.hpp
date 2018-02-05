@@ -34,6 +34,7 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <osmium/handler.hpp>
+#include <osmium/io/detail/metadata_options.hpp>
 #include <osmium/io/detail/output_format.hpp>
 #include <osmium/io/detail/queue_util.hpp>
 #include <osmium/io/detail/string_util.hpp>
@@ -72,8 +73,8 @@ namespace osmium {
 
             struct xml_output_options {
 
-                /// Should metadata of objects be added?
-                bool add_metadata;
+                /// Which metadata of objects should be added?
+                metadata_options add_metadata;
 
                 /// Should the visible flag be added to all OSM objects?
                 bool add_visible_flag;
@@ -144,34 +145,36 @@ namespace osmium {
                 void write_meta(const osmium::OSMObject& object) {
                     write_attribute("id", object.id());
 
-                    if (m_options.add_metadata) {
-                        if (object.version()) {
-                            write_attribute("version", object.version());
-                        }
+                    if (m_options.add_metadata.version() && object.version()) {
+                        write_attribute("version", object.version());
+                    }
 
-                        if (object.timestamp()) {
-                            *m_out += " timestamp=\"";
-                            *m_out += object.timestamp().to_iso();
-                            *m_out += "\"";
-                        }
+                    if (m_options.add_metadata.timestamp() && object.timestamp()) {
+                        *m_out += " timestamp=\"";
+                        *m_out += object.timestamp().to_iso();
+                        *m_out += "\"";
+                    }
 
-                        if (!object.user_is_anonymous()) {
+                    if (!object.user_is_anonymous()) {
+                        if (m_options.add_metadata.uid()) {
                             write_attribute("uid", object.uid());
+                        }
+                        if (m_options.add_metadata.user()) {
                             *m_out += " user=\"";
                             append_xml_encoded_string(*m_out, object.user());
                             *m_out += "\"";
                         }
+                    }
 
-                        if (object.changeset()) {
-                            write_attribute("changeset", object.changeset());
-                        }
+                    if (m_options.add_metadata.changeset() && object.changeset()) {
+                        write_attribute("changeset", object.changeset());
+                    }
 
-                        if (m_options.add_visible_flag) {
-                            if (object.visible()) {
-                                *m_out += " visible=\"true\"";
-                            } else {
-                                *m_out += " visible=\"false\"";
-                            }
+                    if (m_options.add_visible_flag) {
+                        if (object.visible()) {
+                            *m_out += " visible=\"true\"";
+                        } else {
+                            *m_out += " visible=\"false\"";
                         }
                     }
                 }
@@ -426,7 +429,7 @@ namespace osmium {
                 XMLOutputFormat(osmium::thread::Pool& pool, const osmium::io::File& file, future_string_queue_type& output_queue) :
                     OutputFormat(pool, output_queue),
                     m_options() {
-                    m_options.add_metadata      = file.is_not_false("add_metadata");
+                    m_options.add_metadata      = metadata_options{file.get("add_metadata")};
                     m_options.use_change_ops    = file.is_true("xml_change_format");
                     m_options.add_visible_flag  = (file.has_multiple_object_versions() || file.is_true("force_visible_flag")) && !m_options.use_change_ops;
                     m_options.locations_on_ways = file.is_true("locations_on_ways");
