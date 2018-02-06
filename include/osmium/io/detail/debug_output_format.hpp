@@ -33,6 +33,7 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <osmium/io/detail/metadata_options.hpp>
 #include <osmium/io/detail/output_format.hpp>
 #include <osmium/io/detail/queue_util.hpp>
 #include <osmium/io/detail/string_util.hpp>
@@ -92,8 +93,8 @@ namespace osmium {
 
             struct debug_output_options {
 
-                /// Should metadata of objects be added?
-                bool add_metadata;
+                /// Which metadata of objects should be added?
+                metadata_options add_metadata;
 
                 /// Output with ANSI colors?
                 bool use_color;
@@ -220,25 +221,37 @@ namespace osmium {
                 void write_meta(const osmium::OSMObject& object) {
                     output_int(object.id());
                     *m_out += '\n';
-                    if (m_options.add_metadata) {
+                    if (m_options.add_metadata.version()) {
                         write_fieldname("version");
                         *m_out += "  ";
                         output_int(object.version());
+                    }
+                    if (m_options.add_metadata.any()) {
                         if (object.visible()) {
                             *m_out += " visible\n";
                         } else {
                             write_error(" deleted\n");
                         }
+                    }
+                    if (m_options.add_metadata.changeset()) {
                         write_fieldname("changeset");
                         output_int(object.changeset());
                         *m_out += '\n';
+                    }
+                    if (m_options.add_metadata.timestamp()) {
                         write_fieldname("timestamp");
                         write_timestamp(object.timestamp());
+                    }
+                    if (m_options.add_metadata.user() || m_options.add_metadata.uid()) {
                         write_fieldname("user");
                         *m_out += "     ";
-                        output_int(object.uid());
-                        *m_out += ' ';
-                        write_string(object.user());
+                        if (m_options.add_metadata.uid()) {
+                            output_int(object.uid());
+                            *m_out += ' ';
+                        }
+                        if (m_options.add_metadata.user()) {
+                            write_string(object.user());
+                        }
                         *m_out += '\n';
                     }
                 }
@@ -518,7 +531,7 @@ namespace osmium {
                 DebugOutputFormat(osmium::thread::Pool& pool, const osmium::io::File& file, future_string_queue_type& output_queue) :
                     OutputFormat(pool, output_queue),
                     m_options() {
-                    m_options.add_metadata   = file.is_not_false("add_metadata");
+                    m_options.add_metadata   = metadata_options{file.get("add_metadata")};
                     m_options.use_color      = file.is_true("color");
                     m_options.add_crc32      = file.is_true("add_crc32");
                     m_options.format_as_diff = file.is_true("diff");
