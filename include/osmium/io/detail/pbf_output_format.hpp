@@ -34,6 +34,7 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <osmium/handler.hpp>
+#include <osmium/io/detail/metadata_options.hpp>
 #include <osmium/io/detail/output_format.hpp>
 #include <osmium/io/detail/pbf.hpp> // IWYU pragma: export
 #include <osmium/io/detail/protobuf_tags.hpp>
@@ -95,8 +96,8 @@ namespace osmium {
                  */
                 bool use_compression;
 
-                /// Should metadata of objects be written?
-                bool add_metadata;
+                /// Which metadata of objects should be added?
+                metadata_options add_metadata;
 
                 /// Add the "HistoricalInformation" header flag.
                 bool add_historical_information_flag;
@@ -281,15 +282,23 @@ namespace osmium {
                 void add_node(const osmium::Node& node) {
                     m_ids.push_back(m_delta_id.update(node.id()));
 
-                    if (m_options.add_metadata) {
+                    if (m_options.add_metadata.version()) {
                         m_versions.push_back(static_cast_with_assert<int32_t>(node.version()));
+                    }
+                    if (m_options.add_metadata.timestamp()) {
                         m_timestamps.push_back(m_delta_timestamp.update(uint32_t(node.timestamp())));
+                    }
+                    if (m_options.add_metadata.changeset()) {
                         m_changesets.push_back(m_delta_changeset.update(node.changeset()));
+                    }
+                    if (m_options.add_metadata.uid()) {
                         m_uids.push_back(m_delta_uid.update(node.uid()));
+                    }
+                    if (m_options.add_metadata.user()) {
                         m_user_sids.push_back(m_delta_user_sid.update(m_stringtable.add(node.user())));
-                        if (m_options.add_visible_flag) {
-                            m_visibles.push_back(node.visible());
-                        }
+                    }
+                    if (m_options.add_visible_flag) {
+                        m_visibles.push_back(node.visible());
                     }
 
                     m_lats.push_back(m_delta_lat.update(lonlat2int(node.location().lat_without_check())));
@@ -308,14 +317,23 @@ namespace osmium {
 
                     pbf_dense_nodes.add_packed_sint64(OSMFormat::DenseNodes::packed_sint64_id, m_ids.cbegin(), m_ids.cend());
 
-                    if (m_options.add_metadata) {
+                    if (m_options.add_metadata.any() || m_options.add_visible_flag) {
                         protozero::pbf_builder<OSMFormat::DenseInfo> pbf_dense_info{pbf_dense_nodes, OSMFormat::DenseNodes::optional_DenseInfo_denseinfo};
-                        pbf_dense_info.add_packed_int32(OSMFormat::DenseInfo::packed_int32_version, m_versions.cbegin(), m_versions.cend());
-                        pbf_dense_info.add_packed_sint64(OSMFormat::DenseInfo::packed_sint64_timestamp, m_timestamps.cbegin(), m_timestamps.cend());
-                        pbf_dense_info.add_packed_sint64(OSMFormat::DenseInfo::packed_sint64_changeset, m_changesets.cbegin(), m_changesets.cend());
-                        pbf_dense_info.add_packed_sint32(OSMFormat::DenseInfo::packed_sint32_uid, m_uids.cbegin(), m_uids.cend());
-                        pbf_dense_info.add_packed_sint32(OSMFormat::DenseInfo::packed_sint32_user_sid, m_user_sids.cbegin(), m_user_sids.cend());
-
+                        if (m_options.add_metadata.version()) {
+                            pbf_dense_info.add_packed_int32(OSMFormat::DenseInfo::packed_int32_version, m_versions.cbegin(), m_versions.cend());
+                        }
+                        if (m_options.add_metadata.timestamp()) {
+                            pbf_dense_info.add_packed_sint64(OSMFormat::DenseInfo::packed_sint64_timestamp, m_timestamps.cbegin(), m_timestamps.cend());
+                        }
+                        if (m_options.add_metadata.changeset()) {
+                            pbf_dense_info.add_packed_sint64(OSMFormat::DenseInfo::packed_sint64_changeset, m_changesets.cbegin(), m_changesets.cend());
+                        }
+                        if (m_options.add_metadata.uid()) {
+                            pbf_dense_info.add_packed_sint32(OSMFormat::DenseInfo::packed_sint32_uid, m_uids.cbegin(), m_uids.cend());
+                        }
+                        if (m_options.add_metadata.user()) {
+                            pbf_dense_info.add_packed_sint32(OSMFormat::DenseInfo::packed_sint32_user_sid, m_user_sids.cbegin(), m_user_sids.cend());
+                        }
                         if (m_options.add_visible_flag) {
                             pbf_dense_info.add_packed_bool(OSMFormat::DenseInfo::packed_bool_visible, m_visibles.cbegin(), m_visibles.cend());
                         }
@@ -458,14 +476,24 @@ namespace osmium {
                         }
                     }
 
-                    if (m_options.add_metadata) {
+                    if (m_options.add_metadata.any() || m_options.add_visible_flag) {
                         protozero::pbf_builder<OSMFormat::Info> pbf_info{pbf_object, T::enum_type::optional_Info_info};
 
-                        pbf_info.add_int32(OSMFormat::Info::optional_int32_version, static_cast_with_assert<int32_t>(object.version()));
-                        pbf_info.add_int64(OSMFormat::Info::optional_int64_timestamp, uint32_t(object.timestamp()));
-                        pbf_info.add_int64(OSMFormat::Info::optional_int64_changeset, object.changeset());
-                        pbf_info.add_int32(OSMFormat::Info::optional_int32_uid, static_cast_with_assert<int32_t>(object.uid()));
-                        pbf_info.add_uint32(OSMFormat::Info::optional_uint32_user_sid, m_primitive_block.store_in_stringtable(object.user()));
+                        if (m_options.add_metadata.version()) {
+                            pbf_info.add_int32(OSMFormat::Info::optional_int32_version, static_cast_with_assert<int32_t>(object.version()));
+                        }
+                        if (m_options.add_metadata.timestamp()) {
+                            pbf_info.add_int64(OSMFormat::Info::optional_int64_timestamp, uint32_t(object.timestamp()));
+                        }
+                        if (m_options.add_metadata.changeset()) {
+                            pbf_info.add_int64(OSMFormat::Info::optional_int64_changeset, object.changeset());
+                        }
+                        if (m_options.add_metadata.uid()) {
+                            pbf_info.add_int32(OSMFormat::Info::optional_int32_uid, static_cast_with_assert<int32_t>(object.uid()));
+                        }
+                        if (m_options.add_metadata.user()) {
+                            pbf_info.add_uint32(OSMFormat::Info::optional_uint32_user_sid, m_primitive_block.store_in_stringtable(object.user()));
+                        }
                         if (m_options.add_visible_flag) {
                             pbf_info.add_bool(OSMFormat::Info::optional_bool_visible, object.visible());
                         }
@@ -487,7 +515,11 @@ namespace osmium {
                     m_primitive_block(m_options) {
                     m_options.use_dense_nodes = file.is_not_false("pbf_dense_nodes");
                     m_options.use_compression = file.get("pbf_compression") != "none" && file.is_not_false("pbf_compression");
-                    m_options.add_metadata = file.is_not_false("pbf_add_metadata") && file.is_not_false("add_metadata");
+                    m_options.add_metadata = metadata_options{file.get("add_metadata")};
+                    // read deprecated boolean option pbf_add_metadata
+                    if (!file.is_not_false("pbf_add_metadata") || file.get("pbf_add_metadata") == "none") {
+                        m_options.add_metadata.disable_all();
+                    }
                     m_options.add_historical_information_flag = file.has_multiple_object_versions();
                     m_options.add_visible_flag = file.has_multiple_object_versions();
                     m_options.locations_on_ways = file.is_true("locations_on_ways");
