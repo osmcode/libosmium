@@ -623,15 +623,6 @@ namespace osmium {
                         ids.drop_front();
 
                         if (has_info) {
-                            if (versions.empty() ||
-                                changesets.empty() ||
-                                timestamps.empty() ||
-                                uids.empty() ||
-                                user_sids.empty()) {
-                                // this is against the spec, must have same number of elements
-                                throw osmium::pbf_error{"PBF format error"};
-                            }
-
                             if (!versions.empty()) {
                                 const auto version = versions.front();
                                 versions.drop_front();
