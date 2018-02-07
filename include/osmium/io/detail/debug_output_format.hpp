@@ -220,18 +220,16 @@ namespace osmium {
 
                 void write_meta(const osmium::OSMObject& object) {
                     output_int(object.id());
-                    *m_out += '\n';
+                    if (object.visible()) {
+                        *m_out += " visible\n";
+                    } else {
+                        write_error(" deleted\n");
+                    }
                     if (m_options.add_metadata.version()) {
                         write_fieldname("version");
                         *m_out += "  ";
                         output_int(object.version());
-                    }
-                    if (m_options.add_metadata.any()) {
-                        if (object.visible()) {
-                            *m_out += " visible\n";
-                        } else {
-                            write_error(" deleted\n");
-                        }
+                        *m_out += '\n';
                     }
                     if (m_options.add_metadata.changeset()) {
                         write_fieldname("changeset");
