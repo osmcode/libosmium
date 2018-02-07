@@ -172,17 +172,6 @@ set(_own_index)
 
 include_directories(SYSTEM ${OSMIUM_INCLUDE_DIRS})
 
-if(MSVC)
-    find_path(GETOPT_INCLUDE_DIR getopt.h)
-    find_library(GETOPT_LIBRARY NAMES wingetopt)
-    if(GETOPT_INCLUDE_DIR AND GETOPT_LIBRARY)
-        include_directories(SYSTEM ${GETOPT_INCLUDE_DIR})
-        list(APPEND OSMIUM_LIBRARIES ${GETOPT_LIBRARY})
-    else()
-        set(GETOPT_MISSING 1)
-    endif()
-endif()
-
 
 #-----------------------------------------------------------------------------
 #
