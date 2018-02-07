@@ -8,13 +8,13 @@ environment:
   matrix:
   - config: MSYS2
     autocrlf: true
-  - config: Dev
+  - config: Debug
     autocrlf: true
-  - config: RelWithDebInfo
+  - config: Release
     autocrlf: true
-  - config: Dev
+  - config: Debug
     autocrlf: false
-  - config: RelWithDebInfo
+  - config: Release
     autocrlf: false
 
 shallow_clone: true
@@ -22,23 +22,23 @@ shallow_clone: true
 # Operating system (build VM template)
 os: Visual Studio 2015
 
+platform: x64
+
 # scripts that are called at very beginning, before repo cloning
 init:
   - git config --global core.autocrlf %autocrlf%
   - git config --get core.autocrlf
 
+clone_folder: c:\projects\libosmium
+
 install:
   - cd c:\projects
-  - git clone https://github.com/osmcode/osm-testdata
+  - git clone --depth 1 https://github.com/osmcode/osm-testdata
+  - git clone --depth 1 https://github.com/mapbox/protozero
   - if [%config%]==[MSYS2] (
           C:\msys64\usr\bin\pacman --noconfirm --sync --refresh --refresh --sysupgrade --sysupgrade
        && C:\msys64\usr\bin\pacman -Rc --noconfirm mingw-w64-x86_64-gcc-libs
     )
-
-# clone directory
-clone_folder: c:\projects\libosmium
-
-platform: x64
 
 build_script:
   - cd c:\projects\libosmium

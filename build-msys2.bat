@@ -1,3 +1,9 @@
+@ECHO OFF
+SETLOCAL
+SET EL=0
+
+ECHO ~~~~~~ %~f0 ~~~~~~
+
 echo "Adding MSYS2 to path..."
 SET "PATH=C:\msys64\mingw64\bin;C:\msys64\usr\bin;%PATH%"
 echo %PATH%
@@ -14,9 +20,22 @@ echo "Generating makefiles"
 mkdir build
 cd build
 cmake .. -G "MSYS Makefiles" -DBUILD_DATA_TESTS=ON -DBUILD_HEADERS=OFF
+IF %ERRORLEVEL% NEQ 0 GOTO ERROR
 
 echo "Building"
 make
+IF %ERRORLEVEL% NEQ 0 GOTO ERROR
 
 echo "Testing"
-ctest
+ctest --output-on-failure
+IF %ERRORLEVEL% NEQ 0 GOTO ERROR
+
+:ERROR
+ECHO ~~~~~~ ERROR %~f0 ~~~~~~
+SET EL=%ERRORLEVEL%
+
+:DONE
+IF %EL% NEQ 0 ECHO. && ECHO !!! ERRORLEVEL^: %EL% !!! && ECHO.
+ECHO ~~~~~~ DONE %~f0 ~~~~~~
+
+EXIT /b %EL%
