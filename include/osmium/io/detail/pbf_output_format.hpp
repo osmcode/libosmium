@@ -518,7 +518,7 @@ namespace osmium {
                     m_options.add_metadata = metadata_options{file.get("add_metadata")};
                     // read deprecated boolean option pbf_add_metadata
                     if (!file.is_not_false("pbf_add_metadata") || file.get("pbf_add_metadata") == "none") {
-                        m_options.add_metadata.disable_all();
+                        m_options.add_metadata = metadata_options{"none"};
                     }
                     m_options.add_historical_information_flag = file.has_multiple_object_versions();
                     m_options.add_visible_flag = file.has_multiple_object_versions();

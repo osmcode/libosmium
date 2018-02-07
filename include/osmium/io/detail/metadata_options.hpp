@@ -37,7 +37,6 @@ DEALINGS IN THE SOFTWARE.
 
 #include <stdexcept>
 #include <string>
-#include <iostream>
 
 namespace osmium {
 
@@ -88,10 +87,6 @@ namespace osmium {
                         }
                     }
                     m_options = static_cast<options>(opts);
-                }
-
-                void disable_all() {
-                    m_options = options::md_none;
                 }
 
                 bool any() const noexcept {
