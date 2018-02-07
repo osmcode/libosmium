@@ -516,9 +516,9 @@ namespace osmium {
                     m_options.use_dense_nodes = file.is_not_false("pbf_dense_nodes");
                     m_options.use_compression = file.get("pbf_compression") != "none" && file.is_not_false("pbf_compression");
                     m_options.add_metadata = metadata_options{file.get("add_metadata")};
-                    // read deprecated boolean option pbf_add_metadata
-                    if (!file.is_not_false("pbf_add_metadata") || file.get("pbf_add_metadata") == "none") {
-                        m_options.add_metadata = metadata_options{"none"};
+                    // check deprecated option pbf_add_metadata
+                    if (file.get("pbf_add_metadata") != "") {
+                        throw std::invalid_argument("The 'pbf_add_metadata' option is deprecated. Please use 'add_metadata' instead.");
                     }
                     m_options.add_historical_information_flag = file.has_multiple_object_versions();
                     m_options.add_visible_flag = file.has_multiple_object_versions();
