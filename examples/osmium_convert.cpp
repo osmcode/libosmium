@@ -84,6 +84,8 @@ int main(int argc, char* argv[]) {
             } else {
                 print_usage(argv[0]);
             }
+        } else if (!std::strncmp(argv[i], "--from-format=", 14)) {
+            input_format = argv[i] + 14;
         } else if (!std::strcmp(argv[i], "-t") || !std::strcmp(argv[i], "--to-format")) {
             ++i;
             if (i < argc) {
@@ -91,6 +93,8 @@ int main(int argc, char* argv[]) {
             } else {
                 print_usage(argv[0]);
             }
+        } else if (!std::strncmp(argv[i], "--to-format=", 12)) {
+            output_format = argv[i] + 12;
         } else if (input_file_name.empty()) {
             input_file_name = argv[i];
         } else if (output_file_name.empty()) {
