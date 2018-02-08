@@ -10,7 +10,7 @@ add_test(NAME examples_convert_xml_debug
          COMMAND osmium_convert -t debug ${CMAKE_CURRENT_SOURCE_DIR}/data.osm)
 
 set_tests_properties(examples_convert_xml_debug PROPERTIES
-                     PASS_REGULAR_EXPRESSION "node 701000\n  version:   1 visible")
+                     PASS_REGULAR_EXPRESSION "node 701000 visible\n  version:   1")
 
 
 add_test(NAME examples_convert_xml_opl

@@ -530,8 +530,7 @@ namespace osmium {
                 }
 
                 void decode_dense_nodes(const data_view& data) {
-                    bool has_info     = false;
-                    bool has_visibles = false;
+                    bool has_info = false;
 
                     protozero::iterator_range<protozero::pbf_reader::const_sint64_iterator> ids;
                     protozero::iterator_range<protozero::pbf_reader::const_sint64_iterator> lats;
@@ -574,7 +573,6 @@ namespace osmium {
                                                 user_sids = pbf_dense_info.get_packed_sint32();
                                                 break;
                                             case protozero::tag_and_type(OSMFormat::DenseInfo::packed_bool_visible, protozero::pbf_wire_type::length_delimited):
-                                                has_visibles = true;
                                                 visibles = pbf_dense_info.get_packed_bool();
                                                 break;
                                             default:
@@ -623,47 +621,45 @@ namespace osmium {
                         ids.drop_front();
 
                         if (has_info) {
-                            if (versions.empty() ||
-                                changesets.empty() ||
-                                timestamps.empty() ||
-                                uids.empty() ||
-                                user_sids.empty()) {
-                                // this is against the spec, must have same number of elements
-                                throw osmium::pbf_error{"PBF format error"};
-                            }
-
-                            const auto version = versions.front();
-                            versions.drop_front();
-                            if (version < 0) {
-                                throw osmium::pbf_error{"object version must not be negative"};
-                            }
-                            node.set_version(static_cast<osmium::object_version_type>(version));
-
-                            const auto changeset_id = dense_changeset.update(changesets.front());
-                            changesets.drop_front();
-                            if (changeset_id < 0 || changeset_id >= std::numeric_limits<changeset_id_type>::max()) {
-                                throw osmium::pbf_error{"object changeset_id must be between 0 and 2^32-1"};
-                            }
-                            node.set_changeset(static_cast<osmium::changeset_id_type>(changeset_id));
-
-                            node.set_timestamp(dense_timestamp.update(timestamps.front()) * m_date_factor / 1000);
-                            timestamps.drop_front();
-                            node.set_uid_from_signed(static_cast<osmium::signed_user_id_type>(dense_uid.update(uids.front())));
-                            uids.drop_front();
-
-                            if (has_visibles) {
-                                if (visibles.empty()) {
-                                    // this is against the spec, must have same number of elements
-                                    throw osmium::pbf_error{"PBF format error"};
+                            if (!versions.empty()) {
+                                const auto version = versions.front();
+                                versions.drop_front();
+                                if (version < 0) {
+                                    throw osmium::pbf_error{"object version must not be negative"};
                                 }
+                                node.set_version(static_cast<osmium::object_version_type>(version));
+                            }
+
+                            if (!changesets.empty()) {
+                                const auto changeset_id = dense_changeset.update(changesets.front());
+                                changesets.drop_front();
+                                if (changeset_id < 0 || changeset_id >= std::numeric_limits<changeset_id_type>::max()) {
+                                    throw osmium::pbf_error{"object changeset_id must be between 0 and 2^32-1"};
+                                }
+                                node.set_changeset(static_cast<osmium::changeset_id_type>(changeset_id));
+                            }
+
+                            if (!timestamps.empty()) {
+                                node.set_timestamp(dense_timestamp.update(timestamps.front()) * m_date_factor / 1000);
+                                timestamps.drop_front();
+                            }
+
+                            if (!uids.empty()) {
+                                node.set_uid_from_signed(static_cast<osmium::signed_user_id_type>(dense_uid.update(uids.front())));
+                                uids.drop_front();
+                            }
+
+                            if (!visibles.empty()) {
                                 visible = (visibles.front() != 0);
                                 visibles.drop_front();
                             }
                             node.set_visible(visible);
 
-                            const auto& u = m_stringtable.at(dense_user_sid.update(user_sids.front()));
-                            user_sids.drop_front();
-                            builder.set_user(u.first, u.second);
+                            if (!user_sids.empty()) {
+                                const auto& u = m_stringtable.at(dense_user_sid.update(user_sids.front()));
+                                user_sids.drop_front();
+                                builder.set_user(u.first, u.second);
+                            }
                         }
 
                         // even if the node isn't visible, there's still a record

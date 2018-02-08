@@ -33,6 +33,7 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <osmium/io/detail/metadata_options.hpp>
 #include <osmium/io/detail/output_format.hpp>
 #include <osmium/io/detail/queue_util.hpp>
 #include <osmium/io/detail/string_util.hpp>
@@ -69,8 +70,8 @@ namespace osmium {
 
             struct opl_output_options {
 
-                /// Should metadata of objects be added?
-                bool add_metadata;
+                /// Which metadata of objects should be added?
+                metadata_options add_metadata;
 
                 /// Should node locations be added to ways?
                 bool locations_on_ways;
@@ -123,19 +124,29 @@ namespace osmium {
 
                 void write_meta(const osmium::OSMObject& object) {
                     output_int(object.id());
-                    if (m_options.add_metadata) {
-                        *m_out += ' ';
-                        write_field_int('v', object.version());
+                    if (m_options.add_metadata.any()) {
+                        if (m_options.add_metadata.version()) {
+                            *m_out += ' ';
+                            write_field_int('v', object.version());
+                        }
                         *m_out += " d";
                         *m_out += (object.visible() ? 'V' : 'D');
-                        *m_out += ' ';
-                        write_field_int('c', object.changeset());
-                        *m_out += ' ';
-                        write_field_timestamp('t', object.timestamp());
-                        *m_out += ' ';
-                        write_field_int('i', object.uid());
-                        *m_out += " u";
-                        append_encoded_string(object.user());
+                        if (m_options.add_metadata.changeset()) {
+                            *m_out += ' ';
+                            write_field_int('c', object.changeset());
+                        }
+                        if (m_options.add_metadata.timestamp()) {
+                            *m_out += ' ';
+                            write_field_timestamp('t', object.timestamp());
+                        }
+                        if (m_options.add_metadata.uid()) {
+                            *m_out += ' ';
+                            write_field_int('i', object.uid());
+                        }
+                        if (m_options.add_metadata.user()) {
+                            *m_out += " u";
+                            append_encoded_string(object.user());
+                        }
                     }
                     write_tags(object.tags());
                 }
@@ -279,7 +290,7 @@ namespace osmium {
                 OPLOutputFormat(osmium::thread::Pool& pool, const osmium::io::File& file, future_string_queue_type& output_queue) :
                     OutputFormat(pool, output_queue),
                     m_options() {
-                    m_options.add_metadata      = file.is_not_false("add_metadata");
+                    m_options.add_metadata      = metadata_options{file.get("add_metadata")};
                     m_options.locations_on_ways = file.is_true("locations_on_ways");
                     m_options.format_as_diff    = file.is_true("diff");
                 }
