@@ -155,15 +155,14 @@ namespace osmium {
                         *m_out += "\"";
                     }
 
-                    if (!object.user_is_anonymous()) {
-                        if (m_options.add_metadata.uid()) {
-                            write_attribute("uid", object.uid());
-                        }
-                        if (m_options.add_metadata.user()) {
-                            *m_out += " user=\"";
-                            append_xml_encoded_string(*m_out, object.user());
-                            *m_out += "\"";
-                        }
+                    if (m_options.add_metadata.uid() && object.uid()) {
+                        write_attribute("uid", object.uid());
+                    }
+
+                    if (m_options.add_metadata.user() && object.user()[0] != '\0') {
+                        *m_out += " user=\"";
+                        append_xml_encoded_string(*m_out, object.user());
+                        *m_out += "\"";
                     }
 
                     if (m_options.add_metadata.changeset() && object.changeset()) {
