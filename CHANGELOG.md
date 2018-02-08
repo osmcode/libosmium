@@ -8,9 +8,51 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+* Various tests.
+* Add polygon implementation for WKT and GeoJSON geometry factories. (Thanks
+  to Horace Williams.)
+
 ### Changed
 
+* An error is now thrown when the deprecated `pbf_add_metadata` file format
+  option is used. Use `add_metadata` instead.
+* Extended the `add_metadata` file format option. In addition to allowing the
+  values `true`, `yes`, `false`, and `no`, the new values `all` and `none`
+  are now recognized. The option can also be set to a list of attributes
+  separated by the `+` sign. Attributes are `version`, `timestamp`,
+  `changeset`, `uid`, and `user`. All output formats have been updated to
+  only output the specified attributes. (Thanks to Michael Reichert.)
+* The example programs using the `getopt_long` function have been rewritten to
+  work without it. This makes using libosmium on Windows easier, where this
+  function is not available.
+* Removed the embedded protozero from repository. Like other dependencies you
+  have to install protozero first. If you check out the protozero repository
+  in the same directory where you checked out libosmium, libosmium's CMake
+  will find it.
+* Various code cleanups, fixing of include order, etc.
+* Remove need for `winsock2` library in Windows by using code from Protozero.
+  (Thanks alex85k.)
+* Add MSYS2 build to Appveyor and fixed some Windows compile issues. (Thanks
+  to alex85k.)
+* Use array instead of map to store input/output format creators.
+* Update included `catch.hpp` to version 1.12.0.
+
 ### Fixed
+
+* Use different macro magic for registering index maps. This allows the maps
+  to be used for several types at the same time.
+* Lots of code was rewritten to fix warnings reported by `clang-tidy` making
+  libosmium more robust.
+* Make ADL work for `begin()`/`end()` of `InputIterator<Reader>`.
+* Various fixes to make the code more robust, including an undefined behaviour
+  in the debug output format and a buffer overflow in the o5m parser.
+* Range checks in o5m parser throw exceptions now instead of triggering
+  assertions.
+* Better checking that PBF data is in range.
+* Throw exception if elements in XML file are nested too deep.
+* Check `read` and `write` system calls for `EINTR`.
+* Use tag and type from protozero to make PBF parser more robust.
+* Test `testdata-multipolygon` on Windows was using the wrong executable name.
 
 
 ## [2.13.1] - 2017-08-25
