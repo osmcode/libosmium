@@ -44,6 +44,10 @@ namespace osmium {
 
         namespace detail {
 
+            /**
+             * Stores information on which metadata attributes should be
+             * stored in an OSM file.
+             */
             class metadata_options {
 
                 enum options {
@@ -61,7 +65,7 @@ namespace osmium {
                 metadata_options() noexcept = default;
 
                 metadata_options(const std::string& attributes) {
-                    if (attributes.empty() || attributes == "all" || attributes == "true") {
+                    if (attributes.empty() || attributes == "all" || attributes == "true" || attributes == "yes") {
                         return;
                     }
                     if (attributes == "none" || attributes == "false" || attributes == "no") {
@@ -89,14 +93,17 @@ namespace osmium {
                     m_options = static_cast<options>(opts);
                 }
 
+                /// At least one metadata attribute should be stored.
                 bool any() const noexcept {
                     return m_options != 0;
                 }
 
+                /// All metadata attributes should be stored.
                 bool all() const noexcept {
                     return m_options == options::md_all;
                 }
 
+                /// No metadata attributes should be stored.
                 bool none() const noexcept {
                     return m_options == 0;
                 }
