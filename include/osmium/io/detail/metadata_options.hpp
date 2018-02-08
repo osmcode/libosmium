@@ -64,8 +64,7 @@ namespace osmium {
                     if (attributes.empty() || attributes == "all" || attributes == "true") {
                         return;
                     }
-
-                    if (attributes == "none" || attributes == "false") {
+                    if (attributes == "none" || attributes == "false" || attributes == "no") {
                         m_options = options::md_none;
                         return;
                     }
