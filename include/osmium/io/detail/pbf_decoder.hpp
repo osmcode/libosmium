@@ -530,8 +530,7 @@ namespace osmium {
                 }
 
                 void decode_dense_nodes(const data_view& data) {
-                    bool has_info     = false;
-                    bool has_visibles = false;
+                    bool has_info = false;
 
                     protozero::iterator_range<protozero::pbf_reader::const_sint64_iterator> ids;
                     protozero::iterator_range<protozero::pbf_reader::const_sint64_iterator> lats;
@@ -574,7 +573,6 @@ namespace osmium {
                                                 user_sids = pbf_dense_info.get_packed_sint32();
                                                 break;
                                             case protozero::tag_and_type(OSMFormat::DenseInfo::packed_bool_visible, protozero::pbf_wire_type::length_delimited):
-                                                has_visibles = true;
                                                 visibles = pbf_dense_info.get_packed_bool();
                                                 break;
                                             default:
@@ -651,11 +649,9 @@ namespace osmium {
                                 uids.drop_front();
                             }
 
-                            if (has_visibles) {
-                                if (!visibles.empty()) {
-                                    visible = (visibles.front() != 0);
-                                    visibles.drop_front();
-                                }
+                            if (!visibles.empty()) {
+                                visible = (visibles.front() != 0);
+                                visibles.drop_front();
                             }
                             node.set_visible(visible);
 
