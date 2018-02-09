@@ -120,7 +120,7 @@ namespace osmium {
 
             osmium::thread::thread_handler m_thread{};
 
-            std::size_t m_file_size;
+            std::size_t m_file_size = 0;
 
             osmium::osm_entity_bits::type m_read_which_entities = osmium::osm_entity_bits::all;
             osmium::io::read_meta m_read_metadata = osmium::io::read_meta::yes;
