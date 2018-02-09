@@ -64,7 +64,7 @@ namespace osmium {
 
                 metadata_options() noexcept = default;
 
-                metadata_options(const std::string& attributes) {
+                explicit metadata_options(const std::string& attributes) {
                     if (attributes.empty() || attributes == "all" || attributes == "true" || attributes == "yes") {
                         return;
                     }
