@@ -83,8 +83,11 @@ namespace osmium {
 
             struct pbf_output_options {
 
+                /// Which metadata of objects should be added?
+                metadata_options add_metadata;
+
                 /// Should nodes be encoded in DenseNodes?
-                bool use_dense_nodes;
+                bool use_dense_nodes = true;
 
                 /**
                  * Should the PBF blobs contain zlib compressed data?
@@ -94,21 +97,18 @@ namespace osmium {
                  * the writing speed a little but the output will be 2x to 3x
                  * bigger.
                  */
-                bool use_compression;
-
-                /// Which metadata of objects should be added?
-                metadata_options add_metadata;
+                bool use_compression = true;
 
                 /// Add the "HistoricalInformation" header flag.
-                bool add_historical_information_flag;
+                bool add_historical_information_flag = false;
 
                 /// Should the visible flag be added to all OSM objects?
-                bool add_visible_flag;
+                bool add_visible_flag = false;
 
                 /// Should node locations be added to ways?
-                bool locations_on_ways;
+                bool locations_on_ways = false;
 
-            };
+            }; // struct pbf_output_options
 
             /**
              * Maximum number of items in a primitive block.
@@ -511,7 +511,6 @@ namespace osmium {
 
                 PBFOutputFormat(osmium::thread::Pool& pool, const osmium::io::File& file, future_string_queue_type& output_queue) :
                     OutputFormat(pool, output_queue),
-                    m_options(),
                     m_primitive_block(m_options) {
 
                     if (!file.get("pbf_add_metadata").empty()) {

@@ -77,17 +77,18 @@ namespace osmium {
                 metadata_options add_metadata;
 
                 /// Should the visible flag be added to all OSM objects?
-                bool add_visible_flag;
+                bool add_visible_flag = false;
 
                 /**
                  * Should <create>, <modify>, <delete> "operations" be added?
                  * (This is used for .osc files.)
                  */
-                bool use_change_ops;
+                bool use_change_ops = false;
 
                 /// Should node locations be added to ways?
-                bool locations_on_ways;
-            };
+                bool locations_on_ways = false;
+
+            }; // struct xml_output_options
 
             namespace detail {
 
@@ -426,8 +427,7 @@ namespace osmium {
             public:
 
                 XMLOutputFormat(osmium::thread::Pool& pool, const osmium::io::File& file, future_string_queue_type& output_queue) :
-                    OutputFormat(pool, output_queue),
-                    m_options() {
+                    OutputFormat(pool, output_queue) {
                     m_options.add_metadata      = metadata_options{file.get("add_metadata")};
                     m_options.use_change_ops    = file.is_true("xml_change_format");
                     m_options.add_visible_flag  = (file.has_multiple_object_versions() || file.is_true("force_visible_flag")) && !m_options.use_change_ops;

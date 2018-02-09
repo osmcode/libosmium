@@ -97,14 +97,15 @@ namespace osmium {
                 metadata_options add_metadata;
 
                 /// Output with ANSI colors?
-                bool use_color;
+                bool use_color = false;
 
                 /// Add CRC32 checksum to each object?
-                bool add_crc32;
+                bool add_crc32 = false;
 
                 /// Write in form of a diff file?
-                bool format_as_diff;
-            };
+                bool format_as_diff = false;
+
+            }; // struct debug_output_options
 
             /**
              * Writes out one buffer with OSM data in Debug format.
@@ -527,8 +528,7 @@ namespace osmium {
             public:
 
                 DebugOutputFormat(osmium::thread::Pool& pool, const osmium::io::File& file, future_string_queue_type& output_queue) :
-                    OutputFormat(pool, output_queue),
-                    m_options() {
+                    OutputFormat(pool, output_queue) {
                     m_options.add_metadata   = metadata_options{file.get("add_metadata")};
                     m_options.use_color      = file.is_true("color");
                     m_options.add_crc32      = file.is_true("add_crc32");

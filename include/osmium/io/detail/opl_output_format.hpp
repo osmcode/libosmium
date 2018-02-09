@@ -74,12 +74,12 @@ namespace osmium {
                 metadata_options add_metadata;
 
                 /// Should node locations be added to ways?
-                bool locations_on_ways;
+                bool locations_on_ways = false;
 
                 /// Write in form of a diff file?
-                bool format_as_diff;
+                bool format_as_diff = false;
 
-            };
+            }; // struct opl_output_options
 
             /**
              * Writes out one buffer with OSM data in OPL format.
@@ -288,8 +288,7 @@ namespace osmium {
             public:
 
                 OPLOutputFormat(osmium::thread::Pool& pool, const osmium::io::File& file, future_string_queue_type& output_queue) :
-                    OutputFormat(pool, output_queue),
-                    m_options() {
+                    OutputFormat(pool, output_queue) {
                     m_options.add_metadata      = metadata_options{file.get("add_metadata")};
                     m_options.locations_on_ways = file.is_true("locations_on_ways");
                     m_options.format_as_diff    = file.is_true("diff");
