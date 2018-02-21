@@ -12,13 +12,13 @@
 using namespace osmium::builder::attr; // NOLINT clang-tidy: google-build-using-namespace
 
 TEST_CASE("Object ID comparisons") {
-    osmium::object_id_type a =   0;
-    osmium::object_id_type b =  -1;
-    osmium::object_id_type c = -10;
-    osmium::object_id_type d = -11;
-    osmium::object_id_type e =   1;
-    osmium::object_id_type f =  11;
-    osmium::object_id_type g =  12;
+    const osmium::object_id_type a =   0;
+    const osmium::object_id_type b =  -1;
+    const osmium::object_id_type c = -10;
+    const osmium::object_id_type d = -11;
+    const osmium::object_id_type e =   1;
+    const osmium::object_id_type f =  11;
+    const osmium::object_id_type g =  12;
 
     REQUIRE_FALSE(osmium::id_order{}(a, a));
     REQUIRE(osmium::id_order{}(a, b));
@@ -79,7 +79,7 @@ TEST_CASE("Object ID comparisons") {
 
 TEST_CASE("Node comparisons") {
 
-    osmium::memory::Buffer buffer(10 * 1000);
+    osmium::memory::Buffer buffer{10 * 1000};
     std::vector<std::reference_wrapper<osmium::Node>> nodes;
 
     SECTION("nodes are ordered by id, version, and timestamp") {
@@ -129,18 +129,14 @@ TEST_CASE("Node comparisons") {
 
 }
 
-TEST_CASE("Object comparisons") {
-
-    osmium::memory::Buffer buffer(10 * 1000);
+TEST_CASE("Object comparisons: types are ordered nodes, then ways, then relations") {
+    osmium::memory::Buffer buffer{10 * 1000};
     std::vector<std::reference_wrapper<osmium::OSMObject>> objects;
 
-    SECTION("types are ordered nodes, then ways, then relations") {
-        objects.emplace_back(buffer.get<osmium::Node>(    osmium::builder::add_node(    buffer, _id(3))));
-        objects.emplace_back(buffer.get<osmium::Way>(     osmium::builder::add_way(     buffer, _id(2))));
-        objects.emplace_back(buffer.get<osmium::Relation>(osmium::builder::add_relation(buffer, _id(1))));
+    objects.emplace_back(buffer.get<osmium::Node>(    osmium::builder::add_node(    buffer, _id(3))));
+    objects.emplace_back(buffer.get<osmium::Way>(     osmium::builder::add_way(     buffer, _id(2))));
+    objects.emplace_back(buffer.get<osmium::Relation>(osmium::builder::add_relation(buffer, _id(1))));
 
-        REQUIRE(std::is_sorted(objects.cbegin(), objects.cend()));
-    }
-
+    REQUIRE(std::is_sorted(objects.cbegin(), objects.cend()));
 }
 
