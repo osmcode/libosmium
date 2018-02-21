@@ -31,6 +31,10 @@ init:
 
 clone_folder: c:\projects\libosmium
 
+# The option --ask=20 is a workaround for a problem with the MSYS2 update
+# process. Without it the following error is printed and the appveyor script
+# halts: "msys2-runtime and catgets are in conflict. Remove catgets?"
+# See also: https://github.com/Alexpux/MSYS2-packages/issues/1141
 install:
   - cd c:\projects
   - git clone --depth 1 https://github.com/osmcode/osm-testdata
