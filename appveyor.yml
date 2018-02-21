@@ -36,7 +36,7 @@ install:
   - git clone --depth 1 https://github.com/osmcode/osm-testdata
   - git clone --depth 1 https://github.com/mapbox/protozero
   - if [%config%]==[MSYS2] (
-          C:\msys64\usr\bin\pacman --noconfirm --sync --refresh --refresh --sysupgrade --sysupgrade
+          C:\msys64\usr\bin\pacman --noconfirm --sync --refresh --refresh --sysupgrade --sysupgrade --ask=20
        && C:\msys64\usr\bin\pacman -Rc --noconfirm mingw-w64-x86_64-gcc-libs
     )
 
