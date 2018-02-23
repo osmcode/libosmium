@@ -45,7 +45,7 @@ addons_shortcuts:
   addons_clang50: &clang50
     apt:
       sources: [ 'ubuntu-toolchain-r-test', 'boost-latest', 'llvm-toolchain-trusty-5.0' ]
-      packages: [ 'libboost1.55-all-dev', 'libgdal-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin', 'clang-5.0', 'clang-tidy-5.0']
+      packages: [ 'libboost1.55-all-dev', 'libgdal-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin', 'clang-5.0', 'clang-tidy-5.0', 'g++-6', 'gcc-6']
   addons_gcc48: &gcc48
     apt:
       sources: [ 'ubuntu-toolchain-r-test', 'boost-latest' ]
@@ -117,6 +117,15 @@ matrix:
     - os: linux
       compiler: linux-clang50-dev
       env: CC='clang-5.0' CXX='clang++-5.0' BUILD_TYPE='Dev'
+      addons: *clang50
+
+    - os: linux
+      compiler: linux-clang50-debug
+      env: CC='clang-5.0' CXX='clang++-5.0' BUILD_TYPE='Debug'
+           CXXFLAGS="-fsanitize=address,undefined,integer -fno-sanitize-recover=all -fno-omit-frame-pointer"
+           LDFLAGS="-fsanitize=address,undefined,integer"
+      # LSAN doesn't work on container-based system
+      sudo: required
       addons: *clang50
 
     # 2/ Linux GCC Builds
