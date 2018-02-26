@@ -188,7 +188,7 @@ namespace osmium {
              * For backwards compatibility only. Use the constructor taking
              * a mapping_mode as second argument instead.
              */
-            OSMIUM_DEPRECATED MemoryMapping(std::size_t size, bool writable = true, int fd = -1, off_t offset = 0) : // NOLINT clang-tidy: google-explicit-constructor, hicpp-explicit-conversions
+            OSMIUM_DEPRECATED MemoryMapping(std::size_t size, bool writable = true, int fd = -1, off_t offset = 0) : // NOLINT(google-explicit-constructor, hicpp-explicit-conversions)
                 MemoryMapping(size, writable ? mapping_mode::write_shared : mapping_mode::readonly, fd, offset)  {
             }
 
@@ -519,11 +519,11 @@ namespace osmium {
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 
 inline bool osmium::util::MemoryMapping::is_valid() const noexcept {
-    return m_addr != MAP_FAILED; // NOLINT clang-tidy: cppcoreguidelines-pro-type-cstyle-cast
+    return m_addr != MAP_FAILED; // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
 }
 
 inline void osmium::util::MemoryMapping::make_invalid() noexcept {
-    m_addr = MAP_FAILED; // NOLINT clang-tidy: cppcoreguidelines-pro-type-cstyle-cast
+    m_addr = MAP_FAILED; // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
 }
 
 #pragma GCC diagnostic pop

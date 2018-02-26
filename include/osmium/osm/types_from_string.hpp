@@ -62,8 +62,8 @@ namespace osmium {
         if (*input != '\0' && !std::isspace(*input)) {
             char* end;
             const auto id = std::strtoll(input, &end, 10);
-            if (id != std::numeric_limits<long long>::min() && // NOLINT clang-tidy: google-runtime-int
-                id != std::numeric_limits<long long>::max() && // NOLINT clang-tidy: google-runtime-int
+            if (id != std::numeric_limits<long long>::min() && // NOLINT(google-runtime-int)
+                id != std::numeric_limits<long long>::max() && // NOLINT(google-runtime-int)
                 *end == '\0') {
                 return id;
             }
@@ -107,11 +107,11 @@ namespace osmium {
 
     namespace detail {
 
-        inline unsigned long string_to_ulong(const char* input, const char* name) { // NOLINT clang-tidy: google-runtime-int
+        inline unsigned long string_to_ulong(const char* input, const char* name) { // NOLINT(google-runtime-int)
             if (*input != '\0' && *input != '-' && !std::isspace(*input)) {
                 char* end;
                 const auto value = std::strtoul(input, &end, 10);
-                if (value != std::numeric_limits<unsigned long>::max() && *end == '\0') { // NOLINT clang-tidy: google-runtime-int
+                if (value != std::numeric_limits<unsigned long>::max() && *end == '\0') { // NOLINT(google-runtime-int)
                     return value;
                 }
             }

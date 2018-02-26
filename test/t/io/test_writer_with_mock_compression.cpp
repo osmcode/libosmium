@@ -64,7 +64,7 @@ TEST_CASE("Write with mock compressor") {
     REQUIRE(buffer);
     REQUIRE(buffer.committed() > 0);
     REQUIRE_FALSE(buffer.select<osmium::OSMObject>().empty());
-    REQUIRE(buffer.select<osmium::OSMObject>().size() > 0); // NOLINT clang-tidy: readability-container-size-empty
+    REQUIRE(buffer.select<osmium::OSMObject>().size() > 0); // NOLINT(readability-container-size-empty)
 
     SECTION("fail on construction") {
 

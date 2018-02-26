@@ -9,7 +9,7 @@
 #include <functional>
 #include <vector>
 
-using namespace osmium::builder::attr; // NOLINT clang-tidy: google-build-using-namespace
+using namespace osmium::builder::attr; // NOLINT(google-build-using-namespace)
 
 TEST_CASE("Object ID comparisons") {
     const osmium::object_id_type a =   0;

@@ -8,7 +8,7 @@
 #include <map>
 #include <vector>
 
-using namespace osmium::builder::attr; // NOLINT clang-tidy: google-build-using-namespace
+using namespace osmium::builder::attr; // NOLINT(google-build-using-namespace)
 
 TEST_CASE("create tag list") {
     osmium::memory::Buffer buffer{10240};

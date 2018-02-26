@@ -336,7 +336,7 @@ namespace osmium {
          * or
          * @code StringMatcher{StringMatcher::always_false}; @endcode
          */
-        StringMatcher(bool result) : // NOLINT clang-tidy: google-explicit-constructor, hicpp-explicit-conversions
+        StringMatcher(bool result) : // NOLINT(google-explicit-constructor, hicpp-explicit-conversions)
             m_matcher(always_false{}) {
             if (result) {
                 m_matcher = always_true{};
@@ -348,7 +348,7 @@ namespace osmium {
          * Shortcut for
          * @code StringMatcher{StringMatcher::equal{str}}; @endcode
          */
-        StringMatcher(const char* str) : // NOLINT clang-tidy: google-explicit-constructor, hicpp-explicit-conversions
+        StringMatcher(const char* str) : // NOLINT(google-explicit-constructor, hicpp-explicit-conversions)
             m_matcher(equal{str}) {
         }
 
@@ -357,7 +357,7 @@ namespace osmium {
          * Shortcut for
          * @code StringMatcher{StringMatcher::equal{str}}; @endcode
          */
-        StringMatcher(const std::string& str) : // NOLINT clang-tidy: google-explicit-constructor, hicpp-explicit-conversions
+        StringMatcher(const std::string& str) : // NOLINT(google-explicit-constructor, hicpp-explicit-conversions)
             m_matcher(equal{str}) {
         }
 
@@ -367,7 +367,7 @@ namespace osmium {
          * Shortcut for
          * @code StringMatcher{StringMatcher::regex{aregex}}; @endcode
          */
-        StringMatcher(const std::regex& aregex) : // NOLINT clang-tidy: google-explicit-constructor, hicpp-explicit-conversions
+        StringMatcher(const std::regex& aregex) : // NOLINT(google-explicit-constructor, hicpp-explicit-conversions)
             m_matcher(regex{aregex}) {
         }
 #endif
@@ -378,7 +378,7 @@ namespace osmium {
          * Shortcut for
          * @code StringMatcher{StringMatcher::list{strings}}; @endcode
          */
-        StringMatcher(const std::vector<std::string>& strings) : // NOLINT clang-tidy: google-explicit-constructor, hicpp-explicit-conversions
+        StringMatcher(const std::vector<std::string>& strings) : // NOLINT(google-explicit-constructor, hicpp-explicit-conversions)
             m_matcher(list{strings}) {
         }
 
@@ -391,7 +391,7 @@ namespace osmium {
          */
         template <typename TMatcher, typename std::enable_if<
             std::is_base_of<matcher, TMatcher>::value, int>::type = 0>
-        StringMatcher(TMatcher&& matcher) : // NOLINT clang-tidy: google-explicit-constructor, hicpp-explicit-conversions
+        StringMatcher(TMatcher&& matcher) : // NOLINT(google-explicit-constructor, hicpp-explicit-conversions)
             m_matcher(std::forward<TMatcher>(matcher)) {
         }
 

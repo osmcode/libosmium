@@ -13,7 +13,7 @@ static_assert(!std::is_copy_assignable<osmium::index::RelationsMapStash>::value,
 TEST_CASE("RelationsMapStash lvalue") {
     osmium::index::RelationsMapStash stash;
     REQUIRE(stash.empty());
-    REQUIRE(stash.size() == 0); // NOLINT clang-tidy: readability-container-size-empty
+    REQUIRE(stash.size() == 0); // NOLINT(readability-container-size-empty)
 
     stash.add(1, 2);
     stash.add(2, 3);

@@ -6,7 +6,7 @@
 #include <osmium/osm/object_comparisons.hpp>
 #include <osmium/visitor.hpp>
 
-using namespace osmium::builder::attr; // NOLINT clang-tidy: google-build-using-namespace
+using namespace osmium::builder::attr; // NOLINT(google-build-using-namespace)
 
 TEST_CASE("Create ObjectPointerCollection") {
     osmium::memory::Buffer buffer{1024, osmium::memory::Buffer::auto_grow::yes};
@@ -28,7 +28,7 @@ TEST_CASE("Create ObjectPointerCollection") {
 
     osmium::ObjectPointerCollection collection;
     REQUIRE(collection.empty());
-    REQUIRE(collection.size() == 0); // NOLINT clang-tidy: readability-container-size-empty
+    REQUIRE(collection.size() == 0); // NOLINT(readability-container-size-empty)
 
     osmium::apply(buffer, collection);
 

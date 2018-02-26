@@ -9,7 +9,7 @@ TEST_CASE("Basic functionality of IdSetDense") {
     REQUIRE_FALSE(s.get(17));
     REQUIRE_FALSE(s.get(28));
     REQUIRE(s.empty());
-    REQUIRE(s.size() == 0); // NOLINT clang-tidy: readability-container-size-empty
+    REQUIRE(s.size() == 0); // NOLINT(readability-container-size-empty)
 
     s.set(17);
     REQUIRE(s.get(17));

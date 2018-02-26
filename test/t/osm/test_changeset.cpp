@@ -6,7 +6,7 @@
 
 #include <boost/crc.hpp>
 
-using namespace osmium::builder::attr; // NOLINT clang-tidy: google-build-using-namespace
+using namespace osmium::builder::attr; // NOLINT(google-build-using-namespace)
 
 TEST_CASE("Build changeset") {
     osmium::memory::Buffer buffer{10 * 1000};

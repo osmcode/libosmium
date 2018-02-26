@@ -74,7 +74,7 @@ namespace osmium {
              * This constructor is not explicit on purpose allowing use of
              * a Location everywhere a Coordinates object is needed.
              */
-            Coordinates(const osmium::Location& location) : // NOLINT clang-tidy: google-explicit-constructor, hicpp-explicit-conversions
+            Coordinates(const osmium::Location& location) : // NOLINT(google-explicit-constructor, hicpp-explicit-conversions)
                 x(location.lon()),
                 y(location.lat()) {
             }

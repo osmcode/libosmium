@@ -64,7 +64,7 @@ namespace osmium {
              * @returns Compressed data.
              */
             inline std::string zlib_compress(const std::string& input) {
-                unsigned long output_size = ::compressBound(osmium::static_cast_with_assert<unsigned long>(input.size())); // NOLINT clang-tidy: google-runtime-int
+                unsigned long output_size = ::compressBound(osmium::static_cast_with_assert<unsigned long>(input.size())); // NOLINT(google-runtime-int)
 
                 std::string output(output_size, '\0');
 
@@ -72,7 +72,7 @@ namespace osmium {
                     reinterpret_cast<unsigned char*>(const_cast<char *>(output.data())),
                     &output_size,
                     reinterpret_cast<const unsigned char*>(input.data()),
-                    osmium::static_cast_with_assert<unsigned long>(input.size()) // NOLINT clang-tidy: google-runtime-int
+                    osmium::static_cast_with_assert<unsigned long>(input.size()) // NOLINT(google-runtime-int)
                 );
 
                 if (result != Z_OK) {
@@ -95,7 +95,7 @@ namespace osmium {
              * @param output Uncompressed result data.
              * @returns Pointer and size to incompressed data.
              */
-            inline protozero::data_view zlib_uncompress_string(const char* input, unsigned long input_size, unsigned long raw_size, std::string& output) { // NOLINT clang-tidy: google-runtime-int
+            inline protozero::data_view zlib_uncompress_string(const char* input, unsigned long input_size, unsigned long raw_size, std::string& output) { // NOLINT(google-runtime-int)
                 output.resize(raw_size);
 
                 const auto result = ::uncompress(

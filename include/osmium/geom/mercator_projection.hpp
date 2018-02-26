@@ -142,7 +142,7 @@ namespace osmium {
             // like it and complain that "default initialization of an object
             // of const type 'const osmium::geom::MercatorProjection' requires
             // a user-provided default constructor".
-            MercatorProjection() { // NOLINT clang-tidy: modernize-use-equals-default
+            MercatorProjection() { // NOLINT(modernize-use-equals-default)
             }
 
             Coordinates operator()(osmium::Location location) const {
