@@ -48,19 +48,17 @@ public:
         if (m_read_count == 1) {
             if (m_fail_in == "first read") {
                 throw std::runtime_error{"error first read"};
-            } else {
-                buffer += "<?xml version='1.0' encoding='UTF-8'?>\n<osm version='0.6' generator='testdata'>\n";
-                for (int i = 0; i < 1000; ++i) {
-                    add_node(buffer, i);
-                }
+            }
+            buffer += "<?xml version='1.0' encoding='UTF-8'?>\n<osm version='0.6' generator='testdata'>\n";
+            for (int i = 0; i < 1000; ++i) {
+                add_node(buffer, i);
             }
         } else if (m_read_count == 2) {
             if (m_fail_in == "second read") {
                 throw std::runtime_error{"error second read"};
-            } else {
-                for (int i = 1000; i < 2000; ++i) {
-                    add_node(buffer, i);
-                }
+            }
+            for (int i = 1000; i < 2000; ++i) {
+                add_node(buffer, i);
             }
         } else if (m_read_count == 3) {
             buffer += "</osm>";

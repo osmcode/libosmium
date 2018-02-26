@@ -67,7 +67,7 @@ namespace osmium {
                 };
 
                 enum constant_block_size : uint64_t {
-                    block_size = 1ll << bits
+                    block_size = 1ull << bits
                 };
 
                 // Minimum number of entries in the sparse index before we

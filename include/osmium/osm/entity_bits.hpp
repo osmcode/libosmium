@@ -78,15 +78,15 @@ namespace osmium {
         }; // enum type
 
         inline constexpr type operator|(const type lhs, const type rhs) noexcept {
-            return static_cast<type>(static_cast<int>(lhs) | static_cast<int>(rhs));
+            return static_cast<type>(static_cast<unsigned char>(lhs) | static_cast<unsigned char>(rhs));
         }
 
         inline constexpr type operator&(const type lhs, const type rhs) noexcept {
-            return static_cast<type>(static_cast<int>(lhs) & static_cast<int>(rhs));
+            return static_cast<type>(static_cast<unsigned char>(lhs) & static_cast<unsigned char>(rhs));
         }
 
         inline constexpr type operator~(const type value) noexcept {
-            return all & static_cast<type>(~static_cast<int>(value));
+            return all & static_cast<type>(~static_cast<unsigned char>(value));
         }
 
         inline type& operator|=(type& lhs, const type rhs) noexcept {
@@ -111,7 +111,7 @@ namespace osmium {
             if (ut == 0) {
                 return nothing;
             }
-            return static_cast<osmium::osm_entity_bits::type>(0x1 << (ut - 1));
+            return static_cast<osmium::osm_entity_bits::type>(0x1u << (ut - 1));
         }
 
     } // namespace osm_entity_bits

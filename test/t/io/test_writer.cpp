@@ -9,6 +9,7 @@
 #include <osmium/memory/buffer.hpp>
 
 #include <algorithm>
+#include <stdexcept>
 
 static osmium::memory::Buffer get_buffer() {
     osmium::io::Reader reader{with_data_dir("t/io/data.osm")};
@@ -123,30 +124,30 @@ TEST_CASE("Writer: Successful writes using output iterator") {
 TEST_CASE("Writer: Interrupted writer after open") {
     auto buffer = get_and_check_buffer();
 
-    int error = 0;
+    bool error = false;
     try {
         osmium::io::Writer writer{"test-writer-out-fail1.osm", osmium::io::overwrite::allow};
-        throw 1;
-    } catch (int e) {
-        error = e;
+        throw std::runtime_error{"some error"};
+    } catch (...) {
+        error = true;
     }
 
-    REQUIRE(error > 0);
+    REQUIRE(error);
 }
 
 TEST_CASE("Writer: Interrupted writer after write") {
     auto buffer = get_and_check_buffer();
 
-    int error = 0;
+    bool error = false;
     try {
         osmium::io::Writer writer{"test-writer-out-fail2.osm", osmium::io::overwrite::allow};
         writer(std::move(buffer));
-        throw 2;
-    } catch (int e) {
-        error = e;
+        throw std::runtime_error{"some error"};
+    } catch (...) {
+        error = true;
     }
 
-    REQUIRE(error > 0);
+    REQUIRE(error);
 }
 
 TEST_CASE("Writer with user-provided pool with default number of threads") {
