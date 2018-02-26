@@ -89,7 +89,7 @@ namespace osmium {
             // to work seemlessly.
             template <typename TFunction>
             // cppcheck-suppress noExplicitConstructor
-            function_wrapper(TFunction&& f) : // NOLINT(google-explicit-constructor, hicpp-explicit-conversions)
+            function_wrapper(TFunction&& f) : // NOLINT(google-explicit-constructor, hicpp-explicit-conversions, misc-forwarding-reference-overload)
                 impl(new impl_type<TFunction>(std::forward<TFunction>(f))) {
             }
 

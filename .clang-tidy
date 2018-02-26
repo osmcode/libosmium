@@ -80,7 +80,7 @@ Checks: '*,-android-cloexec-*,-cert-dcl21-cpp,-cert-err58-cpp,-cppcoreguidelines
 #    often the same and we want to have the const in implementations.
 #
 #  readability-implicit-bool-cast
-#    Old name for readability-implicit-bool-conversion
+#    Old name for readability-implicit-bool-conversion.
 #
 #  readability-implicit-bool-conversion
 #    I don't think this makes the code more readable.

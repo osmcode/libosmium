@@ -105,7 +105,7 @@ namespace osmium {
 
                 struct slocation {
 
-                    static constexpr const uint32_t invalid_item = 1u << 30;
+                    static constexpr const uint32_t invalid_item = 1u << 30u;
 
                     uint32_t item : 31;
                     uint32_t reverse : 1;

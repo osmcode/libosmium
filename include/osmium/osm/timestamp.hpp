@@ -200,7 +200,7 @@ namespace osmium {
          *
          * @deprecated You should call seconds_since_epoch() explicitly instead.
          */
-        OSMIUM_DEPRECATED constexpr operator time_t() const noexcept { // NOLINT(google-explicit-constructor)
+        OSMIUM_DEPRECATED constexpr operator time_t() const noexcept { // NOLINT(google-explicit-constructor, hicpp-explicit-conversions)
             return static_cast<time_t>(m_timestamp);
         }
 
