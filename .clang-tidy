@@ -1,5 +1,5 @@
 ---
-Checks: '*,-android-cloexec-*,-cert-dcl21-cpp,-cert-err58-cpp,-cppcoreguidelines-owning-memory,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-cppcoreguidelines-pro-bounds-constant-array-index,-cppcoreguidelines-pro-type-const-cast,-cppcoreguidelines-pro-type-reinterpret-cast,-cppcoreguidelines-pro-type-static-cast-downcast,-cppcoreguidelines-pro-type-vararg,-google-runtime-references,-fuchsia-*,-hicpp-invalid-access-moved,-hicpp-no-array-decay,-hicpp-no-assembler,-hicpp-vararg,-misc-macro-parentheses,-misc-unused-parameters,-modernize-make-unique,-modernize-raw-string-literal,-readability-avoid-const-params-in-decls,-readability-implicit-bool-cast,-readability-implicit-bool-conversion'
+Checks: '*,-android-cloexec-*,-cert-dcl21-cpp,-cert-err58-cpp,-cppcoreguidelines-owning-memory,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-cppcoreguidelines-pro-bounds-constant-array-index,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-pro-type-const-cast,-cppcoreguidelines-pro-type-reinterpret-cast,-cppcoreguidelines-pro-type-static-cast-downcast,-cppcoreguidelines-pro-type-vararg,-fuchsia-*,-google-runtime-references,-hicpp-invalid-access-moved,-hicpp-no-array-decay,-hicpp-no-assembler,-hicpp-vararg,-misc-macro-parentheses,-misc-unused-parameters,-modernize-make-unique,-modernize-raw-string-literal,-readability-avoid-const-params-in-decls,-readability-implicit-bool-cast,-readability-implicit-bool-conversion'
 #
 #  For a list of check options, see:
 #  http://clang.llvm.org/extra/clang-tidy/checks/list.html
@@ -19,14 +19,14 @@ Checks: '*,-android-cloexec-*,-cert-dcl21-cpp,-cert-err58-cpp,-cppcoreguidelines
 #  cppcoreguidelines-owning-memory
 #    Don't want to add dependency on gsl library.
 #
-#  cppcoreguidelines-pro-bounds-pointer-arithmetic
-#    This is a low-level library, it needs to do pointer arithmetic.
-#
 #  cppcoreguidelines-pro-bounds-array-to-pointer-decay
 #    Limited use and many false positives including for all asserts.
 #
 #  cppcoreguidelines-pro-bounds-constant-array-index
 #    Is needed for low-level code.
+#
+#  cppcoreguidelines-pro-bounds-pointer-arithmetic
+#    This is a low-level library, it needs to do pointer arithmetic.
 #
 #  cppcoreguidelines-pro-type-const-cast
 #    When you need it, you need it.
@@ -41,12 +41,12 @@ Checks: '*,-android-cloexec-*,-cert-dcl21-cpp,-cert-err58-cpp,-cppcoreguidelines
 #    We need some of these functions at least and for some functions it isn't
 #    even clear that those are vararg functions.
 #
+#  fuchsia-*
+#    Much too strict.
+#
 #  google-runtime-references
 #    This is just a matter of preference, and we can't change the interfaces
 #    now anyways.
-#
-#  fuchsia-*
-#    Much too strict.
 #
 #  hicpp-invalid-access-moved
 #    Creates false positives.
