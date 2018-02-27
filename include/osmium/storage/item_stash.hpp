@@ -72,7 +72,12 @@ namespace osmium {
 
             friend class ItemStash;
 
-            std::size_t value = 0;
+            std::size_t value; // NOLINT(modernize-use-default-member-init)
+                               // Some compilers don't like the default member
+                               // init: "error: defaulted default constructor
+                               // of 'handle_type' cannot be used by non-static
+                               // data member initializer which appears before
+                               // end of class definition"
 
             explicit handle_type(std::size_t new_value) noexcept :
                 value(new_value) {
@@ -82,7 +87,9 @@ namespace osmium {
         public:
 
             /// The default constructor creates an invalid handle.
-            handle_type() noexcept = default;
+            handle_type() noexcept :
+                value(0) {
+            }
 
             /// Is this a valid handle?
             bool valid() const noexcept {
