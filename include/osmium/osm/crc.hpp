@@ -52,7 +52,7 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
-    namespace util {
+    inline namespace util {
 
         inline uint16_t byte_swap_16(uint16_t value) noexcept {
 # if defined(__GNUC__) || defined(__clang__)
@@ -83,7 +83,7 @@ namespace osmium {
 # endif
         }
 
-    } // namespace util
+    } // inline namespace util
 
     template <typename TCRC>
     class CRC {
