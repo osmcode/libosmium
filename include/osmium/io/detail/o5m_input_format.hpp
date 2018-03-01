@@ -231,15 +231,15 @@ namespace osmium {
                     set_header_value(m_header);
                 }
 
-                osmium::util::DeltaDecode<osmium::object_id_type> m_delta_id;
+                osmium::DeltaDecode<osmium::object_id_type> m_delta_id;
 
-                osmium::util::DeltaDecode<int64_t> m_delta_timestamp;
-                osmium::util::DeltaDecode<osmium::changeset_id_type> m_delta_changeset;
-                osmium::util::DeltaDecode<int64_t> m_delta_lon;
-                osmium::util::DeltaDecode<int64_t> m_delta_lat;
+                osmium::DeltaDecode<int64_t> m_delta_timestamp;
+                osmium::DeltaDecode<osmium::changeset_id_type> m_delta_changeset;
+                osmium::DeltaDecode<int64_t> m_delta_lon;
+                osmium::DeltaDecode<int64_t> m_delta_lat;
 
-                osmium::util::DeltaDecode<osmium::object_id_type> m_delta_way_node_id;
-                osmium::util::DeltaDecode<osmium::object_id_type> m_delta_member_ids[3];
+                osmium::DeltaDecode<osmium::object_id_type> m_delta_way_node_id;
+                osmium::DeltaDecode<osmium::object_id_type> m_delta_member_ids[3];
 
                 void reset() {
                     m_reference_table.clear();

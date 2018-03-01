@@ -41,7 +41,7 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
-    namespace util {
+    inline namespace util {
 
         constexpr const int max_double_length = 20; // should fit any double
 
@@ -89,7 +89,7 @@ namespace osmium {
             double2string(std::back_inserter(out), value, precision);
         }
 
-    } // namespace util
+    } // inline namespace util
 
 } // namespace osmium
 

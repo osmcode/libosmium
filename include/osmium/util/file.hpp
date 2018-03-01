@@ -58,7 +58,7 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
-    namespace util {
+    inline namespace util {
 
 #ifdef _MSC_VER
         namespace detail {
@@ -233,7 +233,7 @@ namespace osmium {
 #endif
         }
 
-    } // namespace util
+    } // inline namespace util
 
 } // namespace osmium
 
