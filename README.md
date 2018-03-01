@@ -76,6 +76,14 @@ chapter in the manual.
 
 ## Testing
 
+To download the `osm-testdata` submodule call:
+
+```
+git submodule update --init
+```
+
+This will enable additional tests.
+
 See the
 [Libosmium Manual](http://osmcode.org/libosmium/manual.html#running-tests)
 for instructions.

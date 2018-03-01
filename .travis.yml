@@ -210,7 +210,6 @@ matrix:
 
 install:
   - git clone --quiet --depth 1 https://github.com/mapbox/protozero.git ../protozero
-  - git clone --quiet --depth 1 https://github.com/osmcode/osm-testdata.git ../osm-testdata
   - |
     if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
       brew remove gdal
@@ -220,6 +219,7 @@ install:
 
 before_script:
   - cd ${TRAVIS_BUILD_DIR}
+  - git submodule update --init
   - mkdir build && cd build
   - cmake -LA .. -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DBUILD_WITH_CCACHE=1 -DOSM_TESTDATA="${TRAVIS_BUILD_DIR}/../osm-testdata"
 

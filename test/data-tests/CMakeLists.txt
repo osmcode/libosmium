@@ -15,7 +15,7 @@ if(NOT GDAL_FOUND OR NOT EXPAT_FOUND)
 endif()
 
 message(STATUS "Looking for osm-testdata")
-find_path(OSM_TESTDATA grid/data/all.osm HINT ../../../osm-testdata)
+find_path(OSM_TESTDATA grid/data/all.osm HINT osm-testdata)
 if(OSM_TESTDATA STREQUAL "OSM_TESTDATA-NOTFOUND")
     message(STATUS "Looking for osm-testdata - not found (data tests disabled)")
     message(STATUS "Configuring data tests - failed")

@@ -36,8 +36,8 @@ clone_folder: c:\projects\libosmium
 # halts: "msys2-runtime and catgets are in conflict. Remove catgets?"
 # See also: https://github.com/Alexpux/MSYS2-packages/issues/1141
 install:
+  - git submodule update --init
   - cd c:\projects
-  - git clone --depth 1 https://github.com/osmcode/osm-testdata
   - git clone --depth 1 https://github.com/mapbox/protozero
   - if [%config%]==[MSYS2] (
           C:\msys64\usr\bin\pacman --noconfirm --sync --refresh --refresh --sysupgrade --sysupgrade --ask=20
