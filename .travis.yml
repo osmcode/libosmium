@@ -221,7 +221,7 @@ before_script:
   - cd ${TRAVIS_BUILD_DIR}
   - git submodule update --init
   - mkdir build && cd build
-  - cmake -LA .. -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DBUILD_WITH_CCACHE=1 -DOSM_TESTDATA="${TRAVIS_BUILD_DIR}/../osm-testdata"
+  - cmake -LA .. -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DBUILD_WITH_CCACHE=1
 
 script:
   - make VERBOSE=1 && ctest --output-on-failure
