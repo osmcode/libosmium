@@ -98,9 +98,9 @@ namespace osmium {
              */
             void append_to_string(std::string& s, const char infix, int precision) const {
                 if (valid()) {
-                    osmium::double2string(s, x, precision);
+                    osmium::util::double2string(s, x, precision);
                     s += infix;
-                    osmium::double2string(s, y, precision);
+                    osmium::util::double2string(s, y, precision);
                 } else {
                     s.append("invalid");
                 }

@@ -69,7 +69,7 @@ namespace osmium {
          *
          * If the filename is empty or "-", this means stdin or stdout is used.
          */
-        class File : public osmium::Options {
+        class File : public osmium::util::Options {
 
         private:
 

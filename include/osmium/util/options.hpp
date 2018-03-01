@@ -41,7 +41,7 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
-    inline namespace util {
+    namespace util {
 
         /**
          * Stores key=value type options. This class can be used stand-alone or
@@ -198,7 +198,7 @@ namespace osmium {
 
         }; // class Options
 
-    } // inline namespace util
+    } // namespace util
 
 } // namespace osmium
 

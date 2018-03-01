@@ -174,7 +174,7 @@ namespace osmium {
          * stream.
          *
          * @tparam TStream Output stream type (like std::cout, std::cerr, or
-         *                 osmium::VerboseOutput).
+         *                 osmium::util::VerboseOutput).
          * @param stream Reference to stream where the output should go.
          * @param mu Memory usage data as returned by the used_memory()
          *                  functions of various relations managers.

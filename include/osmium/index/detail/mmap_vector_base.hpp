@@ -59,13 +59,13 @@ namespace osmium {
         protected:
 
             size_t m_size = 0;
-            osmium::TypedMemoryMapping<T> m_mapping;
+            osmium::util::TypedMemoryMapping<T> m_mapping;
 
         public:
 
             mmap_vector_base(int fd, size_t capacity, size_t size = 0) :
                 m_size(size),
-                m_mapping(capacity, osmium::MemoryMapping::mapping_mode::write_shared, fd) {
+                m_mapping(capacity, osmium::util::MemoryMapping::mapping_mode::write_shared, fd) {
                 assert(size <= capacity);
                 std::fill(data() + size, data() + capacity, osmium::index::empty_value<T>());
                 shrink_to_fit();

@@ -41,7 +41,7 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
-    inline namespace util {
+    namespace util {
 
         /**
          * Helper class for delta encoding.
@@ -122,7 +122,7 @@ namespace osmium {
 
         }; // class DeltaDecode
 
-    } // inline namespace util
+    } // namespace util
 
 } // namespace osmium
 

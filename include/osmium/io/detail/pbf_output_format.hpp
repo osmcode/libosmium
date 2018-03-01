@@ -230,15 +230,15 @@ namespace osmium {
                 std::vector<int64_t> m_lons;
                 std::vector<int32_t> m_tags;
 
-                osmium::DeltaEncode<object_id_type, int64_t> m_delta_id;
+                osmium::util::DeltaEncode<object_id_type, int64_t> m_delta_id;
 
-                osmium::DeltaEncode<uint32_t, int64_t> m_delta_timestamp;
-                osmium::DeltaEncode<changeset_id_type, int64_t> m_delta_changeset;
-                osmium::DeltaEncode<user_id_type, int32_t> m_delta_uid;
-                osmium::DeltaEncode<uint32_t, int32_t> m_delta_user_sid;
+                osmium::util::DeltaEncode<uint32_t, int64_t> m_delta_timestamp;
+                osmium::util::DeltaEncode<changeset_id_type, int64_t> m_delta_changeset;
+                osmium::util::DeltaEncode<user_id_type, int32_t> m_delta_uid;
+                osmium::util::DeltaEncode<uint32_t, int32_t> m_delta_user_sid;
 
-                osmium::DeltaEncode<int64_t, int64_t> m_delta_lat;
-                osmium::DeltaEncode<int64_t, int64_t> m_delta_lon;
+                osmium::util::DeltaEncode<int64_t, int64_t> m_delta_lat;
+                osmium::util::DeltaEncode<int64_t, int64_t> m_delta_lon;
 
                 const pbf_output_options& m_options;
 
@@ -611,7 +611,7 @@ namespace osmium {
                     add_meta(way, pbf_way);
 
                     {
-                        osmium::DeltaEncode<object_id_type, int64_t> delta_id;
+                        osmium::util::DeltaEncode<object_id_type, int64_t> delta_id;
                         protozero::packed_field_sint64 field{pbf_way, protozero::pbf_tag_type(OSMFormat::Way::packed_sint64_refs)};
                         for (const auto& node_ref : way.nodes()) {
                             field.add_element(delta_id.update(node_ref.ref()));
@@ -620,14 +620,14 @@ namespace osmium {
 
                     if (m_options.locations_on_ways) {
                         {
-                            osmium::DeltaEncode<int64_t, int64_t> delta_id;
+                            osmium::util::DeltaEncode<int64_t, int64_t> delta_id;
                             protozero::packed_field_sint64 field{pbf_way, protozero::pbf_tag_type(OSMFormat::Way::packed_sint64_lon)};
                             for (const auto& node_ref : way.nodes()) {
                                 field.add_element(delta_id.update(lonlat2int(node_ref.location().lon_without_check())));
                             }
                         }
                         {
-                            osmium::DeltaEncode<int64_t, int64_t> delta_id;
+                            osmium::util::DeltaEncode<int64_t, int64_t> delta_id;
                             protozero::packed_field_sint64 field{pbf_way, protozero::pbf_tag_type(OSMFormat::Way::packed_sint64_lat)};
                             for (const auto& node_ref : way.nodes()) {
                                 field.add_element(delta_id.update(lonlat2int(node_ref.location().lat_without_check())));
@@ -651,7 +651,7 @@ namespace osmium {
                     }
 
                     {
-                        osmium::DeltaEncode<object_id_type, int64_t> delta_id;
+                        osmium::util::DeltaEncode<object_id_type, int64_t> delta_id;
                         protozero::packed_field_sint64 field{pbf_relation, protozero::pbf_tag_type(OSMFormat::Relation::packed_sint64_memids)};
                         for (const auto& member : relation.members()) {
                             field.add_element(delta_id.update(member.ref()));

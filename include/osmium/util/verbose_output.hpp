@@ -44,7 +44,7 @@ namespace osmium {
     /**
      * @brief Helpful utility classes and functions not strictly OSM related
      */
-    inline namespace util {
+    namespace util {
 
         /**
          * Osmium programs often run for a long time because of the amount of
@@ -130,7 +130,7 @@ namespace osmium {
             return verbose_output;
         }
 
-    } // inline namespace util
+    } // namespace util
 
 } // namespace osmium
 

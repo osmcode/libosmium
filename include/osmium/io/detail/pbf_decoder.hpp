@@ -357,14 +357,14 @@ namespace osmium {
 
                     if (!refs.empty()) {
                         osmium::builder::WayNodeListBuilder wnl_builder{builder};
-                        osmium::DeltaDecode<int64_t> ref;
+                        osmium::util::DeltaDecode<int64_t> ref;
                         if (lats.empty()) {
                             for (const auto& ref_value : refs) {
                                 wnl_builder.add_node_ref(ref.update(ref_value));
                             }
                         } else {
-                            osmium::DeltaDecode<int64_t> lon;
-                            osmium::DeltaDecode<int64_t> lat;
+                            osmium::util::DeltaDecode<int64_t> lon;
+                            osmium::util::DeltaDecode<int64_t> lat;
                             while (!refs.empty() && !lons.empty() && !lats.empty()) {
                                 wnl_builder.add_node_ref(
                                     ref.update(refs.front()),
@@ -429,7 +429,7 @@ namespace osmium {
 
                     if (!refs.empty()) {
                         osmium::builder::RelationMemberListBuilder rml_builder{builder};
-                        osmium::DeltaDecode<int64_t> ref;
+                        osmium::util::DeltaDecode<int64_t> ref;
                         while (!roles.empty() && !refs.empty() && !types.empty()) {
                             const auto& r = m_stringtable.at(roles.front());
                             const int type = types.front();
@@ -494,9 +494,9 @@ namespace osmium {
                         }
                     }
 
-                    osmium::DeltaDecode<int64_t> dense_id;
-                    osmium::DeltaDecode<int64_t> dense_latitude;
-                    osmium::DeltaDecode<int64_t> dense_longitude;
+                    osmium::util::DeltaDecode<int64_t> dense_id;
+                    osmium::util::DeltaDecode<int64_t> dense_latitude;
+                    osmium::util::DeltaDecode<int64_t> dense_longitude;
 
                     auto tag_it = tags.begin();
 
@@ -595,13 +595,13 @@ namespace osmium {
                         }
                     }
 
-                    osmium::DeltaDecode<int64_t> dense_id;
-                    osmium::DeltaDecode<int64_t> dense_latitude;
-                    osmium::DeltaDecode<int64_t> dense_longitude;
-                    osmium::DeltaDecode<int64_t> dense_uid;
-                    osmium::DeltaDecode<int64_t> dense_user_sid;
-                    osmium::DeltaDecode<int64_t> dense_changeset;
-                    osmium::DeltaDecode<int64_t> dense_timestamp;
+                    osmium::util::DeltaDecode<int64_t> dense_id;
+                    osmium::util::DeltaDecode<int64_t> dense_latitude;
+                    osmium::util::DeltaDecode<int64_t> dense_longitude;
+                    osmium::util::DeltaDecode<int64_t> dense_uid;
+                    osmium::util::DeltaDecode<int64_t> dense_user_sid;
+                    osmium::util::DeltaDecode<int64_t> dense_changeset;
+                    osmium::util::DeltaDecode<int64_t> dense_timestamp;
 
                     auto tag_it = tags.begin();
 
