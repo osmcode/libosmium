@@ -45,7 +45,6 @@ install:
 
 build_script:
   - cd c:\projects\libosmium
-  - git submodule update --init
   - if [%config%]==[MSYS2] (
         build-msys2.bat
     ) else (
