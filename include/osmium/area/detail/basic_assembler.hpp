@@ -935,20 +935,6 @@ namespace osmium {
                     return true;
                 }
 
-                /**
-                 * Checks if any ways were completely removed in the
-                 * erase_duplicate_segments step.
-                 */
-                bool ways_were_lost() {
-                    std::unordered_set<const osmium::Way*> ways_in_segments;
-
-                    for (const auto& segment : m_segment_list) {
-                        ways_in_segments.insert(segment.way());
-                    }
-
-                    return ways_in_segments.size() < m_num_members;
-                }
-
 #ifdef OSMIUM_WITH_TIMER
                 static bool print_header() {
                     std::cout << "nodes outer_rings inner_rings sort dupl intersection locations split simple_case complex_case roles_check\n";
@@ -1014,15 +1000,6 @@ namespace osmium {
                     if (m_segment_list.empty()) {
                         if (debug()) {
                             std::cerr << "  No segments left\n";
-                        }
-                        return false;
-                    }
-
-                    // If one or more complete ways was removed because of
-                    // duplicate segments, this isn't a valid area.
-                    if (ways_were_lost()) {
-                        if (debug()) {
-                            std::cerr << "  Complete ways removed because of duplicate segments\n";
                         }
                         return false;
                     }
