@@ -75,8 +75,10 @@ public:
         const std::string wkt = m_geometries[way.id()];
         assert(wkt != "" && "Missing geometry for way in ways.wkt");
 
-        const std::string this_wkt = m_factory.create_linestring(way);
-        assert(wkt == this_wkt && "wkt geometries don't match");
+        if (wkt != "NULL") {
+            const std::string this_wkt = m_factory.create_linestring(way);
+            assert(wkt == this_wkt && "wkt geometries don't match");
+        }
         m_geometries.erase(way.id());
     }
 
