@@ -194,10 +194,13 @@ namespace osmium {
                             case protozero::tag_and_type(OSMFormat::Info::optional_int32_version, protozero::pbf_wire_type::varint):
                                 {
                                     const auto version = pbf_info.get_int32();
-                                    if (version < 0) {
+                                    if (version < -1) {
                                         throw osmium::pbf_error{"object version must not be negative"};
+                                    } else if (version == -1) {
+                                        object.set_version(0U);
+                                    } else {
+                                        object.set_version(static_cast<object_version_type>(version));
                                     }
-                                    object.set_version(static_cast<object_version_type>(version));
                                 }
                                 break;
                             case protozero::tag_and_type(OSMFormat::Info::optional_int64_timestamp, protozero::pbf_wire_type::varint):
@@ -206,10 +209,13 @@ namespace osmium {
                             case protozero::tag_and_type(OSMFormat::Info::optional_int64_changeset, protozero::pbf_wire_type::varint):
                                 {
                                     const auto changeset_id = pbf_info.get_int64();
-                                    if (changeset_id < 0 || changeset_id >= std::numeric_limits<changeset_id_type>::max()) {
+                                    if (changeset_id < -1 || changeset_id >= std::numeric_limits<changeset_id_type>::max()) {
                                         throw osmium::pbf_error{"object changeset_id must be between 0 and 2^32-1"};
+                                    } else if (changeset_id == -1) {
+                                        object.set_changeset(0U);
+                                    } else {
+                                        object.set_changeset(static_cast<changeset_id_type>(changeset_id));
                                     }
-                                    object.set_changeset(static_cast<changeset_id_type>(changeset_id));
                                 }
                                 break;
                             case protozero::tag_and_type(OSMFormat::Info::optional_int32_uid, protozero::pbf_wire_type::varint):
@@ -624,19 +630,25 @@ namespace osmium {
                             if (!versions.empty()) {
                                 const auto version = versions.front();
                                 versions.drop_front();
-                                if (version < 0) {
+                                if (version < -1) {
                                     throw osmium::pbf_error{"object version must not be negative"};
+                                } else if (version == -1) {
+                                    node.set_version(0U);
+                                } else {
+                                    node.set_version(static_cast<osmium::object_version_type>(version));
                                 }
-                                node.set_version(static_cast<osmium::object_version_type>(version));
                             }
 
                             if (!changesets.empty()) {
                                 const auto changeset_id = dense_changeset.update(changesets.front());
                                 changesets.drop_front();
-                                if (changeset_id < 0 || changeset_id >= std::numeric_limits<changeset_id_type>::max()) {
+                                if (changeset_id < -1 || changeset_id >= std::numeric_limits<changeset_id_type>::max()) {
                                     throw osmium::pbf_error{"object changeset_id must be between 0 and 2^32-1"};
+                                } else if (changeset_id == -1) {
+                                    node.set_changeset(0U);
+                                } else {
+                                    node.set_changeset(static_cast<osmium::changeset_id_type>(changeset_id));
                                 }
-                                node.set_changeset(static_cast<osmium::changeset_id_type>(changeset_id));
                             }
 
                             if (!timestamps.empty()) {
