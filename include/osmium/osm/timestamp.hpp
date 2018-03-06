@@ -49,6 +49,36 @@ namespace osmium {
 
     namespace detail {
 
+        inline void add_2digit_int_to_string(int value, std::string& out) {
+            assert(value >= 0 && value <= 99);
+            if (value > 9) {
+                const int dec = value / 10;
+                out += '0' + dec;
+                value -= dec * 10;
+            } else {
+                out += '0';
+            }
+            out += '0' + value;
+        }
+
+        inline void add_4digit_int_to_string(int value, std::string& out) {
+            assert(value >= 1000 && value <= 9999);
+
+            const int dec1 = value / 1000;
+            out += '0' + dec1;
+            value -= dec1 * 1000;
+
+            const int dec2 = value / 100;
+            out += '0' + dec2;
+            value -= dec2 * 100;
+
+            const int dec3 = value / 10;
+            out += '0' + dec3;
+            value -= dec3 * 10;
+
+            out += '0' + value;
+        }
+
         inline time_t parse_timestamp(const char* str) {
             static const int mon_lengths[] = {
                 31, 29, 31, 30, 31, 30,
@@ -113,16 +143,6 @@ namespace osmium {
      * never be dates before that.
      */
     class Timestamp {
-
-        // length of ISO timestamp string yyyy-mm-ddThh:mm:ssZ\0
-        static constexpr const int timestamp_length = 20 + 1;
-
-        // The timestamp format for OSM timestamps in strftime(3) format.
-        // This is the ISO-Format "yyyy-mm-ddThh:mm:ssZ".
-        static const char* timestamp_format() {
-            static const char f[timestamp_length] = "%Y-%m-%dT%H:%M:%SZ";
-            return f;
-        }
 
         uint32_t m_timestamp = 0;
 
@@ -236,13 +256,18 @@ namespace osmium {
                 assert(result == 0);
 #endif
 
-                s.resize(timestamp_length);
-                /* This const_cast is ok, because we know we have enough space
-                in the string for the format we are using (well at least until
-                the year will have 5 digits). And by setting the size
-                afterwards from the result of strftime we make sure thats set
-                right, too. */
-                s.resize(strftime(const_cast<char*>(s.c_str()), timestamp_length, timestamp_format(), &tm));
+                detail::add_4digit_int_to_string(tm.tm_year + 1900, s);
+                s += '-';
+                detail::add_2digit_int_to_string(tm.tm_mon + 1, s);
+                s += '-';
+                detail::add_2digit_int_to_string(tm.tm_mday, s);
+                s += 'T';
+                detail::add_2digit_int_to_string(tm.tm_hour, s);
+                s += ':';
+                detail::add_2digit_int_to_string(tm.tm_min, s);
+                s += ':';
+                detail::add_2digit_int_to_string(tm.tm_sec, s);
+                s += 'Z';
             }
 
             return s;
