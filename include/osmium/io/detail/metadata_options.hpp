@@ -37,6 +37,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <stdexcept>
 #include <string>
+#include <osmium/osm/object.hpp>
 
 namespace osmium {
 
@@ -50,7 +51,7 @@ namespace osmium {
              */
             class metadata_options {
 
-                enum options {
+                enum options : char {
                     md_none      = 0x00,
                     md_version   = 0x01,
                     md_timestamp = 0x02,
@@ -93,6 +94,28 @@ namespace osmium {
                     m_options = static_cast<options>(opts);
                 }
 
+                metadata_options(const osmium::OSMObject& object) {
+                    int opts = 0;
+                    if (object.version() > 0) {
+                        opts |= options::md_version;
+                    }
+                    if (object.timestamp().valid()) {
+                        opts |= options::md_timestamp;
+                    }
+                    if (object.changeset() > 0) {
+                        opts |= options::md_changeset;
+                    }
+                    // Objects by anonymous users don't have these attributes set. There is no way
+                    // to distinguish them from objects with a reduced number of metadata fields.
+                    if (object.uid() > 0) {
+                        opts |= options::md_uid;
+                    }
+                    if (object.user()) {
+                        opts |= options::md_user;
+                    }
+                    m_options = static_cast<options>(opts);
+                }
+
                 /// At least one metadata attribute should be stored.
                 bool any() const noexcept {
                     return m_options != 0;
@@ -128,7 +151,45 @@ namespace osmium {
                     return (m_options & options::md_user) != 0;
                 }
 
+                metadata_options operator&=(const metadata_options& other) {
+                    m_options = static_cast<options>(other.m_options & m_options);
+                    return *this;
+                }
+
+                std::string to_string() const {
+                    if (none()) {
+                        return "none";
+                    }
+                    if (all()) {
+                        return "all";
+                    }
+                    std::string result;
+                    if (version()) {
+                        result += "version+";
+                    }
+                    if (timestamp()) {
+                        result += "timestamp+";
+                    }
+                    if (changeset()) {
+                        result += "changeset+";
+                    }
+                    if (uid()) {
+                        result += "uid+";
+                    }
+                    if (user()) {
+                        result += "user+";
+                    }
+                    // remove last + character
+                    result.pop_back();
+                    return result;
+                }
+
             }; // class metadata_options
+
+            template <typename TChar, typename TTraits>
+            inline std::basic_ostream<TChar, TTraits>& operator<<(std::basic_ostream<TChar, TTraits>& out, const metadata_options& options) {
+                return out << options.to_string();
+            }
 
         } // namespace detail
 
