@@ -619,10 +619,10 @@ inline void osmium::util::MemoryMapping::resize(std::size_t new_size) {
 // =========== Windows implementation =============
 
 /* References:
- * CreateFileMapping: http://msdn.microsoft.com/en-us/library/aa366537(VS.85).aspx
- * CloseHandle:       http://msdn.microsoft.com/en-us/library/ms724211(VS.85).aspx
- * MapViewOfFile:     http://msdn.microsoft.com/en-us/library/aa366761(VS.85).aspx
- * UnmapViewOfFile:   http://msdn.microsoft.com/en-us/library/aa366882(VS.85).aspx
+ * CreateFileMapping: https://msdn.microsoft.com/en-us/library/aa366537(VS.85).aspx
+ * CloseHandle:       https://msdn.microsoft.com/en-us/library/ms724211(VS.85).aspx
+ * MapViewOfFile:     https://msdn.microsoft.com/en-us/library/aa366761(VS.85).aspx
+ * UnmapViewOfFile:   https://msdn.microsoft.com/en-us/library/aa366882(VS.85).aspx
  */
 
 namespace osmium {

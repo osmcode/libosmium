@@ -86,7 +86,7 @@ namespace osmium {
 
 
             // The following uses trick from
-            // http://stackoverflow.com/questions/257288/is-it-possible-to-write-a-c-template-to-check-for-a-functions-existence
+            // https://stackoverflow.com/questions/257288/is-it-possible-to-write-a-c-template-to-check-for-a-functions-existence
             // to either call handler style functions or visitor style operator().
 
 #define OSMIUM_DYNAMIC_HANDLER_DISPATCH(_name_, _type_) \

@@ -83,7 +83,7 @@ namespace osmium {
                 * Type of WKB geometry.
                 * These definitions are from
                 * 99-049_OpenGIS_Simple_Features_Specification_For_SQL_Rev_1.1.pdf (for WKB)
-                * and http://trac.osgeo.org/postgis/browser/trunk/doc/ZMSgeoms.txt (for EWKB).
+                * and https://trac.osgeo.org/postgis/browser/trunk/doc/ZMSgeoms.txt (for EWKB).
                 * They are used to encode geometries into the WKB format.
                 */
                 enum wkbGeometryType : uint32_t {

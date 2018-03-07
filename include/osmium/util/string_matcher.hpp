@@ -45,7 +45,7 @@ DEALINGS IN THE SOFTWARE.
 // std::regex isn't implemented properly in glibc++ (before the version
 // delivered with GCC 4.9) and libc++ before the version 3.6, so the use is
 // disabled by these checks. Checks for GLIBC were based on
-// http://stackoverflow.com/questions/12530406/is-gcc-4-8-or-earlier-buggy-about-regular-expressions
+// https://stackoverflow.com/questions/12530406/is-gcc-4-8-or-earlier-buggy-about-regular-expressions
 // Checks for libc++ are simply based on compiler defines. This is probably
 // not optimal but seems to work for now.
 #if defined(__GLIBCXX__)

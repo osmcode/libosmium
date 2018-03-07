@@ -43,7 +43,7 @@ CD build
 
 ::This will produce lots of LNK4099 warnings which can be ignored.
 ::Unfortunately they can't be disabled, see
-::http://stackoverflow.com/questions/661606/visual-c-how-to-disable-specific-linker-warnings
+::https://stackoverflow.com/questions/661606/visual-c-how-to-disable-specific-linker-warnings
 SET CMAKE_CMD=cmake .. -LA -G "Visual Studio 14 Win64" ^
 -DOsmium_DEBUG=TRUE ^
 -DCMAKE_BUILD_TYPE=%config% ^

@@ -296,7 +296,7 @@ namespace osmium {
              *          or a defined Location if the segments intersect.
              */
             inline osmium::Location calculate_intersection(const NodeRefSegment& s1, const NodeRefSegment& s2) noexcept {
-                // See http://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect
+                // See https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect
                 // for some hints about how the algorithm works.
                 const vec p0{s1.first()};
                 const vec p1{s1.second()};

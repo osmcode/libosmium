@@ -90,7 +90,7 @@ namespace osmium {
         namespace detail {
 
             // Implementation of the o5m/o5c file formats according to the
-            // description at http://wiki.openstreetmap.org/wiki/O5m .
+            // description at https://wiki.openstreetmap.org/wiki/O5m .
 
             class ReferenceTable {
 

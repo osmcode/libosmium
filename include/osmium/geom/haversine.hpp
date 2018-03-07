@@ -48,7 +48,7 @@ namespace osmium {
         /**
          * @brief Functions to calculate arc distance on Earth using the haversine formula.
          *
-         * See http://en.wikipedia.org/wiki/Haversine_formula
+         * See https://en.wikipedia.org/wiki/Haversine_formula
          *
          * Implementation derived from
          * http://blog.julien.cayzac.name/2008/10/arc-and-distance-between-two-points-on.html
