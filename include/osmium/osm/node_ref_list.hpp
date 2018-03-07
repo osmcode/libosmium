@@ -137,7 +137,7 @@ namespace osmium {
          */
         const NodeRef& back() const noexcept {
             assert(!empty());
-            return operator[](size()-1);
+            return operator[](size() - 1);
         }
 
         /**

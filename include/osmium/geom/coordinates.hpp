@@ -146,7 +146,7 @@ namespace osmium {
         }
 
         inline bool operator!=(const Coordinates& lhs, const Coordinates& rhs) noexcept {
-            return ! operator==(lhs, rhs);
+            return !(lhs == rhs);
         }
 
         template <typename TChar, typename TTraits>

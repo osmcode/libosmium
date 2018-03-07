@@ -177,7 +177,7 @@ namespace osmium {
         }
 
         inline bool operator!=(const Tile& lhs, const Tile& rhs) noexcept {
-            return ! (lhs == rhs);
+            return !(lhs == rhs);
         }
 
         /**

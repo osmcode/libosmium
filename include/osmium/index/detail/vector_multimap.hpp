@@ -47,7 +47,7 @@ namespace osmium {
 
         namespace multimap {
 
-            template <typename TId, typename TValue, template<typename...> class TVector>
+            template <typename TId, typename TValue, template <typename...> class TVector>
             class VectorBasedSparseMultimap : public Multimap<TId, TValue> {
 
             public:

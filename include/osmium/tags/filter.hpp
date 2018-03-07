@@ -90,7 +90,7 @@ namespace osmium {
         }; // struct match_value<void>
 
         /// @deprecated Use osmium::TagsFilter instead.
-        template <typename TKey, typename TValue=void, typename TKeyComp=match_key<TKey>, typename TValueComp=match_value<TValue>>
+        template <typename TKey, typename TValue = void, typename TKeyComp = match_key<TKey>, typename TValueComp = match_value<TValue>>
         class Filter {
 
             using key_type   = TKey;
@@ -132,7 +132,7 @@ namespace osmium {
                 m_default_result(default_result) {
             }
 
-            template <typename V=TValue, typename std::enable_if<!std::is_void<V>::value, int>::type = 0>
+            template <typename V = TValue, typename std::enable_if<!std::is_void<V>::value, int>::type = 0>
             Filter& add(bool result, const key_type& key, const value_type& value) {
                 m_rules.emplace_back(result, false, key, value);
                 return *this;

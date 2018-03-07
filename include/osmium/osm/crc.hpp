@@ -55,32 +55,32 @@ namespace osmium {
     namespace util {
 
         inline uint16_t byte_swap_16(uint16_t value) noexcept {
-# if defined(__GNUC__) || defined(__clang__)
+#if defined(__GNUC__) || defined(__clang__)
             return __builtin_bswap16(value);
-# else
+#else
             return (value >> 8) | (value << 8);
-# endif
+#endif
         }
 
         inline uint32_t byte_swap_32(uint32_t value) noexcept {
-# if defined(__GNUC__) || defined(__clang__)
+#if defined(__GNUC__) || defined(__clang__)
             return __builtin_bswap32(value);
-# else
+#else
             return  (value >> 24) |
                    ((value >>  8) & 0x0000FF00) |
                    ((value <<  8) & 0x00FF0000) |
                     (value << 24);
-# endif
+#endif
         }
 
         inline uint64_t byte_swap_64(uint64_t value) noexcept {
-# if defined(__GNUC__) || defined(__clang__)
+#if defined(__GNUC__) || defined(__clang__)
             return __builtin_bswap64(value);
-# else
+#else
             const uint64_t val1 = byte_swap_32(value & 0xFFFFFFFF);
             const uint64_t val2 = byte_swap_32(value >> 32);
             return (val1 << 32) | val2;
-# endif
+#endif
         }
 
     } // namespace util

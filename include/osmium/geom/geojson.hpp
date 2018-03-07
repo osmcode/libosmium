@@ -68,7 +68,7 @@ namespace osmium {
 
                 // { "type": "Point", "coordinates": [100.0, 0.0] }
                 point_type make_point(const osmium::geom::Coordinates& xy) const {
-                    std::string str {"{\"type\":\"Point\",\"coordinates\":"};
+                    std::string str{"{\"type\":\"Point\",\"coordinates\":"};
                     xy.append_to_string(str, '[', ',', ']', m_precision);
                     str += "}";
                     return str;

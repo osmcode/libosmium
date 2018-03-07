@@ -50,7 +50,7 @@ int main(int argc, char* argv[]) {
 
     const auto& map_factory = osmium::index::MapFactory<osmium::unsigned_object_id_type, osmium::Location>::instance();
 
-    const auto buffer_size = buffer.committed() / (1024*1024); // buffer size in MBytes
+    const auto buffer_size = buffer.committed() / (1024 * 1024); // buffer size in MBytes
     const int runs = std::max(10, static_cast<int>(5000ull / buffer_size));
 
     std::cout << "input: filename=" << input_filename << " buffer_size=" << buffer_size << "MBytes\n";
@@ -81,7 +81,7 @@ int main(int argc, char* argv[]) {
             osmium::apply(tmp_buffer, static_location_handler);
             const auto end = std::chrono::steady_clock::now();
 
-            const double duration = std::chrono::duration<double, std::milli>(end-start).count();
+            const double duration = std::chrono::duration<double, std::milli>(end - start).count();
 
             if (duration < static_min) {
                 static_min = duration;
@@ -108,7 +108,7 @@ int main(int argc, char* argv[]) {
             osmium::apply(tmp_buffer, dynamic_location_handler);
             const auto end = std::chrono::steady_clock::now();
 
-            const double duration = std::chrono::duration<double, std::milli>(end-start).count();
+            const double duration = std::chrono::duration<double, std::milli>(end - start).count();
 
             if (duration < dynamic_min) {
                 dynamic_min = duration;
@@ -120,8 +120,8 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    const double static_avg = static_sum/runs;
-    const double dynamic_avg = dynamic_sum/runs;
+    const double static_avg = static_sum / runs;
+    const double dynamic_avg = dynamic_sum / runs;
 
     std::cout << "static  min=" << static_min << "ms avg=" << static_avg << "ms max=" << static_max << "ms\n";
     std::cout << "dynamic min=" << dynamic_min << "ms avg=" << dynamic_avg << "ms max=" << dynamic_max << "ms\n";

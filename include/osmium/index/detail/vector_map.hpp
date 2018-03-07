@@ -144,7 +144,7 @@ namespace osmium {
             }; // class VectorBasedDenseMap
 
 
-            template <typename TId, typename TValue, template<typename...> class TVector>
+            template <typename TId, typename TValue, template <typename...> class TVector>
             class VectorBasedSparseMap : public Map<TId, TValue> {
 
             public:

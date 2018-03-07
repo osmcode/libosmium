@@ -29,7 +29,7 @@ TEST_CASE("check_for_exception with exception") {
 
     try {
         throw std::runtime_error{"TEST"};
-    } catch(...) {
+    } catch (...) {
         p.set_exception(std::current_exception());
     }
 

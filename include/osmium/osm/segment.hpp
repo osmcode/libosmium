@@ -80,7 +80,7 @@ namespace osmium {
     }
 
     inline constexpr bool operator!=(const Segment& lhs, const Segment& rhs) noexcept {
-        return ! (lhs == rhs);
+        return !(lhs == rhs);
     }
 
     /**

@@ -80,11 +80,11 @@ namespace osmium {
 
             std::string m_format_string;
 
-            file_format m_file_format {file_format::unknown};
+            file_format m_file_format = file_format::unknown;
 
-            file_compression m_file_compression {file_compression::none};
+            file_compression m_file_compression = file_compression::none;
 
-            bool m_has_multiple_object_versions {false};
+            bool m_has_multiple_object_versions = false;
 
         public:
 
@@ -163,7 +163,7 @@ namespace osmium {
                     if (pos == std::string::npos) {
                         set(option, true);
                     } else {
-                        std::string value{option.substr(pos+1)};
+                        std::string value{option.substr(pos + 1)};
                         option.erase(pos);
                         set(option, value);
                     }
@@ -261,7 +261,7 @@ namespace osmium {
             const File& check() const {
                 if (m_file_format == file_format::unknown) {
                     std::string msg{"Could not detect file format"};
-                    if (!m_format_string.empty())  {
+                    if (!m_format_string.empty()) {
                         msg += " from format string '";
                         msg += m_format_string;
                         msg += "'";

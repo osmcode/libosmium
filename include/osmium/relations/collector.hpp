@@ -136,7 +136,7 @@ namespace osmium {
                 void node(const osmium::Node& node) {
                     if (TNodes) {
                         m_check_order.node(node);
-                        if (! m_collector.find_and_add_object(node)) {
+                        if (!m_collector.find_and_add_object(node)) {
                             m_collector.node_not_in_any_relation(node);
                         }
                     }
@@ -145,7 +145,7 @@ namespace osmium {
                 void way(const osmium::Way& way) {
                     if (TWays) {
                         m_check_order.way(way);
-                        if (! m_collector.find_and_add_object(way)) {
+                        if (!m_collector.find_and_add_object(way)) {
                             m_collector.way_not_in_any_relation(way);
                         }
                     }
@@ -154,7 +154,7 @@ namespace osmium {
                 void relation(const osmium::Relation& relation) {
                     if (TRelations) {
                         m_check_order.relation(relation);
-                        if (! m_collector.find_and_add_object(relation)) {
+                        if (!m_collector.find_and_add_object(relation)) {
                             m_collector.relation_not_in_any_relation(relation);
                         }
                     }

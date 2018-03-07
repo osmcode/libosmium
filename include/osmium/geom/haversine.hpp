@@ -69,7 +69,7 @@ namespace osmium {
                 double lath = sin(deg_to_rad(c1.y - c2.y) * 0.5);
                 lath *= lath;
                 const double tmp = cos(deg_to_rad(c1.y)) * cos(deg_to_rad(c2.y));
-                return 2.0 * EARTH_RADIUS_IN_METERS * asin(sqrt(lath + tmp*lonh));
+                return 2.0 * EARTH_RADIUS_IN_METERS * asin(sqrt(lath + tmp * lonh));
             }
 
             /**

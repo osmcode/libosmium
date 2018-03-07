@@ -68,7 +68,7 @@ namespace osmium {
      */
     inline item_type nwr_index_to_item_type(unsigned int i) noexcept {
         assert(i <= 2);
-        return item_type(i+1);
+        return item_type(i + 1);
     }
 
     /**

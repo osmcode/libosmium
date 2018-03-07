@@ -94,13 +94,13 @@ namespace osmium {
             };
 #else
             // True if Predicate matches for none of the types Ts
-            template <template<typename> class Predicate, typename... Ts>
+            template <template <typename> class Predicate, typename... Ts>
             struct static_none_of : std::is_same<std::tuple<std::false_type, typename Predicate<Ts>::type...>,
                                                  std::tuple<typename Predicate<Ts>::type..., std::false_type>>
             {};
 
             // True if Predicate matches for all of the types Ts
-            template <template<typename> class Predicate, typename... Ts>
+            template <template <typename> class Predicate, typename... Ts>
             struct static_all_of : std::is_same<std::tuple<std::true_type, typename Predicate<Ts>::type...>,
                                                 std::tuple<typename Predicate<Ts>::type..., std::true_type>>
             {};

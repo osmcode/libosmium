@@ -36,7 +36,6 @@ struct CountHandler : public osmium::handler::Handler {
 
 };
 
-
 int main(int argc, char* argv[]) {
     if (argc != 2) {
         std::cerr << "Usage: " << argv[0] << " OSMFILE\n";
@@ -51,6 +50,6 @@ int main(int argc, char* argv[]) {
     osmium::apply(reader, handler);
     reader.close();
 
-    std::cout << "r_all=" << handler.all << " r_counter="  << handler.counter << "\n";
+    std::cout << "r_all=" << handler.all << " r_counter=" << handler.counter << '\n';
 }
 

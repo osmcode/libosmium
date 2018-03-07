@@ -137,7 +137,7 @@ namespace osmium {
              */
             osmium::Location get_node_location(const osmium::object_id_type id) const {
                 if (id >= 0) {
-                    return m_storage_pos.get_noexcept(static_cast<osmium::unsigned_object_id_type>( id));
+                    return m_storage_pos.get_noexcept(static_cast<osmium::unsigned_object_id_type>(id));
                 }
                 return m_storage_neg.get_noexcept(static_cast<osmium::unsigned_object_id_type>(-id));
             }

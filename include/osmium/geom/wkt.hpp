@@ -80,7 +80,7 @@ namespace osmium {
                 /* Point */
 
                 point_type make_point(const osmium::geom::Coordinates& xy) const {
-                    std::string str {m_srid_prefix};
+                    std::string str{m_srid_prefix};
                     str += "POINT";
                     xy.append_to_string(str, '(', ' ', ')', m_precision);
                     return str;

@@ -159,7 +159,7 @@ namespace osmium {
      * Node IDs.
      */
     inline constexpr bool operator!=(const NodeRef& lhs, const NodeRef& rhs) noexcept {
-        return ! (lhs == rhs);
+        return !(lhs == rhs);
     }
 
     /**
@@ -183,7 +183,7 @@ namespace osmium {
      * they reference.
      */
     inline constexpr bool operator<=(const NodeRef& lhs, const NodeRef& rhs) noexcept {
-        return ! (rhs < lhs);
+        return !(rhs < lhs);
     }
 
     /**
@@ -191,7 +191,7 @@ namespace osmium {
      * they reference.
      */
     inline constexpr bool operator>=(const NodeRef& lhs, const NodeRef& rhs) noexcept {
-        return ! (lhs < rhs);
+        return !(lhs < rhs);
     }
 
     /**

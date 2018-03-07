@@ -456,7 +456,7 @@ namespace osmium {
     }
 
     inline bool operator!=(const OSMObject& lhs, const OSMObject& rhs) noexcept {
-        return ! (lhs == rhs);
+        return !(lhs == rhs);
     }
 
     /**
@@ -484,11 +484,11 @@ namespace osmium {
     }
 
     inline bool operator<=(const OSMObject& lhs, const OSMObject& rhs) noexcept {
-        return ! (rhs < lhs);
+        return !(rhs < lhs);
     }
 
     inline bool operator>=(const OSMObject& lhs, const OSMObject& rhs) noexcept {
-        return ! (lhs < rhs);
+        return !(lhs < rhs);
     }
 
 } // namespace osmium

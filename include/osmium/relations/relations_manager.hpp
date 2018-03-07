@@ -505,7 +505,7 @@ namespace osmium {
                     const bool added = member_nodes_database().add(node, [this](RelationHandle& rel_handle) {
                         handle_complete_relation(rel_handle);
                     });
-                    if (! added) {
+                    if (!added) {
                         derived().node_not_in_any_relation(node);
                     }
                     derived().after_node(node);
@@ -520,7 +520,7 @@ namespace osmium {
                     const bool added = member_ways_database().add(way, [this](RelationHandle& rel_handle) {
                         handle_complete_relation(rel_handle);
                     });
-                    if (! added) {
+                    if (!added) {
                         derived().way_not_in_any_relation(way);
                     }
                     derived().after_way(way);
@@ -535,7 +535,7 @@ namespace osmium {
                     const bool added = member_relations_database().add(relation, [this](RelationHandle& rel_handle) {
                         handle_complete_relation(rel_handle);
                     });
-                    if (! added) {
+                    if (!added) {
                         derived().relation_not_in_any_relation(relation);
                     }
                     derived().after_relation(relation);

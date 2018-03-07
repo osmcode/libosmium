@@ -107,7 +107,7 @@ namespace osmium {
                 m_verbose = verbose;
             }
 
-            template<typename T>
+            template <typename T>
             void print(const T& value) {
                 if (m_verbose) {
                     start_line();
@@ -124,7 +124,7 @@ namespace osmium {
 
         }; // class VerboseOutput
 
-        template<typename T>
+        template <typename T>
         inline VerboseOutput& operator<<(VerboseOutput& verbose_output, const T& value) {
             verbose_output.print(value);
             return verbose_output;

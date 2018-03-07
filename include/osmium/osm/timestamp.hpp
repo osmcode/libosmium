@@ -314,11 +314,11 @@ namespace osmium {
     }
 
     inline bool operator<=(const Timestamp& lhs, const Timestamp& rhs) noexcept {
-        return ! (rhs < lhs);
+        return !(rhs < lhs);
     }
 
     inline bool operator>=(const Timestamp& lhs, const Timestamp& rhs) noexcept {
-        return ! (lhs < rhs);
+        return !(lhs < rhs);
     }
 
     template <>

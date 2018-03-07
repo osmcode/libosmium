@@ -112,7 +112,7 @@ namespace osmium {
                 if (pos == std::string::npos) {
                     m_options[data] = "true";
                 } else {
-                    const std::string value{data.substr(pos+1)};
+                    const std::string value{data.substr(pos + 1)};
                     set(data.substr(0, pos), value);
                 }
             }

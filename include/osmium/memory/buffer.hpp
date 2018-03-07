@@ -771,7 +771,7 @@ namespace osmium {
         }
 
         inline bool operator!=(const Buffer& lhs, const Buffer& rhs) noexcept {
-            return ! (lhs == rhs);
+            return !(lhs == rhs);
         }
 
     } // namespace memory

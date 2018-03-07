@@ -265,7 +265,7 @@ namespace osmium {
         class NoDecompressor : public Decompressor {
 
             int m_fd = -1;
-            const char *m_buffer = nullptr;
+            const char* m_buffer = nullptr;
             std::size_t m_buffer_size = 0;
             std::size_t m_offset = 0;
 

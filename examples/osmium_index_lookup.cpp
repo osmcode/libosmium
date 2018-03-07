@@ -89,7 +89,7 @@ public:
 template <typename TValue>
 class IndexAccessDense : public IndexAccess<TValue> {
 
-    using index_type  = typename osmium::index::map::DenseFileArray<osmium::unsigned_object_id_type, TValue>;
+    using index_type = typename osmium::index::map::DenseFileArray<osmium::unsigned_object_id_type, TValue>;
 
 public:
 
@@ -221,8 +221,8 @@ public:
                     print_usage(argv[0]);
                 }
             } else if (!std::strncmp(argv[i], "--array=", 8)) {
-                    m_array_format = true;
-                    m_filename = argv[i] + 8;
+                m_array_format = true;
+                m_filename = argv[i] + 8;
             } else if (!std::strcmp(argv[i], "-l") || !std::strcmp(argv[i], "--list")) {
                 ++i;
                 if (i < argc) {
@@ -232,8 +232,8 @@ public:
                     print_usage(argv[0]);
                 }
             } else if (!std::strncmp(argv[i], "--list=", 7)) {
-                    m_list_format = true;
-                    m_filename = argv[i] + 7;
+                m_list_format = true;
+                m_filename = argv[i] + 7;
             } else if (!std::strcmp(argv[i], "-d") || !std::strcmp(argv[i], "--dump")) {
                 m_dump = true;
             } else if (!std::strcmp(argv[i], "-s") || !std::strcmp(argv[i], "--search")) {
@@ -362,7 +362,7 @@ int main(int argc, char* argv[]) {
         // index id -> offset
         const auto index = create<std::size_t>(options.dense_format(), fd);
         return run(*index, options);
-    } catch(const std::exception& e) {
+    } catch (const std::exception& e) {
         std::cerr << "Error: " << e.what() << '\n';
         std::exit(1);
     }

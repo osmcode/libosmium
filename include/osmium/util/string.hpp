@@ -55,7 +55,7 @@ namespace osmium {
             std::size_t nextpos = str.find_first_of(sep);
             while (nextpos != std::string::npos) {
                 if (!compact || (nextpos - pos != 0)) {
-                    tokens.push_back(str.substr(pos, nextpos-pos));
+                    tokens.push_back(str.substr(pos, nextpos - pos));
                 }
                 pos = nextpos + 1;
                 nextpos = str.find_first_of(sep, pos);
@@ -84,7 +84,7 @@ namespace osmium {
             std::size_t nextpos = str.find_first_of(sep);
             while (nextpos != std::string::npos) {
                 if (!compact || (nextpos - pos != 0)) {
-                    tokens.push_back(str.substr(pos, nextpos-pos));
+                    tokens.push_back(str.substr(pos, nextpos - pos));
                 }
                 pos = nextpos + 1;
                 nextpos = str.find_first_of(sep, pos);

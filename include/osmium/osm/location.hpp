@@ -220,7 +220,7 @@ namespace osmium {
                 v /= 10;
             } while (v != 0);
 
-            while (t-temp < 7) {
+            while (t - temp < 7) {
                 *t++ = '0';
             }
 
@@ -488,7 +488,7 @@ namespace osmium {
     }
 
     inline constexpr bool operator!=(const Location& lhs, const Location& rhs) noexcept {
-        return ! (lhs == rhs);
+        return !(lhs == rhs);
     }
 
     /**
@@ -505,11 +505,11 @@ namespace osmium {
     }
 
     inline constexpr bool operator<=(const Location& lhs, const Location& rhs) noexcept {
-        return ! (rhs < lhs);
+        return !(rhs < lhs);
     }
 
     inline constexpr bool operator>=(const Location& lhs, const Location& rhs) noexcept {
-        return ! (lhs < rhs);
+        return !(lhs < rhs);
     }
 
     /**

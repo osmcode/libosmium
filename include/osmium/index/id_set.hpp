@@ -162,7 +162,7 @@ namespace osmium {
             }
 
             bool operator!=(const IdSetDenseIterator<T>& rhs) const noexcept {
-                return ! (*this == rhs);
+                return !(*this == rhs);
             }
 
             T operator*() const noexcept {
@@ -430,7 +430,7 @@ namespace osmium {
         }; // class IdSetSmall
 
         /// @deprecated Use nwr_array helper class instead.
-        template <template<typename> class IdSetType>
+        template <template <typename> class IdSetType>
         class NWRIdSet {
 
             using id_set_type = IdSetType<osmium::unsigned_object_id_type>;

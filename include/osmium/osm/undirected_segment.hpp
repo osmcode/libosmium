@@ -72,11 +72,11 @@ namespace osmium {
     }
 
     inline bool operator<=(const UndirectedSegment& lhs, const UndirectedSegment& rhs) noexcept {
-        return ! (rhs < lhs);
+        return !(rhs < lhs);
     }
 
     inline bool operator>=(const UndirectedSegment& lhs, const UndirectedSegment& rhs) noexcept {
-        return ! (lhs < rhs);
+        return !(lhs < rhs);
     }
 
     /**

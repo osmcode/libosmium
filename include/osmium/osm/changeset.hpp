@@ -440,7 +440,7 @@ namespace osmium {
     }
 
     inline bool operator!=(const Changeset& lhs, const Changeset& rhs) {
-        return ! (lhs == rhs);
+        return !(lhs == rhs);
     }
 
     /**
@@ -455,11 +455,11 @@ namespace osmium {
     }
 
     inline bool operator<=(const Changeset& lhs, const Changeset& rhs) {
-        return ! (rhs < lhs);
+        return !(rhs < lhs);
     }
 
     inline bool operator>=(const Changeset& lhs, const Changeset& rhs) {
-        return ! (lhs < rhs);
+        return !(lhs < rhs);
     }
 
 } // namespace osmium

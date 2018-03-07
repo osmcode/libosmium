@@ -68,7 +68,7 @@ namespace osmium {
             return t == itemtype;
         }
 
-        OuterRing():
+        OuterRing() :
             NodeRefList(itemtype) {
         }
 
@@ -89,7 +89,7 @@ namespace osmium {
             return t == itemtype;
         }
 
-        InnerRing():
+        InnerRing() :
             NodeRefList(itemtype) {
         }
 
