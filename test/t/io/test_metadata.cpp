@@ -1,6 +1,10 @@
 #include "catch.hpp"
 
+#include <sstream>
+#include <osmium/builder/attr.hpp>
 #include <osmium/io/metadata_options.hpp>
+#include <osmium/memory/buffer.hpp>
+#include <osmium/osm/object.hpp>
 
 TEST_CASE("Metadata options: default") {
     osmium::io::metadata_options m;
@@ -88,5 +92,86 @@ TEST_CASE("Metadata options: timestamp,uid,user") {
 
 TEST_CASE("Metadata options: fail") {
     REQUIRE_THROWS_AS(osmium::io::metadata_options{"timestamp+foo"}, const std::invalid_argument&);
+}
+
+TEST_CASE("Metdata options: constructor using OSMObject") {
+    osmium::memory::Buffer buffer{10 * 1000};
+    using namespace osmium::builder::attr;
+
+    SECTION("only version") {
+        const osmium::OSMObject& obj = buffer.get<osmium::OSMObject>(osmium::builder::add_node(buffer, _id(1),
+                _version(2)));
+        osmium::io::metadata_options options{obj};
+        REQUIRE(!options.user());
+        REQUIRE(!options.uid());
+        REQUIRE(!options.changeset());
+        REQUIRE(!options.timestamp());
+        REQUIRE(options.version());
+    }
+
+    SECTION("full") {
+        const osmium::OSMObject& obj = buffer.get<osmium::OSMObject>(osmium::builder::add_node(buffer, _id(1),
+                _version(2), _cid(30), _user("foo"), _uid(8), _timestamp("2018-01-01T23:00:00Z")));
+        osmium::io::metadata_options options{obj};
+        REQUIRE(options.all());
+    }
+
+    SECTION("changeset+timestamp+version") {
+        const osmium::OSMObject& obj = buffer.get<osmium::OSMObject>(osmium::builder::add_node(buffer, _id(1),
+                _version(2), _cid(30), _timestamp("2018-01-01T23:00:00Z")));
+        osmium::io::metadata_options options{obj};
+        REQUIRE(options.version());
+        REQUIRE(options.timestamp());
+        REQUIRE(options.changeset());
+        REQUIRE(!options.user());
+        REQUIRE(!options.uid());
+    }
+}
+
+TEST_CASE("Metdata options: string representation should be valid") {
+    std::string expected;
+    std::ostringstream out;
+
+    SECTION("version+changeset") {
+        osmium::io::metadata_options options{"version+changeset"};
+        out << options;
+        REQUIRE(out.str() == "version+changeset");
+    }
+
+    SECTION("version+uid+user") {
+        osmium::io::metadata_options options{"version+uid+user"};
+        out << options;
+        REQUIRE(out.str() == "version+uid+user");
+    }
+
+    SECTION("version+timestamp") {
+        osmium::io::metadata_options options{"version+timestamp"};
+        out << options;
+        REQUIRE(out.str() == "version+timestamp");
+    }
+
+    SECTION("timestamp+version (different order") {
+        osmium::io::metadata_options options{"timestamp+version"};
+        out << options;
+        REQUIRE(out.str() == "version+timestamp");
+    }
+
+    SECTION("none") {
+        osmium::io::metadata_options options{"none"};
+        out << options;
+        REQUIRE(out.str() == "none");
+    }
+
+    SECTION("all (short)") {
+        osmium::io::metadata_options options{"all"};
+        out << options;
+        REQUIRE(out.str() == "all");
+    }
+
+    SECTION("all (long)") {
+        osmium::io::metadata_options options{"user+uid+version+timestamp+changeset"};
+        out << options;
+        REQUIRE(out.str() == "all");
+    }
 }
 
