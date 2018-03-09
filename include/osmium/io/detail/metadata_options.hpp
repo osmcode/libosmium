@@ -156,6 +156,11 @@ namespace osmium {
                     return *this;
                 }
 
+                metadata_options operator|=(const metadata_options& other) {
+                    m_options = static_cast<options>(other.m_options | m_options);
+                    return *this;
+                }
+
                 std::string to_string() const {
                     if (none()) {
                         return "none";
