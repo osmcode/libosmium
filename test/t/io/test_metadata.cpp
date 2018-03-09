@@ -1,9 +1,9 @@
 #include "catch.hpp"
 
-#include <osmium/io/detail/metadata_options.hpp>
+#include <osmium/io/metadata_options.hpp>
 
 TEST_CASE("Metadata options: default") {
-    osmium::io::detail::metadata_options m;
+    osmium::io::metadata_options m;
     REQUIRE_FALSE(m.none());
     REQUIRE(m.any());
     REQUIRE(m.all());
@@ -15,7 +15,7 @@ TEST_CASE("Metadata options: default") {
 }
 
 TEST_CASE("Metadata options: false") {
-    osmium::io::detail::metadata_options m{"false"};
+    osmium::io::metadata_options m{"false"};
     REQUIRE(m.none());
     REQUIRE_FALSE(m.any());
     REQUIRE_FALSE(m.all());
@@ -27,7 +27,7 @@ TEST_CASE("Metadata options: false") {
 }
 
 TEST_CASE("Metadata options: none") {
-    osmium::io::detail::metadata_options m{"none"};
+    osmium::io::metadata_options m{"none"};
     REQUIRE(m.none());
     REQUIRE_FALSE(m.any());
     REQUIRE_FALSE(m.all());
@@ -39,7 +39,7 @@ TEST_CASE("Metadata options: none") {
 }
 
 TEST_CASE("Metadata options: true") {
-    osmium::io::detail::metadata_options m{"true"};
+    osmium::io::metadata_options m{"true"};
     REQUIRE_FALSE(m.none());
     REQUIRE(m.any());
     REQUIRE(m.all());
@@ -51,7 +51,7 @@ TEST_CASE("Metadata options: true") {
 }
 
 TEST_CASE("Metadata options: all") {
-    osmium::io::detail::metadata_options m{"all"};
+    osmium::io::metadata_options m{"all"};
     REQUIRE_FALSE(m.none());
     REQUIRE(m.any());
     REQUIRE(m.all());
@@ -63,7 +63,7 @@ TEST_CASE("Metadata options: all") {
 }
 
 TEST_CASE("Metadata options: version,changeset") {
-    osmium::io::detail::metadata_options m{"version+changeset"};
+    osmium::io::metadata_options m{"version+changeset"};
     REQUIRE_FALSE(m.none());
     REQUIRE(m.any());
     REQUIRE_FALSE(m.all());
@@ -75,7 +75,7 @@ TEST_CASE("Metadata options: version,changeset") {
 }
 
 TEST_CASE("Metadata options: timestamp,uid,user") {
-    osmium::io::detail::metadata_options m{"timestamp+uid+user"};
+    osmium::io::metadata_options m{"timestamp+uid+user"};
     REQUIRE_FALSE(m.none());
     REQUIRE(m.any());
     REQUIRE_FALSE(m.all());
@@ -87,6 +87,6 @@ TEST_CASE("Metadata options: timestamp,uid,user") {
 }
 
 TEST_CASE("Metadata options: fail") {
-    REQUIRE_THROWS_AS(osmium::io::detail::metadata_options{"timestamp+foo"}, const std::invalid_argument&);
+    REQUIRE_THROWS_AS(osmium::io::metadata_options{"timestamp+foo"}, const std::invalid_argument&);
 }
 
