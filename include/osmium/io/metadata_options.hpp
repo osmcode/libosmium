@@ -108,7 +108,7 @@ namespace osmium {
                 if (object.uid() > 0) {
                     opts |= options::md_uid;
                 }
-                if (object.user()) {
+                if (object.user() && strlen(object.user()) > 0) {
                     opts |= options::md_user;
                 }
                 m_options = static_cast<options>(opts);
