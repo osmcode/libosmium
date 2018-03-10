@@ -195,7 +195,7 @@ namespace osmium {
             if (object.uid() > 0) {
                 flags |= metadata_options::options::md_uid;
             }
-            if (object.user() && strlen(object.user()) > 0) {
+            if (object.user()[0] != '\0') {
                 flags |= metadata_options::options::md_user;
             }
             metadata_options opts;
