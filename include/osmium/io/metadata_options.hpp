@@ -159,42 +159,41 @@ namespace osmium {
                 return *this;
             }
 
+            std::string to_string() const {
+                std::string result;
+                if (none()) {
+                    result = "none";
+                    return result;
+                }
+                if (all()) {
+                    result = "all";
+                    return result;
+                }
+                if (version()) {
+                    result += "version+";
+                }
+                if (timestamp()) {
+                    result += "timestamp+";
+                }
+                if (changeset()) {
+                    result += "changeset+";
+                }
+                if (uid()) {
+                    result += "uid+";
+                }
+                if (user()) {
+                     result += "user+";
+                }
+                // remove last + character
+                result.pop_back();
+                return result;
+            }
+
         }; // class metadata_options
 
         template <typename TChar, typename TTraits>
-        inline bool write_option(std::basic_ostream<TChar, TTraits>& out, bool already_written, const char* name) {
-            if (already_written) {
-                out << '+';
-            }
-            out << name;
-            return true;
-        }
-
-        template <typename TChar, typename TTraits>
         inline std::basic_ostream<TChar, TTraits>& operator<<(std::basic_ostream<TChar, TTraits>& out, const metadata_options& options) {
-            if (options.none()) {
-                return out << "none";
-            }
-            if (options.all()) {
-                return out << "all";
-            }
-            bool written = false;
-            if (options.version()) {
-                written = write_option(out, written, "version");
-            }
-            if (options.timestamp()) {
-                written = write_option(out, written, "timestamp");
-            }
-            if (options.changeset()) {
-                written = write_option(out, written, "changeset");
-            }
-            if (options.uid()) {
-                written = write_option(out, written, "uid");
-            }
-            if (options.user()) {
-                written = write_option(out, written, "user");
-            }
-            return out;
+            return out << options.to_string();
         }
 
     } // namespace io

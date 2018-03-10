@@ -129,49 +129,40 @@ TEST_CASE("Metdata options: constructor using OSMObject") {
 }
 
 TEST_CASE("Metdata options: string representation should be valid") {
-    std::string expected;
-    std::ostringstream out;
 
     SECTION("version+changeset") {
         osmium::io::metadata_options options{"version+changeset"};
-        out << options;
-        REQUIRE(out.str() == "version+changeset");
+        REQUIRE(options.to_string() == "version+changeset");
     }
 
     SECTION("version+uid+user") {
         osmium::io::metadata_options options{"version+uid+user"};
-        out << options;
-        REQUIRE(out.str() == "version+uid+user");
+        REQUIRE(options.to_string() == "version+uid+user");
     }
 
     SECTION("version+timestamp") {
         osmium::io::metadata_options options{"version+timestamp"};
-        out << options;
-        REQUIRE(out.str() == "version+timestamp");
+        REQUIRE(options.to_string() == "version+timestamp");
     }
 
     SECTION("timestamp+version (different order") {
         osmium::io::metadata_options options{"timestamp+version"};
-        out << options;
-        REQUIRE(out.str() == "version+timestamp");
+        REQUIRE(options.to_string() == "version+timestamp");
     }
 
     SECTION("none") {
         osmium::io::metadata_options options{"none"};
-        out << options;
-        REQUIRE(out.str() == "none");
+        REQUIRE(options.to_string() == "none");
     }
 
     SECTION("all (short)") {
         osmium::io::metadata_options options{"all"};
-        out << options;
-        REQUIRE(out.str() == "all");
+        REQUIRE(options.to_string() == "all");
     }
 
     SECTION("all (long)") {
         osmium::io::metadata_options options{"user+uid+version+timestamp+changeset"};
-        out << options;
-        REQUIRE(out.str() == "all");
+        REQUIRE(options.to_string() == "all");
     }
 }
 
