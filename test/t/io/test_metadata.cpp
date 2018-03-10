@@ -101,7 +101,7 @@ TEST_CASE("Metdata options: constructor using OSMObject") {
     SECTION("only version") {
         const osmium::OSMObject& obj = buffer.get<osmium::OSMObject>(osmium::builder::add_node(buffer, _id(1),
                 _version(2)));
-        osmium::io::metadata_options options{obj};
+        osmium::io::metadata_options options = osmium::io::metadata_options_from_object(obj);
         REQUIRE(!options.user());
         REQUIRE(!options.uid());
         REQUIRE(!options.changeset());
@@ -112,14 +112,14 @@ TEST_CASE("Metdata options: constructor using OSMObject") {
     SECTION("full") {
         const osmium::OSMObject& obj = buffer.get<osmium::OSMObject>(osmium::builder::add_node(buffer, _id(1),
                 _version(2), _cid(30), _user("foo"), _uid(8), _timestamp("2018-01-01T23:00:00Z")));
-        osmium::io::metadata_options options{obj};
+        osmium::io::metadata_options options = osmium::io::metadata_options_from_object(obj);
         REQUIRE(options.all());
     }
 
     SECTION("changeset+timestamp+version") {
         const osmium::OSMObject& obj = buffer.get<osmium::OSMObject>(osmium::builder::add_node(buffer, _id(1),
                 _version(2), _cid(30), _timestamp("2018-01-01T23:00:00Z")));
-        osmium::io::metadata_options options{obj};
+        osmium::io::metadata_options options = osmium::io::metadata_options_from_object(obj);
         REQUIRE(options.version());
         REQUIRE(options.timestamp());
         REQUIRE(options.changeset());

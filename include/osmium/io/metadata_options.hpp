@@ -92,27 +92,7 @@ namespace osmium {
                 m_options = static_cast<options>(opts);
             }
 
-            metadata_options(const osmium::OSMObject& object) {
-                int opts = 0;
-                if (object.version() > 0) {
-                    opts |= options::md_version;
-                }
-                if (object.timestamp().valid()) {
-                    opts |= options::md_timestamp;
-                }
-                if (object.changeset() > 0) {
-                    opts |= options::md_changeset;
-                }
-                // Objects by anonymous users don't have these attributes set. There is no way
-                // to distinguish them from objects with a reduced number of metadata fields.
-                if (object.uid() > 0) {
-                    opts |= options::md_uid;
-                }
-                if (object.user() && strlen(object.user()) > 0) {
-                    opts |= options::md_user;
-                }
-                m_options = static_cast<options>(opts);
-            }
+            friend metadata_options metadata_options_from_object(const osmium::OSMObject& object);
 
             /// At least one metadata attribute should be stored.
             bool any() const noexcept {
@@ -194,6 +174,33 @@ namespace osmium {
         template <typename TChar, typename TTraits>
         inline std::basic_ostream<TChar, TTraits>& operator<<(std::basic_ostream<TChar, TTraits>& out, const metadata_options& options) {
             return out << options.to_string();
+        }
+
+        /**
+         * Create an instance of metadata_options from an instance of osmium::OSMObject
+         */
+        metadata_options metadata_options_from_object(const osmium::OSMObject& object) {
+            int flags = 0;
+            if (object.version() > 0) {
+                flags |= metadata_options::options::md_version;
+            }
+            if (object.timestamp().valid()) {
+                flags |= metadata_options::options::md_timestamp;
+            }
+            if (object.changeset() > 0) {
+                flags |= metadata_options::options::md_changeset;
+            }
+            // Objects by anonymous users don't have these attributes set. There is no way
+            // to distinguish them from objects with a reduced number of metadata fields.
+            if (object.uid() > 0) {
+                flags |= metadata_options::options::md_uid;
+            }
+            if (object.user() && strlen(object.user()) > 0) {
+                flags |= metadata_options::options::md_user;
+            }
+            metadata_options opts;
+            opts.m_options = static_cast<metadata_options::options>(flags);
+            return opts;
         }
 
     } // namespace io
