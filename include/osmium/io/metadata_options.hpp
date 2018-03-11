@@ -92,8 +92,6 @@ namespace osmium {
                 m_options = static_cast<options>(opts);
             }
 
-            friend metadata_options metadata_options_from_object(const osmium::OSMObject& object);
-
             /// At least one metadata attribute should be stored.
             bool any() const noexcept {
                 return m_options != 0;
@@ -113,20 +111,60 @@ namespace osmium {
                 return (m_options & options::md_version) != 0;
             }
 
+            void set_version(bool flag) noexcept {
+                if (flag) {
+                    m_options = static_cast<options>(m_options | options::md_version);
+                } else {
+                    m_options = static_cast<options>(m_options & ~options::md_version);
+                }
+            }
+
             bool timestamp() const noexcept {
                 return (m_options & options::md_timestamp) != 0;
+            }
+
+            void set_timestamp(bool flag) noexcept {
+                if (flag) {
+                    m_options = static_cast<options>(m_options | options::md_timestamp);
+                } else {
+                    m_options = static_cast<options>(m_options & ~options::md_timestamp);
+                }
             }
 
             bool changeset() const noexcept {
                 return (m_options & options::md_changeset) != 0;
             }
 
+            void set_changeset(bool flag) noexcept {
+                if (flag) {
+                    m_options = static_cast<options>(m_options | options::md_changeset);
+                } else {
+                    m_options = static_cast<options>(m_options & ~options::md_changeset);
+                }
+            }
+
             bool uid() const noexcept {
                 return (m_options & options::md_uid) != 0;
             }
 
+            void set_uid(bool flag) noexcept {
+                if (flag) {
+                    m_options = static_cast<options>(m_options | options::md_uid);
+                } else {
+                    m_options = static_cast<options>(m_options & ~options::md_uid);
+                }
+            }
+
             bool user() const noexcept {
                 return (m_options & options::md_user) != 0;
+            }
+
+            void set_user(bool flag) noexcept {
+                if (flag) {
+                    m_options = static_cast<options>(m_options | options::md_user);
+                } else {
+                    m_options = static_cast<options>(m_options & ~options::md_user);
+                }
             }
 
             metadata_options operator&=(const metadata_options& other) {
@@ -180,26 +218,15 @@ namespace osmium {
          * Create an instance of metadata_options from an instance of osmium::OSMObject
          */
         metadata_options metadata_options_from_object(const osmium::OSMObject& object) {
-            int flags = 0;
-            if (object.version() > 0) {
-                flags |= metadata_options::options::md_version;
-            }
-            if (object.timestamp().valid()) {
-                flags |= metadata_options::options::md_timestamp;
-            }
-            if (object.changeset() > 0) {
-                flags |= metadata_options::options::md_changeset;
-            }
+            metadata_options opts;
+            opts.set_version(object.version());
+            opts.set_timestamp(object.timestamp().valid());
+            opts.set_changeset(object.changeset() > 0);
+
             // Objects by anonymous users don't have these attributes set. There is no way
             // to distinguish them from objects with a reduced number of metadata fields.
-            if (object.uid() > 0) {
-                flags |= metadata_options::options::md_uid;
-            }
-            if (object.user()[0] != '\0') {
-                flags |= metadata_options::options::md_user;
-            }
-            metadata_options opts;
-            opts.m_options = static_cast<metadata_options::options>(flags);
+            opts.set_uid(object.uid() > 0);
+            opts.set_user(object.user()[0] != '\0');
             return opts;
         }
 
