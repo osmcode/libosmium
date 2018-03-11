@@ -44,8 +44,9 @@ namespace osmium {
     namespace io {
 
         /**
-         * Stores information on which metadata attributes should be
-         * stored in an OSM file.
+         * Describes which metadata fields are available in an OSMObject. This is most often used to
+         * describe which metadata fields are available in the objects of an OSM file or which
+         * metadata information should be written to an OSM file.
          */
         class metadata_options {
 
