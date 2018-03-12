@@ -1,6 +1,5 @@
 #include "catch.hpp"
 
-#include <sstream>
 #include <osmium/builder/attr.hpp>
 #include <osmium/io/metadata_options.hpp>
 #include <osmium/memory/buffer.hpp>
