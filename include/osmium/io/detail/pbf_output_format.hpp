@@ -34,7 +34,6 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <osmium/handler.hpp>
-#include <osmium/io/metadata_options.hpp>
 #include <osmium/io/detail/output_format.hpp>
 #include <osmium/io/detail/pbf.hpp> // IWYU pragma: export
 #include <osmium/io/detail/protobuf_tags.hpp>
@@ -49,6 +48,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/box.hpp>
 #include <osmium/osm/item_type.hpp>
 #include <osmium/osm/location.hpp>
+#include <osmium/osm/metadata_options.hpp>
 #include <osmium/osm/node.hpp>
 #include <osmium/osm/node_ref.hpp>
 #include <osmium/osm/object.hpp>
@@ -84,7 +84,7 @@ namespace osmium {
             struct pbf_output_options {
 
                 /// Which metadata of objects should be added?
-                metadata_options add_metadata;
+                osmium::metadata_options add_metadata;
 
                 /// Should nodes be encoded in DenseNodes?
                 bool use_dense_nodes = true;
@@ -519,7 +519,7 @@ namespace osmium {
 
                     m_options.use_dense_nodes = file.is_not_false("pbf_dense_nodes");
                     m_options.use_compression = file.get("pbf_compression") != "none" && file.is_not_false("pbf_compression");
-                    m_options.add_metadata = metadata_options{file.get("add_metadata")};
+                    m_options.add_metadata = osmium::metadata_options{file.get("add_metadata")};
                     m_options.add_historical_information_flag = file.has_multiple_object_versions();
                     m_options.add_visible_flag = file.has_multiple_object_versions();
                     m_options.locations_on_ways = file.is_true("locations_on_ways");

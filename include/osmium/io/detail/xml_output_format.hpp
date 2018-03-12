@@ -40,13 +40,13 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/io/file.hpp>
 #include <osmium/io/file_format.hpp>
 #include <osmium/io/header.hpp>
-#include <osmium/io/metadata_options.hpp>
 #include <osmium/memory/buffer.hpp>
 #include <osmium/memory/item_iterator.hpp>
 #include <osmium/osm/box.hpp>
 #include <osmium/osm/changeset.hpp>
 #include <osmium/osm/item_type.hpp>
 #include <osmium/osm/location.hpp>
+#include <osmium/osm/metadata_options.hpp>
 #include <osmium/osm/node.hpp>
 #include <osmium/osm/node_ref.hpp>
 #include <osmium/osm/object.hpp>
@@ -74,7 +74,7 @@ namespace osmium {
             struct xml_output_options {
 
                 /// Which metadata of objects should be added?
-                metadata_options add_metadata;
+                osmium::metadata_options add_metadata;
 
                 /// Should the visible flag be added to all OSM objects?
                 bool add_visible_flag = false;
@@ -428,7 +428,7 @@ namespace osmium {
 
                 XMLOutputFormat(osmium::thread::Pool& pool, const osmium::io::File& file, future_string_queue_type& output_queue) :
                     OutputFormat(pool, output_queue) {
-                    m_options.add_metadata      = metadata_options{file.get("add_metadata")};
+                    m_options.add_metadata      = osmium::metadata_options{file.get("add_metadata")};
                     m_options.use_change_ops    = file.is_true("xml_change_format");
                     m_options.add_visible_flag  = (file.has_multiple_object_versions() || file.is_true("force_visible_flag")) && !m_options.use_change_ops;
                     m_options.locations_on_ways = file.is_true("locations_on_ways");

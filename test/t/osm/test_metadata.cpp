@@ -1,12 +1,12 @@
 #include "catch.hpp"
 
 #include <osmium/builder/attr.hpp>
-#include <osmium/io/metadata_options.hpp>
 #include <osmium/memory/buffer.hpp>
+#include <osmium/osm/metadata_options.hpp>
 #include <osmium/osm/object.hpp>
 
 TEST_CASE("Metadata options: default") {
-    const osmium::io::metadata_options m;
+    const osmium::metadata_options m;
     REQUIRE_FALSE(m.none());
     REQUIRE(m.any());
     REQUIRE(m.all());
@@ -18,7 +18,7 @@ TEST_CASE("Metadata options: default") {
 }
 
 TEST_CASE("Metadata options: false") {
-    const osmium::io::metadata_options m{"false"};
+    const osmium::metadata_options m{"false"};
     REQUIRE(m.none());
     REQUIRE_FALSE(m.any());
     REQUIRE_FALSE(m.all());
@@ -30,7 +30,7 @@ TEST_CASE("Metadata options: false") {
 }
 
 TEST_CASE("Metadata options: none") {
-    const osmium::io::metadata_options m{"none"};
+    const osmium::metadata_options m{"none"};
     REQUIRE(m.none());
     REQUIRE_FALSE(m.any());
     REQUIRE_FALSE(m.all());
@@ -42,7 +42,7 @@ TEST_CASE("Metadata options: none") {
 }
 
 TEST_CASE("Metadata options: true") {
-    const osmium::io::metadata_options m{"true"};
+    const osmium::metadata_options m{"true"};
     REQUIRE_FALSE(m.none());
     REQUIRE(m.any());
     REQUIRE(m.all());
@@ -54,7 +54,7 @@ TEST_CASE("Metadata options: true") {
 }
 
 TEST_CASE("Metadata options: all") {
-    const osmium::io::metadata_options m{"all"};
+    const osmium::metadata_options m{"all"};
     REQUIRE_FALSE(m.none());
     REQUIRE(m.any());
     REQUIRE(m.all());
@@ -66,7 +66,7 @@ TEST_CASE("Metadata options: all") {
 }
 
 TEST_CASE("Metadata options: version,changeset") {
-    const osmium::io::metadata_options m{"version+changeset"};
+    const osmium::metadata_options m{"version+changeset"};
     REQUIRE_FALSE(m.none());
     REQUIRE(m.any());
     REQUIRE_FALSE(m.all());
@@ -78,7 +78,7 @@ TEST_CASE("Metadata options: version,changeset") {
 }
 
 TEST_CASE("Metadata options: timestamp,uid,user") {
-    const osmium::io::metadata_options m{"timestamp+uid+user"};
+    const osmium::metadata_options m{"timestamp+uid+user"};
     REQUIRE_FALSE(m.none());
     REQUIRE(m.any());
     REQUIRE_FALSE(m.all());
@@ -90,7 +90,7 @@ TEST_CASE("Metadata options: timestamp,uid,user") {
 }
 
 TEST_CASE("Metadata options: fail") {
-    REQUIRE_THROWS_AS(osmium::io::metadata_options{"timestamp+foo"}, const std::invalid_argument&);
+    REQUIRE_THROWS_AS(osmium::metadata_options{"timestamp+foo"}, const std::invalid_argument&);
 }
 
 TEST_CASE("Metdata options: constructor using OSMObject") {
@@ -100,7 +100,7 @@ TEST_CASE("Metdata options: constructor using OSMObject") {
     SECTION("only version") {
         const osmium::OSMObject& obj = buffer.get<osmium::OSMObject>(osmium::builder::add_node(buffer, _id(1),
                 _version(2)));
-        osmium::io::metadata_options options = osmium::io::detect_available_metadata(obj);
+        osmium::metadata_options options = osmium::detect_available_metadata(obj);
         REQUIRE_FALSE(options.user());
         REQUIRE_FALSE(options.uid());
         REQUIRE_FALSE(options.changeset());
@@ -111,14 +111,14 @@ TEST_CASE("Metdata options: constructor using OSMObject") {
     SECTION("full") {
         const osmium::OSMObject& obj = buffer.get<osmium::OSMObject>(osmium::builder::add_node(buffer, _id(1),
                 _version(2), _cid(30), _user("foo"), _uid(8), _timestamp("2018-01-01T23:00:00Z")));
-        osmium::io::metadata_options options = osmium::io::detect_available_metadata(obj);
+        osmium::metadata_options options = osmium::detect_available_metadata(obj);
         REQUIRE(options.all());
     }
 
     SECTION("changeset+timestamp+version") {
         const osmium::OSMObject& obj = buffer.get<osmium::OSMObject>(osmium::builder::add_node(buffer, _id(1),
                 _version(2), _cid(30), _timestamp("2018-01-01T23:00:00Z")));
-        osmium::io::metadata_options options = osmium::io::detect_available_metadata(obj);
+        osmium::metadata_options options = osmium::detect_available_metadata(obj);
         REQUIRE(options.version());
         REQUIRE(options.timestamp());
         REQUIRE(options.changeset());
@@ -130,37 +130,37 @@ TEST_CASE("Metdata options: constructor using OSMObject") {
 TEST_CASE("Metdata options: string representation should be valid") {
 
     SECTION("version+changeset") {
-        const osmium::io::metadata_options options{"version+changeset"};
+        const osmium::metadata_options options{"version+changeset"};
         REQUIRE(options.to_string() == "version+changeset");
     }
 
     SECTION("version+uid+user") {
-        const osmium::io::metadata_options options{"version+uid+user"};
+        const osmium::metadata_options options{"version+uid+user"};
         REQUIRE(options.to_string() == "version+uid+user");
     }
 
     SECTION("version+timestamp") {
-        const osmium::io::metadata_options options{"version+timestamp"};
+        const osmium::metadata_options options{"version+timestamp"};
         REQUIRE(options.to_string() == "version+timestamp");
     }
 
     SECTION("timestamp+version (different order") {
-        const osmium::io::metadata_options options{"timestamp+version"};
+        const osmium::metadata_options options{"timestamp+version"};
         REQUIRE(options.to_string() == "version+timestamp");
     }
 
     SECTION("none") {
-        const osmium::io::metadata_options options{"none"};
+        const osmium::metadata_options options{"none"};
         REQUIRE(options.to_string() == "none");
     }
 
     SECTION("all (short)") {
-        const osmium::io::metadata_options options{"all"};
+        const osmium::metadata_options options{"all"};
         REQUIRE(options.to_string() == "all");
     }
 
     SECTION("all (long)") {
-        const osmium::io::metadata_options options{"user+uid+version+timestamp+changeset"};
+        const osmium::metadata_options options{"user+uid+version+timestamp+changeset"};
         REQUIRE(options.to_string() == "all");
     }
 }
