@@ -218,8 +218,8 @@ namespace osmium {
      * Create an instance of metadata_options based on the availability of metadata of an
      * instance of osmium::OSMObject
      */
-    metadata_options detect_available_metadata(const osmium::OSMObject& object) {
-        metadata_options opts;
+    inline osmium::metadata_options detect_available_metadata(const osmium::OSMObject& object) {
+        osmium::metadata_options opts;
         opts.set_version(object.version());
         opts.set_timestamp(object.timestamp().valid());
         opts.set_changeset(object.changeset() > 0);
