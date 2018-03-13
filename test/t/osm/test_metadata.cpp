@@ -127,41 +127,37 @@ TEST_CASE("Metdata options: constructor using OSMObject") {
     }
 }
 
-TEST_CASE("Metdata options: string representation should be valid") {
-
-    SECTION("version+changeset") {
-        const osmium::metadata_options options{"version+changeset"};
-        REQUIRE(options.to_string() == "version+changeset");
-    }
-
-    SECTION("version+uid+user") {
-        const osmium::metadata_options options{"version+uid+user"};
-        REQUIRE(options.to_string() == "version+uid+user");
-    }
-
-    SECTION("version+timestamp") {
-        const osmium::metadata_options options{"version+timestamp"};
-        REQUIRE(options.to_string() == "version+timestamp");
-    }
-
-    SECTION("timestamp+version (different order") {
-        const osmium::metadata_options options{"timestamp+version"};
-        REQUIRE(options.to_string() == "version+timestamp");
-    }
-
-    SECTION("none") {
-        const osmium::metadata_options options{"none"};
-        REQUIRE(options.to_string() == "none");
-    }
-
-    SECTION("all (short)") {
-        const osmium::metadata_options options{"all"};
-        REQUIRE(options.to_string() == "all");
-    }
-
-    SECTION("all (long)") {
-        const osmium::metadata_options options{"user+uid+version+timestamp+changeset"};
-        REQUIRE(options.to_string() == "all");
-    }
+TEST_CASE("Metdata options: string representation should be valid \"version+changeset\"") {
+    const osmium::metadata_options options{"version+changeset"};
+    REQUIRE(options.to_string() == "version+changeset");
 }
 
+TEST_CASE("Metdata options: string representation should be valid \"version+uid+user\"") {
+    const osmium::metadata_options options{"version+uid+user"};
+    REQUIRE(options.to_string() == "version+uid+user");
+}
+
+TEST_CASE("Metdata options: string representation should be valid \"version+timestamp\"") {
+    const osmium::metadata_options options{"version+timestamp"};
+    REQUIRE(options.to_string() == "version+timestamp");
+}
+
+TEST_CASE("Metdata options: string representation should be valid \"timestamp+version (different order\"") {
+    const osmium::metadata_options options{"timestamp+version"};
+    REQUIRE(options.to_string() == "version+timestamp");
+}
+
+TEST_CASE("Metdata options: string representation should be valid \"none\"") {
+    const osmium::metadata_options options{"none"};
+    REQUIRE(options.to_string() == "none");
+}
+
+TEST_CASE("Metdata options: string representation should be valid \"all (short)\"") {
+    const osmium::metadata_options options{"all"};
+    REQUIRE(options.to_string() == "all");
+}
+
+TEST_CASE("Metdata options: string representation should be valid \"all (long)\"") {
+    const osmium::metadata_options options{"user+uid+version+timestamp+changeset"};
+    REQUIRE(options.to_string() == "all");
+}
