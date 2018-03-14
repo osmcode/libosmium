@@ -33,7 +33,6 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <osmium/io/detail/metadata_options.hpp>
 #include <osmium/io/detail/output_format.hpp>
 #include <osmium/io/detail/queue_util.hpp>
 #include <osmium/io/detail/string_util.hpp>
@@ -46,6 +45,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/changeset.hpp>
 #include <osmium/osm/item_type.hpp>
 #include <osmium/osm/location.hpp>
+#include <osmium/osm/metadata_options.hpp>
 #include <osmium/osm/node.hpp>
 #include <osmium/osm/node_ref.hpp>
 #include <osmium/osm/object.hpp>
@@ -71,7 +71,7 @@ namespace osmium {
             struct opl_output_options {
 
                 /// Which metadata of objects should be added?
-                metadata_options add_metadata;
+                osmium::metadata_options add_metadata;
 
                 /// Should node locations be added to ways?
                 bool locations_on_ways = false;
@@ -289,7 +289,7 @@ namespace osmium {
 
                 OPLOutputFormat(osmium::thread::Pool& pool, const osmium::io::File& file, future_string_queue_type& output_queue) :
                     OutputFormat(pool, output_queue) {
-                    m_options.add_metadata      = metadata_options{file.get("add_metadata")};
+                    m_options.add_metadata      = osmium::metadata_options{file.get("add_metadata")};
                     m_options.locations_on_ways = file.is_true("locations_on_ways");
                     m_options.format_as_diff    = file.is_true("diff");
                 }
