@@ -6,7 +6,7 @@
 #include <osmium/osm/object.hpp>
 
 TEST_CASE("Metadata options: default") {
-    const osmium::metadata_options m {};
+    const osmium::metadata_options m{};
     REQUIRE_FALSE(m.none());
     REQUIRE(m.any());
     REQUIRE(m.all());
@@ -95,10 +95,11 @@ TEST_CASE("Metadata options: fail") {
 
 TEST_CASE("Metdata options: constructor using OSMObject") {
     osmium::memory::Buffer buffer{10 * 1000};
-    using namespace osmium::builder::attr;
+    using namespace osmium::builder::attr; // NOLINT(google-build-using-namespace)
 
     SECTION("only version") {
-        const osmium::OSMObject& obj = buffer.get<osmium::OSMObject>(osmium::builder::add_node(buffer, _id(1),
+        const osmium::OSMObject& obj = buffer.get<osmium::OSMObject>(osmium::builder::add_node(buffer,
+                _id(1),
                 _version(2)));
         osmium::metadata_options options = osmium::detect_available_metadata(obj);
         REQUIRE_FALSE(options.user());
@@ -109,15 +110,23 @@ TEST_CASE("Metdata options: constructor using OSMObject") {
     }
 
     SECTION("full") {
-        const osmium::OSMObject& obj = buffer.get<osmium::OSMObject>(osmium::builder::add_node(buffer, _id(1),
-                _version(2), _cid(30), _user("foo"), _uid(8), _timestamp("2018-01-01T23:00:00Z")));
+        const osmium::OSMObject& obj = buffer.get<osmium::OSMObject>(osmium::builder::add_node(buffer,
+                _id(1),
+                _version(2),
+                _timestamp("2018-01-01T23:00:00Z"),
+                _cid(30),
+                _uid(8),
+                _user("foo")));
         osmium::metadata_options options = osmium::detect_available_metadata(obj);
         REQUIRE(options.all());
     }
 
     SECTION("changeset+timestamp+version") {
-        const osmium::OSMObject& obj = buffer.get<osmium::OSMObject>(osmium::builder::add_node(buffer, _id(1),
-                _version(2), _cid(30), _timestamp("2018-01-01T23:00:00Z")));
+        const osmium::OSMObject& obj = buffer.get<osmium::OSMObject>(osmium::builder::add_node(buffer,
+                _id(1),
+                _version(2),
+                _timestamp("2018-01-01T23:00:00Z"),
+                _cid(30)));
         osmium::metadata_options options = osmium::detect_available_metadata(obj);
         REQUIRE(options.version());
         REQUIRE(options.timestamp());
@@ -127,37 +136,38 @@ TEST_CASE("Metdata options: constructor using OSMObject") {
     }
 }
 
-TEST_CASE("Metdata options: string representation should be valid \"version+changeset\"") {
+TEST_CASE("Metdata options: string representation should be valid 'version+changeset'") {
     const osmium::metadata_options options{"version+changeset"};
     REQUIRE(options.to_string() == "version+changeset");
 }
 
-TEST_CASE("Metdata options: string representation should be valid \"version+uid+user\"") {
+TEST_CASE("Metdata options: string representation should be valid 'version+uid+user'") {
     const osmium::metadata_options options{"version+uid+user"};
     REQUIRE(options.to_string() == "version+uid+user");
 }
 
-TEST_CASE("Metdata options: string representation should be valid \"version+timestamp\"") {
+TEST_CASE("Metdata options: string representation should be valid 'version+timestamp'") {
     const osmium::metadata_options options{"version+timestamp"};
     REQUIRE(options.to_string() == "version+timestamp");
 }
 
-TEST_CASE("Metdata options: string representation should be valid \"timestamp+version (different order\"") {
+TEST_CASE("Metdata options: string representation should be valid 'timestamp+version (different order'") {
     const osmium::metadata_options options{"timestamp+version"};
     REQUIRE(options.to_string() == "version+timestamp");
 }
 
-TEST_CASE("Metdata options: string representation should be valid \"none\"") {
+TEST_CASE("Metdata options: string representation should be valid 'none'") {
     const osmium::metadata_options options{"none"};
     REQUIRE(options.to_string() == "none");
 }
 
-TEST_CASE("Metdata options: string representation should be valid \"all (short)\"") {
+TEST_CASE("Metdata options: string representation should be valid 'all (short)'") {
     const osmium::metadata_options options{"all"};
     REQUIRE(options.to_string() == "all");
 }
 
-TEST_CASE("Metdata options: string representation should be valid \"all (long)\"") {
+TEST_CASE("Metdata options: string representation should be valid 'all (long)'") {
     const osmium::metadata_options options{"user+uid+version+timestamp+changeset"};
     REQUIRE(options.to_string() == "all");
 }
+

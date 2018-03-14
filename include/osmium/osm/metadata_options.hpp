@@ -33,12 +33,12 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <osmium/osm/object.hpp>
 #include <osmium/util/string.hpp>
 
+#include <ostream>
 #include <stdexcept>
 #include <string>
-#include <ostream>
-#include <osmium/osm/object.hpp>
 
 namespace osmium {
 
@@ -49,7 +49,7 @@ namespace osmium {
      */
     class metadata_options {
 
-        enum options : char {
+        enum options : unsigned int {
             md_none      = 0x00,
             md_version   = 0x01,
             md_timestamp = 0x02,
@@ -179,31 +179,40 @@ namespace osmium {
 
         std::string to_string() const {
             std::string result;
+
             if (none()) {
                 result = "none";
                 return result;
             }
+
             if (all()) {
                 result = "all";
                 return result;
             }
+
             if (version()) {
                 result += "version+";
             }
+
             if (timestamp()) {
                 result += "timestamp+";
             }
+
             if (changeset()) {
                 result += "changeset+";
             }
+
             if (uid()) {
                 result += "uid+";
             }
+
             if (user()) {
                  result += "user+";
             }
-            // remove last + character
+
+            // remove last '+' character
             result.pop_back();
+
             return result;
         }
 
@@ -215,11 +224,12 @@ namespace osmium {
     }
 
     /**
-     * Create an instance of metadata_options based on the availability of metadata of an
-     * instance of osmium::OSMObject
+     * Create an instance of metadata_options based on the availability of
+     * metadata of an instance of osmium::OSMObject.
      */
     inline osmium::metadata_options detect_available_metadata(const osmium::OSMObject& object) {
         osmium::metadata_options opts;
+
         opts.set_version(object.version());
         opts.set_timestamp(object.timestamp().valid());
         opts.set_changeset(object.changeset() > 0);
@@ -228,6 +238,7 @@ namespace osmium {
         // to distinguish them from objects with a reduced number of metadata fields.
         opts.set_uid(object.uid() > 0);
         opts.set_user(object.user()[0] != '\0');
+
         return opts;
     }
 
