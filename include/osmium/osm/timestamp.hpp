@@ -53,30 +53,30 @@ namespace osmium {
             assert(value >= 0 && value <= 99);
             if (value > 9) {
                 const int dec = value / 10;
-                out += '0' + dec;
+                out += static_cast<char>('0' + dec);
                 value -= dec * 10;
             } else {
                 out += '0';
             }
-            out += '0' + value;
+            out += static_cast<char>('0' + value);
         }
 
         inline void add_4digit_int_to_string(int value, std::string& out) {
             assert(value >= 1000 && value <= 9999);
 
             const int dec1 = value / 1000;
-            out += '0' + dec1;
+            out += static_cast<char>('0' + dec1);
             value -= dec1 * 1000;
 
             const int dec2 = value / 100;
-            out += '0' + dec2;
+            out += static_cast<char>('0' + dec2);
             value -= dec2 * 100;
 
             const int dec3 = value / 10;
-            out += '0' + dec3;
+            out += static_cast<char>('0' + dec3);
             value -= dec3 * 10;
 
-            out += '0' + value;
+            out += static_cast<char>('0' + value);
         }
 
         inline time_t parse_timestamp(const char* str) {
