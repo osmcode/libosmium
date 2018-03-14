@@ -196,7 +196,9 @@ namespace osmium {
                                     const auto version = pbf_info.get_int32();
                                     if (version < -1) {
                                         throw osmium::pbf_error{"object version must not be negative"};
-                                    } else if (version == -1) {
+                                    }
+
+                                    if (version == -1) {
                                         object.set_version(0U);
                                     } else {
                                         object.set_version(static_cast<object_version_type>(version));
@@ -211,7 +213,9 @@ namespace osmium {
                                     const auto changeset_id = pbf_info.get_int64();
                                     if (changeset_id < -1 || changeset_id >= std::numeric_limits<changeset_id_type>::max()) {
                                         throw osmium::pbf_error{"object changeset_id must be between 0 and 2^32-1"};
-                                    } else if (changeset_id == -1) {
+                                    }
+
+                                    if (changeset_id == -1) {
                                         object.set_changeset(0U);
                                     } else {
                                         object.set_changeset(static_cast<changeset_id_type>(changeset_id));
@@ -632,7 +636,9 @@ namespace osmium {
                                 versions.drop_front();
                                 if (version < -1) {
                                     throw osmium::pbf_error{"object version must not be negative"};
-                                } else if (version == -1) {
+                                }
+
+                                if (version == -1) {
                                     node.set_version(0U);
                                 } else {
                                     node.set_version(static_cast<osmium::object_version_type>(version));
@@ -644,7 +650,9 @@ namespace osmium {
                                 changesets.drop_front();
                                 if (changeset_id < -1 || changeset_id >= std::numeric_limits<changeset_id_type>::max()) {
                                     throw osmium::pbf_error{"object changeset_id must be between 0 and 2^32-1"};
-                                } else if (changeset_id == -1) {
+                                }
+
+                                if (changeset_id == -1) {
                                     node.set_changeset(0U);
                                 } else {
                                     node.set_changeset(static_cast<osmium::changeset_id_type>(changeset_id));
