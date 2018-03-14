@@ -6,7 +6,7 @@
 #include <osmium/osm/object.hpp>
 
 TEST_CASE("Metadata options: default") {
-    const osmium::metadata_options m;
+    const osmium::metadata_options m {};
     REQUIRE_FALSE(m.none());
     REQUIRE(m.any());
     REQUIRE(m.all());
