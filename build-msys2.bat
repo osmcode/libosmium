@@ -16,8 +16,6 @@ call C:\msys64\mingw64\bin\gem.cmd install json
 echo "Setting PROJ_LIB variable for correct PROJ.4 working"
 set PROJ_LIB=c:\msys64\mingw64\share\proj
 
-git submodule update --init
-
 echo "Generating makefiles"
 mkdir build
 cd build

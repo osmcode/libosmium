@@ -34,8 +34,6 @@ IF "%config%"=="Debug" SET libpostfix="d"
 IF EXIST build ECHO deleting build dir... && RD /Q /S build
 IF %ERRORLEVEL% NEQ 0 GOTO ERROR
 
-git submodule update --init
-
 MKDIR build
 IF %ERRORLEVEL% NEQ 0 GOTO ERROR
 
