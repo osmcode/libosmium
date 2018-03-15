@@ -26,8 +26,9 @@ message(STATUS "Looking for osm-testdata - found")
 
 #-----------------------------------------------------------------------------
 
-include_directories("include")
-include_directories("../include")
+include_directories(SYSTEM ../catch)
+include_directories(include)
+include_directories(../include)
 
 
 #-----------------------------------------------------------------------------

@@ -9,6 +9,8 @@
 message(STATUS "Configuring unit tests")
 
 include(CMakeParseArguments)
+
+include_directories(SYSTEM catch)
 include_directories(include)
 
 add_library(testlib STATIC test_main.cpp)
