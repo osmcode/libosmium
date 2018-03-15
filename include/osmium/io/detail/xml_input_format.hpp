@@ -493,9 +493,9 @@ namespace osmium {
                                 const char* user = "";
                                 check_attributes(attrs, [&date, &uid, &user](const XML_Char* name, const XML_Char* value) {
                                     if (!std::strcmp(name, "date")) {
-                                        date = osmium::Timestamp(value);
+                                        date = osmium::Timestamp{value};
                                     } else if (!std::strcmp(name, "uid")) {
-                                        uid = osmium::string_to_user_id(value);
+                                        uid = osmium::string_to_uid(value);
                                     } else if (!std::strcmp(name, "user")) {
                                         user = static_cast<const char*>(value);
                                     }

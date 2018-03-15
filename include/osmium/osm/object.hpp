@@ -274,7 +274,8 @@ namespace osmium {
          * @returns Reference to object to make calls chainable.
          */
         OSMObject& set_uid(const char* uid) {
-            return set_uid_from_signed(string_to_user_id(uid));
+            m_uid = string_to_uid(uid);
+            return *this;
         }
 
         /// Is this user anonymous?
