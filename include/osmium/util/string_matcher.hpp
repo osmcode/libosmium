@@ -391,7 +391,7 @@ namespace osmium {
          */
         template <typename TMatcher, typename std::enable_if<
             std::is_base_of<matcher, TMatcher>::value, int>::type = 0>
-        StringMatcher(TMatcher&& matcher) : // NOLINT(google-explicit-constructor, hicpp-explicit-conversions)
+        StringMatcher(TMatcher&& matcher) : // NOLINT(google-explicit-constructor, hicpp-explicit-conversions, misc-forwarding-reference-overload)
             m_matcher(std::forward<TMatcher>(matcher)) {
         }
 

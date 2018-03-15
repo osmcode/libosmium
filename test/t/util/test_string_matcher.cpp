@@ -187,3 +187,35 @@ TEST_CASE("Construct StringMatcher") {
     REQUIRE(print(m) == "substring[foo]");
 }
 
+TEST_CASE("Copy construct StringMatcher") {
+    osmium::StringMatcher m1{"foo"};
+    osmium::StringMatcher m2{m1};
+
+    REQUIRE(print(m1) == "equal[foo]");
+    REQUIRE(print(m2) == "equal[foo]");
+}
+
+TEST_CASE("Copy assign StringMatcher") {
+    osmium::StringMatcher m1{"foo"};
+    osmium::StringMatcher m2{"bar"};
+    m2 = m1;
+
+    REQUIRE(print(m1) == "equal[foo]");
+    REQUIRE(print(m2) == "equal[foo]");
+}
+
+TEST_CASE("Move construct StringMatcher") {
+    osmium::StringMatcher m1{"foo"};
+    osmium::StringMatcher m2{std::move(m1)};
+
+    REQUIRE(print(m2) == "equal[foo]");
+}
+
+TEST_CASE("Move assign StringMatcher") {
+    osmium::StringMatcher m1{"foo"};
+    osmium::StringMatcher m2{"bar"};
+    m2 = std::move(m1);
+
+    REQUIRE(print(m2) == "equal[foo]");
+}
+
