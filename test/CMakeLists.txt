@@ -22,7 +22,9 @@ if(CMAKE_COMPILER_IS_GNUCXX)
     add_definitions(-Wno-parentheses)
 endif()
 
-add_definitions(-Wno-deprecated-declarations)
+if(NOT MSVC)
+    add_definitions(-Wno-deprecated-declarations)
+endif()
 
 
 #-----------------------------------------------------------------------------
