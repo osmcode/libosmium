@@ -230,7 +230,7 @@ namespace osmium {
     inline osmium::metadata_options detect_available_metadata(const osmium::OSMObject& object) {
         osmium::metadata_options opts;
 
-        opts.set_version(object.version());
+        opts.set_version(object.version() > 0);
         opts.set_timestamp(object.timestamp().valid());
         opts.set_changeset(object.changeset() > 0);
 

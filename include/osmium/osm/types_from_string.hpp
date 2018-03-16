@@ -168,7 +168,7 @@ namespace osmium {
             return -1;
         }
         const auto value = detail::string_to_ulong(input, "user id");
-        if (value > std::numeric_limits<int32_t>::max()) {
+        if (value > static_cast<uint32_t>(std::numeric_limits<int32_t>::max())) {
             throw std::range_error{"illegal user id"};
         }
         return static_cast<signed_user_id_type>(value);
