@@ -149,8 +149,8 @@ namespace osmium {
                 context m_last_context = context::root;
 
                 /**
-                 * This is used only for change files which contain create, modify,
-                 * and delete sections.
+                 * This is used only for change files which contain create,
+                 * modify, and delete sections.
                  */
                 bool m_in_delete_section = false;
 
@@ -171,9 +171,9 @@ namespace osmium {
                 std::string m_comment_text;
 
                 /**
-                 * A C++ wrapper for the Expat parser that makes sure no memory is leaked.
+                 * A C++ wrapper for the Expat parser that makes sure no memory
+                 * is leaked.
                  */
-                template <typename T>
                 class ExpatXMLParser {
 
                     XML_Parser m_parser;
@@ -209,7 +209,7 @@ namespace osmium {
 
                 public:
 
-                    explicit ExpatXMLParser(T* callback_object) :
+                    explicit ExpatXMLParser(void* callback_object) :
                         m_parser(XML_ParserCreate(nullptr)) {
                         if (!m_parser) {
                             throw osmium::io_error{"Internal error: Can not create parser"};
@@ -221,9 +221,9 @@ namespace osmium {
                     }
 
                     ExpatXMLParser(const ExpatXMLParser&) = delete;
-                    ExpatXMLParser(ExpatXMLParser&&) = delete;
-
                     ExpatXMLParser& operator=(const ExpatXMLParser&) = delete;
+
+                    ExpatXMLParser(ExpatXMLParser&&) = delete;
                     ExpatXMLParser& operator=(ExpatXMLParser&&) = delete;
 
                     ~ExpatXMLParser() noexcept {
@@ -239,21 +239,20 @@ namespace osmium {
                 }; // class ExpatXMLParser
 
                 template <typename T>
-                static void check_attributes(const XML_Char** attrs, T check) {
+                static void check_attributes(const XML_Char** attrs, T&& check) {
                     while (*attrs) {
-                        check(attrs[0], attrs[1]);
+                        std::forward<T>(check)(attrs[0], attrs[1]);
                         attrs += 2;
                     }
                 }
 
                 const char* init_object(osmium::OSMObject& object, const XML_Char** attrs) {
-                    const char* user = "";
-
                     if (m_in_delete_section) {
                         object.set_visible(false);
                     }
 
                     osmium::Location location;
+                    const char* user = "";
 
                     check_attributes(attrs, [&location, &user, &object](const XML_Char* name, const XML_Char* value) {
                         if (!std::strcmp(name, "lon")) {
@@ -301,9 +300,9 @@ namespace osmium {
                     const char* v = "";
 
                     check_attributes(attrs, [&k, &v](const XML_Char* name, const XML_Char* value) {
-                        if (name[0] == 'k' && name[1] == 0) {
+                        if (name[0] == 'k' && name[1] == '\0') {
                             k = value;
-                        } else if (name[0] == 'v' && name[1] == 0) {
+                        } else if (name[0] == 'v' && name[1] == '\0') {
                             v = value;
                         }
                     });
@@ -585,9 +584,6 @@ namespace osmium {
                             m_context = context::comment;
                             m_changeset_discussion_builder->add_comment_text(m_comment_text);
                             break;
-                        case context::in_object:
-                            m_context = m_last_context;
-                            break;
                         case context::ignored_node:
                             if (!std::strcmp(element, "node")) {
                                 m_context = context::top;
@@ -608,6 +604,9 @@ namespace osmium {
                                 m_context = context::top;
                             }
                             break;
+                        case context::in_object:
+                            m_context = m_last_context;
+                            break;
                     }
                 }
 
@@ -615,7 +614,7 @@ namespace osmium {
                     if (m_context == context::comment_text) {
                         m_comment_text.append(text, len);
                     } else {
-                        m_comment_text.resize(0);
+                        m_comment_text.clear();
                     }
                 }
 
@@ -646,7 +645,7 @@ namespace osmium {
                 void run() final {
                     osmium::thread::set_thread_name("_osmium_xml_in");
 
-                    ExpatXMLParser<XMLParser> parser{this};
+                    ExpatXMLParser parser{this};
 
                     while (!input_done()) {
                         const std::string data{get_input()};
