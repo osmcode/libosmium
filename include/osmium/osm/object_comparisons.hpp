@@ -157,28 +157,6 @@ namespace osmium {
 
     }; // struct object_order_type_id_reverse_version
 
-    /**
-     * Function object class for ordering OSM objects by type, id, and reverse
-     * version.
-     *
-     * The naming is a bit awkward here, but necessary to keep backwards
-     * compatibility with object_order_type_id_reverse_version.
-     */
-    struct object_order_type_id_reverse_version_without_timestamp {
-
-        bool operator()(const osmium::OSMObject& lhs, const osmium::OSMObject& rhs) const noexcept {
-            return const_tie(lhs.type(), lhs.id() > 0, lhs.positive_id(), rhs.version()) <
-                   const_tie(rhs.type(), rhs.id() > 0, rhs.positive_id(), lhs.version());
-        }
-
-        /// @pre lhs and rhs must not be nullptr
-        bool operator()(const osmium::OSMObject* lhs, const osmium::OSMObject* rhs) const noexcept {
-            assert(lhs && rhs);
-            return operator()(*lhs, *rhs);
-        }
-
-    }; // struct object_order_type_id_reverse_version_without_timestamp
-
 } // namespace osmium
 
 #endif // OSMIUM_OSM_OBJECT_COMPARISONS_HPP
