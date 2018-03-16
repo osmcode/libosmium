@@ -140,3 +140,22 @@ TEST_CASE("Object comparisons: types are ordered nodes, then ways, then relation
     REQUIRE(std::is_sorted(objects.cbegin(), objects.cend()));
 }
 
+TEST_CASE("Object comparisons with partially missing timestamp") {
+    osmium::memory::Buffer buffer{10 * 1000};
+    osmium::OSMObject& obj1 = buffer.get<osmium::Node>(    osmium::builder::add_node(    buffer,
+            _id(3), _version(2), _timestamp(("2016-01-01T00:00:00Z"))));
+    osmium::OSMObject& obj2 = buffer.get<osmium::Node>(    osmium::builder::add_node(    buffer,
+            _id(3), _version(2)));
+
+    SECTION("OSMObject::operator<") {
+        REQUIRE_FALSE(obj1 < obj2);
+        REQUIRE_FALSE(obj1 > obj2);
+        REQUIRE(obj1 == obj2);
+    }
+
+    SECTION("object_order_type_id_reverse_version") {
+        const osmium::object_order_type_id_reverse_version comp{};
+        REQUIRE_FALSE(comp(obj1, obj2));
+        REQUIRE_FALSE(comp(obj2, obj1));
+    }
+}
