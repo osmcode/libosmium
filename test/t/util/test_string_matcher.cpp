@@ -189,7 +189,7 @@ TEST_CASE("Construct StringMatcher") {
 
 TEST_CASE("Copy construct StringMatcher") {
     osmium::StringMatcher m1{"foo"};
-    osmium::StringMatcher m2{m1};
+    osmium::StringMatcher m2{m1}; // NOLINT(performance-unnecessary-copy-initialization)
 
     REQUIRE(print(m1) == "equal[foo]");
     REQUIRE(print(m2) == "equal[foo]");
