@@ -476,8 +476,10 @@ namespace osmium {
      * ordering.
      */
     inline bool operator<(const OSMObject& lhs, const OSMObject& rhs) noexcept {
-        return const_tie(lhs.type(), lhs.id() > 0, lhs.positive_id(), lhs.version(), lhs.timestamp()) <
-               const_tie(rhs.type(), rhs.id() > 0, rhs.positive_id(), rhs.version(), rhs.timestamp());
+        return const_tie(lhs.type(), lhs.id() > 0, lhs.positive_id(), lhs.version(),
+                   ((lhs.timestamp().valid() && rhs.timestamp().valid()) ? lhs.timestamp() : osmium::Timestamp())) <
+               const_tie(rhs.type(), rhs.id() > 0, rhs.positive_id(), rhs.version(),
+                   ((lhs.timestamp().valid() && rhs.timestamp().valid()) ? rhs.timestamp() : osmium::Timestamp()));
     }
 
     inline bool operator>(const OSMObject& lhs, const OSMObject& rhs) noexcept {
