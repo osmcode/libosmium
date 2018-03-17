@@ -245,6 +245,66 @@ TEST_CASE("Reading OSM XML 105: Using Reader") {
 
 // =============================================
 
+TEST_CASE("Reading OSM XML 106: Direct") {
+    REQUIRE_THROWS_AS(read_xml("106-invalid_xml_file"), const osmium::xml_error&);
+}
+
+TEST_CASE("Reading OSM XML 106: Using Reader") {
+    REQUIRE_THROWS_AS([](){
+        osmium::io::Reader reader{filename("106-invalid_xml_file")};
+        const osmium::io::Header header{reader.header()};
+        osmium::memory::Buffer buffer = reader.read();
+        reader.close();
+    }(), const osmium::xml_error&);
+}
+
+// =============================================
+
+TEST_CASE("Reading OSM XML 107: Direct") {
+    REQUIRE_THROWS_AS(read_xml("107-wrongly_nested_xml_file"), const osmium::xml_error&);
+}
+
+TEST_CASE("Reading OSM XML 107: Using Reader") {
+    REQUIRE_THROWS_AS([](){
+        osmium::io::Reader reader{filename("107-wrongly_nested_xml_file")};
+        const osmium::io::Header header{reader.header()};
+        osmium::memory::Buffer buffer = reader.read();
+        reader.close();
+    }(), const osmium::xml_error&);
+}
+
+// =============================================
+
+TEST_CASE("Reading OSM XML 108: Direct") {
+    REQUIRE_THROWS_AS(read_xml("108-unknown_top_level"), const osmium::xml_error&);
+}
+
+TEST_CASE("Reading OSM XML 108: Using Reader") {
+    REQUIRE_THROWS_AS([](){
+        osmium::io::Reader reader{filename("108-unknown_top_level")};
+        const osmium::io::Header header{reader.header()};
+        osmium::memory::Buffer buffer = reader.read();
+        reader.close();
+    }(), const osmium::xml_error&);
+}
+
+// =============================================
+
+TEST_CASE("Reading OSM XML 109: Direct") {
+    read_xml("109-unknown_data_level");
+}
+
+TEST_CASE("Reading OSM XML 109: Using Reader") {
+    osmium::io::Reader reader{filename("109-unknown_data_level")};
+
+    const osmium::io::Header header{reader.header()};
+    osmium::memory::Buffer buffer = reader.read();
+    REQUIRE(buffer.committed() > 0);
+    reader.close();
+}
+
+// =============================================
+
 TEST_CASE("Reading OSM XML 120: Direct") {
     std::string data = read_gz_file("120-correct_gzip_file_without_data", "osm.gz");
 
