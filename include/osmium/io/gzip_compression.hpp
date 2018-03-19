@@ -47,13 +47,14 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/io/error.hpp>
 #include <osmium/io/file_compression.hpp>
 #include <osmium/io/writer_options.hpp>
-#include <osmium/util/cast.hpp>
 #include <osmium/util/compatibility.hpp>
 
 #include <zlib.h>
 
+#include <cassert>
 #include <cerrno>
 #include <cstddef>
+#include <limits>
 #include <string>
 
 #ifndef _MSC_VER
@@ -130,7 +131,8 @@ namespace osmium {
 
             void write(const std::string& data) final {
                 if (!data.empty()) {
-                    const int nwrite = ::gzwrite(m_gzfile, data.data(), static_cast_with_assert<unsigned int>(data.size()));
+                    assert(data.size() < std::numeric_limits<unsigned int>::max());
+                    const int nwrite = ::gzwrite(m_gzfile, data.data(), static_cast<unsigned int>(data.size()));
                     if (nwrite == 0) {
                         detail::throw_gzip_error(m_gzfile, "write failed");
                     }
@@ -182,7 +184,8 @@ namespace osmium {
 
             std::string read() final {
                 std::string buffer(osmium::io::Decompressor::input_buffer_size, '\0');
-                int nread = ::gzread(m_gzfile, const_cast<char*>(buffer.data()), static_cast_with_assert<unsigned int>(buffer.size()));
+                assert(buffer.size() < std::numeric_limits<unsigned int>::max());
+                int nread = ::gzread(m_gzfile, const_cast<char*>(buffer.data()), static_cast<unsigned int>(buffer.size()));
                 if (nread < 0) {
                     detail::throw_gzip_error(m_gzfile, "read failed");
                 }
@@ -218,7 +221,8 @@ namespace osmium {
                 m_buffer_size(size),
                 m_zstream() {
                 m_zstream.next_in = reinterpret_cast<unsigned char*>(const_cast<char*>(buffer));
-                m_zstream.avail_in = static_cast_with_assert<unsigned int>(size);
+                assert(size < std::numeric_limits<unsigned int>::max());
+                m_zstream.avail_in = static_cast<unsigned int>(size);
                 const int result = inflateInit2(&m_zstream, MAX_WBITS | 32);
                 if (result != Z_OK) {
                     std::string message{"gzip error: decompression init failed: "};

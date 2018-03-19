@@ -47,13 +47,14 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/io/error.hpp>
 #include <osmium/io/file_compression.hpp>
 #include <osmium/io/writer_options.hpp>
-#include <osmium/util/cast.hpp>
 #include <osmium/util/compatibility.hpp>
 
 #include <bzlib.h>
 
+#include <cassert>
 #include <cerrno>
 #include <cstdio>
+#include <limits>
 #include <string>
 #include <system_error>
 
@@ -133,7 +134,8 @@ namespace osmium {
 
             void write(const std::string& data) final {
                 int error;
-                ::BZ2_bzWrite(&error, m_bzfile, const_cast<char*>(data.data()), static_cast_with_assert<int>(data.size()));
+                assert(data.size() < std::numeric_limits<int>::max());
+                ::BZ2_bzWrite(&error, m_bzfile, const_cast<char*>(data.data()), static_cast<int>(data.size()));
                 if (error != BZ_OK && error != BZ_STREAM_END) {
                     detail::throw_bzip2_error(m_bzfile, "write failed", error);
                 }
@@ -197,7 +199,8 @@ namespace osmium {
                 if (!m_stream_end) {
                     buffer.resize(osmium::io::Decompressor::input_buffer_size);
                     int error;
-                    const int nread = ::BZ2_bzRead(&error, m_bzfile, const_cast<char*>(buffer.data()), static_cast_with_assert<int>(buffer.size()));
+                    assert(buffer.size() < std::numeric_limits<int>::max());
+                    const int nread = ::BZ2_bzRead(&error, m_bzfile, const_cast<char*>(buffer.data()), static_cast<int>(buffer.size()));
                     if (error != BZ_OK && error != BZ_STREAM_END) {
                         detail::throw_bzip2_error(m_bzfile, "read failed", error);
                     }
@@ -214,7 +217,8 @@ namespace osmium {
                             if (error != BZ_OK) {
                                 detail::throw_bzip2_error(m_bzfile, "read close failed", error);
                             }
-                            m_bzfile = ::BZ2_bzReadOpen(&error, m_file, 0, 0, const_cast<void*>(static_cast<const void*>(unused_data.data())), static_cast_with_assert<int>(unused_data.size()));
+                            assert(unused_data.size() < std::numeric_limits<int>::max());
+                            m_bzfile = ::BZ2_bzReadOpen(&error, m_file, 0, 0, const_cast<void*>(static_cast<const void*>(unused_data.data())), static_cast<int>(unused_data.size()));
                             if (error != BZ_OK) {
                                 detail::throw_bzip2_error(m_bzfile, "read open failed", error);
                             }
@@ -261,7 +265,8 @@ namespace osmium {
                 m_buffer_size(size),
                 m_bzstream() {
                 m_bzstream.next_in = const_cast<char*>(buffer);
-                m_bzstream.avail_in = static_cast_with_assert<unsigned int>(size);
+                assert(size < std::numeric_limits<unsigned int>::max());
+                m_bzstream.avail_in = static_cast<unsigned int>(size);
                 const int result = BZ2_bzDecompressInit(&m_bzstream, 0, 0);
                 if (result != BZ_OK) {
                     std::string message{"bzip2 error: decompression init failed: "};

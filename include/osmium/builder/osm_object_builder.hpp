@@ -48,7 +48,6 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/timestamp.hpp>
 #include <osmium/osm/types.hpp>
 #include <osmium/osm/way.hpp>
-#include <osmium/util/cast.hpp>
 #include <osmium/util/compatibility.hpp>
 
 #include <algorithm>
@@ -464,18 +463,25 @@ namespace osmium {
              * Set user name.
              *
              * @param user Pointer to \0-terminated user name.
+             *
+             * @pre @code strlen(user) < 2^16 - 1 @endcode
              */
             TDerived& set_user(const char* user) {
-                return set_user(user, static_cast_with_assert<string_size_type>(std::strlen(user)));
+                const auto len = std::strlen(user);
+                assert(len < std::numeric_limits<string_size_type>::max());
+                return set_user(user, static_cast<string_size_type>(len));
             }
 
             /**
              * Set user name.
              *
              * @param user User name.
+             *
+             * @pre @code user.size() < 2^16 - 1 @endcode
              */
             TDerived& set_user(const std::string& user) {
-                return set_user(user.data(), static_cast_with_assert<string_size_type>(user.size()));
+                assert(user.size() < std::numeric_limits<string_size_type>::max());
+                return set_user(user.data(), static_cast<string_size_type>(user.size()));
             }
 
             /// @deprecated Use set_user(...) instead.
@@ -673,18 +679,25 @@ namespace osmium {
              * Set user name.
              *
              * @param user Pointer to \0-terminated user name.
+             *
+             * @pre @code strlen(user) < 2^16 - 1 @endcode
              */
             ChangesetBuilder& set_user(const char* user) {
-                return set_user(user, static_cast_with_assert<string_size_type>(std::strlen(user)));
+                const auto len = std::strlen(user);
+                assert(len <= std::numeric_limits<string_size_type>::max());
+                return set_user(user, static_cast<string_size_type>(len));
             }
 
             /**
              * Set user name.
              *
              * @param user User name.
+             *
+             * @pre @code user.size() < 2^16 - 1 @endcode
              */
             ChangesetBuilder& set_user(const std::string& user) {
-                return set_user(user.data(), static_cast_with_assert<string_size_type>(user.size()));
+                assert(user.size() < std::numeric_limits<string_size_type>::max());
+                return set_user(user.data(), static_cast<string_size_type>(user.size()));
             }
 
             /// @deprecated Use set_user(...) instead.

@@ -55,13 +55,13 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/types_from_string.hpp>
 #include <osmium/osm/way.hpp>
 #include <osmium/thread/util.hpp>
-#include <osmium/util/cast.hpp>
 
 #include <expat.h>
 
 #include <cassert>
 #include <cstring>
 #include <future>
+#include <limits>
 #include <memory>
 #include <string>
 #include <utility>
@@ -227,7 +227,8 @@ namespace osmium {
                     }
 
                     void operator()(const std::string& data, bool last) {
-                        if (XML_Parse(m_parser, data.data(), static_cast_with_assert<int>(data.size()), last) == XML_STATUS_ERROR) {
+                        assert(data.size() < std::numeric_limits<int>::max());
+                        if (XML_Parse(m_parser, data.data(), static_cast<int>(data.size()), last) == XML_STATUS_ERROR) {
                             throw osmium::xml_error{m_parser};
                         }
                     }
