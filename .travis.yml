@@ -119,14 +119,15 @@ matrix:
       env: CC='clang-5.0' CXX='clang++-5.0' BUILD_TYPE='Dev'
       addons: *clang50
 
-    - os: linux
-      compiler: linux-clang50-debug
-      env: CC='clang-5.0' CXX='clang++-5.0' BUILD_TYPE='Debug'
-           CXXFLAGS="-fsanitize=address,undefined,integer -fno-sanitize-recover=all -fno-omit-frame-pointer"
-           LDFLAGS="-fsanitize=address,undefined,integer"
-      # LSAN doesn't work on container-based system
-      sudo: required
-      addons: *clang50
+# Disabled because it creates false-positives on the old travis systems
+#    - os: linux
+#      compiler: linux-clang50-debug
+#      env: CC='clang-5.0' CXX='clang++-5.0' BUILD_TYPE='Debug'
+#           CXXFLAGS="-fsanitize=address,undefined,integer -fno-sanitize-recover=all -fno-omit-frame-pointer"
+#           LDFLAGS="-fsanitize=address,undefined,integer"
+#      # LSAN doesn't work on container-based system
+#      sudo: required
+#      addons: *clang50
 
     # 2/ Linux GCC Builds
     - os: linux
