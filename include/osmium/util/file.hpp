@@ -58,45 +58,45 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
-    namespace util {
-
 #ifdef _MSC_VER
-        namespace detail {
+    namespace detail {
 
-            // Disable parameter validation on Windows and reenable it
-            // automatically when scope closes.
-            // https://docs.microsoft.com/en-us/cpp/c-runtime-library/parameter-validation
-            class disable_invalid_parameter_handler {
+        // Disable parameter validation on Windows and reenable it
+        // automatically when scope closes.
+        // https://docs.microsoft.com/en-us/cpp/c-runtime-library/parameter-validation
+        class disable_invalid_parameter_handler {
 
-                static void invalid_parameter_handler(
-                        const wchar_t* expression,
-                        const wchar_t* function,
-                        const wchar_t* file,
-                        unsigned int line,
-                        uintptr_t pReserved
-                        ) {
-                    // do nothing
-                }
+            static void invalid_parameter_handler(
+                    const wchar_t* expression,
+                    const wchar_t* function,
+                    const wchar_t* file,
+                    unsigned int line,
+                    uintptr_t pReserved
+                    ) {
+                // do nothing
+            }
 
-                _invalid_parameter_handler old_handler;
-                int old_report_mode;
+            _invalid_parameter_handler old_handler;
+            int old_report_mode;
 
-            public:
+        public:
 
-                disable_invalid_parameter_handler() :
-                    old_handler(_set_thread_local_invalid_parameter_handler(invalid_parameter_handler)),
-                    old_report_mode(_CrtSetReportMode(_CRT_ASSERT, 0)) {
-                }
+            disable_invalid_parameter_handler() :
+                old_handler(_set_thread_local_invalid_parameter_handler(invalid_parameter_handler)),
+                old_report_mode(_CrtSetReportMode(_CRT_ASSERT, 0)) {
+            }
 
-                ~disable_invalid_parameter_handler() {
-                    _CrtSetReportMode(_CRT_ASSERT, old_report_mode);
-                    _set_thread_local_invalid_parameter_handler(old_handler);
-                }
+            ~disable_invalid_parameter_handler() {
+                _CrtSetReportMode(_CRT_ASSERT, old_report_mode);
+                _set_thread_local_invalid_parameter_handler(old_handler);
+            }
 
-            }; // class disable_invalid_parameter_handler
+        }; // class disable_invalid_parameter_handler
 
-        }
+    }
 #endif
+
+    namespace util {
 
         /**
          * Get file size.
@@ -109,7 +109,7 @@ namespace osmium {
         inline std::size_t file_size(int fd) {
 #ifdef _MSC_VER
             // Windows implementation
-            detail::disable_invalid_parameter_handler diph;
+            osmium::detail::disable_invalid_parameter_handler diph;
             // https://msdn.microsoft.com/en-us/library/dfbc2kec.aspx
             const auto size = ::_filelengthi64(fd);
             if (size < 0) {
@@ -175,7 +175,7 @@ namespace osmium {
          */
         inline void resize_file(int fd, std::size_t new_size) {
 #ifdef _MSC_VER
-            detail::disable_invalid_parameter_handler diph;
+            osmium::detail::disable_invalid_parameter_handler diph;
             // https://msdn.microsoft.com/en-us/library/whx354w1.aspx
             if (::_chsize_s(fd, static_cast_with_assert<__int64>(new_size)) != 0) {
 #else
@@ -208,7 +208,7 @@ namespace osmium {
          */
         inline std::size_t file_offset(int fd) {
 #ifdef _MSC_VER
-            detail::disable_invalid_parameter_handler diph;
+            osmium::detail::disable_invalid_parameter_handler diph;
             // https://msdn.microsoft.com/en-us/library/1yee101t.aspx
             const auto offset = _lseeki64(fd, 0, SEEK_CUR);
 #else
@@ -225,7 +225,7 @@ namespace osmium {
          */
         inline bool isatty(int fd) {
 #ifdef _MSC_VER
-            detail::disable_invalid_parameter_handler diph;
+            osmium::detail::disable_invalid_parameter_handler diph;
             // https://msdn.microsoft.com/en-us/library/f4s0ddew.aspx
             return _isatty(fd) != 0;
 #else
