@@ -111,7 +111,7 @@ namespace osmium {
             if (ut == 0) {
                 return nothing;
             }
-            return static_cast<osmium::osm_entity_bits::type>(0x1u << (ut - 1));
+            return static_cast<osmium::osm_entity_bits::type>(1u << (ut - 1u));
         }
 
     } // namespace osm_entity_bits

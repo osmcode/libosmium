@@ -70,8 +70,8 @@ namespace osmium {
                 out.reserve(str.size() * 2);
 
                 for (char c : str) {
-                    out += lookup_hex[(c >> 4) & 0xf];
-                    out += lookup_hex[c & 0xf];
+                    out += lookup_hex[(c >> 4u) & 0xfu];
+                    out += lookup_hex[c & 0xfu];
                 }
 
                 return out;
