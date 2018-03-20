@@ -384,7 +384,7 @@ TEST_CASE("Reading OSM XML 140: Using Reader") {
 #if !defined(_MSC_VER)
         switch (count) {
             case 1:
-                REQUIRE(S_(uc) ==  u8"a");
+                REQUIRE(S_(uc) == u8"a");
                 break;
             case 2:
                 REQUIRE(S_(uc) == u8"\u00e4");
