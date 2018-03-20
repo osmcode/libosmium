@@ -56,13 +56,13 @@ namespace osmium {
     namespace detail {
 
         template <typename T>
-        inline long long get_max_int() noexcept {
-            return static_cast<long long>(std::numeric_limits<T>::max());
+        inline long long get_max_int() noexcept { // NOLINT(google-runtime-int)
+            return static_cast<long long>(std::numeric_limits<T>::max()); // NOLINT(google-runtime-int)
         }
 
         template <>
-        inline long long get_max_int<uint64_t>() noexcept {
-            return std::numeric_limits<long long>::max();
+        inline long long get_max_int<uint64_t>() noexcept { // NOLINT(google-runtime-int)
+            return std::numeric_limits<long long>::max(); // NOLINT(google-runtime-int)
         }
 
         /**
