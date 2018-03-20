@@ -121,7 +121,7 @@ namespace osmium {
                         const auto slot = m_set->m_data[cid][IdSetDense<T>::offset(m_value)];
                         if (slot == 0) {
                             m_value += 8;
-                            m_value &= ~0x7;
+                            m_value &= ~0x7ull;
                         } else {
                             ++m_value;
                         }
