@@ -437,19 +437,21 @@ namespace osmium {
 
         Location& set_lon(const char* str) {
             const char** data = &str;
-            m_x = detail::string_to_location_coordinate(data);
+            const auto value = detail::string_to_location_coordinate(data);
             if (**data != '\0') {
                 throw invalid_location{std::string{"characters after coordinate: '"} + *data + "'"};
             }
+            m_x = value;
             return *this;
         }
 
         Location& set_lat(const char* str) {
             const char** data = &str;
-            m_y = detail::string_to_location_coordinate(data);
+            const auto value = detail::string_to_location_coordinate(data);
             if (**data != '\0') {
                 throw invalid_location{std::string{"characters after coordinate: '"} + *data + "'"};
             }
+            m_y = value;
             return *this;
         }
 
