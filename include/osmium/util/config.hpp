@@ -47,10 +47,20 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
+    namespace detail {
+
+#ifndef OSMIUM_TEST_RUNNER
+        inline const char* getenv_wrapper(const char* var) noexcept {
+            return getenv(var);
+        }
+#endif
+
+    } // namespace detail
+
     namespace config {
 
         inline int get_pool_threads() noexcept {
-            const char* env = getenv("OSMIUM_POOL_THREADS");
+            auto env = osmium::detail::getenv_wrapper("OSMIUM_POOL_THREADS");
             if (env) {
                 return osmium::detail::str_to_int<int>(env);
             }
@@ -58,7 +68,7 @@ namespace osmium {
         }
 
         inline bool use_pool_threads_for_pbf_parsing() noexcept {
-            const char* env = getenv("OSMIUM_USE_POOL_THREADS_FOR_PBF_PARSING");
+            auto env = osmium::detail::getenv_wrapper("OSMIUM_USE_POOL_THREADS_FOR_PBF_PARSING");
             if (env) {
                 if (!strcasecmp(env, "off") ||
                     !strcasecmp(env, "false") ||
@@ -75,7 +85,7 @@ namespace osmium {
             std::string name{"OSMIUM_MAX_"};
             name += queue_name;
             name += "_QUEUE_SIZE";
-            const char* env = getenv(name.c_str());
+            auto env = osmium::detail::getenv_wrapper(name.c_str());
             if (env) {
                 const auto value = osmium::detail::str_to_int<std::size_t>(env);
                 return value == 0 ? default_value : value;
