@@ -223,7 +223,7 @@ namespace osmium {
                 m_zstream.next_in = reinterpret_cast<unsigned char*>(const_cast<char*>(buffer));
                 assert(size < std::numeric_limits<unsigned int>::max());
                 m_zstream.avail_in = static_cast<unsigned int>(size);
-                const int result = inflateInit2(&m_zstream, MAX_WBITS | 32);
+                const int result = inflateInit2(&m_zstream, MAX_WBITS | 32); // NOLINT(hicpp-signed-bitwise)
                 if (result != Z_OK) {
                     std::string message{"gzip error: decompression init failed: "};
                     if (m_zstream.msg) {

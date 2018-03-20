@@ -537,12 +537,12 @@ inline int osmium::util::MemoryMapping::get_protection() const noexcept {
     if (m_mapping_mode == mapping_mode::readonly) {
         return PROT_READ;
     }
-    return PROT_READ | PROT_WRITE;
+    return PROT_READ | PROT_WRITE; // NOLINT(hicpp-signed-bitwise)
 }
 
 inline int osmium::util::MemoryMapping::get_flags() const noexcept {
     if (m_fd == -1) {
-        return MAP_PRIVATE | MAP_ANONYMOUS;
+        return MAP_PRIVATE | MAP_ANONYMOUS; // NOLINT(hicpp-signed-bitwise)
     }
     if (m_mapping_mode == mapping_mode::write_shared) {
         return MAP_SHARED;

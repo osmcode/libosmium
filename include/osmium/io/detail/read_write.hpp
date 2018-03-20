@@ -74,7 +74,7 @@ namespace osmium {
                     return 1; // stdout
                 }
 
-                int flags = O_WRONLY | O_CREAT;
+                int flags = O_WRONLY | O_CREAT; // NOLINT(hicpp-signed-bitwise)
                 if (allow_overwrite == osmium::io::overwrite::allow) {
                     flags |= O_TRUNC;
                 } else {
