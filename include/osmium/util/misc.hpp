@@ -56,12 +56,12 @@ namespace osmium {
     namespace detail {
 
         template <typename T>
-        long long get_max_int() noexcept {
+        inline long long get_max_int() noexcept {
             return static_cast<long long>(std::numeric_limits<T>::max());
         }
 
         template <>
-        long long get_max_int<uint64_t>() noexcept {
+        inline long long get_max_int<uint64_t>() noexcept {
             return std::numeric_limits<long long>::max();
         }
 
@@ -76,7 +76,7 @@ namespace osmium {
          *
          */
         template <typename TReturn>
-        TReturn str_to_int(const char* str) {
+        inline TReturn str_to_int(const char* str) {
             assert(str);
             errno = 0;
             char* end;
