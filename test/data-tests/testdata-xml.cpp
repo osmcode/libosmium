@@ -6,6 +6,7 @@
 #include <osmium/io/detail/queue_util.hpp>
 #include <osmium/io/gzip_compression.hpp>
 #include <osmium/io/xml_input.hpp>
+#include <osmium/util/misc.hpp>
 #include <osmium/visitor.hpp>
 
 #include <cassert>
@@ -374,7 +375,7 @@ TEST_CASE("Reading OSM XML 140: Using Reader") {
 
         const char* uc = t["unicode_char"];
 
-        const auto len = atoi(t["unicode_utf8_length"]);
+        const auto len = osmium::detail::str_to_int<std::size_t>(t["unicode_utf8_length"]);
         REQUIRE(len == std::strlen(uc));
 
         REQUIRE(S_(uc) == t["unicode_xml"]);

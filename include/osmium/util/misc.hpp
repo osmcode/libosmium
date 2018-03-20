@@ -33,7 +33,13 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <cassert>
+#include <cerrno>
+#include <cstdlib>
+#include <limits>
+#include <stdexcept>
 #include <tuple>
+#include <type_traits>
 
 namespace osmium {
 
@@ -46,6 +52,43 @@ namespace osmium {
     const_tie(const Ts&... args) noexcept {
         return std::tuple<const Ts&...>(args...);
     }
+
+    namespace detail {
+
+        template <typename T>
+        long long get_max_int() noexcept {
+            return static_cast<long long>(std::numeric_limits<T>::max());
+        }
+
+        template <>
+        long long get_max_int<uint64_t>() noexcept {
+            return std::numeric_limits<long long>::max();
+        }
+
+        /**
+         * Interpret the input string as number. Leading white space is
+         * ignored. If there is any error, return 0.
+         *
+         * @tparam TReturn The return type.
+         * @param str The input string.
+         *
+         * @pre @code str != nullptr @endcode
+         *
+         */
+        template <typename TReturn>
+        TReturn str_to_int(const char* str) {
+            assert(str);
+            errno = 0;
+            char* end;
+            const auto value = std::strtoll(str, &end, 10);
+            if (errno != 0 || value < 0 || value >= get_max_int<TReturn>() || *end != '\0') {
+                return 0;
+            }
+
+            return static_cast<TReturn>(value);
+        }
+
+    } // namespace detail
 
 } // namespace osmium
 

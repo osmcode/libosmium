@@ -33,6 +33,8 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <osmium/util/misc.hpp>
+
 #include <cassert>
 #include <cstddef>
 #include <cstdlib>
@@ -50,7 +52,7 @@ namespace osmium {
         inline int get_pool_threads() noexcept {
             const char* env = getenv("OSMIUM_POOL_THREADS");
             if (env) {
-                return std::atoi(env);
+                return osmium::detail::str_to_int<int>(env);
             }
             return 0;
         }
@@ -75,7 +77,7 @@ namespace osmium {
             name += "_QUEUE_SIZE";
             const char* env = getenv(name.c_str());
             if (env) {
-                auto value = std::atoi(env);
+                const auto value = osmium::detail::str_to_int<std::size_t>(env);
                 return value == 0 ? default_value : value;
             }
             return default_value;

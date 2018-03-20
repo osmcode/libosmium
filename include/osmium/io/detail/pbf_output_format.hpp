@@ -60,6 +60,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/thread/pool.hpp>
 #include <osmium/util/cast.hpp>
 #include <osmium/util/delta.hpp>
+#include <osmium/util/misc.hpp>
 #include <osmium/visitor.hpp>
 
 #include <protozero/pbf_builder.hpp>
@@ -563,7 +564,7 @@ namespace osmium {
 
                     const std::string osmosis_replication_sequence_number{header.get("osmosis_replication_sequence_number")};
                     if (!osmosis_replication_sequence_number.empty()) {
-                        pbf_header_block.add_int64(OSMFormat::HeaderBlock::optional_int64_osmosis_replication_sequence_number, std::atoll(osmosis_replication_sequence_number.c_str()));
+                        pbf_header_block.add_int64(OSMFormat::HeaderBlock::optional_int64_osmosis_replication_sequence_number, osmium::detail::str_to_int<int64_t>(osmosis_replication_sequence_number.c_str()));
                     }
 
                     const std::string osmosis_replication_base_url{header.get("osmosis_replication_base_url")};
