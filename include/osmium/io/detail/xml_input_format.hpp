@@ -698,7 +698,7 @@ namespace osmium {
                 void flush_buffer() {
                     if (m_buffer.committed() > buffer_size / 10 * 9) {
                         send_to_output_queue(std::move(m_buffer));
-                        osmium::memory::Buffer buffer(buffer_size);
+                        osmium::memory::Buffer buffer{buffer_size};
                         using std::swap;
                         swap(m_buffer, buffer);
                     }
