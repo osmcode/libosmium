@@ -239,12 +239,12 @@ public:
             } else if (!std::strcmp(argv[i], "-s") || !std::strcmp(argv[i], "--search")) {
                 ++i;
                 if (i < argc) {
-                    m_ids.push_back(std::atoll(argv[i]));
+                    m_ids.push_back(std::atoll(argv[i])); // NOLINT(cert-err34-c)
                 } else {
                     print_usage(argv[0]);
                 }
             } else if (!std::strncmp(argv[i], "--search=", 9)) {
-                m_ids.push_back(std::atoll(argv[i] + 9));
+                m_ids.push_back(std::atoll(argv[i] + 9)); // NOLINT(cert-err34-c)
             } else if (!std::strcmp(argv[i], "-t") || !std::strcmp(argv[i], "--type")) {
                 ++i;
                 if (i < argc) {

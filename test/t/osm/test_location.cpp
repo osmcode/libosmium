@@ -172,8 +172,8 @@ TEST_CASE("Location hash") {
 void C(const char* s, int32_t v, const char* r = "") {
     std::string strm{"-"};
     strm += s;
-    REQUIRE(std::atof(strm.c_str() + 1) == Approx( v / 10000000.0));
-    REQUIRE(std::atof(strm.c_str()    ) == Approx(-v / 10000000.0));
+    REQUIRE(std::atof(strm.c_str() + 1) == Approx( v / 10000000.0)); // NOLINT(cert-err34-c)
+    REQUIRE(std::atof(strm.c_str()    ) == Approx(-v / 10000000.0)); // NOLINT(cert-err34-c)
     const char* x = strm.c_str() + 1;
     const char** data = &x;
     REQUIRE(osmium::detail::string_to_location_coordinate(data) == v);
