@@ -206,7 +206,7 @@ namespace osmium {
             }
 
             static unsigned char bitmask(T id) noexcept {
-                return 1 << (id & 0x7u);
+                return 1u << (id & 0x7u);
             }
 
             T last() const noexcept {

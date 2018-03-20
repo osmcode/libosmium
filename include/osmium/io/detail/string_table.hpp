@@ -211,12 +211,12 @@ namespace osmium {
 
             struct djb2_hash {
 
-                size_t operator()(const char* str) const noexcept {
-                    size_t hash = 5381;
+                std::size_t operator()(const char* str) const noexcept {
+                    std::size_t hash = 5381;
                     int c;
 
                     while ((c = *str++)) {
-                        hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+                        hash = ((hash << 5u) + hash) + c; /* hash * 33 + c */
                     }
 
                     return hash;
