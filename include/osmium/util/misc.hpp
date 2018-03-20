@@ -78,10 +78,9 @@ namespace osmium {
         template <typename TReturn>
         inline TReturn str_to_int(const char* str) {
             assert(str);
-            errno = 0;
-            char* end;
+            char* end = nullptr;
             const auto value = std::strtoll(str, &end, 10);
-            if (errno != 0 || value < 0 || value >= get_max_int<TReturn>() || *end != '\0') {
+            if (value < 0 || value >= get_max_int<TReturn>() || end == nullptr || *end != '\0') {
                 return 0;
             }
 
