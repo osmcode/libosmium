@@ -55,16 +55,6 @@ namespace osmium {
 
     namespace detail {
 
-        template <typename T>
-        inline long long get_max_int() noexcept { // NOLINT(google-runtime-int)
-            return static_cast<long long>(std::numeric_limits<T>::max()); // NOLINT(google-runtime-int)
-        }
-
-        template <>
-        inline long long get_max_int<uint64_t>() noexcept { // NOLINT(google-runtime-int)
-            return std::numeric_limits<long long>::max(); // NOLINT(google-runtime-int)
-        }
-
         /**
          * Interpret the input string as number. Leading white space is
          * ignored. If there is any error, return 0.
@@ -75,12 +65,15 @@ namespace osmium {
          * @pre @code str != nullptr @endcode
          *
          */
+
         template <typename TReturn>
         inline TReturn str_to_int(const char* str) {
+            static_assert(std::is_integral<TReturn>::value, "Must be integral type");
+            using r_type = typename std::conditional<std::is_unsigned<TReturn>::value, unsigned long long, long long>::type;
             assert(str);
             char* end = nullptr;
             const auto value = std::strtoll(str, &end, 10);
-            if (value < 0 || value >= get_max_int<TReturn>() || end == nullptr || *end != '\0') {
+            if (value < 0 || value == std::numeric_limits<long long>::max() || static_cast<r_type>(value) >= std::numeric_limits<TReturn>::max() || end == nullptr || *end != '\0') {
                 return 0;
             }
 
