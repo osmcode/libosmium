@@ -198,7 +198,7 @@ namespace osmium {
 
         }; // class Options
 
-    } // inline namespace util
+    } // namespace util
 
 } // namespace osmium
 

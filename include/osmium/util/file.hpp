@@ -233,7 +233,7 @@ namespace osmium {
 #endif
         }
 
-    } // inline namespace util
+    } // namespace util
 
 } // namespace osmium
 

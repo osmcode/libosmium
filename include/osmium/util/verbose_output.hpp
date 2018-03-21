@@ -130,7 +130,7 @@ namespace osmium {
             return verbose_output;
         }
 
-    } // inline namespace util
+    } // namespace util
 
 } // namespace osmium
 

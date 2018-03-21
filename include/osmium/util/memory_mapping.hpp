@@ -506,7 +506,7 @@ namespace osmium {
 
         }; // class AnonymousTypedMemoryMapping
 
-    } // inline namespace util
+    } // namespace util
 
 } // namespace osmium
 
@@ -637,7 +637,7 @@ namespace osmium {
             return static_cast<DWORD>(x & 0xffffffff);
         }
 
-    } // inline namespace util
+    } // namespace util
 
 } // namespace osmium
 

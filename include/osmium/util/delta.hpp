@@ -122,7 +122,7 @@ namespace osmium {
 
         }; // class DeltaDecode
 
-    } // inline namespace util
+    } // namespace util
 
 } // namespace osmium
 

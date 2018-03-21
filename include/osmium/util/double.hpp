@@ -89,7 +89,7 @@ namespace osmium {
             double2string(std::back_inserter(out), value, precision);
         }
 
-    } // inline namespace util
+    } // namespace util
 
 } // namespace osmium
 
