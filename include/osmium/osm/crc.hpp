@@ -52,7 +52,7 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
-    namespace util {
+    inline namespace util {
 
         inline uint16_t byte_swap_16(uint16_t value) noexcept {
 #if defined(__GNUC__) || defined(__clang__)
@@ -83,7 +83,7 @@ namespace osmium {
 #endif
         }
 
-    } // namespace util
+    } // inline namespace util
 
     template <typename TCRC>
     class CRC {
@@ -112,7 +112,7 @@ namespace osmium {
 #if __BYTE_ORDER == __LITTLE_ENDIAN
             m_crc.process_bytes(&value, sizeof(uint16_t));
 #else
-            const uint16_t v = osmium::util::byte_swap_16(value);
+            const uint16_t v = osmium::byte_swap_16(value);
             m_crc.process_bytes(&v, sizeof(uint16_t));
 #endif
         }
@@ -121,7 +121,7 @@ namespace osmium {
 #if __BYTE_ORDER == __LITTLE_ENDIAN
             m_crc.process_bytes(&value, sizeof(uint32_t));
 #else
-            const uint32_t v = osmium::util::byte_swap_32(value);
+            const uint32_t v = osmium::byte_swap_32(value);
             m_crc.process_bytes(&v, sizeof(uint32_t));
 #endif
         }
@@ -130,7 +130,7 @@ namespace osmium {
 #if __BYTE_ORDER == __LITTLE_ENDIAN
             m_crc.process_bytes(&value, sizeof(uint64_t));
 #else
-            const uint64_t v = osmium::util::byte_swap_64(value);
+            const uint64_t v = osmium::byte_swap_64(value);
             m_crc.process_bytes(&v, sizeof(uint64_t));
 #endif
         }

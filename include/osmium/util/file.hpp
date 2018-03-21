@@ -93,10 +93,10 @@ namespace osmium {
 
         }; // class disable_invalid_parameter_handler
 
-    }
+    } // namespace detail
 #endif
 
-    namespace util {
+    inline namespace util {
 
         /**
          * Get file size.
@@ -233,7 +233,7 @@ namespace osmium {
 #endif
         }
 
-    } // namespace util
+    } // inline namespace util
 
 } // namespace osmium
 

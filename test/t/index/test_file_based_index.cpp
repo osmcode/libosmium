@@ -11,7 +11,7 @@
 TEST_CASE("File based dense index") {
     const int fd = osmium::detail::create_tmp_file();
 
-    REQUIRE(osmium::util::file_size(fd) == 0);
+    REQUIRE(osmium::file_size(fd) == 0);
 
     const osmium::unsigned_object_id_type id1 = 6;
     const osmium::unsigned_object_id_type id2 = 3;
@@ -54,12 +54,12 @@ TEST_CASE("File based dense index") {
         REQUIRE(index.size() == 7);
         REQUIRE(std::distance(index.cbegin(), index.cend()) == 7);
 
-        REQUIRE(osmium::util::file_size(fd) >= (6 * S));
+        REQUIRE(osmium::file_size(fd) >= (6 * S));
     }
 
     {
         index_type index{fd};
-        REQUIRE(osmium::util::file_size(fd) >= (6 * S));
+        REQUIRE(osmium::file_size(fd) >= (6 * S));
 
         REQUIRE(index.size() == 7);
 
@@ -90,7 +90,7 @@ TEST_CASE("File based dense index") {
 TEST_CASE("File based sparse index") {
     const int fd = osmium::detail::create_tmp_file();
 
-    REQUIRE(osmium::util::file_size(fd) == 0);
+    REQUIRE(osmium::file_size(fd) == 0);
 
     const osmium::unsigned_object_id_type id1 = 6;
     const osmium::unsigned_object_id_type id2 = 3;
@@ -133,12 +133,12 @@ TEST_CASE("File based sparse index") {
         REQUIRE(index.size() == 2);
         REQUIRE(std::distance(index.cbegin(), index.cend()) == 2);
 
-        REQUIRE(osmium::util::file_size(fd) >= (2 * S));
+        REQUIRE(osmium::file_size(fd) >= (2 * S));
     }
 
     {
         index_type index{fd};
-        REQUIRE(osmium::util::file_size(fd) >= (2 * S));
+        REQUIRE(osmium::file_size(fd) >= (2 * S));
 
         REQUIRE(index.size() == 2);
 
