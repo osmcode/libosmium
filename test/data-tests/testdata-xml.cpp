@@ -250,6 +250,12 @@ TEST_CASE("Reading OSM XML 109: Using Reader") {
 
 // =============================================
 
+TEST_CASE("Reading OSM XML 110") {
+    test_fail<osmium::xml_error>("110-entity_declaration", "XML entities are not supported");
+}
+
+// =============================================
+
 TEST_CASE("Reading OSM XML 120: Direct") {
     std::string data = read_gz_file("120-correct_gzip_file_without_data", "osm.gz");
 
@@ -293,6 +299,42 @@ TEST_CASE("Reading OSM XML 121: Using Reader") {
 
 TEST_CASE("Reading OSM XML 122") {
     test_fail<osmium::xml_error>("122-no_osm_element", "Unknown top-level element: node");
+}
+
+// =============================================
+
+TEST_CASE("Reading OSM XML 123") {
+    test_fail<osmium::xml_error>("123-unknown_element_in_node", "Unknown element in <node>: nd");
+}
+
+// =============================================
+
+TEST_CASE("Reading OSM XML 124") {
+    test_fail<osmium::xml_error>("124-unknown_element_in_way", "Unknown element in <way>: member");
+}
+
+// =============================================
+
+TEST_CASE("Reading OSM XML 125") {
+    test_fail<osmium::xml_error>("125-unknown_element_in_relation", "Unknown element in <relation>: nd");
+}
+
+// =============================================
+
+TEST_CASE("Reading OSM XML 126") {
+    test_fail<osmium::xml_error>("126-wrong_member_type", "Unknown type on relation <member>");
+}
+
+// =============================================
+
+TEST_CASE("Reading OSM XML 127") {
+    test_fail<osmium::xml_error>("127-missing_member_type", "Unknown type on relation <member>");
+}
+
+// =============================================
+
+TEST_CASE("Reading OSM XML 128") {
+    test_fail<osmium::xml_error>("128-missing_member_ref", "Missing ref on relation <member>");
 }
 
 // =============================================
@@ -506,6 +548,33 @@ TEST_CASE("Reading OSM XML 200: Using Reader asking for ways") {
     osmium::memory::Buffer buffer = reader.read();
     REQUIRE(0 == buffer.committed());
     REQUIRE_FALSE(buffer);
+    reader.close();
+}
+
+TEST_CASE("Reading OSM XML 300: Change file") {
+    osmium::io::Reader reader{filename("300-change-file", "osc")};
+
+    const osmium::io::Header header{reader.header()};
+    REQUIRE(header.get("generator") == "testdata");
+
+    osmium::memory::Buffer buffer = reader.read();
+
+    auto it = buffer.select<osmium::Node>().begin();
+    REQUIRE(it != buffer.select<osmium::Node>().end());
+    REQUIRE(it->id() == 11);
+    REQUIRE(it->visible());
+
+    ++it;
+    REQUIRE(it->id() == 13);
+    REQUIRE_FALSE(it->visible());
+
+    ++it;
+    REQUIRE(it->id() == 14);
+    REQUIRE(it->visible());
+
+    ++it;
+    REQUIRE(it == buffer.select<osmium::Node>().end());
+
     reader.close();
 }
 
