@@ -8,6 +8,15 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+### Changed
+
+### Fixed
+
+
+## [2.14.0] - 2018-03-31
+
+### Added
+
 * Add `ReaderWithProgressBar` class. This wraps an `osmium::io::Reader` and an
   `osmium::ProgressBar` into a nice little package allowing easier use in the
   common case.
@@ -66,7 +75,7 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 * Add MSYS2 build to Appveyor and fixed some Windows compile issues. (Thanks
   to alex85k.)
 * Use array instead of map to store input/output format creators.
-* Update included `catch.hpp` to version 1.12.0.
+* Update included `catch.hpp` to version 1.12.1.
 
 ### Fixed
 
@@ -814,7 +823,8 @@ This project adheres to [Semantic Versioning](https://semver.org/).
   Doxygen (up to version 1.8.8). This version contains a workaround to fix
   this.
 
-[unreleased]: https://github.com/osmcode/libosmium/compare/v2.13.1...HEAD
+[unreleased]: https://github.com/osmcode/libosmium/compare/v2.14.0...HEAD
+[2.14.0]: https://github.com/osmcode/libosmium/compare/v2.13.1...v2.14.0
 [2.13.1]: https://github.com/osmcode/libosmium/compare/v2.13.0...v2.13.1
 [2.13.0]: https://github.com/osmcode/libosmium/compare/v2.12.2...v2.13.0
 [2.12.2]: https://github.com/osmcode/libosmium/compare/v2.12.1...v2.12.2
