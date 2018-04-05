@@ -83,7 +83,7 @@ namespace osmium {
 #endif
         }
 
-    } // inline namespace util
+    } // namespace util
 
     template <typename TCRC>
     class CRC {
