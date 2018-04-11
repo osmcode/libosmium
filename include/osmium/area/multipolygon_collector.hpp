@@ -70,6 +70,8 @@ namespace osmium {
          *
          * @tparam TAssembler Multipolygon Assembler class.
          * @pre The Ids of all objects must be unique in the input data.
+         *
+         * @deprecated Use MultipolygonManager instead.
          */
         template <typename TAssembler>
         class MultipolygonCollector : public osmium::relations::Collector<MultipolygonCollector<TAssembler>, false, true, false> {
