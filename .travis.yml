@@ -38,14 +38,14 @@ addons_shortcuts:
     apt:
       sources: [ 'ubuntu-toolchain-r-test', 'boost-latest' ]
       packages: [ 'libboost1.55-all-dev', 'libgdal-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin', 'clang-3.9']
-  addons_clang40: &clang40
-    apt:
-      sources: [ 'ubuntu-toolchain-r-test', 'boost-latest', 'llvm-toolchain-trusty-4.0' ]
-      packages: [ 'libboost1.55-all-dev', 'libgdal-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin', 'clang-4.0']
   addons_clang50: &clang50
     apt:
       sources: [ 'ubuntu-toolchain-r-test', 'boost-latest', 'llvm-toolchain-trusty-5.0' ]
       packages: [ 'libboost1.55-all-dev', 'libgdal-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin', 'clang-5.0', 'g++-6', 'gcc-6']
+  addons_clang60: &clang60
+    apt:
+      sources: [ 'ubuntu-toolchain-r-test', 'boost-latest', 'llvm-toolchain-trusty-6.0' ]
+      packages: [ 'libboost1.55-all-dev', 'libgdal-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin', 'clang-6.0', 'g++-6', 'gcc-6']
   addons_gcc48: &gcc48
     apt:
       sources: [ 'ubuntu-toolchain-r-test', 'boost-latest' ]
@@ -100,16 +100,6 @@ matrix:
       addons: *clang39
 
     - os: linux
-      compiler: linux-clang40-release
-      env: CC='clang-4.0' CXX='clang++-4.0' BUILD_TYPE='Release'
-      addons: *clang40
-
-    - os: linux
-      compiler: linux-clang40-dev
-      env: CC='clang-4.0' CXX='clang++-4.0' BUILD_TYPE='Dev'
-      addons: *clang40
-
-    - os: linux
       compiler: linux-clang50-release
       env: CC='clang-5.0' CXX='clang++-5.0' BUILD_TYPE='Release'
       addons: *clang50
@@ -118,6 +108,16 @@ matrix:
       compiler: linux-clang50-dev
       env: CC='clang-5.0' CXX='clang++-5.0' BUILD_TYPE='Dev'
       addons: *clang50
+
+    - os: linux
+      compiler: linux-clang60-release
+      env: CC='clang-6.0' CXX='clang++-6.0' BUILD_TYPE='Release'
+      addons: *clang60
+
+    - os: linux
+      compiler: linux-clang60-dev
+      env: CC='clang-6.0' CXX='clang++-6.0' BUILD_TYPE='Dev'
+      addons: *clang60
 
 # Disabled because it creates false-positives on the old travis systems
 #    - os: linux
