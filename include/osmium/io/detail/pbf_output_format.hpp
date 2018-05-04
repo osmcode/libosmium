@@ -309,7 +309,8 @@ namespace osmium {
                     if (m_options.add_metadata.user()) {
                         m_user_sids.push_back(m_delta_user_sid.update(m_stringtable.add(node.user())));
                     } else if (m_options.default_metadata_values) {
-                        m_user_sids.push_back(m_delta_user_sid.update(m_stringtable.add("")));
+                        // The first string in the string table is always an empty string.
+                        m_user_sids.push_back(0);
                     }
                     if (m_options.add_visible_flag) {
                         m_visibles.push_back(node.visible());
