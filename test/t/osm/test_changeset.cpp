@@ -29,8 +29,8 @@ TEST_CASE("Build changeset") {
     REQUIRE(7 == cs1.num_changes());
     REQUIRE(3 == cs1.num_comments());
     REQUIRE(cs1.closed());
-    REQUIRE(osmium::Timestamp(100) == cs1.created_at());
-    REQUIRE(osmium::Timestamp(200) == cs1.closed_at());
+    REQUIRE(osmium::Timestamp{100} == cs1.created_at());
+    REQUIRE(osmium::Timestamp{200} == cs1.closed_at());
     REQUIRE(1 == cs1.tags().size());
     REQUIRE(std::string("user") == cs1.user());
 
@@ -58,8 +58,8 @@ TEST_CASE("Build changeset") {
     REQUIRE(21 == cs2.num_changes());
     REQUIRE(0 == cs2.num_comments());
     REQUIRE_FALSE(cs2.closed());
-    REQUIRE(osmium::Timestamp(120) == cs2.created_at());
-    REQUIRE(osmium::Timestamp() == cs2.closed_at());
+    REQUIRE(osmium::Timestamp{120} == cs2.created_at());
+    REQUIRE(osmium::Timestamp{} == cs2.closed_at());
     REQUIRE(2 == cs2.tags().size());
     REQUIRE(std::string("user") == cs2.user());
 
@@ -73,13 +73,13 @@ TEST_CASE("Build changeset") {
     auto cit = cs2.discussion().begin();
 
     REQUIRE(cit != cs2.discussion().end());
-    REQUIRE(cit->date() == osmium::Timestamp(300));
+    REQUIRE(cit->date() == osmium::Timestamp{300});
     REQUIRE(cit->uid() == 10);
     REQUIRE(std::string("user2") == cit->user());
     REQUIRE(std::string("foo") == cit->text());
 
     REQUIRE(++cit != cs2.discussion().end());
-    REQUIRE(cit->date() == osmium::Timestamp(400));
+    REQUIRE(cit->date() == osmium::Timestamp{400});
     REQUIRE(cit->uid() == 9);
     REQUIRE(std::string("user") == cit->user());
     REQUIRE(std::string("bar") == cit->text());
@@ -107,9 +107,9 @@ TEST_CASE("Create changeset without helper") {
         }
 
         osmium::builder::ChangesetDiscussionBuilder disc_builder{builder};
-        disc_builder.add_comment(osmium::Timestamp(300), 10, "user2");
+        disc_builder.add_comment(osmium::Timestamp{300}, 10, "user2");
         disc_builder.add_comment_text("foo");
-        disc_builder.add_comment(osmium::Timestamp(400), 9, "user");
+        disc_builder.add_comment(osmium::Timestamp{400}, 9, "user");
         disc_builder.add_comment_text("bar");
     }
 
@@ -120,21 +120,21 @@ TEST_CASE("Create changeset without helper") {
     REQUIRE(7 == cs.num_changes());
     REQUIRE(2 == cs.num_comments());
     REQUIRE(cs.closed());
-    REQUIRE(osmium::Timestamp(100) == cs.created_at());
-    REQUIRE(osmium::Timestamp(200) == cs.closed_at());
+    REQUIRE(osmium::Timestamp{100} == cs.created_at());
+    REQUIRE(osmium::Timestamp{200} == cs.closed_at());
     REQUIRE(2 == cs.tags().size());
     REQUIRE(std::string("user") == cs.user());
 
     auto cit = cs.discussion().begin();
 
     REQUIRE(cit != cs.discussion().end());
-    REQUIRE(cit->date() == osmium::Timestamp(300));
+    REQUIRE(cit->date() == osmium::Timestamp{300});
     REQUIRE(cit->uid() == 10);
     REQUIRE(std::string("user2") == cit->user());
     REQUIRE(std::string("foo") == cit->text());
 
     REQUIRE(++cit != cs.discussion().end());
-    REQUIRE(cit->date() == osmium::Timestamp(400));
+    REQUIRE(cit->date() == osmium::Timestamp{400});
     REQUIRE(cit->uid() == 9);
     REQUIRE(std::string("user") == cit->user());
     REQUIRE(std::string("bar") == cit->text());
