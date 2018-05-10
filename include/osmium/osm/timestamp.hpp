@@ -49,7 +49,7 @@ namespace osmium {
 
     namespace detail {
 
-        inline void add_2digit_int_to_string(int value, std::string& out) {
+        inline void add_2digit_int_to_string(int value, std::string& out) noexcept {
             assert(value >= 0 && value <= 99);
             if (value > 9) {
                 const int dec = value / 10;
@@ -61,7 +61,7 @@ namespace osmium {
             out += static_cast<char>('0' + value);
         }
 
-        inline void add_4digit_int_to_string(int value, std::string& out) {
+        inline void add_4digit_int_to_string(int value, std::string& out) noexcept {
             assert(value >= 1000 && value <= 9999);
 
             const int dec1 = value / 1000;
