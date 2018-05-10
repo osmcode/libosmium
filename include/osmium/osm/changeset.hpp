@@ -366,6 +366,11 @@ namespace osmium {
             return reinterpret_cast<const char*>(data() + sizeof(Changeset));
         }
 
+        /// Clear user name.
+        void clear_user() noexcept {
+            std::memset(data() + sizeof(Changeset), 0, user_size());
+        }
+
         /// Get the list of tags.
         const TagList& tags() const {
             return osmium::detail::subitem_of_type<const TagList>(cbegin(), cend());

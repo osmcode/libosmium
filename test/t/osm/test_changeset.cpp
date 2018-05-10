@@ -142,3 +142,45 @@ TEST_CASE("Create changeset without helper") {
     REQUIRE(++cit == cs.discussion().end());
 }
 
+TEST_CASE("Change changeset") {
+    osmium::memory::Buffer buffer{10 * 1000};
+
+    osmium::builder::add_changeset(buffer,
+        _cid(42),
+        _created_at(time_t(100)),
+        _closed_at(time_t(200)),
+        _num_changes(7),
+        _num_comments(3),
+        _uid(9),
+        _user("user"),
+        _tag("comment", "foo")
+    );
+
+    osmium::Changeset& cs = buffer.get<osmium::Changeset>(0);
+
+    cs.set_id(12);
+    cs.set_created_at(time_t(200));
+    cs.set_closed_at(time_t(300));
+    cs.set_num_changes(3);
+    cs.set_num_comments(4);
+    cs.set_uid(10);
+    cs.clear_user();
+
+    REQUIRE(12 == cs.id());
+    REQUIRE(10 == cs.uid());
+    REQUIRE(3 == cs.num_changes());
+    REQUIRE(4 == cs.num_comments());
+    REQUIRE(cs.closed());
+    REQUIRE(osmium::Timestamp{200} == cs.created_at());
+    REQUIRE(osmium::Timestamp{300} == cs.closed_at());
+    REQUIRE(1 == cs.tags().size());
+    REQUIRE(std::string("") == cs.user());
+    REQUIRE(cs.tags().size() == 1);
+
+    auto it = cs.tags().begin();
+    REQUIRE(it->key() == std::string{"comment"});
+    REQUIRE(it->value() == std::string{"foo"});
+    ++it;
+    REQUIRE(it == cs.tags().end());
+}
+
