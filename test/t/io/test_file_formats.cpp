@@ -286,7 +286,7 @@ TEST_CASE("Unknown format 'bla=foo'") {
 }
 
 TEST_CASE("URL without format") {
-    const osmium::io::File f{"http://www.example.com/api"};
+    const osmium::io::File f{"https://www.example.com/api"};
     REQUIRE(osmium::io::file_format::xml == f.format());
     REQUIRE(osmium::io::file_compression::none == f.compression());
     REQUIRE_FALSE(f.has_multiple_object_versions());
@@ -294,7 +294,7 @@ TEST_CASE("URL without format") {
 }
 
 TEST_CASE("URL without format and filename") {
-    const osmium::io::File f{"http://planet.osm.org/pbf/planet-latest.osm.pbf"};
+    const osmium::io::File f{"https://planet.osm.org/pbf/planet-latest.osm.pbf"};
     REQUIRE(osmium::io::file_format::pbf == f.format());
     REQUIRE(osmium::io::file_compression::none == f.compression());
     REQUIRE_FALSE(f.has_multiple_object_versions());
@@ -302,7 +302,7 @@ TEST_CASE("URL without format and filename") {
 }
 
 TEST_CASE("URL with format") {
-    const osmium::io::File f{"http://www.example.com/api", "osh"};
+    const osmium::io::File f{"https://www.example.com/api", "osh"};
     REQUIRE(osmium::io::file_format::xml == f.format());
     REQUIRE(osmium::io::file_compression::none == f.compression());
     REQUIRE(f.has_multiple_object_versions());
