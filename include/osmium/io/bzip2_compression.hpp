@@ -148,7 +148,7 @@ namespace osmium {
                     m_bzfile = nullptr;
                     if (m_file) {
                         if (do_fsync()) {
-                            osmium::io::detail::reliable_fsync(::fileno(m_file));
+                            osmium::io::detail::reliable_fsync(fileno(m_file));
                         }
                         if (fclose(m_file) != 0) {
                             throw std::system_error{errno, std::system_category(), "Close failed"};
