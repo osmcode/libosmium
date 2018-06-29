@@ -76,6 +76,9 @@ namespace osmium {
                 /// Which metadata of objects should be added?
                 osmium::metadata_options add_metadata;
 
+                /// Write zeros to those metadata fields which should not be written?
+                bool use_default_metadata_values = false;
+
                 /// Should the visible flag be added to all OSM objects?
                 bool add_visible_flag = false;
 
@@ -148,26 +151,38 @@ namespace osmium {
 
                     if (m_options.add_metadata.version() && object.version()) {
                         write_attribute("version", object.version());
+                    } else if (m_options.use_default_metadata_values) {
+                        write_attribute("version", 0);
                     }
 
                     if (m_options.add_metadata.timestamp() && object.timestamp()) {
                         *m_out += " timestamp=\"";
                         *m_out += object.timestamp().to_iso();
                         *m_out += "\"";
+                    } else if (m_options.use_default_metadata_values) {
+                        *m_out += " timestamp=\"";
+                        *m_out += osmium::Timestamp().to_iso(true);
+                        *m_out += "\"";
                     }
 
                     if (m_options.add_metadata.uid() && object.uid()) {
                         write_attribute("uid", object.uid());
+                    } else if (m_options.use_default_metadata_values) {
+                        write_attribute("uid", 0);
                     }
 
                     if (m_options.add_metadata.user() && object.user()[0] != '\0') {
                         *m_out += " user=\"";
                         append_xml_encoded_string(*m_out, object.user());
                         *m_out += "\"";
+                    } else if (m_options.use_default_metadata_values) {
+                        *m_out += " user=\"\"";
                     }
 
                     if (m_options.add_metadata.changeset() && object.changeset()) {
                         write_attribute("changeset", object.changeset());
+                    } else if (m_options.use_default_metadata_values) {
+                        write_attribute("changeset", 0);
                     }
 
                     if (m_options.add_visible_flag) {
@@ -429,6 +444,7 @@ namespace osmium {
                 XMLOutputFormat(osmium::thread::Pool& pool, const osmium::io::File& file, future_string_queue_type& output_queue) :
                     OutputFormat(pool, output_queue) {
                     m_options.add_metadata      = osmium::metadata_options{file.get("add_metadata")};
+                    m_options.use_default_metadata_values = file.is_true("use_default_metadata_values");
                     m_options.use_change_ops    = file.is_true("xml_change_format");
                     m_options.add_visible_flag  = (file.has_multiple_object_versions() || file.is_true("force_visible_flag")) && !m_options.use_change_ops;
                     m_options.locations_on_ways = file.is_true("locations_on_ways");

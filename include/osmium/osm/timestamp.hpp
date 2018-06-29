@@ -238,11 +238,13 @@ namespace osmium {
          * Return the timestamp as string in ISO date/time
          * ("yyyy-mm-ddThh:mm:ssZ") format. If the timestamp is invalid, an
          * empty string will be returned.
+         *
+         * @param output_zero output the string even if it is 1970-01-01T00:00:00Z
          */
-        std::string to_iso() const {
+        std::string to_iso(const bool output_zero = false) const {
             std::string s;
 
-            if (m_timestamp != 0) {
+            if (m_timestamp != 0 || output_zero) {
                 struct tm tm;
                 time_t sse = seconds_since_epoch();
 #ifndef NDEBUG
