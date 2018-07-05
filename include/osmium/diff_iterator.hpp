@@ -49,6 +49,9 @@ namespace osmium {
      * An input iterator wrapping any iterator over OSMObjects. When
      * dereferenced it will yield DiffObject objects pointing to the
      * underlying OSMObjects.
+     *
+     * Note that this class uses a mutable member variable internally.
+     * It can not be used safely in multiple threads!
      */
     template <typename TBasicIterator>
     class DiffIterator {
