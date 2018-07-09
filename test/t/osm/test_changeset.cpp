@@ -156,7 +156,7 @@ TEST_CASE("Change changeset") {
         _tag("comment", "foo")
     );
 
-    osmium::Changeset& cs = buffer.get<osmium::Changeset>(0);
+    auto& cs = buffer.get<osmium::Changeset>(0);
 
     cs.set_id(12);
     cs.set_created_at(time_t(200));

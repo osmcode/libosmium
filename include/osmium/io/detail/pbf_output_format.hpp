@@ -195,7 +195,7 @@ namespace osmium {
                     // The following static_cast is okay, because
                     // blob_header_data is tiny.
 #ifndef _WIN32
-                    const uint32_t sz = htonl(static_cast<uint32_t>(blob_header_data.size()));
+                    const uint32_t sz = htonl(static_cast<uint32_t>(blob_header_data.size())); // NOLINT(hicpp-signed-bitwise)
 #else
                     uint32_t sz = static_cast<uint32_t>(blob_header_data.size());
                     protozero::detail::byteswap_inplace(&sz);

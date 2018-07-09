@@ -25,7 +25,7 @@ int main(int argc, char* argv[]) {
     osmium::io::Header header;
     osmium::io::Writer writer{output_file, header, osmium::io::overwrite::allow};
 
-    while (osmium::memory::Buffer buffer = reader.read()) {
+    while (osmium::memory::Buffer buffer = reader.read()) { // NOLINT(bugprone-use-after-move) Bug in clang-tidy https://bugs.llvm.org/show_bug.cgi?id=36516
         writer(std::move(buffer));
     }
 

@@ -105,12 +105,12 @@ namespace osmium {
                         return 0; // EOF
                     }
 
-                    #ifndef _WIN32
-                    const uint32_t size = ntohl(size_in_network_byte_order);
-                    #else
+#ifndef _WIN32
+                    const uint32_t size = ntohl(size_in_network_byte_order); // NOLINT(hicpp-signed-bitwise)
+#else
                     uint32_t size = size_in_network_byte_order;
                     protozero::detail::byteswap_inplace(&size);
-                    #endif
+#endif
 
                     if (size > static_cast<uint32_t>(max_blob_header_size)) {
                         throw osmium::pbf_error{"invalid BlobHeader size (> max_blob_header_size)"};
