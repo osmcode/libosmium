@@ -236,7 +236,7 @@ namespace osmium {
                 osmium::DeltaEncode<uint32_t, int64_t> m_delta_timestamp;
                 osmium::DeltaEncode<changeset_id_type, int64_t> m_delta_changeset;
                 osmium::DeltaEncode<user_id_type, int32_t> m_delta_uid;
-                osmium::DeltaEncode<uint32_t, int32_t> m_delta_user_sid;
+                osmium::DeltaEncode<int32_t, int32_t> m_delta_user_sid;
 
                 osmium::DeltaEncode<int64_t, int64_t> m_delta_lat;
                 osmium::DeltaEncode<int64_t, int64_t> m_delta_lon;
@@ -306,8 +306,8 @@ namespace osmium {
                     m_lons.push_back(m_delta_lon.update(lonlat2int(node.location().lon_without_check())));
 
                     for (const auto& tag : node.tags()) {
-                        m_tags.push_back(static_cast_with_assert<int32_t>(m_stringtable.add(tag.key())));
-                        m_tags.push_back(static_cast_with_assert<int32_t>(m_stringtable.add(tag.value())));
+                        m_tags.push_back(m_stringtable.add(tag.key()));
+                        m_tags.push_back(m_stringtable.add(tag.value()));
                     }
                     m_tags.push_back(0);
                 }
@@ -397,8 +397,18 @@ namespace osmium {
                     ++m_count;
                 }
 
-                uint32_t store_in_stringtable(const char* s) {
+                // There are two functions store_in_stringtable(_unsigned)
+                // here because of an inconsistency in the OSMPBF format
+                // specification. Both uint32 and sint32 types are used in
+                // the format for essentially the same thing.
+
+                int32_t store_in_stringtable(const char* s) {
                     return m_stringtable.add(s);
+                }
+
+                uint32_t store_in_stringtable_unsigned(const char* s) {
+                    // static_cast okay, because result of add is always >= 0
+                    return static_cast<uint32_t>(m_stringtable.add(s));
                 }
 
                 int count() const noexcept {
@@ -466,14 +476,14 @@ namespace osmium {
                     {
                         protozero::packed_field_uint32 field{pbf_object, protozero::pbf_tag_type(T::enum_type::packed_uint32_keys)};
                         for (const auto& tag : object.tags()) {
-                            field.add_element(m_primitive_block.store_in_stringtable(tag.key()));
+                            field.add_element(m_primitive_block.store_in_stringtable_unsigned(tag.key()));
                         }
                     }
 
                     {
                         protozero::packed_field_uint32 field{pbf_object, protozero::pbf_tag_type(T::enum_type::packed_uint32_vals)};
                         for (const auto& tag : object.tags()) {
-                            field.add_element(m_primitive_block.store_in_stringtable(tag.value()));
+                            field.add_element(m_primitive_block.store_in_stringtable_unsigned(tag.value()));
                         }
                     }
 
@@ -493,7 +503,7 @@ namespace osmium {
                             pbf_info.add_int32(OSMFormat::Info::optional_int32_uid, static_cast_with_assert<int32_t>(object.uid()));
                         }
                         if (m_options.add_metadata.user()) {
-                            pbf_info.add_uint32(OSMFormat::Info::optional_uint32_user_sid, m_primitive_block.store_in_stringtable(object.user()));
+                            pbf_info.add_uint32(OSMFormat::Info::optional_uint32_user_sid, m_primitive_block.store_in_stringtable_unsigned(object.user()));
                         }
                         if (m_options.add_visible_flag) {
                             pbf_info.add_bool(OSMFormat::Info::optional_bool_visible, object.visible());
