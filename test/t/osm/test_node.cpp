@@ -1,10 +1,10 @@
 #include "catch.hpp"
 
+#include "test_crc.hpp"
+
 #include <osmium/builder/attr.hpp>
 #include <osmium/osm/crc.hpp>
 #include <osmium/osm/node.hpp>
-
-#include <boost/crc.hpp>
 
 using namespace osmium::builder::attr; // NOLINT(google-build-using-namespace)
 
@@ -41,7 +41,7 @@ TEST_CASE("Build node") {
     REQUIRE(osmium::Location(3.5, 4.7) == node.location());
     REQUIRE(2 == node.tags().size());
 
-    osmium::CRC<boost::crc_32_type> crc32;
+    osmium::CRC<crc_type> crc32;
     crc32.update(node);
     REQUIRE(crc32().checksum() == 0x7dc553f9);
 

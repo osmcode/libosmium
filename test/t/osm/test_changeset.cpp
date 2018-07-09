@@ -1,10 +1,10 @@
 #include "catch.hpp"
 
+#include "test_crc.hpp"
+
 #include <osmium/builder/attr.hpp>
 #include <osmium/osm/changeset.hpp>
 #include <osmium/osm/crc.hpp>
-
-#include <boost/crc.hpp>
 
 using namespace osmium::builder::attr; // NOLINT(google-build-using-namespace)
 
@@ -34,7 +34,7 @@ TEST_CASE("Build changeset") {
     REQUIRE(1 == cs1.tags().size());
     REQUIRE(std::string("user") == cs1.user());
 
-    osmium::CRC<boost::crc_32_type> crc32;
+    osmium::CRC<crc_type> crc32;
     crc32.update(cs1);
     REQUIRE(crc32().checksum() == 0x502e8c0e);
 

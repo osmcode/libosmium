@@ -10,6 +10,15 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+* Add support for using the CRC32 implementation from the zlib library in
+  addition to the one from Boost. It is significantly faster and means we
+  have one less dependency, because zlib is needed anyway in almost all
+  programs using Osmium due to its use in the PBF format. Set macro
+  `OSMIUM_TEST_CRC_USE_BOOST` before compiling the tests, if you want to
+  run the tests with the boost library code, otherwise it will use the
+  zlib code. Note that to use this you have to change your software slightly,
+  see the documentation of the `CRC_zlib` class for details.
+
 ### Fixed
 
 
