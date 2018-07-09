@@ -459,6 +459,7 @@ if(CLANG_TIDY)
     add_custom_target(clang-tidy
         ${CLANG_TIDY}
         -p ${CMAKE_BINARY_DIR}
+        "-extra-arg=-Wno-#pragma-messages"
         ${CT_CHECK_FILES}
     )
 else()
