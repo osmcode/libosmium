@@ -104,7 +104,7 @@ namespace osmium {
                 str[17] >= '0' && str[17] <= '9' &&
                 str[18] >= '0' && str[18] <= '9' &&
                 str[19] == 'Z') {
-                struct tm tm;
+                std::tm tm; // NOLINT(cppcoreguidelines-pro-type-member-init,hicpp-member-init)
                 tm.tm_year = (str[ 0] - '0') * 1000 +
                              (str[ 1] - '0') *  100 +
                              (str[ 2] - '0') *   10 +
@@ -243,7 +243,7 @@ namespace osmium {
             std::string s;
 
             if (m_timestamp != 0) {
-                struct tm tm;
+                std::tm tm; // NOLINT(cppcoreguidelines-pro-type-member-init,hicpp-member-init)
                 time_t sse = seconds_since_epoch();
 #ifndef NDEBUG
                 auto result =
