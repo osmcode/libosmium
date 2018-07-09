@@ -58,7 +58,6 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/types.hpp>
 #include <osmium/osm/way.hpp>
 #include <osmium/thread/pool.hpp>
-#include <osmium/util/cast.hpp>
 #include <osmium/util/delta.hpp>
 #include <osmium/util/misc.hpp>
 #include <osmium/visitor.hpp>
@@ -185,12 +184,20 @@ namespace osmium {
                     protozero::pbf_builder<FileFormat::BlobHeader> pbf_blob_header{blob_header_data};
 
                     pbf_blob_header.add_string(FileFormat::BlobHeader::required_string_type, m_blob_type == pbf_blob_type::data ? "OSMData" : "OSMHeader");
-                    pbf_blob_header.add_int32(FileFormat::BlobHeader::required_int32_datasize, static_cast_with_assert<int32_t>(blob_data.size()));
 
+                    // The static_cast is okay, because the size can never
+                    // be much larger than max_uncompressed_blob_size. This
+                    // is due to the assert above and the fact that the zlib
+                    // library will not grow deflated data beyond the original
+                    // data plus a few header bytes (https://zlib.net/zlib_tech.html).
+                    pbf_blob_header.add_int32(FileFormat::BlobHeader::required_int32_datasize, static_cast<int32_t>(blob_data.size()));
+
+                    // The following static_cast is okay, because
+                    // blob_header_data is tiny.
 #ifndef _WIN32
-                    const uint32_t sz = htonl(static_cast_with_assert<uint32_t>(blob_header_data.size()));
+                    const uint32_t sz = htonl(static_cast<uint32_t>(blob_header_data.size()));
 #else
-                    uint32_t sz = static_cast_with_assert<uint32_t>(blob_header_data.size());
+                    uint32_t sz = static_cast<uint32_t>(blob_header_data.size());
                     protozero::detail::byteswap_inplace(&sz);
 #endif
 
@@ -284,7 +291,8 @@ namespace osmium {
                     m_ids.push_back(m_delta_id.update(node.id()));
 
                     if (m_options.add_metadata.version()) {
-                        m_versions.push_back(static_cast_with_assert<int32_t>(node.version()));
+                        assert(node.version() <= std::numeric_limits<int32_t>::max());
+                        m_versions.push_back(static_cast<int32_t>(node.version()));
                     }
                     if (m_options.add_metadata.timestamp()) {
                         m_timestamps.push_back(m_delta_timestamp.update(uint32_t(node.timestamp())));
@@ -491,7 +499,8 @@ namespace osmium {
                         protozero::pbf_builder<OSMFormat::Info> pbf_info{pbf_object, T::enum_type::optional_Info_info};
 
                         if (m_options.add_metadata.version()) {
-                            pbf_info.add_int32(OSMFormat::Info::optional_int32_version, static_cast_with_assert<int32_t>(object.version()));
+                            assert(object.version() <= std::numeric_limits<int32_t>::max());
+                            pbf_info.add_int32(OSMFormat::Info::optional_int32_version, static_cast<int32_t>(object.version()));
                         }
                         if (m_options.add_metadata.timestamp()) {
                             pbf_info.add_int64(OSMFormat::Info::optional_int64_timestamp, uint32_t(object.timestamp()));
@@ -500,7 +509,8 @@ namespace osmium {
                             pbf_info.add_int64(OSMFormat::Info::optional_int64_changeset, object.changeset());
                         }
                         if (m_options.add_metadata.uid()) {
-                            pbf_info.add_int32(OSMFormat::Info::optional_int32_uid, static_cast_with_assert<int32_t>(object.uid()));
+                            assert(object.uid() <= std::numeric_limits<int32_t>::max());
+                            pbf_info.add_int32(OSMFormat::Info::optional_int32_uid, static_cast<int32_t>(object.uid()));
                         }
                         if (m_options.add_metadata.user()) {
                             pbf_info.add_uint32(OSMFormat::Info::optional_uint32_user_sid, m_primitive_block.store_in_stringtable_unsigned(object.user()));

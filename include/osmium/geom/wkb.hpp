@@ -35,7 +35,6 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/geom/coordinates.hpp>
 #include <osmium/geom/factory.hpp>
-#include <osmium/util/cast.hpp>
 #include <osmium/util/endian.hpp>
 
 #include <algorithm>
