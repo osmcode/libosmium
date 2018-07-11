@@ -44,6 +44,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/thread/util.hpp>
 #include <osmium/util/config.hpp>
 
+#include <protozero/byteswap.hpp>
 #include <protozero/pbf_message.hpp>
 #include <protozero/types.hpp>
 
@@ -105,12 +106,8 @@ namespace osmium {
                         return 0; // EOF
                     }
 
-#ifndef _WIN32
-                    const uint32_t size = ntohl(size_in_network_byte_order); // NOLINT(hicpp-signed-bitwise)
-#else
                     uint32_t size = size_in_network_byte_order;
-                    protozero::detail::byteswap_inplace(&size);
-#endif
+                    ::protozero::byteswap_inplace(&size);
 
                     if (size > static_cast<uint32_t>(max_blob_header_size)) {
                         throw osmium::pbf_error{"invalid BlobHeader size (> max_blob_header_size)"};

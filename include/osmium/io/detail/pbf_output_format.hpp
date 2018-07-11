@@ -62,6 +62,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/util/misc.hpp>
 #include <osmium/visitor.hpp>
 
+#include <protozero/byteswap.hpp>
 #include <protozero/pbf_builder.hpp>
 #include <protozero/pbf_writer.hpp>
 #include <protozero/types.hpp>
@@ -192,14 +193,8 @@ namespace osmium {
                     // data plus a few header bytes (https://zlib.net/zlib_tech.html).
                     pbf_blob_header.add_int32(FileFormat::BlobHeader::required_int32_datasize, static_cast<int32_t>(blob_data.size()));
 
-                    // The following static_cast is okay, because
-                    // blob_header_data is tiny.
-#ifndef _WIN32
-                    const uint32_t sz = htonl(static_cast<uint32_t>(blob_header_data.size())); // NOLINT(hicpp-signed-bitwise)
-#else
                     uint32_t sz = static_cast<uint32_t>(blob_header_data.size());
-                    protozero::detail::byteswap_inplace(&sz);
-#endif
+                    ::protozero::byteswap_inplace(&sz);
 
                     // write to output: the 4-byte BlobHeader-Size followed by the BlobHeader followed by the Blob
                     std::string output;
