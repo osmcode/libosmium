@@ -134,7 +134,8 @@ TEST_CASE("debug encoding of non-printable characters in the first 127 character
 }
 
 TEST_CASE("test codepoint to utf8 encoding") {
-    const char* s = u8"\n_\u01a2_\u30dc_\U0001d11e_\U0001f680";
+    const char s[] = u8"\n_\u01a2_\u30dc_\U0001d11e_\U0001f680";
+
     std::string out;
     osmium::io::detail::append_codepoint_as_utf8(0x0au, std::back_inserter(out)); // 1 utf8 byte
     REQUIRE(out.size() == 1);
@@ -155,5 +156,54 @@ TEST_CASE("test codepoint to utf8 encoding") {
     osmium::io::detail::append_codepoint_as_utf8(0x1f680u, std::back_inserter(out)); // 4 utf8 bytes
     REQUIRE(out.size() == 18);
     REQUIRE(out == s);
+}
+
+TEST_CASE("test utf8 to codepoint decoding") {
+    const char s[] = u8"\n_\u01a2_\u30dc_\U0001d11e_\U0001f680";
+
+    auto it = s;
+    REQUIRE(osmium::io::detail::next_utf8_codepoint(&it, std::end(s)) == 0x0au);
+    REQUIRE(osmium::io::detail::next_utf8_codepoint(&it, std::end(s)) == '_');
+    REQUIRE(osmium::io::detail::next_utf8_codepoint(&it, std::end(s)) == 0x01a2u);
+    REQUIRE(osmium::io::detail::next_utf8_codepoint(&it, std::end(s)) == '_');
+    REQUIRE(osmium::io::detail::next_utf8_codepoint(&it, std::end(s)) == 0x30dcu);
+    REQUIRE(osmium::io::detail::next_utf8_codepoint(&it, std::end(s)) == '_');
+    REQUIRE(osmium::io::detail::next_utf8_codepoint(&it, std::end(s)) == 0x1d11eu);
+    REQUIRE(osmium::io::detail::next_utf8_codepoint(&it, std::end(s)) == '_');
+    REQUIRE(osmium::io::detail::next_utf8_codepoint(&it, std::end(s)) == 0x1f680u);
+
+    REQUIRE(*it++ == '\0');
+    REQUIRE(it == std::end(s));
+}
+
+TEST_CASE("Roundtrip unicode characters") {
+    char s[4] = {0};
+
+    const uint32_t max_code_point = 0x10ffffu;
+    for (uint32_t cp = 0; cp <= max_code_point; ++cp) {
+        auto end = osmium::io::detail::append_codepoint_as_utf8(cp, s);
+        const char* it = s;
+        REQUIRE(osmium::io::detail::next_utf8_codepoint(&it, std::end(s)) == cp);
+        REQUIRE(end == it);
+    }
+}
+
+TEST_CASE("invalid codepoint") {
+    const char s[] = {static_cast<char>(0xff), static_cast<char>(0xff), static_cast<char>(0xff), static_cast<char>(0xff)};
+    const char* it = s;
+    REQUIRE_THROWS_AS(osmium::io::detail::next_utf8_codepoint(&it, std::end(s)), const std::runtime_error&);
+}
+
+TEST_CASE("incomplete Unicode codepoint") {
+    const char s[] = u8"\U0001f680";
+
+    auto it = s;
+    REQUIRE(osmium::io::detail::next_utf8_codepoint(&it, std::end(s) - 1) == 0x1f680u);
+    REQUIRE(std::distance(s, it) == 4);
+
+    for (int i : {0, 1, 2, 3}) {
+        it = s;
+        REQUIRE_THROWS_AS(osmium::io::detail::next_utf8_codepoint(&it, s + i), const std::out_of_range&);
+    }
 }
 
