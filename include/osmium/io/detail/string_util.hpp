@@ -225,6 +225,27 @@ namespace osmium {
                 }
             }
 
+            template <typename TOutputIterator>
+            TOutputIterator append_codepoint_as_utf8(uint32_t cp, TOutputIterator out)
+            {
+                if (cp < 0x80ul) {
+                    *(out++) = static_cast<uint8_t>(cp);
+                } else if (cp < 0x800ul) {
+                    *(out++) = static_cast<uint8_t>( (cp >>  6u)          | 0xc0u);
+                    *(out++) = static_cast<uint8_t>(( cp         & 0x3fu) | 0x80u);
+                } else if (cp < 0x10000ul) {
+                    *(out++) = static_cast<uint8_t>( (cp >> 12u)          | 0xe0u);
+                    *(out++) = static_cast<uint8_t>(((cp >>  6u) & 0x3fu) | 0x80u);
+                    *(out++) = static_cast<uint8_t>(( cp         & 0x3fu) | 0x80u);
+                } else {
+                    *(out++) = static_cast<uint8_t>( (cp >> 18u)          | 0xf0u);
+                    *(out++) = static_cast<uint8_t>(((cp >> 12u) & 0x3fu) | 0x80u);
+                    *(out++) = static_cast<uint8_t>(((cp >>  6u) & 0x3fu) | 0x80u);
+                    *(out++) = static_cast<uint8_t>(( cp         & 0x3fu) | 0x80u);
+                }
+                return out;
+            }
+
         } // namespace detail
 
     } // namespace io
