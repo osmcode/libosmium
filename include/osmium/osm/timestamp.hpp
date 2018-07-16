@@ -49,7 +49,7 @@ namespace osmium {
 
     namespace detail {
 
-        inline void add_2digit_int_to_string(int value, std::string& out) noexcept {
+        inline void add_2digit_int_to_string(int value, std::string& out) {
             assert(value >= 0 && value <= 99);
             if (value > 9) {
                 const int dec = value / 10;
@@ -61,7 +61,7 @@ namespace osmium {
             out += static_cast<char>('0' + value);
         }
 
-        inline void add_4digit_int_to_string(int value, std::string& out) noexcept {
+        inline void add_4digit_int_to_string(int value, std::string& out) {
             assert(value >= 1000 && value <= 9999);
 
             const int dec1 = value / 1000;
@@ -145,6 +145,34 @@ namespace osmium {
     class Timestamp {
 
         uint32_t m_timestamp = 0;
+
+        void to_iso_str(std::string& s) const {
+            std::tm tm; // NOLINT(cppcoreguidelines-pro-type-member-init,hicpp-member-init)
+            time_t sse = seconds_since_epoch();
+#ifndef NDEBUG
+            auto result =
+#endif
+#ifndef _WIN32
+            gmtime_r(&sse, &tm);
+            assert(result != nullptr);
+#else
+            gmtime_s(&tm, &sse);
+            assert(result == 0);
+#endif
+
+            detail::add_4digit_int_to_string(tm.tm_year + 1900, s);
+            s += '-';
+            detail::add_2digit_int_to_string(tm.tm_mon + 1, s);
+            s += '-';
+            detail::add_2digit_int_to_string(tm.tm_mday, s);
+            s += 'T';
+            detail::add_2digit_int_to_string(tm.tm_hour, s);
+            s += ':';
+            detail::add_2digit_int_to_string(tm.tm_min, s);
+            s += ':';
+            detail::add_2digit_int_to_string(tm.tm_sec, s);
+            s += 'Z';
+        }
 
     public:
 
@@ -243,32 +271,21 @@ namespace osmium {
             std::string s;
 
             if (m_timestamp != 0) {
-                std::tm tm; // NOLINT(cppcoreguidelines-pro-type-member-init,hicpp-member-init)
-                time_t sse = seconds_since_epoch();
-#ifndef NDEBUG
-                auto result =
-#endif
-#ifndef _WIN32
-                gmtime_r(&sse, &tm);
-                assert(result != nullptr);
-#else
-                gmtime_s(&tm, &sse);
-                assert(result == 0);
-#endif
-
-                detail::add_4digit_int_to_string(tm.tm_year + 1900, s);
-                s += '-';
-                detail::add_2digit_int_to_string(tm.tm_mon + 1, s);
-                s += '-';
-                detail::add_2digit_int_to_string(tm.tm_mday, s);
-                s += 'T';
-                detail::add_2digit_int_to_string(tm.tm_hour, s);
-                s += ':';
-                detail::add_2digit_int_to_string(tm.tm_min, s);
-                s += ':';
-                detail::add_2digit_int_to_string(tm.tm_sec, s);
-                s += 'Z';
+                to_iso_str(s);
             }
+
+            return s;
+        }
+
+        /**
+         * Return the timestamp as string in ISO date/time
+         * ("yyyy-mm-ddThh:mm:ssZ") format. If the timestamp is invalid, the
+         * string "1970-01-01T00:00:00Z" will be returned.
+         */
+        std::string to_iso_all() const {
+            std::string s;
+
+            to_iso_str(s);
 
             return s;
         }

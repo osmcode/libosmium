@@ -152,7 +152,7 @@ namespace osmium {
 
                     if (m_options.add_metadata.timestamp() && object.timestamp()) {
                         *m_out += " timestamp=\"";
-                        *m_out += object.timestamp().to_iso();
+                        *m_out += object.timestamp().to_iso_all();
                         *m_out += "\"";
                     }
 
@@ -198,7 +198,7 @@ namespace osmium {
                         *m_out += " user=\"";
                         append_xml_encoded_string(*m_out, comment.user());
                         *m_out += "\" date=\"";
-                        *m_out += comment.date().to_iso();
+                        *m_out += comment.date().to_iso_all();
                         *m_out += "\">\n";
                         *m_out += "    <text>";
                         append_xml_encoded_string(*m_out, comment.text());
