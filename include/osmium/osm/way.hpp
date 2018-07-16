@@ -108,16 +108,38 @@ namespace osmium {
         }
 
         /**
-         * Do the nodes in this way form a closed ring?
+         * Checks whether the first and last node in the way have the
+         * same ID. The locations are not checked.
+         *
+         * Complexity: Constant.
+         *
+         * @pre @code !empty() @endcode
          */
-        bool is_closed() const {
+        bool is_closed() const noexcept {
             return nodes().is_closed();
         }
 
-        bool ends_have_same_id() const {
+        /**
+         * Checks whether the first and last node in the way have the
+         * same ID. The locations are not checked.
+         *
+         * Complexity: Constant.
+         *
+         * @pre @code !empty() @endcode
+         */
+        bool ends_have_same_id() const noexcept {
             return nodes().ends_have_same_id();
         }
 
+        /**
+         * Checks whether the first and last node in the way have the
+         * same location. The IDs are not checked.
+         *
+         * Complexity: Constant.
+         *
+         * @pre @code !empty() @endcode
+         * @pre @code front().location() && back().location() @endcode
+         */
         bool ends_have_same_location() const {
             return nodes().ends_have_same_location();
         }

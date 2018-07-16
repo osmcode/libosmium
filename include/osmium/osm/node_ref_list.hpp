@@ -149,6 +149,7 @@ namespace osmium {
          * @pre @code !empty() @endcode
          */
         bool is_closed() const noexcept {
+            assert(!empty());
             return ends_have_same_id();
         }
 
@@ -161,6 +162,7 @@ namespace osmium {
          * @pre @code !empty() @endcode
          */
         bool ends_have_same_id() const noexcept {
+            assert(!empty());
             return front().ref() == back().ref();
         }
 
@@ -174,6 +176,7 @@ namespace osmium {
          * @pre @code front().location() && back().location() @endcode
          */
         bool ends_have_same_location() const {
+            assert(!empty());
             assert(front().location() && back().location());
             return front().location() == back().location();
         }
