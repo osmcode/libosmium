@@ -176,7 +176,7 @@ namespace osmium {
         inline void resize_file(int fd, std::size_t new_size) {
 #ifdef _MSC_VER
             osmium::detail::disable_invalid_parameter_handler diph;
-            assert(new_size <= std::numeric_limits<__int64>::max());
+            assert(new_size <= static_cast<std::size_t>(std::numeric_limits<__int64>::max()));
             // https://msdn.microsoft.com/en-us/library/whx354w1.aspx
             if (::_chsize_s(fd, static_cast<__int64>(new_size)) != 0) {
 #else

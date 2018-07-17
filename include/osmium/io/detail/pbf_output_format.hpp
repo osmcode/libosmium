@@ -291,7 +291,7 @@ namespace osmium {
                     m_ids.push_back(m_delta_id.update(node.id()));
 
                     if (m_options.add_metadata.version()) {
-                        assert(node.version() <= std::numeric_limits<int32_t>::max());
+                        assert(node.version() <= static_cast<std::size_t>(std::numeric_limits<int32_t>::max()));
                         m_versions.push_back(static_cast<int32_t>(node.version()));
                     }
                     if (m_options.add_metadata.timestamp()) {
@@ -499,7 +499,7 @@ namespace osmium {
                         protozero::pbf_builder<OSMFormat::Info> pbf_info{pbf_object, T::enum_type::optional_Info_info};
 
                         if (m_options.add_metadata.version()) {
-                            assert(object.version() <= std::numeric_limits<int32_t>::max());
+                            assert(object.version() <= static_cast<std::size_t>(std::numeric_limits<int32_t>::max()));
                             pbf_info.add_int32(OSMFormat::Info::optional_int32_version, static_cast<int32_t>(object.version()));
                         }
                         if (m_options.add_metadata.timestamp()) {
@@ -509,7 +509,7 @@ namespace osmium {
                             pbf_info.add_int64(OSMFormat::Info::optional_int64_changeset, object.changeset());
                         }
                         if (m_options.add_metadata.uid()) {
-                            assert(object.uid() <= std::numeric_limits<int32_t>::max());
+                            assert(object.uid() <= static_cast<std::size_t>(std::numeric_limits<int32_t>::max()));
                             pbf_info.add_int32(OSMFormat::Info::optional_int32_uid, static_cast<int32_t>(object.uid()));
                         }
                         if (m_options.add_metadata.user()) {
