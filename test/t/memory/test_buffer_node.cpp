@@ -3,6 +3,10 @@
 #include <osmium/builder/osm_object_builder.hpp>
 #include <osmium/osm/node.hpp>
 
+#include <algorithm>
+#include <iterator>
+#include <string>
+
 void check_node_1(const osmium::Node& node) {
     REQUIRE(1 == node.id());
     REQUIRE(3 == node.version());

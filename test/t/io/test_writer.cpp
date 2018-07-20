@@ -9,7 +9,10 @@
 #include <osmium/memory/buffer.hpp>
 
 #include <algorithm>
+#include <iterator>
 #include <stdexcept>
+#include <string>
+#include <utility>
 
 static osmium::memory::Buffer get_buffer() {
     osmium::io::Reader reader{with_data_dir("t/io/data.osm")};

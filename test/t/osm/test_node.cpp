@@ -6,6 +6,8 @@
 #include <osmium/osm/crc.hpp>
 #include <osmium/osm/node.hpp>
 
+#include <string>
+
 using namespace osmium::builder::attr; // NOLINT(google-build-using-namespace)
 
 TEST_CASE("Build node") {

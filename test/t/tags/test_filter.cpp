@@ -8,6 +8,11 @@
 #include <osmium/tags/taglist.hpp>
 
 #include <algorithm>
+#include <initializer_list>
+#include <iterator>
+#include <regex>
+#include <utility>
+#include <vector>
 
 template <class TFilter>
 void check_filter(const osmium::TagList& tag_list,

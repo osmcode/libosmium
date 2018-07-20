@@ -8,6 +8,9 @@
 
 #include <algorithm>
 #include <cstring>
+#include <initializer_list>
+#include <string>
+#include <vector>
 
 namespace oid = osmium::io::detail;
 

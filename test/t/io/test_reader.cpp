@@ -9,6 +9,8 @@
 #include <osmium/memory/buffer.hpp>
 #include <osmium/visitor.hpp>
 
+#include <stdexcept>
+
 struct CountHandler : public osmium::handler::Handler {
 
     int count = 0;

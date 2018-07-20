@@ -6,6 +6,8 @@
 #include <osmium/osm/relation.hpp>
 #include <osmium/relations/relations_manager.hpp>
 
+#include <iterator>
+
 struct EmptyRM : public osmium::relations::RelationsManager<EmptyRM, true, true, true> {
 };
 

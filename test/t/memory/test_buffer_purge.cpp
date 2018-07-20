@@ -3,6 +3,8 @@
 #include <osmium/builder/osm_object_builder.hpp>
 #include <osmium/osm/node.hpp>
 
+#include <iterator>
+
 struct CallbackClass {
 
     int count = 0;

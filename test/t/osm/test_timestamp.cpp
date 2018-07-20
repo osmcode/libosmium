@@ -3,6 +3,7 @@
 #include <osmium/osm/timestamp.hpp>
 
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <vector>
 

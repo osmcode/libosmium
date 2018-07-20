@@ -2,7 +2,10 @@
 
 #include <osmium/io/detail/string_util.hpp>
 
+#include <iterator>
 #include <locale>
+#include <stdexcept>
+#include <string>
 
 TEST_CASE("output formatted with small results") {
     std::string out;

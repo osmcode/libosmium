@@ -4,6 +4,8 @@
 #include <osmium/memory/buffer.hpp>
 #include <osmium/osm.hpp>
 
+#include <string>
+
 TEST_CASE("create objects using builder") {
     osmium::memory::Buffer buffer{1024 * 10};
     std::string user;

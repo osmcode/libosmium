@@ -6,6 +6,8 @@
 #include <osmium/geom/wkb.hpp>
 #include <osmium/util/endian.hpp>
 
+#include <string>
+
 #if __BYTE_ORDER == __LITTLE_ENDIAN
 
 TEST_CASE("WKB geometry factory (byte-order-dependant), points") {

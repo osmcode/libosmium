@@ -5,6 +5,7 @@
 #include <osmium/io/compression.hpp>
 #include <osmium/io/xml_input.hpp>
 
+#include <stdexcept>
 #include <string>
 #include <utility>
 

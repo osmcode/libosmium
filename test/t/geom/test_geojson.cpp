@@ -5,6 +5,9 @@
 
 #include <osmium/geom/geojson.hpp>
 
+#include <iterator>
+#include <string>
+
 TEST_CASE("GeoJSON point geometry") {
     osmium::geom::GeoJSONFactory<> factory;
 

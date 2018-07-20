@@ -3,9 +3,7 @@
 #include <osmium/thread/pool.hpp>
 #include <osmium/util/compatibility.hpp>
 
-#include <chrono>
 #include <stdexcept>
-#include <thread>
 
 struct test_job_with_result {
     int operator()() const {

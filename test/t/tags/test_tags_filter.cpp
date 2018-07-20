@@ -5,6 +5,8 @@
 #include <osmium/tags/tags_filter.hpp>
 
 #include <functional>
+#include <iterator>
+#include <string>
 
 TEST_CASE("Tags filter") {
     osmium::memory::Buffer buffer{10240};

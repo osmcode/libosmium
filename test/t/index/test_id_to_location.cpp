@@ -14,6 +14,10 @@
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/types.hpp>
 
+#include <memory>
+#include <string>
+#include <vector>
+
 static_assert(osmium::index::empty_value<osmium::Location>() == osmium::Location{}, "Empty value for location is wrong");
 
 template <typename TIndex>

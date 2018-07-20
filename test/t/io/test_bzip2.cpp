@@ -5,6 +5,7 @@
 #include <osmium/io/bzip2_compression.hpp>
 
 #include <fcntl.h>
+#include <string>
 #include <sys/stat.h>
 #include <sys/types.h>
 

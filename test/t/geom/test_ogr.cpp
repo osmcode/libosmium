@@ -5,6 +5,8 @@
 
 #include <osmium/geom/ogr.hpp>
 
+#include <memory>
+
 TEST_CASE("OGR point geometry") {
     osmium::geom::OGRFactory<> factory;
 
