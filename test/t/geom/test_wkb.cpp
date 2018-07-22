@@ -32,14 +32,19 @@ TEST_CASE("WKB geometry factory (byte-order-dependant), points") {
         osmium::geom::WKBFactory<osmium::geom::MercatorProjection> factory{osmium::geom::wkb_type::wkb, osmium::geom::out_type::hex};
 
         const std::string wkb{factory.create_point(loc)};
-        REQUIRE(wkb == "010100000028706E7BF9BD1541D6A90093E48F1C41");
+        REQUIRE(wkb.substr(0, 10) == "0101000000"); // little endian, point type
+        REQUIRE(wkb.substr(10 + 2, 16 - 2) == "706E7BF9BD1541"); // x coordinate (without first (least significant) byte)
+        REQUIRE(wkb.substr(26 + 2, 16 - 2) == "A90093E48F1C41"); // y coordinate (without first (least significant) byte)
     }
 
     SECTION("point in ewkb in web mercator") {
         osmium::geom::WKBFactory<osmium::geom::MercatorProjection> factory{osmium::geom::wkb_type::ewkb, osmium::geom::out_type::hex};
 
         const std::string wkb{factory.create_point(loc)};
-        REQUIRE(wkb == "0101000020110F000028706E7BF9BD1541D6A90093E48F1C41");
+        REQUIRE(wkb.substr(0, 10) == "0101000020"); // little endian, point type (extended)
+        REQUIRE(wkb.substr(10, 8) == "110F0000"); // SRID 3857
+        REQUIRE(wkb.substr(18 + 2, 16 - 2) == "706E7BF9BD1541"); // x coordinate (without first (least significant) byte)
+        REQUIRE(wkb.substr(34 + 2, 16 - 2) == "A90093E48F1C41"); // y coordinate (without first (least significant) byte)
     }
 #endif
 
