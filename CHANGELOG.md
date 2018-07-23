@@ -13,6 +13,14 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 ### Fixed
 
 
+## [2.14.2] - 2018-07-23
+
+### Fixed
+
+* PBF reader and writer depended on byte order of system architecture.
+* Removed an unreliable test that didn't work on some architectures.
+
+
 ## [2.14.1] - 2018-07-23
 
 ### Changed
@@ -861,7 +869,8 @@ This project adheres to [Semantic Versioning](https://semver.org/).
   Doxygen (up to version 1.8.8). This version contains a workaround to fix
   this.
 
-[unreleased]: https://github.com/osmcode/libosmium/compare/v2.14.1...HEAD
+[unreleased]: https://github.com/osmcode/libosmium/compare/v2.14.2...HEAD
+[2.14.2]: https://github.com/osmcode/libosmium/compare/v2.14.1...v2.14.2
 [2.14.1]: https://github.com/osmcode/libosmium/compare/v2.14.0...v2.14.1
 [2.14.0]: https://github.com/osmcode/libosmium/compare/v2.13.1...v2.14.0
 [2.13.1]: https://github.com/osmcode/libosmium/compare/v2.13.0...v2.13.1
