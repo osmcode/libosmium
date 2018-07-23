@@ -62,7 +62,6 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/util/misc.hpp>
 #include <osmium/visitor.hpp>
 
-#include <protozero/byteswap.hpp>
 #include <protozero/pbf_builder.hpp>
 #include <protozero/pbf_writer.hpp>
 #include <protozero/types.hpp>
@@ -193,13 +192,16 @@ namespace osmium {
                     // data plus a few header bytes (https://zlib.net/zlib_tech.html).
                     pbf_blob_header.add_int32(FileFormat::BlobHeader::required_int32_datasize, static_cast<int32_t>(blob_data.size()));
 
-                    auto sz = static_cast<uint32_t>(blob_header_data.size());
-                    ::protozero::byteswap_inplace(&sz);
+                    const auto size = static_cast<uint32_t>(blob_header_data.size());
 
-                    // write to output: the 4-byte BlobHeader-Size followed by the BlobHeader followed by the Blob
+                    // write to output: the 4-byte BlobHeader size in network
+                    // byte order followed by the BlobHeader followed by the Blob
                     std::string output;
-                    output.reserve(sizeof(sz) + blob_header_data.size() + blob_data.size());
-                    output.append(reinterpret_cast<const char*>(&sz), sizeof(sz));
+                    output.reserve(4 + blob_header_data.size() + blob_data.size());
+                    output += static_cast<char>((size >> 24u) & 0xffu);
+                    output += static_cast<char>((size >> 16u) & 0xffu);
+                    output += static_cast<char>((size >>  8u) & 0xffu);
+                    output += static_cast<char>( size         & 0xffu);
                     output.append(blob_header_data);
                     output.append(blob_data);
 
