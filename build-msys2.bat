@@ -13,6 +13,9 @@ bash -lc "pacman -S --needed --noconfirm mingw-w64-x86_64-gcc mingw-w64-x86_64-g
 bash -lc "pacman -S --needed --noconfirm mingw-w64-x86_64-postgresql mingw-w64-x86_64-netcdf mingw-w64-x86_64-crypto++"
 call C:\msys64\mingw64\bin\gem.cmd install json
 
+REM Workaround for problem with gdal (see https://github.com/osmcode/libosmium/issues/262)
+copy /y C:\msys64\mingw64\bin\libjson-c-4.dll C:\msys64\mingw64\bin\libjson-c-3.dll
+
 echo "Setting PROJ_LIB variable for correct PROJ.4 working"
 set PROJ_LIB=c:\msys64\mingw64\share\proj
 
