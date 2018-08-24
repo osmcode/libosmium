@@ -176,6 +176,7 @@ add_unit_test(handler test_dynamic_handler)
 add_unit_test(index test_id_set)
 add_unit_test(index test_id_to_location ENABLE_IF ${SPARSEHASH_FOUND})
 add_unit_test(index test_file_based_index)
+add_unit_test(index test_dump_and_load_index)
 add_unit_test(index test_object_pointer_collection)
 add_unit_test(index test_relations_map)
 
