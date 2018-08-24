@@ -36,10 +36,10 @@ TEST_CASE("Dump DenseMmapArray, load as DenseFileArray") {
     dense_file_array file_index {fd};
 
     // test retrievals
-    REQUIRE(loc1 == index.get(id1));
-    REQUIRE(loc2 == index.get(id2));
-    REQUIRE(loc3 == index.get(id3));
-    REQUIRE_THROWS_AS(index.get(5), const osmium::not_found&);
-    REQUIRE_THROWS_AS(index.get(6), const osmium::not_found&);
-    REQUIRE_THROWS_AS(index.get(200), const osmium::not_found&);
+    REQUIRE(loc1 == file_index.get(id1));
+    REQUIRE(loc2 == file_index.get(id2));
+    REQUIRE(loc3 == file_index.get(id3));
+    REQUIRE_THROWS_AS(file_index.get(5), const osmium::not_found&);
+    REQUIRE_THROWS_AS(file_index.get(6), const osmium::not_found&);
+    REQUIRE_THROWS_AS(file_index.get(200), const osmium::not_found&);
 }
