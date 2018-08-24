@@ -221,6 +221,41 @@ namespace osmium {
                     std::sort(m_vector.begin(), m_vector.end());
                 }
 
+                void dump_as_array(const int fd) final {
+                    constexpr const size_t VALUE_SIZE = sizeof(TValue);
+                    constexpr const size_t BUFFER_SIZE = (10L * 1024L * 1024L) / VALUE_SIZE;
+                    TValue output_buffer[BUFFER_SIZE];
+                    // initialize with zeros
+                    for (size_t i = 0; i != BUFFER_SIZE; ++i) {
+                        output_buffer[i] = osmium::index::empty_value<TValue>();
+                    }
+                    size_t offset = 0;
+                    size_t buffer_start_id = 0;
+                    iterator it = begin();
+                    do {
+                        if (buffer_start_id + offset == it->first) {
+                            // first iteration, first element in vector is 0
+                            output_buffer[offset] = it->second;
+                            ++it;
+                            ++offset;
+                        } else if (it->first >= buffer_start_id + BUFFER_SIZE) {
+                            ++it;
+                            offset = BUFFER_SIZE;
+                        } else {
+                            ++offset;
+                        }
+                        if (offset == BUFFER_SIZE || it == end()) {
+                            osmium::io::detail::reliable_write(fd, reinterpret_cast<const char*>(output_buffer), BUFFER_SIZE);
+                            // clear buffer
+                            for (size_t i = 0; i != BUFFER_SIZE; ++i) {
+                                output_buffer[i] = osmium::index::empty_value<TValue>();
+                            }
+                            buffer_start_id = buffer_start_id + BUFFER_SIZE;
+                            offset = 0;
+                        }
+                    } while (it != end());
+                }
+
                 void dump_as_list(const int fd) final {
                     osmium::io::detail::reliable_write(fd, reinterpret_cast<const char*>(m_vector.data()), byte_size());
                 }
