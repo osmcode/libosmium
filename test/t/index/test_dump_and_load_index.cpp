@@ -14,7 +14,7 @@ template <class TMemoryIndex>
 void test_index() {
     const int fd = osmium::detail::create_tmp_file();
     REQUIRE(osmium::file_size(fd) == 0);
-    constexpr const size_t MIN_INDEX_SIZE = sizeof(dense_file_array::element_type);
+    constexpr const size_t ELEMENT_SIZE = sizeof(dense_file_array::element_type);
     const osmium::unsigned_object_id_type id1 = 12;
     const osmium::unsigned_object_id_type id2 = 3;
     const osmium::unsigned_object_id_type id3 = 7;
@@ -31,7 +31,7 @@ void test_index() {
     // dump to file
     index.dump_as_array(fd);
 
-    REQUIRE(osmium::file_size(fd) >= (3 * MIN_INDEX_SIZE));
+    REQUIRE(osmium::file_size(fd) >= (3 * ELEMENT_SIZE));
 
     // load index from file
     dense_file_array file_index {fd};
