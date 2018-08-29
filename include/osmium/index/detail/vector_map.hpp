@@ -41,6 +41,8 @@ DEALINGS IN THE SOFTWARE.
 #include <cstddef>
 #include <utility>
 
+#include <iostream>
+
 namespace osmium {
 
     namespace index {
@@ -224,7 +226,7 @@ namespace osmium {
                 void dump_as_array(const int fd) final {
                     constexpr const size_t VALUE_SIZE = sizeof(TValue);
                     constexpr const size_t BUFFER_SIZE = (10L * 1024L * 1024L) / VALUE_SIZE;
-                    TValue output_buffer[BUFFER_SIZE];
+                    TValue* output_buffer = new TValue[BUFFER_SIZE];
                     // initialize with zeros
                     for (size_t i = 0; i != BUFFER_SIZE; ++i) {
                         output_buffer[i] = osmium::index::empty_value<TValue>();
@@ -234,18 +236,20 @@ namespace osmium {
                     iterator it = begin();
                     do {
                         if (buffer_start_id + offset == it->first) {
-                            // first iteration, first element in vector is 0
+                            // current position in array is the right position for this index entry
                             output_buffer[offset] = it->second;
                             ++it;
                             ++offset;
                         } else if (it->first >= buffer_start_id + BUFFER_SIZE) {
-                            ++it;
+                            // ID of index entry is too large for this buffer, trigger writing of array by setting offset to BUFFER_SIZE.
                             offset = BUFFER_SIZE;
                         } else {
                             ++offset;
                         }
                         if (offset == BUFFER_SIZE || it == end()) {
-                            osmium::io::detail::reliable_write(fd, reinterpret_cast<const char*>(output_buffer), BUFFER_SIZE);
+                            // read test
+                            // write buffer
+                            osmium::io::detail::reliable_write(fd, reinterpret_cast<const unsigned char*>(output_buffer), BUFFER_SIZE * VALUE_SIZE);
                             // clear buffer
                             for (size_t i = 0; i != BUFFER_SIZE; ++i) {
                                 output_buffer[i] = osmium::index::empty_value<TValue>();
@@ -254,6 +258,7 @@ namespace osmium {
                             offset = 0;
                         }
                     } while (it != end());
+                    delete[] output_buffer;
                 }
 
                 void dump_as_list(const int fd) final {
