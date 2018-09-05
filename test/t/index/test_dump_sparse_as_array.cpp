@@ -44,19 +44,26 @@ TEST_CASE("Dump SparseMmapArray as array and load it as DenseFileArray") {
 
     dense_file_array dense_index{fd};
     const auto max_id_in_refs = std::max_element(refs.begin(), refs.end())->ref();
-    REQUIRE(osmium::file_size(fd) >= max_id_in_refs * sizeof(osmium::Location));
-    REQUIRE_THROWS_AS(dense_index.get(0),                   const osmium::not_found&);
-    REQUIRE_THROWS_AS(dense_index.get(buffer_size - 1),     const osmium::not_found&);
-    REQUIRE_THROWS_AS(dense_index.get(buffer_size),         const osmium::not_found&);
-    REQUIRE_THROWS_AS(dense_index.get(refs[1].ref() - 1),   const osmium::not_found&);
-    REQUIRE_THROWS_AS(dense_index.get(refs[1].ref() + 1),   const osmium::not_found&);
-    REQUIRE_THROWS_AS(dense_index.get(100),                 const osmium::not_found&);
-    REQUIRE_THROWS_AS(dense_index.get(refs[2].ref() - 1),   const osmium::not_found&);
-    REQUIRE_THROWS_AS(dense_index.get(buffer_size),         const osmium::not_found&);
-    REQUIRE_THROWS_AS(dense_index.get(4 * buffer_size),     const osmium::not_found&);
-    REQUIRE_THROWS_AS(dense_index.get(4 * buffer_size - 1), const osmium::not_found&);
 
+    // Array index should be as large as necessary.
+    REQUIRE(osmium::file_size(fd) >= max_id_in_refs * sizeof(osmium::Location));
+
+    // check beyond largest ID
+    REQUIRE_THROWS_AS(dense_index.get(max_id_in_refs + 1),           const osmium::not_found&);
+    // max_id_in_refs + buffer_size will not get written if the array is written in chunks
+    REQUIRE_THROWS_AS(dense_index.get(max_id_in_refs + buffer_size), const osmium::not_found&);
+
+    // check if written values can be retrieved
     for (auto& r : refs) {
         REQUIRE(dense_index.get(r.ref()) == r.location());
     }
+
+    // check if all other values are invalid locations
+    size_t invalid_count = 0;
+    for (osmium::object_id_type id = 0; id <= max_id_in_refs; ++id) {
+        if (!dense_index.get_noexcept(id).valid()) {
+            ++invalid_count;
+        }
+    }
+    REQUIRE(invalid_count == max_id_in_refs - refs.size() + 1);
 }
