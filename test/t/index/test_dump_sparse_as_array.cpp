@@ -11,9 +11,7 @@
 
 #include <vector>
 
-using sparse_mem_array = osmium::index::map::SparseMemArray<osmium::unsigned_object_id_type, osmium::Location>;
 using dense_file_array = osmium::index::map::DenseFileArray<osmium::unsigned_object_id_type, osmium::Location>;
-
 
 template <class TSparseIndex>
 void test_index() {
@@ -79,6 +77,9 @@ TEST_CASE("Dump SparseMmapArray as array and load it as DenseFileArray") {
 # pragma message("not running 'SparseMmapArray' test case on this machine")
 #endif
 
+using sparse_mem_array = osmium::index::map::SparseMemArray<osmium::unsigned_object_id_type, osmium::Location>;
+
 TEST_CASE("Dump SparseMemArray as array and load it as DenseFileArray") {
     test_index<sparse_mem_array>();
 }
+

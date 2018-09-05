@@ -2,19 +2,17 @@
 
 #include <osmium/index/detail/tmpfile.hpp>
 #include <osmium/index/map/dense_file_array.hpp>
-#include <osmium/index/map/dense_mmap_array.hpp>
 #include <osmium/index/map/dense_mem_array.hpp>
+#include <osmium/index/map/dense_mmap_array.hpp>
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/types.hpp>
 
-using dense_mem_array = osmium::index::map::DenseMemArray<osmium::unsigned_object_id_type, osmium::Location>;
 using dense_file_array = osmium::index::map::DenseFileArray<osmium::unsigned_object_id_type, osmium::Location>;
 
 template <class TMemoryIndex>
 void test_index() {
     const int fd = osmium::detail::create_tmp_file();
     REQUIRE(osmium::file_size(fd) == 0);
-    constexpr const size_t ELEMENT_SIZE = sizeof(dense_file_array::element_type);
     const osmium::unsigned_object_id_type id1 = 12;
     const osmium::unsigned_object_id_type id2 = 3;
     const osmium::unsigned_object_id_type id3 = 7;
@@ -31,10 +29,10 @@ void test_index() {
     // dump to file
     index.dump_as_array(fd);
 
-    REQUIRE(osmium::file_size(fd) >= (3 * ELEMENT_SIZE));
+    REQUIRE(osmium::file_size(fd) >= (3 * sizeof(dense_file_array::element_type)));
 
     // load index from file
-    dense_file_array file_index {fd};
+    dense_file_array file_index{fd};
 
     // test retrievals
     REQUIRE(loc1 == file_index.get(id1));
@@ -55,6 +53,9 @@ TEST_CASE("Dump DenseMmapArray, load as DenseFileArray") {
 # pragma message("not running 'DenseMmapArray' test case on this machine")
 #endif
 
+using dense_mem_array = osmium::index::map::DenseMemArray<osmium::unsigned_object_id_type, osmium::Location>;
+
 TEST_CASE("Dump DenseMemArray, load as DenseFileArray") {
     test_index<dense_mem_array>();
 }
+
