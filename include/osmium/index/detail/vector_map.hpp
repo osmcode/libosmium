@@ -234,29 +234,19 @@ namespace osmium {
                     size_t offset = 0;
                     size_t buffer_start_id = 0;
                     iterator it = begin();
-                    do {
-                        if (buffer_start_id + offset == it->first) {
-                            // current position in array is the right position for this index entry
-                            output_buffer[offset] = it->second;
-                            ++it;
-                            ++offset;
-                        } else if (it->first >= buffer_start_id + buffer_size) {
-                            // ID of index entry is too large for this buffer, trigger writing of array by setting offset to BUFFER_SIZE.
-                            offset = buffer_size;
-                        } else {
-                            output_buffer[offset] = osmium::index::empty_value<TValue>();
-                            ++offset;
+                    while (it != end()) {
+                        size_t offset = 0;
+                        for (; offset < buffer_size && it != end(); ++offset) {
+                            if (buffer_start_id + offset == it->first) {
+                                output_buffer[offset] = it->second;
+                                ++it;
+                            } else {
+                                output_buffer[offset] = osmium::index::empty_value<TValue>();
+                            }
                         }
-                        if (offset == buffer_size) {
-                            // read test
-                            // write buffer
-                            osmium::io::detail::reliable_write(fd, reinterpret_cast<const unsigned char*>(output_buffer.get()), buffer_size * value_size);
-                            buffer_start_id = buffer_start_id + buffer_size;
-                            offset = 0;
-                        } else if (it == end()) {
-                            osmium::io::detail::reliable_write(fd, reinterpret_cast<const unsigned char*>(output_buffer.get()), offset * value_size);
-                        }
-                    } while (it != end());
+                        osmium::io::detail::reliable_write(fd, reinterpret_cast<const unsigned char*>(output_buffer.get()), offset * value_size);
+                        buffer_start_id = buffer_start_id + buffer_size;
+                    }
                 }
 
                 void dump_as_list(const int fd) final {
