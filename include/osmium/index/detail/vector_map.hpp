@@ -227,13 +227,9 @@ namespace osmium {
                     constexpr const size_t value_size = sizeof(TValue);
                     constexpr const size_t buffer_size = (10L * 1024L * 1024L) / value_size;
                     std::unique_ptr<TValue[]> output_buffer {new TValue[buffer_size]};
-                    // initialize with zeros
-                    for (size_t i = 0; i != buffer_size; ++i) {
-                        output_buffer[i] = osmium::index::empty_value<TValue>();
-                    }
                     size_t buffer_start_id = 0;
-                    iterator it = begin();
                     for (auto it = begin(); it != end();) {
+                        // initialize with zeros
                         std::fill_n(output_buffer.get(), buffer_size, osmium::index::empty_value<TValue>());
                         size_t offset = 0;
                         for (; offset < buffer_size && it != end(); ++offset) {
