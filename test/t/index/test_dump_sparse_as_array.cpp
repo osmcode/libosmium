@@ -38,7 +38,7 @@ void test_index() {
     };
 
     TSparseIndex sparse_index;
-    for (auto& r : refs) {
+    for (const auto& r : refs) {
         sparse_index.set(r.ref(), r.location());
     }
     sparse_index.sort();
@@ -54,7 +54,7 @@ void test_index() {
     REQUIRE_THROWS_AS(dense_index.get(max_id_in_refs + 1), const osmium::not_found&);
 
     // check if written values can be retrieved
-    for (auto& r : refs) {
+    for (const auto& r : refs) {
         REQUIRE(dense_index.get(r.ref()) == r.location());
     }
 
