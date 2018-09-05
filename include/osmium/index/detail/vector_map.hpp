@@ -39,8 +39,8 @@ DEALINGS IN THE SOFTWARE.
 
 #include <algorithm>
 #include <cstddef>
-#include <utility>
 #include <memory>
+#include <utility>
 
 
 namespace osmium {
@@ -233,18 +233,17 @@ namespace osmium {
                     }
                     size_t buffer_start_id = 0;
                     iterator it = begin();
-                    while (it != end()) {
+                    for (auto it = begin(); it != end();) {
+                        std::fill_n(output_buffer.get(), buffer_size, osmium::index::empty_value<TValue>());
                         size_t offset = 0;
                         for (; offset < buffer_size && it != end(); ++offset) {
                             if (buffer_start_id + offset == it->first) {
                                 output_buffer[offset] = it->second;
                                 ++it;
-                            } else {
-                                output_buffer[offset] = osmium::index::empty_value<TValue>();
                             }
                         }
                         osmium::io::detail::reliable_write(fd, reinterpret_cast<const unsigned char*>(output_buffer.get()), offset * value_size);
-                        buffer_start_id = buffer_start_id + buffer_size;
+                        buffer_start_id += buffer_size;
                     }
                 }
 
