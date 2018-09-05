@@ -231,7 +231,6 @@ namespace osmium {
                     for (size_t i = 0; i != buffer_size; ++i) {
                         output_buffer[i] = osmium::index::empty_value<TValue>();
                     }
-                    size_t offset = 0;
                     size_t buffer_start_id = 0;
                     iterator it = begin();
                     while (it != end()) {
