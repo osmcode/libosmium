@@ -3,6 +3,7 @@
 #include <osmium/index/detail/tmpfile.hpp>
 #include <osmium/index/map/dense_file_array.hpp>
 #include <osmium/index/map/sparse_mmap_array.hpp>
+#include <osmium/index/map/sparse_mem_array.hpp>
 #include <osmium/index/node_locations_map.hpp>
 #include <osmium/osm/node_ref.hpp>
 #include <osmium/osm/types.hpp>
@@ -10,13 +11,14 @@
 
 #include <vector>
 
-using sparse_mmap_array = osmium::index::map::SparseMmapArray<osmium::unsigned_object_id_type, osmium::Location>;
+using sparse_mem_array = osmium::index::map::SparseMemArray<osmium::unsigned_object_id_type, osmium::Location>;
 using dense_file_array = osmium::index::map::DenseFileArray<osmium::unsigned_object_id_type, osmium::Location>;
 
-TEST_CASE("Dump SparseMmapArray as array and load it as DenseFileArray") {
 
+template <class TSparseIndex>
+void test_index() {
     const int fd = osmium::detail::create_tmp_file();
-    constexpr const size_t value_size = sizeof(sparse_mmap_array::element_type::second_type);
+    constexpr const size_t value_size = sizeof(typename TSparseIndex::element_type::second_type);
     constexpr const size_t buffer_size = (10L * 1024L * 1024L) / value_size;
 
     REQUIRE(osmium::file_size(fd) == 0);
@@ -35,7 +37,7 @@ TEST_CASE("Dump SparseMmapArray as array and load it as DenseFileArray") {
         osmium::NodeRef{3 * buffer_size + 5, osmium::Location{-171.26, 9.21}}
     };
 
-    sparse_mmap_array sparse_index;
+    TSparseIndex sparse_index;
     for (auto& r : refs) {
         sparse_index.set(r.ref(), r.location());
     }
@@ -49,9 +51,7 @@ TEST_CASE("Dump SparseMmapArray as array and load it as DenseFileArray") {
     REQUIRE(osmium::file_size(fd) >= max_id_in_refs * sizeof(osmium::Location));
 
     // check beyond largest ID
-    REQUIRE_THROWS_AS(dense_index.get(max_id_in_refs + 1),           const osmium::not_found&);
-    // max_id_in_refs + buffer_size will not get written if the array is written in chunks
-    REQUIRE_THROWS_AS(dense_index.get(max_id_in_refs + buffer_size), const osmium::not_found&);
+    REQUIRE_THROWS_AS(dense_index.get(max_id_in_refs + 1), const osmium::not_found&);
 
     // check if written values can be retrieved
     for (auto& r : refs) {
@@ -66,4 +66,19 @@ TEST_CASE("Dump SparseMmapArray as array and load it as DenseFileArray") {
         }
     }
     REQUIRE(invalid_count == max_id_in_refs - refs.size() + 1);
+}
+
+
+#ifdef __linux__
+using sparse_mmap_array = osmium::index::map::SparseMmapArray<osmium::unsigned_object_id_type, osmium::Location>;
+
+TEST_CASE("Dump SparseMmapArray as array and load it as DenseFileArray") {
+    test_index<sparse_mmap_array>();
+}
+#else
+# pragma message("not running 'SparseMmapArray' test case on this machine")
+#endif
+
+TEST_CASE("Dump SparseMemArray as array and load it as DenseFileArray") {
+    test_index<sparse_mem_array>();
 }
