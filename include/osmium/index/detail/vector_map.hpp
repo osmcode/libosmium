@@ -41,7 +41,6 @@ DEALINGS IN THE SOFTWARE.
 #include <cstddef>
 #include <utility>
 
-#include <iostream>
 
 namespace osmium {
 
@@ -244,18 +243,17 @@ namespace osmium {
                             // ID of index entry is too large for this buffer, trigger writing of array by setting offset to BUFFER_SIZE.
                             offset = BUFFER_SIZE;
                         } else {
+                            output_buffer[offset] = osmium::index::empty_value<TValue>();
                             ++offset;
                         }
-                        if (offset == BUFFER_SIZE || it == end()) {
+                        if (offset == BUFFER_SIZE) {
                             // read test
                             // write buffer
                             osmium::io::detail::reliable_write(fd, reinterpret_cast<const unsigned char*>(output_buffer), BUFFER_SIZE * VALUE_SIZE);
-                            // clear buffer
-                            for (size_t i = 0; i != BUFFER_SIZE; ++i) {
-                                output_buffer[i] = osmium::index::empty_value<TValue>();
-                            }
                             buffer_start_id = buffer_start_id + BUFFER_SIZE;
                             offset = 0;
+                        } else if (it == end()) {
+                            osmium::io::detail::reliable_write(fd, reinterpret_cast<const unsigned char*>(output_buffer), offset * VALUE_SIZE);
                         }
                     } while (it != end());
                     delete[] output_buffer;
