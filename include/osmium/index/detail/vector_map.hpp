@@ -40,6 +40,7 @@ DEALINGS IN THE SOFTWARE.
 #include <algorithm>
 #include <cstddef>
 #include <utility>
+#include <memory>
 
 
 namespace osmium {
@@ -223,11 +224,11 @@ namespace osmium {
                 }
 
                 void dump_as_array(const int fd) final {
-                    constexpr const size_t VALUE_SIZE = sizeof(TValue);
-                    constexpr const size_t BUFFER_SIZE = (10L * 1024L * 1024L) / VALUE_SIZE;
-                    TValue* output_buffer = new TValue[BUFFER_SIZE];
+                    constexpr const size_t value_size = sizeof(TValue);
+                    constexpr const size_t buffer_size = (10L * 1024L * 1024L) / value_size;
+                    std::unique_ptr<TValue[]> output_buffer {new TValue[buffer_size]};
                     // initialize with zeros
-                    for (size_t i = 0; i != BUFFER_SIZE; ++i) {
+                    for (size_t i = 0; i != buffer_size; ++i) {
                         output_buffer[i] = osmium::index::empty_value<TValue>();
                     }
                     size_t offset = 0;
@@ -239,24 +240,23 @@ namespace osmium {
                             output_buffer[offset] = it->second;
                             ++it;
                             ++offset;
-                        } else if (it->first >= buffer_start_id + BUFFER_SIZE) {
+                        } else if (it->first >= buffer_start_id + buffer_size) {
                             // ID of index entry is too large for this buffer, trigger writing of array by setting offset to BUFFER_SIZE.
-                            offset = BUFFER_SIZE;
+                            offset = buffer_size;
                         } else {
                             output_buffer[offset] = osmium::index::empty_value<TValue>();
                             ++offset;
                         }
-                        if (offset == BUFFER_SIZE) {
+                        if (offset == buffer_size) {
                             // read test
                             // write buffer
-                            osmium::io::detail::reliable_write(fd, reinterpret_cast<const unsigned char*>(output_buffer), BUFFER_SIZE * VALUE_SIZE);
-                            buffer_start_id = buffer_start_id + BUFFER_SIZE;
+                            osmium::io::detail::reliable_write(fd, reinterpret_cast<const unsigned char*>(output_buffer.get()), buffer_size * value_size);
+                            buffer_start_id = buffer_start_id + buffer_size;
                             offset = 0;
                         } else if (it == end()) {
-                            osmium::io::detail::reliable_write(fd, reinterpret_cast<const unsigned char*>(output_buffer), offset * VALUE_SIZE);
+                            osmium::io::detail::reliable_write(fd, reinterpret_cast<const unsigned char*>(output_buffer.get()), offset * value_size);
                         }
                     } while (it != end());
-                    delete[] output_buffer;
                 }
 
                 void dump_as_list(const int fd) final {
