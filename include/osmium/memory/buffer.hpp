@@ -109,8 +109,8 @@ namespace osmium {
 
         private:
 
-            std::unique_ptr<Buffer> m_next_buffer = nullptr;
-            std::unique_ptr<unsigned char[]> m_memory = nullptr;
+            std::unique_ptr<Buffer> m_next_buffer{};
+            std::unique_ptr<unsigned char[]> m_memory{};
             unsigned char* m_data = nullptr;
             std::size_t m_capacity = 0;
             std::size_t m_written = 0;
