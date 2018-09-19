@@ -411,7 +411,7 @@ namespace osmium {
                             assert(!buffer.has_nested_buffers());
                             assert(next);
                             m_buffer_stack.push(std::move(buffer));
-                            buffer = std::move(*next.get());
+                            buffer = std::move(*next);
                         }
                         if (buffer.committed() > 0) {
                             return buffer;
