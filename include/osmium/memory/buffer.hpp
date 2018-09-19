@@ -109,7 +109,7 @@ namespace osmium {
 
         private:
 
-            std::unique_ptr<Buffer> m_next_buffer{};
+            std::unique_ptr<Buffer> m_next_buffer;
             std::unique_ptr<unsigned char[]> m_memory{};
             unsigned char* m_data = nullptr;
             std::size_t m_capacity = 0;
@@ -143,7 +143,9 @@ namespace osmium {
              * Most methods of the Buffer class will not work with an invalid
              * buffer.
              */
-            Buffer() noexcept = default;
+            Buffer() noexcept :
+                m_next_buffer() {
+            }
 
             /**
              * Constructs a valid externally memory-managed buffer using the
@@ -156,6 +158,7 @@ namespace osmium {
              *         the alignment.
              */
             explicit Buffer(unsigned char* data, std::size_t size) :
+                m_next_buffer(),
                 m_data(data),
                 m_capacity(size),
                 m_written(size),
@@ -178,6 +181,7 @@ namespace osmium {
              *         than capacity.
              */
             explicit Buffer(unsigned char* data, std::size_t capacity, std::size_t committed) :
+                m_next_buffer(),
                 m_data(data),
                 m_capacity(capacity),
                 m_written(committed),
@@ -207,6 +211,7 @@ namespace osmium {
              *         than capacity.
              */
             explicit Buffer(std::unique_ptr<unsigned char[]> data, std::size_t capacity, std::size_t committed) :
+                m_next_buffer(),
                 m_memory(std::move(data)),
                 m_data(m_memory.get()),
                 m_capacity(capacity),
@@ -236,6 +241,7 @@ namespace osmium {
              *        becomes to small?
              */
             explicit Buffer(std::size_t capacity, auto_grow auto_grow = auto_grow::yes) :
+                m_next_buffer(),
                 m_memory(new unsigned char[calculate_capacity(capacity)]),
                 m_data(m_memory.get()),
                 m_capacity(calculate_capacity(capacity)),
