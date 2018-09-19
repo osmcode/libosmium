@@ -2,8 +2,8 @@
 
 #include <osmium/index/detail/tmpfile.hpp>
 #include <osmium/index/map/dense_file_array.hpp>
-#include <osmium/index/map/sparse_mmap_array.hpp>
 #include <osmium/index/map/sparse_mem_array.hpp>
+#include <osmium/index/map/sparse_mmap_array.hpp>
 #include <osmium/index/node_locations_map.hpp>
 #include <osmium/osm/node_ref.hpp>
 #include <osmium/osm/types.hpp>
