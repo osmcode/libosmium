@@ -65,7 +65,7 @@ namespace osmium {
             explicit Builder(osmium::memory::Buffer& buffer, Builder* parent, osmium::memory::item_size_type size) :
                 m_buffer(buffer),
                 m_parent(parent),
-                m_item_offset(buffer.written()) {
+                m_item_offset(buffer.written() - buffer.committed()) {
                 reserve_space(size);
                 assert(buffer.is_aligned());
                 if (m_parent) {
@@ -88,7 +88,7 @@ namespace osmium {
 #endif
 
             osmium::memory::Item& item() const {
-                return *reinterpret_cast<osmium::memory::Item*>(m_buffer.data() + m_item_offset);
+                return *reinterpret_cast<osmium::memory::Item*>(m_buffer.data() + m_buffer.committed() + m_item_offset);
             }
 
             unsigned char* reserve_space(std::size_t size) {

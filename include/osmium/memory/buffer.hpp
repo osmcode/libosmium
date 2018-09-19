@@ -101,14 +101,16 @@ namespace osmium {
             // This is needed so we can call std::back_inserter() on a Buffer.
             using value_type = Item;
 
-            enum class auto_grow : bool {
-                yes = true,
-                no  = false
+            enum class auto_grow {
+                no  = 0,
+                yes = 1,
+                internal = 2
             }; // enum class auto_grow
 
         private:
 
-            std::unique_ptr<unsigned char[]> m_memory;
+            std::unique_ptr<Buffer> m_next_buffer = nullptr;
+            std::unique_ptr<unsigned char[]> m_memory = nullptr;
             unsigned char* m_data = nullptr;
             std::size_t m_capacity = 0;
             std::size_t m_written = 0;
@@ -141,9 +143,7 @@ namespace osmium {
              * Most methods of the Buffer class will not work with an invalid
              * buffer.
              */
-            Buffer() noexcept :
-                m_memory() {
-            }
+            Buffer() noexcept = default;
 
             /**
              * Constructs a valid externally memory-managed buffer using the
@@ -156,7 +156,6 @@ namespace osmium {
              *         the alignment.
              */
             explicit Buffer(unsigned char* data, std::size_t size) :
-                m_memory(),
                 m_data(data),
                 m_capacity(size),
                 m_written(size),
@@ -179,8 +178,37 @@ namespace osmium {
              *         than capacity.
              */
             explicit Buffer(unsigned char* data, std::size_t capacity, std::size_t committed) :
-                m_memory(),
                 m_data(data),
+                m_capacity(capacity),
+                m_written(committed),
+                m_committed(committed) {
+                if (capacity % align_bytes != 0) {
+                    throw std::invalid_argument{"buffer capacity needs to be multiple of alignment"};
+                }
+                if (committed % align_bytes != 0) {
+                    throw std::invalid_argument{"buffer parameter 'committed' needs to be multiple of alignment"};
+                }
+                if (committed > capacity) {
+                    throw std::invalid_argument{"buffer parameter 'committed' can not be larger than capacity"};
+                }
+            }
+
+            /**
+             * Constructs a valid internally memory-managed buffer with the
+             * given capacity that already contains 'committed' bytes of data.
+             *
+             * @param data A unique pointer to some (possibly initialized) data.
+             *             The Buffer will manage this memory.
+             * @param capacity The size of the memory for this buffer.
+             * @param committed The size of the initialized data. If this is 0, the buffer startes out empty.
+             *
+             * @throws std::invalid_argument if the capacity or committed isn't
+             *         a multiple of the alignment or if committed is larger
+             *         than capacity.
+             */
+            explicit Buffer(std::unique_ptr<unsigned char[]> data, std::size_t capacity, std::size_t committed) :
+                m_memory(std::move(data)),
+                m_data(m_memory.get()),
                 m_capacity(capacity),
                 m_written(committed),
                 m_committed(committed) {
@@ -222,7 +250,7 @@ namespace osmium {
             Buffer(Buffer&&) = default;
             Buffer& operator=(Buffer&&) = default;
 
-            ~Buffer() = default;
+            ~Buffer() noexcept = default;
 
 #ifndef NDEBUG
             void increment_builder_count() noexcept {
@@ -327,13 +355,51 @@ namespace osmium {
                 }
                 size = calculate_capacity(size);
                 if (m_capacity < size) {
-                    std::unique_ptr<unsigned char[]> memory(new unsigned char[size]);
+                    std::unique_ptr<unsigned char[]> memory{new unsigned char[size]};
                     std::copy_n(m_memory.get(), m_capacity, memory.get());
                     using std::swap;
                     swap(m_memory, memory);
                     m_data = m_memory.get();
                     m_capacity = size;
                 }
+            }
+
+            void grow_internal() {
+                assert(m_data && "This must be a valid buffer");
+                if (!m_memory) {
+                    throw std::logic_error{"Can't grow Buffer if it doesn't use internal memory management."};
+                }
+
+                std::unique_ptr<Buffer> old{new Buffer{std::move(m_memory), m_capacity, m_committed}};
+                m_memory = std::unique_ptr<unsigned char[]>{new unsigned char[m_capacity]};
+                m_data = m_memory.get();
+
+                m_written -= m_committed;
+                std::copy_n(old->data() + m_committed, m_written, m_data);
+                m_committed = 0;
+
+                old->m_next_buffer = std::move(m_next_buffer);
+                m_next_buffer = std::move(old);
+            }
+
+            /**
+             * Does this buffer have nested buffers inside. This happens
+             * when a buffer is full and auto_grow is defined as internal.
+             *
+             * @returns Are there nested buffers or not?
+             */
+            bool has_nested_buffers() const noexcept {
+                return m_next_buffer != nullptr;
+            }
+
+            /**
+             * Return the nested buffer. The buffer will be moved out.
+             *
+             * @pre has_nested_buffers()
+             */
+            std::unique_ptr<Buffer> next_buffer() noexcept {
+                assert(has_nested_buffers());
+                return std::move(m_next_buffer);
             }
 
             /**
@@ -444,15 +510,19 @@ namespace osmium {
                 }
                 // if there's still not enough space, then try growing the buffer.
                 if (m_written + size > m_capacity) {
-                    if (m_memory && (m_auto_grow == auto_grow::yes)) {
+                    if (!m_memory || m_auto_grow == auto_grow::no) {
+                        throw osmium::buffer_is_full{};
+                    }
+                    if (m_auto_grow == auto_grow::internal && m_committed != 0) {
+                        grow_internal();
+                    }
+                    if (m_written + size > m_capacity) {
                         // double buffer size until there is enough space
                         std::size_t new_capacity = m_capacity * 2;
                         while (m_written + size > new_capacity) {
                             new_capacity *= 2;
                         }
                         grow(new_capacity);
-                    } else {
-                        throw osmium::buffer_is_full{};
                     }
                 }
                 unsigned char* data = &m_data[m_written];
@@ -698,6 +768,7 @@ namespace osmium {
             void swap(Buffer& other) {
                 using std::swap;
 
+                swap(m_next_buffer, other.m_next_buffer);
                 swap(m_memory, other.m_memory);
                 swap(m_data, other.m_data);
                 swap(m_capacity, other.m_capacity);

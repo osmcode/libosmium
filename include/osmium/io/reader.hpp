@@ -52,6 +52,7 @@ DEALINGS IN THE SOFTWARE.
 #include <fcntl.h>
 #include <future>
 #include <memory>
+#include <stack>
 #include <string>
 #include <system_error>
 #include <thread>
@@ -90,6 +91,12 @@ namespace osmium {
          * Buffer.
          */
         class Reader {
+
+            // The Reader::read() function reads from a queue of buffers which
+            // can contain nested buffers. These nested buffers will be pushed
+            // on this stack, because read() can only return a single unnested
+            // buffer.
+            std::stack<osmium::memory::Buffer> m_buffer_stack{};
 
             osmium::io::File m_file;
 
@@ -371,6 +378,13 @@ namespace osmium {
             osmium::memory::Buffer read() {
                 osmium::memory::Buffer buffer;
 
+                // If there are buffers on the stack, return those first.
+                if (!m_buffer_stack.empty()) {
+                    buffer = std::move(m_buffer_stack.top());
+                    m_buffer_stack.pop();
+                    return buffer;
+                }
+
                 if (m_status != status::okay) {
                     throw io_error{"Can not read from reader when in status 'closed', 'eof', or 'error'"};
                 }
@@ -391,6 +405,13 @@ namespace osmium {
                             m_status = status::eof;
                             m_read_thread_manager.close();
                             return buffer;
+                        }
+                        while (buffer.has_nested_buffers()) {
+                            std::unique_ptr<osmium::memory::Buffer> next = buffer.next_buffer();
+                            assert(!buffer.has_nested_buffers());
+                            assert(next);
+                            m_buffer_stack.push(std::move(buffer));
+                            buffer = std::move(*next.get());
                         }
                         if (buffer.committed() > 0) {
                             return buffer;

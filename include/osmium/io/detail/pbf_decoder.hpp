@@ -81,7 +81,7 @@ namespace osmium {
             class PBFPrimitiveBlockDecoder {
 
                 enum {
-                    initial_buffer_size = 2ul * 1024ul * 1024ul
+                    initial_buffer_size = 256ul * 1024ul
                 };
 
                 data_view m_data;
@@ -94,7 +94,7 @@ namespace osmium {
 
                 osmium::osm_entity_bits::type m_read_types;
 
-                osmium::memory::Buffer m_buffer{initial_buffer_size};
+                osmium::memory::Buffer m_buffer{initial_buffer_size, osmium::memory::Buffer::auto_grow::internal};
 
                 osmium::io::read_meta m_read_metadata;
 
@@ -519,24 +519,27 @@ namespace osmium {
                             throw osmium::pbf_error{"PBF format error"};
                         }
 
-                        osmium::builder::NodeBuilder builder{m_buffer};
-                        osmium::Node& node = builder.object();
+                        {
+                            osmium::builder::NodeBuilder builder{m_buffer};
+                            osmium::Node& node = builder.object();
 
-                        node.set_id(dense_id.update(ids.front()));
-                        ids.drop_front();
+                            node.set_id(dense_id.update(ids.front()));
+                            ids.drop_front();
 
-                        const auto lon = dense_longitude.update(lons.front());
-                        lons.drop_front();
-                        const auto lat = dense_latitude.update(lats.front());
-                        lats.drop_front();
-                        builder.object().set_location(osmium::Location(
-                                convert_pbf_coordinate(lon),
-                                convert_pbf_coordinate(lat)
-                        ));
+                            const auto lon = dense_longitude.update(lons.front());
+                            lons.drop_front();
+                            const auto lat = dense_latitude.update(lats.front());
+                            lats.drop_front();
+                            builder.object().set_location(osmium::Location(
+                                    convert_pbf_coordinate(lon),
+                                    convert_pbf_coordinate(lat)
+                            ));
 
-                        if (tag_it != tags.end()) {
-                            build_tag_list_from_dense_nodes(builder, tag_it, tags.end());
+                            if (tag_it != tags.end()) {
+                                build_tag_list_from_dense_nodes(builder, tag_it, tags.end());
+                            }
                         }
+                        m_buffer.commit();
                     }
 
                 }
@@ -626,82 +629,84 @@ namespace osmium {
 
                         bool visible = true;
 
-                        osmium::builder::NodeBuilder builder{m_buffer};
-                        osmium::Node& node = builder.object();
+                        {
+                            osmium::builder::NodeBuilder builder{m_buffer};
+                            osmium::Node& node = builder.object();
 
-                        node.set_id(dense_id.update(ids.front()));
-                        ids.drop_front();
+                            node.set_id(dense_id.update(ids.front()));
+                            ids.drop_front();
 
-                        if (has_info) {
-                            if (!versions.empty()) {
-                                const auto version = versions.front();
-                                versions.drop_front();
-                                if (version < -1) {
-                                    throw osmium::pbf_error{"object version must not be negative"};
+                            if (has_info) {
+                                if (!versions.empty()) {
+                                    const auto version = versions.front();
+                                    versions.drop_front();
+                                    if (version < -1) {
+                                        throw osmium::pbf_error{"object version must not be negative"};
+                                    }
+
+                                    if (version == -1) {
+                                        node.set_version(0U);
+                                    } else {
+                                        node.set_version(static_cast<osmium::object_version_type>(version));
+                                    }
                                 }
 
-                                if (version == -1) {
-                                    node.set_version(0U);
-                                } else {
-                                    node.set_version(static_cast<osmium::object_version_type>(version));
+                                if (!changesets.empty()) {
+                                    const auto changeset_id = dense_changeset.update(changesets.front());
+                                    changesets.drop_front();
+                                    if (changeset_id < -1 || changeset_id >= std::numeric_limits<changeset_id_type>::max()) {
+                                        throw osmium::pbf_error{"object changeset_id must be between 0 and 2^32-1"};
+                                    }
+
+                                    if (changeset_id == -1) {
+                                        node.set_changeset(0U);
+                                    } else {
+                                        node.set_changeset(static_cast<osmium::changeset_id_type>(changeset_id));
+                                    }
+                                }
+
+                                if (!timestamps.empty()) {
+                                    node.set_timestamp(dense_timestamp.update(timestamps.front()) * m_date_factor / 1000);
+                                    timestamps.drop_front();
+                                }
+
+                                if (!uids.empty()) {
+                                    node.set_uid_from_signed(static_cast<osmium::signed_user_id_type>(dense_uid.update(uids.front())));
+                                    uids.drop_front();
+                                }
+
+                                if (!visibles.empty()) {
+                                    visible = (visibles.front() != 0);
+                                    visibles.drop_front();
+                                }
+                                node.set_visible(visible);
+
+                                if (!user_sids.empty()) {
+                                    const auto& u = m_stringtable.at(dense_user_sid.update(user_sids.front()));
+                                    user_sids.drop_front();
+                                    builder.set_user(u.first, u.second);
                                 }
                             }
 
-                            if (!changesets.empty()) {
-                                const auto changeset_id = dense_changeset.update(changesets.front());
-                                changesets.drop_front();
-                                if (changeset_id < -1 || changeset_id >= std::numeric_limits<changeset_id_type>::max()) {
-                                    throw osmium::pbf_error{"object changeset_id must be between 0 and 2^32-1"};
-                                }
-
-                                if (changeset_id == -1) {
-                                    node.set_changeset(0U);
-                                } else {
-                                    node.set_changeset(static_cast<osmium::changeset_id_type>(changeset_id));
-                                }
+                            // even if the node isn't visible, there's still a record
+                            // of its lat/lon in the dense arrays.
+                            const auto lon = dense_longitude.update(lons.front());
+                            lons.drop_front();
+                            const auto lat = dense_latitude.update(lats.front());
+                            lats.drop_front();
+                            if (visible) {
+                                builder.object().set_location(osmium::Location{
+                                        convert_pbf_coordinate(lon),
+                                        convert_pbf_coordinate(lat)
+                                });
                             }
 
-                            if (!timestamps.empty()) {
-                                node.set_timestamp(dense_timestamp.update(timestamps.front()) * m_date_factor / 1000);
-                                timestamps.drop_front();
-                            }
-
-                            if (!uids.empty()) {
-                                node.set_uid_from_signed(static_cast<osmium::signed_user_id_type>(dense_uid.update(uids.front())));
-                                uids.drop_front();
-                            }
-
-                            if (!visibles.empty()) {
-                                visible = (visibles.front() != 0);
-                                visibles.drop_front();
-                            }
-                            node.set_visible(visible);
-
-                            if (!user_sids.empty()) {
-                                const auto& u = m_stringtable.at(dense_user_sid.update(user_sids.front()));
-                                user_sids.drop_front();
-                                builder.set_user(u.first, u.second);
+                            if (tag_it != tags.end()) {
+                                build_tag_list_from_dense_nodes(builder, tag_it, tags.end());
                             }
                         }
-
-                        // even if the node isn't visible, there's still a record
-                        // of its lat/lon in the dense arrays.
-                        const auto lon = dense_longitude.update(lons.front());
-                        lons.drop_front();
-                        const auto lat = dense_latitude.update(lats.front());
-                        lats.drop_front();
-                        if (visible) {
-                            builder.object().set_location(osmium::Location{
-                                    convert_pbf_coordinate(lon),
-                                    convert_pbf_coordinate(lat)
-                            });
-                        }
-
-                        if (tag_it != tags.end()) {
-                            build_tag_list_from_dense_nodes(builder, tag_it, tags.end());
-                        }
+                        m_buffer.commit();
                     }
-
                 }
 
             public:
