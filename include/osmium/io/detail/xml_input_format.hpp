@@ -333,6 +333,8 @@ namespace osmium {
                             }
                         } else if (!std::strcmp(name, "generator")) {
                             m_header.set("generator", value);
+                        } else if (!std::strcmp(name, "upload")) {
+                            m_header.set("xml_josm_upload", value);
                         }
                         // ignore other attributes
                     });
