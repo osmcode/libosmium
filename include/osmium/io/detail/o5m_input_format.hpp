@@ -97,14 +97,20 @@ namespace osmium {
                 // The following settings are from the o5m description:
 
                 // The maximum number of entries in this table.
-                const uint64_t number_of_entries = 15000;
+                enum {
+                    number_of_entries = 15000u
+                };
 
                 // The size of one entry in the table.
-                const unsigned int entry_size = 256;
+                enum {
+                    entry_size = 256u
+                };
 
                 // The maximum length of a string in the table including
                 // two \0 bytes.
-                const unsigned int max_length = 250 + 2;
+                enum {
+                    max_length = 250u + 2u
+                };
 
                 // The data is stored in this string. It is default constructed
                 // and then resized on demand the first time something is added.

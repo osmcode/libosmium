@@ -56,7 +56,9 @@ namespace osmium {
 
             // Maximum number of allowed pool threads (just to keep the user
             // from setting something silly).
-            constexpr const int max_pool_threads = 32;
+            enum {
+                max_pool_threads = 32
+            };
 
             inline int get_pool_size(int num_threads, int user_setting, unsigned hardware_concurrency) {
                 if (num_threads == 0) {
@@ -138,8 +140,13 @@ namespace osmium {
 
         public:
 
-            static constexpr int default_num_threads = 0;
-            static constexpr int default_queue_size = 0;
+            enum {
+                default_num_threads = 0
+            };
+
+            enum {
+                default_queue_size = 0u
+            };
 
             /**
              * Create thread pool with the given number of threads. If
