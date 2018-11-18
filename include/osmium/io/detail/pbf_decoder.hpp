@@ -92,7 +92,7 @@ namespace osmium {
 
                 osmium::osm_entity_bits::type m_read_types;
 
-                osmium::memory::Buffer m_buffer { initial_buffer_size };
+                osmium::memory::Buffer m_buffer{initial_buffer_size};
 
                 osmium::io::read_meta m_read_metadata;
 
