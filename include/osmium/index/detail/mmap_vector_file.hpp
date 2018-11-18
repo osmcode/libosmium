@@ -74,7 +74,7 @@ namespace osmium {
             explicit mmap_vector_file(int fd) :
                 mmap_vector_base<T>(
                     fd,
-                    std::max(osmium::detail::mmap_vector_size_increment, filesize(fd)),
+                    std::max(static_cast<std::size_t>(mmap_vector_size_increment), filesize(fd)),
                     filesize(fd)) {
             }
 

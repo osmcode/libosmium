@@ -403,7 +403,9 @@ namespace osmium {
 
             using type = TDerived;
 
-            constexpr static const std::size_t min_size_for_user = osmium::memory::padded_length(sizeof(string_size_type) + 1);
+            enum {
+                min_size_for_user = osmium::memory::padded_length(sizeof(string_size_type) + 1)
+            };
 
         public:
 
@@ -600,7 +602,9 @@ namespace osmium {
 
             using type = ChangesetBuilder;
 
-            constexpr static const std::size_t min_size_for_user = osmium::memory::padded_length(1);
+            enum {
+                min_size_for_user = osmium::memory::padded_length(1)
+            };
 
         public:
 

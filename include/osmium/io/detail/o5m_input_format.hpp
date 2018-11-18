@@ -151,7 +151,9 @@ namespace osmium {
 
             class O5mParser : public Parser {
 
-                static constexpr std::size_t buffer_size = 2 * 1000 * 1000;
+                enum {
+                    buffer_size = 2ul * 1000ul * 1000ul
+                };
 
                 osmium::io::Header m_header{};
 

@@ -434,7 +434,9 @@ namespace osmium {
                  * enough space for the string table (which typically
                  * needs about 0.1 to 0.3% of the block size).
                  */
-                constexpr static std::size_t max_used_blob_size = max_uncompressed_blob_size * 95 / 100;
+                enum {
+                    max_used_blob_size = max_uncompressed_blob_size * 95u / 100u
+                };
 
                 bool can_add(OSMFormat::PrimitiveGroup type) const noexcept {
                     if (type != m_type) {

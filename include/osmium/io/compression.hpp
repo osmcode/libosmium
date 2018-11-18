@@ -97,7 +97,9 @@ namespace osmium {
 
         public:
 
-            static constexpr unsigned int input_buffer_size = 1024 * 1024;
+            enum {
+                input_buffer_size = 1024u * 1024u
+            };
 
             Decompressor() = default;
 

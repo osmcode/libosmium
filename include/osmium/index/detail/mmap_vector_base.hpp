@@ -46,7 +46,9 @@ namespace osmium {
 
     namespace detail {
 
-        constexpr size_t mmap_vector_size_increment = 1024 * 1024;
+        enum {
+            mmap_vector_size_increment = 1024ul * 1024ul
+        };
 
         /**
          * This is a base class for implementing classes that look like
@@ -150,7 +152,7 @@ namespace osmium {
 
             void resize(size_t new_size) {
                 if (new_size > capacity()) {
-                    reserve(new_size + osmium::detail::mmap_vector_size_increment);
+                    reserve(new_size + mmap_vector_size_increment);
                 }
                 m_size = new_size;
             }

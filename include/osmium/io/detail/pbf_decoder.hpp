@@ -80,7 +80,9 @@ namespace osmium {
 
             class PBFPrimitiveBlockDecoder {
 
-                static constexpr const size_t initial_buffer_size = 2 * 1024 * 1024;
+                enum {
+                    initial_buffer_size = 2ul * 1024ul * 1024ul
+                };
 
                 data_view m_data;
                 std::vector<osm_string_len_type> m_stringtable;

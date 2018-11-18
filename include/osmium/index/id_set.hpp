@@ -191,8 +191,12 @@ namespace osmium {
             // which would mean less (but larger) memory allocations. For
             // relations Ids it could be smaller, because they would all fit
             // into a smaller allocation.
-            constexpr static const std::size_t chunk_bits = 22u;
-            constexpr static const std::size_t chunk_size = 1u << chunk_bits;
+            enum {
+                chunk_bits = 22u
+            };
+            enum {
+                chunk_size = 1u << chunk_bits
+            };
 
             std::vector<std::unique_ptr<unsigned char[]>> m_data;
             T m_size = 0;
