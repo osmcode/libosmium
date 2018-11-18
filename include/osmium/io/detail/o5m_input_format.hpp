@@ -362,7 +362,7 @@ namespace osmium {
                             object.set_timestamp(timestamp);
                             object.set_changeset(m_delta_changeset.update(zvarint(dataptr, end)));
                             if (*dataptr != end) {
-                                auto uid_user = decode_user(dataptr, end);
+                                const auto uid_user = decode_user(dataptr, end);
                                 object.set_uid(uid_user.first);
                                 user = uid_user.second;
                             } else {
@@ -439,7 +439,7 @@ namespace osmium {
                     const char* data = decode_string(dataptr, end);
                     const char* start = data;
 
-                    auto member_type = decode_member_type(*data++);
+                    const auto member_type = decode_member_type(*data++);
                     if (data == end) {
                         throw o5m_error{"missing role"};
                     }
@@ -480,13 +480,13 @@ namespace osmium {
                             osmium::builder::RelationMemberListBuilder rml_builder{builder};
 
                             while (data < end_refs) {
-                                auto delta_id = zvarint(&data, end);
+                                const auto delta_id = zvarint(&data, end);
                                 if (data == end) {
                                     throw o5m_error{"relation member format error"};
                                 }
-                                auto type_role = decode_role(&data, end);
-                                auto i = osmium::item_type_to_nwr_index(type_role.first);
-                                auto ref = m_delta_member_ids[i].update(delta_id);
+                                const auto type_role = decode_role(&data, end);
+                                const auto i = osmium::item_type_to_nwr_index(type_role.first);
+                                const auto ref = m_delta_member_ids[i].update(delta_id);
                                 rml_builder.add_member(type_role.first, ref, type_role.second);
                             }
                         }
