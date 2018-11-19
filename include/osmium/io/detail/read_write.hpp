@@ -125,7 +125,10 @@ namespace osmium {
              * @throws std::system_error On error.
              */
             inline void reliable_write(const int fd, const unsigned char* output_buffer, const size_t size) {
-                constexpr size_t max_write = 100L * 1024L * 1024L; // Max 100 MByte per write
+                enum : std::size_t {
+                    // Max 100 MByte per write
+                    max_write = 100ul * 1024ul * 1024ul
+                };
                 size_t offset = 0;
                 do {
                     auto write_count = size - offset;

@@ -122,9 +122,13 @@ namespace osmium {
              * as well as Osmium implementation always
              * uses at most 8k entities in a block.
              */
-            constexpr int32_t max_entities_per_block = 8000;
+            enum {
+                max_entities_per_block = 8000
+            };
 
-            constexpr int location_granularity = 100;
+            enum {
+                location_granularity = 100
+            };
 
             /**
              * convert a double lat or lon value to an int, respecting the granularity

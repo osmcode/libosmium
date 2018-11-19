@@ -120,8 +120,11 @@ namespace osmium {
             std::function<void(Buffer&)> m_full;
 
             static std::size_t calculate_capacity(std::size_t capacity) noexcept {
-                // The majority of all Nodes will fit into this size.
-                constexpr static const std::size_t min_capacity = 64;
+                enum {
+                    // The majority of all Nodes will fit into this size.
+                    min_capacity = 64
+                };
+
                 if (capacity < min_capacity) {
                     return min_capacity;
                 }
