@@ -274,8 +274,8 @@ namespace osmium {
      */
     class Location {
 
-        int32_t m_x;
-        int32_t m_y;
+        int32_t m_x; // NOLINT(modernize-use-default-member-init)
+        int32_t m_y; // NOLINT(modernize-use-default-member-init)
 
     public:
 
