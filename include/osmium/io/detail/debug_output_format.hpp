@@ -391,7 +391,7 @@ namespace osmium {
                     for (const auto& node_ref : way.nodes()) {
                         write_diff();
                         write_counter(width, n++);
-                        output_formatted("%10lld", static_cast<long long>(node_ref.ref()));
+                        output_formatted("%10lld", static_cast<long long>(node_ref.ref())); // NOLINT(google-runtime-int)
                         if (node_ref.location().valid()) {
                             *m_out += " (";
                             node_ref.location().as_string(std::back_inserter(*m_out));
@@ -427,7 +427,7 @@ namespace osmium {
                         write_diff();
                         write_counter(width, n++);
                         *m_out += short_typename[item_type_to_nwr_index(member.type())];
-                        output_formatted(" %10lld ", static_cast<long long>(member.ref()));
+                        output_formatted(" %10lld ", static_cast<long long>(member.ref())); // NOLINT(google-runtime-int)
                         write_string(member.role());
                         *m_out += '\n';
                     }
