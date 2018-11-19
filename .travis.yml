@@ -6,7 +6,7 @@
 
 language: generic
 
-dist: trusty
+dist: xenial
 
 #-----------------------------------------------------------------------------
 
@@ -30,40 +30,35 @@ addons_shortcuts:
       packages: [ 'libboost1.55-all-dev', 'libgdal-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin', 'clang-3.5']
   addons_clang38: &clang38
     apt:
-      sources: [ 'ubuntu-toolchain-r-test', 'boost-latest' ]
-      packages: [ 'libboost1.55-all-dev', 'libgdal-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin', 'clang-3.8']
+      packages: [ 'libboost-all-dev', 'libgdal-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin', 'clang-3.8']
   addons_clang39: &clang39
     apt:
-      sources: [ 'ubuntu-toolchain-r-test', 'boost-latest' ]
-      packages: [ 'libboost1.55-all-dev', 'libgdal-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin', 'clang-3.9']
+      packages: [ 'libboost-all-dev', 'libgdal-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin', 'clang-3.9']
   addons_clang50: &clang50
     apt:
-      sources: [ 'ubuntu-toolchain-r-test', 'boost-latest', 'llvm-toolchain-trusty-5.0' ]
-      packages: [ 'libboost1.55-all-dev', 'libgdal-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin', 'clang-5.0', 'g++-6', 'gcc-6']
+      sources: [ 'ubuntu-toolchain-r-test' ]
+      packages: [ 'libboost-all-dev', 'libgdal-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin', 'clang-5.0', 'g++-6', 'gcc-6']
   addons_clang60: &clang60
     apt:
-      sources: [ 'ubuntu-toolchain-r-test', 'boost-latest', 'llvm-toolchain-trusty-6.0' ]
-      packages: [ 'libboost1.55-all-dev', 'libgdal-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin', 'clang-6.0', 'g++-6', 'gcc-6']
+      sources: [ 'ubuntu-toolchain-r-test' ]
+      packages: [ 'libboost-all-dev', 'libgdal-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin', 'clang-6.0', 'g++-6', 'gcc-6']
   addons_gcc48: &gcc48
     apt:
-      sources: [ 'ubuntu-toolchain-r-test', 'boost-latest' ]
-      packages: [ 'libboost1.55-all-dev', 'libgdal-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin', 'g++-4.8', 'gcc-4.8' ]
+      packages: [ 'libboost-all-dev', 'libgdal-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin', 'g++-4.8', 'gcc-4.8' ]
   addons_gcc49: &gcc49
     apt:
-      sources: [ 'ubuntu-toolchain-r-test', 'boost-latest' ]
-      packages: [ 'libboost1.55-all-dev', 'libgdal-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin', 'g++-4.9', 'gcc-4.9' ]
+      packages: [ 'libboost-all-dev', 'libgdal-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin', 'g++-4.9', 'gcc-4.9' ]
   addons_gcc5: &gcc5
     apt:
-      sources: [ 'ubuntu-toolchain-r-test', 'boost-latest' ]
-      packages: [ 'libboost1.55-all-dev', 'libgdal-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin', 'g++-5', 'gcc-5' ]
+      packages: [ 'libboost-all-dev', 'libgdal-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin', 'g++-5', 'gcc-5' ]
   addons_gcc6: &gcc6
     apt:
-      sources: [ 'ubuntu-toolchain-r-test', 'boost-latest' ]
-      packages: [ 'libboost1.55-all-dev', 'libgdal-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin', 'g++-6', 'gcc-6' ]
+      sources: [ 'ubuntu-toolchain-r-test' ]
+      packages: [ 'libboost-all-dev', 'libgdal-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin', 'g++-6', 'gcc-6' ]
   addons_gcc7: &gcc7
     apt:
-      sources: [ 'ubuntu-toolchain-r-test', 'boost-latest' ]
-      packages: [ 'libboost1.55-all-dev', 'libgdal-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin', 'g++-7', 'gcc-7' ]
+      sources: [ 'ubuntu-toolchain-r-test' ]
+      packages: [ 'libboost-all-dev', 'libgdal-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin', 'g++-7', 'gcc-7' ]
 
 #-----------------------------------------------------------------------------
 
@@ -75,6 +70,7 @@ matrix:
       compiler: linux-clang35-dev
       env: CC='clang-3.5' CXX='clang++-3.5' BUILD_TYPE='Dev'
       addons: *clang35
+      dist: trusty
 
     - os: linux
       compiler: linux-clang38-dev
@@ -97,17 +93,16 @@ matrix:
       addons: *clang60
 
     - os: linux
+      compiler: linux-clang60-debug
+      env: CC='clang-6.0' CXX='clang++-6.0' BUILD_TYPE='Debug'
+           CXXFLAGS="-fsanitize=address,undefined,integer -fno-sanitize-recover=all -fno-omit-frame-pointer"
+           LDFLAGS="-fsanitize=address,undefined,integer"
+      addons: *clang60
+
+    - os: linux
       compiler: linux-clang60-release
       env: CC='clang-6.0' CXX='clang++-6.0' BUILD_TYPE='Release'
       addons: *clang60
-
-# Disabled because it creates false-positives on the old travis systems
-#    - os: linux
-#      compiler: linux-clang50-debug
-#      env: CC='clang-5.0' CXX='clang++-5.0' BUILD_TYPE='Debug'
-#           CXXFLAGS="-fsanitize=address,undefined,integer -fno-sanitize-recover=all -fno-omit-frame-pointer"
-#           LDFLAGS="-fsanitize=address,undefined,integer"
-#      addons: *clang50
 
     # Linux GCC Builds
     - os: linux
@@ -132,17 +127,17 @@ matrix:
       addons: *gcc6
 
     - os: linux
-      compiler: linux-gcc6-coverage
-      env: CC='gcc-6' CXX='g++-6' BUILD_TYPE='Coverage'
-      addons: *gcc6
-
-    - os: linux
       compiler: linux-gcc7-dev
       env: CC='gcc-7' CXX='g++-7' BUILD_TYPE='Dev'
       addons: *gcc7
 
     - os: linux
-      compiler: linux-gcc7-dev
+      compiler: linux-gcc7-coverage
+      env: CC='gcc-7' CXX='g++-7' BUILD_TYPE='Coverage'
+      addons: *gcc7
+
+    - os: linux
+      compiler: linux-gcc7-release
       env: CC='gcc-7' CXX='g++-7' BUILD_TYPE='Release'
       addons: *gcc7
 
