@@ -403,7 +403,7 @@ namespace osmium {
 
             using type = TDerived;
 
-            enum {
+            enum : std::size_t {
                 min_size_for_user = osmium::memory::padded_length(sizeof(string_size_type) + 1)
             };
 

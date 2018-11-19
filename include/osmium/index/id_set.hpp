@@ -191,10 +191,10 @@ namespace osmium {
             // which would mean less (but larger) memory allocations. For
             // relations Ids it could be smaller, because they would all fit
             // into a smaller allocation.
-            enum {
+            enum : std::size_t {
                 chunk_bits = 22u
             };
-            enum {
+            enum : std::size_t {
                 chunk_size = 1u << chunk_bits
             };
 
