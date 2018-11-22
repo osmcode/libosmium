@@ -133,6 +133,24 @@ namespace osmium {
                 return padded_length(capacity);
             }
 
+            void grow_internal() {
+                assert(m_data && "This must be a valid buffer");
+                if (!m_memory) {
+                    throw std::logic_error{"Can't grow Buffer if it doesn't use internal memory management."};
+                }
+
+                std::unique_ptr<Buffer> old{new Buffer{std::move(m_memory), m_capacity, m_committed}};
+                m_memory = std::unique_ptr<unsigned char[]>{new unsigned char[m_capacity]};
+                m_data = m_memory.get();
+
+                m_written -= m_committed;
+                std::copy_n(old->data() + m_committed, m_written, m_data);
+                m_committed = 0;
+
+                old->m_next_buffer = std::move(m_next_buffer);
+                m_next_buffer = std::move(old);
+            }
+
         public:
 
             /**
@@ -368,24 +386,6 @@ namespace osmium {
                     m_data = m_memory.get();
                     m_capacity = size;
                 }
-            }
-
-            void grow_internal() {
-                assert(m_data && "This must be a valid buffer");
-                if (!m_memory) {
-                    throw std::logic_error{"Can't grow Buffer if it doesn't use internal memory management."};
-                }
-
-                std::unique_ptr<Buffer> old{new Buffer{std::move(m_memory), m_capacity, m_committed}};
-                m_memory = std::unique_ptr<unsigned char[]>{new unsigned char[m_capacity]};
-                m_data = m_memory.get();
-
-                m_written -= m_committed;
-                std::copy_n(old->data() + m_committed, m_written, m_data);
-                m_committed = 0;
-
-                old->m_next_buffer = std::move(m_next_buffer);
-                m_next_buffer = std::move(old);
             }
 
             /**
