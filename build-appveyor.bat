@@ -68,7 +68,7 @@ msbuild libosmium.sln ^
 /p:PlatformToolset=v140 %avlogger%
 IF %ERRORLEVEL% NEQ 0 GOTO ERROR
 
-ctest --output-on-failure -C %config% -E testdata-overview
+ctest --output-on-failure -C %config%
 IF %ERRORLEVEL% NEQ 0 GOTO ERROR
 
 GOTO DONE

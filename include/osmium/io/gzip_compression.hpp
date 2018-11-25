@@ -72,7 +72,7 @@ namespace osmium {
         int gzip_error_code;
         int system_errno;
 
-        gzip_error(const std::string& what, int error_code) :
+        gzip_error(const std::string& what, const int error_code) :
             io_error(what),
             gzip_error_code(error_code),
             system_errno(error_code == Z_ERRNO ? errno : 0) {
@@ -91,7 +91,7 @@ namespace osmium {
                 int errnum = zlib_error;
                 if (zlib_error) {
                     error += std::to_string(zlib_error);
-                } else {
+                } else if (gzfile) {
                     error += ::gzerror(gzfile, &errnum);
                 }
                 throw osmium::gzip_error{error, errnum};
@@ -106,10 +106,10 @@ namespace osmium {
 
         public:
 
-            explicit GzipCompressor(int fd, fsync sync) :
+            explicit GzipCompressor(const int fd, const fsync sync) :
                 Compressor(sync),
-                m_fd(::dup(fd)),
-                m_gzfile(::gzdopen(fd, "w")) {
+                m_fd(osmium::io::detail::reliable_dup(fd)),
+                m_gzfile(::gzdopen(m_fd, "wb")) {
                 if (!m_gzfile) {
                     detail::throw_gzip_error(m_gzfile, "write initialization failed");
                 }
@@ -130,8 +130,9 @@ namespace osmium {
             }
 
             void write(const std::string& data) final {
+                assert(m_gzfile);
+                assert(data.size() < std::numeric_limits<unsigned int>::max());
                 if (!data.empty()) {
-                    assert(data.size() < std::numeric_limits<unsigned int>::max());
                     const int nwrite = ::gzwrite(m_gzfile, data.data(), static_cast<unsigned int>(data.size()));
                     if (nwrite == 0) {
                         detail::throw_gzip_error(m_gzfile, "write failed");
@@ -157,13 +158,15 @@ namespace osmium {
 
         class GzipDecompressor : public Decompressor {
 
-            gzFile m_gzfile;
+            gzFile m_gzfile = nullptr;
 
         public:
 
-            explicit GzipDecompressor(int fd) :
-                m_gzfile(::gzdopen(fd, "r")) {
+            explicit GzipDecompressor(const int fd) {
+                const int fd2 = osmium::io::detail::reliable_dup(fd);
+                m_gzfile = ::gzdopen(fd2, "rb");
                 if (!m_gzfile) {
+                    ::close(fd2);
                     detail::throw_gzip_error(m_gzfile, "read initialization failed");
                 }
             }
@@ -183,15 +186,16 @@ namespace osmium {
             }
 
             std::string read() final {
+                assert(m_gzfile);
                 std::string buffer(osmium::io::Decompressor::input_buffer_size, '\0');
                 assert(buffer.size() < std::numeric_limits<unsigned int>::max());
-                int nread = ::gzread(m_gzfile, const_cast<char*>(buffer.data()), static_cast<unsigned int>(buffer.size()));
+                int nread = ::gzread(m_gzfile, &*buffer.begin(), static_cast<unsigned int>(buffer.size()));
                 if (nread < 0) {
                     detail::throw_gzip_error(m_gzfile, "read failed");
                 }
                 buffer.resize(static_cast<std::string::size_type>(nread));
 #if ZLIB_VERNUM >= 0x1240
-                set_offset(size_t(::gzoffset(m_gzfile)));
+                set_offset(static_cast<std::size_t>(::gzoffset(m_gzfile)));
 #endif
                 return buffer;
             }
@@ -211,12 +215,12 @@ namespace osmium {
         class GzipBufferDecompressor : public Decompressor {
 
             const char* m_buffer;
-            size_t m_buffer_size;
+            std::size_t m_buffer_size;
             z_stream m_zstream;
 
         public:
 
-            GzipBufferDecompressor(const char* buffer, size_t size) :
+            GzipBufferDecompressor(const char* buffer, const std::size_t size) :
                 m_buffer(buffer),
                 m_buffer_size(size),
                 m_zstream() {
@@ -251,9 +255,9 @@ namespace osmium {
                 std::string output;
 
                 if (m_buffer) {
-                    const size_t buffer_size = 10240;
+                    const std::size_t buffer_size = 10240;
                     output.append(buffer_size, '\0');
-                    m_zstream.next_out = reinterpret_cast<unsigned char*>(const_cast<char*>(output.data()));
+                    m_zstream.next_out = reinterpret_cast<unsigned char*>(&*output.begin());
                     m_zstream.avail_out = buffer_size;
                     const int result = inflate(&m_zstream, Z_SYNC_FLUSH);
 
@@ -263,7 +267,7 @@ namespace osmium {
                     }
 
                     if (result != Z_OK && result != Z_STREAM_END) {
-                        std::string message("gzip error: inflate failed: ");
+                        std::string message{"gzip error: inflate failed: "};
                         if (m_zstream.msg) {
                             message.append(m_zstream.msg);
                         }
@@ -287,9 +291,9 @@ namespace osmium {
             // we want the register_compression() function to run, setting
             // the variable is only a side-effect, it will never be used
             const bool registered_gzip_compression = osmium::io::CompressionFactory::instance().register_compression(osmium::io::file_compression::gzip,
-                [](int fd, fsync sync) { return new osmium::io::GzipCompressor{fd, sync}; },
-                [](int fd) { return new osmium::io::GzipDecompressor{fd}; },
-                [](const char* buffer, size_t size) { return new osmium::io::GzipBufferDecompressor{buffer, size}; }
+                [](const int fd, const fsync sync) { return new osmium::io::GzipCompressor{fd, sync}; },
+                [](const int fd) { return new osmium::io::GzipDecompressor{fd}; },
+                [](const char* buffer, const std::size_t size) { return new osmium::io::GzipBufferDecompressor{buffer, size}; }
             );
 
             // dummy function to silence the unused variable warning from above
