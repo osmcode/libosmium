@@ -12,14 +12,29 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
 #-----------------------------------------------------------------------------
 #
-#  Project version
+#  Configurations
 #
 #-----------------------------------------------------------------------------
+
+set(CMAKE_CXX_FLAGS_COVERAGE
+    "-g -O0 -fno-inline-functions -fno-inline --coverage ${extra_coverage_flags_}"
+    CACHE STRING "Flags used by the compiler during coverage builds.")
+
+set(CMAKE_EXE_LINKER_FLAGS_COVERAGE
+    "--coverage"
+    CACHE STRING "Flags used by the linker during coverage builds.")
 
 set(CMAKE_CONFIGURATION_TYPES "Debug;Release;RelWithDebInfo;MinSizeRel;Dev;Coverage"
     CACHE STRING
     "List of available configuration types"
     FORCE)
+
+
+#-----------------------------------------------------------------------------
+#
+#  Project version
+#
+#-----------------------------------------------------------------------------
 
 project(libosmium)
 
@@ -99,14 +114,6 @@ endif()
 #if(HAS_KEEP_INLINE_FUNCTIONS)
 #    set(extra_coverage_flags_ "-fkeep-inline-functions")
 #endif()
-
-set(CMAKE_CXX_FLAGS_COVERAGE
-    "-g -O0 -fno-inline-functions -fno-inline --coverage ${extra_coverage_flags_}"
-    CACHE STRING "Flags used by the compiler during coverage builds.")
-
-set(CMAKE_EXE_LINKER_FLAGS_COVERAGE
-    "--coverage"
-    CACHE STRING "Flags used by the linker during coverage builds.")
 
 if(CMAKE_BUILD_TYPE STREQUAL "Coverage")
     if(BUILD_EXAMPLES OR BUILD_HEADERS OR BUILD_BENCHMARKS)
