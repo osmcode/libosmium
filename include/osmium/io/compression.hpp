@@ -197,19 +197,19 @@ namespace osmium {
             }
 
             template <typename... TArgs>
-            std::unique_ptr<osmium::io::Compressor> create_compressor(osmium::io::file_compression compression, TArgs&&... args) const {
+            std::unique_ptr<osmium::io::Compressor> create_compressor(const osmium::io::file_compression compression, TArgs&&... args) const {
                 const auto callbacks = find_callbacks(compression);
                 return std::unique_ptr<osmium::io::Compressor>(std::get<0>(callbacks)(std::forward<TArgs>(args)...));
             }
 
-            std::unique_ptr<osmium::io::Decompressor> create_decompressor(osmium::io::file_compression compression, int fd) const {
+            std::unique_ptr<osmium::io::Decompressor> create_decompressor(const osmium::io::file_compression compression, const int fd) const {
                 const auto callbacks = find_callbacks(compression);
                 auto p = std::unique_ptr<osmium::io::Decompressor>(std::get<1>(callbacks)(fd));
                 p->set_file_size(osmium::file_size(fd));
                 return p;
             }
 
-            std::unique_ptr<osmium::io::Decompressor> create_decompressor(osmium::io::file_compression compression, const char* buffer, std::size_t size) const {
+            std::unique_ptr<osmium::io::Decompressor> create_decompressor(const osmium::io::file_compression compression, const char* buffer, const std::size_t size) const {
                 const auto callbacks = find_callbacks(compression);
                 return std::unique_ptr<osmium::io::Decompressor>(std::get<2>(callbacks)(buffer, size));
             }
@@ -222,7 +222,7 @@ namespace osmium {
 
         public:
 
-            NoCompressor(int fd, fsync sync) :
+            NoCompressor(const int fd, const fsync sync) :
                 Compressor(sync),
                 m_fd(fd) {
             }
@@ -268,7 +268,7 @@ namespace osmium {
         public:
 
             explicit NoDecompressor(const int fd) :
-                m_fd(osmium::io::detail::reliable_dup(fd)) {
+                m_fd(fd) {
             }
 
             NoDecompressor(const char* buffer, const std::size_t size) :

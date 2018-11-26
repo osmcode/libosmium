@@ -61,7 +61,7 @@ namespace osmium {
              * @returns File descriptor of open file.
              * @throws system_error if the file can't be opened.
              */
-            inline int open_for_writing(const std::string& filename, osmium::io::overwrite allow_overwrite = osmium::io::overwrite::no) {
+            inline int open_for_writing(const std::string& filename, const osmium::io::overwrite allow_overwrite = osmium::io::overwrite::no) {
 #ifdef _MSC_VER
                 osmium::detail::disable_invalid_parameter_handler diph;
 #endif

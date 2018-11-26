@@ -109,7 +109,7 @@ namespace osmium {
             explicit GzipCompressor(const int fd, const fsync sync) :
                 Compressor(sync),
                 m_fd(osmium::io::detail::reliable_dup(fd)),
-                m_gzfile(::gzdopen(m_fd, "wb")) {
+                m_gzfile(::gzdopen(fd, "wb")) {
                 if (!m_gzfile) {
                     detail::throw_gzip_error(m_gzfile, "write initialization failed");
                 }
@@ -163,10 +163,9 @@ namespace osmium {
         public:
 
             explicit GzipDecompressor(const int fd) {
-                const int fd2 = osmium::io::detail::reliable_dup(fd);
-                m_gzfile = ::gzdopen(fd2, "rb");
+                m_gzfile = ::gzdopen(fd, "rb");
                 if (!m_gzfile) {
-                    ::close(fd2);
+                    ::close(fd);
                     detail::throw_gzip_error(m_gzfile, "read initialization failed");
                 }
             }

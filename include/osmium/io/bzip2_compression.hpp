@@ -108,14 +108,12 @@ namespace osmium {
                 file_wrapper() noexcept = default;
 
                 file_wrapper(const int fd, const char* mode) {
-                    const int fd2 = osmium::io::detail::reliable_dup(fd);
-
 #ifdef _MSC_VER
                     osmium::detail::disable_invalid_parameter_handler diph;
 #endif
-                    m_file = fdopen(fd2, mode);
+                    m_file = fdopen(fd, mode);
                     if (!m_file) {
-                        ::close(fd2);
+                        ::close(fd);
                         throw std::system_error{errno, std::system_category(), "fdopen failed"};
                     }
                 }
