@@ -215,6 +215,9 @@ namespace osmium {
             }
 
             inline void reliable_close(const int fd) {
+                if (fd < 0) {
+                    return;
+                }
 #ifdef _MSC_VER
                 osmium::detail::disable_invalid_parameter_handler diph;
 #endif

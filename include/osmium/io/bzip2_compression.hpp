@@ -158,15 +158,18 @@ namespace osmium {
 
             detail::file_wrapper m_file;
             int m_bzerror;
-            BZFILE* m_bzfile;
+            BZFILE* m_bzfile = nullptr;
 
         public:
 
             explicit Bzip2Compressor(const int fd, const fsync sync) :
                 Compressor(sync),
                 m_file(fd, "wb"),
-                m_bzerror(BZ_OK),
-                m_bzfile(::BZ2_bzWriteOpen(&m_bzerror, m_file.file(), 6, 0, 0)) {
+                m_bzerror(BZ_OK) {
+#ifdef _MSC_VER
+                osmium::detail::disable_invalid_parameter_handler diph;
+#endif
+                m_bzfile = ::BZ2_bzWriteOpen(&m_bzerror, m_file.file(), 6, 0, 0);
                 if (!m_bzfile) {
                     detail::throw_bzip2_error(m_bzfile, "write open failed", m_bzerror);
                 }
@@ -189,6 +192,9 @@ namespace osmium {
             void write(const std::string& data) final {
                 assert(data.size() < std::numeric_limits<int>::max());
                 assert(m_bzfile);
+#ifdef _MSC_VER
+                osmium::detail::disable_invalid_parameter_handler diph;
+#endif
                 int error = BZ_OK;
                 ::BZ2_bzWrite(&error, m_bzfile, const_cast<char*>(data.data()), static_cast<int>(data.size()));
                 if (error != BZ_OK && error != BZ_STREAM_END) {
@@ -198,6 +204,9 @@ namespace osmium {
 
             void close() final {
                 if (m_bzfile) {
+#ifdef _MSC_VER
+                    osmium::detail::disable_invalid_parameter_handler diph;
+#endif
                     int error = BZ_OK;
                     ::BZ2_bzWriteClose(&error, m_bzfile, 0, nullptr, nullptr);
                     m_bzfile = nullptr;
@@ -223,6 +232,9 @@ namespace osmium {
 
             explicit Bzip2Decompressor(const int fd) :
                 m_file(fd, "rb") {
+#ifdef _MSC_VER
+                osmium::detail::disable_invalid_parameter_handler diph;
+#endif
                 int bzerror = BZ_OK;
                 m_bzfile = ::BZ2_bzReadOpen(&bzerror, m_file.file(), 0, 0, nullptr, 0);
                 if (!m_bzfile) {
@@ -245,6 +257,9 @@ namespace osmium {
             }
 
             std::string read() final {
+#ifdef _MSC_VER
+                osmium::detail::disable_invalid_parameter_handler diph;
+#endif
                 assert(m_bzfile);
                 std::string buffer;
 
@@ -288,6 +303,9 @@ namespace osmium {
 
             void close() final {
                 if (m_bzfile) {
+#ifdef _MSC_VER
+                    osmium::detail::disable_invalid_parameter_handler diph;
+#endif
                     int error = BZ_OK;
                     ::BZ2_bzReadClose(&error, m_bzfile);
                     m_bzfile = nullptr;

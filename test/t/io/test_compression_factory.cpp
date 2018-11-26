@@ -4,7 +4,7 @@
 
 TEST_CASE("Create compressor using factory") {
     const auto& factory = osmium::io::CompressionFactory::instance();
-    REQUIRE(factory.create_compressor(osmium::io::file_compression::none, 1, osmium::io::fsync::no));
+    REQUIRE(factory.create_compressor(osmium::io::file_compression::none, -1, osmium::io::fsync::no));
 }
 
 TEST_CASE("Create decompressor using factory") {

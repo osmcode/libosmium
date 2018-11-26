@@ -108,8 +108,11 @@ namespace osmium {
 
             explicit GzipCompressor(const int fd, const fsync sync) :
                 Compressor(sync),
-                m_fd(osmium::io::detail::reliable_dup(fd)),
-                m_gzfile(::gzdopen(fd, "wb")) {
+                m_fd(osmium::io::detail::reliable_dup(fd)) {
+#ifdef _MSC_VER
+                osmium::detail::disable_invalid_parameter_handler diph;
+#endif
+                m_gzfile = ::gzdopen(fd, "wb");
                 if (!m_gzfile) {
                     detail::throw_gzip_error(m_gzfile, "write initialization failed");
                 }
@@ -130,6 +133,9 @@ namespace osmium {
             }
 
             void write(const std::string& data) final {
+#ifdef _MSC_VER
+                osmium::detail::disable_invalid_parameter_handler diph;
+#endif
                 assert(m_gzfile);
                 assert(data.size() < std::numeric_limits<unsigned int>::max());
                 if (!data.empty()) {
@@ -142,6 +148,9 @@ namespace osmium {
 
             void close() final {
                 if (m_gzfile) {
+#ifdef _MSC_VER
+                    osmium::detail::disable_invalid_parameter_handler diph;
+#endif
                     const int result = ::gzclose(m_gzfile);
                     m_gzfile = nullptr;
                     if (result != Z_OK) {
@@ -163,9 +172,15 @@ namespace osmium {
         public:
 
             explicit GzipDecompressor(const int fd) {
+#ifdef _MSC_VER
+                osmium::detail::disable_invalid_parameter_handler diph;
+#endif
                 m_gzfile = ::gzdopen(fd, "rb");
                 if (!m_gzfile) {
-                    ::close(fd);
+                    try {
+                        osmium::io::detail::reliable_close(fd);
+                    } catch (...) {
+                    }
                     detail::throw_gzip_error(m_gzfile, "read initialization failed");
                 }
             }
@@ -185,6 +200,9 @@ namespace osmium {
             }
 
             std::string read() final {
+#ifdef _MSC_VER
+                osmium::detail::disable_invalid_parameter_handler diph;
+#endif
                 assert(m_gzfile);
                 std::string buffer(osmium::io::Decompressor::input_buffer_size, '\0');
                 assert(buffer.size() < std::numeric_limits<unsigned int>::max());
@@ -201,6 +219,9 @@ namespace osmium {
 
             void close() final {
                 if (m_gzfile) {
+#ifdef _MSC_VER
+                    osmium::detail::disable_invalid_parameter_handler diph;
+#endif
                     const int result = ::gzclose(m_gzfile);
                     m_gzfile = nullptr;
                     if (result != Z_OK) {
