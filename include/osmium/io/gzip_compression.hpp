@@ -36,7 +36,7 @@ DEALINGS IN THE SOFTWARE.
 /**
  * @file
  *
- * Include this file if you want to read or write gzip-compressed OSM XML
+ * Include this file if you want to read or write gzip-compressed OSM
  * files.
  *
  * @attention If you include this file, you'll need to link with `libz`.
@@ -69,13 +69,19 @@ namespace osmium {
      */
     struct gzip_error : public io_error {
 
-        int gzip_error_code;
-        int system_errno;
+        int gzip_error_code = 0;
+        int system_errno = 0;
+
+        explicit gzip_error(const std::string& what) :
+            io_error(what) {
+        }
 
         gzip_error(const std::string& what, const int error_code) :
             io_error(what),
-            gzip_error_code(error_code),
-            system_errno(error_code == Z_ERRNO ? errno : 0) {
+            gzip_error_code(error_code) {
+            if (error_code == Z_ERRNO) {
+                system_errno = errno;
+            }
         }
 
     }; // struct gzip_error
@@ -84,17 +90,15 @@ namespace osmium {
 
         namespace detail {
 
-            OSMIUM_NORETURN inline void throw_gzip_error(gzFile gzfile, const char* msg, int zlib_error = 0) {
+            OSMIUM_NORETURN inline void throw_gzip_error(gzFile gzfile, const char* msg) {
                 std::string error{"gzip error: "};
                 error += msg;
                 error += ": ";
-                int errnum = zlib_error;
-                if (zlib_error) {
-                    error += std::to_string(zlib_error);
-                } else if (gzfile) {
-                    error += ::gzerror(gzfile, &errnum);
+                int error_code = 0;
+                if (gzfile) {
+                    error += ::gzerror(gzfile, &error_code);
                 }
-                throw osmium::gzip_error{error, errnum};
+                throw osmium::gzip_error{error, error_code};
             }
 
         } // namespace detail
@@ -114,7 +118,7 @@ namespace osmium {
 #endif
                 m_gzfile = ::gzdopen(fd, "wb");
                 if (!m_gzfile) {
-                    detail::throw_gzip_error(m_gzfile, "write initialization failed");
+                    throw gzip_error{"gzip error: write initialization failed"};
                 }
             }
 
@@ -151,10 +155,10 @@ namespace osmium {
 #ifdef _MSC_VER
                     osmium::detail::disable_invalid_parameter_handler diph;
 #endif
-                    const int result = ::gzclose(m_gzfile);
+                    const int result = ::gzclose_w(m_gzfile);
                     m_gzfile = nullptr;
                     if (result != Z_OK) {
-                        detail::throw_gzip_error(m_gzfile, "write close failed", result);
+                        throw gzip_error{"gzip error: write close failed", result};
                     }
                     if (do_fsync()) {
                         osmium::io::detail::reliable_fsync(m_fd);
@@ -181,7 +185,7 @@ namespace osmium {
                         osmium::io::detail::reliable_close(fd);
                     } catch (...) {
                     }
-                    detail::throw_gzip_error(m_gzfile, "read initialization failed");
+                    throw gzip_error{"gzip error: read initialization failed"};
                 }
             }
 
@@ -222,10 +226,10 @@ namespace osmium {
 #ifdef _MSC_VER
                     osmium::detail::disable_invalid_parameter_handler diph;
 #endif
-                    const int result = ::gzclose(m_gzfile);
+                    const int result = ::gzclose_r(m_gzfile);
                     m_gzfile = nullptr;
                     if (result != Z_OK) {
-                        detail::throw_gzip_error(m_gzfile, "read close failed", result);
+                        throw gzip_error{"gzip error: read close failed", result};
                     }
                 }
             }
