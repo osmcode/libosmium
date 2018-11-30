@@ -201,7 +201,7 @@ namespace osmium {
                                     }
 
                                     if (version == -1) {
-                                        object.set_version(0U);
+                                        object.set_version(0u);
                                     } else {
                                         object.set_version(static_cast<object_version_type>(version));
                                     }
@@ -218,7 +218,7 @@ namespace osmium {
                                     }
 
                                     if (changeset_id == -1) {
-                                        object.set_changeset(0U);
+                                        object.set_changeset(0u);
                                     } else {
                                         object.set_changeset(static_cast<changeset_id_type>(changeset_id));
                                     }
@@ -260,7 +260,7 @@ namespace osmium {
                     }
                 }
 
-                int32_t convert_pbf_coordinate(int64_t c) const noexcept {
+                int32_t convert_pbf_coordinate(const int64_t c) const noexcept {
                     return int32_t((c * m_granularity + m_lon_offset) / resolution_convert);
                 }
 
@@ -530,10 +530,10 @@ namespace osmium {
                             lons.drop_front();
                             const auto lat = dense_latitude.update(lats.front());
                             lats.drop_front();
-                            builder.object().set_location(osmium::Location(
+                            builder.object().set_location(osmium::Location{
                                     convert_pbf_coordinate(lon),
                                     convert_pbf_coordinate(lat)
-                            ));
+                            });
 
                             if (tag_it != tags.end()) {
                                 build_tag_list_from_dense_nodes(builder, tag_it, tags.end());
@@ -645,7 +645,7 @@ namespace osmium {
                                     }
 
                                     if (version == -1) {
-                                        node.set_version(0U);
+                                        node.set_version(0u);
                                     } else {
                                         node.set_version(static_cast<osmium::object_version_type>(version));
                                     }
@@ -659,7 +659,7 @@ namespace osmium {
                                     }
 
                                     if (changeset_id == -1) {
-                                        node.set_changeset(0U);
+                                        node.set_changeset(0u);
                                     } else {
                                         node.set_changeset(static_cast<osmium::changeset_id_type>(changeset_id));
                                     }
@@ -711,7 +711,7 @@ namespace osmium {
 
             public:
 
-                PBFPrimitiveBlockDecoder(const data_view& data, osmium::osm_entity_bits::type read_types, osmium::io::read_meta read_metadata) :
+                PBFPrimitiveBlockDecoder(const data_view& data, const osmium::osm_entity_bits::type read_types, const osmium::io::read_meta read_metadata) :
                     m_data(data),
                     m_read_types(read_types),
                     m_read_metadata(read_metadata) {
@@ -815,8 +815,8 @@ namespace osmium {
                     }
 
                     osmium::Box box;
-                    box.extend(osmium::Location(left  / resolution_convert, bottom / resolution_convert));
-                    box.extend(osmium::Location(right / resolution_convert, top    / resolution_convert));
+                    box.extend(osmium::Location{left  / resolution_convert, bottom / resolution_convert});
+                    box.extend(osmium::Location{right / resolution_convert, top    / resolution_convert});
 
                     return box;
             }
@@ -895,7 +895,7 @@ namespace osmium {
 
             public:
 
-                PBFDataBlobDecoder(std::string&& input_buffer, osmium::osm_entity_bits::type read_types, osmium::io::read_meta read_metadata) :
+                PBFDataBlobDecoder(std::string&& input_buffer, const osmium::osm_entity_bits::type read_types, const osmium::io::read_meta read_metadata) :
                     m_input_buffer(std::make_shared<std::string>(std::move(input_buffer))),
                     m_read_types(read_types),
                     m_read_metadata(read_metadata) {

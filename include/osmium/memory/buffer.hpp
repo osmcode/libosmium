@@ -102,8 +102,8 @@ namespace osmium {
             using value_type = Item;
 
             enum class auto_grow {
-                no  = 0,
-                yes = 1,
+                no       = 0,
+                yes      = 1,
                 internal = 2
             }; // enum class auto_grow
 
