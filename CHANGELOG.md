@@ -8,9 +8,22 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+* Function `dump_as_array()` to dump sparse array indexes.
+* Set the `xml_josm_upload` header option when reading XML files.
+* More tests.
+
 ### Changed
 
+* When reading PBF files Libosmium now has considerably less memory overhead.
+  This works by using more, but smaller buffers.
+* Use enums for many constants instead of (static) const(expr) variables.
+* Hardcode `%lld` format instead of using `<cinttypes>` PRI macro.
+* Update included gdalcpp to version 1.2.0.
+
 ### Fixed
+
+* The gzip/bzip2 compression code was overhauled and is better tested now.
+  This fixes some bugs on Windows.
 
 
 ## [2.14.2] - 2018-07-23
