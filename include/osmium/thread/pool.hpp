@@ -79,8 +79,7 @@ namespace osmium {
             }
 
             inline std::size_t get_work_queue_size() noexcept {
-                const std::size_t n = osmium::config::get_max_queue_size("WORK", 10);
-                return n > 2 ? n : 2;
+                return osmium::config::get_max_queue_size("WORK", 10);
             }
 
         } // namespace detail

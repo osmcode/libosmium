@@ -68,9 +68,8 @@ namespace osmium {
 
         namespace detail {
 
-            inline size_t get_output_queue_size() noexcept {
-                size_t n = osmium::config::get_max_queue_size("OUTPUT", 20);
-                return n > 2 ? n : 2;
+            inline std::size_t get_output_queue_size() noexcept {
+                return osmium::config::get_max_queue_size("OUTPUT", 20);
             }
 
         } // namespace detail

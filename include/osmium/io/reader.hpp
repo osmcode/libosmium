@@ -72,13 +72,11 @@ namespace osmium {
         namespace detail {
 
             inline std::size_t get_input_queue_size() noexcept {
-                const std::size_t n = osmium::config::get_max_queue_size("INPUT", 20);
-                return n > 2 ? n : 2;
+                return osmium::config::get_max_queue_size("INPUT", 20);
             }
 
             inline std::size_t get_osmdata_queue_size() noexcept {
-                const std::size_t n = osmium::config::get_max_queue_size("OSMDATA", 20);
-                return n > 2 ? n : 2;
+                return osmium::config::get_max_queue_size("OSMDATA", 20);
             }
 
         } // namespace detail
