@@ -81,7 +81,7 @@ namespace osmium {
             class PBFPrimitiveBlockDecoder {
 
                 enum {
-                    initial_buffer_size = 256ul * 1024ul
+                    initial_buffer_size = 64ul * 1024ul
                 };
 
                 data_view m_data;
