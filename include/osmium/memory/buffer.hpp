@@ -399,13 +399,18 @@ namespace osmium {
             }
 
             /**
-             * Return the nested buffer. The buffer will be moved out.
+             * Return the most deeply nested buffer. The buffer will be moved
+             * out.
              *
              * @pre has_nested_buffers()
              */
-            std::unique_ptr<Buffer> next_buffer() noexcept {
+            std::unique_ptr<Buffer> get_last_nested() {
                 assert(has_nested_buffers());
-                return std::move(m_next_buffer);
+                Buffer* buffer = this;
+                while (buffer->m_next_buffer->has_nested_buffers()) {
+                    buffer = buffer->m_next_buffer.get();
+                }
+                return std::move(buffer->m_next_buffer);
             }
 
             /**

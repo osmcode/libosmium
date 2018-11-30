@@ -52,7 +52,6 @@ DEALINGS IN THE SOFTWARE.
 #include <fcntl.h>
 #include <future>
 #include <memory>
-#include <stack>
 #include <string>
 #include <system_error>
 #include <thread>
@@ -93,10 +92,9 @@ namespace osmium {
         class Reader {
 
             // The Reader::read() function reads from a queue of buffers which
-            // can contain nested buffers. These nested buffers will be pushed
-            // on this stack, because read() can only return a single unnested
-            // buffer.
-            std::stack<osmium::memory::Buffer> m_buffer_stack{};
+            // can contain nested buffers. These nested buffers will be in
+            // here, because read() can only return a single unnested buffer.
+            osmium::memory::Buffer m_back_buffers{};
 
             osmium::io::File m_file;
 
@@ -379,9 +377,13 @@ namespace osmium {
                 osmium::memory::Buffer buffer;
 
                 // If there are buffers on the stack, return those first.
-                if (!m_buffer_stack.empty()) {
-                    buffer = std::move(m_buffer_stack.top());
-                    m_buffer_stack.pop();
+                if (m_back_buffers) {
+                    if (m_back_buffers.has_nested_buffers()) {
+                        buffer = std::move(*m_back_buffers.get_last_nested());
+                    } else {
+                        buffer = std::move(m_back_buffers);
+                        m_back_buffers = osmium::memory::Buffer{};
+                    }
                     return buffer;
                 }
 
@@ -406,12 +408,9 @@ namespace osmium {
                             m_read_thread_manager.close();
                             return buffer;
                         }
-                        while (buffer.has_nested_buffers()) {
-                            std::unique_ptr<osmium::memory::Buffer> next = buffer.next_buffer();
-                            assert(!buffer.has_nested_buffers());
-                            assert(next);
-                            m_buffer_stack.push(std::move(buffer));
-                            buffer = std::move(*next);
+                        if (buffer.has_nested_buffers()) {
+                            m_back_buffers = std::move(buffer);
+                            buffer = std::move(*m_back_buffers.get_last_nested());
                         }
                         if (buffer.committed() > 0) {
                             return buffer;
