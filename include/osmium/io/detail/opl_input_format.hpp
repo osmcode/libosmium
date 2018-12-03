@@ -127,7 +127,7 @@ namespace osmium {
                 void parse_line(const char* data) {
                     if (opl_parse_line(m_line_count, data, m_buffer, read_types())) {
                         if (m_buffer.has_nested_buffers()) {
-                            auto buffer_ptr{m_buffer.get_last_nested()};
+                            std::unique_ptr<osmium::memory::Buffer> buffer_ptr{m_buffer.get_last_nested()};
                             send_to_output_queue(std::move(*buffer_ptr));
                         }
                     }

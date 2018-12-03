@@ -702,7 +702,7 @@ namespace osmium {
 
                 void flush_buffer() {
                     if (m_buffer.has_nested_buffers()) {
-                        auto buffer_ptr{m_buffer.get_last_nested()};
+                        std::unique_ptr<osmium::memory::Buffer> buffer_ptr{m_buffer.get_last_nested()};
                         send_to_output_queue(std::move(*buffer_ptr));
                     }
                 }
