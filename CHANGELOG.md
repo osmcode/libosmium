@@ -14,8 +14,8 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
-* When reading PBF files Libosmium now has considerably less memory overhead.
-  This works by using more, but smaller buffers.
+* When reading OSM files Libosmium now has less memory overhead, especially
+  when reading PBF files. This works by using more, but smaller buffers.
 * Use enums for many constants instead of (static) const(expr) variables.
 * Hardcode `%lld` format instead of using `<cinttypes>` PRI macro.
 * Update included gdalcpp to version 1.2.0.

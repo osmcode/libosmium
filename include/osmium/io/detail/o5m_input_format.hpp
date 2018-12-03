@@ -152,12 +152,13 @@ namespace osmium {
             class O5mParser : public Parser {
 
                 enum {
-                    buffer_size = 2ul * 1000ul * 1000ul
+                    initial_buffer_size = 1024ul * 1024ul
                 };
 
                 osmium::io::Header m_header{};
 
-                osmium::memory::Buffer m_buffer;
+                osmium::memory::Buffer m_buffer{initial_buffer_size,
+                                                osmium::memory::Buffer::auto_grow::internal};
 
                 std::string m_input{};
 
@@ -515,13 +516,6 @@ namespace osmium {
                     m_header.set("timestamp", timestamp);
                 }
 
-                void flush() {
-                    osmium::memory::Buffer buffer{buffer_size};
-                    using std::swap;
-                    swap(m_buffer, buffer);
-                    send_to_output_queue(std::move(buffer));
-                }
-
                 enum class dataset_type : unsigned char {
                     node         = 0x10,
                     way          = 0x11,
@@ -594,14 +588,15 @@ namespace osmium {
 
                             m_data += length;
 
-                            if (m_buffer.committed() > buffer_size / 10 * 9) {
-                                flush();
+                            if (m_buffer.has_nested_buffers()) {
+                                auto buffer_ptr{m_buffer.get_last_nested()};
+                                send_to_output_queue(std::move(*buffer_ptr));
                             }
                         }
                     }
 
-                    if (m_buffer.committed()) {
-                        flush();
+                    if (m_buffer.committed() > 0) {
+                        send_to_output_queue(std::move(m_buffer));
                     }
 
                     mark_header_as_done();
@@ -611,7 +606,6 @@ namespace osmium {
 
                 explicit O5mParser(parser_arguments& args) :
                     Parser(args),
-                    m_buffer(buffer_size),
                     m_data(m_input.data()),
                     m_end(m_data) {
                 }
