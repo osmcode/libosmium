@@ -125,7 +125,7 @@ namespace osmium {
 
         protected:
 
-            explicit Item(item_size_type size = 0, item_type type = item_type()) noexcept :
+            explicit Item(item_size_type size = 0, item_type type = item_type{}) noexcept :
                 m_size(size),
                 m_type(type),
                 m_removed(false),
@@ -176,7 +176,7 @@ namespace osmium {
                 return m_removed;
             }
 
-            void set_removed(bool removed) noexcept {
+            void set_removed(const bool removed) noexcept {
                 m_removed = removed;
             }
 
@@ -189,7 +189,7 @@ namespace osmium {
                 return diff_chars[m_diff];
             }
 
-            void set_diff(diff_indicator_type diff) noexcept {
+            void set_diff(const diff_indicator_type diff) noexcept {
                 m_diff = uint16_t(diff);
             }
 
