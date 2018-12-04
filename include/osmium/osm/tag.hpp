@@ -78,10 +78,20 @@ namespace osmium {
 
         static constexpr item_type collection_type = item_type::tag_list;
 
+        /**
+         * Get a pointer to the C string containing the tag key.
+         *
+         * Complexity: Constant.
+         */
         const char* key() const noexcept {
             return reinterpret_cast<const char*>(data());
         }
 
+        /**
+         * Get a pointer to the C string containing the tag value.
+         *
+         * Complexity: Linear on the number of characters in the key!
+         */
         const char* value() const noexcept {
             return reinterpret_cast<const char*>(after_null(data()));
         }
