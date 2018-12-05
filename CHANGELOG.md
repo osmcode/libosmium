@@ -16,6 +16,9 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 * When reading OSM files Libosmium now has less memory overhead, especially
   when reading PBF files. This works by using more, but smaller buffers.
+* The `TagsFilter` class is now based on the `TagsFilterBase` template
+  class which allows setting the result type. This allows the filter to
+  return more data depending on the rule that matched.
 * Use enums for many constants instead of (static) const(expr) variables.
 * Hardcode `%lld` format instead of using `<cinttypes>` PRI macro.
 * Update included gdalcpp to version 1.2.0.
