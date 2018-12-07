@@ -271,8 +271,48 @@ namespace osmium {
             Buffer& operator=(const Buffer&) = delete;
 
             // buffers can be moved
-            Buffer(Buffer&&) = default;
-            Buffer& operator=(Buffer&&) = default;
+            Buffer(Buffer&& other) noexcept :
+                m_next_buffer(std::move(other.m_next_buffer)),
+                m_memory(std::move(other.m_memory)),
+                m_data(other.m_data),
+                m_capacity(other.m_capacity),
+                m_written(other.m_written),
+                m_committed(other.m_committed),
+#ifndef NDEBUG
+                m_builder_count(other.m_builder_count),
+#endif
+                m_auto_grow(other.m_auto_grow),
+                m_full(std::move(other.m_full)) {
+                other.m_data = nullptr;
+                other.m_capacity = 0;
+                other.m_written = 0;
+                other.m_committed = 0;
+#ifndef NDEBUG
+                other.m_builder_count = 0;
+#endif
+            }
+
+            Buffer& operator=(Buffer&& other) noexcept {
+                m_next_buffer = std::move(other.m_next_buffer);
+                m_memory = std::move(other.m_memory);
+                m_data = other.m_data;
+                m_capacity = other.m_capacity;
+                m_written = other.m_written;
+                m_committed = other.m_committed;
+#ifndef NDEBUG
+                m_builder_count = other.m_builder_count;
+#endif
+                m_auto_grow = other.m_auto_grow;
+                m_full = std::move(other.m_full);
+                other.m_data = nullptr;
+                other.m_capacity = 0;
+                other.m_written = 0;
+                other.m_committed = 0;
+#ifndef NDEBUG
+                other.m_builder_count = 0;
+#endif
+                return *this;
+            }
 
             ~Buffer() noexcept = default;
 

@@ -80,7 +80,7 @@ namespace osmium {
             }
 
 #ifdef NDEBUG
-            ~Builder() = default;
+            ~Builder() noexcept = default;
 #else
             ~Builder() noexcept {
                 m_buffer.decrement_builder_count();
