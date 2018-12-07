@@ -10,6 +10,8 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 * Function `dump_as_array()` to dump sparse array indexes.
 * Set the `xml_josm_upload` header option when reading XML files.
+* New function `OSMObject::remove_tags()` marks tags on OSM objects as
+  removed.
 * More tests.
 
 ### Changed

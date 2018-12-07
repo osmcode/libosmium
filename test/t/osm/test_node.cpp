@@ -50,6 +50,9 @@ TEST_CASE("Build node") {
     node.set_visible(false);
     REQUIRE_FALSE(node.visible());
     REQUIRE(node.deleted());
+
+    node.remove_tags();
+    REQUIRE(node.tags().empty());
 }
 
 TEST_CASE("default values for node attributes") {

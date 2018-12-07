@@ -27,7 +27,7 @@ TEST_CASE("Build way") {
         _nodes({1, 3, 2})
     );
 
-    const osmium::Way& way = buffer.get<osmium::Way>(0);
+    osmium::Way& way = buffer.get<osmium::Way>(0);
 
     REQUIRE(osmium::item_type::way == way.type());
     REQUIRE(way.type_is_in(osmium::osm_entity_bits::way));
@@ -49,6 +49,10 @@ TEST_CASE("Build way") {
     osmium::CRC<crc_type> crc32;
     crc32.update(way);
     REQUIRE(crc32().checksum() == 0x65f6ba91);
+
+    way.remove_tags();
+    REQUIRE(way.tags().empty());
+    REQUIRE(3 == way.nodes().size());
 }
 
 TEST_CASE("build closed way") {
