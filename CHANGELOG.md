@@ -8,6 +8,15 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+### Changed
+
+### Fixed
+
+
+## [2.15.0] - 2018-12-07
+
+### Added
+
 * Function `dump_as_array()` to dump sparse array indexes.
 * Set the `xml_josm_upload` header option when reading XML files.
 * New function `OSMObject::remove_tags()` marks tags on OSM objects as
@@ -22,7 +31,7 @@ This project adheres to [Semantic Versioning](https://semver.org/).
   class which allows setting the result type. This allows the filter to
   return more data depending on the rule that matched.
 * Use enums for many constants instead of (static) const(expr) variables.
-* Make chunk_bits in IdSetDense configurable.
+* Make `chunk_bits` in `IdSetDense` configurable.
 * Hardcode `%lld` format instead of using `<cinttypes>` PRI macro.
 * Update included gdalcpp to version 1.2.0.
 
@@ -888,7 +897,8 @@ This project adheres to [Semantic Versioning](https://semver.org/).
   Doxygen (up to version 1.8.8). This version contains a workaround to fix
   this.
 
-[unreleased]: https://github.com/osmcode/libosmium/compare/v2.14.2...HEAD
+[unreleased]: https://github.com/osmcode/libosmium/compare/v2.15.0...HEAD
+[2.15.0]: https://github.com/osmcode/libosmium/compare/v2.14.2...v2.15.0
 [2.14.2]: https://github.com/osmcode/libosmium/compare/v2.14.1...v2.14.2
 [2.14.1]: https://github.com/osmcode/libosmium/compare/v2.14.0...v2.14.1
 [2.14.0]: https://github.com/osmcode/libosmium/compare/v2.13.1...v2.14.0
