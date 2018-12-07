@@ -91,7 +91,7 @@ struct result_type {
         b(b_) {
     }
 
-    operator bool() const noexcept {
+    explicit operator bool() const noexcept {
         return b;
     }
 

@@ -27,7 +27,7 @@ TEST_CASE("Build way") {
         _nodes({1, 3, 2})
     );
 
-    osmium::Way& way = buffer.get<osmium::Way>(0);
+    auto& way = buffer.get<osmium::Way>(0);
 
     REQUIRE(osmium::item_type::way == way.type());
     REQUIRE(way.type_is_in(osmium::osm_entity_bits::way));
