@@ -130,7 +130,7 @@ TEST_CASE("Map Id to location: DenseMmapArray") {
     test_func_real<index_type>(index2);
 }
 #else
-# pragma message("not running 'DenseMapMmap' test case on this machine")
+# pragma message("not running 'DenseMmapArray' test case on this machine")
 #endif
 
 TEST_CASE("Map Id to location: DenseFileArray") {
