@@ -10,8 +10,6 @@
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/types.hpp>
 
-#include <functional>
-
 using dense_file_array = osmium::index::map::DenseFileArray<osmium::unsigned_object_id_type, osmium::Location>;
 using sparse_file_array = osmium::index::map::SparseFileArray<osmium::unsigned_object_id_type, osmium::Location>;
 
@@ -35,7 +33,7 @@ void test_index(std::function<void(TMemoryIndex&, const int)> dump_method) {
     index.sort();
     dump_method(index, fd);
 
-    REQUIRE(osmium::file_size(fd) >= (3 * sizeof(dense_file_array::element_type)));
+    REQUIRE(osmium::file_size(fd) >= (3 * sizeof(typename TFileIndex::element_type)));
 
     // load index from file
     TFileIndex file_index{fd};
@@ -49,13 +47,11 @@ void test_index(std::function<void(TMemoryIndex&, const int)> dump_method) {
     REQUIRE_THROWS_AS(file_index.get(200), const osmium::not_found&);
 }
 
-using namespace std::placeholders;
-
 #ifdef __linux__
 using dense_mmap_array = osmium::index::map::DenseMmapArray<osmium::unsigned_object_id_type, osmium::Location>;
 
 TEST_CASE("Dump DenseMmapArray, load as DenseFileArray") {
-    auto dump_method = std::bind(&dense_mmap_array::dump_as_array, _1, _2);
+    auto dump_method = [](dense_mmap_array& index, const int fd) { index.dump_as_array(fd);};
     test_index<dense_mmap_array, dense_file_array>(dump_method);
 }
 #else
@@ -65,7 +61,7 @@ TEST_CASE("Dump DenseMmapArray, load as DenseFileArray") {
 using dense_mem_array = osmium::index::map::DenseMemArray<osmium::unsigned_object_id_type, osmium::Location>;
 
 TEST_CASE("Dump DenseMemArray, load as DenseFileArray") {
-    auto dump_method = std::bind(&dense_mem_array::dump_as_array, _1, _2);
+    auto dump_method = [](dense_mem_array& index, const int fd) { index.dump_as_array(fd);};
     test_index<dense_mem_array, dense_file_array>(dump_method);
 }
 
@@ -73,7 +69,7 @@ TEST_CASE("Dump DenseMemArray, load as DenseFileArray") {
 using sparse_mmap_array = osmium::index::map::SparseMmapArray<osmium::unsigned_object_id_type, osmium::Location>;
 
 TEST_CASE("Dump SparseMmapArray, load as SparseFileArray") {
-    auto dump_method = std::bind(&sparse_mmap_array::dump_as_list, _1, _2);
+    auto dump_method = [](sparse_mmap_array& index, const int fd) { index.dump_as_list(fd);};
     test_index<sparse_mmap_array, sparse_file_array>(dump_method);
 }
 #else
@@ -83,6 +79,6 @@ TEST_CASE("Dump SparseMmapArray, load as SparseFileArray") {
 using sparse_mem_array = osmium::index::map::SparseMemArray<osmium::unsigned_object_id_type, osmium::Location>;
 
 TEST_CASE("Dump SparseMemArray, load as SparseFileArray") {
-    auto dump_method = std::bind(&sparse_mem_array::dump_as_list, _1, _2);
+    auto dump_method = [](sparse_mem_array& index, const int fd) { index.dump_as_list(fd);};
     test_index<sparse_mem_array, sparse_file_array>(dump_method);
 }
