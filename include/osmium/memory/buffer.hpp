@@ -517,6 +517,7 @@ namespace osmium {
             template <typename T>
             T& get(const std::size_t offset) const {
                 assert(m_data && "This must be a valid buffer");
+                assert(offset % alignof(T) == 0 && "Wrong alignment");
                 return *reinterpret_cast<T*>(&m_data[offset]);
             }
 
@@ -714,6 +715,7 @@ namespace osmium {
             template <typename T>
             t_iterator<T> get_iterator(std::size_t offset) {
                 assert(m_data && "This must be a valid buffer");
+                assert(offset % alignof(T) == 0 && "Wrong alignment");
                 return {m_data + offset, m_data + m_committed};
             }
 
@@ -728,6 +730,7 @@ namespace osmium {
              */
             iterator get_iterator(std::size_t offset) {
                 assert(m_data && "This must be a valid buffer");
+                assert(offset % alignof(OSMEntity) == 0 && "Wrong alignment");
                 return {m_data + offset, m_data + m_committed};
             }
 
@@ -772,11 +775,13 @@ namespace osmium {
             template <typename T>
             t_const_iterator<T> get_iterator(std::size_t offset) const {
                 assert(m_data && "This must be a valid buffer");
+                assert(offset % alignof(T) == 0 && "Wrong alignment");
                 return {m_data + offset, m_data + m_committed};
             }
 
             const_iterator get_iterator(std::size_t offset) const {
                 assert(m_data && "This must be a valid buffer");
+                assert(offset % alignof(OSMEntity) == 0 && "Wrong alignment");
                 return {m_data + offset, m_data + m_committed};
             }
 
