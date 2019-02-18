@@ -605,7 +605,11 @@ namespace osmium {
                     }
                 }
 
+#ifdef NDEBUG
+                void end_element(const XML_Char* /*element*/) {
+#else
                 void end_element(const XML_Char* element) {
+#endif
                     assert(!m_context_stack.empty());
                     switch (m_context_stack.back()) {
                         case context::osm:
