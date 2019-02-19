@@ -216,7 +216,7 @@ namespace osmium {
                 return (id >> 3u) & ((1u << chunk_bits) - 1u);
             }
 
-            static unsigned char bitmask(T id) noexcept {
+            static unsigned int bitmask(T id) noexcept {
                 return 1u << (id & 0x7u);
             }
 
