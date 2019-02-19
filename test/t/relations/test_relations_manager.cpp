@@ -84,7 +84,7 @@ struct CallbackRM : public osmium::relations::RelationsManager<CallbackRM, true,
         return member.type() == osmium::item_type::node;
     }
 
-    void complete_relation(const osmium::Relation& relation) noexcept {
+    void complete_relation(const osmium::Relation& relation) {
         for (const auto& member : relation.members()) {
             if (member.type() == osmium::item_type::node) {
                 ++count_nodes;
