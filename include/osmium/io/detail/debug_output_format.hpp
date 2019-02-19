@@ -197,7 +197,12 @@ namespace osmium {
 
                 void write_counter(int width, int n) {
                     write_color(color_white);
+#pragma GCC diagnostic push
+#if !defined(__clang__) && defined(__GNUC__) && (__GNUC__ > 7)
+#pragma GCC diagnostic ignored "-Wformat-truncation"
+#endif
                     output_formatted("    %0*d: ", width, n++);
+#pragma GCC diagnostic pop
                     write_color(color_reset);
                 }
 
