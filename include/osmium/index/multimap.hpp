@@ -113,7 +113,7 @@ namespace osmium {
                 }
 
                 virtual void dump_as_list(const int /*fd*/) {
-                    std::runtime_error("can't dump as list");
+                    throw std::runtime_error{"can't dump as list"};
                 }
 
             }; // class Multimap
