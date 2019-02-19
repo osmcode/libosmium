@@ -196,7 +196,7 @@ int main(int argc, char* argv[]) {
         reader.close();
     } catch (const std::exception& e) {
         // All exceptions used by the Osmium library derive from std::exception.
-        std::cerr << e.what() << "\n";
+        std::cerr << e.what() << '\n';
         std::exit(1);
     }
 }

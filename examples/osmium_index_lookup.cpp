@@ -363,7 +363,8 @@ int main(int argc, char* argv[]) {
         const auto index = create<std::size_t>(options.dense_format(), fd);
         return run(*index, options);
     } catch (const std::exception& e) {
-        std::cerr << "Error: " << e.what() << '\n';
+        // All exceptions used by the Osmium library derive from std::exception.
+        std::cerr << e.what() << '\n';
         std::exit(1);
     }
 }
