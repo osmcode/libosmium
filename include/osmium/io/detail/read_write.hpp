@@ -75,12 +75,12 @@ namespace osmium {
 
                 int flags = O_WRONLY | O_CREAT; // NOLINT(hicpp-signed-bitwise)
                 if (allow_overwrite == osmium::io::overwrite::allow) {
-                    flags |= O_TRUNC;
+                    flags |= O_TRUNC; // NOLINT(hicpp-signed-bitwise)
                 } else {
-                    flags |= O_EXCL;
+                    flags |= O_EXCL; // NOLINT(hicpp-signed-bitwise)
                 }
 #ifdef _WIN32
-                flags |= O_BINARY;
+                flags |= O_BINARY; // NOLINT(hicpp-signed-bitwise)
 #endif
                 const int fd = ::open(filename.c_str(), flags, 0666);
                 if (fd < 0) {

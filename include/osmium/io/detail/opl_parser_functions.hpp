@@ -158,7 +158,7 @@ namespace osmium {
                         *data = s;
                         return;
                     }
-                    value <<= 4;
+                    value <<= 4u;
                     if (*s >= '0' && *s <= '9') {
                         value += *s - '0';
                     } else if (*s >= 'a' && *s <= 'f') {

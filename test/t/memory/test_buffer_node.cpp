@@ -54,6 +54,8 @@ void check_node_2(const osmium::Node& node) {
                 REQUIRE(std::string("name") == tag.key());
                 REQUIRE(std::string("OSM Savings") == tag.value());
                 break;
+            default:
+                REQUIRE(false);
         }
         ++n;
     }
