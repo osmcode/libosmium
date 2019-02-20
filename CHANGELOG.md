@@ -8,9 +8,21 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+* More tests.
+* CMake config: also find clang-tidy-7.
+
 ### Changed
 
+* Example and benchmark programs now don't crash with exceptions any more
+  but report them properly.
+
 ### Fixed
+
+* Compile with NDEBUG in RelWithDebInfo mode.
+* Correctly throw exception in `multimap::dump_as_list()`.
+* Integer truncation on 32 bit systems in `MemoryUsage`.
+* Exception specification on some functions.
+* Forwarding references that might have hidden copy/move constructors.
 
 
 ## [2.15.0] - 2018-12-07
