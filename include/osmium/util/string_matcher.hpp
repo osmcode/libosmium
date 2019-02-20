@@ -389,9 +389,9 @@ namespace osmium {
          *                  osmium::StringMatcher::always_false, always_true,
          *                  equal, prefix, substring, regex or list.
          */
-        template <typename TMatcher, typename std::enable_if<
-            std::is_base_of<matcher, TMatcher>::value, int>::type = 0>
-        StringMatcher(TMatcher&& matcher) : // NOLINT(google-explicit-constructor, hicpp-explicit-conversions, misc-forwarding-reference-overload)
+        template <typename TMatcher, typename X = typename std::enable_if<
+            std::is_base_of<matcher, TMatcher>::value, void>::type>
+        StringMatcher(TMatcher&& matcher) : // NOLINT(google-explicit-constructor, hicpp-explicit-conversions)
             m_matcher(std::forward<TMatcher>(matcher)) {
         }
 

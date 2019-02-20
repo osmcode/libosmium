@@ -87,9 +87,10 @@ namespace osmium {
 
             // Constructor must not be "explicit" for wrapper
             // to work seemlessly.
-            template <typename TFunction>
+            template <typename TFunction, typename X = typename std::enable_if<
+                !std::is_same<TFunction, function_wrapper>::value, void>::type>
             // cppcheck-suppress noExplicitConstructor
-            function_wrapper(TFunction&& f) : // NOLINT(google-explicit-constructor, hicpp-explicit-conversions, misc-forwarding-reference-overload)
+            function_wrapper(TFunction&& f) : // NOLINT(google-explicit-constructor, hicpp-explicit-conversions)
                 impl(new impl_type<TFunction>(std::forward<TFunction>(f))) {
             }
 
