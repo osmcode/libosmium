@@ -14,16 +14,16 @@ clone_depth: 1
 
 environment:
   matrix:
+  - config: Debug
+    autocrlf: true
+  - config: Release
+    autocrlf: true
+  - config: Debug
+    autocrlf: false
+  - config: Release
+    autocrlf: false
   - config: MSYS2
     autocrlf: true
-  - config: Debug
-    autocrlf: true
-  - config: Release
-    autocrlf: true
-  - config: Debug
-    autocrlf: false
-  - config: Release
-    autocrlf: false
 
 #-----------------------------------------------------------------------------
 
