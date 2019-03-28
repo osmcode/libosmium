@@ -103,6 +103,10 @@ namespace osmium {
              */
             class BasicAssembler {
 
+                enum {
+                    max_split_locations = 100
+                };
+
                 struct slocation {
 
                     enum {
@@ -1079,6 +1083,15 @@ namespace osmium {
                         timer_simple_case.start();
                         create_rings_simple_case();
                         timer_simple_case.stop();
+                    } else if (m_split_locations.size() > max_split_locations) {
+                        if (debug()) {
+                            std::cerr << "  Ignoring polygon with "
+                                      << m_split_locations.size()
+                                      << " split locations (>"
+                                      << std::to_string(max_split_locations)
+                                      << ")\n";
+                        }
+                        return false;
                     } else {
                         if (debug()) {
                             std::cerr << "  Found split locations -> using complex algorithm\n";
