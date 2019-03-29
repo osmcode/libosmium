@@ -103,9 +103,7 @@ namespace osmium {
              */
             class BasicAssembler {
 
-                enum {
-                    max_split_locations = 100
-                };
+                static constexpr const std::size_t max_split_locations = 100ull;
 
                 struct slocation {
 
@@ -1088,7 +1086,7 @@ namespace osmium {
                             std::cerr << "  Ignoring polygon with "
                                       << m_split_locations.size()
                                       << " split locations (>"
-                                      << std::to_string(max_split_locations)
+                                      << max_split_locations
                                       << ")\n";
                         }
                         return false;
