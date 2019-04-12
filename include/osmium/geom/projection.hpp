@@ -158,6 +158,12 @@ namespace osmium {
                 m_crs_user(epsg) {
             }
 
+            /**
+             * Do coordinate transformation.
+             *
+             * @pre Location must be in valid range (depends on projection
+             *      used).
+             */
             Coordinates operator()(osmium::Location location) const {
                 if (m_epsg == 4326) {
                     return Coordinates{location.lon(), location.lat()};
