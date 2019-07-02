@@ -31,7 +31,7 @@ FOR ANY DAMAGES OR OTHER LIABILITY, WHETHER IN CONTRACT, TORT OR OTHERWISE,
 ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 
-*/
+ */
 
 /**
  * @file
@@ -62,37 +62,39 @@ namespace osmium {
         class CRS {
 
             struct ProjCRSDeleter {
+
                 void operator()(PJconsts* crs) {
                     proj_destroy(crs);
                 }
             }; // struct ProjCRSDeleter
 
             std::unique_ptr<PJconsts, ProjCRSDeleter> m_crs;
-            std::unique_ptr<const char> m_crs_char;
+            std::unique_ptr<const char*> m_crs_char;
 
         public:
 
             explicit CRS(const char* crs) :
-                m_crs(proj_create(PJ_DEFAULT_CTX, crs), ProjCRSDeleter()) {
-                    if (!m_crs) {
-                        throw osmium::projection_error{std::string{"creation of CRS failed: "} + proj_errno_string(proj_errno(proj_create(PJ_DEFAULT_CTX, crs)))};
-                    }
-                    m_crs_char(crs);
+            m_crs(proj_create(PJ_DEFAULT_CTX, crs), ProjCRSDeleter()) {
+                if (!m_crs) {
+                    throw osmium::projection_error{std::string{"creation of CRS failed: "} +proj_errno_string(proj_errno(proj_create(PJ_DEFAULT_CTX, crs)))};
+                }
+                m_crs_char(crs);
             }
 
             explicit CRS(const std::string& crs) :
-                CRS(crs.c_str()) {
+            CRS(crs.c_str()) {
             }
 
             explicit CRS(int epsg) :
-                CRS(std::string{"+init=epsg:"} + std::to_string(epsg)) {
+            CRS(std::string{"+init=epsg:"}
+            +std::to_string(epsg)) {
             }
 
             /**
              * Get underlying projPJ handle from proj library.
              */
             PJconsts* get() const noexcept {
-                return const_cast <PJconsts *>(m_crs.get()); 
+                return const_cast<PJconsts *> (m_crs.get());
             }
 
             /**
@@ -103,11 +105,11 @@ namespace osmium {
             }
 
             bool is_latlong() const noexcept {
-                return proj_get_type(const_cast <PJconsts *>(m_crs.get())) == PJ_TYPE_GEOGRAPHIC_2D_CRS;
+                return proj_get_type(const_cast<PJconsts *> (m_crs.get())) == PJ_TYPE_GEOGRAPHIC_2D_CRS;
             }
 
             bool is_geocent() const noexcept {
-                return proj_get_type(const_cast <PJconsts *>(m_crs.get())) == PJ_TYPE_GEOCENTRIC_CRS;
+                return proj_get_type(const_cast<PJconsts *> (m_crs.get())) == PJ_TYPE_GEOCENTRIC_CRS;
             }
 
         }; // class CRS
@@ -121,6 +123,7 @@ namespace osmium {
          * @throws osmium::projection_error if the projection fails
          */
         // cppcheck-suppress passedByValue (because c is small and we want to change it)
+
         inline Coordinates transform(const CRS& src, const CRS& dest, Coordinates c) {
             PJ *P;
             PJ_COORD a, result;
@@ -129,7 +132,7 @@ namespace osmium {
             a = proj_coord(c.x, c.y, 0, 0);
             result = proj_trans(P, PJ_FWD, a);
             if (proj_errno(P) != 0) {
-                throw osmium::projection_error{std::string{"projection failed: "} + proj_errno_string(proj_errno(P))};
+                throw osmium::projection_error{std::string{"projection failed: "} +proj_errno_string(proj_errno(P))};
             }
 
             c.x = result.xy.x;
@@ -149,7 +152,6 @@ namespace osmium {
          * not work if you use any of the constructors taking a string.
          */
         class Projection {
-
             int m_epsg;
             std::string m_proj_string;
             CRS m_crs_wgs84{4326};
@@ -158,21 +160,22 @@ namespace osmium {
         public:
 
             explicit Projection(const std::string& proj_string) :
-                m_epsg(-1),
-                m_proj_string(proj_string),
-                m_crs_user(proj_string) {
+            m_epsg(-1),
+            m_proj_string(proj_string),
+            m_crs_user(proj_string) {
             }
 
             explicit Projection(const char* proj_string) :
-                m_epsg(-1),
-                m_proj_string(proj_string),
-                m_crs_user(proj_string) {
+            m_epsg(-1),
+            m_proj_string(proj_string),
+            m_crs_user(proj_string) {
             }
 
             explicit Projection(int epsg) :
-                m_epsg(epsg),
-                m_proj_string(std::string{"+init=epsg:"} + std::to_string(epsg)),
-                m_crs_user(epsg) {
+            m_epsg(epsg),
+            m_proj_string(std::string{"+init=epsg:"}
+            +std::to_string(epsg)),
+            m_crs_user(epsg) {
             }
 
             /**
@@ -188,11 +191,12 @@ namespace osmium {
 
                 if (m_epsg == 3857) {
                     return Coordinates{detail::lon_to_x(location.lon()),
-                                       detail::lat_to_y(location.lat())};
+                        detail::lat_to_y(location.lat())};
                 }
 
-                Coordinates c{transform(m_crs_wgs84, m_crs_user, Coordinates{deg_to_rad(location.lon()),
-                                                                             deg_to_rad(location.lat())})};
+                Coordinates c{transform(m_crs_wgs84, m_crs_user, Coordinates
+                    {deg_to_rad(location.lon()),
+                        deg_to_rad(location.lat())})};
                 if (m_crs_user.is_latlong()) {
                     c.x = rad_to_deg(c.x);
                     c.y = rad_to_deg(c.y);
