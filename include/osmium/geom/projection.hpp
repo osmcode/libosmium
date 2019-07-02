@@ -47,7 +47,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/geom/util.hpp>
 #include <osmium/osm/location.hpp>
 
-#include <proj_api.h>
+#include <proj.h>
 
 #include <memory>
 #include <string>
@@ -62,20 +62,22 @@ namespace osmium {
         class CRS {
 
             struct ProjCRSDeleter {
-                void operator()(void* crs) {
-                    pj_free(crs);
+                void operator()(PJconsts* crs) {
+                    proj_destroy(crs);
                 }
             }; // struct ProjCRSDeleter
 
-            std::unique_ptr<void, ProjCRSDeleter> m_crs;
+            std::unique_ptr<PJconsts, ProjCRSDeleter> m_crs;
+            const char* m_crs_char;
 
         public:
 
             explicit CRS(const char* crs) :
-                m_crs(pj_init_plus(crs), ProjCRSDeleter()) {
-                if (!m_crs) {
-                    throw osmium::projection_error{std::string{"creation of CRS failed: "} + pj_strerrno(*pj_get_errno_ref())};
-                }
+                m_crs(proj_create(PJ_DEFAULT_CTX, crs), ProjCRSDeleter()) {
+                    if (!m_crs) {
+                        throw osmium::projection_error{std::string{"creation of CRS failed: "} + proj_errno_string(proj_errno(proj_create(PJ_DEFAULT_CTX, crs)))};
+                    }
+                    m_crs_char = crs;
             }
 
             explicit CRS(const std::string& crs) :
@@ -89,16 +91,23 @@ namespace osmium {
             /**
              * Get underlying projPJ handle from proj library.
              */
-            projPJ get() const noexcept {
-                return m_crs.get();
+            PJconsts* get() const noexcept {
+                return const_cast <PJconsts *>(m_crs.get()); 
+            }
+
+            /**
+             * Get underlying projPJ handle from proj library.
+             */
+            const char* get_crs() const noexcept {
+                return m_crs_char;
             }
 
             bool is_latlong() const noexcept {
-                return pj_is_latlong(m_crs.get()) != 0;
+                return proj_get_type(const_cast <PJconsts *>(m_crs.get())) == PJ_TYPE_GEOGRAPHIC_2D_CRS;
             }
 
             bool is_geocent() const noexcept {
-                return pj_is_geocent(m_crs.get()) != 0;
+                return proj_get_type(const_cast <PJconsts *>(m_crs.get())) == PJ_TYPE_GEOCENTRIC_CRS;
             }
 
         }; // class CRS
@@ -113,10 +122,18 @@ namespace osmium {
          */
         // cppcheck-suppress passedByValue (because c is small and we want to change it)
         inline Coordinates transform(const CRS& src, const CRS& dest, Coordinates c) {
-            const int result = pj_transform(src.get(), dest.get(), 1, 1, &c.x, &c.y, nullptr);
-            if (result != 0) {
-                throw osmium::projection_error{std::string{"projection failed: "} + pj_strerrno(result)};
+            PJ *P;
+            PJ_COORD a, result;
+
+            P = proj_create_crs_to_crs(PJ_DEFAULT_CTX, src.get_crs(), dest.get_crs(), NULL);
+            a = proj_coord(c.x, c.y, 0, 0);
+            result = proj_trans(P, PJ_FWD, a);
+            if (proj_errno(P) != 0) {
+                throw osmium::projection_error{std::string{"projection failed: "} + proj_errno_string(proj_errno(P))};
             }
+
+            c.x = result.xy.x;
+            c.y = result.xy.y;
             return c;
         }
 
