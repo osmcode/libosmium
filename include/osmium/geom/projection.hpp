@@ -68,7 +68,7 @@ namespace osmium {
             }; // struct ProjCRSDeleter
 
             std::unique_ptr<PJconsts, ProjCRSDeleter> m_crs;
-            std::unique_ptr<const char*> m_crs_char;
+            std::unique_ptr<const char> m_crs_char;
 
         public:
 
@@ -77,7 +77,7 @@ namespace osmium {
                     if (!m_crs) {
                         throw osmium::projection_error{std::string{"creation of CRS failed: "} + proj_errno_string(proj_errno(proj_create(PJ_DEFAULT_CTX, crs)))};
                     }
-                    m_crs_char(crs);
+                    m_crs_char(*crs);
             }
 
             explicit CRS(const std::string& crs) :
