@@ -84,6 +84,7 @@ namespace osmium {
                 31, 29, 31, 30, 31, 30,
                 31, 31, 30, 31, 30, 31
             };
+
             if (str[ 0] >= '0' && str[ 0] <= '9' &&
                 str[ 1] >= '0' && str[ 1] <= '9' &&
                 str[ 2] >= '0' && str[ 2] <= '9' &&
@@ -130,7 +131,7 @@ namespace osmium {
 #endif
                 }
             }
-            throw std::invalid_argument{"can not parse timestamp"};
+            throw std::invalid_argument{std::string{"can not parse timestamp: '"} + str + "'"};
         }
 
     } // namespace detail
