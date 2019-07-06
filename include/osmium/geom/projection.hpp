@@ -73,12 +73,12 @@ namespace osmium {
 
         public:
 
-            explicit CRS(const char* crs) :
+            explicit CRS(const std::string crs) :
             m_crs(proj_create(PJ_DEFAULT_CTX, crs), ProjCRSDeleter()) {
                 if (!m_crs) {
                     throw osmium::projection_error{std::string{"creation of CRS failed: "} +proj_errno_string(proj_errno(proj_create(PJ_DEFAULT_CTX, crs)))};
                 }
-                m_crs_string(crs);
+                m_crs_string = crs;
             }
 
             explicit CRS(const std::string& crs) :
@@ -100,8 +100,8 @@ namespace osmium {
             /**
              * Get underlying projPJ handle from proj library.
              */
-            const char* get_crs() const noexcept {
-                return m_crs_string.c_str();
+            const std:string get_crs() const noexcept {
+                return m_crs_string;
             }
 
             bool is_latlong() const noexcept {
