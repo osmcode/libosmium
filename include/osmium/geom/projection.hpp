@@ -69,20 +69,20 @@ namespace osmium {
             }; // struct ProjCRSDeleter
 
             std::unique_ptr<PJconsts, ProjCRSDeleter> m_crs;
-            const std::string m_crs_string;
+            std::string m_crs_string;
 
         public:
 
-            explicit CRS(const std::string crs) :
-            m_crs(proj_create(PJ_DEFAULT_CTX, crs), ProjCRSDeleter()) {
+            explicit CRS(const std::string& crs) :
+            m_crs(proj_create(PJ_DEFAULT_CTX, crs.c_str()), ProjCRSDeleter()) {
                 if (!m_crs) {
-                    throw osmium::projection_error{std::string{"creation of CRS failed: "} +proj_errno_string(proj_errno(proj_create(PJ_DEFAULT_CTX, crs)))};
+                    throw osmium::projection_error{std::string{"creation of CRS failed: "} +proj_errno_string(proj_errno(proj_create(PJ_DEFAULT_CTX, crs.c_str())))};
                 }
-                m_crs_string = crs;
+                this->m_crs_string = crs;
             }
 
-            explicit CRS(const std::string& crs) :
-            CRS(crs.c_str()) {
+            explicit CRS(const char* crs) :
+            CRS(std::string(crs)) {
             }
 
             explicit CRS(int epsg) :
@@ -100,7 +100,7 @@ namespace osmium {
             /**
              * Get underlying projPJ handle from proj library.
              */
-            const std:string get_crs() const noexcept {
+            const std::string get_crs() const noexcept {
                 return m_crs_string;
             }
 
@@ -128,7 +128,7 @@ namespace osmium {
             PJ *P;
             PJ_COORD a, result;
 
-            P = proj_create_crs_to_crs(PJ_DEFAULT_CTX, src.get_crs(), dest.get_crs(), NULL);
+            P = proj_create_crs_to_crs(PJ_DEFAULT_CTX, src.get_crs().c_str(), dest.get_crs().c_str(), NULL);
             a = proj_coord(c.x, c.y, 0, 0);
             result = proj_trans(P, PJ_FWD, a);
             if (proj_errno(P) != 0) {
