@@ -47,7 +47,17 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/geom/util.hpp>
 #include <osmium/osm/location.hpp>
 
+#if __has_include(<proj.h>)
 #include <proj.h>
+#define PROJ_V4 0
+#elif __has_include(<proj_api.h>)
+#include <proj_api.h>
+#define PROJ_V4 1
+#endif
+
+#ifndef PROJ_V4
+##error 'No proj-lib found'
+#endif
 
 #include <memory>
 #include <string>
@@ -59,6 +69,73 @@ namespace osmium {
         /**
          * C++ wrapper for a Coordinate Reference System of the proj library.
          */
+
+
+
+#if PROJ_V4 == 1
+        class CRS {
+
+            struct ProjCRSDeleter {
+
+                void operator()(void* crs) {
+                    pj_free(crs);
+                }
+            }; // struct ProjCRSDeleter
+
+            std::unique_ptr<void, ProjCRSDeleter> m_crs;
+
+        public:
+
+            explicit CRS(const char* crs) :
+            m_crs(pj_init_plus(crs), ProjCRSDeleter()) {
+                if (!m_crs) {
+                    throw osmium::projection_error{std::string{"creation of CRS failed: "} +pj_strerrno(*pj_get_errno_ref())};
+                }
+            }
+
+            explicit CRS(const std::string& crs) :
+            CRS(crs.c_str()) {
+            }
+
+            explicit CRS(int epsg) :
+            CRS(std::string{"+init=epsg:"}
+            +std::to_string(epsg)) {
+            }
+
+            /**
+             * Get underlying projPJ handle from proj library.
+             */
+            projPJ get() const noexcept {
+                return m_crs.get();
+            }
+
+            bool is_latlong() const noexcept {
+                return pj_is_latlong(m_crs.get()) != 0;
+            }
+
+            bool is_geocent() const noexcept {
+                return pj_is_geocent(m_crs.get()) != 0;
+            }
+
+        }; // class CRS
+
+        /**
+         * Transform coordinates from one CRS into another. Wraps the same
+         * function of the proj library.
+         *
+         * Coordinates have to be in radians and are produced in radians.
+         *
+         * @throws osmium::projection_error if the projection fails
+         */
+        // cppcheck-suppress passedByValue (because c is small and we want to change it)
+        inline Coordinates transform(const CRS& src, const CRS& dest, Coordinates c) {
+            const int result = pj_transform(src.get(), dest.get(), 1, 1, &c.x, &c.y, nullptr);
+            if (result != 0) {
+                throw osmium::projection_error{std::string{"projection failed: "} + pj_strerrno(result)};
+            }
+            return c;
+}
+#else          
         class CRS {
 
             struct ProjCRSDeleter {
@@ -67,7 +144,6 @@ namespace osmium {
                     proj_destroy(crs);
                 }
             }; // struct ProjCRSDeleter
-
             std::unique_ptr<PJconsts, ProjCRSDeleter> m_crs;
             std::string m_crs_string;
 
@@ -139,6 +215,7 @@ namespace osmium {
             c.y = result.xy.y;
             return c;
         }
+#endif
 
         /**
          * Functor that does projection from WGS84 (EPSG:4326) to the given
