@@ -53,10 +53,8 @@ DEALINGS IN THE SOFTWARE.
 #elif __has_include(<proj_api.h>)
 #include <proj_api.h>
 #define PROJ_V4 1
-#endif
-
-#ifndef PROJ_V4
-##error 'No proj-lib found'
+#else
+#error 'No proj-lib found'
 #endif
 
 #include <memory>
@@ -69,10 +67,8 @@ namespace osmium {
         /**
          * C++ wrapper for a Coordinate Reference System of the proj library.
          */
-
-
-
 #if PROJ_V4 == 1
+
         class CRS {
 
             struct ProjCRSDeleter {
@@ -128,14 +124,16 @@ namespace osmium {
          * @throws osmium::projection_error if the projection fails
          */
         // cppcheck-suppress passedByValue (because c is small and we want to change it)
+
         inline Coordinates transform(const CRS& src, const CRS& dest, Coordinates c) {
             const int result = pj_transform(src.get(), dest.get(), 1, 1, &c.x, &c.y, nullptr);
             if (result != 0) {
-                throw osmium::projection_error{std::string{"projection failed: "} + pj_strerrno(result)};
+                throw osmium::projection_error{std::string{"projection failed: "} +pj_strerrno(result)};
             }
             return c;
-}
-#else          
+        }
+#else
+
         class CRS {
 
             struct ProjCRSDeleter {
