@@ -47,6 +47,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/geom/util.hpp>
 #include <osmium/osm/location.hpp>
 
+#ifdef __has_include
 #if __has_include(<proj.h>)
 #include <proj.h>
 #define PROJ_V4 0
@@ -55,6 +56,10 @@ DEALINGS IN THE SOFTWARE.
 #define PROJ_V4 1
 #else
 #error 'No proj-lib found'
+#endif
+#else
+#include <proj_api.h>
+#define PROJ_V4 1
 #endif
 
 #include <memory>
