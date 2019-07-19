@@ -6,7 +6,7 @@
 
 language: generic
 
-dist: xenial
+dist: bionic
 
 #-----------------------------------------------------------------------------
 
@@ -59,6 +59,10 @@ addons_shortcuts:
     apt:
       sources: [ 'ubuntu-toolchain-r-test' ]
       packages: [ 'libboost-all-dev', 'libgdal-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin', 'g++-7', 'gcc-7' ]
+  addons_gcc8: &gcc8
+    apt:
+      sources: [ 'ubuntu-toolchain-r-test' ]
+      packages: [ 'libboost-all-dev', 'libgdal-dev', 'libproj-dev', 'libsparsehash-dev', 'spatialite-bin', 'g++-8', 'gcc-8' ]
 
 #-----------------------------------------------------------------------------
 
@@ -132,6 +136,11 @@ matrix:
       addons: *gcc7
 
     - os: linux
+      compiler: linux-gcc8-dev
+      env: CC='gcc-8' CXX='g++-8' BUILD_TYPE='Dev'
+      addons: *gcc8
+
+    - os: linux
       compiler: linux-gcc7-coverage
       env: CC='gcc-7' CXX='g++-7' BUILD_TYPE='Coverage'
       addons: *gcc7
@@ -155,6 +164,16 @@ matrix:
     - os: osx
       osx_image: xcode10.1
       compiler: xcode10-clang-dev
+      env: CC='clang' CXX='clang++' BUILD_TYPE='Dev'
+
+    - os: osx
+      osx_image: xcode10.2
+      compiler: xcode10-clang-dev
+      env: CC='clang' CXX='clang++' BUILD_TYPE='Dev'
+
+    - os: osx
+      osx_image: xcode11
+      compiler: xcode11-clang-dev
       env: CC='clang' CXX='clang++' BUILD_TYPE='Dev'
 
     - os: osx
