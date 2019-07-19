@@ -50,7 +50,12 @@ DEALINGS IN THE SOFTWARE.
 #ifdef __has_include
 #if __has_include(<proj.h>)
 #include <proj.h>
+#if PROJ_VERSION_MAJOR < 6
+#include <proj_api.h>
+#define PROJ_V4 1
+#else
 #define PROJ_V4 0
+#endif
 #elif __has_include(<proj_api.h>)
 #include <proj_api.h>
 #define PROJ_V4 1
