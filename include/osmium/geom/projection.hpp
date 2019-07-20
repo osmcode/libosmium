@@ -158,14 +158,13 @@ namespace osmium {
         public:
 
             explicit CRS(const std::string& crs) :
-            proj_context_use_proj4_init_rules(PJ_DEFAULT_CTX, 1){
-                m_crs(proj_create(PJ_DEFAULT_CTX, crs.c_str()), ProjCRSDeleter()) {
-                    if (!m_crs) {
-                        throw osmium::projection_error{std::string{"creation of CRS failed: "} +proj_errno_string(proj_errno(proj_create(PJ_DEFAULT_CTX, crs.c_str())))};
-                    }
-                    this->m_crs_string = crs;
+            m_crs(createPJ(crs), ProjCRSDeleter()) {
+                if (!m_crs) {
+                    throw osmium::projection_error{std::string{"creation of CRS failed: "} +proj_errno_string(proj_errno(proj_create(PJ_DEFAULT_CTX, crs.c_str())))};
                 }
+                this->m_crs_string = crs;
             }
+            
 
             explicit CRS(const char* crs) :
             CRS(std::string(crs)) {
@@ -196,6 +195,12 @@ namespace osmium {
 
             bool is_geocent() const noexcept {
                 return proj_get_type(const_cast<PJconsts *> (m_crs.get())) == PJ_TYPE_GEOCENTRIC_CRS;
+            }
+            
+            
+            PJ* createPJ(const std::string& crs) const noexcept {
+                proj_context_use_proj4_init_rules(PJ_DEFAULT_CTX, 1);
+                return proj_create(PJ_DEFAULT_CTX, crs.c_str());
             }
 
         }; // class CRS
