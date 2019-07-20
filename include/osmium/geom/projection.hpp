@@ -158,11 +158,13 @@ namespace osmium {
         public:
 
             explicit CRS(const std::string& crs) :
-            m_crs(proj_create(PJ_DEFAULT_CTX, crs.c_str()), ProjCRSDeleter()) {
-                if (!m_crs) {
-                    throw osmium::projection_error{std::string{"creation of CRS failed: "} +proj_errno_string(proj_errno(proj_create(PJ_DEFAULT_CTX, crs.c_str())))};
+            proj_context_use_proj4_init_rules(PJ_DEFAULT_CTX, 1){
+                m_crs(proj_create(PJ_DEFAULT_CTX, crs.c_str()), ProjCRSDeleter()) {
+                    if (!m_crs) {
+                        throw osmium::projection_error{std::string{"creation of CRS failed: "} +proj_errno_string(proj_errno(proj_create(PJ_DEFAULT_CTX, crs.c_str())))};
+                    }
+                    this->m_crs_string = crs;
                 }
-                this->m_crs_string = crs;
             }
 
             explicit CRS(const char* crs) :
