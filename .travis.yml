@@ -177,7 +177,7 @@ install:
   - git clone --quiet --depth 1 https://github.com/mapbox/protozero.git ../protozero
   - |
     if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
-      brew remove gdal
+      brew remove --ignore-dependencies gdal
       brew install cmake boost google-sparsehash gdal proj || true
     fi
   - cmake --version
