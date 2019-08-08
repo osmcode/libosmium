@@ -146,7 +146,7 @@ TEST_CASE("Relations manager derived class") {
 
     bool callback_called = false;
     osmium::io::Reader reader{file};
-    osmium::apply(reader, manager.handler([&](osmium::memory::Buffer&&) {
+    osmium::apply(reader, manager.handler([&](osmium::memory::Buffer&& /*unused*/) {
         callback_called = true;
     }));
     reader.close();

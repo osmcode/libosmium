@@ -51,9 +51,9 @@ TEST_CASE("Write with mock compressor") {
     std::string fail_in;
 
     osmium::io::CompressionFactory::instance().register_compression(osmium::io::file_compression::gzip,
-        [&](int, osmium::io::fsync) { return new MockCompressor(fail_in); },
-        [](int) { return nullptr; },
-        [](const char*, size_t) { return nullptr; }
+        [&](int /*unused*/, osmium::io::fsync /*unused*/) { return new MockCompressor(fail_in); },
+        [](int /*unused*/) { return nullptr; },
+        [](const char* /*unused*/, size_t /*unused*/) { return nullptr; }
     );
 
     osmium::io::Header header;

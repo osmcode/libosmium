@@ -81,9 +81,9 @@ TEST_CASE("Test Reader using MockDecompressor") {
     std::string fail_in;
 
     osmium::io::CompressionFactory::instance().register_compression(osmium::io::file_compression::gzip,
-        [](int, osmium::io::fsync) { return nullptr; },
-        [&](int) { return new MockDecompressor(fail_in); },
-        [](const char*, size_t) { return nullptr; }
+        [](int /*unused*/, osmium::io::fsync /*unused*/) { return nullptr; },
+        [&](int /*unused*/) { return new MockDecompressor(fail_in); },
+        [](const char* /*unused*/, size_t /*unused*/) { return nullptr; }
     );
 
     SECTION("fail in constructor") {
