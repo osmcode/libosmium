@@ -100,8 +100,12 @@ TEST_CASE("Tile order") {
 TEST_CASE("Check a random list of tiles") {
     std::istringstream input_data(s);
     while (input_data) {
-        double lon, lat;
-        uint32_t x, y, zoom;
+        double lon;
+        double lat;
+        uint32_t x;
+        uint32_t y;
+        uint32_t zoom;
+
         input_data >> lon;
         input_data >> lat;
         input_data >> x;
