@@ -1,5 +1,5 @@
 ---
-Checks: '*,-android-cloexec-*,-bugprone-macro-parentheses,-cert-dcl21-cpp,-cert-err58-cpp,-clang-analyzer-optin.cplusplus.VirtualCall,-cppcoreguidelines-avoid-magic-numbers,-cppcoreguidelines-owning-memory,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-cppcoreguidelines-pro-bounds-constant-array-index,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-pro-type-const-cast,-cppcoreguidelines-pro-type-reinterpret-cast,-cppcoreguidelines-pro-type-static-cast-downcast,-cppcoreguidelines-pro-type-vararg,-fuchsia-*,-google-runtime-references,-hicpp-invalid-access-moved,-hicpp-no-array-decay,-hicpp-no-assembler,-hicpp-vararg,-misc-macro-parentheses,-misc-unused-parameters,-modernize-make-unique,-modernize-raw-string-literal,-readability-avoid-const-params-in-decls,-readability-implicit-bool-cast,-readability-implicit-bool-conversion'
+Checks: '*,-android-cloexec-*,-bugprone-macro-parentheses,-cert-dcl21-cpp,-cert-err58-cpp,-clang-analyzer-optin.cplusplus.VirtualCall,-cppcoreguidelines-avoid-magic-numbers,-cppcoreguidelines-macro-usage,-cppcoreguidelines-owning-memory,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-cppcoreguidelines-pro-bounds-constant-array-index,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-pro-type-const-cast,-cppcoreguidelines-pro-type-reinterpret-cast,-cppcoreguidelines-pro-type-static-cast-downcast,-cppcoreguidelines-pro-type-vararg,-fuchsia-*,-google-runtime-references,-hicpp-invalid-access-moved,-hicpp-no-array-decay,-hicpp-no-assembler,-hicpp-vararg,-misc-macro-parentheses,-misc-unused-parameters,-modernize-make-unique,-modernize-raw-string-literal,-readability-avoid-const-params-in-decls,-readability-implicit-bool-cast,-readability-implicit-bool-conversion,-readability-magic-numbers'
 #
 #  For a list of check options, see:
 #  https://clang.llvm.org/extra/clang-tidy/checks/list.html
@@ -26,6 +26,9 @@ Checks: '*,-android-cloexec-*,-bugprone-macro-parentheses,-cert-dcl21-cpp,-cert-
 #  cppcoreguidelines-avoid-magic-numbers
 #    Generally good advice, but there are too many places where this is
 #    useful, for instance in tests.
+#
+#  cppcoreguidelines-macro-usage
+#    There are cases where we actually need macros.
 #
 #  cppcoreguidelines-owning-memory
 #    Don't want to add dependency on gsl library.
@@ -94,6 +97,9 @@ Checks: '*,-android-cloexec-*,-bugprone-macro-parentheses,-cert-dcl21-cpp,-cert-
 #
 #  readability-implicit-bool-conversion
 #    I don't think this makes the code more readable.
+#
+#  readability-magic-numbers
+#    Alias for cppcoreguidelines-avoid-magic-numbers.
 #
 #WarningsAsErrors: '*'
 HeaderFilterRegex: '\/include\/osmium\/.*'
