@@ -243,7 +243,7 @@ namespace osmium {
                 // in typical OSM files will only need a single memory
                 // allocation.
                 enum {
-                    default_stringtable_chunk_size = 100u * 1024u
+                    default_stringtable_chunk_size = 100U * 1024U
                 };
 
                 StringStore m_strings;

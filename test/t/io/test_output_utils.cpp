@@ -140,23 +140,23 @@ TEST_CASE("test codepoint to utf8 encoding") {
     const char s[] = u8"\n_\u01a2_\u30dc_\U0001d11e_\U0001f680";
 
     std::string out;
-    osmium::io::detail::append_codepoint_as_utf8(0x0au, std::back_inserter(out)); // 1 utf8 byte
+    osmium::io::detail::append_codepoint_as_utf8(0x0aU, std::back_inserter(out)); // 1 utf8 byte
     REQUIRE(out.size() == 1);
     osmium::io::detail::append_codepoint_as_utf8('_', std::back_inserter(out));
     REQUIRE(out.size() == 2);
-    osmium::io::detail::append_codepoint_as_utf8(0x01a2u, std::back_inserter(out)); // 2 utf8 bytes
+    osmium::io::detail::append_codepoint_as_utf8(0x01a2U, std::back_inserter(out)); // 2 utf8 bytes
     REQUIRE(out.size() == 4);
     osmium::io::detail::append_codepoint_as_utf8('_', std::back_inserter(out));
     REQUIRE(out.size() == 5);
-    osmium::io::detail::append_codepoint_as_utf8(0x30dcu, std::back_inserter(out)); // 3 utf8 bytes
+    osmium::io::detail::append_codepoint_as_utf8(0x30dcU, std::back_inserter(out)); // 3 utf8 bytes
     REQUIRE(out.size() == 8);
     osmium::io::detail::append_codepoint_as_utf8('_', std::back_inserter(out));
     REQUIRE(out.size() == 9);
-    osmium::io::detail::append_codepoint_as_utf8(0x1d11eu, std::back_inserter(out)); // 4 utf8 bytes
+    osmium::io::detail::append_codepoint_as_utf8(0x1d11eU, std::back_inserter(out)); // 4 utf8 bytes
     REQUIRE(out.size() == 13);
     osmium::io::detail::append_codepoint_as_utf8('_', std::back_inserter(out));
     REQUIRE(out.size() == 14);
-    osmium::io::detail::append_codepoint_as_utf8(0x1f680u, std::back_inserter(out)); // 4 utf8 bytes
+    osmium::io::detail::append_codepoint_as_utf8(0x1f680U, std::back_inserter(out)); // 4 utf8 bytes
     REQUIRE(out.size() == 18);
     REQUIRE(out == s);
 }

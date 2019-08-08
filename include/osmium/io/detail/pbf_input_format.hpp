@@ -103,9 +103,9 @@ namespace osmium {
                         const std::string input_data{read_from_input_queue(sizeof(size))};
                         const char* d = input_data.data();
                         size = (static_cast<uint32_t>(d[3])) |
-                               (static_cast<uint32_t>(d[2]) << 8u) |
-                               (static_cast<uint32_t>(d[1]) << 16u) |
-                               (static_cast<uint32_t>(d[0]) << 24u);
+                               (static_cast<uint32_t>(d[2]) <<  8U) |
+                               (static_cast<uint32_t>(d[1]) << 16U) |
+                               (static_cast<uint32_t>(d[0]) << 24U);
                     } catch (const osmium::pbf_error&) {
                         return 0; // EOF
                     }

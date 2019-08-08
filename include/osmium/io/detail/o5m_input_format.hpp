@@ -152,7 +152,7 @@ namespace osmium {
             class O5mParser : public Parser {
 
                 enum {
-                    initial_buffer_size = 1024ul * 1024ul
+                    initial_buffer_size = 1024UL * 1024UL
                 };
 
                 osmium::io::Header m_header{};

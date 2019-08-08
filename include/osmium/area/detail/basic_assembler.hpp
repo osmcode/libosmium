@@ -103,7 +103,7 @@ namespace osmium {
              */
             class BasicAssembler {
 
-                static constexpr const std::size_t max_split_locations = 100ull;
+                static constexpr const std::size_t max_split_locations = 100ULL;
 
                 struct slocation {
 

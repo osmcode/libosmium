@@ -659,7 +659,7 @@ namespace osmium {
                                     }
 
                                     if (changeset_id == -1) {
-                                        node.set_changeset(0u);
+                                        node.set_changeset(0U);
                                     } else {
                                         node.set_changeset(static_cast<osmium::changeset_id_type>(changeset_id));
                                     }

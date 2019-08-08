@@ -41,7 +41,7 @@ TEST_CASE("Tile from x180.0 y90.0 at zoom 4") {
 
     osmium::geom::Tile t{4, l};
 
-    REQUIRE(t.x == (1u << 4u) - 1);
+    REQUIRE(t.x == (1U << 4U) - 1);
     REQUIRE(t.y == 0);
     REQUIRE(t.z == 4);
     REQUIRE(t.valid());

@@ -169,7 +169,7 @@ namespace osmium {
                         break;
                     case 4:
                         ++it;
-                        cp = ((cp << 18U) & 0x1fffffU) + (((0xffU & *it) << 12u) & 0x3ffffU);
+                        cp = ((cp << 18U) & 0x1fffffU) + (((0xffU & *it) << 12U) & 0x3ffffU);
                         ++it;
                         cp += ((0xffU & *it) << 6U) & 0xfffU;
                         ++it;
@@ -289,17 +289,17 @@ namespace osmium {
                 if (cp < 0x80UL) {
                     *(out++) = static_cast<uint8_t>(cp);
                 } else if (cp < 0x800UL) {
-                    *(out++) = static_cast<uint8_t>( (cp >>  6U)          | 0xc0u);
-                    *(out++) = static_cast<uint8_t>(( cp         & 0x3fU) | 0x80u);
+                    *(out++) = static_cast<uint8_t>( (cp >>  6U)          | 0xc0U);
+                    *(out++) = static_cast<uint8_t>(( cp         & 0x3fU) | 0x80U);
                 } else if (cp < 0x10000UL) {
-                    *(out++) = static_cast<uint8_t>( (cp >> 12U)          | 0xe0u);
-                    *(out++) = static_cast<uint8_t>(((cp >>  6U) & 0x3fU) | 0x80u);
-                    *(out++) = static_cast<uint8_t>(( cp         & 0x3fU) | 0x80u);
+                    *(out++) = static_cast<uint8_t>( (cp >> 12U)          | 0xe0U);
+                    *(out++) = static_cast<uint8_t>(((cp >>  6U) & 0x3fU) | 0x80U);
+                    *(out++) = static_cast<uint8_t>(( cp         & 0x3fU) | 0x80U);
                 } else {
-                    *(out++) = static_cast<uint8_t>( (cp >> 18U)          | 0xf0u);
-                    *(out++) = static_cast<uint8_t>(((cp >> 12U) & 0x3fU) | 0x80u);
-                    *(out++) = static_cast<uint8_t>(((cp >>  6U) & 0x3fU) | 0x80u);
-                    *(out++) = static_cast<uint8_t>(( cp         & 0x3fU) | 0x80u);
+                    *(out++) = static_cast<uint8_t>( (cp >> 18U)          | 0xf0U);
+                    *(out++) = static_cast<uint8_t>(((cp >> 12U) & 0x3fU) | 0x80U);
+                    *(out++) = static_cast<uint8_t>(((cp >>  6U) & 0x3fU) | 0x80U);
+                    *(out++) = static_cast<uint8_t>(( cp         & 0x3fU) | 0x80U);
                 }
                 return out;
             }
