@@ -99,7 +99,7 @@ namespace osmium {
         struct Tile {
 
             enum {
-                max_zoom = 30u
+                max_zoom = 30U
             };
 
             /// x coordinate

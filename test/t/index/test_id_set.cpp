@@ -49,9 +49,9 @@ TEST_CASE("Iterating over IdSetDense") {
     s.set(35);
     s.set(35);
     s.set(20);
-    s.set(1ull << 33u);
+    s.set(1ULL << 33U);
     s.set(21);
-    s.set((1ull << 27u) + 13u);
+    s.set((1ULL << 27U) + 13U);
 
     REQUIRE(s.size() == 6);
 
@@ -69,10 +69,10 @@ TEST_CASE("Iterating over IdSetDense") {
     REQUIRE(*it == 35);
     ++it;
     REQUIRE(it != s.end());
-    REQUIRE(*it == (1ull << 27u) + 13u);
+    REQUIRE(*it == (1ULL << 27U) + 13U);
     ++it;
     REQUIRE(it != s.end());
-    REQUIRE(*it == 1ull << 33u);
+    REQUIRE(*it == 1ULL << 33U);
     ++it;
     REQUIRE(it == s.end());
 }
@@ -98,10 +98,10 @@ TEST_CASE("Large gap") {
     osmium::index::IdSetDense<osmium::unsigned_object_id_type> s;
 
     s.set(3);
-    s.set(1u << 30u);
+    s.set(1U << 30U);
 
-    REQUIRE(s.get(1u << 30u));
-    REQUIRE_FALSE(s.get(1u << 29u));
+    REQUIRE(s.get(1U << 30U));
+    REQUIRE_FALSE(s.get(1U << 29U));
 }
 
 TEST_CASE("Basic functionality of IdSetSmall") {
@@ -131,9 +131,9 @@ TEST_CASE("Iterating over IdSetSmall") {
     s.set(35);
     s.set(35);
     s.set(20);
-    s.set(1ull << 33u);
+    s.set(1ULL << 33U);
     s.set(21);
-    s.set((1ull << 27u) + 13u);
+    s.set((1ULL << 27U) + 13U);
 
     // needs to be called before size() and iterator will work properly
     s.sort_unique();
@@ -154,10 +154,10 @@ TEST_CASE("Iterating over IdSetSmall") {
     REQUIRE(*it == 35);
     ++it;
     REQUIRE(it != s.end());
-    REQUIRE(*it == (1ull << 27u) + 13u);
+    REQUIRE(*it == (1ULL << 27U) + 13U);
     ++it;
     REQUIRE(it != s.end());
-    REQUIRE(*it == 1ull << 33u);
+    REQUIRE(*it == 1ULL << 33U);
     ++it;
     REQUIRE(it == s.end());
 }

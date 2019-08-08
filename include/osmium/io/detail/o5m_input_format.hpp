@@ -98,18 +98,18 @@ namespace osmium {
 
                 // The maximum number of entries in this table.
                 enum {
-                    number_of_entries = 15000u
+                    number_of_entries = 15000U
                 };
 
                 // The size of one entry in the table.
                 enum {
-                    entry_size = 256u
+                    entry_size = 256U
                 };
 
                 // The maximum length of a string in the table including
                 // two \0 bytes.
                 enum {
-                    max_length = 250u + 2u
+                    max_length = 250U + 2U
                 };
 
                 // The data is stored in this string. It is default constructed

@@ -216,7 +216,7 @@ namespace osmium {
                     int c;
 
                     while ((c = *str++)) {
-                        hash = ((hash << 5u) + hash) + c; /* hash * 33 + c */
+                        hash = ((hash << 5U) + hash) + c; /* hash * 33 + c */
                     }
 
                     return hash;

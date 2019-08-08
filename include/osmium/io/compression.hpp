@@ -92,7 +92,7 @@ namespace osmium {
         public:
 
             enum {
-                input_buffer_size = 1024u * 1024u
+                input_buffer_size = 1024U * 1024U
             };
 
             Decompressor() = default;

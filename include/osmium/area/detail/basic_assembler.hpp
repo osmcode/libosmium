@@ -108,7 +108,7 @@ namespace osmium {
                 struct slocation {
 
                     enum {
-                        invalid_item = 1u << 30u
+                        invalid_item = 1U << 30U
                     };
 
                     uint32_t item : 31;

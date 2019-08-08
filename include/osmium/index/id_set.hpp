@@ -102,7 +102,7 @@ namespace osmium {
             // relations Ids it could be smaller, because they would all fit
             // into a smaller allocation.
             enum : std::size_t {
-                default_chunk_bits = 22u
+                default_chunk_bits = 22U
             };
 
         } // namespace detail
@@ -135,7 +135,7 @@ namespace osmium {
                         const auto slot = m_set->m_data[cid][id_set::offset(m_value)];
                         if (slot == 0) {
                             m_value += 8;
-                            m_value &= ~0x7ull;
+                            m_value &= ~0x7ULL;
                         } else {
                             ++m_value;
                         }
@@ -202,22 +202,22 @@ namespace osmium {
             friend class IdSetDenseIterator<T, chunk_bits>;
 
             enum : std::size_t {
-                chunk_size = 1u << chunk_bits
+                chunk_size = 1U << chunk_bits
             };
 
             std::vector<std::unique_ptr<unsigned char[]>> m_data;
             T m_size = 0;
 
             static std::size_t chunk_id(T id) noexcept {
-                return id >> (chunk_bits + 3u);
+                return id >> (chunk_bits + 3U);
             }
 
             static std::size_t offset(T id) noexcept {
-                return (id >> 3u) & ((1u << chunk_bits) - 1u);
+                return (id >> 3U) & ((1U << chunk_bits) - 1U);
             }
 
             static unsigned int bitmask(T id) noexcept {
-                return 1u << (id & 0x7u);
+                return 1u << (id & 0x7U);
             }
 
             T last() const noexcept {

@@ -193,7 +193,7 @@ namespace osmium {
             callback_func_type m_callback;
 
             enum {
-                initial_buffer_size = 1024ul * 1024ul
+                initial_buffer_size = 1024UL * 1024UL
             };
 
             iterator_range<mm_iterator> find_member_meta(osmium::item_type type, osmium::object_id_type id) {
