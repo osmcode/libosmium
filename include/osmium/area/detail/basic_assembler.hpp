@@ -354,7 +354,8 @@ namespace osmium {
                                     std::cerr << "        Segment is below (nesting=" << nesting << ")\n";
                                 }
                                 if (segment->ring()->is_outer()) {
-                                    const double y = ay + (by - ay) * (lx - ax) / double(bx - ax);
+                                    const double y = static_cast<double>(ay) +
+                                                     static_cast<double>((by - ay) * (lx - ax)) / static_cast<double>(bx - ax);
                                     if (debug()) {
                                         std::cerr << "        Segment belongs to outer ring (y=" << y << " ring=" << *segment->ring() << ")\n";
                                     }
