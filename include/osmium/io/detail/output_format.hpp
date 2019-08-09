@@ -91,7 +91,7 @@ namespace osmium {
                     m_out->resize(old_size + (t - temp));
                     char* data = &(*m_out)[old_size];
                     do {
-                        *data++ += *--t;
+                        *data++ = *--t;
                     } while (t != temp);
                 }
 
