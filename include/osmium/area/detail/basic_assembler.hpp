@@ -505,7 +505,12 @@ namespace osmium {
                 void create_locations_list() {
                     m_locations.reserve(m_segment_list.size() * 2);
 
-                    for (uint32_t n = 0; n < m_segment_list.size(); ++n) {
+                    // static_cast is okay here: The 32bit limit is way past
+                    // anything that makes sense here and even if there are
+                    // 2^32 segments here, it would simply not go through
+                    // all of them not building the multipolygon correctly.
+                    assert(m_segment_list.size() < std::numeric_limits<uint32_t>::max());
+                    for (uint32_t n = 0; n < static_cast<uint32_t>(m_segment_list.size()); ++n) {
                         m_locations.emplace_back(n, false);
                         m_locations.emplace_back(n, true);
                     }
