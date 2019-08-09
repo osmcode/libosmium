@@ -33,7 +33,7 @@
 
 class NamesHandler : public osmium::handler::Handler {
 
-    void output_pubs(const osmium::OSMObject& object) {
+    static void output_pubs(const osmium::OSMObject& object) {
         const osmium::TagList& tags = object.tags();
         if (tags.has_tag("amenity", "pub")) {
 

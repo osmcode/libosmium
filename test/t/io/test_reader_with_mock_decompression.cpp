@@ -36,7 +36,7 @@ public:
 
     ~MockDecompressor() noexcept final = default;
 
-    void add_node(std::string& s, int i) {
+    static void add_node(std::string& s, int i) {
         s += "<node id='";
         s += std::to_string(i);
         s += "' version='1' timestamp='2014-01-01T00:00:00Z' uid='1' user='test' changeset='1' lon='1.02' lat='1.02'/>\n";

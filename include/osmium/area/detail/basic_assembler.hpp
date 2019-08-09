@@ -273,7 +273,7 @@ namespace osmium {
 
                 using rings_stack = std::vector<rings_stack_element>;
 
-                void remove_duplicates(rings_stack& outer_rings) {
+                static void remove_duplicates(rings_stack& outer_rings) {
                     while (true) {
                         const auto it = std::adjacent_find(outer_rings.begin(), outer_rings.end());
                         if (it == outer_rings.end()) {

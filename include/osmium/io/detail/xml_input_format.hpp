@@ -275,7 +275,7 @@ namespace osmium {
                     return user;
                 }
 
-                void init_changeset(osmium::builder::ChangesetBuilder& builder, const XML_Char** attrs) {
+                static void init_changeset(osmium::builder::ChangesetBuilder& builder, const XML_Char** attrs) {
                     osmium::Box box;
 
                     check_attributes(attrs, [&builder, &box](const XML_Char* name, const XML_Char* value) {

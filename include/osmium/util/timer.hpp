@@ -79,13 +79,13 @@ namespace osmium {
 
         Timer() = default;
 
-        void start() {
+        static void start() {
         }
 
-        void stop() {
+        static void stop() {
         }
 
-        int64_t elapsed_microseconds() const {
+        static int64_t elapsed_microseconds() {
             return 0;
         }
 

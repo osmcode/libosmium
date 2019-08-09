@@ -431,7 +431,7 @@ namespace osmium {
                     }
                 }
 
-                osmium::item_type decode_member_type(char c) {
+                static osmium::item_type decode_member_type(char c) {
                     if (c < '0' || c > '2') {
                         throw o5m_error{"unknown member type"};
                     }

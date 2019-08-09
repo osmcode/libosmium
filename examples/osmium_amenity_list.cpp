@@ -58,12 +58,12 @@ using location_handler_type = osmium::handler::NodeLocationsForWays<index_type>;
 class AmenityHandler : public osmium::handler::Handler {
 
     // Print info about one amenity to stdout.
-    void print_amenity(const char* type, const char* name, const osmium::geom::Coordinates& c) {
+    static void print_amenity(const char* type, const char* name, const osmium::geom::Coordinates& c) {
         std::printf("%8.4f,%8.4f %-15s %s\n", c.x, c.y, type, name ? name : "");
     }
 
     // Calculate the center point of a NodeRefList.
-    osmium::geom::Coordinates calc_center(const osmium::NodeRefList& nr_list) {
+    static osmium::geom::Coordinates calc_center(const osmium::NodeRefList& nr_list) {
         // Coordinates simply store an X and Y coordinate pair as doubles.
         // (Unlike osmium::Location which stores them more efficiently as
         // 32 bit integers.) Use Coordinates when you want to do calculations

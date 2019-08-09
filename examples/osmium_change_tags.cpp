@@ -66,7 +66,7 @@ class RewriteHandler : public osmium::handler::Handler {
     // Copy all tags with two changes:
     // * Do not copy "created_by" tags
     // * Change "landuse=forest" into "natural=wood"
-    void copy_tags(osmium::builder::Builder& parent, const osmium::TagList& tags) {
+    static void copy_tags(osmium::builder::Builder& parent, const osmium::TagList& tags) {
 
         // The TagListBuilder is used to create a list of tags. The parameter
         // to create it is a reference to the builder of the object that

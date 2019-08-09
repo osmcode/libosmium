@@ -182,7 +182,7 @@ class Options {
     bool m_array_format = false;
     bool m_list_format = false;
 
-    void print_help() {
+    static void print_help() {
         std::cout << "Usage: osmium_index_lookup [OPTIONS]\n\n"
                   << "-h, --help        Print this help message\n"
                   << "-a, --array=FILE  Read given index file in array format\n"
@@ -193,7 +193,7 @@ class Options {
         ;
     }
 
-    void print_usage(const char* prgname) {
+    static void print_usage(const char* prgname) {
         std::cout << "Usage: " << prgname << " [OPTIONS]\n\n";
         std::exit(0);
     }
