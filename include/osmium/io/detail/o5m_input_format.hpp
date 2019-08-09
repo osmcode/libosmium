@@ -57,6 +57,7 @@ DEALINGS IN THE SOFTWARE.
 #include <protozero/varint.hpp>
 
 #include <algorithm>
+#include <array>
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
@@ -248,7 +249,7 @@ namespace osmium {
                 osmium::DeltaDecode<int64_t> m_delta_lat;
 
                 osmium::DeltaDecode<osmium::object_id_type> m_delta_way_node_id;
-                osmium::DeltaDecode<osmium::object_id_type> m_delta_member_ids[3];
+                std::array<osmium::DeltaDecode<osmium::object_id_type>, 3> m_delta_member_ids;
 
                 void reset() {
                     m_reference_table.clear();

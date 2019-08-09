@@ -196,7 +196,7 @@ namespace osmium {
                 }
 
                 const char* role_name() const noexcept {
-                    static std::array<const char*, 4> names = {{ "unknown", "outer", "inner", "empty" }};
+                    static const std::array<const char*, 4> names = {{ "unknown", "outer", "inner", "empty" }};
                     return names[int(m_role)];
                 }
 

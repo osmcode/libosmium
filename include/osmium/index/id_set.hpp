@@ -37,6 +37,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/types.hpp>
 
 #include <algorithm>
+#include <array>
 #include <cassert>
 #include <cstddef>
 #include <cstring>
@@ -446,7 +447,7 @@ namespace osmium {
 
             using id_set_type = IdSetType<osmium::unsigned_object_id_type>;
 
-            id_set_type m_sets[3];
+            std::array<id_set_type, 3> m_sets;
 
         public:
 

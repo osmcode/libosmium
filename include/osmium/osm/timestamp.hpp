@@ -36,6 +36,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/util/compatibility.hpp>
 #include <osmium/util/minmax.hpp> // IWYU pragma: keep
 
+#include <array>
 #include <cassert>
 #include <cstdint>
 #include <ctime>
@@ -80,10 +81,10 @@ namespace osmium {
         }
 
         inline time_t parse_timestamp(const char* str) {
-            static const int mon_lengths[] = {
+            static const std::array<int, 12> mon_lengths = {{
                 31, 29, 31, 30, 31, 30,
                 31, 31, 30, 31, 30, 31
-            };
+            }};
 
             if (str[ 0] >= '0' && str[ 0] <= '9' &&
                 str[ 1] >= '0' && str[ 1] <= '9' &&
