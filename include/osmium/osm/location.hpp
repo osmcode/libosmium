@@ -214,7 +214,7 @@ namespace osmium {
             char temp[10];
             char* t = temp;
             do {
-                *t++ = char(v % 10) + '0';
+                *t++ = static_cast<char>(v % 10) + '0'; // NOLINT(bugprone-narrowing-conversions, cppcoreguidelines-narrowing-conversions)
                 v /= 10;
             } while (v != 0);
 

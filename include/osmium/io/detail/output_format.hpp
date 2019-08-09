@@ -83,7 +83,7 @@ namespace osmium {
                     char temp[20];
                     char *t = temp;
                     do {
-                        *t++ = char(value % 10) + '0';
+                        *t++ = static_cast<char>(value % 10) + '0'; // NOLINT(bugprone-narrowing-conversions, cppcoreguidelines-narrowing-conversions)
                         value /= 10;
                     } while (value > 0);
 
