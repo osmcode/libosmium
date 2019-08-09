@@ -1,5 +1,5 @@
 ---
-Checks: '*,-android-cloexec-*,-bugprone-macro-parentheses,-cert-dcl21-cpp,-cert-err58-cpp,-clang-analyzer-optin.cplusplus.VirtualCall,-cppcoreguidelines-avoid-magic-numbers,-cppcoreguidelines-macro-usage,-cppcoreguidelines-owning-memory,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-cppcoreguidelines-pro-bounds-constant-array-index,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-pro-type-const-cast,-cppcoreguidelines-pro-type-reinterpret-cast,-cppcoreguidelines-pro-type-static-cast-downcast,-cppcoreguidelines-pro-type-vararg,-fuchsia-*,-google-runtime-references,-hicpp-invalid-access-moved,-hicpp-no-array-decay,-hicpp-no-assembler,-hicpp-vararg,-misc-macro-parentheses,-misc-unused-parameters,-modernize-make-unique,-modernize-raw-string-literal,-readability-avoid-const-params-in-decls,-readability-implicit-bool-cast,-readability-implicit-bool-conversion,-readability-magic-numbers'
+Checks: '*,-android-cloexec-*,-bugprone-macro-parentheses,-cert-dcl21-cpp,-cert-err58-cpp,-clang-analyzer-optin.cplusplus.VirtualCall,-cppcoreguidelines-avoid-c-arrays,-cppcoreguidelines-avoid-magic-numbers,-cppcoreguidelines-macro-usage,-cppcoreguidelines-owning-memory,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-cppcoreguidelines-pro-bounds-constant-array-index,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-pro-type-const-cast,-cppcoreguidelines-pro-type-reinterpret-cast,-cppcoreguidelines-pro-type-static-cast-downcast,-cppcoreguidelines-pro-type-vararg,-fuchsia-*,-google-runtime-references,-hicpp-avoid-c-arrays,-hicpp-invalid-access-moved,-hicpp-no-array-decay,-hicpp-no-assembler,-hicpp-vararg,-misc-macro-parentheses,-misc-unused-parameters,-modernize-avoid-c-arrays,-modernize-make-unique,-modernize-raw-string-literal,-readability-avoid-const-params-in-decls,-readability-implicit-bool-cast,-readability-implicit-bool-conversion,-readability-magic-numbers'
 #
 #  For a list of check options, see:
 #  https://clang.llvm.org/extra/clang-tidy/checks/list.html
@@ -22,6 +22,9 @@ Checks: '*,-android-cloexec-*,-bugprone-macro-parentheses,-cert-dcl21-cpp,-cert-
 #
 #  clang-analyzer-optin.cplusplus.VirtualCall
 #    Disable a warning we get from the Catch test framework.
+#
+#  cppcoreguidelines-avoid-c-arrays
+#    Alias for modernize-avoid-c-arrays.
 #
 #  cppcoreguidelines-avoid-magic-numbers
 #    Generally good advice, but there are too many places where this is
@@ -62,6 +65,9 @@ Checks: '*,-android-cloexec-*,-bugprone-macro-parentheses,-cert-dcl21-cpp,-cert-
 #    This is just a matter of preference, and we can't change the interfaces
 #    now anyways.
 #
+#  hicpp-avoid-c-arrays
+#    Alias for modernize-avoid-c-arrays.
+#
 #  hicpp-invalid-access-moved
 #    Creates false positives.
 #
@@ -80,6 +86,10 @@ Checks: '*,-android-cloexec-*,-bugprone-macro-parentheses,-cert-dcl21-cpp,-cert-
 #  misc-unused-parameters
 #    Can't be fixed, because then Doxygen will complain. (In file
 #    include/osmium/area/problem_reporter.hpp).
+#
+#  modernize-avoid-c-arrays
+#    Makes sense for some array, but especially for char arrays using
+#    std::array isn't a good solution.
 #
 #  modernize-make-unique
 #    This is a C++11 library and C++ doesn't have std::make_unique.
