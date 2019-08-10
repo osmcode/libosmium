@@ -47,7 +47,13 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/geom/util.hpp>
 #include <osmium/osm/location.hpp>
 
-#include <proj_api.h>
+#ifdef ACCEPT_USE_OF_DEPRECATED_PROJ_API_H
+# include <proj_api.h>
+#else
+# define ACCEPT_USE_OF_DEPRECATED_PROJ_API_H
+# include <proj_api.h>
+# undef ACCEPT_USE_OF_DEPRECATED_PROJ_API_H
+#endif
 
 #include <memory>
 #include <string>
