@@ -64,6 +64,17 @@ addons_shortcuts:
 
 #-----------------------------------------------------------------------------
 
+addons:
+  homebrew:
+    packages:
+      - cmake
+      - boost
+      - google-sparsehash
+      - gdal
+    update: true
+
+#-----------------------------------------------------------------------------
+
 matrix:
   include:
 
@@ -172,23 +183,23 @@ matrix:
       env: CC='clang' CXX='clang++' BUILD_TYPE='Dev'
 
     - os: osx
-      osx_image: xcode10.1
+      osx_image: xcode10.2
       compiler: xcode10-clang-dev
       env: CC='clang' CXX='clang++' BUILD_TYPE='Dev'
 
     - os: osx
-      osx_image: xcode10.1
-      compiler: xcode10-clang-release
+      osx_image: xcode11
+      compiler: xcode11-clang-dev
+      env: CC='clang' CXX='clang++' BUILD_TYPE='Dev'
+
+    - os: osx
+      osx_image: xcode11
+      compiler: xcode11-clang-release
       env: CC='clang' CXX='clang++' BUILD_TYPE='Release'
 
 
 install:
   - git clone --quiet --depth 1 https://github.com/mapbox/protozero.git ../protozero
-  - |
-    if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
-      brew remove gdal
-      brew install cmake boost google-sparsehash gdal || true
-    fi
   - cmake --version
 
 before_script:
