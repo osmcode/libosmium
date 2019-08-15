@@ -273,7 +273,8 @@ namespace osmium {
 
             IdSetDense(IdSetDense&&) noexcept = default;
 
-            IdSetDense& operator=(IdSetDense&&) noexcept = default;
+            // This should really be noexcept, but GCC 4.8 doesn't like it.
+            IdSetDense& operator=(IdSetDense&&) = default;
 
             ~IdSetDense() noexcept override = default;
 
