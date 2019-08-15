@@ -170,6 +170,7 @@ add_unit_test(geom test_tile)
 add_unit_test(geom test_wkb)
 add_unit_test(geom test_wkt)
 
+add_unit_test(handler test_apply LIBS "${OSMIUM_XML_LIBRARIES};${OSMIUM_PBF_LIBRARIES}")
 add_unit_test(handler test_check_order_handler)
 add_unit_test(handler test_dynamic_handler)
 

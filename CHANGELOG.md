@@ -8,6 +8,9 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+* Instead of handler classes, the `apply` function can now also take
+  lambdas (or objects from classes implementing `operator()`).
+
 ### Changed
 
 ### Fixed
