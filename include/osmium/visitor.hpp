@@ -203,7 +203,8 @@ namespace osmium {
         struct wrapper_handler : TFunc {
 
             template<typename T>
-            wrapper_handler(T&& func) : TFunc(std::forward<T>(func)) {}
+            explicit wrapper_handler(T&& func) : TFunc(std::forward<T>(func)) { // NOLINT(bugprone-forwarding-reference-overload)
+            }
 
             // Fallback that always matches.
             void operator()(const osmium::memory::Item& /*item*/) const noexcept {
