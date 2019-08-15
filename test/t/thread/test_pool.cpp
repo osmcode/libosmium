@@ -1,7 +1,6 @@
 #include "catch.hpp"
 
 #include <osmium/thread/pool.hpp>
-#include <osmium/util/compatibility.hpp>
 
 #include <stdexcept>
 
@@ -12,7 +11,7 @@ struct test_job_with_result {
 };
 
 struct test_job_throw {
-    OSMIUM_NORETURN void operator()() const {
+    [[noreturn]] void operator()() const {
         throw std::runtime_error{"exception in pool thread"};
     }
 };
