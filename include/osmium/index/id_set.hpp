@@ -252,7 +252,8 @@ namespace osmium {
 
             IdSetDense() = default;
 
-            IdSetDense(const IdSetDense& other) {
+            IdSetDense(const IdSetDense& other) :
+                IdSet<T>(other) {
                 m_data.reserve(other.m_data.size());
                 for (const auto& ptr: other.m_data) {
                     if (ptr) {
