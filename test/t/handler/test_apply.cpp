@@ -64,7 +64,7 @@ TEST_CASE("apply with lambda on buffer") {
     const auto buffer = reader.read();
     reader.close();
 
-    int members = 0;
+    std::size_t members = 0;
 
     osmium::apply(buffer, [&](const osmium::Relation& relation) {
         members += relation.members().size();
