@@ -43,6 +43,33 @@ TEST_CASE("Basic functionality of IdSetDense") {
     REQUIRE(s.empty());
 }
 
+TEST_CASE("Copying IdSetDense") {
+    osmium::index::IdSetDense<osmium::unsigned_object_id_type> s1;
+    osmium::index::IdSetDense<osmium::unsigned_object_id_type> s2;
+
+    REQUIRE(s1.empty());
+    REQUIRE(s2.empty());
+
+    s1.set(17);
+    s1.set(28);
+    REQUIRE(s1.get(17));
+    REQUIRE(s1.get(17));
+    REQUIRE(s1.size() == 2);
+
+    s2 = s1;
+    REQUIRE(s1.get(17));
+    REQUIRE(s1.get(28));
+    REQUIRE(s1.size() == 2);
+    REQUIRE(s2.get(17));
+    REQUIRE(s2.get(28));
+    REQUIRE(s2.size() == 2);
+
+    osmium::index::IdSetDense<osmium::unsigned_object_id_type> s3{s1};
+    REQUIRE(s3.get(17));
+    REQUIRE(s3.get(28));
+    REQUIRE(s3.size() == 2);
+}
+
 TEST_CASE("Iterating over IdSetDense") {
     osmium::index::IdSetDense<osmium::unsigned_object_id_type> s;
     s.set(7);
@@ -123,6 +150,33 @@ TEST_CASE("Basic functionality of IdSetSmall") {
 
     s.clear();
     REQUIRE(s.empty());
+}
+
+TEST_CASE("Copying IdSetSmall") {
+    osmium::index::IdSetSmall<osmium::unsigned_object_id_type> s1;
+    osmium::index::IdSetSmall<osmium::unsigned_object_id_type> s2;
+
+    REQUIRE(s1.empty());
+    REQUIRE(s2.empty());
+
+    s1.set(17);
+    s1.set(28);
+    REQUIRE(s1.get(17));
+    REQUIRE(s1.get(17));
+    REQUIRE(s1.size() == 2);
+
+    s2 = s1;
+    REQUIRE(s1.get(17));
+    REQUIRE(s1.get(28));
+    REQUIRE(s1.size() == 2);
+    REQUIRE(s2.get(17));
+    REQUIRE(s2.get(28));
+    REQUIRE(s2.size() == 2);
+
+    osmium::index::IdSetSmall<osmium::unsigned_object_id_type> s3{s1};
+    REQUIRE(s3.get(17));
+    REQUIRE(s3.get(28));
+    REQUIRE(s3.size() == 2);
 }
 
 TEST_CASE("Iterating over IdSetSmall") {

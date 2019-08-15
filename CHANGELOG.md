@@ -10,6 +10,7 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 * Instead of handler classes, the `apply` function can now also take
   lambdas (or objects from classes implementing `operator()`).
+* Add swap, copy constructor and assignment operator to IdSetDense.
 
 ### Changed
 

@@ -244,7 +244,34 @@ namespace osmium {
 
             using const_iterator = IdSetDenseIterator<T, chunk_bits>;
 
+            friend void swap(IdSetDense& first, IdSetDense& second) noexcept {
+                using std::swap;
+                swap(first.m_data, second.m_data);
+                swap(first.m_size, second.m_size);
+            }
+
             IdSetDense() = default;
+
+            IdSetDense(const IdSetDense& other) {
+                m_data.reserve(other.m_data.size());
+                for (const auto& ptr: other.m_data) {
+                    if (ptr) {
+                        m_data.emplace_back(new unsigned char[chunk_size]);
+                        ::memcpy(m_data.back().get(), ptr.get(), chunk_size);
+                    } else {
+                        m_data.emplace_back();
+                    }
+                }
+                m_size = other.m_size;
+            }
+
+            IdSetDense& operator=(IdSetDense other) {
+                swap(*this, other);
+                return *this;
+            }
+
+            IdSetDense(IdSetDense&&) = default;
+            IdSetDense& operator=(IdSetDense&&) = default;
 
             /**
              * Add the Id to the set if it is not already in there.
