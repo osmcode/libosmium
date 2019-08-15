@@ -13,7 +13,29 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+* Enable use of the old proj API in proj version 6. This is a stopgap
+  solution until we find a better one.
+* Better error messages when there is an error parsing a timestamp.
+* Cleaned up a lot of code based on clang-tidy warnings.
+* Ignore <bbox> or <bounds> subelement of <way> or <relation>. <bounds>
+  elements are created by Overpass API as subelements of ways or relations
+  when the "out bb" format is used. <bbox> subelements turn up in files
+  downloaded from http://download.openstreetmap.fr/replication . Libosmium
+  used to throw an error  like "Unknown element in <way>: bbox". With this
+  commit, these subelements are ignored, ie. there is no error any more,
+  but the data is not read.
+
 ### Fixed
+
+* Do not build areas with more than 100 locations where rings touch.
+  Places where rings touch are unusual for normal multipolygons and the
+  algorithm in libosmium that assembles multipolygons does not handle
+  them well. If there are too many touching points it becomes very slow.
+  This is not a problem for almost all multipolygons. As I am writing
+  this there are only three relations in the OSM database with more than
+  100 touching points, all of them rather weird boundaries in the US.
+  With this commit libosmium will simply ignore those areas to keep the
+  processing speed within reasonable bounds.
 
 
 ## [2.15.1] - 2019-02-26
