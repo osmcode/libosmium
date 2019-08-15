@@ -271,8 +271,11 @@ namespace osmium {
                 return *this;
             }
 
-            IdSetDense(IdSetDense&&) = default;
-            IdSetDense& operator=(IdSetDense&&) = default;
+            IdSetDense(IdSetDense&&) noexcept = default;
+
+            IdSetDense& operator=(IdSetDense&&) noexcept = default;
+
+            ~IdSetDense() noexcept override = default;
 
             /**
              * Add the Id to the set if it is not already in there.
