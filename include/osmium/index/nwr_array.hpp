@@ -48,9 +48,13 @@ namespace osmium {
     template <typename T>
     class nwr_array {
 
-        std::array<T, 3> m_data{};
+        std::array<T, 3> m_data;
 
     public:
+
+        nwr_array() :
+            m_data() {
+        }
 
         T& operator()(const osmium::item_type type) noexcept {
             return m_data[osmium::item_type_to_nwr_index(type)];
