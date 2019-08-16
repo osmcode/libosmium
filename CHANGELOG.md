@@ -8,6 +8,15 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+### Changed
+
+### Fixed
+
+
+## [2.15.2] - 2019-08-16
+
+### Added
+
 * Instead of handler classes, the `apply` function can now also take
   lambdas (or objects from classes implementing `operator()`).
 * Add swap, copy constructor and assignment operator to IdSetDense.
@@ -25,6 +34,9 @@ This project adheres to [Semantic Versioning](https://semver.org/).
   used to throw an error  like "Unknown element in <way>: bbox". With this
   commit, these subelements are ignored, ie. there is no error any more,
   but the data is not read.
+* Add swap, copy constructor and assignment operator to IdSetDense.
+* Update included catch.hpp to 1.12.2.
+* Retire use of `OSMIUM_NORETURN` macro. Use `[[noreturn]]` instead.
 
 ### Fixed
 
@@ -944,7 +956,8 @@ This project adheres to [Semantic Versioning](https://semver.org/).
   Doxygen (up to version 1.8.8). This version contains a workaround to fix
   this.
 
-[unreleased]: https://github.com/osmcode/libosmium/compare/v2.15.1...HEAD
+[unreleased]: https://github.com/osmcode/libosmium/compare/v2.15.2...HEAD
+[2.15.2]: https://github.com/osmcode/libosmium/compare/v2.15.1...v2.15.2
 [2.15.1]: https://github.com/osmcode/libosmium/compare/v2.15.0...v2.15.1
 [2.15.0]: https://github.com/osmcode/libosmium/compare/v2.14.2...v2.15.0
 [2.14.2]: https://github.com/osmcode/libosmium/compare/v2.14.1...v2.14.2
