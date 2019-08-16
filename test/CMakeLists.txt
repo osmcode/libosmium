@@ -174,11 +174,12 @@ add_unit_test(handler test_apply LIBS "${OSMIUM_XML_LIBRARIES};${OSMIUM_PBF_LIBR
 add_unit_test(handler test_check_order_handler)
 add_unit_test(handler test_dynamic_handler)
 
+add_unit_test(index test_dump_and_load_index)
 add_unit_test(index test_dump_sparse_as_array)
+add_unit_test(index test_file_based_index)
 add_unit_test(index test_id_set)
 add_unit_test(index test_id_to_location ENABLE_IF ${SPARSEHASH_FOUND})
-add_unit_test(index test_file_based_index)
-add_unit_test(index test_dump_and_load_index)
+add_unit_test(index test_nwr_array)
 add_unit_test(index test_object_pointer_collection)
 add_unit_test(index test_relations_map)
 
