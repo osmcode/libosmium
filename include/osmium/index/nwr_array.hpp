@@ -48,7 +48,7 @@ namespace osmium {
     template <typename T>
     class nwr_array {
 
-        std::array<T, 3> m_data;
+        std::array<T, 3> m_data{};
 
     public:
 
