@@ -13,6 +13,24 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 ### Fixed
 
 
+## [2.15.3] - 2019-09-16
+
+### Added
+
+* New header option "sorting" when reading and writing PBFs. If the header
+  option "sorting" is set to `Type_then_ID`, the optional header property
+  `Sort.Type_then_ID` is set on writing to PBF files. When reading PBF files
+  with this header property, the "sorting" header option is set accordingly.
+
+### Fixed
+
+* Do not propagate C++ exception through C code. We are using the Expat
+  XML parser, a C library. It calls callbacks in our code. When those
+  callbacks throw, the exception was propagated through the C code. This
+  did work in the tests, but that behaviour isn't guaranteed (C++
+  standard says it is implementation defined). This fixes it by catching
+  the exception and rethrowing it later.
+
 ## [2.15.2] - 2019-08-16
 
 ### Added
@@ -956,7 +974,8 @@ This project adheres to [Semantic Versioning](https://semver.org/).
   Doxygen (up to version 1.8.8). This version contains a workaround to fix
   this.
 
-[unreleased]: https://github.com/osmcode/libosmium/compare/v2.15.2...HEAD
+[unreleased]: https://github.com/osmcode/libosmium/compare/v2.15.3...HEAD
+[2.15.3]: https://github.com/osmcode/libosmium/compare/v2.15.2...v2.15.3
 [2.15.2]: https://github.com/osmcode/libosmium/compare/v2.15.1...v2.15.2
 [2.15.1]: https://github.com/osmcode/libosmium/compare/v2.15.0...v2.15.1
 [2.15.0]: https://github.com/osmcode/libosmium/compare/v2.14.2...v2.15.0
