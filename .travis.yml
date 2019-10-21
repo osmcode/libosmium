@@ -173,11 +173,6 @@ matrix:
 
     # OSX Clang Builds
     - os: osx
-      osx_image: xcode8.3
-      compiler: xcode83-clang-dev
-      env: CC='clang' CXX='clang++' BUILD_TYPE='Dev'
-
-    - os: osx
       osx_image: xcode9.4
       compiler: xcode94-clang-dev
       env: CC='clang' CXX='clang++' BUILD_TYPE='Dev'
