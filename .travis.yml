@@ -171,13 +171,6 @@ matrix:
       addons: *gcc7
       dist: bionic
 
-    - os: linux
-      arch: arm64
-      compiler: linux-gcc7-dev
-      env: CC='gcc-7' CXX='g++-7' BUILD_TYPE='Dev'
-      addons: *gcc7
-      dist: bionic
-
     # OSX Clang Builds
     - os: osx
       osx_image: xcode9.4
