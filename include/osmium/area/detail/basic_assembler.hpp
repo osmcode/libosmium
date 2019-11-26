@@ -713,7 +713,7 @@ namespace osmium {
 
                 };
 
-                void find_candidates(std::vector<candidate>& candidates, std::unordered_set<osmium::Location>& loc_done, const std::vector<location_to_ring_map>& xrings, candidate& cand) {
+                void find_candidates(std::vector<candidate>& candidates, std::unordered_set<osmium::Location>& loc_done, const std::vector<location_to_ring_map>& xrings, candidate& cand, unsigned depth = 0) {
                     if (debug()) {
                         std::cerr << "      find_candidates sum=" << cand.sum << " start=" << cand.start_location << " stop=" << cand.stop_location << "\n";
                         for (const auto& ring : cand.rings) {
@@ -754,10 +754,10 @@ namespace osmium {
                                 candidates.push_back(c);
                             } else if (loc_done.count(c.stop_location) == 0) {
                                 if (debug()) {
-                                    std::cerr << "          recurse...\n";
+                                    std::cerr << "          recurse... (depth=" << depth << " candidates.size=" << candidates.size() << ")\n";
                                 }
                                 loc_done.insert(c.stop_location);
-                                find_candidates(candidates, loc_done, xrings, c);
+                                find_candidates(candidates, loc_done, xrings, c, depth + 1);
                                 loc_done.erase(c.stop_location);
                                 if (debug()) {
                                     std::cerr << "          ...back\n";
