@@ -1088,7 +1088,7 @@ namespace osmium {
                         create_rings_simple_case();
                         timer_simple_case.stop();
                     } else if (m_split_locations.size() > max_split_locations) {
-                        if (debug()) {
+                        if (m_config.debug_level > 0) {
                             std::cerr << "  Ignoring polygon with "
                                       << m_split_locations.size()
                                       << " split locations (>"
@@ -1097,8 +1097,10 @@ namespace osmium {
                         }
                         return false;
                     } else {
-                        if (debug()) {
-                            std::cerr << "  Found split locations -> using complex algorithm\n";
+                        if (m_config.debug_level > 0) {
+                            std::cerr << "  Found "
+                                      << m_split_locations.size()
+                                      << " split locations -> using complex algorithm\n";
                         }
                         ++m_stats.area_touching_rings_case;
 
