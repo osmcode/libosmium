@@ -751,7 +751,24 @@ namespace osmium {
                                 if (debug()) {
                                     std::cerr << "          found candidate\n";
                                 }
-                                candidates.push_back(c);
+
+                                if (candidates.empty()) {
+                                    candidates.push_back(c);
+                                } else if (candidates.size() == 1) {
+                                    // add new candidate to vector, keep sorted
+                                    if (std::abs(c.sum) < std::abs(candidates.front().sum)) {
+                                        candidates.insert(candidates.begin(), c);
+                                    } else {
+                                        candidates.push_back(c);
+                                    }
+                                } else {
+                                    // add new candidate if it has either smallest or largest area
+                                    if (std::abs(c.sum) < std::abs(candidates.front().sum)) {
+                                        candidates.front() = c;
+                                    } else if (std::abs(c.sum) > std::abs(candidates.back().sum)) {
+                                        candidates.back() = c;
+                                    }
+                                }
                             } else if (loc_done.count(c.stop_location) == 0) {
                                 if (debug()) {
                                     std::cerr << "          recurse... (depth=" << depth << " candidates.size=" << candidates.size() << ")\n";
@@ -838,26 +855,20 @@ namespace osmium {
                     }
 
                     // Find the candidate with the smallest/largest area
-                    const auto chosen_cand = ring_min_is_outer ?
-                        std::min_element(candidates.cbegin(), candidates.cend(), [](const candidate& lhs, const candidate& rhs) {
-                            return std::abs(lhs.sum) < std::abs(rhs.sum);
-                        }) :
-                        std::max_element(candidates.cbegin(), candidates.cend(), [](const candidate& lhs, const candidate& rhs) {
-                            return std::abs(lhs.sum) < std::abs(rhs.sum);
-                        });
+                    const auto chosen_cand = ring_min_is_outer ? candidates.front() : candidates.back();
 
                     if (debug()) {
-                        std::cerr << "    Decided on: sum=" << chosen_cand->sum << "\n";
-                        for (const auto& ring : chosen_cand->rings) {
+                        std::cerr << "    Decided on: sum=" << chosen_cand.sum << "\n";
+                        for (const auto& ring : chosen_cand.rings) {
                             std::cerr << "        " << ring.first.ring() << (ring.second ? " reverse" : "") << "\n";
                         }
                     }
 
                     // Join all (open) rings in the candidate to get one closed ring.
-                    assert(chosen_cand->rings.size() > 1);
-                    const auto& first_ring = chosen_cand->rings.front().first;
+                    assert(chosen_cand.rings.size() > 1);
+                    const auto& first_ring = chosen_cand.rings.front().first;
                     const ProtoRing& remaining_ring = first_ring.ring();
-                    for (auto it = std::next(chosen_cand->rings.begin()); it != chosen_cand->rings.end(); ++it) {
+                    for (auto it = std::next(chosen_cand.rings.begin()); it != chosen_cand.rings.end(); ++it) {
                         merge_two_rings(open_ring_its, first_ring, it->first);
                     }
 
