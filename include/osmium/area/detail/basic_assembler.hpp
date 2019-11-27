@@ -713,7 +713,7 @@ namespace osmium {
 
                 };
 
-                void find_candidates(std::vector<candidate>& candidates, std::unordered_set<osmium::Location>& loc_done, const std::vector<location_to_ring_map>& xrings, candidate& cand, unsigned depth = 0) {
+                void find_candidates(std::vector<candidate>& candidates, std::unordered_set<osmium::Location>& loc_done, const std::vector<location_to_ring_map>& xrings, const candidate& cand, unsigned depth = 0) {
                     if (debug()) {
                         std::cerr << "      find_candidates sum=" << cand.sum << " start=" << cand.start_location << " stop=" << cand.stop_location << "\n";
                         for (const auto& ring : cand.rings) {
@@ -817,7 +817,7 @@ namespace osmium {
                         ring.reset();
                     }
 
-                    candidate cand{*ring_min, false};
+                    const candidate cand{*ring_min, false};
 
                     // Locations we have visited while finding candidates, used
                     // to detect loops.
