@@ -12,6 +12,17 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+## [2.15.4] - 2019-11-28
+
+### Added
+
+* Add osmium::Options::empty() for consistency with STL containers.
+
+### Fixed
+
+* Massive reduction of memory consumption in area assembly code. For some
+  very complex polygons memory usage can drop from multiple gigabytes to just
+  megabytes.
 
 ## [2.15.3] - 2019-09-16
 
@@ -974,7 +985,8 @@ This project adheres to [Semantic Versioning](https://semver.org/).
   Doxygen (up to version 1.8.8). This version contains a workaround to fix
   this.
 
-[unreleased]: https://github.com/osmcode/libosmium/compare/v2.15.3...HEAD
+[unreleased]: https://github.com/osmcode/libosmium/compare/v2.15.4...HEAD
+[2.15.4]: https://github.com/osmcode/libosmium/compare/v2.15.3...v2.15.4
 [2.15.3]: https://github.com/osmcode/libosmium/compare/v2.15.2...v2.15.3
 [2.15.2]: https://github.com/osmcode/libosmium/compare/v2.15.1...v2.15.2
 [2.15.1]: https://github.com/osmcode/libosmium/compare/v2.15.0...v2.15.1
