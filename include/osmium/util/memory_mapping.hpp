@@ -573,6 +573,7 @@ inline osmium::util::MemoryMapping::MemoryMapping(std::size_t size, mapping_mode
     m_fd(resize_fd(fd)),
     m_mapping_mode(mode),
     m_addr(::mmap(nullptr, m_size, get_protection(), get_flags(), m_fd, m_offset)) {
+    madvise(m_addr,m_size,MADV_RANDOM);
     assert(!(fd == -1 && mode == mapping_mode::readonly));
     if (!is_valid()) {
         throw std::system_error{errno, std::system_category(), "mmap failed"};
@@ -630,6 +631,7 @@ inline void osmium::util::MemoryMapping::resize(std::size_t new_size) {
         m_size = new_size;
         resize_fd(m_fd);
         m_addr = ::mmap(nullptr, new_size, get_protection(), get_flags(), m_fd, m_offset);
+        madvise(m_addr,new_size,MADV_RANDOM);
         if (!is_valid()) {
             throw std::system_error{errno, std::system_category(), "mmap (remap) failed"};
         }
