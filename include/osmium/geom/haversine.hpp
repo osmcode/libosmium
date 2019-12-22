@@ -63,13 +63,13 @@ namespace osmium {
              *
              * @pre @code c1.valid() && c2.valid() @endcode
              */
-            inline double distance(const osmium::geom::Coordinates& c1, const osmium::geom::Coordinates& c2) {
-                double lonh = sin(deg_to_rad(c1.x - c2.x) * 0.5);
+            inline double distance(const osmium::geom::Coordinates& c1, const osmium::geom::Coordinates& c2) noexcept {
+                double lonh = std::sin(deg_to_rad(c1.x - c2.x) * 0.5);
                 lonh *= lonh;
-                double lath = sin(deg_to_rad(c1.y - c2.y) * 0.5);
+                double lath = std::sin(deg_to_rad(c1.y - c2.y) * 0.5);
                 lath *= lath;
-                const double tmp = cos(deg_to_rad(c1.y)) * cos(deg_to_rad(c2.y));
-                return 2.0 * EARTH_RADIUS_IN_METERS * asin(sqrt(lath + tmp * lonh));
+                const double tmp = std::cos(deg_to_rad(c1.y)) * std::cos(deg_to_rad(c2.y));
+                return 2.0 * EARTH_RADIUS_IN_METERS * std::asin(std::sqrt(lath + tmp * lonh));
             }
 
             /**
