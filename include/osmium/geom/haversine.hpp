@@ -36,6 +36,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/geom/coordinates.hpp>
 #include <osmium/geom/util.hpp>
 #include <osmium/osm/node_ref_list.hpp>
+#include <osmium/osm/way.hpp>
 
 #include <cmath>
 #include <iterator>
@@ -72,7 +73,22 @@ namespace osmium {
             }
 
             /**
-             * Calculate length of node list (for instance from a way).
+             * Calculate length of way.
+             */
+            inline double distance(const osmium::WayNodeList& wnl) {
+                double sum_length = 0;
+
+                for (auto it = wnl.begin(); it != wnl.end(); ++it) {
+                    if (std::next(it) != wnl.end()) {
+                        sum_length += distance(it->location(), std::next(it)->location());
+                    }
+                }
+
+                return sum_length;
+            }
+
+            /**
+             * Calculate length of node list.
              */
             inline double distance(const osmium::NodeRefList& nrl) {
                 double sum_length = 0;
