@@ -674,7 +674,8 @@ namespace osmium {
                         return;
                     }
                     const char* value = equal_sign + 1;
-                    builder.add_tag(key, equal_sign - tag.value.first, value, std::strlen(value));
+                    builder.add_tag(key, equal_sign - key,
+                                    value, std::strlen(value));
                 }
 
                 template <typename TIterator>
