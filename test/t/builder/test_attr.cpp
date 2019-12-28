@@ -143,6 +143,37 @@ TEST_CASE("create node with tags using builders") {
         REQUIRE(it == node.tags().cend());
     }
 
+    SECTION("add tags using _tag with equal sign in single cstring") {
+        const auto pos = osmium::builder::add_node(buffer,
+            _id(2),
+            _tag("amenity=restaurant"),
+            _tag("name="),
+            _tag("phone"),
+            _tag(std::string{"cuisine=italian"})
+        );
+
+        const auto& node = buffer.get<osmium::Node>(pos);
+
+        REQUIRE(node.id() == 2);
+        REQUIRE(node.tags().size() == 4);
+        REQUIRE(std::distance(node.cbegin(), node.cend()) == 1);
+
+        auto it = node.tags().cbegin();
+        REQUIRE(std::string{it->key()} == "amenity");
+        REQUIRE(std::string{it->value()} == "restaurant");
+        ++it;
+        REQUIRE(std::string{it->key()} == "name");
+        REQUIRE(std::string{it->value()} == "");
+        ++it;
+        REQUIRE(std::string{it->key()} == "phone");
+        REQUIRE(std::string{it->value()} == "");
+        ++it;
+        REQUIRE(std::string{it->key()} == "cuisine");
+        REQUIRE(std::string{it->value()} == "italian");
+        ++it;
+        REQUIRE(it == node.tags().cend());
+    }
+
     SECTION("add tags using _tags from initializer list") {
         const auto pos = osmium::builder::add_node(buffer,
             _id(3),
@@ -198,7 +229,7 @@ TEST_CASE("create node with tags using builders") {
 
         const auto pos = osmium::builder::add_node(buffer,
             _id(4),
-            _tag("t1", "t1"),
+            _tag("t1=t1"),
             _tags({{"t2", "t2"}, {"t3", "t3"}}),
             _tag("t4", "t4"),
             _tags(tags)

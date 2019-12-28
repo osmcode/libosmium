@@ -360,6 +360,10 @@ namespace osmium {
                     type_wrapper(std::make_pair(key, val)) {}
                 explicit _tag(const std::string& key, const std::string& val) :
                     type_wrapper(std::make_pair(key.c_str(), val.c_str())) {}
+                explicit _tag(const char* const key_value) :
+                    type_wrapper(pair_of_cstrings{key_value, nullptr}) {}
+                explicit _tag(const std::string& key_value) :
+                    type_wrapper(pair_of_cstrings{key_value.c_str(), nullptr}) {}
             };
 
             template <typename TTagIterator>
@@ -659,7 +663,18 @@ namespace osmium {
                 }
 
                 static void set_value(TagListBuilder& builder, const attr::_tag& tag) {
-                    builder.add_tag(tag.value);
+                    if (tag.value.second != nullptr) {
+                        builder.add_tag(tag.value);
+                        return;
+                    }
+                    const char* key = tag.value.first;
+                    auto const equal_sign = std::strchr(key, '=');
+                    if (!equal_sign) {
+                        builder.add_tag(key, "");
+                        return;
+                    }
+                    const char* value = equal_sign + 1;
+                    builder.add_tag(key, equal_sign - tag.value.first, value, std::strlen(value));
                 }
 
                 template <typename TIterator>
