@@ -4,8 +4,6 @@
 #include <osmium/geom/mercator_projection.hpp>
 #include <osmium/geom/projection.hpp>
 
-#include <random>
-
 TEST_CASE("Indentity Projection") {
     osmium::geom::IdentityProjection projection;
     REQUIRE(4326 == projection.epsg());
