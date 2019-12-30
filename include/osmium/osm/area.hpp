@@ -202,7 +202,7 @@ namespace osmium {
 
         /**
          * Check whether this area is a multipolygon, ie. whether it has more
-         * than one outer ring?
+         * than one outer ring.
          */
         bool is_multipolygon() const {
             return num_rings().first > 1;
