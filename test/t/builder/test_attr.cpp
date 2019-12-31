@@ -27,7 +27,7 @@ TEST_CASE("create node using builders: add node with only id") {
     REQUIRE(node.timestamp() == osmium::Timestamp{});
     REQUIRE(node.changeset() == 0);
     REQUIRE(node.uid() == 0);
-    REQUIRE(std::string{node.user()}.empty());
+    REQUIRE(node.user()[0] == '\0');
     REQUIRE(node.location() == osmium::Location{});
     REQUIRE(node.tags().empty());
 }
@@ -163,10 +163,10 @@ TEST_CASE("create node with tags using builders: add tags using _tag with equal 
     REQUIRE(std::string{it->value()} == "restaurant");
     ++it;
     REQUIRE(std::string{it->key()} == "name");
-    REQUIRE(std::string{it->value()} == "");
+    REQUIRE(it->value()[0] == '\0');
     ++it;
     REQUIRE(std::string{it->key()} == "phone");
-    REQUIRE(std::string{it->value()} == "");
+    REQUIRE(it->value()[0] == '\0');
     ++it;
     REQUIRE(std::string{it->key()} == "cuisine");
     REQUIRE(std::string{it->value()} == "italian");
@@ -281,10 +281,10 @@ TEST_CASE("create node with tags using builders: add tags using _t with string")
     REQUIRE(std::string{it->value()} == "post_box");
     ++it;
     REQUIRE(std::string{it->key()} == "empty");
-    REQUIRE(std::string{it->value()} == "");
+    REQUIRE(it->value()[0] == '\0');
     ++it;
     REQUIRE(std::string{it->key()} == "also_empty");
-    REQUIRE(std::string{it->value()} == "");
+    REQUIRE(it->value()[0] == '\0');
     ++it;
     REQUIRE(std::string{it->key()} == "operator");
     REQUIRE(std::string{it->value()} == "Deutsche Post");
@@ -468,12 +468,12 @@ TEST_CASE("create relation using builders: create relation") {
 
     REQUIRE(it->type() == osmium::item_type::node);
     REQUIRE(it->ref() == 123);
-    REQUIRE(std::string{it->role()}.empty());
+    REQUIRE(it->role()[0] == '\0');
     ++it;
 
     REQUIRE(it->type() == osmium::item_type::node);
     REQUIRE(it->ref() == 132);
-    REQUIRE(std::string{it->role()}.empty());
+    REQUIRE(it->role()[0] == '\0');
     ++it;
 
     REQUIRE(it->type() == osmium::item_type::way);
@@ -551,7 +551,7 @@ TEST_CASE("create relation using builders: create relation with members from ini
     auto it = relation.members().begin();
     REQUIRE(it->type() == osmium::item_type::node);
     REQUIRE(it->ref() == 123);
-    REQUIRE(std::string{it->role()}.empty());
+    REQUIRE(it->role()[0] == '\0');
     ++it;
     REQUIRE(it->type() == osmium::item_type::way);
     REQUIRE(it->ref() == 111);
@@ -595,7 +595,7 @@ TEST_CASE("create relation using builders: create relation with members from ite
     auto it = relation.members().begin();
     REQUIRE(it->type() == osmium::item_type::node);
     REQUIRE(it->ref() == 123);
-    REQUIRE(std::string{it->role()}.empty());
+    REQUIRE(it->role()[0] == '\0');
     ++it;
     REQUIRE(it->type() == osmium::item_type::way);
     REQUIRE(it->ref() == 111);
