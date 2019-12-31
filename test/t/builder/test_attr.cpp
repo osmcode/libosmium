@@ -257,6 +257,34 @@ TEST_CASE("create node with tags using builders") {
         REQUIRE(std::distance(node.cbegin(), node.cend()) == 1);
     }
 
+    SECTION("add tags using _tags with string") {
+        const auto pos = osmium::builder::add_node(buffer,
+            _id(5),
+            _t("amenity=post_box,,empty,also_empty=,operator=Deutsche Post")
+        );
+
+        const auto& node = buffer.get<osmium::Node>(pos);
+
+        REQUIRE(node.id() == 5);
+        REQUIRE(node.tags().size() == 4);
+
+        auto it = node.tags().cbegin();
+        REQUIRE(std::string{it->key()} == "amenity");
+        REQUIRE(std::string{it->value()} == "post_box");
+        ++it;
+        REQUIRE(std::string{it->key()} == "empty");
+        REQUIRE(std::string{it->value()} == "");
+        ++it;
+        REQUIRE(std::string{it->key()} == "also_empty");
+        REQUIRE(std::string{it->value()} == "");
+        ++it;
+        REQUIRE(std::string{it->key()} == "operator");
+        REQUIRE(std::string{it->value()} == "Deutsche Post");
+        ++it;
+        REQUIRE(it == node.tags().cend());
+        REQUIRE(std::distance(node.cbegin(), node.cend()) == 1);
+    }
+
 }
 
 TEST_CASE("create way using builders") {

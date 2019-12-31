@@ -45,6 +45,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/relation.hpp>
 #include <osmium/osm/timestamp.hpp>
 #include <osmium/osm/types.hpp>
+#include <osmium/util/string.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -366,6 +367,11 @@ namespace osmium {
                     type_wrapper(pair_of_cstrings{key_value.c_str(), nullptr}) {}
             };
 
+            OSMIUM_ATTRIBUTE(tags_handler, _t, const char*)
+                explicit _t(const char *tags) :
+                    type_wrapper(tags) {}
+            };
+
             template <typename TTagIterator>
             inline constexpr detail::tags_from_iterator_pair<TTagIterator> _tags(TTagIterator first, TTagIterator last) {
                 return {first, last};
@@ -682,6 +688,21 @@ namespace osmium {
                 static void set_value(TagListBuilder& builder, const attr::detail::tags_from_iterator_pair<TIterator>& tags) {
                     for (const auto& tag : tags) {
                         builder.add_tag(tag);
+                    }
+                }
+
+                static void set_value(TagListBuilder& builder, const attr::_t& tags) {
+                    const auto taglist = osmium::split_string(tags.value, ',', true);
+                    for (const auto& tag : taglist) {
+                        const std::size_t pos = tag.find_first_of('=');
+                        if (pos == std::string::npos) {
+                            builder.add_tag(tag, "");
+                        } else {
+                            const char* value = tag.c_str() + pos + 1;
+                            builder.add_tag(tag.c_str(), pos,
+                                            value, tag.size() - pos - 1);
+                        }
+
                     }
                 }
 
