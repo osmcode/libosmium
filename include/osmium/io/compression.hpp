@@ -249,6 +249,12 @@ namespace osmium {
                 if (m_fd >= 0) {
                     const int fd = m_fd;
                     m_fd = -1;
+
+                    // Do not sync or close stdout
+                    if (fd == 1) {
+                        return;
+                    }
+
                     if (do_fsync()) {
                         osmium::io::detail::reliable_fsync(fd);
                     }

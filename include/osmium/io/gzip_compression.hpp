@@ -111,11 +111,11 @@ namespace osmium {
 
             explicit GzipCompressor(const int fd, const fsync sync) :
                 Compressor(sync),
-                m_fd(osmium::io::detail::reliable_dup(fd)) {
+                m_fd(fd) {
 #ifdef _MSC_VER
                 osmium::detail::disable_invalid_parameter_handler diph;
 #endif
-                m_gzfile = ::gzdopen(fd, "wb");
+                m_gzfile = ::gzdopen(osmium::io::detail::reliable_dup(fd), "wb");
                 if (!m_gzfile) {
                     throw gzip_error{"gzip error: write initialization failed"};
                 }
@@ -159,6 +159,12 @@ namespace osmium {
                     if (result != Z_OK) {
                         throw gzip_error{"gzip error: write close failed", result};
                     }
+
+                    // Do not sync or close stdout
+                    if (m_fd == 1) {
+                        return;
+                    }
+
                     if (do_fsync()) {
                         osmium::io::detail::reliable_fsync(m_fd);
                     }

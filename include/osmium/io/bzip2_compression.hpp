@@ -114,7 +114,11 @@ namespace osmium {
 #endif
                     m_file = fdopen(fd, mode);
                     if (!m_file) {
-                        ::close(fd);
+
+                        // Do not close stdout
+                        if (fd != 1) {
+                            ::close(fd);
+                        }
                         throw std::system_error{errno, std::system_category(), "fdopen failed"};
                     }
                 }
@@ -143,11 +147,17 @@ namespace osmium {
                     osmium::detail::disable_invalid_parameter_handler diph;
 #endif
                     if (m_file) {
-                        if (fclose(m_file) != 0) {
-                            m_file = nullptr;
+                        FILE* file = m_file;
+                        m_file = nullptr;
+
+                        // Do not close stdout
+                        if (fileno(file) == 1) {
+                            return;
+                        }
+
+                        if (fclose(file) != 0) {
                             throw std::system_error{errno, std::system_category(), "fclose failed"};
                         }
-                        m_file = nullptr;
                     }
                 }
 
