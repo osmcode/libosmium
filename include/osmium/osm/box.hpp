@@ -60,7 +60,7 @@ namespace osmium {
         constexpr Box() noexcept = default;
 
         /**
-         * Create box from minimum and maximum coordinates.
+         * Create box from minimum and maximum coordinates in WGS84.
          *
          * @pre @code minx <= maxx && miny <= maxy @endcode
          */

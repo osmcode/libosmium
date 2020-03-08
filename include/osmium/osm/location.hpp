@@ -320,7 +320,8 @@ namespace osmium {
         }
 
         /**
-         * Create Location with given longitude and latitude.
+         * Create Location with given longitude and latitude in WGS84
+         * coordinates.
          */
         Location(const double lon, const double lat) :
             m_x(double_to_fix(lon)),
