@@ -44,6 +44,7 @@ DEALINGS IN THE SOFTWARE.
 
 #ifndef _WIN32
 # include <sys/mman.h>
+# include <sys/statvfs.h>
 #else
 # include <fcntl.h>
 # include <io.h>
@@ -150,6 +151,17 @@ namespace osmium {
             void* map_view_of_file() const noexcept;
 #endif
 
+            // Get the available space on the file system where the file
+            // behind fd is on. Return 0 if it can't be determined.
+            unsigned long available_space(int fd) {
+                struct statvfs stat;
+                int const result = ::fstatvfs(fd, &stat);
+                if (result != 0) {
+                    return 0;
+                }
+                return stat.f_bsize * stat.f_bavail;
+            }
+
             int resize_fd(int fd) {
                 // Anonymous mapping doesn't need resizing.
                 if (fd == -1) {
@@ -157,7 +169,13 @@ namespace osmium {
                 }
 
                 // Make sure the file backing this mapping is large enough.
-                if (osmium::file_size(fd) < m_size + m_offset) {
+                auto const current_file_size = osmium::file_size(fd);
+                if (current_file_size < m_size + m_offset) {
+                    auto const available = available_space(fd);
+                    if (available > 0 && current_file_size + available <= m_size) {
+                        throw std::system_error{ENOSPC, std::system_category(), "Could not resize file: Not enough space on filesystem"};
+                    }
+
                     osmium::resize_file(fd, m_size + m_offset);
                 }
                 return fd;
