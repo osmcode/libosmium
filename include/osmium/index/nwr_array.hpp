@@ -52,6 +52,9 @@ namespace osmium {
 
     public:
 
+        using iterator = typename std::array<T, 3>::iterator;
+        using const_iterator = typename std::array<T, 3>::const_iterator;
+
         nwr_array() :
             m_data() {
         }
@@ -62,6 +65,30 @@ namespace osmium {
 
         const T& operator()(const osmium::item_type type) const noexcept {
             return m_data[osmium::item_type_to_nwr_index(type)];
+        }
+
+        iterator begin() noexcept {
+            return m_data.begin();
+        }
+
+        iterator end() noexcept {
+            return m_data.end();
+        }
+
+        const_iterator begin() const noexcept {
+            return m_data.cbegin();
+        }
+
+        const_iterator end() const noexcept {
+            return m_data.cend();
+        }
+
+        const_iterator cbegin() const noexcept {
+            return m_data.cbegin();
+        }
+
+        const_iterator cend() const noexcept {
+            return m_data.cend();
         }
 
     }; // class nwr_array
