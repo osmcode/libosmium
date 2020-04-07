@@ -255,6 +255,10 @@ namespace osmium {
                     m_role(role) {
                 }
 
+                member_type(char type, osmium::object_id_type ref, const char* role = "") noexcept :
+                    member_type(osmium::char_to_item_type(type), ref, role) {
+                }
+
                 constexpr osmium::item_type type() const noexcept {
                     return m_type;
                 }
@@ -281,6 +285,10 @@ namespace osmium {
                     m_type(type),
                     m_ref(ref),
                     m_role(std::move(role)) {
+                }
+
+                member_type_string(char type, osmium::object_id_type ref, std::string&& role) noexcept :
+                    member_type_string(osmium::char_to_item_type(type), ref, std::forward<std::string>(role)) {
                 }
 
                 osmium::item_type type() const noexcept {
