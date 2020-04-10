@@ -227,8 +227,8 @@ namespace osmium {
             OSMIUM_ATTRIBUTE(node_handler, _location, osmium::Location)
                 constexpr explicit _location(const osmium::Location& value) noexcept :
                     type_wrapper(value) {}
-                explicit _location(double lat, double lon) :
-                    type_wrapper(osmium::Location{lat, lon}) {}
+                explicit _location(double lon, double lat) :
+                    type_wrapper(osmium::Location{lon, lat}) {}
             };
 
             OSMIUM_ATTRIBUTE(entity_handler, _user, const char*)
