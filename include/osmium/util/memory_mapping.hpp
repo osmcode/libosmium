@@ -154,12 +154,16 @@ namespace osmium {
             // Get the available space on the file system where the file
             // behind fd is on. Return 0 if it can't be determined.
             unsigned long available_space(int fd) {
+#ifdef _WIN32
+                return 0;
+#else
                 struct statvfs stat;
                 int const result = ::fstatvfs(fd, &stat);
                 if (result != 0) {
                     return 0;
                 }
                 return stat.f_bsize * stat.f_bavail;
+#endif
             }
 
             int resize_fd(int fd) {
