@@ -8,9 +8,26 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+* Additional constructor for `builder::attr::member_type(_string)` taking
+  char type making it even easier to generate test data.
+* Allow single C string or `std::string` as argument for `builder::attr::_tag`.
+  Must contain key and value separated by the equal sign.
+* New `builder::attr::_t()` function to set tags from comma-separated string.
+* New `nwr_array` iterator.
+* Also support API of modern PROJ library (version 6 and above).
+
 ### Changed
 
+* Check how much space is available in file system before resizing memory
+  mapped file (not on Windows). This means we can, at least in some cases,
+  show an error message instead of crashing the program.
+
 ### Fixed
+
+* Parsing coordinates in PBF files did not work correctly if an lat/lon
+  offset was specified (which almost never happens).
+* Make OPL parser more strict: Attributes can only be specified once.
+* Do not close stdout after writing OSM file to it.
 
 ## [2.15.4] - 2019-11-28
 
