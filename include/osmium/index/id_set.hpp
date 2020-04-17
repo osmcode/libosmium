@@ -274,6 +274,7 @@ namespace osmium {
             IdSetDense(IdSetDense&&) noexcept = default;
 
             // This should really be noexcept, but GCC 4.8 doesn't like it.
+            // NOLINTNEXTLINE(hicpp-noexcept-move, performance-noexcept-move-constructor)
             IdSetDense& operator=(IdSetDense&&) = default;
 
             ~IdSetDense() noexcept override = default;
