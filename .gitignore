@@ -1,5 +1,5 @@
 *.swp
-.ycm_extra_conf.pyc
+compile_commands.json
 /_build*
 /build
 /libosmium-deps
