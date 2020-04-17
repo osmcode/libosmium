@@ -158,7 +158,7 @@ namespace osmium {
                 return 0;
 #else
                 struct statvfs stat;
-                int const result = ::fstatvfs(fd, &stat);
+                const int result = ::fstatvfs(fd, &stat);
                 if (result != 0) {
                     return 0;
                 }
@@ -175,7 +175,7 @@ namespace osmium {
                 // Make sure the file backing this mapping is large enough.
                 auto const current_file_size = osmium::file_size(fd);
                 if (current_file_size < m_size + m_offset) {
-                    auto const available = available_space(fd);
+                    const auto available = available_space(fd);
                     if (available > 0 && current_file_size + available <= m_size) {
                         throw std::system_error{ENOSPC, std::system_category(), "Could not resize file: Not enough space on filesystem"};
                     }
