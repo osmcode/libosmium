@@ -2,8 +2,6 @@
 
 #include <osmium/geom/projection.hpp>
 
-#ifdef OSMIUM_USE_PROJ_API_H
-
 TEST_CASE("CRS") {
     const osmium::geom::CRS wgs84{4326};
     const osmium::geom::CRS mercator{3857};
@@ -15,6 +13,4 @@ TEST_CASE("CRS") {
     REQUIRE(c.x == Approx(c2.x));
     REQUIRE(c.y == Approx(c2.y));
 }
-
-#endif
 

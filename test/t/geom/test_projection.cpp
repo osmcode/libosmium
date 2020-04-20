@@ -4,7 +4,7 @@
 #include <osmium/geom/mercator_projection.hpp>
 #include <osmium/geom/projection.hpp>
 
-TEST_CASE("Identity Projection") {
+TEST_CASE("Indentity Projection") {
     osmium::geom::IdentityProjection projection;
     REQUIRE(4326 == projection.epsg());
     REQUIRE("+proj=longlat +datum=WGS84 +no_defs" == projection.proj_string());
@@ -13,12 +13,7 @@ TEST_CASE("Identity Projection") {
 TEST_CASE("Projection 4326") {
     osmium::geom::Projection projection{4326};
     REQUIRE(4326 == projection.epsg());
-#ifdef OSMIUM_USE_PROJ_API_H
     REQUIRE("+init=epsg:4326" == projection.proj_string());
-#endif
-#ifdef OSMIUM_USE_PROJ_H
-    REQUIRE("EPSG:4326" == projection.proj_string());
-#endif
 
     const osmium::Location loc{1.0, 2.0};
     const osmium::geom::Coordinates c{1.0, 2.0};
@@ -27,19 +22,9 @@ TEST_CASE("Projection 4326") {
 }
 
 TEST_CASE("Projection 4326 from init string") {
-#ifdef OSMIUM_USE_PROJ_API_H
     osmium::geom::Projection projection{"+init=epsg:4326"};
-#endif
-#ifdef OSMIUM_USE_PROJ_H
-    osmium::geom::Projection projection{"EPSG:4326"};
-#endif
     REQUIRE(-1 == projection.epsg());
-#ifdef OSMIUM_USE_PROJ_API_H
     REQUIRE("+init=epsg:4326" == projection.proj_string());
-#endif
-#ifdef OSMIUM_USE_PROJ_H
-    REQUIRE("EPSG:4326" == projection.proj_string());
-#endif
 
     const osmium::Location loc{1.0, 2.0};
     const osmium::geom::Coordinates c{1.0, 2.0};
@@ -58,12 +43,7 @@ TEST_CASE("Creating projection from unknown EPSG code") {
 TEST_CASE("Projection 3857") {
     osmium::geom::Projection projection{3857};
     REQUIRE(3857 == projection.epsg());
-#ifdef OSMIUM_USE_PROJ_API_H
     REQUIRE("+init=epsg:3857" == projection.proj_string());
-#endif
-#ifdef OSMIUM_USE_PROJ_H
-    REQUIRE("EPSG:3857" == projection.proj_string());
-#endif
 
     SECTION("Zero coordinates") {
         const osmium::Location loc{0.0, 0.0};

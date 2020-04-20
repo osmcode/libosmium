@@ -37,12 +37,7 @@ DEALINGS IN THE SOFTWARE.
  * @file
  *
  * This file contains code for projecting OSM locations to arbitrary
- * coordinate reference systems. It is based on the PROJ library.
- *
- * Set the OSMIUM_USE_PROJ_H or OSMIUM_USE_PROJ_API_H to choose which API
- * version of the PROJ library should be used. For versions up to 5 use
- * OSMIUM_USE_PROJ_API_H, for version 6 both will work, for versions 7 and
- * above use OSMIUM_USE_PROJ_H.
+ * coordinate reference systems. It is based on the Proj.4 library.
  *
  * @attention If you include this file, you'll need to link with `libproj`.
  */
@@ -51,31 +46,15 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/geom/mercator_projection.hpp>
 #include <osmium/geom/util.hpp>
 #include <osmium/osm/location.hpp>
-#include <osmium/util/compatibility.hpp>
 
-#if defined(OSMIUM_USE_PROJ_H) && defined(OSMIUM_USE_PROJ_API_H)
-# error Do not set both OSMIUM_USE_PROJ_H and OSMIUM_USE_PROJ_API_H
+#ifdef ACCEPT_USE_OF_DEPRECATED_PROJ_API_H
+# include <proj_api.h>
+#else
+# define ACCEPT_USE_OF_DEPRECATED_PROJ_API_H
+# include <proj_api.h>
+# undef ACCEPT_USE_OF_DEPRECATED_PROJ_API_H
 #endif
 
-#if !defined(OSMIUM_USE_PROJ_H) && !defined(OSMIUM_USE_PROJ_API_H)
-# error You have to define either OSMIUM_USE_PROJ_H or OSMIUM_USE_PROJ_API_H
-#endif
-
-#ifdef OSMIUM_USE_PROJ_H
-# include <proj.h>
-#endif
-
-#ifdef OSMIUM_USE_PROJ_API_H
-# ifdef ACCEPT_USE_OF_DEPRECATED_PROJ_API_H
-#  include <proj_api.h>
-# else
-#  define ACCEPT_USE_OF_DEPRECATED_PROJ_API_H
-#  include <proj_api.h>
-#  undef ACCEPT_USE_OF_DEPRECATED_PROJ_API_H
-# endif
-#endif
-
-#include <cassert>
 #include <memory>
 #include <string>
 
@@ -83,107 +62,8 @@ namespace osmium {
 
     namespace geom {
 
-#ifdef OSMIUM_USE_PROJ_H
-        /**
-         * Functor that does projection from WGS84 (EPSG:4326) to the given
-         * CRS.
-         *
-         * If this Projection is initialized with the constructor taking
-         * an integer with the epsg code 4326, no projection is done. If it
-         * is initialized with epsg code 3857 the Osmium-internal
-         * implementation of the Mercator projection is used, otherwise this
-         * falls back to using the PROJ library. Note that this "magic" does
-         * not work if you use any of the constructors taking a string.
-         */
-        class Projection {
-
-            struct ProjDestroyer {
-                void operator()(PJ* crs) {
-                    proj_destroy(crs);
-                }
-            }; // struct ProjDestroyer
-
-            std::string m_proj_string;
-            std::unique_ptr<PJ, ProjDestroyer> m_proj;
-            int m_epsg = -1;
-
-            PJ* make_proj(const char* to_crs) {
-                PJ* p = proj_create_crs_to_crs(PJ_DEFAULT_CTX,
-                                               "EPSG:4326", to_crs,
-                                               nullptr);
-                if (p) {
-                    return p;
-                }
-
-                throw osmium::projection_error{std::string{"Creating PROJ projection failed: "} +
-                                               proj_errno_string(proj_errno(p))};
-            }
-
-        public:
-
-            explicit Projection(const char* proj_string) :
-                m_proj_string(proj_string),
-                m_proj(make_proj(proj_string)) {
-            }
-
-            explicit Projection(const std::string& proj_string) :
-                Projection(proj_string.c_str()) {
-            }
-
-            explicit Projection(int epsg) :
-                m_proj_string(std::string{"EPSG:"} + std::to_string(epsg)),
-                m_proj((epsg == 4326 || epsg == 3857) ? nullptr
-                                                      : make_proj(m_proj_string.c_str())),
-                m_epsg(epsg) {
-            }
-
-            /**
-             * Do coordinate transformation.
-             *
-             * @pre Location must be in valid range (depends on projection
-             *      used).
-             */
-            Coordinates operator()(osmium::Location location) const {
-                if (m_epsg == 4326) {
-                    return Coordinates{location.lon(), location.lat()};
-                }
-
-                if (m_epsg == 3857) {
-                    return Coordinates{detail::lon_to_x(location.lon()),
-                                       detail::lat_to_y(location.lat())};
-                }
-
-                PJ_COORD from;
-                from.lpzt.z = 0.0;
-                from.lpzt.t = HUGE_VAL;
-                from.lpzt.lam = location.lon();
-                from.lpzt.phi = location.lat();
-
-                assert(m_proj);
-                PJ_COORD to = proj_trans(m_proj.get(), PJ_FWD, from);
-
-                return Coordinates{to.xy.x, to.xy.y};
-            }
-
-            int epsg() const noexcept {
-                return m_epsg;
-            }
-
-            /**
-             * @deprecated Because it is different for different PROJ versions.
-             */
-            OSMIUM_DEPRECATED const std::string& proj_string() const noexcept {
-                return m_proj_string;
-            }
-
-        }; // class Projection
-#endif
-
-#ifdef OSMIUM_USE_PROJ_API_H
         /**
          * C++ wrapper for a Coordinate Reference System of the proj library.
-         *
-         * @deprecated Not available with PROJ 6 or later.
          */
         class CRS {
 
@@ -229,18 +109,6 @@ namespace osmium {
 
         }; // class CRS
 
-        namespace detail {
-
-            inline Coordinates transform(const CRS& src, const CRS& dest, Coordinates c) {
-                const int result = pj_transform(src.get(), dest.get(), 1, 1, &c.x, &c.y, nullptr);
-                if (result != 0) {
-                    throw osmium::projection_error{std::string{"projection failed: "} + pj_strerrno(result)};
-                }
-                return c;
-            }
-
-        } // namespace detail
-
         /**
          * Transform coordinates from one CRS into another. Wraps the same
          * function of the proj library.
@@ -248,12 +116,14 @@ namespace osmium {
          * Coordinates have to be in radians and are produced in radians.
          *
          * @throws osmium::projection_error if the projection fails
-         *
-         * @deprecated Not available with PROJ 6 or later
          */
         // cppcheck-suppress passedByValue (because c is small and we want to change it)
-        inline OSMIUM_DEPRECATED Coordinates transform(const CRS& src, const CRS& dest, Coordinates c) {
-            return detail::transform(src, dest, c);
+        inline Coordinates transform(const CRS& src, const CRS& dest, Coordinates c) {
+            const int result = pj_transform(src.get(), dest.get(), 1, 1, &c.x, &c.y, nullptr);
+            if (result != 0) {
+                throw osmium::projection_error{std::string{"projection failed: "} + pj_strerrno(result)};
+            }
+            return c;
         }
 
         /**
@@ -310,10 +180,8 @@ namespace osmium {
                                        detail::lat_to_y(location.lat())};
                 }
 
-                Coordinates c{osmium::geom::detail::transform(m_crs_wgs84, m_crs_user,
-                                                              Coordinates{deg_to_rad(location.lon()),
-                                                                          deg_to_rad(location.lat())})};
-
+                Coordinates c{transform(m_crs_wgs84, m_crs_user, Coordinates{deg_to_rad(location.lon()),
+                                                                             deg_to_rad(location.lat())})};
                 if (m_crs_user.is_latlong()) {
                     c.x = rad_to_deg(c.x);
                     c.y = rad_to_deg(c.y);
@@ -326,16 +194,11 @@ namespace osmium {
                 return m_epsg;
             }
 
-            /**
-             * @deprecated Because return value is different for different PROJ
-             *             versions.
-             */
-            OSMIUM_DEPRECATED std::string proj_string() const {
+            std::string proj_string() const {
                 return m_proj_string;
             }
 
         }; // class Projection
-#endif
 
     } // namespace geom
 
