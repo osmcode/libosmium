@@ -14,7 +14,11 @@ This project adheres to [Semantic Versioning](https://semver.org/).
   Must contain key and value separated by the equal sign.
 * New `builder::attr::_t()` function to set tags from comma-separated string.
 * New `nwr_array` iterator.
-* Also support API of modern PROJ library (version 6 and above).
+* Support for the PROJ library has now been declared deprecated. The old
+  PROJ API (up to version PROJ 6) is currently still available, but will
+  be removed in a future version. Support for the new PROJ API will not be
+  in libosmium. See https://github.com/osmcode/osmium-proj for some code
+  that might help you if you need this.
 
 ### Changed
 
