@@ -8,6 +8,15 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+### Changed
+
+### Fixed
+
+
+## [2.15.5] - 2020-04-21
+
+### Added
+
 * Additional constructor for `builder::attr::member_type(_string)` taking
   char type making it even easier to generate test data.
 * Allow single C string or `std::string` as argument for `builder::attr::_tag`.
@@ -1006,7 +1015,8 @@ This project adheres to [Semantic Versioning](https://semver.org/).
   Doxygen (up to version 1.8.8). This version contains a workaround to fix
   this.
 
-[unreleased]: https://github.com/osmcode/libosmium/compare/v2.15.4...HEAD
+[unreleased]: https://github.com/osmcode/libosmium/compare/v2.15.5...HEAD
+[2.15.5]: https://github.com/osmcode/libosmium/compare/v2.15.4...v2.15.5
 [2.15.4]: https://github.com/osmcode/libosmium/compare/v2.15.3...v2.15.4
 [2.15.3]: https://github.com/osmcode/libosmium/compare/v2.15.2...v2.15.3
 [2.15.2]: https://github.com/osmcode/libosmium/compare/v2.15.1...v2.15.2
