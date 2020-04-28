@@ -224,3 +224,31 @@ TEST_CASE("Iterating over IdSetSmall") {
     REQUIRE(it == s.end());
 }
 
+TEST_CASE("Merge two IdSetSmall") {
+    osmium::index::IdSetSmall<osmium::unsigned_object_id_type> s1;
+    osmium::index::IdSetSmall<osmium::unsigned_object_id_type> s2;
+
+    s1.set(23);
+    s1.set(2);
+    s1.set(7);
+    s1.set(55);
+    s1.set(42);
+    s1.set(7);
+
+    s2.set(2);
+    s2.set(32);
+    s2.set(8);
+    s2.set(55);
+    s2.set(1);
+
+    s1.sort_unique();
+    REQUIRE(s1.size() == 5);
+    s2.sort_unique();
+    REQUIRE(s2.size() == 5);
+    s1.merge_sorted(s2);
+    REQUIRE(s1.size() == 8);
+
+    const auto ids = {1, 2, 7, 8, 23, 32, 42, 55};
+    REQUIRE(std::equal(s1.cbegin(), s1.cend(), ids.begin()));
+}
+
