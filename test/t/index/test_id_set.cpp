@@ -147,6 +147,14 @@ TEST_CASE("Basic functionality of IdSetSmall") {
     REQUIRE(s.get(17));
     REQUIRE(s.get(28));
     REQUIRE_FALSE(s.empty());
+    const auto size = s.size();
+
+    // Setting the same id as last time doesn't grow the size
+    s.set(28);
+    REQUIRE(s.get(17));
+    REQUIRE(s.get(28));
+    REQUIRE_FALSE(s.empty());
+    REQUIRE(size == s.size());
 
     s.clear();
     REQUIRE(s.empty());

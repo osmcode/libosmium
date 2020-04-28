@@ -387,7 +387,9 @@ namespace osmium {
              * Add the given Id to the set.
              */
             void set(T id) final {
-                m_data.push_back(id);
+                if (m_data.empty() || m_data.back() != id) {
+                    m_data.push_back(id);
+                }
             }
 
             /**
