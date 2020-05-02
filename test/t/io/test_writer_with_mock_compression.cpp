@@ -10,7 +10,7 @@
 #include <string>
 #include <utility>
 
-class MockCompressor : public osmium::io::Compressor {
+class MockCompressor final : public osmium::io::Compressor {
 
     std::string m_fail_in;
 
@@ -30,15 +30,15 @@ public:
     MockCompressor(MockCompressor&&) = delete;
     MockCompressor& operator=(MockCompressor&&) = delete;
 
-    ~MockCompressor() noexcept final = default;
+    ~MockCompressor() noexcept = default;
 
-    void write(const std::string& /*data*/) final {
+    void write(const std::string& /*data*/) override {
         if (m_fail_in == "write") {
             throw std::logic_error{"write"};
         }
     }
 
-    void close() final {
+    void close() override {
         if (m_fail_in == "close") {
             throw std::logic_error{"close"};
         }

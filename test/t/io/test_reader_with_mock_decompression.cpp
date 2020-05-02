@@ -14,7 +14,7 @@
 // constructor it can be instructed to throw an exception in specific parts
 // of its code. This is then used to test the internals of the Reader.
 
-class MockDecompressor : public osmium::io::Decompressor {
+class MockDecompressor final : public osmium::io::Decompressor {
 
     std::string m_fail_in;
     int m_read_count = 0;
@@ -34,7 +34,7 @@ public:
     MockDecompressor(MockDecompressor&&) = delete;
     MockDecompressor& operator=(MockDecompressor&&) = delete;
 
-    ~MockDecompressor() noexcept final = default;
+    ~MockDecompressor() noexcept = default;
 
     static void add_node(std::string& s, int i) {
         s += "<node id='";
@@ -42,7 +42,7 @@ public:
         s += "' version='1' timestamp='2014-01-01T00:00:00Z' uid='1' user='test' changeset='1' lon='1.02' lat='1.02'/>\n";
     }
 
-    std::string read() final {
+    std::string read() override {
         std::string buffer;
         ++m_read_count;
 
@@ -68,7 +68,7 @@ public:
         return buffer;
     }
 
-    void close() final {
+    void close() override {
         if (m_fail_in == "close") {
             throw std::runtime_error{"error close"};
         }
