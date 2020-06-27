@@ -8,6 +8,15 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+### Changed
+
+### Fixed
+
+
+## [2.15.6] - 2020-06-27
+
+### Added
+
 * Add `IdSetSmall::merge_sorted` function.
 
 ### Changed
@@ -1023,7 +1032,8 @@ This project adheres to [Semantic Versioning](https://semver.org/).
   Doxygen (up to version 1.8.8). This version contains a workaround to fix
   this.
 
-[unreleased]: https://github.com/osmcode/libosmium/compare/v2.15.5...HEAD
+[unreleased]: https://github.com/osmcode/libosmium/compare/v2.15.6...HEAD
+[2.15.6]: https://github.com/osmcode/libosmium/compare/v2.15.5...v2.15.6
 [2.15.5]: https://github.com/osmcode/libosmium/compare/v2.15.4...v2.15.5
 [2.15.4]: https://github.com/osmcode/libosmium/compare/v2.15.3...v2.15.4
 [2.15.3]: https://github.com/osmcode/libosmium/compare/v2.15.2...v2.15.3
