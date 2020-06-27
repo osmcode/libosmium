@@ -108,7 +108,7 @@ namespace osmium {
                 // Maximum recursion depth, stops complex multipolygons from
                 // breaking everything.
                 enum : unsigned {
-                    max_depth = 20
+                    max_depth = 20U
                 };
 
                 struct slocation {
@@ -842,7 +842,7 @@ namespace osmium {
                         find_candidates(candidates, loc_done, xrings, cand);
                     } catch (const exceeded_max_depth&) {
                         if (m_config.debug_level > 0) {
-                            std::cerr << "    Exceeded max depth (" << max_depth << ")\n";
+                            std::cerr << "    Exceeded max depth (" << static_cast<unsigned>(max_depth) << ")\n";
                         }
                         return false;
                     }
