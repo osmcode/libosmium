@@ -8,10 +8,18 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+* Add `IdSetSmall::merge_sorted` function.
+
 ### Changed
+
+* Little optimization for IdSetSmall: Don't add the same id twice in a row.
 
 ### Fixed
 
+* Do not build areas with "recursion depth > 20". This happens when there
+  are complex multipolygon with many rings touching in single points. This
+  is a quick fix that hopefully keeps us going until we find a better
+  solution.
 
 ## [2.15.5] - 2020-04-21
 
