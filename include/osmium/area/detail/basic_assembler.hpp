@@ -722,7 +722,9 @@ namespace osmium {
 
                 struct exceeded_max_depth : public std::exception {};
 
-                void find_candidates(std::vector<candidate>& candidates, std::unordered_set<osmium::Location>& loc_done, const std::vector<location_to_ring_map>& xrings, const candidate& cand, unsigned depth = 0) {
+                using location_set = std::vector<osmium::Location>;
+
+                void find_candidates(std::vector<candidate>& candidates, location_set& loc_done, const std::vector<location_to_ring_map>& xrings, const candidate& cand, unsigned depth = 0) {
                     if (depth > max_depth) {
                         throw exceeded_max_depth{};
                     }
@@ -782,13 +784,14 @@ namespace osmium {
                                         candidates.back() = c;
                                     }
                                 }
-                            } else if (loc_done.count(c.stop_location) == 0) {
+                            } else if (std::find(loc_done.cbegin(), loc_done.cend(), c.stop_location) == loc_done.cend()) {
                                 if (debug()) {
-                                    std::cerr << "          recurse... (depth=" << depth << " candidates.size=" << candidates.size() << ")\n";
+                                    std::cerr << "          recurse... (depth=" << depth << " candidates.size=" << candidates.size() << " loc_done.size=" << loc_done.size() << ")\n";
                                 }
-                                loc_done.insert(c.stop_location);
+                                loc_done.push_back(c.stop_location);
                                 find_candidates(candidates, loc_done, xrings, c, depth + 1);
-                                loc_done.erase(c.stop_location);
+                                assert(!loc_done.empty() && loc_done.back() == c.stop_location);
+                                loc_done.pop_back();
                                 if (debug()) {
                                     std::cerr << "          ...back\n";
                                 }
@@ -834,9 +837,9 @@ namespace osmium {
 
                     // Locations we have visited while finding candidates, used
                     // to detect loops.
-                    std::unordered_set<osmium::Location> loc_done;
+                    location_set loc_done;
 
-                    loc_done.insert(cand.stop_location);
+                    loc_done.push_back(cand.stop_location);
 
                     std::vector<candidate> candidates;
                     try {
