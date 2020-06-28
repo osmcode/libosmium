@@ -385,7 +385,7 @@ namespace osmium {
                     }
                     assert(!outer_rings.empty());
 
-                    std::sort(outer_rings.rbegin(), outer_rings.rend());
+                    std::stable_sort(outer_rings.rbegin(), outer_rings.rend());
                     if (debug()) {
                         for (const auto& o : outer_rings) {
                             std::cerr << "        y=" << o.y() << " " << o.ring() << "\n";
@@ -553,7 +553,7 @@ namespace osmium {
                         return;
                     }
 
-                    std::sort(rings.begin(), rings.end(), [](ProtoRing* a, ProtoRing* b) {
+                    std::stable_sort(rings.begin(), rings.end(), [](ProtoRing* a, ProtoRing* b) {
                         return a->min_segment() < b->min_segment();
                     });
 
@@ -631,7 +631,7 @@ namespace osmium {
                         xrings.emplace_back((*it)->get_node_ref_stop().location(), it, false);
                     }
 
-                    std::sort(xrings.begin(), xrings.end());
+                    std::stable_sort(xrings.begin(), xrings.end());
 
                     return xrings;
                 }
