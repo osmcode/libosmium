@@ -223,6 +223,13 @@ namespace osmium {
              *       before closing it? Can be osmium::io::fsync::yes or
              *       osmium::io::fsync::no (default).
              *
+             * * osmium::thread::Pool&: Reference to a thread pool that should
+             *      be used for writing instead of the default pool. Usually
+             *      it is okay to use the statically initialized shared
+             *      default pool, but sometimes you want or need your own.
+             *      For instance when your program will fork, using the
+             *      statically initialized pool will not work.
+             *
              * @throws osmium::io_error If there was an error.
              * @throws std::system_error If the file could not be opened.
              */

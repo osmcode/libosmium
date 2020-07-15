@@ -249,6 +249,12 @@ namespace osmium {
              *      osmium::io::read_meta::no, meta data (like version, uid,
              *      etc.) is not read possibly speeding up the read. Not all
              *      file formats use this setting.
+             * * osmium::thread::Pool&: Reference to a thread pool that should
+             *      be used for reading instead of the default pool. Usually
+             *      it is okay to use the statically initialized shared
+             *      default pool, but sometimes you want or need your own.
+             *      For instance when your program will fork, using the
+             *      statically initialized pool will not work.
              *
              * @throws osmium::io_error If there was an error.
              * @throws std::system_error If the file could not be opened.

@@ -177,6 +177,12 @@ namespace osmium {
                 }
             }
 
+            /**
+             * Return a statically created "default pool". This is initialized
+             * the first time you use it.
+             *
+             * Do not use this if your program will fork.
+             */
             static Pool& default_instance() {
                 static Pool pool{};
                 return pool;
