@@ -51,6 +51,7 @@ DEALINGS IN THE SOFTWARE.
 #include <cassert>
 #include <cstdint>
 #include <cstdlib>
+#include <exception>
 #include <iostream>
 #include <iterator>
 #include <list>
@@ -719,7 +720,7 @@ namespace osmium {
 
                 };
 
-                struct exceeded_max_depth {};
+                struct exceeded_max_depth : public std::exception {};
 
                 void find_candidates(std::vector<candidate>& candidates, std::unordered_set<osmium::Location>& loc_done, const std::vector<location_to_ring_map>& xrings, const candidate& cand, unsigned depth = 0) {
                     if (depth > max_depth) {
