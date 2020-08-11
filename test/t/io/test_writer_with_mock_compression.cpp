@@ -30,7 +30,7 @@ public:
     MockCompressor(MockCompressor&&) = delete;
     MockCompressor& operator=(MockCompressor&&) = delete;
 
-    ~MockCompressor() noexcept = default;
+    ~MockCompressor() noexcept override = default;
 
     void write(const std::string& /*data*/) override {
         if (m_fail_in == "write") {

@@ -768,7 +768,7 @@ namespace osmium {
                 XMLParser(XMLParser&&) = delete;
                 XMLParser& operator=(XMLParser&&) = delete;
 
-                ~XMLParser() noexcept = default;
+                ~XMLParser() noexcept override = default;
 
                 void run() override {
                     osmium::thread::set_thread_name("_osmium_xml_in");

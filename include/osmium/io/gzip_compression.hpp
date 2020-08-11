@@ -127,7 +127,7 @@ namespace osmium {
             GzipCompressor(GzipCompressor&&) = delete;
             GzipCompressor& operator=(GzipCompressor&&) = delete;
 
-            ~GzipCompressor() noexcept {
+            ~GzipCompressor() noexcept override {
                 try {
                     close();
                 } catch (...) {
@@ -200,7 +200,7 @@ namespace osmium {
             GzipDecompressor(GzipDecompressor&&) = delete;
             GzipDecompressor& operator=(GzipDecompressor&&) = delete;
 
-            ~GzipDecompressor() noexcept {
+            ~GzipDecompressor() noexcept override {
                 try {
                     close();
                 } catch (...) {
@@ -272,7 +272,7 @@ namespace osmium {
             GzipBufferDecompressor(GzipBufferDecompressor&&) = delete;
             GzipBufferDecompressor& operator=(GzipBufferDecompressor&&) = delete;
 
-            ~GzipBufferDecompressor() noexcept {
+            ~GzipBufferDecompressor() noexcept override {
                 try {
                     close();
                 } catch (...) {

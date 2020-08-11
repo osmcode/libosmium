@@ -233,7 +233,7 @@ namespace osmium {
             NoCompressor(NoCompressor&&) = delete;
             NoCompressor& operator=(NoCompressor&&) = delete;
 
-            ~NoCompressor() noexcept {
+            ~NoCompressor() noexcept override {
                 try {
                     close();
                 } catch (...) {
@@ -288,7 +288,7 @@ namespace osmium {
             NoDecompressor(NoDecompressor&&) = delete;
             NoDecompressor& operator=(NoDecompressor&&) = delete;
 
-            ~NoDecompressor() noexcept {
+            ~NoDecompressor() noexcept override {
                 try {
                     close();
                 } catch (...) {

@@ -122,7 +122,7 @@ namespace osmium {
                 OPLParser(OPLParser&&) = delete;
                 OPLParser& operator=(OPLParser&&) = delete;
 
-                ~OPLParser() noexcept = default;
+                ~OPLParser() noexcept override = default;
 
                 void parse_line(const char* data) {
                     if (opl_parse_line(m_line_count, data, m_buffer, read_types())) {

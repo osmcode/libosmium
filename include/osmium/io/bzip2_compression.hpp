@@ -191,7 +191,7 @@ namespace osmium {
             Bzip2Compressor(Bzip2Compressor&&) = delete;
             Bzip2Compressor& operator=(Bzip2Compressor&&) = delete;
 
-            ~Bzip2Compressor() noexcept {
+            ~Bzip2Compressor() noexcept override {
                 try {
                     close();
                 } catch (...) {
@@ -258,7 +258,7 @@ namespace osmium {
             Bzip2Decompressor(Bzip2Decompressor&&) = delete;
             Bzip2Decompressor& operator=(Bzip2Decompressor&&) = delete;
 
-            ~Bzip2Decompressor() noexcept {
+            ~Bzip2Decompressor() noexcept override {
                 try {
                     close();
                 } catch (...) {
@@ -355,7 +355,7 @@ namespace osmium {
             Bzip2BufferDecompressor(Bzip2BufferDecompressor&&) = delete;
             Bzip2BufferDecompressor& operator=(Bzip2BufferDecompressor&&) = delete;
 
-            ~Bzip2BufferDecompressor() noexcept {
+            ~Bzip2BufferDecompressor() noexcept override {
                 try {
                     close();
                 } catch (...) {

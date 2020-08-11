@@ -213,7 +213,7 @@ namespace osmium {
                 BlackholeOutputFormat(BlackholeOutputFormat&&) = delete;
                 BlackholeOutputFormat& operator=(BlackholeOutputFormat&&) = delete;
 
-                ~BlackholeOutputFormat() noexcept = default;
+                ~BlackholeOutputFormat() noexcept override = default;
 
                 void write_buffer(osmium::memory::Buffer&& /*buffer*/) override {
                 }

@@ -617,7 +617,7 @@ namespace osmium {
                 O5mParser(O5mParser&&) = delete;
                 O5mParser& operator=(O5mParser&&) = delete;
 
-                ~O5mParser() noexcept = default;
+                ~O5mParser() noexcept override = default;
 
                 void run() override {
                     osmium::thread::set_thread_name("_osmium_o5m_in");
