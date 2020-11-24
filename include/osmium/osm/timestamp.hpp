@@ -203,8 +203,8 @@ namespace osmium {
          *
          * @throws std::invalid_argument if the timestamp can not be parsed.
          */
-        explicit Timestamp(const char* timestamp) {
-            m_timestamp = static_cast<uint32_t>(detail::parse_timestamp(timestamp));
+        explicit Timestamp(const char* timestamp) :
+            m_timestamp(static_cast<uint32_t>(detail::parse_timestamp(timestamp))) {
         }
 
         /**
