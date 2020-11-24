@@ -682,7 +682,7 @@ namespace osmium {
                         return;
                     }
                     const char* key = tag.value.first;
-                    auto const equal_sign = std::strchr(key, '=');
+                    const char* const equal_sign = std::strchr(key, '=');
                     if (!equal_sign) {
                         builder.add_tag(key, "");
                         return;

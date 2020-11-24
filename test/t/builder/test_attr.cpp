@@ -415,7 +415,7 @@ TEST_CASE("create way with nodes") {
     REQUIRE(way.nodes().size() == 4);
     REQUIRE(std::distance(way.cbegin(), way.cend()) == 1);
 
-    auto it = way.nodes().cbegin();
+    const auto* it = way.nodes().cbegin();
 
     REQUIRE(it->ref() == 1);
     if (it->location().valid()) {

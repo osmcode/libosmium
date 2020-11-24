@@ -458,12 +458,12 @@ TEST_CASE("Parse OPL: nodes") {
         REQUIRE(buffer.written() > 0);
         const auto& wnl = buffer.get<osmium::WayNodeList>(0);
         REQUIRE(wnl.size() == 2);
-        auto it = wnl.begin();
+        const auto* it = wnl.cbegin();
         REQUIRE(it->ref() == 123);
         ++it;
         REQUIRE(it->ref() == 456);
         ++it;
-        REQUIRE(it == wnl.end());
+        REQUIRE(it == wnl.cend());
     }
 
     SECTION("Trailing comma") {
@@ -472,12 +472,12 @@ TEST_CASE("Parse OPL: nodes") {
         REQUIRE(buffer.written() > 0);
         const auto& wnl = buffer.get<osmium::WayNodeList>(0);
         REQUIRE(wnl.size() == 2);
-        auto it = wnl.begin();
+        const auto* it = wnl.cbegin();
         REQUIRE(it->ref() == 123);
         ++it;
         REQUIRE(it->ref() == 456);
         ++it;
-        REQUIRE(it == wnl.end());
+        REQUIRE(it == wnl.cend());
     }
 
     SECTION("Way nodes with coordinates") {
@@ -486,7 +486,7 @@ TEST_CASE("Parse OPL: nodes") {
         REQUIRE(buffer.written() > 0);
         const auto& wnl = buffer.get<osmium::WayNodeList>(0);
         REQUIRE(wnl.size() == 2);
-        auto it = wnl.begin();
+        const auto* it = wnl.cbegin();
         REQUIRE(it->ref() == 123);
         const osmium::Location loc1{1.2, 3.4};
         REQUIRE(it->location() == loc1);
@@ -495,7 +495,7 @@ TEST_CASE("Parse OPL: nodes") {
         const osmium::Location loc2{33.0, 0.1};
         REQUIRE(it->location() == loc2);
         ++it;
-        REQUIRE(it == wnl.end());
+        REQUIRE(it == wnl.cend());
     }
 
 }

@@ -34,7 +34,7 @@ using tagmap_type = std::map<const char*, const char*, less_charptr>;
 tagmap_type create_map(const osmium::TagList& taglist) {
     tagmap_type map;
 
-    for (auto& tag : taglist) {
+    for (const auto& tag : taglist) {
         map[tag.key()] = tag.value();
     }
 
@@ -114,7 +114,7 @@ public:
 
             const auto tagmap = create_map(area.tags());
             bool first = true;
-            for (auto& tag : tagmap) {
+            for (const auto& tag : tagmap) {
                 if (first) {
                     first = false;
                 } else {

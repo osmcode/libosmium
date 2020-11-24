@@ -145,7 +145,7 @@ namespace osmium {
             }
 
             inline uint32_t next_utf8_codepoint(char const** begin, const char* end) {
-                auto it = reinterpret_cast<const uint8_t*>(*begin);
+                const auto* it = reinterpret_cast<const uint8_t*>(*begin);
                 uint32_t cp = 0xffU & *it;
                 const auto length = utf8_sequence_length(cp);
                 if (length == 0) {

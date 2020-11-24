@@ -77,7 +77,7 @@ TEST_CASE("File based dense index") {
         REQUIRE(index.size() == 7);
         REQUIRE(std::distance(index.cbegin(), index.cend()) == 7);
 
-        auto it = index.cbegin();
+        const auto* it = index.cbegin();
         REQUIRE(*it++ == osmium::Location{});
         REQUIRE(*it++ == osmium::Location{});
         REQUIRE(*it++ == osmium::Location{});

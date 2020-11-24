@@ -214,7 +214,7 @@ namespace osmium {
                     *m_out += " N";
 
                     if (!way.nodes().empty()) {
-                        auto it = way.nodes().begin();
+                        const auto* it = way.nodes().cbegin();
                         if (m_options.locations_on_ways) {
                             write_field_ref(*it);
                             for (++it; it != way.nodes().end(); ++it) {

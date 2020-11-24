@@ -134,7 +134,7 @@ namespace osmium {
 
                     const_iterator& operator++() {
                         assert(m_it != m_last);
-                        const auto last_pos = m_it->c_str() + m_it->size();
+                        const auto* const last_pos = m_it->c_str() + m_it->size();
                         while (m_pos != last_pos && *m_pos) {
                             ++m_pos;
                         }
