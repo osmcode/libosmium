@@ -202,7 +202,7 @@ namespace osmium {
                 }
 
                 create_parser_type get_creator_function(const osmium::io::File& file) const {
-                    const auto func = callbacks(file.format());
+                    auto func = callbacks(file.format());
                     if (func) {
                         return func;
                     }

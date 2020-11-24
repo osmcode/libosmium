@@ -69,7 +69,7 @@ static std::string read_gz_file(const char* test_id, const char* suffix) {
     assert(fd >= 0);
 
     osmium::io::GzipDecompressor gzip_decompressor{fd};
-    const std::string input = gzip_decompressor.read();
+    std::string input = gzip_decompressor.read();
     gzip_decompressor.close();
 
     return input;
