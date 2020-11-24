@@ -131,11 +131,11 @@ namespace osmium {
                 return Coordinates{location.lon(), location.lat()};
             }
 
-            int epsg() const noexcept {
+            static int epsg() noexcept {
                 return 4326;
             }
 
-            std::string proj_string() const {
+            static std::string proj_string() noexcept {
                 return "+proj=longlat +datum=WGS84 +no_defs";
             }
 

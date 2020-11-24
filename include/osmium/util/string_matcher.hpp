@@ -85,7 +85,7 @@ namespace osmium {
 
         public:
 
-            bool match(const char* /*test_string*/) const noexcept {
+            static bool match(const char* /*test_string*/) noexcept {
                 return false;
             }
 
@@ -103,7 +103,7 @@ namespace osmium {
 
         public:
 
-            bool match(const char* /*test_string*/) const noexcept {
+            static bool match(const char* /*test_string*/) noexcept {
                 return true;
             }
 

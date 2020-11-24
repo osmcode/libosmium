@@ -82,7 +82,7 @@ namespace osmium {
 
                 /* Point */
 
-                point_type make_point(const osmium::geom::Coordinates& xy) const {
+                static point_type make_point(const osmium::geom::Coordinates& xy) {
                     return point_type{new OGRPoint{xy.x, xy.y}};
                 }
 
