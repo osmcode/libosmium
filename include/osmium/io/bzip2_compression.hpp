@@ -282,8 +282,8 @@ namespace osmium {
                         detail::throw_bzip2_error(m_bzfile, "read failed", bzerror);
                     }
                     if (bzerror == BZ_STREAM_END) {
-                        void* unused;
-                        int nunused;
+                        void* unused = nullptr;
+                        int nunused = 0;
                         if (!feof(m_file.file())) {
                             ::BZ2_bzReadGetUnused(&bzerror, m_bzfile, &unused, &nunused);
                             if (bzerror != BZ_OK) {

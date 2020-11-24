@@ -96,7 +96,7 @@ namespace osmium {
                  * the length of the following BlobHeader.
                  */
                 uint32_t read_blob_header_size_from_file() {
-                    uint32_t size;
+                    uint32_t size = 0;
 
                     try {
                         // size is encoded in network byte order

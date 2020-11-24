@@ -332,7 +332,7 @@ namespace osmium {
 
 #ifndef _WIN32
                 if (m_childpid) {
-                    int status;
+                    int status = 0;
                     const pid_t pid = ::waitpid(m_childpid, &status, 0);
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wold-style-cast"

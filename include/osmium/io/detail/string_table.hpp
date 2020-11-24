@@ -213,7 +213,7 @@ namespace osmium {
 
                 std::size_t operator()(const char* str) const noexcept {
                     std::size_t hash = 5381;
-                    int c;
+                    int c = 0;
 
                     while ((c = *str++)) {
                         hash = ((hash << 5U) + hash) + c; /* hash * 33 + c */
