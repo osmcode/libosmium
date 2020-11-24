@@ -619,7 +619,7 @@ namespace osmium {
                     }
                 }
 
-                std::vector<location_to_ring_map> create_location_to_ring_map(open_ring_its_type& open_ring_its) {
+                std::vector<location_to_ring_map> create_location_to_ring_map(open_ring_its_type& open_ring_its) const {
                     std::vector<location_to_ring_map> xrings;
                     xrings.reserve(open_ring_its.size() * 2);
 

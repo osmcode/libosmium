@@ -126,7 +126,7 @@ namespace osmium {
                     }
                 }
 
-                int prefix_spaces() {
+                int prefix_spaces() const noexcept {
                     return m_options.use_change_ops ? 4 : 2;
                 }
 

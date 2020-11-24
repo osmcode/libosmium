@@ -519,7 +519,7 @@ namespace osmium {
 
                 debug_output_options m_options;
 
-                void write_fieldname(std::string& out, const char* name) {
+                void write_fieldname(std::string& out, const char* name) const {
                     out += "  ";
                     if (m_options.use_color) {
                         out += color_cyan;

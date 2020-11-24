@@ -166,7 +166,7 @@ namespace osmium {
 #endif
             }
 
-            int resize_fd(int fd) {
+            int resize_fd(int fd) const {
                 // Anonymous mapping doesn't need resizing.
                 if (fd == -1) {
                     return -1;
