@@ -244,7 +244,7 @@ namespace osmium {
                     if (m_dense) {
                         return;
                     }
-                    for (const auto entry : m_sparse_entries) {
+                    for (const auto& entry : m_sparse_entries) {
                         set_dense(entry.id, entry.value);
                     }
                     m_sparse_entries.clear();
