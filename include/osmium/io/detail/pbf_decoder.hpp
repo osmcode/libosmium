@@ -375,7 +375,7 @@ namespace osmium {
                         osmium::builder::WayNodeListBuilder wnl_builder{builder};
                         osmium::DeltaDecode<int64_t> ref;
                         if (lats.empty()) {
-                            for (const auto& ref_value : refs) {
+                            for (const auto ref_value : refs) {
                                 wnl_builder.add_node_ref(ref.update(ref_value));
                             }
                         } else {
