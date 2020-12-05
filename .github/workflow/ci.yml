@@ -1,0 +1,150 @@
+name: CI
+
+on: [ push, pull_request ]
+
+jobs:
+  ubuntu16-clang-dev:
+    runs-on: ubuntu-16.04
+    env:
+      CC: clang
+      CXX: clang++
+      BUILD_TYPE: Dev
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - uses: ./.github/actions/ubuntu-prerequisites
+      - uses: ./.github/actions/build-and-test
+
+  ubuntu18-clang-dev:
+    runs-on: ubuntu-18.04
+    env:
+      CC: clang
+      CXX: clang++
+      BUILD_TYPE: Dev
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - uses: ./.github/actions/ubuntu-prerequisites
+      - uses: ./.github/actions/build-and-test
+
+  ubuntu20-clang-dev:
+    runs-on: ubuntu-20.04
+    env:
+      CC: clang
+      CXX: clang++
+      BUILD_TYPE: Dev
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - uses: ./.github/actions/ubuntu-prerequisites
+      - uses: ./.github/actions/build-and-test
+
+  ubuntu20-clang-san:
+    runs-on: ubuntu-20.04
+    env:
+      CC: clang
+      CXX: clang++
+      BUILD_TYPE: Debug
+      CXXFLAGS: -fsanitize=address,undefined,integer -fno-sanitize-recover=all -fno-omit-frame-pointer
+      LDFLAGS: -fsanitize=address,undefined,integer
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - uses: ./.github/actions/ubuntu-prerequisites
+      - uses: ./.github/actions/build-and-test
+
+  ubuntu20-clang-release:
+    runs-on: ubuntu-20.04
+    env:
+      CC: clang
+      CXX: clang++
+      BUILD_TYPE: Release
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - uses: ./.github/actions/ubuntu-prerequisites
+      - uses: ./.github/actions/build-and-test
+
+  ubuntu16-gcc-dev:
+    runs-on: ubuntu-16.04
+    env:
+      CC: gcc-5
+      CXX: g++-5
+      BUILD_TYPE: Dev
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - uses: ./.github/actions/ubuntu-prerequisites
+      - uses: ./.github/actions/build-and-test
+
+  ubuntu18-gcc-dev:
+    runs-on: ubuntu-18.04
+    env:
+      CC: gcc-7
+      CXX: g++-7
+      BUILD_TYPE: Dev
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - uses: ./.github/actions/ubuntu-prerequisites
+      - uses: ./.github/actions/build-and-test
+
+  ubuntu20-gcc-dev:
+    runs-on: ubuntu-20.04
+    env:
+      CC: gcc-9
+      CXX: g++-9
+      BUILD_TYPE: Dev
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - uses: ./.github/actions/ubuntu-prerequisites
+      - uses: ./.github/actions/build-and-test
+
+  ubuntu20-gcc-release:
+    runs-on: ubuntu-20.04
+    env:
+      CC: gcc-9
+      CXX: g++-9
+      BUILD_TYPE: Release
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - uses: ./.github/actions/ubuntu-prerequisites
+      - uses: ./.github/actions/build-and-test
+
+  macos10:
+    runs-on: macos-10.15
+    env:
+      CC: clang
+      CXX: clang++
+      BUILD_TYPE: Dev
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - uses: ./.github/actions/macos-prerequisites
+      - uses: ./.github/actions/build-and-test
+
+  macos11:
+    runs-on: macos-11.0
+    env:
+      CC: clang
+      CXX: clang++
+      BUILD_TYPE: Dev
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - uses: ./.github/actions/macos-prerequisites
+      - uses: ./.github/actions/build-and-test
+

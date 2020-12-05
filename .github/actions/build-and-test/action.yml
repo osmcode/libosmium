@@ -1,0 +1,29 @@
+name: 'Build and test'
+
+runs:
+    using: "composite"
+
+    steps:
+      - name: Create build directory
+        run: mkdir build
+        shell: bash
+
+      - name: Configure
+        run: |
+          cmake -LA .. \
+           -DBUILD_DATA_TESTS=ON \
+           -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
+           -DPROTOZERO_INCLUDE_DIR=${GITHUB_WORKSPACE}/../protozero/include
+        shell: bash
+        working-directory: build
+
+      - name: Build
+        run: make VERBOSE=1
+        shell: bash
+        working-directory: build
+
+      - name: Test
+        run: ctest --output-on-failure
+        shell: bash
+        working-directory: build
+
