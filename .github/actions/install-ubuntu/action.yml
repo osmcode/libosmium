@@ -1,0 +1,24 @@
+name: Install Prerequisites on Ubuntu
+
+runs:
+  using: composite
+
+  steps:
+    - name: Install packages
+      run: |
+        sudo apt-get update -q
+        sudo apt-get install -yq \
+             doxygen \
+             libboost-all-dev \
+             libgdal-dev \
+             libgeos++-dev \
+             libproj-dev \
+             libsparsehash-dev \
+             ruby-json \
+             spatialite-bin
+      shell: bash
+    - name: Install from git
+      run: |
+        git clone --quiet --depth 1 https://github.com/mapbox/protozero.git ../protozero
+      shell: bash
+

@@ -1,0 +1,263 @@
+name: CI
+
+on: [ push, pull_request ]
+
+jobs:
+  ubuntu16-clang6-dev:
+    runs-on: ubuntu-16.04
+    env:
+      CC: clang-6.0
+      CXX: clang++-6.0
+      BUILD_TYPE: Dev
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - uses: ./.github/actions/install-ubuntu
+      - uses: ./.github/actions/build
+      - uses: ./.github/actions/ctest
+
+  ubuntu16-clang8-dev:
+    runs-on: ubuntu-16.04
+    env:
+      CC: clang-8
+      CXX: clang++-8
+      BUILD_TYPE: Dev
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - uses: ./.github/actions/install-ubuntu
+      - uses: ./.github/actions/build
+      - uses: ./.github/actions/ctest
+
+  ubuntu16-clang9-dev:
+    runs-on: ubuntu-16.04
+    env:
+      CC: clang-9
+      CXX: clang++-9
+      BUILD_TYPE: Dev
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - uses: ./.github/actions/install-ubuntu
+      - uses: ./.github/actions/build
+      - uses: ./.github/actions/ctest
+
+  ubuntu18-clang9-dev:
+    runs-on: ubuntu-18.04
+    env:
+      CC: clang-9
+      CXX: clang++-9
+      BUILD_TYPE: Dev
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - uses: ./.github/actions/install-ubuntu
+      - uses: ./.github/actions/build
+      - uses: ./.github/actions/ctest
+
+  ubuntu20-clang10-dev:
+    runs-on: ubuntu-20.04
+    env:
+      CC: clang-10
+      CXX: clang++-10
+      BUILD_TYPE: Dev
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - uses: ./.github/actions/install-ubuntu
+      - uses: ./.github/actions/build
+      - uses: ./.github/actions/ctest
+
+  ubuntu20-clang10-debug-san:
+    runs-on: ubuntu-20.04
+    env:
+      CC: clang-10
+      CXX: clang++-10
+      BUILD_TYPE: Debug
+      CXXFLAGS: -fsanitize=address,undefined,integer -fno-sanitize-recover=all -fno-omit-frame-pointer
+      LDFLAGS: -fsanitize=address,undefined,integer
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - uses: ./.github/actions/install-ubuntu
+      - uses: ./.github/actions/build
+      - uses: ./.github/actions/ctest
+
+  ubuntu20-clang10-release:
+    runs-on: ubuntu-20.04
+    env:
+      CC: clang-10
+      CXX: clang++-10
+      BUILD_TYPE: Release
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - uses: ./.github/actions/install-ubuntu
+      - uses: ./.github/actions/build
+      - uses: ./.github/actions/ctest
+
+  ubuntu16-gcc5-dev:
+    runs-on: ubuntu-16.04
+    env:
+      CC: gcc-5
+      CXX: g++-5
+      BUILD_TYPE: Dev
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - uses: ./.github/actions/install-ubuntu
+      - uses: ./.github/actions/build
+      - uses: ./.github/actions/ctest
+
+  ubuntu18-gcc7-dev:
+    runs-on: ubuntu-18.04
+    env:
+      CC: gcc-7
+      CXX: g++-7
+      BUILD_TYPE: Dev
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - uses: ./.github/actions/install-ubuntu
+      - uses: ./.github/actions/build
+      - uses: ./.github/actions/ctest
+
+  ubuntu20-gcc9-dev:
+    runs-on: ubuntu-20.04
+    env:
+      CC: gcc-9
+      CXX: g++-9
+      BUILD_TYPE: Dev
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - uses: ./.github/actions/install-ubuntu
+      - uses: ./.github/actions/build
+      - uses: ./.github/actions/ctest
+
+  ubuntu20-gcc10-dev-coverage:
+    runs-on: ubuntu-20.04
+    env:
+      CC: gcc-10
+      CXX: g++-10
+      CXXFLAGS: -Wno-stringop-overflow
+      BUILD_TYPE: Coverage
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - uses: ./.github/actions/install-ubuntu
+      - uses: ./.github/actions/build
+      - uses: ./.github/actions/ctest
+      - name: Coverage
+        run: |
+          curl -S -f https://codecov.io/bash -o codecov
+          chmod +x codecov
+          gcov-${CXX#g++-} -p $(find test/CMakeFiles -name '*.o')
+          ./codecov -Z -c -X gcov -F unit_tests
+          gcov-${CXX#g++-} -p $(find test/data-tests -name '*.o')
+          ./codecov -Z -c -X gcov -F data_tests
+          gcov-${CXX#g++-} -p $(find examples -name '*.o')
+          ./codecov -Z -c -X gcov -F examples
+        working-directory: build
+
+  ubuntu20-gcc10-release:
+    runs-on: ubuntu-20.04
+    env:
+      CC: gcc-10
+      CXX: g++-10
+      BUILD_TYPE: Release
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - uses: ./.github/actions/install-ubuntu
+      - uses: ./.github/actions/build
+      - uses: ./.github/actions/ctest
+
+  macos10-dev:
+    runs-on: macos-10.15
+    env:
+      CC: clang
+      CXX: clang++
+      BUILD_TYPE: Dev
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - uses: ./.github/actions/install-macos
+      - uses: ./.github/actions/build
+      - uses: ./.github/actions/ctest
+
+  macos11-dev:
+    runs-on: macos-11.0
+    env:
+      CC: clang
+      CXX: clang++
+      BUILD_TYPE: Dev
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - uses: ./.github/actions/install-macos
+      - uses: ./.github/actions/build
+      - uses: ./.github/actions/ctest
+
+  macos11-release:
+    runs-on: macos-11.0
+    env:
+      CC: clang
+      CXX: clang++
+      BUILD_TYPE: Release
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - uses: ./.github/actions/install-macos
+      - uses: ./.github/actions/build
+      - uses: ./.github/actions/ctest
+
+# does not work yet
+#  windows-msys2:
+#    runs-on: windows-2019
+#    defaults:
+#      run:
+#        shell: msys2 {0}
+#    env:
+#      PROJ_LIB: c:\msys64\mingw64\share\proj
+#    steps:
+#      - uses: actions/checkout@v2
+#        with:
+#          submodules: true
+#      - uses: msys2/setup-msys2@v2
+#        with:
+#          msystem: MINGW64
+#          update: true
+#          install: git mingw-w64-x86_64-gcc-libs mingw-w64-x86_64-gcc mingw-w64-x86_64-geos mingw-w64-x86_64-cmake mingw-w64-x86_64-boost mingw-w64-x86_64-cppcheck mingw-w64-x86_64-doxygen mingw-w64-x86_64-gdb mingw-w64-x86_64-sparsehash mingw-w64-x86_64-gdal mingw-w64-x86_64-ruby mingw-w64-x86_64-libspatialite mingw-w64-x86_64-spatialite-tools mingw-w64-x86_64-clang-tools-extra
+#      - name: Install Protozero...
+#        run: |
+#          echo $PATH
+#          cd ..
+#          git clone --depth 1 https://github.com/mapbox/protozero
+#          gem.cmd install json
+#      - name: CI-Build
+#        run: |
+#          mkdir build
+#          cd build
+#          cmake -LA .. \
+#           -DBUILD_DATA_TESTS=ON \
+#           -DBUILD_HEADERS=OFF \
+#           -DPROTOZERO_INCLUDE_DIR=${GITHUB_WORKSPACE}/../protozero/include
+#          make
+#      - uses: ./.github/actions/ctest
+
