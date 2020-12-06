@@ -19,6 +19,8 @@ copy /y C:\msys64\mingw64\bin\libreadline8.dll C:\msys64\mingw64\bin\libreadline
 echo "Setting PROJ_LIB variable for correct PROJ.4 working"
 set PROJ_LIB=c:\msys64\mingw64\share\proj
 
+set CXXFLAGS=-Wno-stringop-overflow
+
 echo "Generating makefiles"
 mkdir build
 cd build
