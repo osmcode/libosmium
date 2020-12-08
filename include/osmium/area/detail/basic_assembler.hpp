@@ -1107,17 +1107,16 @@ namespace osmium {
                     // whether there were any split locations or not. If there
                     // are no splits, we use the faster "simple algorithm", if
                     // there are, we use the slower "complex algorithm".
-                    osmium::Timer timer_simple_case;
-                    osmium::Timer timer_complex_case;
+                    osmium::Timer timer;
                     if (m_split_locations.empty()) {
                         if (debug()) {
                             std::cerr << "  No split locations -> using simple algorithm\n";
                         }
                         ++m_stats.area_simple_case;
 
-                        timer_simple_case.start();
+                        timer.start();
                         create_rings_simple_case();
-                        timer_simple_case.stop();
+                        timer.stop();
                     } else if (m_split_locations.size() > max_split_locations) {
                         if (m_config.debug_level > 0) {
                             std::cerr << "  Ignoring polygon with "
@@ -1135,11 +1134,11 @@ namespace osmium {
                         }
                         ++m_stats.area_touching_rings_case;
 
-                        timer_complex_case.start();
+                        timer.start();
                         if (!create_rings_complex_case()) {
                             return false;
                         }
-                        timer_complex_case.stop();
+                        timer.stop();
                     }
 
                     // If the assembler was so configured, now check whether the
@@ -1164,11 +1163,9 @@ namespace osmium {
                                                 ' ' << timer_split.elapsed_microseconds();
 
                     if (m_split_locations.empty()) {
-                        std::cout << ' ' << timer_simple_case.elapsed_microseconds() <<
-                                    " 0";
+                        std::cout << ' ' << timer.elapsed_microseconds() << " 0";
                     } else {
-                        std::cout << " 0" <<
-                                    ' ' << timer_complex_case.elapsed_microseconds();
+                        std::cout << " 0" << ' ' << timer.elapsed_microseconds();
                     }
 
                     std::cout <<
