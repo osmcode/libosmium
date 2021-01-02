@@ -86,6 +86,9 @@ namespace osmium {
                 /// Which metadata of objects should be added?
                 osmium::metadata_options add_metadata;
 
+                /// Compression level used for compression
+                int compression_level = 0;
+
                 /// Should nodes be encoded in DenseNodes?
                 bool use_dense_nodes = true;
 
@@ -146,6 +149,8 @@ namespace osmium {
 
                 std::string m_msg;
 
+                int m_compression_level;
+
                 pbf_blob_type m_blob_type;
 
                 bool m_use_compression;
@@ -155,13 +160,15 @@ namespace osmium {
                 /**
                  * Initialize a blob serializer.
                  *
-                 * @param msg Protobuf-message containing the blob data
+                 * @param msg Protobuf-message containing the blob data.
                  * @param type Type of blob.
                  * @param use_compression Should the output be compressed using
                  *        zlib?
+                 * @param compression_level Compression level.
                  */
-                SerializeBlob(std::string&& msg, pbf_blob_type type, bool use_compression) :
+                SerializeBlob(std::string&& msg, pbf_blob_type type, bool use_compression, int compression_level) :
                     m_msg(std::move(msg)),
+                    m_compression_level(compression_level),
                     m_blob_type(type),
                     m_use_compression(use_compression) {
                 }
@@ -179,7 +186,7 @@ namespace osmium {
 
                     if (m_use_compression) {
                         pbf_blob.add_int32(FileFormat::Blob::optional_int32_raw_size, int32_t(m_msg.size()));
-                        pbf_blob.add_bytes(FileFormat::Blob::optional_bytes_zlib_data, osmium::io::detail::zlib_compress(m_msg));
+                        pbf_blob.add_bytes(FileFormat::Blob::optional_bytes_zlib_data, osmium::io::detail::zlib_compress(m_msg, m_compression_level));
                     } else {
                         pbf_blob.add_bytes(FileFormat::Blob::optional_bytes_raw, m_msg);
                     }
@@ -478,7 +485,8 @@ namespace osmium {
                     m_output_queue.push(m_pool.submit(
                         SerializeBlob{std::move(primitive_block_data),
                                       pbf_blob_type::data,
-                                      m_options.use_compression}
+                                      m_options.use_compression,
+                                      m_options.compression_level}
                     ));
                 }
 
@@ -547,6 +555,19 @@ namespace osmium {
                     m_options.add_historical_information_flag = file.has_multiple_object_versions();
                     m_options.add_visible_flag = file.has_multiple_object_versions();
                     m_options.locations_on_ways = file.is_true("locations_on_ways");
+
+                    const auto pbl = file.get("pbf_compression_level");
+                    if (pbl.empty()) {
+                        m_options.compression_level = osmium::io::detail::zlib_default_compression_level();
+                    } else {
+                        char *end = nullptr;
+                        const auto val = std::strtol(pbl.c_str(), &end, 10);
+                        if (*end != '\0') {
+                            throw std::invalid_argument{"The 'pbf_compression_level' option must be an integer."};
+                        }
+                        osmium::io::detail::zlib_check_compression_level(val);
+                        m_options.compression_level = static_cast<int>(val);
+                    }
                 }
 
                 void write_header(const osmium::io::Header& header) final {
@@ -602,7 +623,8 @@ namespace osmium {
                     m_output_queue.push(m_pool.submit(
                         SerializeBlob{std::move(data),
                                       pbf_blob_type::header,
-                                      m_options.use_compression}
+                                      m_options.use_compression,
+                                      m_options.compression_level}
                         ));
                 }
 

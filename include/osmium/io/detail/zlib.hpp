@@ -55,6 +55,16 @@ namespace osmium {
 
         namespace detail {
 
+            inline int zlib_default_compression_level() noexcept {
+                return Z_DEFAULT_COMPRESSION;
+            }
+
+            inline void zlib_check_compression_level(int value) {
+                if (value < 0 || value > 9) {
+                    throw std::invalid_argument{"The 'pbf_compression_level' for zlib compression must be between 0 and 9."};
+                }
+            }
+
             /**
              * Compress data using zlib.
              *
