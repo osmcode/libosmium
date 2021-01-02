@@ -62,19 +62,21 @@ namespace osmium {
              * what fits in an unsigned long, on Windows this is usually 32bit.
              *
              * @param input Data to compress.
+             * @param compression_level Compression level.
              * @returns Compressed data.
              */
-            inline std::string zlib_compress(const std::string& input) {
+            inline std::string zlib_compress(const std::string& input, int compression_level = Z_DEFAULT_COMPRESSION) {
                 assert(input.size() < std::numeric_limits<unsigned long>::max());
                 unsigned long output_size = ::compressBound(static_cast<unsigned long>(input.size())); // NOLINT(google-runtime-int)
 
                 std::string output(output_size, '\0');
 
-                const auto result = ::compress(
+                const auto result = ::compress2(
                     reinterpret_cast<unsigned char*>(&*output.begin()),
                     &output_size,
                     reinterpret_cast<const unsigned char*>(input.data()),
-                    static_cast<unsigned long>(input.size()) // NOLINT(google-runtime-int)
+                    static_cast<unsigned long>(input.size()), // NOLINT(google-runtime-int)
+                    compression_level
                 );
 
                 if (result != Z_OK) {
