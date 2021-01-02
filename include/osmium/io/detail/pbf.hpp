@@ -73,6 +73,21 @@ namespace osmium {
 
             const int64_t resolution_convert = lonlat_resolution / osmium::detail::coordinate_precision;
 
+            enum pbf_compression : uint8_t {
+                none = 0,
+                zlib = 1
+            };
+
+            inline pbf_compression get_compression_type(const std::string &val) {
+                if (val.empty() || val == "zlib" || val == "true") {
+                    return pbf_compression::zlib;
+                }
+                if (val == "none" || val == "false") {
+                    return pbf_compression::none;
+                }
+                throw std::invalid_argument{"Unknown value for 'pbf_compression' option."};
+            }
+
         } // namespace detail
 
     } // namespace io
