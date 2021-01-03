@@ -33,6 +33,8 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#ifdef OSMIUM_WITH_LZ4
+
 #include <cassert>
 #include <limits>
 #include <stdexcept>
@@ -136,5 +138,7 @@ namespace osmium {
     } // namespace io
 
 } // namespace osmium
+
+#endif
 
 #endif // OSMIUM_IO_DETAIL_LZ4_HPP
