@@ -1,4 +1,4 @@
-/*
+
 
   EXAMPLE osmium_count
 
@@ -88,7 +88,7 @@ int main(int argc, char* argv[]) {
         // Because of the huge amount of OSM data, some Osmium-based programs
         // (though not this one) can use huge amounts of data. So checking actual
         // memore usage is often useful and can be done easily with this class.
-        // (Currently only works on Linux, not OSX and Windows.)
+        // (Currently only works on Linux, not macOS and Windows.)
         osmium::MemoryUsage memory;
 
         std::cout << "\nMemory used: " << memory.peak() << " MBytes\n";

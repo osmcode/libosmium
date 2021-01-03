@@ -89,11 +89,11 @@ between compilers due to different C++11 support.
 
 ## Operating systems
 
-Usually all code must work on Linux, OSX, and Windows. Execptions are allowed
+Usually all code must work on Linux, macOS, and Windows. Execptions are allowed
 for some minor functionality, but please discuss this first.
 
 When writing code and tests, care must be taken that everything works with the
-CR line ending convention used on Linux and OSX and the CRLF line ending used
+CR line ending convention used on Linux and macOS and the CRLF line ending used
 on Windows. Note that `git` can be run with different settings regarding line
 ending rewritings on different machines making things more difficult. Some
 files have been "forced" to LF line endings using `.gitattributes` files.
