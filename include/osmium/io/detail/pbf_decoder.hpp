@@ -773,7 +773,7 @@ namespace osmium {
                             compressed_data = pbf_blob.get_view();
                             break;
                         case protozero::tag_and_type(FileFormat::Blob::optional_bytes_lzma_data, protozero::pbf_wire_type::length_delimited):
-                            throw osmium::pbf_error{"lzma blobs not implemented"};
+                            throw osmium::pbf_error{"lzma blobs not supported"};
                         case protozero::tag_and_type(FileFormat::Blob::optional_bytes_lz4_data, protozero::pbf_wire_type::length_delimited):
 #ifdef OSMIUM_WITH_LZ4
                             use_compression = pbf_compression::lz4;
@@ -782,6 +782,8 @@ namespace osmium {
 #else
                             throw osmium::pbf_error{"lz4 blobs not supported"};
 #endif
+                        case protozero::tag_and_type(FileFormat::Blob::optional_bytes_zstd_data, protozero::pbf_wire_type::length_delimited):
+                            throw osmium::pbf_error{"zstd blobs not supported"};
                         default:
                             throw osmium::pbf_error{"unknown compression"};
                     }
