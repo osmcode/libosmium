@@ -75,7 +75,8 @@ namespace osmium {
 
             enum pbf_compression : uint8_t {
                 none = 0,
-                zlib = 1
+                zlib = 1,
+                lz4 = 2
             };
 
             inline pbf_compression get_compression_type(const std::string &val) {
@@ -84,6 +85,9 @@ namespace osmium {
                 }
                 if (val == "none" || val == "false") {
                     return pbf_compression::none;
+                }
+                if (val == "lz4") {
+                    return pbf_compression::lz4;
                 }
                 throw std::invalid_argument{"Unknown value for 'pbf_compression' option."};
             }

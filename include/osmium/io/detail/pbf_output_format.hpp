@@ -33,6 +33,15 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <cassert>
+#include <cmath>
+#include <cstdint>
+#include <cstdlib>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include <osmium/handler.hpp>
 #include <osmium/io/detail/output_format.hpp>
 #include <osmium/io/detail/pbf.hpp> // IWYU pragma: export
@@ -62,18 +71,13 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/util/misc.hpp>
 #include <osmium/visitor.hpp>
 
+#ifdef OSMIUM_WITH_LZ4
+# include <osmium/io/detail/lz4.hpp>
+#endif
+
 #include <protozero/pbf_builder.hpp>
 #include <protozero/pbf_writer.hpp>
 #include <protozero/types.hpp>
-
-#include <cassert>
-#include <cmath>
-#include <cstdint>
-#include <cstdlib>
-#include <memory>
-#include <string>
-#include <utility>
-#include <vector>
 
 namespace osmium {
 
@@ -187,6 +191,14 @@ namespace osmium {
                             pbf_blob.add_int32(FileFormat::Blob::optional_int32_raw_size, int32_t(m_msg.size()));
                             pbf_blob.add_bytes(FileFormat::Blob::optional_bytes_zlib_data, osmium::io::detail::zlib_compress(m_msg, m_compression_level));
                             break;
+                        case pbf_compression::lz4:
+#ifdef OSMIUM_WITH_LZ4
+                            pbf_blob.add_int32(FileFormat::Blob::optional_int32_raw_size, int32_t(m_msg.size()));
+                            pbf_blob.add_bytes(FileFormat::Blob::optional_bytes_lz4_data, osmium::io::detail::lz4_compress(m_msg, m_compression_level));
+                            break;
+#else
+                            throw osmium::pbf_error{"lz4 blobs not supported"};
+#endif
                     }
 
                     std::string blob_header_data;
@@ -562,6 +574,11 @@ namespace osmium {
                             case pbf_compression::zlib:
                                 m_options.compression_level = osmium::io::detail::zlib_default_compression_level();
                                 break;
+                            case pbf_compression::lz4:
+#ifdef OSMIUM_WITH_LZ4
+                                m_options.compression_level = osmium::io::detail::lz4_default_compression_level();
+#endif
+                                break;
                         }
                     } else {
                         char *end = nullptr;
@@ -574,6 +591,11 @@ namespace osmium {
                                 throw std::invalid_argument{"The 'pbf_compression_level' option doesn't make sense without 'pbf_compression' set."};
                             case pbf_compression::zlib:
                                 osmium::io::detail::zlib_check_compression_level(val);
+                                break;
+                            case pbf_compression::lz4:
+#ifdef OSMIUM_WITH_LZ4
+                                osmium::io::detail::lz4_check_compression_level(val);
+#endif
                                 break;
                         }
                         m_options.compression_level = static_cast<int>(val);
