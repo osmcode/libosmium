@@ -55,7 +55,7 @@ namespace osmium {
 
         namespace detail {
 
-            inline int zlib_default_compression_level() noexcept {
+            constexpr inline int zlib_default_compression_level() noexcept {
                 return Z_DEFAULT_COMPRESSION;
             }
 
