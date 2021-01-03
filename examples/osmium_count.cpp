@@ -1,4 +1,4 @@
-
+/*
 
   EXAMPLE osmium_count
 
