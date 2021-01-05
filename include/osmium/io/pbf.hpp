@@ -1,5 +1,5 @@
-#ifndef OSMIUM_IO_PBF_OUTPUT_HPP
-#define OSMIUM_IO_PBF_OUTPUT_HPP
+#ifndef OSMIUM_IO_PBF_HPP
+#define OSMIUM_IO_PBF_HPP
 
 /*
 
@@ -33,17 +33,28 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-/**
- * @file
- *
- * Include this file if you want to write OSM PBF files.
- *
- * @attention If you include this file, you'll need to link with
- *            `libz`, and enable multithreading.
- */
+#include <string>
+#include <vector>
 
-#include <osmium/io/detail/pbf_output_format.hpp> // IWYU pragma: export
-#include <osmium/io/pbf.hpp> // IWYU pragma: export
-#include <osmium/io/writer.hpp> // IWYU pragma: export
+namespace osmium {
 
-#endif // OSMIUM_IO_PBF_OUTPUT_HPP
+    namespace io {
+
+        /**
+         * Get a list of all compression types supported for PBF files.
+         */
+        inline std::vector<std::string> supported_pbf_compression_types() {
+            std::vector<std::string> types{"none", "zlib"};
+
+#if OSMIUM_WITH_LZ4
+            types.push_back("lz4");
+#endif
+
+            return types;
+        }
+
+    } // namespace io
+
+} // namespace osmium
+
+#endif // OSMIUM_IO_PBF_HPP

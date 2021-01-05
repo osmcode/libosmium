@@ -43,6 +43,7 @@ DEALINGS IN THE SOFTWARE.
  */
 
 #include <osmium/io/detail/pbf_input_format.hpp> // IWYU pragma: export
+#include <osmium/io/pbf.hpp> // IWYU pragma: export
 #include <osmium/io/reader.hpp> // IWYU pragma: export
 
 #endif // OSMIUM_IO_PBF_INPUT_HPP
