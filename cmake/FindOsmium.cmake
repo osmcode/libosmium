@@ -118,8 +118,8 @@ if(Osmium_USE_PBF)
     find_package(Protozero 1.6.3)
 
     if(Osmium_USE_LZ4)
-        find_package(PkgConfig REQUIRED)
-        pkg_check_modules(LZ4 REQUIRED liblz4)
+        find_path(LZ4_INCLUDE_DIR NAMES lz4.h REQUIRED)
+        find_library(LZ4_LIBRARY NAMES lz4 REQUIRED)
         add_definitions(-DOSMIUM_WITH_LZ4)
     endif()
 
@@ -127,12 +127,12 @@ if(Osmium_USE_PBF)
     if(ZLIB_FOUND AND Threads_FOUND AND PROTOZERO_FOUND)
         list(APPEND OSMIUM_PBF_LIBRARIES
             ${ZLIB_LIBRARIES}
-            ${LZ4_LIBRARIES}
+            ${LZ4_LIBRARY}
             ${CMAKE_THREAD_LIBS_INIT}
         )
         list(APPEND OSMIUM_INCLUDE_DIRS
             ${ZLIB_INCLUDE_DIR}
-            ${LZ4_INCLUDE_DIRS}
+            ${LZ4_INCLUDE_DIR}
             ${PROTOZERO_INCLUDE_DIR}
         )
     else()
