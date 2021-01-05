@@ -73,7 +73,7 @@ namespace osmium {
 
             const int64_t resolution_convert = lonlat_resolution / osmium::detail::coordinate_precision;
 
-            enum pbf_compression : uint8_t {
+            enum class pbf_compression : uint8_t {
                 none = 0,
                 zlib = 1,
                 lz4 = 2
