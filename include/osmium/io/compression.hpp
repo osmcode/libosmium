@@ -82,6 +82,10 @@ namespace osmium {
 
             virtual void close() = 0;
 
+            virtual std::size_t file_size() const {
+                return 0;
+            }
+
         }; // class Compressor
 
         class Decompressor {
@@ -218,6 +222,7 @@ namespace osmium {
 
         class NoCompressor final : public Compressor {
 
+            std::size_t m_file_size = 0;
             int m_fd;
 
         public:
@@ -243,6 +248,7 @@ namespace osmium {
 
             void write(const std::string& data) override {
                 osmium::io::detail::reliable_write(m_fd, data.data(), data.size());
+                m_file_size += data.size();
             }
 
             void close() override {
@@ -260,6 +266,10 @@ namespace osmium {
                     }
                     osmium::io::detail::reliable_close(fd);
                 }
+            }
+
+            std::size_t file_size() const override {
+                return m_file_size;
             }
 
         }; // class NoCompressor

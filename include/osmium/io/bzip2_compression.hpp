@@ -167,6 +167,7 @@ namespace osmium {
 
         class Bzip2Compressor final : public Compressor {
 
+            std::size_t m_file_size = 0;
             detail::file_wrapper m_file;
             BZFILE* m_bzfile = nullptr;
 
@@ -218,7 +219,9 @@ namespace osmium {
                     osmium::detail::disable_invalid_parameter_handler diph;
 #endif
                     int bzerror = BZ_OK;
-                    ::BZ2_bzWriteClose(&bzerror, m_bzfile, 0, nullptr, nullptr);
+                    unsigned int nbytes_out_lo32 = 0;
+                    unsigned int nbytes_out_hi32 = 0;
+                    ::BZ2_bzWriteClose64(&bzerror, m_bzfile, 0, nullptr, nullptr, &nbytes_out_lo32, &nbytes_out_hi32);
                     m_bzfile = nullptr;
                     if (do_fsync() && m_file.file()) {
                         osmium::io::detail::reliable_fsync(fileno(m_file.file()));
@@ -227,7 +230,12 @@ namespace osmium {
                     if (bzerror != BZ_OK) {
                         throw bzip2_error{"bzip2 error: write close failed", bzerror};
                     }
+                    m_file_size = static_cast<std::size_t>(nbytes_out_hi32) << 32U | nbytes_out_lo32;
                 }
+            }
+
+            std::size_t file_size() const override {
+                return m_file_size;
             }
 
         }; // class Bzip2Compressor

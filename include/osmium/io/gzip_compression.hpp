@@ -104,6 +104,7 @@ namespace osmium {
 
         class GzipCompressor final : public Compressor {
 
+            std::size_t m_file_size = 0;
             int m_fd;
             gzFile m_gzfile;
 
@@ -163,6 +164,8 @@ namespace osmium {
                     // Do not sync or close stdout
                     if (m_fd == 1) {
                         return;
+                    } else {
+                        m_file_size = osmium::file_size(m_fd);
                     }
 
                     if (do_fsync()) {
@@ -170,6 +173,10 @@ namespace osmium {
                     }
                     osmium::io::detail::reliable_close(m_fd);
                 }
+            }
+
+            std::size_t file_size() const override {
+                return m_file_size;
             }
 
         }; // class GzipCompressor
