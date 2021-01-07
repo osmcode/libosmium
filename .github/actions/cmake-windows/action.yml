@@ -11,6 +11,7 @@ runs:
           BOOST_ROOT=$BOOST_ROOT_1_72_0 cmake -LA .. \
            -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake \
            -DBUILD_HEADERS=OFF \
+           -BUILD_DATA_TESTS=OFF \
            -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
            -DPROTOZERO_INCLUDE_DIR=${GITHUB_WORKSPACE}/../protozero/include
         shell: bash
