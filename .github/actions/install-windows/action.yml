@@ -1,0 +1,22 @@
+name: Install Prerequisites on Windows
+
+runs:
+  using: composite
+
+  steps:
+    - name: Install packages
+      run: |
+        vcpkg install \
+            bzip2:x64-windows \
+            expat:x64-windows \
+            gdal:x64-windows \
+            geos:x64-windows \
+            proj:x64-windows \
+            sparsehash:x64-windows \
+            zlib:x64-windows
+      shell: bash
+    - name: Install from git
+      run: |
+        git clone --quiet --depth 1 https://github.com/mapbox/protozero.git ../protozero
+      shell: bash
+

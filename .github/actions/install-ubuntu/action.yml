@@ -9,7 +9,7 @@ runs:
         sudo apt-get update -q
         sudo apt-get install -yq \
              doxygen \
-             libboost-all-dev \
+             libboost-dev \
              libgdal-dev \
              libgeos++-dev \
              libproj-dev \

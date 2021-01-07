@@ -14,6 +14,7 @@ jobs:
         with:
           submodules: true
       - uses: ./.github/actions/install-ubuntu
+      - uses: ./.github/actions/cmake
       - uses: ./.github/actions/build
       - uses: ./.github/actions/ctest
 
@@ -28,6 +29,7 @@ jobs:
         with:
           submodules: true
       - uses: ./.github/actions/install-ubuntu
+      - uses: ./.github/actions/cmake
       - uses: ./.github/actions/build
       - uses: ./.github/actions/ctest
 
@@ -42,6 +44,7 @@ jobs:
         with:
           submodules: true
       - uses: ./.github/actions/install-ubuntu
+      - uses: ./.github/actions/cmake
       - uses: ./.github/actions/build
       - uses: ./.github/actions/ctest
 
@@ -56,6 +59,7 @@ jobs:
         with:
           submodules: true
       - uses: ./.github/actions/install-ubuntu
+      - uses: ./.github/actions/cmake
       - uses: ./.github/actions/build
       - uses: ./.github/actions/ctest
 
@@ -70,6 +74,7 @@ jobs:
         with:
           submodules: true
       - uses: ./.github/actions/install-ubuntu
+      - uses: ./.github/actions/cmake
       - uses: ./.github/actions/build
       - uses: ./.github/actions/ctest
 
@@ -86,6 +91,7 @@ jobs:
         with:
           submodules: true
       - uses: ./.github/actions/install-ubuntu
+      - uses: ./.github/actions/cmake
       - uses: ./.github/actions/build
       - uses: ./.github/actions/ctest
 
@@ -100,6 +106,7 @@ jobs:
         with:
           submodules: true
       - uses: ./.github/actions/install-ubuntu
+      - uses: ./.github/actions/cmake
       - uses: ./.github/actions/build
       - uses: ./.github/actions/ctest
 
@@ -114,6 +121,7 @@ jobs:
         with:
           submodules: true
       - uses: ./.github/actions/install-ubuntu
+      - uses: ./.github/actions/cmake
       - uses: ./.github/actions/build
       - uses: ./.github/actions/ctest
 
@@ -128,6 +136,7 @@ jobs:
         with:
           submodules: true
       - uses: ./.github/actions/install-ubuntu
+      - uses: ./.github/actions/cmake
       - uses: ./.github/actions/build
       - uses: ./.github/actions/ctest
 
@@ -142,6 +151,7 @@ jobs:
         with:
           submodules: true
       - uses: ./.github/actions/install-ubuntu
+      - uses: ./.github/actions/cmake
       - uses: ./.github/actions/build
       - uses: ./.github/actions/ctest
 
@@ -157,6 +167,7 @@ jobs:
         with:
           submodules: true
       - uses: ./.github/actions/install-ubuntu
+      - uses: ./.github/actions/cmake
       - uses: ./.github/actions/build
       - uses: ./.github/actions/ctest
       - name: Coverage
@@ -182,6 +193,7 @@ jobs:
         with:
           submodules: true
       - uses: ./.github/actions/install-ubuntu
+      - uses: ./.github/actions/cmake
       - uses: ./.github/actions/build
       - uses: ./.github/actions/ctest
 
@@ -196,6 +208,7 @@ jobs:
         with:
           submodules: true
       - uses: ./.github/actions/install-macos
+      - uses: ./.github/actions/cmake
       - uses: ./.github/actions/build
       - uses: ./.github/actions/ctest
 
@@ -210,6 +223,7 @@ jobs:
         with:
           submodules: true
       - uses: ./.github/actions/install-macos
+      - uses: ./.github/actions/cmake
       - uses: ./.github/actions/build
       - uses: ./.github/actions/ctest
 
@@ -224,40 +238,20 @@ jobs:
         with:
           submodules: true
       - uses: ./.github/actions/install-macos
+      - uses: ./.github/actions/cmake
       - uses: ./.github/actions/build
       - uses: ./.github/actions/ctest
 
-# does not work yet
-#  windows-msys2:
-#    runs-on: windows-2019
-#    defaults:
-#      run:
-#        shell: msys2 {0}
-#    env:
-#      PROJ_LIB: c:\msys64\mingw64\share\proj
-#    steps:
-#      - uses: actions/checkout@v2
-#        with:
-#          submodules: true
-#      - uses: msys2/setup-msys2@v2
-#        with:
-#          msystem: MINGW64
-#          update: true
-#          install: git mingw-w64-x86_64-gcc-libs mingw-w64-x86_64-gcc mingw-w64-x86_64-geos mingw-w64-x86_64-cmake mingw-w64-x86_64-boost mingw-w64-x86_64-cppcheck mingw-w64-x86_64-doxygen mingw-w64-x86_64-gdb mingw-w64-x86_64-sparsehash mingw-w64-x86_64-gdal mingw-w64-x86_64-ruby mingw-w64-x86_64-libspatialite mingw-w64-x86_64-spatialite-tools mingw-w64-x86_64-clang-tools-extra
-#      - name: Install Protozero...
-#        run: |
-#          echo $PATH
-#          cd ..
-#          git clone --depth 1 https://github.com/mapbox/protozero
-#          gem.cmd install json
-#      - name: CI-Build
-#        run: |
-#          mkdir build
-#          cd build
-#          cmake -LA .. \
-#           -DBUILD_DATA_TESTS=ON \
-#           -DBUILD_HEADERS=OFF \
-#           -DPROTOZERO_INCLUDE_DIR=${GITHUB_WORKSPACE}/../protozero/include
-#          make
-#      - uses: ./.github/actions/ctest
+  windows:
+    runs-on: windows-2019
+    env:
+      BUILD_TYPE: Dev
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - uses: ./.github/actions/install-windows
+      - uses: ./.github/actions/cmake-windows
+      - uses: ./.github/actions/build-windows
+      - uses: ./.github/actions/ctest-windows
 

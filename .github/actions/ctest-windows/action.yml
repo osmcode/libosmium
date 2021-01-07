@@ -1,11 +1,10 @@
-name: Build
+name: ctest
 
 runs:
     using: composite
-
     steps:
-      - name: Build
-        run: make VERBOSE=1
+      - name: Test
+        run: ctest --output-on-failure -C ${BUILD_TYPE}
         shell: bash
         working-directory: build
 

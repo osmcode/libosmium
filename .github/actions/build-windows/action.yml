@@ -5,7 +5,7 @@ runs:
 
     steps:
       - name: Build
-        run: make VERBOSE=1
+        run: cmake --build . --config ${BUILD_TYPE}
         shell: bash
         working-directory: build
 
