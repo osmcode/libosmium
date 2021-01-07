@@ -8,9 +8,29 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+* The PBF reader and writer now understand PBF blobs compressed with the LZ4
+  compression algorithm in addition to the usual ZLIB compression (or no
+  compression at all). LZ4 is much faster to compress and uncompress. Use
+  by setting the `pbf_compression` output file format option to `lz4`. You
+  have to define `OSMIUM_WITH_LZ4` to enable this before including any
+  libosmium includes.
+* The function `osmium::io::supported_pbf_compression_types` can now be used
+  to get a list of all PBF compression types supported.
+* The output file option `pbf_compression_level` can now be set to an integer.
+  The range depends on the compression type used, 0-9 for zlib compression
+  and 1-65537 for lz4 compression.
+* Adds `ptr_begin()`/`ptr_end()` functions to `ObjectPointerCollection` for
+  accessing the pointers instead of the underlying objects.
+
 ### Changed
 
+* The `osmium::io::Writer::close()` function now returns the number of bytes
+  written to an OSM file if it is available (and 0 otherwise).
+* Use stable sort when sorting `ObjectPointerCollection`.
+
 ### Fixed
+
+* Various small fixes and cleanups.
 
 
 ## [2.15.6] - 2020-06-27
