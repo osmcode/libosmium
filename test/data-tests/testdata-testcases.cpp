@@ -15,14 +15,16 @@ int main(int argc, char* argv[]) {
         std::cerr << "Running tests from '" << dirname << "' (from TESTCASES_DIR environment variable)\n";
     } else {
         std::cerr << "Please set TESTCASES_DIR environment variable.\n";
-        std::exit(1);
+        return 1;
     }
 
     try {
         return Catch::Session().run(argc, argv);
     } catch (const std::exception& e) {
         std::cerr << e.what() << '\n';
-        std::exit(1);
+        return 1;
     }
+
+    return 0;
 }
 
