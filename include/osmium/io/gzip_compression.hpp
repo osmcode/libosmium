@@ -164,9 +164,9 @@ namespace osmium {
                     // Do not sync or close stdout
                     if (m_fd == 1) {
                         return;
-                    } else {
-                        m_file_size = osmium::file_size(m_fd);
                     }
+
+                    m_file_size = osmium::file_size(m_fd);
 
                     if (do_fsync()) {
                         osmium::io::detail::reliable_fsync(m_fd);
