@@ -8,6 +8,15 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+### Changed
+
+### Fixed
+
+
+## [2.16.0] - 2021-01-08
+
+### Added
+
 * The PBF reader and writer now understand PBF blobs compressed with the LZ4
   compression algorithm in addition to the usual ZLIB compression (or no
   compression at all). LZ4 is much faster to compress and uncompress. Use
@@ -1052,7 +1061,8 @@ This project adheres to [Semantic Versioning](https://semver.org/).
   Doxygen (up to version 1.8.8). This version contains a workaround to fix
   this.
 
-[unreleased]: https://github.com/osmcode/libosmium/compare/v2.15.6...HEAD
+[unreleased]: https://github.com/osmcode/libosmium/compare/v2.16.0...HEAD
+[2.16.0]: https://github.com/osmcode/libosmium/compare/v2.15.6...v2.16.0
 [2.15.6]: https://github.com/osmcode/libosmium/compare/v2.15.5...v2.15.6
 [2.15.5]: https://github.com/osmcode/libosmium/compare/v2.15.4...v2.15.5
 [2.15.4]: https://github.com/osmcode/libosmium/compare/v2.15.3...v2.15.4
