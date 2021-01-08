@@ -155,7 +155,7 @@ TEST_CASE("create tag list") {
     }
 
     SECTION("with add_tag_list from map") {
-        std::map<const char*, const char*> m{
+        std::map<std::string, std::string> m{
             { "highway", "primary" },
             { "name", "Main Street" }
         };
