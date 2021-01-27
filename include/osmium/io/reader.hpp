@@ -248,7 +248,11 @@ namespace osmium {
              *      is read normally. If you set this to
              *      osmium::io::read_meta::no, meta data (like version, uid,
              *      etc.) is not read possibly speeding up the read. Not all
-             *      file formats use this setting.
+             *      file formats use this setting. Do *not* set this to
+             *      osmium::io::read_meta::no for history or change files
+             *      because you will loose the information whether an object
+             *      is visible!
+             *
              * * osmium::thread::Pool&: Reference to a thread pool that should
              *      be used for reading instead of the default pool. Usually
              *      it is okay to use the statically initialized shared
