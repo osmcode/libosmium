@@ -137,7 +137,12 @@ namespace osmium {
             }
 
             void set_option(osmium::io::read_meta value) noexcept {
-                m_read_metadata = value;
+                // Ignore this setting if we have a history/change file,
+                // because if this is set to "no", we don't see the difference
+                // between visible and deleted objects.
+                if (!m_file.has_multiple_object_versions()) {
+                    m_read_metadata = value;
+                }
             }
 
             // This function will run in a separate thread.
