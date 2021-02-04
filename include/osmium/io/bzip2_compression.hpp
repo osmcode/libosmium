@@ -230,7 +230,7 @@ namespace osmium {
                     if (bzerror != BZ_OK) {
                         throw bzip2_error{"bzip2 error: write close failed", bzerror};
                     }
-                    m_file_size = static_cast<std::size_t>(nbytes_out_hi32) << 32U | nbytes_out_lo32;
+                    m_file_size = static_cast<std::size_t>(static_cast<uint64_t>(nbytes_out_hi32) << 32U | nbytes_out_lo32);
                 }
             }
 
