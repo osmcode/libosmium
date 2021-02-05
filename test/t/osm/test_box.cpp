@@ -114,6 +114,10 @@ TEST_CASE("Create box from locations") {
     REQUIRE(!!b);
     REQUIRE(b.bottom_left() == (osmium::Location{1.23, 2.34}));
     REQUIRE(b.top_right() == (osmium::Location{3.45, 4.56}));
+    REQUIRE(b.top() == Approx(4.56));
+    REQUIRE(b.bottom() == Approx(2.34));
+    REQUIRE(b.left() == Approx(1.23));
+    REQUIRE(b.right() == Approx(3.45));
 }
 
 TEST_CASE("Create box from doubles") {
