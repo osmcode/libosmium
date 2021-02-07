@@ -119,6 +119,15 @@ TEST_CASE("WKB geometry factory (byte-order-dependent): linestring with undefine
     REQUIRE_THROWS_AS(factory.create_linestring(wnl), const osmium::invalid_location&);
 }
 
+TEST_CASE("WKB geometry factory (byte-order-dependent): polygon") {
+    osmium::memory::Buffer buffer{10000};
+    osmium::geom::WKBFactory<> factory{osmium::geom::wkb_type::wkb, osmium::geom::out_type::hex};
+    const auto& wnl = create_test_wnl_closed(buffer);
+
+    const std::string wkb{factory.create_polygon(wnl)};
+    REQUIRE(wkb == "010300000001000000050000000000000000000840000000000000084066666666666610406666666666661040CDCCCCCCCCCC0C406666666666661040CDCCCCCCCCCC08400000000000000C4000000000000008400000000000000840");
+}
+
 #endif
 
 TEST_CASE("WKB geometry (byte-order-independent) of empty point") {
