@@ -48,7 +48,8 @@ namespace osmium {
             o5m       = 5,
             debug     = 6,
             blackhole = 7,
-            last      = 7 // must have the same value as the last real value
+            ids       = 8,
+            last      = 8 // must have the same value as the last real value
         };
 
         enum class read_meta {
@@ -72,6 +73,8 @@ namespace osmium {
                     return "DEBUG";
                 case file_format::blackhole:
                     return "BLACKHOLE";
+                case file_format::ids:
+                    return "IDS";
                 default: // file_format::unknown
                     break;
             }
