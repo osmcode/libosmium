@@ -184,10 +184,11 @@ namespace osmium {
         class GzipDecompressor final : public Decompressor {
 
             gzFile m_gzfile = nullptr;
+            int m_fd;
 
         public:
 
-            explicit GzipDecompressor(const int fd) {
+            explicit GzipDecompressor(const int fd) : m_fd(fd) {
 #ifdef _MSC_VER
                 osmium::detail::disable_invalid_parameter_handler diph;
 #endif
@@ -216,6 +217,9 @@ namespace osmium {
             }
 
             std::string read() override {
+#if ZLIB_VERNUM >= 0x1240
+                osmium::io::detail::remove_buffered_pages(m_fd, static_cast<std::size_t>(::gzoffset(m_gzfile)));
+#endif
 #ifdef _MSC_VER
                 osmium::detail::disable_invalid_parameter_handler diph;
 #endif
@@ -235,6 +239,7 @@ namespace osmium {
 
             void close() override {
                 if (m_gzfile) {
+                    osmium::io::detail::remove_buffered_pages(m_fd);
 #ifdef _MSC_VER
                     osmium::detail::disable_invalid_parameter_handler diph;
 #endif

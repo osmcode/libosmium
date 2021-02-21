@@ -231,7 +231,12 @@ namespace osmium {
                     throw io_error{"Reading OSM files from the network currently not supported on Windows."};
 #endif
                 }
-                return osmium::io::detail::open_for_reading(filename);
+                const int fd = osmium::io::detail::open_for_reading(filename);
+                if (fd >= 0) {
+                    // Tell the kernel we are going to read this file sequentially
+                    ::posix_fadvise(fd, 0, 0, POSIX_FADV_SEQUENTIAL);
+                }
+                return fd;
             }
 
         public:

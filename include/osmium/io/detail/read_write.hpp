@@ -247,6 +247,31 @@ namespace osmium {
                 return fd2;
             }
 
+            /**
+             * Tell the kernel to remove all pages from this file from the
+             * buffer cache. Used when reading a large file that will not be
+             * needed again soon. Keeps the buffer cache clear for other
+             * things.
+             */
+            inline void remove_buffered_pages(int fd) noexcept {
+                if (fd > 0) {
+                    ::posix_fadvise(fd, 0, 0, POSIX_FADV_DONTNEED);
+                }
+            }
+
+            /**
+             * Tell the kernel to remove all pages from this file up to the
+             * specified size from the buffer cache. Used when reading a large
+             * file that will not be needed again soon. Keeps the buffer cache
+             * clear for other things.
+             */
+            inline void remove_buffered_pages(int fd, std::size_t size) noexcept {
+                constexpr const std::size_t block_size = 4096;
+                if (fd > 0 && size > 0) {
+                    ::posix_fadvise(fd, 0, (size - 1) & ~(block_size - 1), POSIX_FADV_DONTNEED);
+                }
+            }
+
         } // namespace detail
 
     } // namespace io
