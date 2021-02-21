@@ -232,10 +232,12 @@ namespace osmium {
 #endif
                 }
                 const int fd = osmium::io::detail::open_for_reading(filename);
+#if __linux__
                 if (fd >= 0) {
                     // Tell the kernel we are going to read this file sequentially
                     ::posix_fadvise(fd, 0, 0, POSIX_FADV_SEQUENTIAL);
                 }
+#endif
                 return fd;
             }
 
