@@ -183,7 +183,7 @@ namespace osmium {
          */
         double left() const noexcept {
             assert(valid());
-            return m_bottom_left.lon();
+            return m_bottom_left.lon_without_check();
         }
 
         /**
@@ -193,7 +193,7 @@ namespace osmium {
          */
         double right() const noexcept {
             assert(valid());
-            return m_top_right.lon();
+            return m_top_right.lon_without_check();
         }
 
         /**
@@ -203,7 +203,7 @@ namespace osmium {
          */
         double top() const noexcept {
             assert(valid());
-            return m_top_right.lat();
+            return m_top_right.lat_without_check();
         }
 
         /**
@@ -213,7 +213,7 @@ namespace osmium {
          */
         double bottom() const noexcept {
             assert(valid());
-            return m_bottom_left.lat();
+            return m_bottom_left.lat_without_check();
         }
 
         /**
