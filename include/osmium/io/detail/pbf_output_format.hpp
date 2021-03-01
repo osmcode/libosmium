@@ -182,6 +182,27 @@ namespace osmium {
                 DenseNodes(StringTable* stringtable, const pbf_output_options* options) :
                     m_stringtable(stringtable),
                     m_options(options) {
+                    m_ids.reserve(max_entities_per_block);
+                    if (m_options->add_metadata.version()) {
+                        m_versions.reserve(max_entities_per_block);
+                    }
+                    if (m_options->add_metadata.timestamp()) {
+                        m_timestamps.reserve(max_entities_per_block);
+                    }
+                    if (m_options->add_metadata.changeset()) {
+                        m_changesets.reserve(max_entities_per_block);
+                    }
+                    if (m_options->add_metadata.uid()) {
+                        m_uids.reserve(max_entities_per_block);
+                    }
+                    if (m_options->add_metadata.user()) {
+                        m_user_sids.reserve(max_entities_per_block);
+                    }
+                    if (m_options->add_visible_flag) {
+                         m_visibles.reserve(max_entities_per_block);
+                    }
+                    m_lats.reserve(max_entities_per_block);
+                    m_lons.reserve(max_entities_per_block);
                 }
 
                 std::size_t size() const noexcept {
