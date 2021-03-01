@@ -264,8 +264,8 @@ namespace osmium {
                 std::string m_pbf_primitive_group_data;
                 protozero::pbf_builder<OSMFormat::PrimitiveGroup> m_pbf_primitive_group;
                 StringTable m_stringtable;
+                pbf_output_options m_options;
                 std::unique_ptr<DenseNodes> m_dense_nodes{};
-                const pbf_output_options* m_options;
                 OSMFormat::PrimitiveGroup m_type = OSMFormat::PrimitiveGroup::unknown;
                 int m_count = 0;
 
@@ -273,7 +273,7 @@ namespace osmium {
 
                 explicit PrimitiveBlock(const pbf_output_options& options) :
                     m_pbf_primitive_group(m_pbf_primitive_group_data),
-                    m_options(&options) {
+                    m_options(options) {
                 }
 
                 const std::string& group_data() {
@@ -305,7 +305,7 @@ namespace osmium {
 
                 void add_dense_node(const osmium::Node& node) {
                     if (!m_dense_nodes) {
-                        m_dense_nodes.reset(new DenseNodes{&m_stringtable, m_options});
+                        m_dense_nodes.reset(new DenseNodes{&m_stringtable, &m_options});
                     }
                     m_dense_nodes->add_node(node);
                     ++m_count;
