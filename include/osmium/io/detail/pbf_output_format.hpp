@@ -148,14 +148,8 @@ namespace osmium {
             /**
              * Contains the code to pack any number of nodes into a DenseNode
              * structure.
-             *
-             * Because this needs to allocate a lot of memory on the heap,
-             * only one object of this class will be created and then re-used
-             * after calling clear() on it.
              */
             class DenseNodes {
-
-                StringTable& m_stringtable;
 
                 std::vector<int64_t> m_ids;
 
@@ -170,6 +164,9 @@ namespace osmium {
                 std::vector<int64_t> m_lons;
                 std::vector<int32_t> m_tags;
 
+                StringTable& m_stringtable;
+                const pbf_output_options& m_options;
+
                 osmium::DeltaEncode<object_id_type, int64_t> m_delta_id;
 
                 osmium::DeltaEncode<uint32_t, int64_t> m_delta_timestamp;
@@ -180,39 +177,11 @@ namespace osmium {
                 osmium::DeltaEncode<int64_t, int64_t> m_delta_lat;
                 osmium::DeltaEncode<int64_t, int64_t> m_delta_lon;
 
-                const pbf_output_options& m_options;
-
             public:
 
                 DenseNodes(StringTable& stringtable, const pbf_output_options& options) :
                     m_stringtable(stringtable),
                     m_options(options) {
-                }
-
-                /// Clear object for re-use. Keep the allocated memory.
-                void clear() {
-                    m_ids.clear();
-
-                    m_versions.clear();
-                    m_timestamps.clear();
-                    m_changesets.clear();
-                    m_uids.clear();
-                    m_user_sids.clear();
-                    m_visibles.clear();
-
-                    m_lats.clear();
-                    m_lons.clear();
-                    m_tags.clear();
-
-                    m_delta_id.clear();
-
-                    m_delta_timestamp.clear();
-                    m_delta_changeset.clear();
-                    m_delta_uid.clear();
-                    m_delta_user_sid.clear();
-
-                    m_delta_lat.clear();
-                    m_delta_lon.clear();
                 }
 
                 std::size_t size() const noexcept {
@@ -295,7 +264,8 @@ namespace osmium {
                 std::string m_pbf_primitive_group_data;
                 protozero::pbf_builder<OSMFormat::PrimitiveGroup> m_pbf_primitive_group;
                 StringTable m_stringtable;
-                DenseNodes m_dense_nodes;
+                std::unique_ptr<DenseNodes> m_dense_nodes{};
+                const pbf_output_options* m_options;
                 OSMFormat::PrimitiveGroup m_type = OSMFormat::PrimitiveGroup::unknown;
                 int m_count = 0;
 
@@ -303,12 +273,13 @@ namespace osmium {
 
                 explicit PrimitiveBlock(const pbf_output_options& options) :
                     m_pbf_primitive_group(m_pbf_primitive_group_data),
-                    m_dense_nodes(m_stringtable, options) {
+                    m_options(&options) {
                 }
 
                 const std::string& group_data() {
                     if (type() == OSMFormat::PrimitiveGroup::optional_DenseNodes_dense) {
-                        m_pbf_primitive_group.add_message(OSMFormat::PrimitiveGroup::optional_DenseNodes_dense, m_dense_nodes.serialize());
+                        assert(m_dense_nodes);
+                        m_pbf_primitive_group.add_message(OSMFormat::PrimitiveGroup::optional_DenseNodes_dense, m_dense_nodes->serialize());
                     }
                     return m_pbf_primitive_group_data;
                 }
@@ -316,7 +287,7 @@ namespace osmium {
                 void reset(OSMFormat::PrimitiveGroup type) {
                     m_pbf_primitive_group_data.clear();
                     m_stringtable.clear();
-                    m_dense_nodes.clear();
+                    m_dense_nodes.reset();
                     m_type = type;
                     m_count = 0;
                 }
@@ -333,7 +304,10 @@ namespace osmium {
                 }
 
                 void add_dense_node(const osmium::Node& node) {
-                    m_dense_nodes.add_node(node);
+                    if (!m_dense_nodes) {
+                        m_dense_nodes.reset(new DenseNodes{m_stringtable, *m_options});
+                    }
+                    m_dense_nodes->add_node(node);
                     ++m_count;
                 }
 
@@ -360,7 +334,9 @@ namespace osmium {
                 }
 
                 std::size_t size() const noexcept {
-                    return m_pbf_primitive_group_data.size() + m_stringtable.size() + m_dense_nodes.size();
+                    return m_pbf_primitive_group_data.size() +
+                           m_stringtable.size() +
+                           (m_dense_nodes ? m_dense_nodes->size() : 0);
                 }
 
                 /**
