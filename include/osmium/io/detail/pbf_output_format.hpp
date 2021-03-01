@@ -287,14 +287,15 @@ namespace osmium {
                 StringTable m_stringtable;
                 pbf_output_options m_options;
                 std::unique_ptr<DenseNodes> m_dense_nodes{};
-                OSMFormat::PrimitiveGroup m_type = OSMFormat::PrimitiveGroup::unknown;
+                OSMFormat::PrimitiveGroup m_type;
                 int m_count = 0;
 
             public:
 
-                explicit PrimitiveBlock(const pbf_output_options& options) :
+                explicit PrimitiveBlock(const pbf_output_options& options, OSMFormat::PrimitiveGroup type) :
                     m_pbf_primitive_group(m_pbf_primitive_group_data),
-                    m_options(options) {
+                    m_options(options),
+                    m_type(type) {
                 }
 
                 const std::string& group_data() {
@@ -302,14 +303,6 @@ namespace osmium {
                         m_pbf_primitive_group.add_message(OSMFormat::PrimitiveGroup::optional_DenseNodes_dense, m_dense_nodes->serialize());
                     }
                     return m_pbf_primitive_group_data;
-                }
-
-                void reset(OSMFormat::PrimitiveGroup type) {
-                    m_pbf_primitive_group_data.clear();
-                    m_stringtable.clear();
-                    m_dense_nodes.reset();
-                    m_type = type;
-                    m_count = 0;
                 }
 
                 void write_stringtable(protozero::pbf_builder<OSMFormat::StringTable>& pbf_string_table) {
@@ -467,10 +460,10 @@ namespace osmium {
 
                 pbf_output_options m_options;
 
-                PrimitiveBlock m_primitive_block;
+                std::unique_ptr<PrimitiveBlock> m_primitive_block{};
 
                 void store_primitive_block() {
-                    if (m_primitive_block.count() == 0) {
+                    if (!m_primitive_block || m_primitive_block->count() == 0) {
                         return;
                     }
 
@@ -479,10 +472,10 @@ namespace osmium {
 
                     {
                         protozero::pbf_builder<OSMFormat::StringTable> pbf_string_table{primitive_block, OSMFormat::PrimitiveBlock::required_StringTable_stringtable};
-                        m_primitive_block.write_stringtable(pbf_string_table);
+                        m_primitive_block->write_stringtable(pbf_string_table);
                     }
 
-                    primitive_block.add_message(OSMFormat::PrimitiveBlock::repeated_PrimitiveGroup_primitivegroup, m_primitive_block.group_data());
+                    primitive_block.add_message(OSMFormat::PrimitiveBlock::repeated_PrimitiveGroup_primitivegroup, m_primitive_block->group_data());
 
                     m_output_queue.push(m_pool.submit(
                         SerializeBlob{std::move(primitive_block_data),
@@ -497,14 +490,14 @@ namespace osmium {
                     {
                         protozero::packed_field_uint32 field{pbf_object, protozero::pbf_tag_type(T::enum_type::packed_uint32_keys)};
                         for (const auto& tag : object.tags()) {
-                            field.add_element(m_primitive_block.store_in_stringtable_unsigned(tag.key()));
+                            field.add_element(m_primitive_block->store_in_stringtable_unsigned(tag.key()));
                         }
                     }
 
                     {
                         protozero::packed_field_uint32 field{pbf_object, protozero::pbf_tag_type(T::enum_type::packed_uint32_vals)};
                         for (const auto& tag : object.tags()) {
-                            field.add_element(m_primitive_block.store_in_stringtable_unsigned(tag.value()));
+                            field.add_element(m_primitive_block->store_in_stringtable_unsigned(tag.value()));
                         }
                     }
 
@@ -526,7 +519,7 @@ namespace osmium {
                             pbf_info.add_int32(OSMFormat::Info::optional_int32_uid, static_cast<int32_t>(object.uid()));
                         }
                         if (m_options.add_metadata.user()) {
-                            pbf_info.add_uint32(OSMFormat::Info::optional_uint32_user_sid, m_primitive_block.store_in_stringtable_unsigned(object.user()));
+                            pbf_info.add_uint32(OSMFormat::Info::optional_uint32_user_sid, m_primitive_block->store_in_stringtable_unsigned(object.user()));
                         }
                         if (m_options.add_visible_flag) {
                             pbf_info.add_bool(OSMFormat::Info::optional_bool_visible, object.visible());
@@ -535,17 +528,16 @@ namespace osmium {
                 }
 
                 void switch_primitive_block_type(OSMFormat::PrimitiveGroup type) {
-                    if (!m_primitive_block.can_add(type)) {
+                    if (!m_primitive_block || !m_primitive_block->can_add(type)) {
                         store_primitive_block();
-                        m_primitive_block.reset(type);
+                        m_primitive_block.reset(new PrimitiveBlock{m_options, type});
                     }
                 }
 
             public:
 
                 PBFOutputFormat(osmium::thread::Pool& pool, const osmium::io::File& file, future_string_queue_type& output_queue) :
-                    OutputFormat(pool, output_queue),
-                    m_primitive_block(m_options) {
+                    OutputFormat(pool, output_queue) {
 
                     if (!file.get("pbf_add_metadata").empty()) {
                         throw std::invalid_argument{"The 'pbf_add_metadata' option is deprecated. Please use 'add_metadata' instead."};
@@ -663,12 +655,12 @@ namespace osmium {
                 void node(const osmium::Node& node) {
                     if (m_options.use_dense_nodes) {
                         switch_primitive_block_type(OSMFormat::PrimitiveGroup::optional_DenseNodes_dense);
-                        m_primitive_block.add_dense_node(node);
+                        m_primitive_block->add_dense_node(node);
                         return;
                     }
 
                     switch_primitive_block_type(OSMFormat::PrimitiveGroup::repeated_Node_nodes);
-                    protozero::pbf_builder<OSMFormat::Node> pbf_node{m_primitive_block.group(), OSMFormat::PrimitiveGroup::repeated_Node_nodes};
+                    protozero::pbf_builder<OSMFormat::Node> pbf_node{m_primitive_block->group(), OSMFormat::PrimitiveGroup::repeated_Node_nodes};
 
                     pbf_node.add_sint64(OSMFormat::Node::required_sint64_id, node.id());
                     add_meta(node, pbf_node);
@@ -679,7 +671,7 @@ namespace osmium {
 
                 void way(const osmium::Way& way) {
                     switch_primitive_block_type(OSMFormat::PrimitiveGroup::repeated_Way_ways);
-                    protozero::pbf_builder<OSMFormat::Way> pbf_way{m_primitive_block.group(), OSMFormat::PrimitiveGroup::repeated_Way_ways};
+                    protozero::pbf_builder<OSMFormat::Way> pbf_way{m_primitive_block->group(), OSMFormat::PrimitiveGroup::repeated_Way_ways};
 
                     pbf_way.add_int64(OSMFormat::Way::required_int64_id, way.id());
                     add_meta(way, pbf_way);
@@ -712,7 +704,7 @@ namespace osmium {
 
                 void relation(const osmium::Relation& relation) {
                     switch_primitive_block_type(OSMFormat::PrimitiveGroup::repeated_Relation_relations);
-                    protozero::pbf_builder<OSMFormat::Relation> pbf_relation{m_primitive_block.group(), OSMFormat::PrimitiveGroup::repeated_Relation_relations};
+                    protozero::pbf_builder<OSMFormat::Relation> pbf_relation{m_primitive_block->group(), OSMFormat::PrimitiveGroup::repeated_Relation_relations};
 
                     pbf_relation.add_int64(OSMFormat::Relation::required_int64_id, relation.id());
                     add_meta(relation, pbf_relation);
@@ -720,7 +712,7 @@ namespace osmium {
                     {
                         protozero::packed_field_int32 field{pbf_relation, protozero::pbf_tag_type(OSMFormat::Relation::packed_int32_roles_sid)};
                         for (const auto& member : relation.members()) {
-                            field.add_element(m_primitive_block.store_in_stringtable(member.role()));
+                            field.add_element(m_primitive_block->store_in_stringtable(member.role()));
                         }
                     }
 

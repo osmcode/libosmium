@@ -250,17 +250,21 @@ namespace osmium {
                 std::unordered_map<const char*, int32_t, djb2_hash, str_equal> m_index;
                 int32_t m_size = 0;
 
+                // We store the bucket count globally, so that new StringTables
+                // can be initialized with it. It turns out starting with a
+                // small bucket count and then resizing them is a major time
+                // sink. So this way we are "learning" from one StringTable
+                // object to the next what a good bucket size is.
+                static std::size_t& bucket_count() {
+                    static std::size_t count = 1;
+                    return count;
+                };
+
             public:
 
                 explicit StringTable(size_t size = default_stringtable_chunk_size) :
-                    m_strings(size) {
-                    m_strings.add("");
-                }
-
-                void clear() {
-                    m_strings.clear();
-                    m_index.clear();
-                    m_size = 0;
+                    m_strings(size),
+                    m_index(bucket_count()) {
                     m_strings.add("");
                 }
 
@@ -280,6 +284,8 @@ namespace osmium {
                     if (m_size > max_entries) {
                         throw osmium::pbf_error{"string table has too many entries"};
                     }
+
+                    bucket_count() = m_index.bucket_count();
 
                     return m_size;
                 }
