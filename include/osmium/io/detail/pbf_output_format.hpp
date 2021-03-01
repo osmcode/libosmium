@@ -298,8 +298,7 @@ namespace osmium {
                 }
 
                 const std::string& group_data() {
-                    if (type() == OSMFormat::PrimitiveGroup::optional_DenseNodes_dense) {
-                        assert(m_dense_nodes);
+                    if (m_dense_nodes) {
                         m_pbf_primitive_group.add_message(OSMFormat::PrimitiveGroup::optional_DenseNodes_dense, m_dense_nodes->serialize());
                     }
                     return m_pbf_primitive_group_data;
@@ -348,10 +347,6 @@ namespace osmium {
 
                 int count() const noexcept {
                     return m_count;
-                }
-
-                OSMFormat::PrimitiveGroup type() const noexcept {
-                    return m_type;
                 }
 
                 std::size_t size() const noexcept {
