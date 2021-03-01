@@ -372,6 +372,8 @@ namespace osmium {
 
             class SerializeBlob {
 
+                std::unique_ptr<PrimitiveBlock> m_block{};
+
                 std::string m_msg;
 
                 int m_compression_level;
@@ -398,11 +400,37 @@ namespace osmium {
                 }
 
                 /**
+                 * Initialize a blob serializer.
+                 *
+                 * @param block Pointer to PrimitiveBlock with data.
+                 * @param type Type of blob.
+                 * @param use_compression The type of compression to use.
+                 * @param compression_level Compression level.
+                 */
+                SerializeBlob(std::unique_ptr<PrimitiveBlock> block, pbf_blob_type type, pbf_compression use_compression, int compression_level) :
+                    m_block(std::move(block)),
+                    m_compression_level(compression_level),
+                    m_blob_type(type),
+                    m_use_compression(use_compression) {
+                }
+
+                /**
                  * Serialize a protobuf message into a Blob, optionally apply
                  * compression and return it together with a BlobHeader ready
                  * to be written to a file.
                  */
                 std::string operator()() {
+                    if (m_block) {
+                        protozero::pbf_builder<OSMFormat::PrimitiveBlock> primitive_block{m_msg};
+
+                        {
+                            protozero::pbf_builder<OSMFormat::StringTable> pbf_string_table{primitive_block, OSMFormat::PrimitiveBlock::required_StringTable_stringtable};
+                            m_block->write_stringtable(pbf_string_table);
+                        }
+
+                        primitive_block.add_message(OSMFormat::PrimitiveBlock::repeated_PrimitiveGroup_primitivegroup, m_block->group_data());
+                    }
+
                     assert(m_msg.size() <= max_uncompressed_blob_size);
 
                     std::string blob_data;
@@ -467,18 +495,8 @@ namespace osmium {
                         return;
                     }
 
-                    std::string primitive_block_data;
-                    protozero::pbf_builder<OSMFormat::PrimitiveBlock> primitive_block{primitive_block_data};
-
-                    {
-                        protozero::pbf_builder<OSMFormat::StringTable> pbf_string_table{primitive_block, OSMFormat::PrimitiveBlock::required_StringTable_stringtable};
-                        m_primitive_block->write_stringtable(pbf_string_table);
-                    }
-
-                    primitive_block.add_message(OSMFormat::PrimitiveBlock::repeated_PrimitiveGroup_primitivegroup, m_primitive_block->group_data());
-
                     m_output_queue.push(m_pool.submit(
-                        SerializeBlob{std::move(primitive_block_data),
+                        SerializeBlob{std::move(m_primitive_block),
                                       pbf_blob_type::data,
                                       m_options.use_compression,
                                       m_options.compression_level}
