@@ -145,92 +145,6 @@ namespace osmium {
                 data = 1
             };
 
-            class SerializeBlob {
-
-                std::string m_msg;
-
-                int m_compression_level;
-
-                pbf_blob_type m_blob_type;
-
-                pbf_compression m_use_compression;
-
-            public:
-
-                /**
-                 * Initialize a blob serializer.
-                 *
-                 * @param msg Protobuf-message containing the blob data.
-                 * @param type Type of blob.
-                 * @param use_compression The type of compression to use.
-                 * @param compression_level Compression level.
-                 */
-                SerializeBlob(std::string&& msg, pbf_blob_type type, pbf_compression use_compression, int compression_level) :
-                    m_msg(std::move(msg)),
-                    m_compression_level(compression_level),
-                    m_blob_type(type),
-                    m_use_compression(use_compression) {
-                }
-
-                /**
-                 * Serialize a protobuf message into a Blob, optionally apply
-                 * compression and return it together with a BlobHeader ready
-                 * to be written to a file.
-                 */
-                std::string operator()() {
-                    assert(m_msg.size() <= max_uncompressed_blob_size);
-
-                    std::string blob_data;
-                    protozero::pbf_builder<FileFormat::Blob> pbf_blob{blob_data};
-
-                    switch (m_use_compression) {
-                        case pbf_compression::none:
-                            pbf_blob.add_bytes(FileFormat::Blob::optional_bytes_raw, m_msg);
-                            break;
-                        case pbf_compression::zlib:
-                            pbf_blob.add_int32(FileFormat::Blob::optional_int32_raw_size, int32_t(m_msg.size()));
-                            pbf_blob.add_bytes(FileFormat::Blob::optional_bytes_zlib_data, osmium::io::detail::zlib_compress(m_msg, m_compression_level));
-                            break;
-                        case pbf_compression::lz4:
-#ifdef OSMIUM_WITH_LZ4
-                            pbf_blob.add_int32(FileFormat::Blob::optional_int32_raw_size, int32_t(m_msg.size()));
-                            pbf_blob.add_bytes(FileFormat::Blob::optional_bytes_lz4_data, osmium::io::detail::lz4_compress(m_msg, m_compression_level));
-                            break;
-#else
-                            throw osmium::pbf_error{"lz4 blobs not supported"};
-#endif
-                    }
-
-                    std::string blob_header_data;
-                    protozero::pbf_builder<FileFormat::BlobHeader> pbf_blob_header{blob_header_data};
-
-                    pbf_blob_header.add_string(FileFormat::BlobHeader::required_string_type, m_blob_type == pbf_blob_type::data ? "OSMData" : "OSMHeader");
-
-                    // The static_cast is okay, because the size can never
-                    // be much larger than max_uncompressed_blob_size. This
-                    // is due to the assert above and the fact that the zlib
-                    // library will not grow deflated data beyond the original
-                    // data plus a few header bytes (https://zlib.net/zlib_tech.html).
-                    pbf_blob_header.add_int32(FileFormat::BlobHeader::required_int32_datasize, static_cast<int32_t>(blob_data.size()));
-
-                    const auto size = static_cast<uint32_t>(blob_header_data.size());
-
-                    // write to output: the 4-byte BlobHeader size in network
-                    // byte order followed by the BlobHeader followed by the Blob
-                    std::string output;
-                    output.reserve(4 + blob_header_data.size() + blob_data.size());
-                    output += static_cast<char>((size >> 24U) & 0xffU);
-                    output += static_cast<char>((size >> 16U) & 0xffU);
-                    output += static_cast<char>((size >>  8U) & 0xffU);
-                    output += static_cast<char>( size         & 0xffU);
-                    output.append(blob_header_data);
-                    output.append(blob_data);
-
-                    return output;
-                }
-
-            }; // class SerializeBlob
-
             /**
              * Contains the code to pack any number of nodes into a DenseNode
              * structure.
@@ -470,6 +384,92 @@ namespace osmium {
                 }
 
             }; // class PrimitiveBlock
+
+            class SerializeBlob {
+
+                std::string m_msg;
+
+                int m_compression_level;
+
+                pbf_blob_type m_blob_type;
+
+                pbf_compression m_use_compression;
+
+            public:
+
+                /**
+                 * Initialize a blob serializer.
+                 *
+                 * @param msg Protobuf-message containing the blob data.
+                 * @param type Type of blob.
+                 * @param use_compression The type of compression to use.
+                 * @param compression_level Compression level.
+                 */
+                SerializeBlob(std::string&& msg, pbf_blob_type type, pbf_compression use_compression, int compression_level) :
+                    m_msg(std::move(msg)),
+                    m_compression_level(compression_level),
+                    m_blob_type(type),
+                    m_use_compression(use_compression) {
+                }
+
+                /**
+                 * Serialize a protobuf message into a Blob, optionally apply
+                 * compression and return it together with a BlobHeader ready
+                 * to be written to a file.
+                 */
+                std::string operator()() {
+                    assert(m_msg.size() <= max_uncompressed_blob_size);
+
+                    std::string blob_data;
+                    protozero::pbf_builder<FileFormat::Blob> pbf_blob{blob_data};
+
+                    switch (m_use_compression) {
+                        case pbf_compression::none:
+                            pbf_blob.add_bytes(FileFormat::Blob::optional_bytes_raw, m_msg);
+                            break;
+                        case pbf_compression::zlib:
+                            pbf_blob.add_int32(FileFormat::Blob::optional_int32_raw_size, int32_t(m_msg.size()));
+                            pbf_blob.add_bytes(FileFormat::Blob::optional_bytes_zlib_data, osmium::io::detail::zlib_compress(m_msg, m_compression_level));
+                            break;
+                        case pbf_compression::lz4:
+#ifdef OSMIUM_WITH_LZ4
+                            pbf_blob.add_int32(FileFormat::Blob::optional_int32_raw_size, int32_t(m_msg.size()));
+                            pbf_blob.add_bytes(FileFormat::Blob::optional_bytes_lz4_data, osmium::io::detail::lz4_compress(m_msg, m_compression_level));
+                            break;
+#else
+                            throw osmium::pbf_error{"lz4 blobs not supported"};
+#endif
+                    }
+
+                    std::string blob_header_data;
+                    protozero::pbf_builder<FileFormat::BlobHeader> pbf_blob_header{blob_header_data};
+
+                    pbf_blob_header.add_string(FileFormat::BlobHeader::required_string_type, m_blob_type == pbf_blob_type::data ? "OSMData" : "OSMHeader");
+
+                    // The static_cast is okay, because the size can never
+                    // be much larger than max_uncompressed_blob_size. This
+                    // is due to the assert above and the fact that the zlib
+                    // library will not grow deflated data beyond the original
+                    // data plus a few header bytes (https://zlib.net/zlib_tech.html).
+                    pbf_blob_header.add_int32(FileFormat::BlobHeader::required_int32_datasize, static_cast<int32_t>(blob_data.size()));
+
+                    const auto size = static_cast<uint32_t>(blob_header_data.size());
+
+                    // write to output: the 4-byte BlobHeader size in network
+                    // byte order followed by the BlobHeader followed by the Blob
+                    std::string output;
+                    output.reserve(4 + blob_header_data.size() + blob_data.size());
+                    output += static_cast<char>((size >> 24U) & 0xffU);
+                    output += static_cast<char>((size >> 16U) & 0xffU);
+                    output += static_cast<char>((size >>  8U) & 0xffU);
+                    output += static_cast<char>( size         & 0xffU);
+                    output.append(blob_header_data);
+                    output.append(blob_data);
+
+                    return output;
+                }
+
+            }; // class SerializeBlob
 
             class PBFOutputFormat : public osmium::io::detail::OutputFormat, public osmium::handler::Handler {
 
