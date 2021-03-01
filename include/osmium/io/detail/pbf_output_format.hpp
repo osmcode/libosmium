@@ -164,8 +164,8 @@ namespace osmium {
                 std::vector<int64_t> m_lons;
                 std::vector<int32_t> m_tags;
 
-                StringTable& m_stringtable;
-                const pbf_output_options& m_options;
+                StringTable* m_stringtable;
+                const pbf_output_options* m_options;
 
                 osmium::DeltaEncode<object_id_type, int64_t> m_delta_id;
 
@@ -179,7 +179,7 @@ namespace osmium {
 
             public:
 
-                DenseNodes(StringTable& stringtable, const pbf_output_options& options) :
+                DenseNodes(StringTable* stringtable, const pbf_output_options* options) :
                     m_stringtable(stringtable),
                     m_options(options) {
                 }
@@ -191,23 +191,23 @@ namespace osmium {
                 void add_node(const osmium::Node& node) {
                     m_ids.push_back(m_delta_id.update(node.id()));
 
-                    if (m_options.add_metadata.version()) {
+                    if (m_options->add_metadata.version()) {
                         assert(node.version() <= static_cast<std::size_t>(std::numeric_limits<int32_t>::max()));
                         m_versions.push_back(static_cast<int32_t>(node.version()));
                     }
-                    if (m_options.add_metadata.timestamp()) {
+                    if (m_options->add_metadata.timestamp()) {
                         m_timestamps.push_back(m_delta_timestamp.update(uint32_t(node.timestamp())));
                     }
-                    if (m_options.add_metadata.changeset()) {
+                    if (m_options->add_metadata.changeset()) {
                         m_changesets.push_back(m_delta_changeset.update(node.changeset()));
                     }
-                    if (m_options.add_metadata.uid()) {
+                    if (m_options->add_metadata.uid()) {
                         m_uids.push_back(m_delta_uid.update(node.uid()));
                     }
-                    if (m_options.add_metadata.user()) {
-                        m_user_sids.push_back(m_delta_user_sid.update(m_stringtable.add(node.user())));
+                    if (m_options->add_metadata.user()) {
+                        m_user_sids.push_back(m_delta_user_sid.update(m_stringtable->add(node.user())));
                     }
-                    if (m_options.add_visible_flag) {
+                    if (m_options->add_visible_flag) {
                         m_visibles.push_back(node.visible());
                     }
 
@@ -215,8 +215,8 @@ namespace osmium {
                     m_lons.push_back(m_delta_lon.update(lonlat2int(node.location().lon_without_check())));
 
                     for (const auto& tag : node.tags()) {
-                        m_tags.push_back(m_stringtable.add(tag.key()));
-                        m_tags.push_back(m_stringtable.add(tag.value()));
+                        m_tags.push_back(m_stringtable->add(tag.key()));
+                        m_tags.push_back(m_stringtable->add(tag.value()));
                     }
                     m_tags.push_back(0);
                 }
@@ -227,24 +227,24 @@ namespace osmium {
 
                     pbf_dense_nodes.add_packed_sint64(OSMFormat::DenseNodes::packed_sint64_id, m_ids.cbegin(), m_ids.cend());
 
-                    if (m_options.add_metadata.any() || m_options.add_visible_flag) {
+                    if (m_options->add_metadata.any() || m_options->add_visible_flag) {
                         protozero::pbf_builder<OSMFormat::DenseInfo> pbf_dense_info{pbf_dense_nodes, OSMFormat::DenseNodes::optional_DenseInfo_denseinfo};
-                        if (m_options.add_metadata.version()) {
+                        if (m_options->add_metadata.version()) {
                             pbf_dense_info.add_packed_int32(OSMFormat::DenseInfo::packed_int32_version, m_versions.cbegin(), m_versions.cend());
                         }
-                        if (m_options.add_metadata.timestamp()) {
+                        if (m_options->add_metadata.timestamp()) {
                             pbf_dense_info.add_packed_sint64(OSMFormat::DenseInfo::packed_sint64_timestamp, m_timestamps.cbegin(), m_timestamps.cend());
                         }
-                        if (m_options.add_metadata.changeset()) {
+                        if (m_options->add_metadata.changeset()) {
                             pbf_dense_info.add_packed_sint64(OSMFormat::DenseInfo::packed_sint64_changeset, m_changesets.cbegin(), m_changesets.cend());
                         }
-                        if (m_options.add_metadata.uid()) {
+                        if (m_options->add_metadata.uid()) {
                             pbf_dense_info.add_packed_sint32(OSMFormat::DenseInfo::packed_sint32_uid, m_uids.cbegin(), m_uids.cend());
                         }
-                        if (m_options.add_metadata.user()) {
+                        if (m_options->add_metadata.user()) {
                             pbf_dense_info.add_packed_sint32(OSMFormat::DenseInfo::packed_sint32_user_sid, m_user_sids.cbegin(), m_user_sids.cend());
                         }
-                        if (m_options.add_visible_flag) {
+                        if (m_options->add_visible_flag) {
                             pbf_dense_info.add_packed_bool(OSMFormat::DenseInfo::packed_bool_visible, m_visibles.cbegin(), m_visibles.cend());
                         }
                     }
@@ -305,7 +305,7 @@ namespace osmium {
 
                 void add_dense_node(const osmium::Node& node) {
                     if (!m_dense_nodes) {
-                        m_dense_nodes.reset(new DenseNodes{m_stringtable, *m_options});
+                        m_dense_nodes.reset(new DenseNodes{&m_stringtable, m_options});
                     }
                     m_dense_nodes->add_node(node);
                     ++m_count;
