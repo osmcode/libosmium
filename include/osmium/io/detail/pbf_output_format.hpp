@@ -292,10 +292,15 @@ namespace osmium {
 
             public:
 
-                explicit PrimitiveBlock(const pbf_output_options& options, OSMFormat::PrimitiveGroup type) :
+                explicit PrimitiveBlock(const pbf_output_options& options, OSMFormat::PrimitiveGroup type, size_t bucket_count) :
                     m_pbf_primitive_group(m_pbf_primitive_group_data),
+                    m_stringtable(StringTable::default_stringtable_chunk_size, bucket_count),
                     m_options(options),
                     m_type(type) {
+                }
+
+                std::size_t get_bucket_count() const noexcept {
+                    return m_stringtable.get_bucket_count();
                 }
 
                 const std::string& group_data() {
@@ -490,10 +495,22 @@ namespace osmium {
 
                 std::unique_ptr<PrimitiveBlock> m_primitive_block{};
 
+                std::size_t m_bucket_count = StringTable::min_bucket_count;
+
                 void store_primitive_block() {
                     if (!m_primitive_block || m_primitive_block->count() == 0) {
                         return;
                     }
+
+                    // Remember the bucket_count of the hash in the string
+                    // table. It will be used when initializing the string
+                    // table for the next block.
+                    //
+                    // Some versions of the std library will set the bucket
+                    // count always larger then what we set it to. We decrease
+                    // the bucket count by one, this way the bucket will not
+                    // grow too much.
+                    m_bucket_count = m_primitive_block->get_bucket_count() - 1;
 
                     m_output_queue.push(m_pool.submit(
                         SerializeBlob{std::move(m_primitive_block),
@@ -548,7 +565,7 @@ namespace osmium {
                 void switch_primitive_block_type(OSMFormat::PrimitiveGroup type) {
                     if (!m_primitive_block || !m_primitive_block->can_add(type)) {
                         store_primitive_block();
-                        m_primitive_block.reset(new PrimitiveBlock{m_options, type});
+                        m_primitive_block.reset(new PrimitiveBlock{m_options, type, m_bucket_count});
                     }
                 }
 
