@@ -99,11 +99,9 @@ TEST_CASE("Dynamic handler") {
     const auto buffer = fill_buffer();
 
     osmium::handler::DynamicHandler handler;
-    int count = 0;
-
     osmium::apply(buffer, handler);
-    REQUIRE(count == 0);
 
+    int count = 0;
     handler.set<Handler1>(count);
     osmium::apply(buffer, handler);
     REQUIRE(count == 6);
