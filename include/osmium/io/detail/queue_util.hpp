@@ -93,7 +93,7 @@ namespace osmium {
                 return data.empty();
             }
 
-            inline bool at_end_of_data(osmium::memory::Buffer& buffer) noexcept {
+            inline bool at_end_of_data(const osmium::memory::Buffer& buffer) noexcept {
                 return !buffer;
             }
 
