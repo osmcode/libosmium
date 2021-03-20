@@ -408,7 +408,7 @@ namespace osmium {
                     return std::find(m_split_locations.cbegin(), m_split_locations.cend(), location) != m_split_locations.cend();
                 }
 
-                uint32_t add_new_ring(slocation& node) {
+                uint32_t add_new_ring(const slocation& node) {
                     NodeRefSegment* segment = &m_segment_list[node.item];
                     assert(!segment->is_done());
 
@@ -466,7 +466,7 @@ namespace osmium {
                     return nodes;
                 }
 
-                uint32_t add_new_ring_complex(slocation& node) {
+                uint32_t add_new_ring_complex(const slocation& node) {
                     NodeRefSegment* segment = &m_segment_list[node.item];
                     assert(!segment->is_done());
 

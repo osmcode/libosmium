@@ -369,7 +369,7 @@ namespace osmium {
             }
 
             static typename iterator_range<mm_iterator>::iterator::difference_type count_not_removed(const iterator_range<mm_iterator>& range) {
-                return std::count_if(range.begin(), range.end(), [](MemberMeta& mm) {
+                return std::count_if(range.begin(), range.end(), [](const MemberMeta& mm) {
                     return !mm.removed();
                 });
             }

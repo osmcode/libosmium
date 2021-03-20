@@ -142,10 +142,8 @@ TEST_CASE("Object comparisons: types are ordered nodes, then ways, then relation
 
 TEST_CASE("Object comparisons with partially missing timestamp") {
     osmium::memory::Buffer buffer{10 * 1000};
-    osmium::OSMObject& obj1 = buffer.get<osmium::Node>(    osmium::builder::add_node(    buffer,
-            _id(3), _version(2), _timestamp(("2016-01-01T00:00:00Z"))));
-    osmium::OSMObject& obj2 = buffer.get<osmium::Node>(    osmium::builder::add_node(    buffer,
-            _id(3), _version(2)));
+    const osmium::OSMObject& obj1 = buffer.get<osmium::Node>(osmium::builder::add_node(buffer, _id(3), _version(2), _timestamp(("2016-01-01T00:00:00Z"))));
+    const osmium::OSMObject& obj2 = buffer.get<osmium::Node>(osmium::builder::add_node(buffer, _id(3), _version(2)));
 
     SECTION("OSMObject::operator<") {
         REQUIRE_FALSE(obj1 < obj2);
