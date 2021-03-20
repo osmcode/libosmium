@@ -147,15 +147,15 @@ namespace osmium {
                     osmium::detail::disable_invalid_parameter_handler diph;
 #endif
                     if (m_file) {
-                        FILE* file = m_file;
+                        FILE* wrapped_file = m_file;
                         m_file = nullptr;
 
                         // Do not close stdout
-                        if (fileno(file) == 1) {
+                        if (fileno(wrapped_file) == 1) {
                             return;
                         }
 
-                        if (fclose(file) != 0) {
+                        if (fclose(wrapped_file) != 0) {
                             throw std::system_error{errno, std::system_category(), "fclose failed"};
                         }
                     }

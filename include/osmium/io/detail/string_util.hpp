@@ -205,11 +205,11 @@ namespace osmium {
 
             inline void append_utf8_encoded_string(std::string& out, const char* data) {
                 static const char* lookup_hex = "0123456789abcdef";
-                const char* end = data + std::strlen(data);
+                const char* end_ptr = data + std::strlen(data);
 
-                while (data != end) {
+                while (data != end_ptr) {
                     const char* last = data;
-                    const uint32_t c = next_utf8_codepoint(&data, end);
+                    const uint32_t c = next_utf8_codepoint(&data, end_ptr);
 
                     // This is a list of Unicode code points that we let
                     // through instead of escaping them. It is incomplete
@@ -255,11 +255,11 @@ namespace osmium {
 
             inline void append_debug_encoded_string(std::string& out, const char* data, const char* prefix, const char* suffix) {
                 static const char* lookup_hex = "0123456789ABCDEF";
-                const char* end = data + std::strlen(data);
+                const char* end_ptr = data + std::strlen(data);
 
-                while (data != end) {
+                while (data != end_ptr) {
                     const char* last = data;
-                    uint32_t c = next_utf8_codepoint(&data, end);
+                    uint32_t c = next_utf8_codepoint(&data, end_ptr);
 
                     // This is a list of Unicode code points that we let
                     // through instead of escaping them. It is incomplete

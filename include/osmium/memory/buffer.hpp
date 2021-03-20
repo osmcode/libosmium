@@ -498,10 +498,10 @@ namespace osmium {
              */
             std::size_t clear() {
                 assert(m_builder_count == 0 && "Make sure there are no Builder objects still in scope");
-                const std::size_t committed = m_committed;
+                const std::size_t num_used_bytes = m_committed;
                 m_written = 0;
                 m_committed = 0;
-                return committed;
+                return num_used_bytes;
             }
 
             /**
@@ -577,9 +577,9 @@ namespace osmium {
                         grow(new_capacity);
                     }
                 }
-                unsigned char* data = &m_data[m_written];
+                unsigned char* reserved_space = &m_data[m_written];
                 m_written += size;
-                return data;
+                return reserved_space;
             }
 
             /**
