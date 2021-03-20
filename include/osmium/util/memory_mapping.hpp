@@ -781,7 +781,12 @@ inline osmium::util::MemoryMapping::MemoryMapping(MemoryMapping&& other) noexcep
 }
 
 inline osmium::util::MemoryMapping& osmium::util::MemoryMapping::operator=(osmium::util::MemoryMapping&& other) noexcept {
-    unmap();
+    try {
+        unmap();
+    } catch (const std::system_error&) {
+        // Ignore unmap error. It should never happen anyway and we can't do
+        // anything about it here.
+    }
     m_size         = other.m_size;
     m_offset       = other.m_offset;
     m_fd           = other.m_fd;
