@@ -217,16 +217,17 @@ namespace osmium {
             }
 
             std::string read() override {
-#if ZLIB_VERNUM >= 0x1240
+                assert(m_gzfile);
+#ifdef _MSC_VER
+                osmium::detail::disable_invalid_parameter_handler diph;
+#else
+# if ZLIB_VERNUM >= 0x1240
                 const auto offset = ::gzoffset(m_gzfile);
                 if (offset > 0) {
                     osmium::io::detail::remove_buffered_pages(m_fd, static_cast<std::size_t>(offset));
                 }
+# endif
 #endif
-#ifdef _MSC_VER
-                osmium::detail::disable_invalid_parameter_handler diph;
-#endif
-                assert(m_gzfile);
                 std::string buffer(osmium::io::Decompressor::input_buffer_size, '\0');
                 assert(buffer.size() < std::numeric_limits<unsigned int>::max());
                 int nread = ::gzread(m_gzfile, &*buffer.begin(), static_cast<unsigned int>(buffer.size()));
