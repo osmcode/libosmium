@@ -58,13 +58,11 @@ namespace osmium {
                                        const std::size_t old_size,
                                        const std::size_t max_size,
                                        const char* format,
-                                       TArgs&&... args) {
+                                       TArgs... args) {
                 out.resize(old_size + max_size);
 
                 return SNPRINTF(max_size ? &out[old_size] : nullptr,
-                                max_size,
-                                format,
-                                std::forward<TArgs>(args)...);
+                                max_size, format, args...);
             }
 
 #undef SNPRINTF
@@ -82,7 +80,7 @@ namespace osmium {
             template <typename... TArgs>
             inline void append_printf_formatted_string(std::string& out,
                                                        const char* format,
-                                                       TArgs&&... args) {
+                                                       TArgs... args) {
 
                 // First try to write string with the max_size, if that doesn't
                 // work snprintf will tell us how much space it needs. We
@@ -106,7 +104,7 @@ namespace osmium {
                                                 old_size,
                                                 max_size,
                                                 format,
-                                                std::forward<TArgs>(args)...);
+                                                args...);
                 assert(len > 0);
 
                 if (static_cast<std::size_t>(len) >= max_size) {
@@ -117,7 +115,7 @@ namespace osmium {
                                                      old_size,
                                                      std::size_t(len) + 1,
                                                      format,
-                                                     std::forward<TArgs>(args)...);
+                                                     args...);
                     assert(len2 == len);
                 }
 
