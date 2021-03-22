@@ -210,6 +210,7 @@ namespace osmium {
              * For backwards compatibility only. Use the constructor taking
              * a mapping_mode as second argument instead.
              */
+            // cppcheck-suppress noExplicitConstructor
             OSMIUM_DEPRECATED MemoryMapping(std::size_t size, bool writable = true, int fd = -1, off_t offset = 0) : // NOLINT(google-explicit-constructor, hicpp-explicit-conversions)
                 MemoryMapping(size, writable ? mapping_mode::write_shared : mapping_mode::readonly, fd, offset)  {
             }

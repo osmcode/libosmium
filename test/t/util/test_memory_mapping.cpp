@@ -45,6 +45,7 @@ TEST_CASE("Anonymous mapping: moving a memory mapping should work") {
     REQUIRE(!!mapping1);
     osmium::MemoryMapping mapping2{std::move(mapping1)};
     REQUIRE(!!mapping2);
+    // cppcheck-suppress accessMoved
     REQUIRE(!mapping1); // NOLINT(bugprone-use-after-move,misc-use-after-move) okay here, we are checking our own code
     mapping1.unmap(); // NOLINT(clang-analyzer-cplusplus.Move) okay here, we are checking our own code
 
@@ -67,6 +68,7 @@ TEST_CASE("Anonymous mapping: move assignment should work") {
 
     mapping2 = std::move(mapping1);
     REQUIRE(!!mapping2);
+    // cppcheck-suppress accessMoved
     REQUIRE(!mapping1); // NOLINT(bugprone-use-after-move,misc-use-after-move) okay here, we are checking our own code
 
     const auto* addr2 = mapping2.get_addr<int>();

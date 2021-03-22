@@ -75,7 +75,6 @@ static std::string read_gz_file(const char* test_id, const char* suffix) {
     return input;
 }
 
-// cppcheck-suppress passedByValue
 static header_buffer_type parse_xml(std::string input) {
     osmium::thread::Pool pool;
     osmium::io::detail::future_string_queue_type input_queue;

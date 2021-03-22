@@ -326,9 +326,6 @@ if(CPPCHECK)
         --force
         -Uassert -DPROTOZERO_STRICT_API -DPROTOZERO_USE_BUILTIN_BSWAP -UPROTOZERO_USE_VIEW)
 
-    # cpp doesn't find system includes for some reason, suppress that report
-    set(CPPCHECK_OPTIONS ${CPPCHECK_OPTIONS} --suppress=missingIncludeSystem)
-
     file(GLOB_RECURSE ALL_INCLUDES   include/osmium/*.hpp)
     file(GLOB         ALL_EXAMPLES   examples/*.cpp)
     file(GLOB         ALL_BENCHMARKS benchmarks/*.cpp)
