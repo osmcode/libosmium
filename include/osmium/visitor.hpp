@@ -314,7 +314,7 @@ namespace osmium {
     template <typename TIterator, typename... THandlers>
     inline void apply_impl(TIterator it, TIterator end, THandlers&&... handlers) {
         for (; it != end; ++it) {
-            apply_item(*it, std::forward<THandlers>(handlers)...);
+            apply_item(*it, handlers...);
         }
         apply_flush(std::forward<THandlers>(handlers)...);
     }
