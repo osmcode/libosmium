@@ -667,9 +667,9 @@ namespace osmium {
                             throw osmium::pbf_error{"PBF format error"};
                         }
 
-                        bool visible = true;
-
                         {
+                            bool visible = true;
+
                             osmium::builder::NodeBuilder builder{m_buffer};
                             osmium::Node& node = builder.object();
 
