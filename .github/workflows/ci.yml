@@ -242,16 +242,3 @@ jobs:
       - uses: ./.github/actions/build
       - uses: ./.github/actions/ctest
 
-  windows:
-    runs-on: windows-2019
-    env:
-      BUILD_TYPE: Dev
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: true
-      - uses: ./.github/actions/install-windows
-      - uses: ./.github/actions/cmake-windows
-      - uses: ./.github/actions/build-windows
-      - uses: ./.github/actions/ctest-windows
-
