@@ -600,9 +600,9 @@ namespace osmium {
                                 break;
                         }
                     } else {
-                        char *end = nullptr;
-                        const auto val = std::strtol(pbl.c_str(), &end, 10);
-                        if (*end != '\0') {
+                        char *end_ptr = nullptr;
+                        const auto val = std::strtol(pbl.c_str(), &end_ptr, 10);
+                        if (*end_ptr != '\0') {
                             throw std::invalid_argument{"The 'pbf_compression_level' option must be an integer."};
                         }
                         switch (m_options.use_compression) {
