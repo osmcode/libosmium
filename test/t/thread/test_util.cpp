@@ -43,7 +43,7 @@ TEST_CASE("empty thread_handler") {
     osmium::thread::thread_handler th;
 }
 
-int foo;
+int foo; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 
 void test_func(int value) {
     foo = value;

@@ -6,7 +6,7 @@
 #include <iostream>
 #include <string>
 
-std::string dirname;
+std::string dirname; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 
 int main(int argc, char* argv[]) {
     const char* testcases_dir = getenv("TESTCASES_DIR");
