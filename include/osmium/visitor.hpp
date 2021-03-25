@@ -220,6 +220,7 @@ namespace osmium {
                 operator()(node);
             }
 
+            // cppcheck-suppress constParameter
             void node(osmium::Node& node) const {
                 operator()(node);
             }
@@ -228,6 +229,7 @@ namespace osmium {
                 operator()(way);
             }
 
+            // cppcheck-suppress constParameter
             void way(osmium::Way& way) const {
                 operator()(way);
             }
@@ -236,6 +238,7 @@ namespace osmium {
                 operator()(relation);
             }
 
+            // cppcheck-suppress constParameter
             void relation(osmium::Relation& relation) const {
                 operator()(relation);
             }
@@ -244,6 +247,7 @@ namespace osmium {
                 operator()(area);
             }
 
+            // cppcheck-suppress constParameter
             void area(osmium::Area& area) const {
                 operator()(area);
             }
@@ -252,6 +256,7 @@ namespace osmium {
                 operator()(changeset);
             }
 
+            // cppcheck-suppress constParameter
             void changeset(osmium::Changeset& changeset) const {
                 operator()(changeset);
             }
