@@ -377,7 +377,7 @@ namespace osmium {
 
             class SerializeBlob {
 
-                std::unique_ptr<PrimitiveBlock> m_block{};
+                std::shared_ptr<PrimitiveBlock> m_block{};
 
                 std::string m_msg;
 
@@ -412,7 +412,7 @@ namespace osmium {
                  * @param use_compression The type of compression to use.
                  * @param compression_level Compression level.
                  */
-                SerializeBlob(std::unique_ptr<PrimitiveBlock> block, pbf_blob_type type, pbf_compression use_compression, int compression_level) :
+                SerializeBlob(std::shared_ptr<PrimitiveBlock> block, pbf_blob_type type, pbf_compression use_compression, int compression_level) :
                     m_block(std::move(block)),
                     m_compression_level(compression_level),
                     m_blob_type(type),
@@ -493,7 +493,7 @@ namespace osmium {
 
                 pbf_output_options m_options;
 
-                std::unique_ptr<PrimitiveBlock> m_primitive_block{};
+                std::shared_ptr<PrimitiveBlock> m_primitive_block{};
 
                 std::size_t m_bucket_count = StringTable::min_bucket_count;
 
