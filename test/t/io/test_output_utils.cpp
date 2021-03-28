@@ -34,7 +34,12 @@ TEST_CASE("output formatted with large results") {
         "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
 
     std::string out;
+#pragma GCC diagnostic push
+#if __GNUC__ >= 8
+#pragma GCC diagnostic ignored "-Wformat-truncation"
+#endif
     osmium::io::detail::append_printf_formatted_string(out, "%s", str);
+#pragma GCC diagnostic pop
     REQUIRE(out == str);
 }
 
