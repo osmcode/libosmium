@@ -155,7 +155,23 @@ jobs:
       - uses: ./.github/actions/build
       - uses: ./.github/actions/ctest
 
-  ubuntu20-gcc10-dev-coverage:
+  ubuntu20-gcc10-dev:
+    runs-on: ubuntu-20.04
+    env:
+      CC: gcc-10
+      CXX: g++-10
+      CXXFLAGS: -Wno-stringop-overflow
+      BUILD_TYPE: Dev
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - uses: ./.github/actions/install-ubuntu
+      - uses: ./.github/actions/cmake
+      - uses: ./.github/actions/build
+      - uses: ./.github/actions/ctest
+
+  ubuntu20-gcc10-coverage:
     runs-on: ubuntu-20.04
     env:
       CC: gcc-10
