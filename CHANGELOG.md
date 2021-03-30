@@ -8,10 +8,46 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+* Add "ids" output format. New IDS output format that is similar to
+  the OPL format, but only the entity type and id is written out.
+* Add convenience functions left(), right(), top(), bottom() to
+  access osmium::Box boundaries.
+* Add polygon output to WKB factory.
+* Add functions to access storage from node_locations_for_ways
+  handler.
+
 ### Changed
+
+* Different varint decoding for faster PBF decoding. This makes PBF
+  decoding about 15% faster.
+* Several code optimmizations in (PBF) writer code that speed up
+  writing of OSM files considerably while using less CPU and spreading
+  the load on multiple CPUs.
+* Use memset/memcpy instead of std::fill_n and std::copy in object
+  builder for some slight speedups.
+* Ignore metadata setting on reader for history/change files. History
+  and change files must be read with metadata, because otherwise the
+  information is lost whether an object is visible or deleted. So
+  ignore this setting in that case.
+* On Linux: Use fadvise() to tell kernel about our reading patterns:
+  1. Tell kernel that we are reading OSM files sequentially. This
+     should improve pre-fetching of data blocks.
+  2. Tell kernel that we are done with block so they can be released.
+     This means we don't hog the buffer cache for something that
+     will, in all likelyhood, not be needed any more.
+* Use assert() instead of exception in "can not happen" situation in
+  the relations manager code.
 
 ### Fixed
 
+* Test failure with add_tag_list on some systems.
+* Test framework fix for aarch64 architecture.
+* Remove undefined behaviour in bzip2 compression code.
+* Rename some local variables to not shadow member functions.
+* Wrap osmium::util::MemoryMapping::unmap() in try/catch on Windows
+  also because we call this from a noexcept function.
+* Removed superfluous std::forwards and fixed code that called
+  std::forward multiple times on the same object.
 
 ## [2.16.0] - 2021-01-08
 
