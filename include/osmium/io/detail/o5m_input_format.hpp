@@ -547,6 +547,7 @@ namespace osmium {
                                 case dataset_type::node:
                                     mark_header_as_done();
                                     if (read_types() & osmium::osm_entity_bits::node) {
+                                        maybe_new_buffer(osmium::item_type::node);
                                         decode_node(m_data, m_data + length);
                                         buffer().commit();
                                     }
@@ -554,6 +555,7 @@ namespace osmium {
                                 case dataset_type::way:
                                     mark_header_as_done();
                                     if (read_types() & osmium::osm_entity_bits::way) {
+                                        maybe_new_buffer(osmium::item_type::way);
                                         decode_way(m_data, m_data + length);
                                         buffer().commit();
                                     }
@@ -561,6 +563,7 @@ namespace osmium {
                                 case dataset_type::relation:
                                     mark_header_as_done();
                                     if (read_types() & osmium::osm_entity_bits::relation) {
+                                        maybe_new_buffer(osmium::item_type::relation);
                                         decode_relation(m_data, m_data + length);
                                         buffer().commit();
                                     }

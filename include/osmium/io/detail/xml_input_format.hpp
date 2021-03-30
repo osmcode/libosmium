@@ -390,6 +390,7 @@ namespace osmium {
                         m_context_stack.push_back(context::node);
                         mark_header_as_done();
                         if (read_types() & osmium::osm_entity_bits::node) {
+                            maybe_new_buffer(osmium::item_type::node);
                             m_node_builder.reset(new osmium::builder::NodeBuilder{buffer()});
                             m_node_builder->set_user(init_object(m_node_builder->object(), attrs));
                         }
@@ -400,6 +401,7 @@ namespace osmium {
                         m_context_stack.push_back(context::way);
                         mark_header_as_done();
                         if (read_types() & osmium::osm_entity_bits::way) {
+                            maybe_new_buffer(osmium::item_type::way);
                             m_way_builder.reset(new osmium::builder::WayBuilder{buffer()});
                             m_way_builder->set_user(init_object(m_way_builder->object(), attrs));
                         }
@@ -410,6 +412,7 @@ namespace osmium {
                         m_context_stack.push_back(context::relation);
                         mark_header_as_done();
                         if (read_types() & osmium::osm_entity_bits::relation) {
+                            maybe_new_buffer(osmium::item_type::relation);
                             m_relation_builder.reset(new osmium::builder::RelationBuilder{buffer()});
                             m_relation_builder->set_user(init_object(m_relation_builder->object(), attrs));
                         }
@@ -424,6 +427,7 @@ namespace osmium {
                         m_context_stack.push_back(context::changeset);
                         mark_header_as_done();
                         if (read_types() & osmium::osm_entity_bits::changeset) {
+                            maybe_new_buffer(osmium::item_type::changeset);
                             m_changeset_builder.reset(new osmium::builder::ChangesetBuilder{buffer()});
                             init_changeset(*m_changeset_builder, attrs);
                         }

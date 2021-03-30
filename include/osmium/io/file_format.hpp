@@ -57,6 +57,11 @@ namespace osmium {
             yes = 1
         };
 
+        enum class buffers_type {
+            any    = 0,
+            single = 1
+        };
+
         inline const char* as_string(const file_format format) noexcept {
             switch (format) {
                 case file_format::xml:

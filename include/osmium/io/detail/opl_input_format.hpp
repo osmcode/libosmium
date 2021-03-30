@@ -118,6 +118,21 @@ namespace osmium {
                 ~OPLParser() noexcept override = default;
 
                 void parse_line(const char* data) {
+                    switch (*data) {
+                        case 'n':
+                            maybe_new_buffer(osmium::item_type::node);
+                            break;
+                        case 'w':
+                            maybe_new_buffer(osmium::item_type::way);
+                            break;
+                        case 'r':
+                            maybe_new_buffer(osmium::item_type::relation);
+                            break;
+                        case 'c':
+                            maybe_new_buffer(osmium::item_type::way);
+                            break;
+                    }
+
                     if (opl_parse_line(m_line_count, data, buffer(), read_types())) {
                         flush_nested_buffer();
                     }
