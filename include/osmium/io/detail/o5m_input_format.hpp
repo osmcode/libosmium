@@ -150,16 +150,9 @@ namespace osmium {
 
             }; // class ReferenceTable
 
-            class O5mParser final : public Parser {
-
-                enum {
-                    initial_buffer_size = 1024UL * 1024UL
-                };
+            class O5mParser final : public ParserWithBuffer {
 
                 osmium::io::Header m_header{};
-
-                osmium::memory::Buffer m_buffer{initial_buffer_size,
-                                                osmium::memory::Buffer::auto_grow::internal};
 
                 std::string m_input{};
 
@@ -379,7 +372,7 @@ namespace osmium {
                 }
 
                 void decode_node(const char* data, const char* const end) {
-                    osmium::builder::NodeBuilder builder{m_buffer};
+                    osmium::builder::NodeBuilder builder{buffer()};
 
                     builder.set_id(m_delta_id.update(zvarint(&data, end)));
 
@@ -401,7 +394,7 @@ namespace osmium {
                 }
 
                 void decode_way(const char* data, const char* const end) {
-                    osmium::builder::WayBuilder builder{m_buffer};
+                    osmium::builder::WayBuilder builder{buffer()};
 
                     builder.set_id(m_delta_id.update(zvarint(&data, end)));
 
@@ -464,7 +457,7 @@ namespace osmium {
                 }
 
                 void decode_relation(const char* data, const char* const end) {
-                    osmium::builder::RelationBuilder builder{m_buffer};
+                    osmium::builder::RelationBuilder builder{buffer()};
 
                     builder.set_id(m_delta_id.update(zvarint(&data, end)));
 
@@ -555,21 +548,21 @@ namespace osmium {
                                     mark_header_as_done();
                                     if (read_types() & osmium::osm_entity_bits::node) {
                                         decode_node(m_data, m_data + length);
-                                        m_buffer.commit();
+                                        buffer().commit();
                                     }
                                     break;
                                 case dataset_type::way:
                                     mark_header_as_done();
                                     if (read_types() & osmium::osm_entity_bits::way) {
                                         decode_way(m_data, m_data + length);
-                                        m_buffer.commit();
+                                        buffer().commit();
                                     }
                                     break;
                                 case dataset_type::relation:
                                     mark_header_as_done();
                                     if (read_types() & osmium::osm_entity_bits::relation) {
                                         decode_relation(m_data, m_data + length);
-                                        m_buffer.commit();
+                                        buffer().commit();
                                     }
                                     break;
                                 case dataset_type::bounding_box:
@@ -589,24 +582,18 @@ namespace osmium {
 
                             m_data += length;
 
-                            if (m_buffer.has_nested_buffers()) {
-                                std::unique_ptr<osmium::memory::Buffer> buffer_ptr{m_buffer.get_last_nested()};
-                                send_to_output_queue(std::move(*buffer_ptr));
-                            }
+                            flush_nested_buffer();
                         }
                     }
 
-                    if (m_buffer.committed() > 0) {
-                        send_to_output_queue(std::move(m_buffer));
-                    }
-
                     mark_header_as_done();
+                    flush_final_buffer();
                 }
 
             public:
 
                 explicit O5mParser(parser_arguments& args) :
-                    Parser(args),
+                    ParserWithBuffer(args),
                     m_data(m_input.data()),
                     m_end(m_data) {
                 }

@@ -162,6 +162,40 @@ namespace osmium {
 
             }; // class Parser
 
+            class ParserWithBuffer : public Parser {
+
+                enum {
+                    initial_buffer_size = 1024UL * 1024UL
+                };
+
+                osmium::memory::Buffer m_buffer{initial_buffer_size,
+                                                osmium::memory::Buffer::auto_grow::internal};
+
+            protected:
+
+                explicit ParserWithBuffer(parser_arguments& args) :
+                    Parser(args) {
+                }
+
+                osmium::memory::Buffer& buffer() noexcept {
+                    return m_buffer;
+                }
+
+                void flush_nested_buffer() {
+                    if (m_buffer.has_nested_buffers()) {
+                        std::unique_ptr<osmium::memory::Buffer> buffer_ptr{m_buffer.get_last_nested()};
+                        send_to_output_queue(std::move(*buffer_ptr));
+                    }
+                }
+
+                void flush_final_buffer() {
+                    if (m_buffer.committed() > 0) {
+                        send_to_output_queue(std::move(m_buffer));
+                    }
+                }
+
+            }; // class ParserWithBuffer
+
             /**
              * This factory class is used to create objects that decode OSM
              * data written in a specified format.
