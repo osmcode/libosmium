@@ -35,6 +35,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <boost/variant.hpp>
 
+#include <algorithm>
 #include <cstring>
 #include <iosfwd>
 #include <regex>
@@ -250,13 +251,10 @@ namespace osmium {
             }
 
             bool match(const char* test_string) const noexcept {
-                for (const auto& s : m_strings) {
-                    if (!std::strcmp(s.c_str(), test_string)) {
-                        return true;
-                    }
-                }
-                return false;
-
+                return std::any_of(m_strings.cbegin(), m_strings.cend(),
+                                   [&test_string](const std::string& s){
+                    return s == test_string;
+                });
             }
 
             template <typename TChar, typename TTraits>

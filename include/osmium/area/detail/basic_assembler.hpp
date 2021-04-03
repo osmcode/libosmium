@@ -869,9 +869,9 @@ namespace osmium {
 
                     if (debug()) {
                         std::cerr << "    Found candidates:\n";
-                        for (const auto& cand : candidates) {
-                            std::cerr << "      sum=" << cand.sum << "\n";
-                            for (const auto& ring : cand.rings) {
+                        for (const auto& c : candidates) {
+                            std::cerr << "      sum=" << c.sum << "\n";
+                            for (const auto& ring : c.rings) {
                                 std::cerr << "        " << ring.first.ring() << (ring.second ? " reverse" : "") << "\n";
                             }
                         }

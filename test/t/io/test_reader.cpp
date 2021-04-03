@@ -362,8 +362,8 @@ std::vector<object_counts> count_objects_per_buffer(const char* filename, osmium
     return counts;
 }
 
-void check_buffer_counts(std::string filename, const std::vector<object_counts>& oc, osmium::io::buffers_type btype) {
-    for (auto *suffix : {".osm", ".osm.opl", ".osm.o5m"}) {
+void check_buffer_counts(const std::string& filename, const std::vector<object_counts>& oc, osmium::io::buffers_type btype) {
+    for (const auto* suffix : {".osm", ".osm.opl", ".osm.o5m"}) {
         const std::string fn = filename + suffix;
         const auto counts = count_objects_per_buffer(fn.c_str(), btype);
         REQUIRE(counts == oc);

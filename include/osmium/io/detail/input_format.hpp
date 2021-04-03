@@ -219,11 +219,11 @@ namespace osmium {
                     }
 
                     if (is_different_type(current_type) && m_buffer.committed() > 0) {
-                        osmium::memory::Buffer buffer{initial_buffer_size,
-                                                      osmium::memory::Buffer::auto_grow::internal};
+                        osmium::memory::Buffer new_buffer{initial_buffer_size,
+                                                          osmium::memory::Buffer::auto_grow::internal};
                         using std::swap;
-                        swap(buffer, m_buffer);
-                        send_to_output_queue(std::move(buffer));
+                        swap(new_buffer, m_buffer);
+                        send_to_output_queue(std::move(new_buffer));
                     }
                 }
 
