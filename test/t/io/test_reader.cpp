@@ -343,7 +343,7 @@ TEST_CASE("Can not read after close") {
     REQUIRE(count == count_fds());
 }
 
-using object_counts = std::array<long, 3>;
+using object_counts = std::array<std::size_t, 3>;
 
 std::vector<object_counts> count_objects_per_buffer(const char* filename, osmium::io::buffers_type btype) {
     osmium::io::File file{with_data_dir(filename)};
@@ -354,9 +354,9 @@ std::vector<object_counts> count_objects_per_buffer(const char* filename, osmium
         const auto rn = buffer.select<osmium::Node>();
         const auto rw = buffer.select<osmium::Way>();
         const auto rr = buffer.select<osmium::Relation>();
-        counts.push_back(object_counts{std::distance(rn.begin(), rn.end()),
-                                       std::distance(rw.begin(), rw.end()),
-                                       std::distance(rr.begin(), rr.end())});
+        counts.push_back(object_counts{static_cast<std::size_t>(std::distance(rn.begin(), rn.end())),
+                                       static_cast<std::size_t>(std::distance(rw.begin(), rw.end())),
+                                       static_cast<std::size_t>(std::distance(rr.begin(), rr.end()))});
     }
 
     return counts;
