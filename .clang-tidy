@@ -1,5 +1,5 @@
 ---
-Checks: '*,-altera-*,-android-cloexec-*,-bugprone-branch-clone,-bugprone-macro-parentheses,-cert-dcl21-cpp,-cert-err58-cpp,-clang-analyzer-optin.cplusplus.VirtualCall,-cppcoreguidelines-avoid-c-arrays,-cppcoreguidelines-avoid-magic-numbers,-cppcoreguidelines-macro-usage,-cppcoreguidelines-non-private-member-variables-in-classes,-cppcoreguidelines-owning-memory,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-cppcoreguidelines-pro-bounds-constant-array-index,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-pro-type-const-cast,-cppcoreguidelines-pro-type-reinterpret-cast,-cppcoreguidelines-pro-type-static-cast-downcast,-cppcoreguidelines-pro-type-vararg,-fuchsia-*,-google-runtime-references,-hicpp-avoid-c-arrays,-hicpp-invalid-access-moved,-hicpp-no-array-decay,-hicpp-no-assembler,-hicpp-vararg,-llvmlibc-*,-misc-macro-parentheses,-misc-non-private-member-variables-in-classes,-misc-no-recursion,-misc-unused-parameters,-modernize-avoid-c-arrays,-modernize-make-unique,-modernize-raw-string-literal,-modernize-use-trailing-return-type,-readability-avoid-const-params-in-decls,-readability-implicit-bool-cast,-readability-implicit-bool-conversion,-readability-magic-numbers'
+Checks: '*,-altera-*,-android-cloexec-*,-bugprone-branch-clone,-bugprone-macro-parentheses,-cert-dcl21-cpp,-cert-err58-cpp,-clang-analyzer-optin.cplusplus.VirtualCall,-cppcoreguidelines-avoid-c-arrays,-cppcoreguidelines-avoid-magic-numbers,-cppcoreguidelines-macro-usage,-cppcoreguidelines-non-private-member-variables-in-classes,-cppcoreguidelines-owning-memory,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-cppcoreguidelines-pro-bounds-constant-array-index,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-pro-type-const-cast,-cppcoreguidelines-pro-type-reinterpret-cast,-cppcoreguidelines-pro-type-static-cast-downcast,-cppcoreguidelines-pro-type-vararg,-fuchsia-*,-google-runtime-references,-hicpp-avoid-c-arrays,-hicpp-invalid-access-moved,-hicpp-no-array-decay,-hicpp-no-assembler,-hicpp-vararg,-llvmlibc-*,-llvm-qualified-auto,-misc-macro-parentheses,-misc-non-private-member-variables-in-classes,-misc-no-recursion,-misc-unused-parameters,-modernize-avoid-c-arrays,-modernize-make-unique,-modernize-raw-string-literal,-modernize-use-trailing-return-type,-readability-avoid-const-params-in-decls,-readability-implicit-bool-cast,-readability-implicit-bool-conversion,-readability-magic-numbers,-readability-qualified-auto'
 #
 #  For a list of check options, see:
 #  https://clang.llvm.org/extra/clang-tidy/checks/list.html
@@ -89,6 +89,11 @@ Checks: '*,-altera-*,-android-cloexec-*,-bugprone-branch-clone,-bugprone-macro-p
 #
 #  hicpp-vararg
 #    Too strict, sometimes calling vararg functions is necessary.
+#
+#  llvm-qualified-auto
+#  readability-qualified-auto
+#    This reports too many cases. Typical case is an iterator that might be
+#    a pointer on one system but some special type on another.
 #
 #  llvmlibc-*
 #    Doesn't apply to us.
