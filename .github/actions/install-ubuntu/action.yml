@@ -16,6 +16,8 @@ runs:
              libsparsehash-dev \
              ruby-json \
              spatialite-bin
+        if [ "$CC" = clang-6.0 ]; then sudo apt-get install -yq --no-install-suggests --no-install-recommends clang-6.0; fi
+        if [ "$CC" = clang-8 ]; then sudo apt-get install -yq --no-install-suggests --no-install-recommends clang-8; fi
       shell: bash
     - name: Install from git
       run: |
