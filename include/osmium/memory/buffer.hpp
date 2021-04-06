@@ -849,10 +849,13 @@ namespace osmium {
              * indexes.
              *
              * @pre The buffer must be valid.
+             * @pre @code callback != nullptr @endptr
              */
             template <typename TCallbackClass>
             void purge_removed(TCallbackClass* callback) {
                 assert(m_data && "This must be a valid buffer");
+                assert(callback);
+
                 if (begin() == end()) {
                     return;
                 }
@@ -869,6 +872,42 @@ namespace osmium {
                             const auto old_offset = static_cast<std::size_t>(it_read.data() - data());
                             const auto new_offset = static_cast<std::size_t>(it_write.data() - data());
                             callback->moving_in_buffer(old_offset, new_offset);
+                            std::memmove(it_write.data(), it_read.data(), it_read->padded_size());
+                        }
+                        it_write.advance_once();
+                    }
+                }
+
+                assert(it_write.data() >= data());
+                m_written = static_cast<std::size_t>(it_write.data() - data());
+                m_committed = m_written;
+            }
+
+            /**
+             * Purge removed items from the buffer. This is done by moving all
+             * non-removed items forward in the buffer overwriting removed
+             * items and then correcting the m_written and m_committed numbers.
+             *
+             * Note that calling this function invalidates all iterators on
+             * this buffer and all offsets in this buffer.
+             *
+             * @pre The buffer must be valid.
+             */
+            void purge_removed() {
+                assert(m_data && "This must be a valid buffer");
+                if (begin() == end()) {
+                    return;
+                }
+
+                iterator it_write = begin();
+
+                iterator next;
+                for (iterator it_read = begin(); it_read != end(); it_read = next) {
+                    next = std::next(it_read);
+                    if (!it_read->removed()) {
+                        if (it_read != it_write) {
+                            assert(it_read.data() >= data());
+                            assert(it_write.data() >= data());
                             std::memmove(it_write.data(), it_read.data(), it_read->padded_size());
                         }
                         it_write.advance_once();
