@@ -104,7 +104,7 @@ TEST_CASE("Parse OPL: parse escaped") {
         const char* e = s + std::strlen(s);
         oid::opl_parse_escaped(&s, result);
         REQUIRE(result.size() == 1);
-        REQUIRE(result[0] == '\0');
+        REQUIRE(result[0] == '%');
         REQUIRE(s == e);
     }
 

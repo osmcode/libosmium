@@ -203,6 +203,7 @@ namespace osmium {
 
             inline void append_utf8_encoded_string(std::string& out, const char* data) {
                 static const char* lookup_hex = "0123456789abcdef";
+                assert(data);
                 const char* end_ptr = data + std::strlen(data);
 
                 while (data != end_ptr) {
@@ -236,6 +237,7 @@ namespace osmium {
             }
 
             inline void append_xml_encoded_string(std::string& out, const char* data) {
+                assert(data);
                 for (; *data != '\0'; ++data) {
                     switch (*data) {
                         case '&':  out += "&amp;";  break;
