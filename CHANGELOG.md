@@ -17,6 +17,11 @@ This project adheres to [Semantic Versioning](https://semver.org/).
   handler.
 * Add flag `osmium::io::buffers_type` for telling the `Reader` class whether
   you want buffers read to only contain a single type of OSM entity.
+* Add convenient named `nodes()`, `ways()`, and `relations()` accessor
+  functions to `nwr_array` class.
+* Add `DeltaDecode::value()` accessor function.
+* Add variant of the `Buffer::purge_removed()` function which doesn't take
+  a callback parameter.
 
 ### Changed
 
@@ -51,6 +56,9 @@ This project adheres to [Semantic Versioning](https://semver.org/).
   also because we call this from a noexcept function.
 * Removed superfluous `std::forward`s and fixed code that called
   `std::forward` multiple times on the same object.
+* Fix in OPL parser which could lead to invalid data being generated.
+* Fixed three bugs in O5M parser which could lead to an infinit loop
+  or segmentation faults.
 
 ## [2.16.0] - 2021-01-08
 
