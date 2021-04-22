@@ -58,6 +58,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <algorithm>
 #include <array>
+#include <cassert>
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
@@ -129,6 +130,8 @@ namespace osmium {
                 }
 
                 void add(const char* string, std::size_t size) {
+                    assert(string);
+
                     if (m_table.empty()) {
                         m_table.resize(entry_size * number_of_entries);
                     }
@@ -260,8 +263,10 @@ namespace osmium {
                 }
 
                 const char* decode_string(const char** dataptr, const char* const end) {
+                    assert(*dataptr != end);
+
                     if (**dataptr == 0x00) { // get inline string
-                        (*dataptr)++;
+                        ++(*dataptr);
                         if (*dataptr == end) {
                             throw o5m_error{"string format error"};
                         }
@@ -273,6 +278,8 @@ namespace osmium {
                 }
 
                 std::pair<osmium::user_id_type, const char*> decode_user(const char** dataptr, const char* const end) {
+                    assert(*dataptr != end);
+
                     const bool update_pointer = (**dataptr == 0x00);
                     const char* data = decode_string(dataptr, end);
                     const char* start = data;
@@ -367,7 +374,7 @@ namespace osmium {
                                 object.set_uid(uid_user.first);
                                 user = uid_user.second;
                             } else {
-                                object.set_uid(user_id_type(0));
+                                object.set_uid(user_id_type{0});
                             }
                         }
                     }
@@ -436,6 +443,8 @@ namespace osmium {
                 }
 
                 std::pair<osmium::item_type, const char*> decode_role(const char** dataptr, const char* const end) {
+                    assert(*dataptr != end);
+
                     const bool update_pointer = (**dataptr == 0x00);
                     const char* data = decode_string(dataptr, end);
                     const char* start = data;
