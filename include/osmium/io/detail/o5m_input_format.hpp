@@ -345,6 +345,10 @@ namespace osmium {
                 const char* decode_info(osmium::OSMObject& object, const char** dataptr, const char* const end) {
                     const char* user = "";
 
+                    if (*dataptr == end) {
+                        throw o5m_error{"premature end of file while parsing object metadata"};
+                    }
+
                     if (**dataptr == 0x00) { // no info section
                         ++*dataptr;
                     } else { // has info section
