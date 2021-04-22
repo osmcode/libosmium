@@ -294,11 +294,11 @@ namespace osmium {
                         return {0, ""};
                     }
 
-                    while (*data++) {
+                    do {
                         if (data == end) {
                             throw o5m_error{"no null byte in user name"};
                         }
-                    }
+                    } while (*data++);
 
                     if (update_pointer) {
                         m_reference_table.add(start, data - start);
