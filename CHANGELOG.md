@@ -8,6 +8,15 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+### Changed
+
+### Fixed
+
+
+## [2.17.0] - 2021-04-26
+
+### Added
+
 * Add "ids" output format. New IDS output format that is similar to
   the OPL format, but only the entity type and id is written out.
 * Add convenience functions `left()`, `right()`, `top()`, `bottom()` to
@@ -1108,7 +1117,8 @@ This project adheres to [Semantic Versioning](https://semver.org/).
   Doxygen (up to version 1.8.8). This version contains a workaround to fix
   this.
 
-[unreleased]: https://github.com/osmcode/libosmium/compare/v2.16.0...HEAD
+[unreleased]: https://github.com/osmcode/libosmium/compare/v2.17.0...HEAD
+[2.17.0]: https://github.com/osmcode/libosmium/compare/v2.16.0...v2.17.0
 [2.16.0]: https://github.com/osmcode/libosmium/compare/v2.15.6...v2.16.0
 [2.15.6]: https://github.com/osmcode/libosmium/compare/v2.15.5...v2.15.6
 [2.15.5]: https://github.com/osmcode/libosmium/compare/v2.15.4...v2.15.5
