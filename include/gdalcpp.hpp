@@ -42,6 +42,8 @@ DEALINGS IN THE SOFTWARE.
 #include <ogr_api.h>
 #include <ogrsf_frmts.h>
 
+#include <osmium/util/compatibility.hpp>
+
 #include <cstdint>
 #include <algorithm>
 #include <memory>
@@ -63,7 +65,7 @@ namespace gdalcpp {
     /**
      * Exception thrown for all errors in this class.
      */
-    class gdal_error : public std::runtime_error {
+    class OSMIUM_EXPORT gdal_error : public std::runtime_error {
 
         std::string m_driver;
         std::string m_dataset;

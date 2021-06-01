@@ -51,4 +51,10 @@ DEALINGS IN THE SOFTWARE.
 # define OSMIUM_DEPRECATED
 #endif
 
+#if defined(_MSC_VER)
+# define OSMIUM_EXPORT __declspec(dllexport)
+#else
+# define OSMIUM_EXPORT __attribute__ ((visibility("default")))
+#endif
+
 #endif // OSMIUM_UTIL_COMPATIBILITY_HPP
