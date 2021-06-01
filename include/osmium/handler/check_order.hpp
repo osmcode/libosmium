@@ -39,6 +39,7 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/relation.hpp>
 #include <osmium/osm/types.hpp>
 #include <osmium/osm/way.hpp>
+#include <osmium/util/compatibility.hpp>
 
 #include <limits>
 #include <stdexcept>
@@ -50,7 +51,7 @@ namespace osmium {
      * Exception thrown when a method in the CheckOrder class detects
      * that the input is out of order.
      */
-    struct out_of_order_error : public std::runtime_error {
+    struct OSMIUM_EXPORT out_of_order_error : public std::runtime_error {
 
         osmium::object_id_type object_id;
 

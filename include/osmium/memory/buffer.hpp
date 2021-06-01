@@ -55,7 +55,7 @@ namespace osmium {
      * to write data into a buffer and it doesn't fit. Buffers with internal
      * memory management will not throw this exception, but increase their size.
      */
-    struct buffer_is_full : public std::runtime_error {
+    struct OSMIUM_EXPORT buffer_is_full : public std::runtime_error {
 
         buffer_is_full() :
             std::runtime_error{"Osmium buffer is full"} {
