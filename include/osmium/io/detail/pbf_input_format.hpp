@@ -67,13 +67,15 @@ namespace osmium {
                 std::string m_input_buffer{};
 
                 /**
-                 * Read the given number of bytes from the input queue.
+                 * Make sure the input data contains at least the specified
+                 * number of bytes.
                  *
                  * @param size Number of bytes to read
-                 * @returns String with the data
-                 * @throws osmium::pbf_error If size bytes can't be read
                  */
-                std::string read_from_input_queue(size_t size) {
+                void ensure_available_in_input_queue(size_t size) {
+                    if (m_input_buffer.size() < size) {
+                        m_input_buffer.reserve(size);
+                    }
                     while (m_input_buffer.size() < size) {
                         const std::string new_data{get_input()};
                         if (input_done()) {
@@ -81,12 +83,29 @@ namespace osmium {
                         }
                         m_input_buffer += new_data;
                     }
+                }
 
-                    std::string output{m_input_buffer.substr(size)};
-                    m_input_buffer.resize(size);
+                /**
+                 * Removes the specified number of bytes from the input data.
+                 *
+                 * @param size Number of bytes to remove
+                 */
+                void pop_from_input_queue(size_t size) {
+                    m_input_buffer.erase(0, size);
+                }
 
-                    using std::swap;
-                    swap(output, m_input_buffer);
+                /**
+                 * Read the given number of bytes from the input queue.
+                 *
+                 * @param size Number of bytes to read
+                 * @returns String with the data
+                 * @throws osmium::pbf_error If size bytes can't be read
+                 */
+                std::string read_from_input_queue(size_t size) {
+                    ensure_available_in_input_queue(size);
+
+                    std::string output(m_input_buffer, 0, size);
+                    pop_from_input_queue(size);
 
                     return output;
                 }
@@ -100,12 +119,13 @@ namespace osmium {
 
                     try {
                         // size is encoded in network byte order
-                        const std::string input_data{read_from_input_queue(sizeof(size))};
-                        const char* d = input_data.data();
+                        ensure_available_in_input_queue(sizeof(size));
+                        const char* d = m_input_buffer.data();
                         size = (static_cast<uint32_t>(d[3])) |
                                (static_cast<uint32_t>(d[2]) <<  8U) |
                                (static_cast<uint32_t>(d[1]) << 16U) |
                                (static_cast<uint32_t>(d[0]) << 24U);
+                        pop_from_input_queue(sizeof(size));
                     } catch (const osmium::pbf_error&) {
                         return 0; // EOF
                     }
@@ -121,7 +141,8 @@ namespace osmium {
                  * Decode the BlobHeader. Make sure it contains the expected
                  * type. Return the size of the following Blob.
                  */
-                static size_t decode_blob_header(protozero::pbf_message<FileFormat::BlobHeader>&& pbf_blob_header, const char* expected_type) {
+                static size_t decode_blob_header(const protozero::data_view &data, const char* expected_type) {
+                    protozero::pbf_message<FileFormat::BlobHeader> pbf_blob_header{data};
                     protozero::data_view blob_header_type;
                     size_t blob_header_datasize = 0;
 
@@ -157,9 +178,11 @@ namespace osmium {
                         return 0;
                     }
 
-                    const std::string blob_header{read_from_input_queue(size)};
+                    ensure_available_in_input_queue(size);
+                    const auto blob_size = decode_blob_header(protozero::data_view{m_input_buffer.data(), size}, expected_type);
+                    pop_from_input_queue(size);
 
-                    return decode_blob_header(protozero::pbf_message<FileFormat::BlobHeader>(blob_header), expected_type);
+                    return blob_size;
                 }
 
                 std::string read_from_input_queue_with_check(size_t size) {
