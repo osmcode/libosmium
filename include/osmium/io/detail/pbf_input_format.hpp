@@ -178,12 +178,13 @@ namespace osmium {
                 }
 
                 void parse_data_blobs() {
+                    const bool use_pool = osmium::config::use_pool_threads_for_pbf_parsing();
                     while (const auto size = check_type_and_get_blob_size("OSMData")) {
                         std::string input_buffer{read_from_input_queue_with_check(size)};
 
                         PBFDataBlobDecoder data_blob_parser{std::move(input_buffer), read_types(), read_metadata()};
 
-                        if (osmium::config::use_pool_threads_for_pbf_parsing()) {
+                        if (use_pool) {
                             send_to_output_queue(get_pool().submit(std::move(data_blob_parser)));
                         } else {
                             send_to_output_queue(data_blob_parser());
