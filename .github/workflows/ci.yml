@@ -171,33 +171,6 @@ jobs:
       - uses: ./.github/actions/build
       - uses: ./.github/actions/ctest
 
-  ubuntu20-gcc10-coverage:
-    runs-on: ubuntu-20.04
-    env:
-      CC: gcc-10
-      CXX: g++-10
-      CXXFLAGS: -Wno-stringop-overflow
-      BUILD_TYPE: Coverage
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: true
-      - uses: ./.github/actions/install-ubuntu
-      - uses: ./.github/actions/cmake
-      - uses: ./.github/actions/build
-      - uses: ./.github/actions/ctest
-      - name: Coverage
-        run: |
-          curl -S -f https://codecov.io/bash -o codecov
-          chmod +x codecov
-          gcov-${CXX#g++-} -p $(find test/CMakeFiles -name '*.o')
-          ./codecov -Z -c -X gcov -F unit_tests
-          gcov-${CXX#g++-} -p $(find test/data-tests -name '*.o')
-          ./codecov -Z -c -X gcov -F data_tests
-          gcov-${CXX#g++-} -p $(find examples -name '*.o')
-          ./codecov -Z -c -X gcov -F examples
-        working-directory: build
-
   ubuntu20-gcc10-release:
     runs-on: ubuntu-20.04
     env:
