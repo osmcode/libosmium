@@ -33,6 +33,7 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <osmium/util/compatibility.hpp>
 #include <osmium/util/string.hpp>
 
 #include <algorithm>
@@ -47,7 +48,7 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
-    struct map_factory_error : public std::runtime_error {
+    struct OSMIUM_EXPORT map_factory_error : public std::runtime_error {
 
         explicit map_factory_error(const char* message) :
             std::runtime_error(message) {
