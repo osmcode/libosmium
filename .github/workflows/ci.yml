@@ -9,6 +9,7 @@ jobs:
       CC: clang-6.0
       CXX: clang++-6.0
       BUILD_TYPE: Dev
+      WITH_PROJ: ON
     steps:
       - uses: actions/checkout@v2
         with:
@@ -24,6 +25,7 @@ jobs:
       CC: clang-8
       CXX: clang++-8
       BUILD_TYPE: Dev
+      WITH_PROJ: ON
     steps:
       - uses: actions/checkout@v2
         with:
@@ -39,6 +41,7 @@ jobs:
       CC: clang-9
       CXX: clang++-9
       BUILD_TYPE: Dev
+      WITH_PROJ: ON
     steps:
       - uses: actions/checkout@v2
         with:
@@ -54,6 +57,7 @@ jobs:
       CC: clang-9
       CXX: clang++-9
       BUILD_TYPE: Dev
+      WITH_PROJ: ON
     steps:
       - uses: actions/checkout@v2
         with:
@@ -69,6 +73,7 @@ jobs:
       CC: clang-10
       CXX: clang++-10
       BUILD_TYPE: Dev
+      WITH_PROJ: ON
     steps:
       - uses: actions/checkout@v2
         with:
@@ -84,6 +89,7 @@ jobs:
       CC: clang-10
       CXX: clang++-10
       BUILD_TYPE: Debug
+      WITH_PROJ: ON
       CXXFLAGS: -fsanitize=address,undefined,integer -fno-sanitize-recover=all -fno-omit-frame-pointer
       LDFLAGS: -fsanitize=address,undefined,integer
     steps:
@@ -101,6 +107,7 @@ jobs:
       CC: clang-10
       CXX: clang++-10
       BUILD_TYPE: Release
+      WITH_PROJ: ON
     steps:
       - uses: actions/checkout@v2
         with:
@@ -116,6 +123,7 @@ jobs:
       CC: gcc-5
       CXX: g++-5
       BUILD_TYPE: Dev
+      WITH_PROJ: ON
     steps:
       - uses: actions/checkout@v2
         with:
@@ -131,6 +139,7 @@ jobs:
       CC: gcc-7
       CXX: g++-7
       BUILD_TYPE: Dev
+      WITH_PROJ: ON
     steps:
       - uses: actions/checkout@v2
         with:
@@ -146,6 +155,7 @@ jobs:
       CC: gcc-9
       CXX: g++-9
       BUILD_TYPE: Dev
+      WITH_PROJ: ON
     steps:
       - uses: actions/checkout@v2
         with:
@@ -162,6 +172,7 @@ jobs:
       CXX: g++-10
       CXXFLAGS: -Wno-stringop-overflow
       BUILD_TYPE: Dev
+      WITH_PROJ: ON
     steps:
       - uses: actions/checkout@v2
         with:
@@ -177,6 +188,7 @@ jobs:
       CC: gcc-10
       CXX: g++-10
       BUILD_TYPE: Release
+      WITH_PROJ: ON
     steps:
       - uses: actions/checkout@v2
         with:
@@ -192,6 +204,7 @@ jobs:
       CC: clang
       CXX: clang++
       BUILD_TYPE: Dev
+      WITH_PROJ: OFF
     steps:
       - uses: actions/checkout@v2
         with:
@@ -207,6 +220,7 @@ jobs:
       CC: clang
       CXX: clang++
       BUILD_TYPE: Dev
+      WITH_PROJ: OFF
     steps:
       - uses: actions/checkout@v2
         with:
@@ -222,6 +236,7 @@ jobs:
       CC: clang
       CXX: clang++
       BUILD_TYPE: Release
+      WITH_PROJ: OFF
     steps:
       - uses: actions/checkout@v2
         with:

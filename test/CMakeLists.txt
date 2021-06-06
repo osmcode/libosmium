@@ -87,7 +87,7 @@ function(add_unit_test _tgroup _tname)
             ENVIRONMENT "OSMIUM_TEST_DATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}"
         )
     else()
-        message("Skipped test ${_tpath} because a dependency was not found")
+        message("Skipped test ${_tpath} because a dependency was disabled/not found")
         set(OSMIUM_SKIPPED_TESTS
             "${OSMIUM_SKIPPED_TESTS} ${_tpath}"
             CACHE STRING "Tests that were skipped because of missing dependecies")
