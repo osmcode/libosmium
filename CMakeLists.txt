@@ -401,7 +401,7 @@ if(BUILD_HEADERS)
     file(MAKE_DIRECTORY header_check)
 
     foreach(hpp ${ALL_HPPS})
-        if(GDAL_FOUND OR NOT ((hpp STREQUAL "osmium/area/problem_reporter_ogr.hpp") OR (hpp STREQUAL "osmium/geom/ogr.hpp")))
+        if((GDAL_FOUND AND PROJ_FOUND) OR NOT ((hpp STREQUAL "osmium/area/problem_reporter_ogr.hpp") OR (hpp STREQUAL "osmium/geom/ogr.hpp") OR (hpp STREQUAL "osmium/geom/projection.hpp")))
             string(REPLACE ".hpp" "" tmp ${hpp})
             string(REPLACE "/" "__" libname ${tmp})
 
