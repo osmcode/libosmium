@@ -710,17 +710,17 @@ namespace osmium {
 
                     if (m_options.locations_on_ways) {
                         {
-                            osmium::DeltaEncode<int64_t, int64_t> delta_id;
+                            osmium::DeltaEncode<int64_t, int64_t> delta;
                             protozero::packed_field_sint64 field{pbf_way, protozero::pbf_tag_type(OSMFormat::Way::packed_sint64_lon)};
                             for (const auto& node_ref : way.nodes()) {
-                                field.add_element(delta_id.update(node_ref.location().x()));
+                                field.add_element(delta.update(node_ref.location().x()));
                             }
                         }
                         {
-                            osmium::DeltaEncode<int64_t, int64_t> delta_id;
+                            osmium::DeltaEncode<int64_t, int64_t> delta;
                             protozero::packed_field_sint64 field{pbf_way, protozero::pbf_tag_type(OSMFormat::Way::packed_sint64_lat)};
                             for (const auto& node_ref : way.nodes()) {
-                                field.add_element(delta_id.update(node_ref.location().y()));
+                                field.add_element(delta.update(node_ref.location().y()));
                             }
                         }
                     }
