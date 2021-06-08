@@ -135,6 +135,32 @@ namespace osmium {
         }
 
         /**
+         * Testing that all rules match for a set of tags.
+         *
+         * @param tags A list of tags.
+         * @returns False if the list of tags is empty,
+         *          or some rules are not matched.
+         */
+        bool match_all(const osmium::TagList& tags) const noexcept {
+            if (tags.empty() || m_rules.empty()) {
+                return false;
+            }
+            for (const auto& rule : m_rules) {
+                bool found = false;
+                for (const auto& tag : tags) {
+                    if (rule.second(tag)) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        /**
          * Return the number of rules in this filter.
          *
          * Complexity: Constant.
