@@ -111,6 +111,8 @@ namespace osmium {
 
             osmium::memory::Buffer m_buffer{};
 
+            osmium::io::Header m_header;
+
             size_t m_buffer_size = default_buffer_size;
 
             std::future<std::size_t> m_write_future{};
@@ -128,6 +130,9 @@ namespace osmium {
                 closed = 2  // close() called successfully
             } m_status = status::okay;
 
+            // Has the header already bin written to the file?
+            bool m_header_written = false;
+
             // This function will run in a separate thread.
             static void write_thread(detail::future_string_queue_type& output_queue,
                                      std::unique_ptr<osmium::io::Compressor>&& compressor,
@@ -140,13 +145,29 @@ namespace osmium {
                 write_thread();
             }
 
+            void write_header() {
+                if (m_header.get("generator").empty()) {
+                    m_header.set("generator", "libosmium/" LIBOSMIUM_VERSION_STRING);
+                }
+
+                m_output->write_header(m_header);
+
+                m_header_written = true;
+            }
+
             void do_write(osmium::memory::Buffer&& buffer) {
+                if (!m_header_written) {
+                    write_header();
+                }
                 if (buffer && buffer.committed() > 0) {
                     m_output->write_buffer(std::move(buffer));
                 }
             }
 
             void do_flush() {
+                if (!m_header_written) {
+                    write_header();
+                }
                 if (m_notification) {
                     osmium::thread::check_for_exception(m_write_future);
                 }
@@ -256,11 +277,9 @@ namespace osmium {
                     options.pool = &thread::Pool::default_instance();
                 }
 
-                m_output = osmium::io::detail::OutputFormatFactory::instance().create_output(*options.pool, m_file, m_output_queue);
+                m_header = options.header;
 
-                if (options.header.get("generator").empty()) {
-                    options.header.set("generator", "libosmium/" LIBOSMIUM_VERSION_STRING);
-                }
+                m_output = osmium::io::detail::OutputFormatFactory::instance().create_output(*options.pool, m_file, m_output_queue);
 
                 std::unique_ptr<osmium::io::Compressor> compressor =
                     CompressionFactory::instance().create_compressor(file.compression(),
@@ -270,10 +289,6 @@ namespace osmium {
                 std::promise<std::size_t> write_promise;
                 m_write_future = write_promise.get_future();
                 m_thread = osmium::thread::thread_handler{write_thread, std::ref(m_output_queue), std::move(compressor), std::move(write_promise), &m_notification};
-
-                ensure_cleanup([&](){
-                    m_output->write_header(options.header);
-                });
             }
 
             template <typename... TArgs>
@@ -313,6 +328,16 @@ namespace osmium {
              */
             void set_buffer_size(size_t size) noexcept {
                 m_buffer_size = size;
+            }
+
+            /**
+             * Set header. This will overwrite a header set in the constructor.
+             *
+             * Has to be called before writing anything to the file, otherwise
+             * this will not do anything.
+             */
+            void set_header(const osmium::io::Header& header) {
+                m_header = header;
             }
 
             /**
