@@ -113,6 +113,10 @@ namespace osmium {
 
             virtual void close() = 0;
 
+            virtual bool is_real() const noexcept {
+                return true;
+            }
+
             std::size_t file_size() const noexcept {
                 return m_file_size;
             }
@@ -273,6 +277,37 @@ namespace osmium {
             }
 
         }; // class NoCompressor
+
+        /**
+         * The DummyDecompressor is used when reading PBF files. In that
+         * case the PBFParser class is responsible for reading from the
+         * file itself, and the DummyDecompressor does nothing.
+         */
+        class DummyDecompressor final : public Decompressor {
+        public:
+
+            DummyDecompressor() = default;
+
+            DummyDecompressor(const DummyDecompressor&) = delete;
+            DummyDecompressor& operator=(const DummyDecompressor&) = delete;
+
+            DummyDecompressor(DummyDecompressor&&) = delete;
+            DummyDecompressor& operator=(DummyDecompressor&&) = delete;
+
+            ~DummyDecompressor() noexcept override = default;
+
+            std::string read() override {
+                return {};
+            }
+
+            void close() override {
+            }
+
+            bool is_real() const noexcept override {
+                return false;
+            }
+
+        }; // class DummyDecompressor
 
         class NoDecompressor final : public Decompressor {
 
