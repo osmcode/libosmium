@@ -58,6 +58,7 @@ namespace osmium {
 
             struct parser_arguments {
                 osmium::thread::Pool& pool;
+                int fd;
                 future_string_queue_type& input_queue;
                 future_buffer_queue_type& output_queue;
                 std::promise<osmium::io::Header>& header_promise;

@@ -87,6 +87,7 @@ static header_buffer_type parse_xml(std::string input) {
 
     osmium::io::detail::parser_arguments args = {
         pool,
+        -1,
         input_queue,
         output_queue,
         header_promise,

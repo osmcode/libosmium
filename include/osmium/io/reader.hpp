@@ -111,6 +111,8 @@ namespace osmium {
 
             detail::future_string_queue_type m_input_queue;
 
+            int m_fd;
+
             std::unique_ptr<osmium::io::Decompressor> m_decompressor;
 
             osmium::io::detail::ReadThreadManager m_read_thread_manager;
@@ -152,6 +154,7 @@ namespace osmium {
 
             // This function will run in a separate thread.
             static void parser_thread(osmium::thread::Pool& pool,
+                                      int fd,
                                       const detail::ParserFactory::create_parser_type& creator,
                                       detail::future_string_queue_type& input_queue,
                                       detail::future_buffer_queue_type& osmdata_queue,
@@ -162,6 +165,7 @@ namespace osmium {
                 std::promise<osmium::io::Header> promise{std::move(header_promise)};
                 osmium::io::detail::parser_arguments args = {
                     pool,
+                    fd,
                     input_queue,
                     osmdata_queue,
                     promise,
@@ -248,6 +252,19 @@ namespace osmium {
                 return fd;
             }
 
+            static std::unique_ptr<Decompressor> make_decompressor(const osmium::io::File& file, int fd) {
+                const auto& factory = osmium::io::CompressionFactory::instance();
+                if (file.buffer()) {
+                    return factory.create_decompressor(file.compression(), file.buffer(), file.buffer_size());
+                }
+
+                if (file.format() == file_format::pbf) {
+                    return std::unique_ptr<Decompressor>{new DummyDecompressor{}};
+                }
+
+                return factory.create_decompressor(file.compression(), fd);
+            }
+
         public:
 
             /**
@@ -295,9 +312,8 @@ namespace osmium {
                 m_file(file.check()),
                 m_creator(detail::ParserFactory::instance().get_creator_function(m_file)),
                 m_input_queue(detail::get_input_queue_size(), "raw_input"),
-                m_decompressor(m_file.buffer() ?
-                    osmium::io::CompressionFactory::instance().create_decompressor(file.compression(), m_file.buffer(), m_file.buffer_size()) :
-                    osmium::io::CompressionFactory::instance().create_decompressor(file.compression(), open_input_file_or_url(m_file.filename(), &m_childpid))),
+                m_fd(m_file.buffer() ? -1 : open_input_file_or_url(m_file.filename(), &m_childpid)),
+                m_decompressor(make_decompressor(m_file, m_fd)),
                 m_read_thread_manager(*m_decompressor, m_input_queue),
                 m_osmdata_queue(detail::get_osmdata_queue_size(), "parser_results"),
                 m_osmdata_queue_wrapper(m_osmdata_queue),
@@ -313,7 +329,9 @@ namespace osmium {
 
                 std::promise<osmium::io::Header> header_promise;
                 m_header_future = header_promise.get_future();
-                m_thread = osmium::thread::thread_handler{parser_thread, std::ref(*m_pool), std::ref(m_creator),
+
+                const int fd_for_parser = m_decompressor->is_real() ? -1 : m_fd;
+                m_thread = osmium::thread::thread_handler{parser_thread, std::ref(*m_pool), fd_for_parser, std::ref(m_creator),
                                                           std::ref(m_input_queue), std::ref(m_osmdata_queue),
                                                           std::move(header_promise), m_read_which_entities,
                                                           m_read_metadata, m_buffers_kind};
