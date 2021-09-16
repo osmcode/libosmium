@@ -206,9 +206,8 @@ namespace osmium {
                 *data = s;
             }
 
-            // Arbitrary limit how long integers can get
             enum {
-                max_int_len = 16
+                max_int_len = std::numeric_limits<int64_t>::digits10 + 1
             };
 
             template <typename T>

@@ -260,6 +260,8 @@ TEST_CASE("Parse OPL: integer") {
     REQUIRE(test_parse_int("-1x") == -1);
     REQUIRE(test_parse_int("1234567890123x") == 1234567890123);
     REQUIRE(test_parse_int("-1234567890123x") == -1234567890123);
+    REQUIRE(test_parse_int("999999999999999999x") == 999999999999999999);
+    REQUIRE(test_parse_int("-999999999999999999x") == -999999999999999999);
 
     REQUIRE_THROWS_WITH(test_parse_int(""),
                         "OPL error: expected integer");
