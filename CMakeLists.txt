@@ -408,7 +408,7 @@ if(BUILD_HEADERS)
             # Create a dummy .cpp file that includes the header file we want to
             # check.
             set(DUMMYCPP ${CMAKE_BINARY_DIR}/header_check/${libname}.cpp)
-            file(WRITE ${DUMMYCPP} "#define OSMIUM_UTIL_COMPATIBILITY_HPP\n#define OSMIUM_DEPRECATED\n#include <${hpp}> // IWYU pragma: keep\n")
+            file(WRITE ${DUMMYCPP} "#define OSMIUM_UTIL_COMPATIBILITY_HPP\n#define OSMIUM_DEPRECATED\n#define OSMIUM_EXPORT\n#include <${hpp}> // IWYU pragma: keep\n")
 
             # There is no way in CMake to just compile but not link a C++ file,
             # so we pretend to build a library here.
