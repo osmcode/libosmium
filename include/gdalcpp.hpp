@@ -5,11 +5,11 @@
 
 C++11 wrapper classes for GDAL/OGR.
 
-Version 1.2.0
+Version 1.3.0
 
 https://github.com/joto/gdalcpp
 
-Copyright 2015-2018 Jochen Topf <jochen@topf.org>
+Copyright 2015-2021 Jochen Topf <jochen@topf.org>
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -42,8 +42,6 @@ DEALINGS IN THE SOFTWARE.
 #include <ogr_api.h>
 #include <ogrsf_frmts.h>
 
-#include <osmium/util/compatibility.hpp>
-
 #include <cstdint>
 #include <algorithm>
 #include <memory>
@@ -51,6 +49,12 @@ DEALINGS IN THE SOFTWARE.
 #include <string>
 #include <utility>
 #include <vector>
+
+#if defined(_MSC_VER)
+# define GDALCPP_EXPORT __declspec(dllexport)
+#else
+# define GDALCPP_EXPORT __attribute__ ((visibility("default")))
+#endif
 
 namespace gdalcpp {
 
@@ -65,7 +69,7 @@ namespace gdalcpp {
     /**
      * Exception thrown for all errors in this class.
      */
-    class OSMIUM_EXPORT gdal_error : public std::runtime_error {
+    class GDALCPP_EXPORT gdal_error : public std::runtime_error {
 
         std::string m_driver;
         std::string m_dataset;
@@ -192,7 +196,7 @@ namespace gdalcpp {
 
         SRS() :
             m_spatial_reference() {
-            const auto result = m_spatial_reference.SetWellKnownGeogCS("WGS84");
+            const auto result = m_spatial_reference.SetWellKnownGeogCS("CRS84");
             if (result != OGRERR_NONE) {
                 throw gdal_error{std::string{"can not initialize spatial reference system WGS84"},
                                  result};
@@ -515,5 +519,7 @@ namespace gdalcpp {
     }; // class Feature
 
 } // namespace gdalcpp
+
+#undef GDALCPP_EXPORT
 
 #endif // GDALCPP_HPP
