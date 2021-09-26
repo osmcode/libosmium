@@ -65,6 +65,7 @@ namespace osmium {
                 osmium::osm_entity_bits::type read_which_entities;
                 osmium::io::read_meta read_metadata;
                 osmium::io::buffers_type buffers_kind;
+                bool want_buffered_pages_removed;
             };
 
             class Parser {

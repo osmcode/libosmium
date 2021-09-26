@@ -66,7 +66,9 @@ namespace osmium {
             class PBFParser final : public Parser {
 
                 std::string m_input_buffer{};
+                std::size_t m_offset = 0;
                 int m_fd;
+                bool m_want_buffered_pages_removed;
 
                 /**
                  * Make sure the input data contains at least the specified
@@ -118,15 +120,24 @@ namespace osmium {
                  * @returns true if size bytes could be read
                  *          false if EOF was encountered
                  */
-                static bool read_exactly(int fd, char* buffer, std::size_t size) {
+                bool read_exactly(char* buffer, std::size_t size) {
                     std::size_t to_read = size;
 
                     while (to_read > 0) {
-                        auto const read_size = osmium::io::detail::reliable_read(fd, buffer + (size - to_read), to_read);
+                        auto const read_size = osmium::io::detail::reliable_read(m_fd, buffer + (size - to_read), to_read);
                         if (read_size == 0) { // EOF
                             return false;
                         }
                         to_read -= read_size;
+                    }
+
+                    m_offset += size;
+
+                    if (m_want_buffered_pages_removed && size > 100) {
+                        // The size check is there to avoid the system call
+                        // when we have only been reading a small number of
+                        // bytes, i.e. for a header.
+                        osmium::io::detail::remove_buffered_pages(m_fd, m_offset);
                     }
 
                     return true;
@@ -139,7 +150,7 @@ namespace osmium {
                 uint32_t read_blob_header_size_from_file() {
                     if (m_fd != -1) {
                         std::array<char, sizeof(uint32_t)> buffer;
-                        if (!read_exactly(m_fd, buffer.data(), buffer.size())) {
+                        if (!read_exactly(buffer.data(), buffer.size())) {
                             return 0; // EOF
                         }
                         return check_size(get_size_in_network_byte_order(buffer.data()));
@@ -225,7 +236,7 @@ namespace osmium {
                     if (m_fd != -1) {
                         buffer.resize(size);
 
-                        if (!read_exactly(m_fd, &*buffer.begin(), size)) {
+                        if (!read_exactly(&*buffer.begin(), size)) {
                             throw osmium::pbf_error{"unexpected EOF"};
                         }
                     } else {
@@ -263,7 +274,8 @@ namespace osmium {
 
                 explicit PBFParser(parser_arguments& args) :
                     Parser(args),
-                    m_fd(args.fd) {
+                    m_fd(args.fd),
+                    m_want_buffered_pages_removed(args.want_buffered_pages_removed) {
                 }
 
                 PBFParser(const PBFParser&) = delete;

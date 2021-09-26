@@ -161,7 +161,8 @@ namespace osmium {
                                       std::promise<osmium::io::Header>&& header_promise,
                                       osmium::osm_entity_bits::type read_which_entities,
                                       osmium::io::read_meta read_metadata,
-                                      osmium::io::buffers_type buffers_kind) {
+                                      osmium::io::buffers_type buffers_kind,
+                                      bool want_buffered_pages_removed) {
                 std::promise<osmium::io::Header> promise{std::move(header_promise)};
                 osmium::io::detail::parser_arguments args = {
                     pool,
@@ -171,7 +172,8 @@ namespace osmium {
                     promise,
                     read_which_entities,
                     read_metadata,
-                    buffers_kind
+                    buffers_kind,
+                    want_buffered_pages_removed
                 };
                 creator(args)->parse();
             }
@@ -339,7 +341,8 @@ namespace osmium {
                 m_thread = osmium::thread::thread_handler{parser_thread, std::ref(*m_pool), fd_for_parser, std::ref(m_creator),
                                                           std::ref(m_input_queue), std::ref(m_osmdata_queue),
                                                           std::move(header_promise), m_read_which_entities,
-                                                          m_read_metadata, m_buffers_kind};
+                                                          m_read_metadata, m_buffers_kind,
+                                                          m_decompressor->want_buffered_pages_removed()};
             }
 
             template <typename... TArgs>
