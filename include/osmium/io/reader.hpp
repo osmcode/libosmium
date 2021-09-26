@@ -330,6 +330,11 @@ namespace osmium {
                 std::promise<osmium::io::Header> header_promise;
                 m_header_future = header_promise.get_future();
 
+                const auto cpc = osmium::config::clean_page_cache_after_read();
+                if (cpc >= 0) {
+                    m_decompressor->set_want_buffered_pages_removed(true);
+                }
+
                 const int fd_for_parser = m_decompressor->is_real() ? -1 : m_fd;
                 m_thread = osmium::thread::thread_handler{parser_thread, std::ref(*m_pool), fd_for_parser, std::ref(m_creator),
                                                           std::ref(m_input_queue), std::ref(m_osmdata_queue),

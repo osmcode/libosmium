@@ -93,7 +93,7 @@ namespace osmium {
             std::atomic<std::size_t> m_file_size{0};
             std::atomic<std::size_t> m_offset{0};
 
-            std::atomic_bool m_want_buffered_pages_removed{true};
+            std::atomic_bool m_want_buffered_pages_removed{false};
 
         public:
 
