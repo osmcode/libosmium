@@ -93,7 +93,8 @@ static header_buffer_type parse_xml(std::string input) {
         header_promise,
         osmium::osm_entity_bits::all,
         osmium::io::read_meta::yes,
-        osmium::io::buffers_type::any
+        osmium::io::buffers_type::any,
+        false
     };
     osmium::io::detail::XMLParser parser{args};
     parser.parse();
