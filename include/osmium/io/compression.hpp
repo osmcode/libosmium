@@ -93,6 +93,8 @@ namespace osmium {
             std::atomic<std::size_t> m_file_size{0};
             std::atomic<std::size_t> m_offset{0};
 
+            std::atomic_bool m_want_buffered_pages_removed{true};
+
         public:
 
             enum {
@@ -131,6 +133,14 @@ namespace osmium {
 
             void set_offset(const std::size_t offset) noexcept {
                 m_offset = offset;
+            }
+
+            bool want_buffered_pages_removed() const noexcept {
+                return m_want_buffered_pages_removed;
+            }
+
+            void set_want_buffered_pages_removed(bool value) noexcept {
+                m_want_buffered_pages_removed = value;
             }
 
         }; // class Decompressor
@@ -352,7 +362,9 @@ namespace osmium {
                     }
                 } else {
                     buffer.resize(osmium::io::Decompressor::input_buffer_size);
-                    osmium::io::detail::remove_buffered_pages(m_fd, m_offset);
+                    if (want_buffered_pages_removed()) {
+                        osmium::io::detail::remove_buffered_pages(m_fd, m_offset);
+                    }
                     const auto nread = detail::reliable_read(m_fd, &*buffer.begin(), osmium::io::Decompressor::input_buffer_size);
                     buffer.resize(std::string::size_type(nread));
                 }
@@ -365,7 +377,9 @@ namespace osmium {
 
             void close() override {
                 if (m_fd >= 0) {
-                    osmium::io::detail::remove_buffered_pages(m_fd);
+                    if (want_buffered_pages_removed()) {
+                        osmium::io::detail::remove_buffered_pages(m_fd);
+                    }
                     const int fd = m_fd;
                     m_fd = -1;
                     osmium::io::detail::reliable_close(fd);
