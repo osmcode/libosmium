@@ -262,6 +262,10 @@ TEST_CASE("Parse OPL: integer") {
     REQUIRE(test_parse_int("-1234567890123x") == -1234567890123);
     REQUIRE(test_parse_int("999999999999999999x") == 999999999999999999);
     REQUIRE(test_parse_int("-999999999999999999x") == -999999999999999999);
+    REQUIRE(test_parse_int("1000000000000000000x") == 1000000000000000000);
+    REQUIRE(test_parse_int("9223372036854775807x") == 9223372036854775807);
+    REQUIRE(test_parse_int("-9223372036854775807x") == -9223372036854775807);
+    REQUIRE(test_parse_int("-9223372036854775808x") == -9223372036854775807 - 1);
 
     REQUIRE_THROWS_WITH(test_parse_int(""),
                         "OPL error: expected integer");
@@ -275,7 +279,25 @@ TEST_CASE("Parse OPL: integer") {
     REQUIRE_THROWS_WITH(test_parse_int("x"),
                         "OPL error: expected integer");
 
-    REQUIRE_THROWS_WITH(test_parse_int("99999999999999999999999x"),
+    REQUIRE_THROWS_WITH(test_parse_int("9223372036854775808x"),
+                        "OPL error: integer too long");
+
+    REQUIRE_THROWS_WITH(test_parse_int("9223372036854775809x"),
+                        "OPL error: integer too long");
+
+    REQUIRE_THROWS_WITH(test_parse_int("9223372036854775810x"),
+                        "OPL error: integer too long");
+
+    REQUIRE_THROWS_WITH(test_parse_int("-9223372036854775809x"),
+                        "OPL error: integer too long");
+
+    REQUIRE_THROWS_WITH(test_parse_int("-9223372036854775810x"),
+                        "OPL error: integer too long");
+
+    REQUIRE_THROWS_WITH(test_parse_int("999999999999999999999x"),
+                        "OPL error: integer too long");
+
+    REQUIRE_THROWS_WITH(test_parse_int("-999999999999999999999x"),
                         "OPL error: integer too long");
 }
 
