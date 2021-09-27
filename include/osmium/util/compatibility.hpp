@@ -51,10 +51,16 @@ DEALINGS IN THE SOFTWARE.
 # define OSMIUM_DEPRECATED
 #endif
 
-#if defined(_MSC_VER)
-# define OSMIUM_EXPORT __declspec(dllexport)
+// Set OSMIUM_DEFINE_EXPORT before including any osmium headers to add
+// the special attributes to all exception classes.
+#ifdef OSMIUM_DEFINE_EXPORT
+# ifdef _MSC_VER
+#  define OSMIUM_EXPORT __declspec(dllexport)
+# else
+#  define OSMIUM_EXPORT __attribute__ ((visibility("default")))
+# endif
 #else
-# define OSMIUM_EXPORT __attribute__ ((visibility("default")))
+#  define OSMIUM_EXPORT
 #endif
 
 #endif // OSMIUM_UTIL_COMPATIBILITY_HPP
