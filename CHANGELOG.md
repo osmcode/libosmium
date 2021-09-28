@@ -8,9 +8,31 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+* Add `osmium_tags_filter` example showing use of tags filter.
+* Add `Writer::set_header()` function to set header after constructing.
+
 ### Changed
 
+* Various improvements in PBF file reading make it slightly faster and less
+  CPU intensive.
+* Since 2.17.0 Osmium will, when reading files, tell the kernel using
+  `fadvise` that it can remove pages from the buffer cache that are not
+  needed any more. This is usually beneficial, because the memory can be used
+  for something else. But if you are reading the same OSM file multiple times
+  at the same time or in short succession, it might be better to keep those
+  buffer pages. In that case you can set the environment variable
+  `OSMIUM_CLEAN_PAGE_CACHE_AFTER_READ` to `no` and Osmium will not call
+  `fadvise`. Set it to `yes` or anything else (or not set it at all) to get
+  the default behaviour.
+* If the macro `OSMIUM_DEFINE_EXPORT` is defined, all exception classes used
+  by Osmium will get "tagged as exported" using `__declspec(dllexport)` when
+  using MSVC or `__attribute__ ((visibility("default")))` on other compilers.
+  This is needed in PyOsmium.
+
 ### Fixed
+
+* Fix integer parser. IDs in OPL files can now be anything between -2^63 and
+  2^63-1.
 
 
 ## [2.17.0] - 2021-04-26
