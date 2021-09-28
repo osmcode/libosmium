@@ -133,13 +133,6 @@ namespace osmium {
 
                     *m_offset_ptr += size;
 
-                    if (m_want_buffered_pages_removed && size > 100) {
-                        // The size check is there to avoid the system call
-                        // when we have only been reading a small number of
-                        // bytes, i.e. for a header.
-                        osmium::io::detail::remove_buffered_pages(m_fd, *m_offset_ptr);
-                    }
-
                     return true;
                 }
 
@@ -266,6 +259,10 @@ namespace osmium {
                             send_to_output_queue(get_pool().submit(std::move(data_blob_parser)));
                         } else {
                             send_to_output_queue(data_blob_parser());
+                        }
+
+                        if (m_want_buffered_pages_removed) {
+                            osmium::io::detail::remove_buffered_pages(m_fd, *m_offset_ptr);
                         }
                     }
                 }
