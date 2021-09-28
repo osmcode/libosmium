@@ -62,6 +62,7 @@ namespace osmium {
                 future_string_queue_type& input_queue;
                 future_buffer_queue_type& output_queue;
                 std::promise<osmium::io::Header>& header_promise;
+                std::atomic<std::size_t>* offset_ptr;
                 osmium::osm_entity_bits::type read_which_entities;
                 osmium::io::read_meta read_metadata;
                 osmium::io::buffers_type buffers_kind;

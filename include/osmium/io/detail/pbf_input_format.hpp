@@ -66,7 +66,7 @@ namespace osmium {
             class PBFParser final : public Parser {
 
                 std::string m_input_buffer{};
-                std::size_t m_offset = 0;
+                std::atomic<std::size_t>* m_offset_ptr;
                 int m_fd;
                 bool m_want_buffered_pages_removed;
 
@@ -131,13 +131,13 @@ namespace osmium {
                         to_read -= read_size;
                     }
 
-                    m_offset += size;
+                    *m_offset_ptr += size;
 
                     if (m_want_buffered_pages_removed && size > 100) {
                         // The size check is there to avoid the system call
                         // when we have only been reading a small number of
                         // bytes, i.e. for a header.
-                        osmium::io::detail::remove_buffered_pages(m_fd, m_offset);
+                        osmium::io::detail::remove_buffered_pages(m_fd, *m_offset_ptr);
                     }
 
                     return true;
@@ -274,6 +274,7 @@ namespace osmium {
 
                 explicit PBFParser(parser_arguments& args) :
                     Parser(args),
+                    m_offset_ptr(args.offset_ptr),
                     m_fd(args.fd),
                     m_want_buffered_pages_removed(args.want_buffered_pages_removed) {
                 }

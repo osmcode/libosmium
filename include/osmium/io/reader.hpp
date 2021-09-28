@@ -126,6 +126,7 @@ namespace osmium {
             osmium::thread::thread_handler m_thread{};
 
             std::size_t m_file_size = 0;
+            std::atomic<std::size_t> m_offset{0};
 
             osmium::osm_entity_bits::type m_read_which_entities = osmium::osm_entity_bits::all;
             osmium::io::read_meta m_read_metadata = osmium::io::read_meta::yes;
@@ -159,6 +160,7 @@ namespace osmium {
                                       detail::future_string_queue_type& input_queue,
                                       detail::future_buffer_queue_type& osmdata_queue,
                                       std::promise<osmium::io::Header>&& header_promise,
+                                      std::atomic<std::size_t>* offset_ptr,
                                       osmium::osm_entity_bits::type read_which_entities,
                                       osmium::io::read_meta read_metadata,
                                       osmium::io::buffers_type buffers_kind,
@@ -170,6 +172,7 @@ namespace osmium {
                     input_queue,
                     osmdata_queue,
                     promise,
+                    offset_ptr,
                     read_which_entities,
                     read_metadata,
                     buffers_kind,
@@ -319,7 +322,7 @@ namespace osmium {
                 m_read_thread_manager(*m_decompressor, m_input_queue),
                 m_osmdata_queue(detail::get_osmdata_queue_size(), "parser_results"),
                 m_osmdata_queue_wrapper(m_osmdata_queue),
-                m_file_size(m_decompressor->file_size()) {
+                m_file_size(m_decompressor->is_real() ? m_decompressor->file_size() : osmium::file_size(m_fd)) {
 
                 (void)std::initializer_list<int>{
                     (set_option(args), 0)...
@@ -340,7 +343,7 @@ namespace osmium {
                 const int fd_for_parser = m_decompressor->is_real() ? -1 : m_fd;
                 m_thread = osmium::thread::thread_handler{parser_thread, std::ref(*m_pool), fd_for_parser, std::ref(m_creator),
                                                           std::ref(m_input_queue), std::ref(m_osmdata_queue),
-                                                          std::move(header_promise), m_read_which_entities,
+                                                          std::move(header_promise), &m_offset, m_read_which_entities,
                                                           m_read_metadata, m_buffers_kind,
                                                           m_decompressor->want_buffered_pages_removed()};
             }
@@ -518,7 +521,10 @@ namespace osmium {
              * do an expensive system call.
              */
             std::size_t offset() const noexcept {
-                return m_decompressor->offset();
+                if (m_decompressor->is_real()) {
+                    return m_decompressor->offset();
+                }
+                return m_offset;
             }
 
         }; // class Reader
