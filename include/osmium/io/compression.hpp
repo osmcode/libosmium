@@ -90,7 +90,6 @@ namespace osmium {
 
         class Decompressor {
 
-            std::atomic<std::size_t> m_file_size{0};
             std::atomic<std::size_t> m_offset{0};
 
             std::atomic_bool m_want_buffered_pages_removed{false};
@@ -117,14 +116,6 @@ namespace osmium {
 
             virtual bool is_real() const noexcept {
                 return true;
-            }
-
-            std::size_t file_size() const noexcept {
-                return m_file_size;
-            }
-
-            void set_file_size(const std::size_t size) noexcept {
-                m_file_size = size;
             }
 
             std::size_t offset() const noexcept {
@@ -222,9 +213,7 @@ namespace osmium {
 
             std::unique_ptr<osmium::io::Decompressor> create_decompressor(const osmium::io::file_compression compression, const int fd) const {
                 const auto callbacks = find_callbacks(compression);
-                auto p = std::unique_ptr<osmium::io::Decompressor>(std::get<1>(callbacks)(fd));
-                p->set_file_size(osmium::file_size(fd));
-                return p;
+                return std::unique_ptr<osmium::io::Decompressor>(std::get<1>(callbacks)(fd));
             }
 
             std::unique_ptr<osmium::io::Decompressor> create_decompressor(const osmium::io::file_compression compression, const char* buffer, const std::size_t size) const {

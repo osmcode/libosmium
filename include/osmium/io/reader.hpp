@@ -322,7 +322,7 @@ namespace osmium {
                 m_read_thread_manager(*m_decompressor, m_input_queue),
                 m_osmdata_queue(detail::get_osmdata_queue_size(), "parser_results"),
                 m_osmdata_queue_wrapper(m_osmdata_queue),
-                m_file_size(m_decompressor->is_real() ? m_decompressor->file_size() : osmium::file_size(m_fd)) {
+                m_file_size(m_fd > 2 ? osmium::file_size(m_fd) : 0) {
 
                 (void)std::initializer_list<int>{
                     (set_option(args), 0)...
