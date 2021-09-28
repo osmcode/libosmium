@@ -90,7 +90,7 @@ namespace osmium {
 
         class Decompressor {
 
-            std::atomic<std::size_t> m_offset{0};
+            std::atomic<std::size_t>* m_offset_ptr{nullptr};
 
             std::atomic_bool m_want_buffered_pages_removed{false};
 
@@ -118,12 +118,14 @@ namespace osmium {
                 return true;
             }
 
-            std::size_t offset() const noexcept {
-                return m_offset;
+            void set_offset_ptr(std::atomic<std::size_t>* offset_ptr) noexcept {
+                m_offset_ptr = offset_ptr;
             }
 
             void set_offset(const std::size_t offset) noexcept {
-                m_offset = offset;
+                if (m_offset_ptr) {
+                    *m_offset_ptr = offset;
+                }
             }
 
             bool want_buffered_pages_removed() const noexcept {

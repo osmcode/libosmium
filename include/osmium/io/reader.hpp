@@ -257,7 +257,7 @@ namespace osmium {
                 return fd;
             }
 
-            static std::unique_ptr<Decompressor> make_decompressor(const osmium::io::File& file, int fd) {
+            std::unique_ptr<Decompressor> make_decompressor(const osmium::io::File& file, int fd) {
                 const auto& factory = osmium::io::CompressionFactory::instance();
                 if (file.buffer()) {
                     return factory.create_decompressor(file.compression(), file.buffer(), file.buffer_size());
@@ -331,6 +331,8 @@ namespace osmium {
                 if (!m_pool) {
                     m_pool = &thread::Pool::default_instance();
                 }
+
+                m_decompressor->set_offset_ptr(&m_offset);
 
                 std::promise<osmium::io::Header> header_promise;
                 m_header_future = header_promise.get_future();
@@ -521,9 +523,6 @@ namespace osmium {
              * do an expensive system call.
              */
             std::size_t offset() const noexcept {
-                if (m_decompressor->is_real()) {
-                    return m_decompressor->offset();
-                }
                 return m_offset;
             }
 
