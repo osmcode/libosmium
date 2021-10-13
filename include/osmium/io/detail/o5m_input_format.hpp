@@ -98,13 +98,11 @@ namespace osmium {
 
                 // The following settings are from the o5m description:
 
-                // The maximum number of entries in this table.
                 enum {
-                    number_of_entries = 15000U
-                };
+                    // The maximum number of entries in this table.
+                    number_of_entries = 15000U,
 
-                // The size of one entry in the table.
-                enum {
+                    // The size of one entry in the table.
                     entry_size = 256U
                 };
 
