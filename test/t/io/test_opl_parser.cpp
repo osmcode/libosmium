@@ -14,6 +14,17 @@
 
 namespace oid = osmium::io::detail;
 
+// From C++20 we need to handle unicode literals differently
+#ifdef __cpp_char8_t
+static const char* u8cast(const char8_t *s) noexcept {
+    return reinterpret_cast<const char*>(s);
+}
+#else
+static const char* u8cast(const char *s) noexcept {
+    return s;
+}
+#endif
+
 TEST_CASE("Parse OPL: base exception") {
     const osmium::opl_error e{"foo"};
     REQUIRE(e.data == nullptr);
@@ -144,7 +155,7 @@ TEST_CASE("Parse OPL: parse escaped") {
         result.append("_");
         const char* s3 = "1f6eb%";
         oid::opl_parse_escaped(&s3, result);
-        REQUIRE(result == u8"\u30dc_\U0001d11e_\U0001f6eb");
+        REQUIRE(result == u8cast(u8"\u30dc_\U0001d11e_\U0001f6eb"));
     }
 
     SECTION("Data after %") {

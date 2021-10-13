@@ -7,6 +7,17 @@
 #include <stdexcept>
 #include <string>
 
+// From C++20 we need to handle unicode literals differently
+#ifdef __cpp_char8_t
+static const char* u8cast(const char8_t *s) noexcept {
+    return reinterpret_cast<const char*>(s);
+}
+#else
+static const char* u8cast(const char *s) noexcept {
+    return s;
+}
+#endif
+
 TEST_CASE("output formatted with small results") {
     std::string out;
     osmium::io::detail::append_printf_formatted_string(out, "%d", 17);
@@ -80,7 +91,7 @@ TEST_CASE("UTF8 encoding: encode characters that are special in OPL") {
 #if !defined(_MSC_VER)
 TEST_CASE("UTF8 encoding: encode multibyte character") {
     std::string out;
-    osmium::io::detail::append_utf8_encoded_string(out, u8"\u30dc_\U0001d11e_\U0001f6eb");
+    osmium::io::detail::append_utf8_encoded_string(out, u8cast(u8"\u30dc_\U0001d11e_\U0001f6eb"));
     REQUIRE(out == "%30dc%_%1d11e%_%1f6eb%");
 }
 #endif
@@ -107,7 +118,7 @@ TEST_CASE("debug encoding does not encode normal characters") {
 }
 
 TEST_CASE("debug encoding encodes some unicode characters") {
-    const char* s = u8"\n_\u30dc_\U0001d11e_\U0001f6eb";
+    const char* s = u8cast(u8"\n_\u30dc_\U0001d11e_\U0001f6eb");
     std::string out;
     osmium::io::detail::append_debug_encoded_string(out, s, "[", "]");
     REQUIRE(out == "[<U+000A>]_[<U+30DC>]_[<U+1D11E>]_[<U+1F6EB>]");
@@ -142,7 +153,7 @@ TEST_CASE("debug encoding of non-printable characters in the first 127 character
 }
 
 TEST_CASE("test codepoint to utf8 encoding") {
-    const char s[] = u8"\n_\u01a2_\u30dc_\U0001d11e_\U0001f680";
+    const char* s = u8cast(u8"\n_\u01a2_\u30dc_\U0001d11e_\U0001f680");
 
     std::string out;
     osmium::io::detail::append_codepoint_as_utf8(0x0aU, std::back_inserter(out)); // 1 utf8 byte
@@ -167,21 +178,22 @@ TEST_CASE("test codepoint to utf8 encoding") {
 }
 
 TEST_CASE("test utf8 to codepoint decoding") {
-    const char s[] = u8"\n_\u01a2_\u30dc_\U0001d11e_\U0001f680";
+    const char* s = u8cast(u8"\n_\u01a2_\u30dc_\U0001d11e_\U0001f680");
 
     const char* it = s;
-    REQUIRE(osmium::io::detail::next_utf8_codepoint(&it, std::end(s)) == 0x0aU);
-    REQUIRE(osmium::io::detail::next_utf8_codepoint(&it, std::end(s)) == '_');
-    REQUIRE(osmium::io::detail::next_utf8_codepoint(&it, std::end(s)) == 0x01a2U);
-    REQUIRE(osmium::io::detail::next_utf8_codepoint(&it, std::end(s)) == '_');
-    REQUIRE(osmium::io::detail::next_utf8_codepoint(&it, std::end(s)) == 0x30dcU);
-    REQUIRE(osmium::io::detail::next_utf8_codepoint(&it, std::end(s)) == '_');
-    REQUIRE(osmium::io::detail::next_utf8_codepoint(&it, std::end(s)) == 0x1d11eU);
-    REQUIRE(osmium::io::detail::next_utf8_codepoint(&it, std::end(s)) == '_');
-    REQUIRE(osmium::io::detail::next_utf8_codepoint(&it, std::end(s)) == 0x1f680U);
+    const char* end = s + std::strlen(s) + 1;
+    REQUIRE(osmium::io::detail::next_utf8_codepoint(&it, end) == 0x0aU);
+    REQUIRE(osmium::io::detail::next_utf8_codepoint(&it, end) == '_');
+    REQUIRE(osmium::io::detail::next_utf8_codepoint(&it, end) == 0x01a2U);
+    REQUIRE(osmium::io::detail::next_utf8_codepoint(&it, end) == '_');
+    REQUIRE(osmium::io::detail::next_utf8_codepoint(&it, end) == 0x30dcU);
+    REQUIRE(osmium::io::detail::next_utf8_codepoint(&it, end) == '_');
+    REQUIRE(osmium::io::detail::next_utf8_codepoint(&it, end) == 0x1d11eU);
+    REQUIRE(osmium::io::detail::next_utf8_codepoint(&it, end) == '_');
+    REQUIRE(osmium::io::detail::next_utf8_codepoint(&it, end) == 0x1f680U);
 
     REQUIRE(*it++ == '\0');
-    REQUIRE(it == std::end(s));
+    REQUIRE(it == end);
 }
 
 TEST_CASE("Roundtrip unicode characters") {
@@ -203,10 +215,11 @@ TEST_CASE("invalid codepoint") {
 }
 
 TEST_CASE("incomplete Unicode codepoint") {
-    const char s[] = u8"\U0001f680";
+    const char* s = u8cast(u8"\U0001f680");
 
     const auto* it = s;
-    REQUIRE(osmium::io::detail::next_utf8_codepoint(&it, std::end(s) - 1) == 0x1f680U);
+    const char* end = s + std::strlen(s) + 1;
+    REQUIRE(osmium::io::detail::next_utf8_codepoint(&it, end - 1) == 0x1f680U);
     REQUIRE(std::distance(s, it) == 4);
 
     for (int i : {0, 1, 2, 3}) {

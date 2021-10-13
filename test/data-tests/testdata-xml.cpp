@@ -21,6 +21,13 @@ static std::string S_(const char* s) {
     return std::string{s};
 }
 
+// From C++20 we need to handle unicode literals differently
+#ifdef __cpp_char8_t
+static std::string S_(const char8_t* s) {
+    return std::string{reinterpret_cast<const char*>(s)};
+}
+#endif
+
 static std::string filename(const char* test_id, const char* suffix = "osm") {
     const char* testdir = getenv("TESTDIR");
     if (!testdir) {
@@ -366,19 +373,19 @@ TEST_CASE("Reading OSM XML 140: Using Reader") {
 #if !defined(_MSC_VER)
         switch (count) {
             case 1:
-                REQUIRE(S_(uc) == u8"a");
+                REQUIRE(S_(uc) == S_(u8"a"));
                 break;
             case 2:
-                REQUIRE(S_(uc) == u8"\u00e4");
+                REQUIRE(S_(uc) == S_(u8"\u00e4"));
                 break;
             case 3:
-                REQUIRE(S_(uc) == u8"\u30dc");
+                REQUIRE(S_(uc) == S_(u8"\u30dc"));
                 break;
             case 4:
-                REQUIRE(S_(uc) == u8"\U0001d11e");
+                REQUIRE(S_(uc) == S_(u8"\U0001d11e"));
                 break;
             case 5:
-                REQUIRE(S_(uc) == u8"\U0001f6eb");
+                REQUIRE(S_(uc) == S_(u8"\U0001f6eb"));
                 break;
             default:
                 REQUIRE(false); // should not be here
