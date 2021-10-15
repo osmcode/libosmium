@@ -267,7 +267,7 @@ namespace osmium {
                 }
 
                 bool register_parser(const osmium::io::file_format format, create_parser_type&& create_function) {
-                    callbacks(format) = std::forward<create_parser_type>(create_function);
+                    callbacks(format) = std::move(create_function);
                     return true;
                 }
 
