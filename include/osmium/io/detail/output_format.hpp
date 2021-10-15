@@ -179,7 +179,7 @@ namespace osmium {
                 }
 
                 bool register_output_format(const osmium::io::file_format format, create_output_type&& create_function) {
-                    callbacks(format) = std::forward<create_output_type>(create_function);
+                    callbacks(format) = std::move(create_function);
                     return true;
                 }
 
