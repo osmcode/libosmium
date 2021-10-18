@@ -111,7 +111,7 @@ namespace osmium {
 
             detail::future_string_queue_type m_input_queue;
 
-            int m_fd;
+            int m_fd = -1;
 
             std::unique_ptr<osmium::io::Decompressor> m_decompressor;
 
@@ -257,7 +257,7 @@ namespace osmium {
                 return fd;
             }
 
-            std::unique_ptr<Decompressor> make_decompressor(const osmium::io::File& file, int fd) {
+            static std::unique_ptr<Decompressor> make_decompressor(const osmium::io::File& file, int fd) {
                 const auto& factory = osmium::io::CompressionFactory::instance();
                 if (file.buffer()) {
                     return factory.create_decompressor(file.compression(), file.buffer(), file.buffer_size());
