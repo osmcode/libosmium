@@ -30,8 +30,8 @@
 // Allow any format of output files (XML, PBF, ...)
 #include <osmium/io/any_output.hpp>
 
-#include <osmium/tags/tags_filter.hpp>
 #include <osmium/tags/taglist.hpp>
+#include <osmium/tags/tags_filter.hpp>
 
 void print_help() {
     std::cout << "osmium_filter [OPTIONS] [INFILE [OUTFILE]]\n\n" \
