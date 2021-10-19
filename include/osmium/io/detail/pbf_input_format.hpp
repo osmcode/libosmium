@@ -117,6 +117,7 @@ namespace osmium {
                 /**
                  * Read exactly size bytes from fd into buffer.
                  *
+                 * @pre Value in size parameter must fit in unsigned int
                  * @returns true if size bytes could be read
                  *          false if EOF was encountered
                  */
@@ -124,7 +125,7 @@ namespace osmium {
                     std::size_t to_read = size;
 
                     while (to_read > 0) {
-                        auto const read_size = osmium::io::detail::reliable_read(m_fd, buffer + (size - to_read), to_read);
+                        auto const read_size = osmium::io::detail::reliable_read(m_fd, buffer + (size - to_read), static_cast<unsigned int>(to_read));
                         if (read_size == 0) { // EOF
                             return false;
                         }
