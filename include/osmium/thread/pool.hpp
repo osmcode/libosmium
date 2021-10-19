@@ -221,17 +221,17 @@ namespace osmium {
             // std::result_of is deprecated in C++17 and removed in C++20,
             // so we use std::invoke_result_t.
             template <typename TFunction>
-            using result_type = std::invoke_result_t<TFunction>;
+            using submit_func_result_type = std::invoke_result_t<TFunction>;
 #else
             // For C++11 and C++14
             template <typename TFunction>
-            using result_type = typename std::result_of<TFunction()>::type;
+            using submit_func_result_type = typename std::result_of<TFunction()>::type;
 #endif
 
             template <typename TFunction>
-            std::future<result_type<TFunction>> submit(TFunction&& func) {
-                std::packaged_task<result_type<TFunction>()> task{std::forward<TFunction>(func)};
-                std::future<result_type<TFunction>> future_result{task.get_future()};
+            std::future<submit_func_result_type<TFunction>> submit(TFunction&& func) {
+                std::packaged_task<submit_func_result_type<TFunction>()> task{std::forward<TFunction>(func)};
+                std::future<submit_func_result_type<TFunction>> future_result{task.get_future()};
                 m_work_queue.push(std::move(task));
 
                 return future_result;
