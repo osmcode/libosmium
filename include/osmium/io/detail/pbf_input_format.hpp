@@ -142,7 +142,7 @@ namespace osmium {
                  */
                 uint32_t read_blob_header_size_from_file() {
                     if (m_fd != -1) {
-                        std::array<char, sizeof(uint32_t)> buffer;
+                        std::array<char, sizeof(uint32_t)> buffer{};
                         if (!read_exactly(buffer.data(), buffer.size())) {
                             return 0; // EOF
                         }

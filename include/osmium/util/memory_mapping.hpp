@@ -157,7 +157,7 @@ namespace osmium {
 #ifdef _WIN32
                 return 0;
 #else
-                struct statvfs stat;
+                struct statvfs stat{};
                 const int result = ::fstatvfs(fd, &stat);
                 if (result != 0) {
                     return 0;
