@@ -57,13 +57,17 @@ class NamesHandler : public osmium::handler::Handler {
 
 public:
 
+    // The callback functions can be either static or not depending on whether
+    // you need to access any member variables of the handler.
     // Nodes can be tagged amenity=pub.
-    void node(const osmium::Node& node) {
+    static void node(const osmium::Node& node) {
         output_pubs(node);
     }
 
+    // The callback functions can be either static or not depending on whether
+    // you need to access any member variables of the handler.
     // Ways can be tagged amenity=pub, too (typically buildings).
-    void way(const osmium::Way& way) {
+    static void way(const osmium::Way& way) {
         output_pubs(way);
     }
 

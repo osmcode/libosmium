@@ -63,7 +63,9 @@ using location_handler_type = osmium::handler::NodeLocationsForWays<index_type>;
 // ID and all nodes IDs and locations in those ways.
 struct MyHandler : public osmium::handler::Handler {
 
-    void way(const osmium::Way& way) {
+    // The callback functions can be either static or not depending on whether
+    // you need to access any member variables of the handler.
+    static void way(const osmium::Way& way) {
         std::cout << "way " << way.id() << "\n";
         for (const auto& nr : way.nodes()) {
             std::cout << "  node " << nr.ref() << " " << nr.location() << "\n";

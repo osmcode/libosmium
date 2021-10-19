@@ -83,7 +83,9 @@ class AmenityHandler : public osmium::handler::Handler {
 
 public:
 
-    void node(const osmium::Node& node) {
+    // The callback functions can be either static or not depending on whether
+    // you need to access any member variables of the handler.
+    static void node(const osmium::Node& node) {
         // Getting a tag value can be expensive, because a list of tags has
         // to be gone through and each tag has to be checked. So we store the
         // result and reuse it.
@@ -93,7 +95,9 @@ public:
         }
     }
 
-    void area(const osmium::Area& area) {
+    // The callback functions can be either static or not depending on whether
+    // you need to access any member variables of the handler.
+    static void area(const osmium::Area& area) {
         const char* amenity = area.tags()["amenity"];
         if (amenity) {
             // Use the center of the first outer ring. Because we set
