@@ -98,6 +98,8 @@ namespace osmium {
 
             osmium::thread::Pool* m_pool = nullptr;
 
+            std::atomic<std::size_t> m_offset{0};
+
             detail::ParserFactory::create_parser_type m_creator;
 
             enum class status {
@@ -126,7 +128,6 @@ namespace osmium {
             osmium::thread::thread_handler m_thread{};
 
             std::size_t m_file_size = 0;
-            std::atomic<std::size_t> m_offset{0};
 
             osmium::osm_entity_bits::type m_read_which_entities = osmium::osm_entity_bits::all;
             osmium::io::read_meta m_read_metadata = osmium::io::read_meta::yes;
@@ -257,17 +258,20 @@ namespace osmium {
                 return fd;
             }
 
-            static std::unique_ptr<Decompressor> make_decompressor(const osmium::io::File& file, int fd) {
+            static std::unique_ptr<Decompressor> make_decompressor(const osmium::io::File& file, int fd, std::atomic<std::size_t>* offset_ptr) {
                 const auto& factory = osmium::io::CompressionFactory::instance();
+                std::unique_ptr<Decompressor> decompressor;
+
                 if (file.buffer()) {
-                    return factory.create_decompressor(file.compression(), file.buffer(), file.buffer_size());
+                    decompressor = factory.create_decompressor(file.compression(), file.buffer(), file.buffer_size());
+                } else if (file.format() == file_format::pbf) {
+                    decompressor = std::unique_ptr<Decompressor>{new DummyDecompressor{}};
+                } else {
+                    decompressor = factory.create_decompressor(file.compression(), fd);
                 }
 
-                if (file.format() == file_format::pbf) {
-                    return std::unique_ptr<Decompressor>{new DummyDecompressor{}};
-                }
-
-                return factory.create_decompressor(file.compression(), fd);
+                decompressor->set_offset_ptr(offset_ptr);
+                return decompressor;
             }
 
         public:
@@ -318,7 +322,7 @@ namespace osmium {
                 m_creator(detail::ParserFactory::instance().get_creator_function(m_file)),
                 m_input_queue(detail::get_input_queue_size(), "raw_input"),
                 m_fd(m_file.buffer() ? -1 : open_input_file_or_url(m_file.filename(), &m_childpid)),
-                m_decompressor(make_decompressor(m_file, m_fd)),
+                m_decompressor(make_decompressor(m_file, m_fd, &m_offset)),
                 m_read_thread_manager(*m_decompressor, m_input_queue),
                 m_osmdata_queue(detail::get_osmdata_queue_size(), "parser_results"),
                 m_osmdata_queue_wrapper(m_osmdata_queue),
@@ -331,8 +335,6 @@ namespace osmium {
                 if (!m_pool) {
                     m_pool = &thread::Pool::default_instance();
                 }
-
-                m_decompressor->set_offset_ptr(&m_offset);
 
                 std::promise<osmium::io::Header> header_promise;
                 m_header_future = header_promise.get_future();
