@@ -36,8 +36,6 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/handler.hpp>
 #include <osmium/osm/object.hpp>
 
-#include <boost/iterator/indirect_iterator.hpp>
-
 #include <algorithm>
 #include <utility>
 #include <vector>
@@ -45,6 +43,31 @@ DEALINGS IN THE SOFTWARE.
 // IWYU pragma: no_forward_declare osmium::OSMObject
 
 namespace osmium {
+
+    template <typename TBaseIterator, typename TValue>
+    class indirect_iterator : public TBaseIterator {
+
+    public:
+
+        using iterator_category = std::random_access_iterator_tag;
+        using value_type        = TValue;
+        using difference_type   = std::ptrdiff_t;
+        using pointer           = value_type*;
+        using reference         = value_type&;
+
+        indirect_iterator(TBaseIterator it) :
+            TBaseIterator(it) {
+        }
+
+        reference operator*() const noexcept {
+            return *TBaseIterator::operator*();
+        }
+
+        pointer operator->() const noexcept {
+            return &*TBaseIterator::operator*();
+        }
+
+    }; // class indirect_iterator
 
     /**
      * A collection of pointers to OSM objects. The pointers can be easily
@@ -71,8 +94,8 @@ namespace osmium {
 
     public:
 
-        using iterator       = boost::indirect_iterator<std::vector<osmium::OSMObject*>::iterator, osmium::OSMObject>;
-        using const_iterator = boost::indirect_iterator<std::vector<osmium::OSMObject*>::const_iterator, const osmium::OSMObject>;
+        using iterator       = indirect_iterator<std::vector<osmium::OSMObject*>::iterator, osmium::OSMObject>;
+        using const_iterator = indirect_iterator<std::vector<osmium::OSMObject*>::const_iterator, const osmium::OSMObject>;
 
         using ptr_iterator = std::vector<osmium::OSMObject*>::iterator;
 
