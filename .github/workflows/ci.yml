@@ -6,6 +6,7 @@ jobs:
 
   linux:
     runs-on: ubuntu-latest
+    timeout-minutes: 40
     strategy:
       fail-fast: false
       matrix:
@@ -196,6 +197,7 @@ jobs:
 
   ubuntu-latest:
     runs-on: ubuntu-20.04
+    timeout-minutes: 40
     env:
       CC: clang-13
       CXX: clang++-13
@@ -218,6 +220,7 @@ jobs:
 
   macos10-dev:
     runs-on: macos-10.15
+    timeout-minutes: 40
     env:
       CC: clang
       CXX: clang++
@@ -252,6 +255,7 @@ jobs:
 
   macos11-release:
     runs-on: macos-11
+    timeout-minutes: 40
     env:
       CC: clang
       CXX: clang++
@@ -269,6 +273,7 @@ jobs:
 
   windows-minimal:
     runs-on: windows-latest
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v2
         with:
