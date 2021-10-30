@@ -1,10 +1,10 @@
-name: Build
+name: Windows Build
 
 runs:
   using: composite
   steps:
     - name: Build
-      run: make VERBOSE=1
+      run: cmake --build . --config Release --verbose
       shell: bash
       working-directory: build
 

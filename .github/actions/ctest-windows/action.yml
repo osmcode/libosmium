@@ -1,10 +1,10 @@
-name: Build
+name: Windows Test
 
 runs:
   using: composite
   steps:
-    - name: Build
-      run: make VERBOSE=1
+    - name: Test
+      run: ctest --output-on-failure -C Release
       shell: bash
       working-directory: build
 
