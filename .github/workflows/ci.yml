@@ -85,14 +85,6 @@ jobs:
             cpp_compiler: clang++
             CXXFLAGS: -fsanitize=address,undefined,integer -fno-sanitize-recover=all -fno-omit-frame-pointer
             LDFLAGS: -fsanitize=address,undefined,integer
-          - name: Debian-11
-            # Uses gcc 10.2.1, clang 11.0.1, cmake 3.18.4
-            image: "debian:bullseye"
-            installer: apt
-            c_compiler: clang
-            cpp_compiler: clang++
-            CXXFLAGS: -fsanitize=thread -fno-sanitize-recover=all -fno-omit-frame-pointer
-            LDFLAGS: -fsanitize=thread
           - name: Debian-Testing
             # Uses gcc 10.3.0, clang 11.1.0, cmake 3.21.3
             image: "debian:testing"
