@@ -115,6 +115,8 @@ namespace osmium {
 
             int m_fd = -1;
 
+            std::size_t m_file_size = 0;
+
             std::unique_ptr<osmium::io::Decompressor> m_decompressor;
 
             osmium::io::detail::ReadThreadManager m_read_thread_manager;
@@ -126,8 +128,6 @@ namespace osmium {
             osmium::io::Header m_header{};
 
             osmium::thread::thread_handler m_thread{};
-
-            std::size_t m_file_size = 0;
 
             osmium::osm_entity_bits::type m_read_which_entities = osmium::osm_entity_bits::all;
             osmium::io::read_meta m_read_metadata = osmium::io::read_meta::yes;
@@ -322,11 +322,11 @@ namespace osmium {
                 m_creator(detail::ParserFactory::instance().get_creator_function(m_file)),
                 m_input_queue(detail::get_input_queue_size(), "raw_input"),
                 m_fd(m_file.buffer() ? -1 : open_input_file_or_url(m_file.filename(), &m_childpid)),
+                m_file_size(m_fd > 2 ? osmium::file_size(m_fd) : 0),
                 m_decompressor(make_decompressor(m_file, m_fd, &m_offset)),
                 m_read_thread_manager(*m_decompressor, m_input_queue),
                 m_osmdata_queue(detail::get_osmdata_queue_size(), "parser_results"),
-                m_osmdata_queue_wrapper(m_osmdata_queue),
-                m_file_size(m_fd > 2 ? osmium::file_size(m_fd) : 0) {
+                m_osmdata_queue_wrapper(m_osmdata_queue) {
 
                 (void)std::initializer_list<int>{
                     (set_option(args), 0)...
