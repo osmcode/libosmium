@@ -131,7 +131,7 @@ static header_buffer_type read_xml(const char* test_id) {
 
 template <typename TException>
 void test_fail(const char* xml_file_name, const char* errmsg) {
-    REQUIRE_THROWS_AS(read_xml(xml_file_name), const TException&);
+    REQUIRE_THROWS_AS(read_xml(xml_file_name), TException);
     REQUIRE_THROWS_WITH(read_xml(xml_file_name), errmsg);
 
     REQUIRE_THROWS_AS([&](){
@@ -139,7 +139,7 @@ void test_fail(const char* xml_file_name, const char* errmsg) {
         const osmium::io::Header header{reader.header()};
         osmium::memory::Buffer buffer = reader.read();
         reader.close();
-    }(), const TException&);
+    }(), TException);
 }
 
 // =============================================
@@ -294,7 +294,7 @@ TEST_CASE("Reading OSM XML 120: Using Reader") {
 // =============================================
 
 TEST_CASE("Reading OSM XML 121: Direct") {
-    REQUIRE_THROWS_AS(read_gz_file("121-truncated_gzip_file", "osm.gz"), const osmium::gzip_error&);
+    REQUIRE_THROWS_AS(read_gz_file("121-truncated_gzip_file", "osm.gz"), osmium::gzip_error);
 }
 
 TEST_CASE("Reading OSM XML 121: Using Reader") {

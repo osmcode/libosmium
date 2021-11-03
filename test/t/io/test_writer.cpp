@@ -77,7 +77,7 @@ TEST_CASE("Writer: Successful writes writing buffer") {
 
     REQUIRE(count == count_fds());
 
-    REQUIRE_THROWS_AS(writer(osmium::memory::Buffer{}), const osmium::io_error&);
+    REQUIRE_THROWS_AS(writer(osmium::memory::Buffer{}), osmium::io_error);
 
     osmium::io::Reader reader_check{filename};
     const osmium::memory::Buffer buffer_check = reader_check.read();

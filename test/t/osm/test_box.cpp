@@ -14,7 +14,7 @@ TEST_CASE("Default constructor creates invalid box") {
     REQUIRE_FALSE(b);
     REQUIRE_FALSE(b.bottom_left());
     REQUIRE_FALSE(b.top_right());
-    REQUIRE_THROWS_AS(b.size(), const osmium::invalid_location&);
+    REQUIRE_THROWS_AS(b.size(), osmium::invalid_location);
 }
 
 TEST_CASE("Extend box with undefined") {

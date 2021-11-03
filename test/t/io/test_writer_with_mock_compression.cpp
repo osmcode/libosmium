@@ -74,7 +74,7 @@ TEST_CASE("Write with mock compressor") {
             osmium::io::Writer writer("test-writer-mock-fail-on-construction.osm.gz", header, osmium::io::overwrite::allow);
             writer(std::move(buffer));
             writer.close();
-        }(), const std::logic_error&);
+        }(), std::logic_error);
 
     }
 
@@ -86,7 +86,7 @@ TEST_CASE("Write with mock compressor") {
             osmium::io::Writer writer("test-writer-mock-fail-on-write.osm.gz", header, osmium::io::overwrite::allow);
             writer(std::move(buffer));
             writer.close();
-        }(), const std::logic_error&);
+        }(), std::logic_error);
 
     }
 
@@ -98,7 +98,7 @@ TEST_CASE("Write with mock compressor") {
             osmium::io::Writer writer("test-writer-mock-fail-on-close.osm.gz", header, osmium::io::overwrite::allow);
             writer(std::move(buffer));
             writer.close();
-        }(), const std::logic_error&);
+        }(), std::logic_error);
 
     }
 

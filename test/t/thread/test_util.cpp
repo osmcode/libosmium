@@ -34,7 +34,7 @@ TEST_CASE("check_for_exception with exception") {
         p.set_exception(std::current_exception());
     }
 
-    REQUIRE_THROWS_AS(osmium::thread::check_for_exception(f), const std::runtime_error&);
+    REQUIRE_THROWS_AS(osmium::thread::check_for_exception(f), std::runtime_error);
 }
 
 static_assert(std::is_nothrow_move_constructible<osmium::thread::thread_handler>::value, "thread_handler must have noexcept move constructor");

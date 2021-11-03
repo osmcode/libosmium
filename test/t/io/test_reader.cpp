@@ -101,7 +101,7 @@ TEST_CASE("Reader should throw after eof") {
 
     REQUIRE(reader.eof());
 
-    REQUIRE_THROWS_AS(reader.read(), const osmium::io_error&);
+    REQUIRE_THROWS_AS(reader.read(), osmium::io_error);
 
     reader.close();
     REQUIRE(reader.eof());
@@ -116,7 +116,7 @@ TEST_CASE("Reader should not hang when apply() is called twice on reader") {
     osmium::handler::Handler handler;
 
     osmium::apply(reader, handler);
-    REQUIRE_THROWS_AS(osmium::apply(reader, handler), const osmium::io_error&);
+    REQUIRE_THROWS_AS(osmium::apply(reader, handler), osmium::io_error);
 
     reader.close();
     REQUIRE(count == count_fds());
@@ -310,7 +310,7 @@ TEST_CASE("Can call read() exactly once on Reader with entity_bits nothing") {
     osmium::memory::Buffer buffer = reader.read();
     REQUIRE_FALSE(buffer);
     REQUIRE(reader.eof());
-    REQUIRE_THROWS_AS(reader.read(), const osmium::io_error&);
+    REQUIRE_THROWS_AS(reader.read(), osmium::io_error);
 
     reader.close();
     REQUIRE(reader.eof());
@@ -338,7 +338,7 @@ TEST_CASE("Can not read after close") {
 
     reader.close();
     REQUIRE(reader.eof());
-    REQUIRE_THROWS_AS(reader.read(), const osmium::io_error&);
+    REQUIRE_THROWS_AS(reader.read(), osmium::io_error);
 
     REQUIRE(count == count_fds());
 }

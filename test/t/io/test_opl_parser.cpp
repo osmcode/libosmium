@@ -49,13 +49,13 @@ TEST_CASE("Parse OPL: space") {
     const std::string d{"a b \t c"};
 
     const char* s = d.data();
-    REQUIRE_THROWS_AS(oid::opl_parse_space(&s), const osmium::opl_error&);
+    REQUIRE_THROWS_AS(oid::opl_parse_space(&s), osmium::opl_error);
 
     s = d.data() + 1;
     oid::opl_parse_space(&s);
     REQUIRE(*s == 'b');
 
-    REQUIRE_THROWS_AS(oid::opl_parse_space(&s), const osmium::opl_error&);
+    REQUIRE_THROWS_AS(oid::opl_parse_space(&s), osmium::opl_error);
 
     ++s;
     oid::opl_parse_space(&s);
@@ -1093,8 +1093,7 @@ TEST_CASE("Duplicate attributes") {
         REQUIRE_NOTHROW(osmium::opl_parse(line.c_str(), buffer));
         line += " ";
         line += attr;
-        REQUIRE_THROWS_AS(osmium::opl_parse(line.c_str(), buffer),
-                          const osmium::opl_error &);
+        REQUIRE_THROWS_AS(osmium::opl_parse(line.c_str(), buffer), osmium::opl_error);
     }
 
     for (const char *attr : {"v1", "dV", "c2", "t2020-01-01T00:00:01Z", "i3", "utest", "Ta=b", "Nn1"}) {
@@ -1102,8 +1101,7 @@ TEST_CASE("Duplicate attributes") {
         REQUIRE_NOTHROW(osmium::opl_parse(line.c_str(), buffer));
         line += " ";
         line += attr;
-        REQUIRE_THROWS_AS(osmium::opl_parse(line.c_str(), buffer),
-                          const osmium::opl_error &);
+        REQUIRE_THROWS_AS(osmium::opl_parse(line.c_str(), buffer), osmium::opl_error);
     }
 
     for (const char *attr : {"v1", "dV", "c2", "t2020-01-01T00:00:01Z", "i3", "utest", "Ta=b", "Mn1@foo"}) {
@@ -1111,8 +1109,7 @@ TEST_CASE("Duplicate attributes") {
         REQUIRE_NOTHROW(osmium::opl_parse(line.c_str(), buffer));
         line += " ";
         line += attr;
-        REQUIRE_THROWS_AS(osmium::opl_parse(line.c_str(), buffer),
-                          const osmium::opl_error &);
+        REQUIRE_THROWS_AS(osmium::opl_parse(line.c_str(), buffer), osmium::opl_error);
     }
 
     for (const char *attr : {"k1", "s2020-01-01T00:00:01Z", "e2020-01-01T00:00:02Z", "d1", "i3", "utest", "Ta=b", "x1", "y2", "X3", "Y4"}) {
@@ -1120,8 +1117,7 @@ TEST_CASE("Duplicate attributes") {
         REQUIRE_NOTHROW(osmium::opl_parse(line.c_str(), buffer));
         line += " ";
         line += attr;
-        REQUIRE_THROWS_AS(osmium::opl_parse(line.c_str(), buffer),
-                          const osmium::opl_error &);
+        REQUIRE_THROWS_AS(osmium::opl_parse(line.c_str(), buffer), osmium::opl_error);
     }
 }
 

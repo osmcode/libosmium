@@ -211,7 +211,7 @@ TEST_CASE("Roundtrip unicode characters") {
 TEST_CASE("invalid codepoint") {
     const char s[] = {static_cast<char>(0xff), static_cast<char>(0xff), static_cast<char>(0xff), static_cast<char>(0xff)};
     const char* it = s;
-    REQUIRE_THROWS_AS(osmium::io::detail::next_utf8_codepoint(&it, std::end(s)), const std::runtime_error&);
+    REQUIRE_THROWS_AS(osmium::io::detail::next_utf8_codepoint(&it, std::end(s)), std::runtime_error);
 }
 
 TEST_CASE("incomplete Unicode codepoint") {
@@ -224,7 +224,7 @@ TEST_CASE("incomplete Unicode codepoint") {
 
     for (int i : {0, 1, 2, 3}) {
         it = s;
-        REQUIRE_THROWS_AS(osmium::io::detail::next_utf8_codepoint(&it, s + i), const std::out_of_range&);
+        REQUIRE_THROWS_AS(osmium::io::detail::next_utf8_codepoint(&it, s + i), std::out_of_range);
     }
 }
 
