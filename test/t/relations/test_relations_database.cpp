@@ -53,7 +53,7 @@ TEST_CASE("Fill relation database") {
     int n = 0;
     rdb.for_each_relation([&](const osmium::relations::RelationHandle& rel_handle) {
         ++n;
-        REQUIRE(rel_handle->members().size() == (*rel_handle).id());
+        REQUIRE(rel_handle->members().size() == static_cast<std::size_t>(rel_handle->id()));
     });
     REQUIRE(n == 3);
 }
