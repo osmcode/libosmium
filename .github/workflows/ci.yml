@@ -112,6 +112,11 @@ jobs:
             image: "fedora:34"
             installer: dnf
             CXXFLAGS: -Wno-stringop-overread
+          - name: Fedora-35
+            # Uses gcc 11.2.1, clang 12.0.1, cmake 3.20.5
+            image: "fedora:35"
+            installer: dnf
+            CXXFLAGS: -Wno-stringop-overread
     container:
       image: ${{ matrix.image }}
       env:
