@@ -121,9 +121,10 @@ namespace osmium {
                 }
 
                 void drain() {
-                    while (!m_has_reached_end_of_data) {
+                    while (!m_queue.empty()) {
                         try {
-                            pop();
+                            std::future<T> data_future;
+                            m_queue.try_pop(data_future);
                         } catch (...) {
                             // Ignore any exceptions.
                         }
