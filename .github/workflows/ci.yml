@@ -89,6 +89,7 @@ jobs:
             # Uses gcc 10.3.0, clang 11.1.0, cmake 3.21.3
             image: "debian:testing"
             installer: apt
+            CXXFLAGS: -Wno-stringop-overread
           - name: Debian-Testing
             # Uses gcc 10.3.0, clang 11.1.0, cmake 3.21.3
             image: "debian:testing"
