@@ -923,7 +923,6 @@ TEST_CASE("Parse line") {
     osmium::memory::Buffer buffer{1024};
 
     SECTION("Empty line") {
-        const char* s = "";
         REQUIRE_FALSE(oid::opl_parse_line(0, "", buffer));
         REQUIRE(buffer.written() == 0);
     }

@@ -11,8 +11,6 @@
 #include "win_mkstemp.hpp"
 #endif
 
-static const size_t huge = std::numeric_limits<size_t>::max();
-
 TEST_CASE("Anonymous mapping: simple memory mapping should work") {
     osmium::MemoryMapping mapping{1000, osmium::MemoryMapping::mapping_mode::write_private};
     REQUIRE(mapping.get_addr() != nullptr);
