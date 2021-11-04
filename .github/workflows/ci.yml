@@ -270,7 +270,7 @@ jobs:
       - uses: ./.github/actions/ctest
 
   windows-minimal:
-    runs-on: windows-latest
+    runs-on: windows-2019
     timeout-minutes: 40
     steps:
       - uses: actions/checkout@v2
@@ -283,7 +283,7 @@ jobs:
       - uses: ./.github/actions/ctest-windows
 
   windows-full:
-    runs-on: windows-latest
+    runs-on: windows-2019
     steps:
       - uses: actions/checkout@v2
         with:
@@ -292,6 +292,19 @@ jobs:
       - name: Install extra packages
         run: vcpkg install geos:x64-windows gdal:x64-windows proj4:x64-windows
         shell: bash
+      - uses: ./.github/actions/install-protozero
+      - uses: ./.github/actions/cmake-windows
+      - uses: ./.github/actions/build-windows
+      - uses: ./.github/actions/ctest-windows
+
+  windows-2020:
+    runs-on: windows-2022
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - uses: ./.github/actions/install-windows
       - uses: ./.github/actions/install-protozero
       - uses: ./.github/actions/cmake-windows
       - uses: ./.github/actions/build-windows
