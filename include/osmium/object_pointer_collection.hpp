@@ -55,7 +55,7 @@ namespace osmium {
         using pointer           = value_type*;
         using reference         = value_type&;
 
-        indirect_iterator(TBaseIterator it) :
+        explicit indirect_iterator(TBaseIterator it) :
             TBaseIterator(it) {
         }
 
@@ -152,19 +152,19 @@ namespace osmium {
         }
 
         iterator begin() {
-            return {m_objects.begin()};
+            return iterator{m_objects.begin()};
         }
 
         iterator end() {
-            return {m_objects.end()};
+            return iterator{m_objects.end()};
         }
 
         const_iterator cbegin() const {
-            return {m_objects.cbegin()};
+            return const_iterator{m_objects.cbegin()};
         }
 
         const_iterator cend() const {
-            return {m_objects.cend()};
+            return const_iterator{m_objects.cend()};
         }
 
         /// Access to begin of pointer vector.
