@@ -171,7 +171,7 @@ namespace osmium {
                 class ExpatXMLParser {
 
                     XML_Parser m_parser;
-                    std::exception_ptr m_exception_ptr{};
+                    std::exception_ptr m_exception_ptr{}; // NOLINT(bugprone-throw-keyword-missing) see https://bugs.llvm.org/show_bug.cgi?id=52400
 
                     template <typename TFunc>
                     void member_wrap(XMLParser& xml_parser, TFunc&& func) noexcept {

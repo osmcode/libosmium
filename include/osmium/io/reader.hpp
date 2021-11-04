@@ -211,7 +211,7 @@ namespace osmium {
                         }
                     }
                     if (dup2(pipefd[1], 1) < 0) { // put end of pipe as stdout/stdin
-                        exit(1);
+                        std::exit(1); // NOLINT(concurrency-mt-unsafe)
                     }
 
                     ::open("/dev/null", O_RDONLY); // stdin
@@ -221,7 +221,7 @@ namespace osmium {
                     // in theory this execute() function could be used for other commands, but it is
                     // only used for curl at the moment, so this is okay.
                     if (::execlp(command.c_str(), command.c_str(), "-g", filename.c_str(), nullptr) < 0) {
-                        exit(1);
+                        std::exit(1); // NOLINT(concurrency-mt-unsafe)
                     }
                 }
                 // parent
