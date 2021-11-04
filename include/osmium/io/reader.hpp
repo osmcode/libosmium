@@ -540,7 +540,7 @@ namespace osmium {
          */
         template <typename... TArgs>
         osmium::memory::Buffer read_file(TArgs&&... args) {
-            osmium::memory::Buffer buffer{1024 * 1024, osmium::memory::Buffer::auto_grow::yes};
+            osmium::memory::Buffer buffer{1024UL * 1024UL, osmium::memory::Buffer::auto_grow::yes};
 
             Reader reader{std::forward<TArgs>(args)...};
             while (auto read_buffer = reader.read()) {

@@ -70,7 +70,7 @@ struct Handler2 : public osmium::handler::Handler {
 
 osmium::memory::Buffer fill_buffer() {
     using namespace osmium::builder::attr; // NOLINT(google-build-using-namespace)
-    osmium::memory::Buffer buffer{1024 * 1024, osmium::memory::Buffer::auto_grow::yes};
+    osmium::memory::Buffer buffer{1024UL * 1024UL, osmium::memory::Buffer::auto_grow::yes};
 
     osmium::builder::add_node(buffer, _id(1));
     osmium::builder::add_way(buffer, _id(2));

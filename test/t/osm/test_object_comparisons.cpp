@@ -11,6 +11,8 @@
 
 using namespace osmium::builder::attr; // NOLINT(google-build-using-namespace)
 
+constexpr const std::size_t test_buffer_size = 1024UL * 10UL;
+
 TEST_CASE("Object ID comparisons") {
     const osmium::object_id_type a =   0;
     const osmium::object_id_type b =  -1;
@@ -145,7 +147,7 @@ TEST_CASE("Object ID comparisons - the other way around") {
 
 TEST_CASE("Node comparisons") {
 
-    osmium::memory::Buffer buffer{10 * 1000};
+    osmium::memory::Buffer buffer{test_buffer_size};
     std::vector<std::reference_wrapper<osmium::Node>> nodes;
 
     SECTION("nodes are ordered by id, version, and timestamp") {
@@ -196,7 +198,7 @@ TEST_CASE("Node comparisons") {
 }
 
 TEST_CASE("Object comparisons: types are ordered nodes, then ways, then relations") {
-    osmium::memory::Buffer buffer{10 * 1000};
+    osmium::memory::Buffer buffer{test_buffer_size};
     std::vector<std::reference_wrapper<osmium::OSMObject>> objects;
 
     objects.emplace_back(buffer.get<osmium::Node>(    osmium::builder::add_node(    buffer, _id(3))));
@@ -207,7 +209,7 @@ TEST_CASE("Object comparisons: types are ordered nodes, then ways, then relation
 }
 
 TEST_CASE("Object comparisons with partially missing timestamp") {
-    osmium::memory::Buffer buffer{10 * 1000};
+    osmium::memory::Buffer buffer{test_buffer_size};
     const osmium::OSMObject& obj1 = buffer.get<osmium::Node>(osmium::builder::add_node(buffer, _id(3), _version(2), _timestamp(("2016-01-01T00:00:00Z"))));
     const osmium::OSMObject& obj2 = buffer.get<osmium::Node>(osmium::builder::add_node(buffer, _id(3), _version(2)));
 

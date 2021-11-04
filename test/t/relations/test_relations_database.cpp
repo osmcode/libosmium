@@ -9,7 +9,7 @@
 
 osmium::memory::Buffer fill_buffer() {
     using namespace osmium::builder::attr; // NOLINT(google-build-using-namespace)
-    osmium::memory::Buffer buffer{1024 * 1024, osmium::memory::Buffer::auto_grow::yes};
+    osmium::memory::Buffer buffer{1024UL * 1024UL, osmium::memory::Buffer::auto_grow::yes};
 
     osmium::builder::add_relation(buffer,
         _id(1),

@@ -96,7 +96,7 @@ TEST_CASE("Metadata options: fail") {
 }
 
 TEST_CASE("Metdata options: constructor using OSMObject") {
-    osmium::memory::Buffer buffer{10 * 1000};
+    osmium::memory::Buffer buffer{10UL * 1024UL};
     using namespace osmium::builder::attr; // NOLINT(google-build-using-namespace)
 
     SECTION("only version") {
