@@ -31,8 +31,7 @@ static std::string S_(const char8_t* s) {
 static std::string filename(const char* test_id, const char* suffix = "osm") {
     const char* testdir = getenv("TESTDIR");
     if (!testdir) {
-        std::cerr << "You have to set TESTDIR environment variable before running testdata-xml\n";
-        std::exit(2);
+        throw std::runtime_error{"You have to set TESTDIR environment variable before running testdata-xml"};
     }
 
     std::string f;

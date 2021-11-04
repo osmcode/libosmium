@@ -25,7 +25,6 @@
 */
 
 #include <cerrno>      // for errno
-#include <cstdlib>     // for std::exit
 #include <cstring>     // for strerror
 #include <fcntl.h>     // for open
 #include <iostream>    // for std::cout, std::cerr
@@ -77,7 +76,7 @@ struct MyHandler : public osmium::handler::Handler {
 int main(int argc, char* argv[]) {
     if (argc != 3) {
         std::cerr << "Usage: " << argv[0] << " OSM_FILE CACHE_FILE\n";
-        std::exit(1);
+        return 1;
     }
 
     try {
@@ -110,7 +109,7 @@ int main(int argc, char* argv[]) {
     } catch (const std::exception& e) {
         // All exceptions used by the Osmium library derive from std::exception.
         std::cerr << e.what() << '\n';
-        std::exit(1);
+        return 1;
     }
 }
 

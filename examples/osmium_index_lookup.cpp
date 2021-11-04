@@ -338,7 +338,7 @@ int main(int argc, char* argv[]) {
     if (fd < 0) {
         std::cerr << "Can not open file '" << options.filename()
                   << "': " << std::strerror(errno) << '\n';
-        std::exit(2);
+        return 2;
     }
 
 #ifdef _WIN32
@@ -365,7 +365,7 @@ int main(int argc, char* argv[]) {
     } catch (const std::exception& e) {
         // All exceptions used by the Osmium library derive from std::exception.
         std::cerr << e.what() << '\n';
-        std::exit(1);
+        return 1;
     }
 }
 
