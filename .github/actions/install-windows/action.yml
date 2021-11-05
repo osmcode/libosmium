@@ -4,6 +4,6 @@ runs:
   using: composite
   steps:
     - name: Install packages
-      run: vcpkg install bzip2:x64-windows expat:x64-windows zlib:x64-windows boost-crc:x64-windows boost-iterator:x64-windows boost-variant:x64-windows sparsehash:x64-windows
+      run: vcpkg install bzip2:x64-windows expat:x64-windows zlib:x64-windows boost-crc:x64-windows boost-variant:x64-windows sparsehash:x64-windows
       shell: bash
 
