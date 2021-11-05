@@ -65,6 +65,14 @@ namespace osmium {
                     m_vector() {
                 }
 
+                VectorBasedDenseMap(const VectorBasedDenseMap&) = default;
+                VectorBasedDenseMap& operator=(const VectorBasedDenseMap&) = default;
+
+                VectorBasedDenseMap(VectorBasedDenseMap&&) noexcept = default;
+                VectorBasedDenseMap& operator=(VectorBasedDenseMap&&) noexcept = default;
+
+                ~VectorBasedDenseMap() noexcept override = default;
+
                 explicit VectorBasedDenseMap(int fd) :
                     m_vector(fd) {
                 }
@@ -179,6 +187,14 @@ namespace osmium {
                 explicit VectorBasedSparseMap(int fd) :
                     m_vector(fd) {
                 }
+
+                VectorBasedSparseMap(const VectorBasedSparseMap&) = default;
+                VectorBasedSparseMap& operator=(const VectorBasedSparseMap&) = default;
+
+                VectorBasedSparseMap(VectorBasedSparseMap&&) noexcept = default;
+                VectorBasedSparseMap& operator=(VectorBasedSparseMap&&) noexcept = default;
+
+                ~VectorBasedSparseMap() noexcept override = default;
 
                 void set(const TId id, const TValue value) final {
                     m_vector.push_back(element_type(id, value));

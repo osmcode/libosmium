@@ -67,7 +67,7 @@ namespace osmium {
             IdSet(IdSet&&) noexcept = default;
             IdSet& operator=(IdSet&&) noexcept = default;
 
-            virtual ~IdSet() = default;
+            virtual ~IdSet() noexcept = default;
 
             /**
              * Add the given Id to the set.
@@ -382,6 +382,8 @@ namespace osmium {
             std::vector<T> m_data;
 
         public:
+
+            ~IdSetSmall() noexcept override = default;
 
             /**
              * Add the given Id to the set.

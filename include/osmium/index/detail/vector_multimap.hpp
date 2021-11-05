@@ -75,6 +75,14 @@ namespace osmium {
                     m_vector(fd) {
                 }
 
+                VectorBasedSparseMultimap(const VectorBasedSparseMultimap&) = default;
+                VectorBasedSparseMultimap& operator=(const VectorBasedSparseMultimap&) = default;
+
+                VectorBasedSparseMultimap(VectorBasedSparseMultimap&&) noexcept = default;
+                VectorBasedSparseMultimap& operator=(VectorBasedSparseMultimap&&) noexcept = default;
+
+                ~VectorBasedSparseMultimap() noexcept override = default;
+
                 void set(const TId id, const TValue value) final {
                     m_vector.push_back(element_type(id, value));
                 }

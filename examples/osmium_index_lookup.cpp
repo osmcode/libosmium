@@ -70,7 +70,7 @@ public:
     IndexAccess(IndexAccess&&) = delete;
     IndexAccess& operator=(IndexAccess&&) = delete;
 
-    virtual ~IndexAccess() = default;
+    virtual ~IndexAccess() noexcept = default;
 
     virtual void dump() const = 0;
 
@@ -96,6 +96,14 @@ public:
     explicit IndexAccessDense(int fd) :
         IndexAccess<TValue>(fd) {
     }
+
+    IndexAccessDense(const IndexAccessDense&) = default;
+    IndexAccessDense& operator=(const IndexAccessDense&) = default;
+
+    IndexAccessDense(IndexAccessDense&&) = default;
+    IndexAccessDense& operator=(IndexAccessDense&&) = default;
+
+    ~IndexAccessDense() noexcept override = default;
 
     void dump() const override {
         index_type index{this->fd()};
@@ -135,6 +143,14 @@ public:
     explicit IndexAccessSparse(int fd) :
         IndexAccess<TValue>(fd) {
     }
+
+    IndexAccessSparse(const IndexAccessSparse&) = default;
+    IndexAccessSparse& operator=(const IndexAccessSparse&) = default;
+
+    IndexAccessSparse(IndexAccessSparse&&) = default;
+    IndexAccessSparse& operator=(IndexAccessSparse&&) = default;
+
+    ~IndexAccessSparse() noexcept override = default;
 
     void dump() const override {
         index_type index{this->fd()};
