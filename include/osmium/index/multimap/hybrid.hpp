@@ -106,9 +106,8 @@ namespace osmium {
                 const element_type& operator*() {
                     if (m_begin_main == m_end_main) {
                         return *m_begin_extra;
-                    } else {
-                        return *m_begin_main;
                     }
+                    return *m_begin_main;
                 }
 
                 const element_type* operator->() {
