@@ -134,7 +134,8 @@ jobs:
           export APT_LISTCHANGES_FRONTEND=none
           export DEBIAN_FRONTEND=noninteractive
           apt-get update -qq
-          apt-get install -y clang \
+          apt-get install -y \
+            clang \
             cmake \
             doxygen \
             g++ \
@@ -145,6 +146,7 @@ jobs:
             libexpat1-dev \
             libgdal-dev \
             libgeos++-dev \
+            liblz4-dev \
             libproj-dev \
             libsparsehash-dev \
             make \
@@ -175,6 +177,7 @@ jobs:
               geos-devel \
               git \
               graphviz \
+              lz4-devel \
               make \
               proj-devel \
               ruby \
@@ -236,6 +239,7 @@ jobs:
 
   macos11-dev:
     runs-on: macos-11
+    timeout-minutes: 40
     env:
       CC: clang
       CXX: clang++
@@ -269,7 +273,7 @@ jobs:
       - uses: ./.github/actions/build
       - uses: ./.github/actions/ctest
 
-  windows-minimal:
+  windows-2019-minimal:
     runs-on: windows-2019
     timeout-minutes: 40
     steps:
@@ -282,7 +286,7 @@ jobs:
       - uses: ./.github/actions/build-windows
       - uses: ./.github/actions/ctest-windows
 
-  windows-full:
+  windows-2019-full:
     runs-on: windows-2019
     steps:
       - uses: actions/checkout@v2
@@ -297,7 +301,7 @@ jobs:
       - uses: ./.github/actions/build-windows
       - uses: ./.github/actions/ctest-windows
 
-  windows-2020:
+  windows-2022-minimal:
     runs-on: windows-2022
     timeout-minutes: 40
     steps:

@@ -11,6 +11,7 @@ runs:
              libboost-dev \
              libgdal-dev \
              libgeos++-dev \
+             liblz4-dev \
              libproj-dev \
              libsparsehash-dev \
              ruby-json \

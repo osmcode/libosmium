@@ -41,6 +41,7 @@ jobs:
             libexpat1-dev \
             libgdal-dev \
             libgeos++-dev \
+            liblz4-dev \
             libproj-dev \
             libsparsehash-dev \
             make \

@@ -170,9 +170,9 @@ set(OSMIUM_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
 include_directories(${OSMIUM_INCLUDE_DIR})
 
 if(WITH_PROJ)
-    find_package(Osmium COMPONENTS io gdal geos proj)
+    find_package(Osmium COMPONENTS lz4 io gdal geos proj)
 else()
-    find_package(Osmium COMPONENTS io gdal geos)
+    find_package(Osmium COMPONENTS lz4 io gdal geos)
 endif()
 
 # The find_package put the directory where it found the libosmium includes
