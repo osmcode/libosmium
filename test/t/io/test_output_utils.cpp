@@ -87,14 +87,11 @@ TEST_CASE("UTF8 encoding: encode characters that are special in OPL") {
     REQUIRE(out == "%20%%0a%%2c%%3d%%40%");
 }
 
-// workaround for missing support for u8 string literals on Windows
-#if !defined(_MSC_VER)
 TEST_CASE("UTF8 encoding: encode multibyte character") {
     std::string out;
     osmium::io::detail::append_utf8_encoded_string(out, u8cast(u8"\u30dc_\U0001d11e_\U0001f6eb"));
     REQUIRE(out == "%30dc%_%1d11e%_%1f6eb%");
 }
-#endif
 
 TEST_CASE("html encoding does not encode normal characters") {
     const char* s = "abc123,.-";
