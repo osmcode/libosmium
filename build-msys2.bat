@@ -9,7 +9,7 @@ SET "PATH=C:\msys64\mingw64\bin;C:\msys64\usr\bin;%PATH%"
 echo %PATH%
 
 echo "Installing MSYS2 packages..."
-bash -lc "pacman -Sy --needed --noconfirm mingw-w64-x86_64-gcc mingw-w64-x86_64-geos mingw-w64-x86_64-cmake mingw-w64-x86_64-boost mingw-w64-x86_64-cppcheck mingw-w64-x86_64-doxygen mingw-w64-x86_64-gdb mingw-w64-x86_64-sparsehash mingw-w64-x86_64-gdal mingw-w64-x86_64-ruby mingw-w64-x86_64-libspatialite mingw-w64-x86_64-spatialite-tools mingw-w64-x86_64-clang-tools-extra"
+bash -lc "pacman -Sy --needed --noconfirm mingw-w64-x86_64-gcc mingw-w64-x86_64-geos mingw-w64-x86_64-cmake mingw-w64-x86_64-boost mingw-w64-x86_64-cppcheck mingw-w64-x86_64-doxygen mingw-w64-x86_64-gdb mingw-w64-x86_64-gdal mingw-w64-x86_64-ruby mingw-w64-x86_64-libspatialite mingw-w64-x86_64-spatialite-tools mingw-w64-x86_64-clang-tools-extra"
 bash -lc "pacman -Sy --needed --noconfirm mingw-w64-x86_64-postgresql mingw-w64-x86_64-netcdf mingw-w64-x86_64-crypto++"
 call C:\msys64\mingw64\bin\gem.cmd install json
 
