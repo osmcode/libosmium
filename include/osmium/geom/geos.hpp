@@ -54,7 +54,6 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/geom/coordinates.hpp>
 #include <osmium/geom/factory.hpp>
-#include <osmium/util/compatibility.hpp>
 
 #include <geos/geom/Coordinate.h>
 #include <geos/geom/CoordinateSequence.h>
@@ -114,16 +113,6 @@ namespace osmium {
                     m_precision_model(nullptr),
                     m_our_geos_factory(nullptr),
                     m_geos_factory(&geos_factory) {
-                }
-
-                /**
-                 * @deprecated Do not set SRID explicitly. It will be set to the
-                 *             correct value automatically.
-                 */
-                OSMIUM_DEPRECATED explicit GEOSFactoryImpl(int /* srid */, int srid) :
-                    m_precision_model(new geos::geom::PrecisionModel),
-                    m_our_geos_factory(new geos::geom::GeometryFactory{m_precision_model.get(), srid}),
-                    m_geos_factory(m_our_geos_factory.get()) {
                 }
 
                 explicit GEOSFactoryImpl(int srid) :

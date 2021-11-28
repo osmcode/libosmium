@@ -8,7 +8,6 @@
 #include <osmium/index/map/sparse_file_array.hpp>
 #include <osmium/index/map/sparse_mem_array.hpp>
 #include <osmium/index/map/sparse_mem_map.hpp>
-#include <osmium/index/map/sparse_mem_table.hpp>
 #include <osmium/index/map/sparse_mmap_array.hpp>
 #include <osmium/index/node_locations_map.hpp>
 #include <osmium/osm/location.hpp>
@@ -142,20 +141,6 @@ TEST_CASE("Map Id to location: DenseFileArray") {
     index_type index2;
     test_func_real<index_type>(index2);
 }
-
-#ifdef OSMIUM_WITH_SPARSEHASH
-
-TEST_CASE("Map Id to location: SparseMemTable") {
-    using index_type = osmium::index::map::SparseMemTable<osmium::unsigned_object_id_type, osmium::Location>;
-
-    index_type index1;
-    test_func_all<index_type>(index1);
-
-    index_type index2;
-    test_func_real<index_type>(index2);
-}
-
-#endif
 
 TEST_CASE("Map Id to location: SparseMemMap") {
     using index_type = osmium::index::map::SparseMemMap<osmium::unsigned_object_id_type, osmium::Location>;

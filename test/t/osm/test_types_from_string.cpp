@@ -83,22 +83,6 @@ TEST_CASE("set changeset id from string") {
     REQUIRE_THROWS_AS(osmium::string_to_changeset_id("999999999999"), std::range_error);
 }
 
-TEST_CASE("set user id from string") {
-    REQUIRE(osmium::string_to_user_id("0") == 0);
-    REQUIRE(osmium::string_to_user_id("1") == 1);
-    REQUIRE(osmium::string_to_user_id("-1") == -1);
-    REQUIRE(osmium::string_to_user_id("2147483647") == 2147483647);
-
-    REQUIRE_THROWS_AS(osmium::string_to_user_id("-2"), std::range_error);
-    REQUIRE_THROWS_AS(osmium::string_to_user_id(""), std::range_error);
-    REQUIRE_THROWS_AS(osmium::string_to_user_id(" "), std::range_error);
-    REQUIRE_THROWS_AS(osmium::string_to_user_id(" 22"), std::range_error);
-    REQUIRE_THROWS_AS(osmium::string_to_user_id("x"), std::range_error);
-    REQUIRE_THROWS_AS(osmium::string_to_user_id("2147483648"), std::range_error);
-    REQUIRE_THROWS_AS(osmium::string_to_user_id("4294967295"), std::range_error);
-    REQUIRE_THROWS_AS(osmium::string_to_user_id("999999999999"), std::range_error);
-}
-
 TEST_CASE("set uid from string") {
     REQUIRE(osmium::string_to_uid("0") == 0);
     REQUIRE(osmium::string_to_uid("1") == 1);

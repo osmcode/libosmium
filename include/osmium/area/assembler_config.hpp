@@ -33,8 +33,6 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-#include <osmium/util/compatibility.hpp>
-
 namespace osmium {
 
     namespace area {
@@ -133,16 +131,6 @@ namespace osmium {
             explicit AssemblerConfig(ProblemReporter* pr, bool d = false) :
                 problem_reporter(pr),
                 debug_level(d) {
-            }
-
-            /**
-             * Enable or disable debug output to stderr. This is for Osmium
-             * developers only.
-             *
-             * @deprecated Set debug_level directly.
-             */
-            OSMIUM_DEPRECATED void enable_debug_output(bool d = true) {
-                debug_level = d;
             }
 
         }; // struct AssemblerConfig

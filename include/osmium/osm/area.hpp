@@ -41,7 +41,6 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/osm/node_ref_list.hpp>
 #include <osmium/osm/object.hpp>
 #include <osmium/osm/types.hpp>
-#include <osmium/util/compatibility.hpp>
 
 #include <cassert>
 #include <cstdlib>
@@ -206,32 +205,6 @@ namespace osmium {
          */
         bool is_multipolygon() const {
             return num_rings().first > 1;
-        }
-
-        /**
-         * @deprecated Use inner_rings() instead.
-         *
-         * Get iterator for iterating over all inner rings in a specified outer
-         * ring.
-         *
-         * @param it Iterator specifying outer ring.
-         * @returns Iterator to first inner ring in specified outer ring.
-         */
-        OSMIUM_DEPRECATED static osmium::memory::ItemIterator<const osmium::InnerRing> inner_ring_cbegin(const osmium::memory::ItemIterator<const osmium::OuterRing>& it) {
-            return it.cast<const osmium::InnerRing>();
-        }
-
-        /**
-         * @deprecated Use inner_rings() instead.
-         *
-         * Get iterator for iterating over all inner rings in a specified outer
-         * ring.
-         *
-         * @param it Iterator specifying outer ring.
-         * @returns Iterator one past last inner ring in specified outer ring.
-         */
-        OSMIUM_DEPRECATED static osmium::memory::ItemIterator<const osmium::InnerRing> inner_ring_cend(const osmium::memory::ItemIterator<const osmium::OuterRing>& it) {
-            return std::next(it).cast<const osmium::InnerRing>();
         }
 
         /**

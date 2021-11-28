@@ -15,6 +15,36 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+### Removed deprecated parts of the code
+
+Several parts of libosmium have been marked deprecated, many of them for a very
+long time. These are now removed:
+
+* Sparsehash index class `osmium::index::map::SparseMemTable` as well as the
+  complete file `osmium/index/map/sparse_mem_table.hpp`.
+* Callback functionality of the `osmium::memory::Buffer` class. The
+  `set_full_callback()` will not be available any more. See the source
+  for replacement options.
+* Various `osmium::builder::build_*` functions in
+  `osmium/builder/builder_helper.hpp`. Use `osmium::builder::add_*`
+  functions instead. Removes `builder_helper.hpp`.
+* `osmium::builder::Builder::add_item(const osmium::memory::Item* item)`.
+  Use the function of the same name taking a reference instead.
+* `osmium::builder::OSMObject/ChangesetBuilder::add_user()`. Use
+  `set_user()` instead.
+* `osmium::builder::ChangesetBuilder::bounds()` returning a modifiable
+  reference. Use `set_bounds()` instead.
+* Several functions around `osmium::io::OutputIterator`.
+* `osmium::Area::inner_ring_cbegin/cend()`, use `inner_rings()` instead.
+* `osmium::RelationMember::ref()`, use `set_ref()` instead.
+* Implicit conversion from `osmium::Timestamp` to `std::time_t`. Use
+  `seconds_since_epoch()` instead.
+* `osmium::string_to_user_id()`, use `string_to_uid` instead.
+* `osmium::static_cast_with_assert()` helper functions as well as the
+  complete include file `osmium/util/cast.hpp`.
+* Some constructors of `osmium::util::MemoryMapping` and
+  `osmium::util::TypedMemoryMapping`. Use other constructor instead.
+
 
 ## [2.17.3] - 2022-01-19
 

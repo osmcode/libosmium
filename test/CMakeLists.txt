@@ -219,7 +219,6 @@ add_unit_test(thread test_pool ENABLE_IF ${Threads_FOUND} LIBS ${CMAKE_THREAD_LI
 add_unit_test(thread test_queue ENABLE_IF ${Threads_FOUND} LIBS ${CMAKE_THREAD_LIBS_INIT})
 add_unit_test(thread test_util ENABLE_IF ${Threads_FOUND} LIBS ${CMAKE_THREAD_LIBS_INIT})
 
-add_unit_test(util test_cast_with_assert)
 add_unit_test(util test_config)
 add_unit_test(util test_delta)
 add_unit_test(util test_double)
