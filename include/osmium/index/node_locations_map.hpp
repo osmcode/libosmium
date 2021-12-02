@@ -59,6 +59,10 @@ DEALINGS IN THE SOFTWARE.
     REGISTER_MAP(osmium::unsigned_object_id_type, osmium::Location, osmium::index::map::SparseMemArray, sparse_mem_array)
 #endif
 
+#ifdef OSMIUM_HAS_INDEX_MAP_SPARSE_MEM_COMPACT_ARRAY
+    REGISTER_MAP(osmium::unsigned_object_id_type, osmium::Location, osmium::index::map::SparseMemCompactArray, sparse_mem_compact_array)
+#endif
+
 #ifdef OSMIUM_HAS_INDEX_MAP_SPARSE_MEM_MAP
     REGISTER_MAP(osmium::unsigned_object_id_type, osmium::Location, osmium::index::map::SparseMemMap, sparse_mem_map)
 #endif

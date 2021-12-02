@@ -12,7 +12,7 @@ BENCHMARK_NAME=index_map
 CMD=$OB_DIR/osmium_benchmark_$BENCHMARK_NAME
 
 #MAPS="sparse_mem_map sparse_mem_table sparse_mem_array sparse_mmap_array sparse_file_array dense_mem_array dense_mmap_array dense_file_array"
-MAPS="sparse_mem_map sparse_mem_table sparse_mem_array sparse_mmap_array sparse_file_array"
+MAPS="sparse_mem_map sparse_mem_array sparse_mmap_array sparse_file_array sparse_mem_compact_array"
 
 echo "# file size num mem time cpu_kernel cpu_user cpu_percent cmd options"
 for data in $OB_DATA_FILES; do
