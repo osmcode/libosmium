@@ -86,7 +86,7 @@ namespace osmium {
                 SparseMemCompactArray() = default;
 
                 void set(const TId id, const TValue value) final {
-                    if (m_index.empty() or id != m_last_id + 1) {
+                    if (m_index.empty() || id != m_last_id + 1) {
                         m_index.push_back({id, m_elements.size()});
                     }
                     m_last_id = id;
@@ -119,7 +119,7 @@ namespace osmium {
                         return osmium::index::empty_value<TValue>();
                     }
 
-                    if (next != m_index.end() and elem_index >= next->second) { // Position greater than next position in index
+                    if (next != m_index.end() && elem_index >= next->second) { // Position greater than next position in index
                         return osmium::index::empty_value<TValue>();
                     }
 
