@@ -55,7 +55,7 @@ osmium::Location location_matching_id(osmium::unsigned_object_id_type id) {
 
 template <typename TIndex>
 void test_func_real(TIndex& index) {
-    const std::vector<osmium::unsigned_object_id_type> ordered_ids{2, 3, 4, 5, 10, 11, 12, 20, 30, 31};
+    const std::vector<osmium::unsigned_object_id_type> ordered_ids{0, 1, 2, 3, 4, 5, 10, 11, 12, 20, 30, 31};
     const std::vector<osmium::unsigned_object_id_type> unordered_ids{40, 13, 6, 7, 8, 39, 25};
 
     // Set of missing IDs

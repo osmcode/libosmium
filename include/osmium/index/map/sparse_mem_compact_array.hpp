@@ -65,7 +65,7 @@ namespace osmium {
                 using index_type = typename std::pair<TId, size_t>;
                 using id_value_pair_type = typename std::pair<TId, TValue>;
 
-                TId m_last_id = -1;
+                TId m_last_id;
                 std::vector<TValue> m_elements;
                 std::vector<index_type> m_index;
 
@@ -86,7 +86,7 @@ namespace osmium {
                 SparseMemCompactArray() = default;
 
                 void set(const TId id, const TValue value) final {
-                    if (id != m_last_id + 1) {
+                    if (m_index.empty() or id != m_last_id + 1) {
                         m_index.push_back({id, m_elements.size()});
                     }
                     m_last_id = id;
@@ -136,7 +136,6 @@ namespace osmium {
                 }
 
                 void clear() final {
-                    m_last_id = -1;
                     m_elements.clear();
                     m_index.clear();
                 }
