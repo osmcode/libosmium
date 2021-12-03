@@ -15,6 +15,7 @@
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/types.hpp>
 
+#include <limits>
 #include <memory>
 #include <set>
 #include <string>
@@ -106,6 +107,62 @@ void test_func_real(TIndex& index) {
     check_ids<TIndex>(index, set_ids);
 }
 
+template <typename TIndex>
+void test_func_limits(TIndex& index) {
+    const auto max_id = std::numeric_limits<osmium::unsigned_object_id_type>::max();
+
+    const osmium::unsigned_object_id_type id1 = 0;
+    const osmium::unsigned_object_id_type id2 = max_id;
+    const osmium::unsigned_object_id_type id3 = max_id/2;
+    const osmium::Location loc1{1.2, 4.5};
+    const osmium::Location loc2{3.5, -7.2};
+    const osmium::Location loc3{42.0, -12.3};
+
+    index.set(id1, loc1);
+    index.set(id2, loc2);
+    index.set(id3, loc3);
+
+    index.sort();
+
+    REQUIRE(loc1 == index.get(id1));
+    REQUIRE(loc2 == index.get(id2));
+    REQUIRE(loc3 == index.get(id3));
+
+    REQUIRE(loc1 == index.get_noexcept(id1));
+    REQUIRE(loc2 == index.get_noexcept(id2));
+    REQUIRE(loc3 == index.get_noexcept(id3));
+
+    REQUIRE_THROWS_AS(index.get(1), osmium::not_found);
+    REQUIRE_THROWS_AS(index.get(5), osmium::not_found);
+    REQUIRE_THROWS_AS(index.get(100), osmium::not_found);
+    REQUIRE_THROWS_AS(index.get(max_id-1), osmium::not_found);
+
+    REQUIRE(index.get_noexcept(1) == osmium::Location{});
+    REQUIRE(index.get_noexcept(5) == osmium::Location{});
+    REQUIRE(index.get_noexcept(100) == osmium::Location{});
+    REQUIRE(index.get_noexcept(max_id-1) == osmium::Location{});
+
+    index.clear();
+
+    REQUIRE_THROWS_AS(index.get(id1), osmium::not_found);
+    REQUIRE_THROWS_AS(index.get(id2), osmium::not_found);
+    REQUIRE_THROWS_AS(index.get(id3), osmium::not_found);
+
+    REQUIRE_THROWS_AS(index.get(0), osmium::not_found);
+    REQUIRE_THROWS_AS(index.get(1), osmium::not_found);
+    REQUIRE_THROWS_AS(index.get(5), osmium::not_found);
+    REQUIRE_THROWS_AS(index.get(100), osmium::not_found);
+
+    REQUIRE(index.get_noexcept(id1) == osmium::Location{});
+    REQUIRE(index.get_noexcept(id2) == osmium::Location{});
+    REQUIRE(index.get_noexcept(id3) == osmium::Location{});
+
+    REQUIRE(index.get_noexcept(1) == osmium::Location{});
+    REQUIRE(index.get_noexcept(5) == osmium::Location{});
+    REQUIRE(index.get_noexcept(100) == osmium::Location{});
+    REQUIRE(index.get_noexcept(max_id-1) == osmium::Location{});
+}
+
 TEST_CASE("Map Id to location: Dummy") {
     using index_type = osmium::index::map::Dummy<osmium::unsigned_object_id_type, osmium::Location>;
 
@@ -166,6 +223,9 @@ TEST_CASE("Map Id to location: SparseMemTable") {
 
     index_type index2;
     test_func_real<index_type>(index2);
+
+    index_type index3;
+    test_func_limits<index_type>(index3);
 }
 
 #endif
@@ -178,6 +238,9 @@ TEST_CASE("Map Id to location: SparseMemMap") {
 
     index_type index2;
     test_func_real<index_type>(index2);
+
+    index_type index3;
+    test_func_limits<index_type>(index3);
 }*/
 
 TEST_CASE("Map Id to location: SparseMemArray") {
@@ -194,6 +257,9 @@ TEST_CASE("Map Id to location: SparseMemArray") {
 
     index_type index2;
     test_func_real<index_type>(index2);
+
+    index_type index3;
+    test_func_limits<index_type>(index3);
 }
 
 TEST_CASE("Map Id to location: SparseMemCompactArray") {
@@ -210,6 +276,9 @@ TEST_CASE("Map Id to location: SparseMemCompactArray") {
 
   index_type index2;
   test_func_real<index_type>(index2);
+
+  index_type index3;
+  test_func_limits<index_type>(index3);
 }
 
 #ifdef __linux__
@@ -221,6 +290,9 @@ TEST_CASE("Map Id to location: SparseMmapArray") {
 
     index_type index2;
     test_func_real<index_type>(index2);
+
+    index_type index3;
+    test_func_limits<index_type>(index3);
 }
 #else
 # pragma message("not running 'SparseMmapArray' test case on this machine")
@@ -234,6 +306,9 @@ TEST_CASE("Map Id to location: FlexMem sparse") {
 
     index_type index2;
     test_func_real<index_type>(index2);
+
+    index_type index3;
+    test_func_limits<index_type>(index3);
 }
 
 TEST_CASE("Map Id to location: FlexMem dense") {
