@@ -54,77 +54,56 @@ osmium::Location location_matching_id(osmium::unsigned_object_id_type id) {
 }
 
 template <typename TIndex>
+void check_ids(TIndex& index, std::vector<bool>& set_ids) {
+    for (osmium::unsigned_object_id_type id = 0; id < set_ids.size(); ++id) {
+        if (set_ids[id]) {
+            REQUIRE(location_matching_id(id) == index.get(id));
+            REQUIRE(location_matching_id(id) == index.get_noexcept(id));
+        }
+        else {
+            REQUIRE_THROWS_AS(index.get(id), osmium::not_found);
+            REQUIRE(index.get_noexcept(id) == osmium::Location{});
+        }
+    }
+}
+
+template <typename TIndex>
 void test_func_real(TIndex& index) {
-    const std::vector<osmium::unsigned_object_id_type> ordered_ids{0, 1, 2, 3, 4, 5, 10, 11, 12, 20, 30, 31};
+    const std::vector<osmium::unsigned_object_id_type> ordered_ids{0, 1, 2, 3, 10, 11, 12, 20, 30, 31};
     const std::vector<osmium::unsigned_object_id_type> unordered_ids{40, 13, 6, 7, 8, 39, 25};
 
-    // Set of missing IDs
-    osmium::unsigned_object_id_type max_id = 50;
-    std::set<osmium::unsigned_object_id_type> missing_ids;
-    for (osmium::unsigned_object_id_type id = 0; id < max_id; ++id)
-        missing_ids.insert(id);
+    // Vector of booleans that keeps track of which IDs have been set in the index
+    osmium::unsigned_object_id_type max_n_ids = 50;
+    std::vector<bool> set_ids(max_n_ids, false);
+
+    check_ids<TIndex>(index, set_ids);
 
     // Set ordered IDs and remove from missing_ids
     for (const auto id : ordered_ids) {
         index.set(id, location_matching_id(id));
-        missing_ids.erase(id);
+        set_ids[id] = true;
     }
 
-    // Get ordered IDs
-    for (const auto id : ordered_ids) {
-        REQUIRE(location_matching_id(id) == index.get(id));
-        REQUIRE(location_matching_id(id) == index.get_noexcept(id));
-    }
-
-    // Missing IDs are not found
-    for (const auto id : missing_ids) {
-        REQUIRE_THROWS_AS(index.get(id), osmium::not_found);
-        REQUIRE(index.get_noexcept(id) == osmium::Location{});
-    }
+    check_ids<TIndex>(index, set_ids);
 
     // Set unordered IDs and remove from missing_ids
     for (const auto id : unordered_ids) {
         index.set(id, location_matching_id(id));
-        missing_ids.erase(id);
+        set_ids[id] = true;
     }
 
     // Sort
     index.sort();
 
-    // Get ordered IDs
-    for (const auto id : ordered_ids) {
-        REQUIRE(location_matching_id(id) == index.get(id));
-        REQUIRE(location_matching_id(id) == index.get_noexcept(id));
-    }
-    // Get unordered IDs
-    for (const auto id : unordered_ids) {
-        REQUIRE(location_matching_id(id) == index.get(id));
-        REQUIRE(location_matching_id(id) == index.get_noexcept(id));
-    }
-
-    // Missing IDs are not found
-    for (const auto id : missing_ids) {
-        REQUIRE_THROWS_AS(index.get(id), osmium::not_found);
-        REQUIRE(index.get_noexcept(id) == osmium::Location{});
-    }
+    check_ids<TIndex>(index, set_ids);
 
     // Clear index
     index.clear();
+    set_ids = std::vector<bool>(max_n_ids, false);
+
     REQUIRE(0 == index.size());
 
-    // All ids missing
-    for (const auto id : ordered_ids) {
-        REQUIRE_THROWS_AS(index.get(id), osmium::not_found);
-        REQUIRE(index.get_noexcept(id) == osmium::Location{});
-    }
-    for (const auto id : unordered_ids) {
-        REQUIRE_THROWS_AS(index.get(id), osmium::not_found);
-        REQUIRE(index.get_noexcept(id) == osmium::Location{});
-    }
-    for (const auto id : missing_ids) {
-        REQUIRE_THROWS_AS(index.get(id), osmium::not_found);
-        REQUIRE(index.get_noexcept(id) == osmium::Location{});
-    }
+    check_ids<TIndex>(index, set_ids);
 }
 
 TEST_CASE("Map Id to location: Dummy") {
