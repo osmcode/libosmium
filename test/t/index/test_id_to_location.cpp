@@ -229,7 +229,7 @@ TEST_CASE("Map Id to location: SparseMemTable") {
 }
 
 #endif
-/*
+
 TEST_CASE("Map Id to location: SparseMemMap") {
     using index_type = osmium::index::map::SparseMemMap<osmium::unsigned_object_id_type, osmium::Location>;
 
@@ -241,7 +241,7 @@ TEST_CASE("Map Id to location: SparseMemMap") {
 
     index_type index3;
     test_func_limits<index_type>(index3);
-}*/
+}
 
 TEST_CASE("Map Id to location: SparseMemArray") {
     using index_type = osmium::index::map::SparseMemArray<osmium::unsigned_object_id_type, osmium::Location>;
