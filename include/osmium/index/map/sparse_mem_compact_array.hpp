@@ -55,7 +55,7 @@ namespace osmium {
             /**
              * This implementation is faster and uses less memory than SparseMemArray,
              * it is suited both for big and small maps, with bigger gains for bigger maps.
-             * 
+             *
              * Performance is worse if the index is fed unordered ids.
              */
 
@@ -71,9 +71,12 @@ namespace osmium {
 
                 void sorted_vector_of_pairs(std::vector<id_value_pair_type>& v) {
                     v = std::vector<id_value_pair_type>(m_elements.size());
-                    size_t i = -1;
-                    TId id = 0;
-                    for (size_t j = 0; j < m_elements.size(); ++j) {
+                    // Add first id
+                    size_t i = 0;
+                    TId id = m_index[0].first;
+                    v[0] = id_value_pair_type{id, m_elements[0]};
+                    // Add the rest of ids
+                    for (size_t j = 1; j < m_elements.size(); ++j) {
                         id = m_index[i+1].second == j ? m_index[++i].first : id + 1;
                         v[j] = id_value_pair_type{id, m_elements[j]};
                     }
