@@ -112,7 +112,7 @@ void test_func_limits(TIndex& index) {
     const auto max_id = std::numeric_limits<osmium::unsigned_object_id_type>::max();
 
     const osmium::unsigned_object_id_type id1 = 0;
-    const osmium::unsigned_object_id_type id2 = max_id;
+    const osmium::unsigned_object_id_type id2 = max_id-5;
     const osmium::unsigned_object_id_type id3 = max_id/2;
     const osmium::Location loc1{1.2, 4.5};
     const osmium::Location loc2{3.5, -7.2};
