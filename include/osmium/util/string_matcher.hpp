@@ -44,11 +44,14 @@ DEALINGS IN THE SOFTWARE.
 #ifdef __has_include
 # if __has_include(<variant>)
 #  include <variant>
-#  define OSMIUM_USE_STD_VARIANT
+#  ifdef __cpp_lib_variant
+#   define OSMIUM_USE_STD_VARIANT
+#  endif
 # endif
-#else
+#endif
+
+#ifndef OSMIUM_USE_STD_VARIANT
 # include <boost/variant.hpp>
-# define OSMIUM_USE_BOOST_VARIANT
 #endif
 
 
@@ -298,7 +301,7 @@ namespace osmium {
         matcher_type m_matcher;
 
         class match_visitor
-#ifdef OSMIUM_USE_BOOST_VARIANT
+#ifndef OSMIUM_USE_STD_VARIANT
         : public boost::static_visitor<bool>
 #endif
         {
@@ -320,7 +323,7 @@ namespace osmium {
 
         template <typename TChar, typename TTraits>
         class print_visitor
-#ifdef OSMIUM_USE_BOOST_VARIANT
+#ifndef OSMIUM_USE_STD_VARIANT
         : public boost::static_visitor<void>
 #endif
         {
@@ -460,6 +463,5 @@ namespace osmium {
 } // namespace osmium
 
 #undef OSMIUM_USE_STD_VARIANT
-#undef OSMIUM_USE_BOOST_VARIANT
 
 #endif // OSMIUM_UTIL_STRING_MATCHER_HPP
