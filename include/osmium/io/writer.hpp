@@ -222,7 +222,7 @@ namespace osmium {
 
             void do_close() {
                 if (m_status == status::okay) {
-                    ensure_cleanup([&](){
+                    ensure_cleanup([&]() {
                         do_write(std::move(m_buffer));
                         m_output->write_end();
                         m_status = status::closed;
@@ -269,9 +269,7 @@ namespace osmium {
                 assert(!m_file.buffer()); // XXX can't handle pseudo-files
 
                 options_type options;
-                (void)std::initializer_list<int>{
-                    (set_option(options, args), 0)...
-                };
+                (void)std::initializer_list<int>{(set_option(options, args), 0)...};
 
                 if (!options.pool) {
                     options.pool = &thread::Pool::default_instance();
@@ -348,7 +346,7 @@ namespace osmium {
              * @throws Some form of osmium::io_error when there is a problem.
              */
             void flush() {
-                ensure_cleanup([&](){
+                ensure_cleanup([&]() {
                     do_flush();
                 });
             }
@@ -362,7 +360,7 @@ namespace osmium {
              * @throws Some form of osmium::io_error when there is a problem.
              */
             void operator()(osmium::memory::Buffer&& buffer) {
-                ensure_cleanup([&](){
+                ensure_cleanup([&]() {
                     do_flush();
                     do_write(std::move(buffer));
                 });
@@ -376,7 +374,7 @@ namespace osmium {
              * @throws Some form of osmium::io_error when there is a problem.
              */
             void operator()(const osmium::memory::Item& item) {
-                ensure_cleanup([&](){
+                ensure_cleanup([&]() {
                     if (!m_buffer) {
                         m_buffer = osmium::memory::Buffer{m_buffer_size,
                                                           osmium::memory::Buffer::auto_grow::no};

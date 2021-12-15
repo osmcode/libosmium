@@ -122,7 +122,7 @@ namespace osmium {
              * Check whether s points to something else than the end of the
              * string or a space or tab.
              */
-            inline bool opl_non_empty(const char *s) {
+            inline bool opl_non_empty(const char* s) {
                 return *s != '\0' && *s != ' ' && *s != '\t';
             }
 

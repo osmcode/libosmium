@@ -169,10 +169,9 @@ namespace osmium {
                 vector_type m_vector;
 
                 typename vector_type::const_iterator find_id(const TId id) const noexcept {
-                    const element_type element {
+                    const element_type element{
                         id,
-                        osmium::index::empty_value<TValue>()
-                    };
+                        osmium::index::empty_value<TValue>()};
                     return std::lower_bound(m_vector.begin(), m_vector.end(), element, [](const element_type& a, const element_type& b) {
                         return a.first < b.first;
                     });

@@ -184,7 +184,7 @@ namespace osmium {
             if (m_count_removed < 10UL * 1000UL) { // *1
                 return false;
             }
-            if (m_count_removed >  5UL * 1000UL * 1000UL) { // *2
+            if (m_count_removed > 5UL * 1000UL * 1000UL) { // *2
                 return true;
             }
             if (m_count_removed * 5UL < m_count_items) { // *3

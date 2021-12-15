@@ -171,7 +171,7 @@ namespace osmium {
                  * Decode the BlobHeader. Make sure it contains the expected
                  * type. Return the size of the following Blob.
                  */
-                static size_t decode_blob_header(const protozero::data_view &data, const char* expected_type) {
+                static size_t decode_blob_header(const protozero::data_view& data, const char* expected_type) {
                     protozero::pbf_message<FileFormat::BlobHeader> pbf_blob_header{data};
                     protozero::data_view blob_header_type;
                     size_t blob_header_datasize = 0;

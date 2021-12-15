@@ -188,7 +188,7 @@ namespace osmium {
                         m_user_sids.reserve(max_entities_per_block);
                     }
                     if (m_options->add_visible_flag) {
-                         m_visibles.reserve(max_entities_per_block);
+                        m_visibles.reserve(max_entities_per_block);
                     }
                     m_lats.reserve(max_entities_per_block);
                     m_lons.reserve(max_entities_per_block);
@@ -505,8 +505,7 @@ namespace osmium {
                         SerializeBlob{std::move(m_primitive_block),
                                       pbf_blob_type::data,
                                       m_options.use_compression,
-                                      m_options.compression_level}
-                    ));
+                                      m_options.compression_level}));
                 }
 
                 template <typename T>
@@ -589,7 +588,7 @@ namespace osmium {
                                 break;
                         }
                     } else {
-                        char *end_ptr = nullptr;
+                        char* end_ptr = nullptr;
                         const auto val = std::strtol(pbl.c_str(), &end_ptr, 10);
                         if (*end_ptr != '\0') {
                             throw std::invalid_argument{"The 'pbf_compression_level' option must be an integer."};
@@ -664,8 +663,7 @@ namespace osmium {
                         SerializeBlob{std::move(data),
                                       pbf_blob_type::header,
                                       m_options.use_compression,
-                                      m_options.compression_level}
-                        ));
+                                      m_options.compression_level}));
                 }
 
                 void write_buffer(osmium::memory::Buffer&& buffer) final {

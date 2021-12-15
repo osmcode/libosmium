@@ -81,7 +81,7 @@ namespace osmium {
                     }
 
                     char temp[20];
-                    char *t = temp;
+                    char* t = temp;
                     do {
                         *t++ = static_cast<char>(value % 10) + '0'; // NOLINT(bugprone-narrowing-conversions, cppcoreguidelines-narrowing-conversions)
                         value /= 10;
@@ -190,11 +190,11 @@ namespace osmium {
                     }
 
                     throw unsupported_file_format_error{
-                                std::string{"Can not open file '"} +
-                                file.filename() +
-                                "' with type '" +
-                                as_string(file.format()) +
-                                "'. No support for writing this format in this program."};
+                        std::string{"Can not open file '"} +
+                        file.filename() +
+                        "' with type '" +
+                        as_string(file.format()) +
+                        "'. No support for writing this format in this program."};
                 }
 
             }; // class OutputFormatFactory

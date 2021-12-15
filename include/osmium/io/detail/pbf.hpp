@@ -79,7 +79,7 @@ namespace osmium {
                 lz4 = 2
             };
 
-            inline pbf_compression get_compression_type(const std::string &val) {
+            inline pbf_compression get_compression_type(const std::string& val) {
                 if (val.empty() || val == "zlib" || val == "true") {
                     return pbf_compression::zlib;
                 }

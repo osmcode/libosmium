@@ -277,11 +277,11 @@ namespace osmium {
                         return func;
                     }
                     throw unsupported_file_format_error{
-                            std::string{"Can not open file '"} +
-                            file.filename() +
-                            "' with type '" +
-                            as_string(file.format()) +
-                            "'. No support for reading this format in this program."};
+                        std::string{"Can not open file '"} +
+                        file.filename() +
+                        "' with type '" +
+                        as_string(file.format()) +
+                        "'. No support for reading this format in this program."};
                 }
 
             }; // class ParserFactory

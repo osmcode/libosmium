@@ -350,7 +350,7 @@ namespace osmium {
                 void top_level_element(const XML_Char* element, const XML_Char** attrs) {
                     if (!std::strcmp(element, "osm")) {
                         m_context_stack.push_back(context::osm);
-                    } else if (!std::strcmp(element, "osmChange")){
+                    } else if (!std::strcmp(element, "osmChange")) {
                         m_context_stack.push_back(context::osmChange);
                         m_header.set_has_multiple_object_versions(true);
                     } else {

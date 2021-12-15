@@ -284,8 +284,7 @@ namespace osmium {
             }
 
             template <typename TOutputIterator>
-            TOutputIterator append_codepoint_as_utf8(uint32_t cp, TOutputIterator out)
-            {
+            TOutputIterator append_codepoint_as_utf8(uint32_t cp, TOutputIterator out) {
                 if (cp < 0x80UL) {
                     *(out++) = static_cast<char>(cp);
                 } else if (cp < 0x800UL) {

@@ -177,8 +177,7 @@ namespace osmium {
                     read_which_entities,
                     read_metadata,
                     buffers_kind,
-                    want_buffered_pages_removed
-                };
+                    want_buffered_pages_removed};
                 creator(args)->parse();
             }
 
@@ -328,9 +327,7 @@ namespace osmium {
                 m_osmdata_queue(detail::get_osmdata_queue_size(), "parser_results"),
                 m_osmdata_queue_wrapper(m_osmdata_queue) {
 
-                (void)std::initializer_list<int>{
-                    (set_option(args), 0)...
-                };
+                (void)std::initializer_list<int>{(set_option(args), 0)...};
 
                 if (!m_pool) {
                     m_pool = &thread::Pool::default_instance();

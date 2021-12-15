@@ -92,20 +92,18 @@ namespace osmium {
                 }
 
                 std::pair<iterator, iterator> get_all(const TId id) {
-                    const element_type element {
+                    const element_type element{
                         id,
-                        osmium::index::empty_value<TValue>()
-                    };
+                        osmium::index::empty_value<TValue>()};
                     return std::equal_range(m_vector.begin(), m_vector.end(), element, [](const element_type& a, const element_type& b) {
                         return a.first < b.first;
                     });
                 }
 
                 std::pair<const_iterator, const_iterator> get_all(const TId id) const {
-                    const element_type element {
+                    const element_type element{
                         id,
-                        osmium::index::empty_value<TValue>()
-                    };
+                        osmium::index::empty_value<TValue>()};
                     return std::equal_range(m_vector.cbegin(), m_vector.cend(), element, [](const element_type& a, const element_type& b) {
                         return a.first < b.first;
                     });
@@ -149,8 +147,7 @@ namespace osmium {
                 void erase_removed() {
                     m_vector.erase(
                         std::remove_if(m_vector.begin(), m_vector.end(), is_removed),
-                        m_vector.end()
-                    );
+                        m_vector.end());
                 }
 
                 void dump_as_list(const int fd) final {
