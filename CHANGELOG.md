@@ -10,7 +10,30 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+* Libosmium now supports being compiled in C++17 and C++20 mode. The minimum
+  version required is still C++11, but if you use libosmium in an C++17 or
+  C++20 application this should work properly.
+* Switch from catch version 1 to catch2 as test framework.
+* When `std::variant` is available (C++17 and above), libosmium will use that
+  instead of `boost::variant` reducing the dependencies a little bit.
+* Removed various workaround that were needed for older MSVC compilers.
+* Remove use of `boost::filter_iterator` and `boost::indirect_iterator`. The
+  removes the dependency on Boost Iterator.
+* Examples now mostly use the somewhat cleaner `return` instead of
+  `std::exit()` to return an exit code from `main`.
+* As always: Various small code cleanups.
+
 ### Fixed
+
+* When ordering OSM objects (mostly use in the `CheckOrder` handler), the
+  smallest id possible (`INTMIN`) wasn't sorted correctly.
+* Threading problem when reading files.
+* Possible dereference of invalid iterator in legacy area assembler. This
+  only affects the legacy area assembler that takes old-style multipolygons
+  into account, so modern code that is not working with history data is not
+  affected.
+* Fixed read from an empty queue when reading a file which could block
+  libosmium forever when an error was encountered while reading a file.
 
 ### Deprecated
 
