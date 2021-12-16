@@ -10,6 +10,13 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+### Fixed
+
+
+## [2.17.2] - 2021-12-16
+
+### Changed
+
 * Libosmium now supports being compiled in C++17 and C++20 mode. The minimum
   version required is still C++11, but if you use libosmium in an C++17 or
   C++20 application this should work properly.
@@ -1201,7 +1208,8 @@ long time. These will not be part of the next version of libosmium:
   Doxygen (up to version 1.8.8). This version contains a workaround to fix
   this.
 
-[unreleased]: https://github.com/osmcode/libosmium/compare/v2.17.1...HEAD
+[unreleased]: https://github.com/osmcode/libosmium/compare/v2.17.2...HEAD
+[2.17.2]: https://github.com/osmcode/libosmium/compare/v2.17.1...v2.17.2
 [2.17.1]: https://github.com/osmcode/libosmium/compare/v2.17.0...v2.17.1
 [2.17.0]: https://github.com/osmcode/libosmium/compare/v2.16.0...v2.17.0
 [2.16.0]: https://github.com/osmcode/libosmium/compare/v2.15.6...v2.16.0
