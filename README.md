@@ -97,7 +97,7 @@ needed](https://osmcode.org/libosmium/manual.html#changes-from-old-versions-of-o
 
 ## License
 
-Libosmium is available under the Boost Software License. See LICENSE.txt.
+Libosmium is available under the Boost Software License. See LICENSE.
 
 
 ## Authors
