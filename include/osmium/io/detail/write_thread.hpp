@@ -97,7 +97,7 @@ namespace osmium {
                     } catch (...) {
                         m_notification->store(true);
                         m_promise.set_exception(std::current_exception());
-                        m_queue.drain();
+                        m_queue.shutdown();
                     }
                 }
 

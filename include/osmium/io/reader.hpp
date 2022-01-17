@@ -386,7 +386,7 @@ namespace osmium {
 
                 m_read_thread_manager.stop();
 
-                m_osmdata_queue_wrapper.drain();
+                m_osmdata_queue_wrapper.shutdown();
 
                 try {
                     m_read_thread_manager.close();
