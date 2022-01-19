@@ -221,7 +221,7 @@ jobs:
 
   macos10-dev:
     runs-on: macos-10.15
-    timeout-minutes: 40
+    timeout-minutes: 60
     env:
       CC: clang
       CXX: clang++
@@ -239,7 +239,7 @@ jobs:
 
   macos11-dev:
     runs-on: macos-11
-    timeout-minutes: 40
+    timeout-minutes: 60
     env:
       CC: clang
       CXX: clang++
@@ -257,7 +257,7 @@ jobs:
 
   macos11-release:
     runs-on: macos-11
-    timeout-minutes: 40
+    timeout-minutes: 60
     env:
       CC: clang
       CXX: clang++
