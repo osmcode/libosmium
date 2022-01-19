@@ -12,6 +12,8 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+* Removed possible deadlock when shutting down active Reader.
+
 
 ## [2.17.2] - 2021-12-16
 
