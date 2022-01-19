@@ -12,6 +12,11 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+
+## [2.17.3] - 2022-01-19
+
+### Fixed
+
 * Removed possible deadlock when shutting down active Reader.
 
 
@@ -1210,7 +1215,8 @@ long time. These will not be part of the next version of libosmium:
   Doxygen (up to version 1.8.8). This version contains a workaround to fix
   this.
 
-[unreleased]: https://github.com/osmcode/libosmium/compare/v2.17.2...HEAD
+[unreleased]: https://github.com/osmcode/libosmium/compare/v2.17.3...HEAD
+[2.17.3]: https://github.com/osmcode/libosmium/compare/v2.17.2...v2.17.3
 [2.17.2]: https://github.com/osmcode/libosmium/compare/v2.17.1...v2.17.2
 [2.17.1]: https://github.com/osmcode/libosmium/compare/v2.17.0...v2.17.1
 [2.17.0]: https://github.com/osmcode/libosmium/compare/v2.16.0...v2.17.0
