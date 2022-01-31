@@ -35,10 +35,10 @@ DEALINGS IN THE SOFTWARE.
 
 #include <cassert>
 #include <cerrno>
-#include <cstring>
 #include <fcntl.h>
 #include <stdexcept>
 #include <string>
+#include <system_error>
 #include <vector>
 
 namespace osmium {
@@ -56,7 +56,7 @@ namespace osmium {
                 const std::string& filename = config[1];
                 const int fd = ::open(filename.c_str(), O_CREAT | O_RDWR, 0644); // NOLINT(hicpp-signed-bitwise)
                 if (fd == -1) {
-                    throw std::runtime_error{std::string{"can't open file '"} + filename + "': " + std::strerror(errno)};
+                    throw std::system_error{errno, std::system_category(), "can't open file '" + filename + "'"};
                 }
                 return new T{fd};
             }
