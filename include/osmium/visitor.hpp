@@ -202,7 +202,7 @@ namespace osmium {
         template <typename TFunc>
         struct wrapper_handler : TFunc {
 
-            template<typename T>
+            template <typename T>
             explicit wrapper_handler(T&& func) : TFunc(std::forward<T>(func)) { // NOLINT(bugprone-forwarding-reference-overload)
             }
 
