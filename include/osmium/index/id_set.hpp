@@ -383,6 +383,14 @@ namespace osmium {
 
         public:
 
+            IdSetSmall() = default;
+
+            IdSetSmall(const IdSetSmall&) = default;
+            IdSetSmall& operator=(const IdSetSmall&) = default;
+
+            IdSetSmall(IdSetSmall&&) noexcept = default;
+            IdSetSmall& operator=(IdSetSmall&&) noexcept = default;
+
             ~IdSetSmall() noexcept override = default;
 
             /**
