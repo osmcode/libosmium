@@ -100,8 +100,8 @@ public:
     IndexAccessDense(const IndexAccessDense&) = default;
     IndexAccessDense& operator=(const IndexAccessDense&) = default;
 
-    IndexAccessDense(IndexAccessDense&&) = default;
-    IndexAccessDense& operator=(IndexAccessDense&&) = default;
+    IndexAccessDense(IndexAccessDense&&) noexcept = default;
+    IndexAccessDense& operator=(IndexAccessDense&&) noexcept = default;
 
     ~IndexAccessDense() noexcept override = default;
 
@@ -147,8 +147,8 @@ public:
     IndexAccessSparse(const IndexAccessSparse&) = default;
     IndexAccessSparse& operator=(const IndexAccessSparse&) = default;
 
-    IndexAccessSparse(IndexAccessSparse&&) = default;
-    IndexAccessSparse& operator=(IndexAccessSparse&&) = default;
+    IndexAccessSparse(IndexAccessSparse&&) noexcept = default;
+    IndexAccessSparse& operator=(IndexAccessSparse&&) noexcept = default;
 
     ~IndexAccessSparse() noexcept override = default;
 
