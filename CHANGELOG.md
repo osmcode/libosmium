@@ -10,6 +10,9 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+* Use `system_error` instead of `runtime_error` where it fits better.
+* Remove `OSMIUM_NORETURN` macro. This hasn't been used in a while.
+
 ### Fixed
 
 
