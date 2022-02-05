@@ -197,7 +197,7 @@ namespace osmium {
     struct OSMIUM_EXPORT unknown_type : public std::runtime_error {
 
         unknown_type() :
-            std::runtime_error("unknown item type") {
+            std::runtime_error{"unknown item type"} {
         }
 
     }; // struct unknown_type
