@@ -137,8 +137,8 @@ namespace osmium {
             using pointer           = value_type*;
             using reference         = value_type&;
 
-            CollectionFilterIterator(const TFilter& filter, CollectionIterator<TMember> begin, CollectionIterator<TMember> end) :
-                m_filter(filter),
+            CollectionFilterIterator(TFilter filter, CollectionIterator<TMember> begin, CollectionIterator<TMember> end) :
+                m_filter(std::move(filter)),
                 m_it(begin),
                 m_end(end) {
                 advance();

@@ -47,7 +47,7 @@ namespace osmium {
             std::vector<std::string> types{"none", "zlib"};
 
 #ifdef OSMIUM_WITH_LZ4
-            types.push_back("lz4");
+            types.emplace_back("lz4");
 #endif
 
             return types;
