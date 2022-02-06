@@ -198,6 +198,8 @@ namespace osmium {
             }
         }
 
+        // XXX Changeset id is not added to the CRC. This is an oversight,
+        // but we don't want to change this now to keep compatibility.
         void update(const osmium::OSMObject& object) noexcept {
             update_int64(static_cast<uint64_t>(object.id()));
             update_bool(object.visible());
