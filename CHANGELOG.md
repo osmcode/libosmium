@@ -10,10 +10,15 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+### Fixed
+
+
+## [2.18.0] - 2022-02-07
+
+### Changed
+
 * Use `system_error` instead of `runtime_error` where it fits better.
 * Remove `OSMIUM_NORETURN` macro. This hasn't been used in a while.
-
-### Fixed
 
 ### Removed deprecated parts of the code
 
@@ -1248,7 +1253,8 @@ long time. These will not be part of the next version of libosmium:
   Doxygen (up to version 1.8.8). This version contains a workaround to fix
   this.
 
-[unreleased]: https://github.com/osmcode/libosmium/compare/v2.17.3...HEAD
+[unreleased]: https://github.com/osmcode/libosmium/compare/v2.18.0...HEAD
+[2.18.0]: https://github.com/osmcode/libosmium/compare/v2.17.3...v2.18.0
 [2.17.3]: https://github.com/osmcode/libosmium/compare/v2.17.2...v2.17.3
 [2.17.2]: https://github.com/osmcode/libosmium/compare/v2.17.1...v2.17.2
 [2.17.1]: https://github.com/osmcode/libosmium/compare/v2.17.0...v2.17.1
