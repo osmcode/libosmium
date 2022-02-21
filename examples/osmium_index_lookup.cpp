@@ -67,8 +67,8 @@ public:
     IndexAccess(const IndexAccess&) = delete;
     IndexAccess& operator=(const IndexAccess&) = delete;
 
-    IndexAccess(IndexAccess&&) = delete;
-    IndexAccess& operator=(IndexAccess&&) = delete;
+    IndexAccess(IndexAccess&&) noexcept = delete;
+    IndexAccess& operator=(IndexAccess&&) noexcept = delete;
 
     virtual ~IndexAccess() noexcept = default;
 
