@@ -159,7 +159,7 @@ namespace osmium {
                 return make_range(std::equal_range(m_elements.cbegin(), m_elements.cend(), element{id}, compare_member_id{}));
             }
 
-            static typename iterator_range<iterator>::iterator::difference_type count_not_removed(const iterator_range<iterator>& range) noexcept {
+            static typename std::iterator_traits<iterator>::difference_type count_not_removed(const iterator_range<iterator>& range) noexcept {
                 return std::count_if(range.begin(), range.end(), [](const element& elem) {
                     return !elem.is_removed();
                 });
