@@ -43,6 +43,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <stdexcept>
 #include <string>
+#include <iostream>
 
 namespace osmium {
 
@@ -69,6 +70,18 @@ namespace osmium {
     namespace handler {
 
         /**
+         * Determines the handler's reaction on duplicates (two Nodes/Ways/Relations
+         * with the same id).
+         * 
+         * THROW_EXCEPTION - exception will be thrown
+         * PRINT - duplication details will be printed
+         */
+        enum class duplicate_handling {
+            THROW_EXCEPTION,
+            PRINT
+        };  // enum class duplicate_handling
+
+        /**
          * Handler that can be used to check that an OSM file is ordered
          * correctly. Ordered in this case refers to the usual order in OSM
          * files: First nodes in the order of their IDs, then ways in the order
@@ -92,8 +105,14 @@ namespace osmium {
             bool m_has_node = false;
             bool m_has_way = false;
             bool m_has_relation = false;
+            duplicate_handling m_duplicate_handling;
 
         public:
+
+            CheckOrder(duplicate_handling handling = duplicate_handling::THROW_EXCEPTION) :
+                m_duplicate_handling(handling)
+                {
+                }
 
             void node(const osmium::Node& node) {
                 if (m_has_way) {
@@ -105,9 +124,8 @@ namespace osmium {
 
                 if (m_has_node) {
                     if (m_max_node_id == node.id()) {
-                        throw out_of_order_error{"Node ID twice in input. Maybe you are using a history or change file?", node.id()};
-                    }
-                    if (id_order{}(node.id(), m_max_node_id)) {
+                        handle_id_twice_in_input(osmium::item_type::node, node.id());
+                    } else if (id_order{}(node.id(), m_max_node_id)) {
                         throw out_of_order_error{"Node IDs out of order: " + std::to_string(node.id()), node.id()};
                     }
                     m_max_node_id = node.id();
@@ -124,9 +142,8 @@ namespace osmium {
 
                 if (m_has_way) {
                     if (m_max_way_id == way.id()) {
-                        throw out_of_order_error{"Way ID twice in input. Maybe you are using a history or change file?", way.id()};
-                    }
-                    if (id_order{}(way.id(), m_max_way_id)) {
+                        handle_id_twice_in_input(osmium::item_type::way, way.id());
+                    } else if (id_order{}(way.id(), m_max_way_id)) {
                         throw out_of_order_error{"Way IDs out of order: " + std::to_string(way.id()), way.id()};
                     }
                     m_max_way_id = way.id();
@@ -139,9 +156,8 @@ namespace osmium {
             void relation(const osmium::Relation& relation) {
                 if (m_has_relation) {
                     if (m_max_relation_id == relation.id()) {
-                        throw out_of_order_error{"Relation ID twice in input. Maybe you are using a history or change file?", relation.id()};
-                    }
-                    if (id_order{}(relation.id(), m_max_relation_id)) {
+                        handle_id_twice_in_input(osmium::item_type::relation, relation.id());
+                    } else if (id_order{}(relation.id(), m_max_relation_id)) {
                         throw out_of_order_error{"Relation IDs out of order: " + std::to_string(relation.id()), relation.id()};
                     }
                     m_max_relation_id = relation.id();
@@ -161,6 +177,42 @@ namespace osmium {
 
             osmium::object_id_type max_relation_id() const noexcept {
                 return m_max_relation_id;
+            }
+
+
+        private:
+
+            void handle_id_twice_in_input(osmium::item_type t, osmium::object_id_type id) {
+                switch (m_duplicate_handling)
+                {
+                    case duplicate_handling::THROW_EXCEPTION:
+                        throw_id_twice_in_input_exception(t, id);
+                        break;
+
+                    case duplicate_handling::PRINT:
+                        print_id_twice_in_input(t, id);
+                        break;
+                        
+                    default:
+                        throw_id_twice_in_input_exception(t, id);
+                        break;
+                }
+            }
+        
+            void throw_id_twice_in_input_exception(osmium::item_type t, osmium::object_id_type id) {
+                std::string error_message = item_type_to_name(t);
+                error_message[0] = toupper(error_message[0]);
+                error_message += " ID twice in input. Maybe you are using a history or change file?\n";                
+                throw out_of_order_error{error_message, id};
+            }
+
+            void print_id_twice_in_input(osmium::item_type t, osmium::object_id_type id) {
+                std::string message = item_type_to_name(t);
+                message[0] = toupper(message[0]);
+                message += " ID (";
+                message += std::to_string(id);
+                message += ") twice in input.\n";                
+                std::cout << message;
             }
 
         }; // class CheckOrder

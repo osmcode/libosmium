@@ -25,6 +25,17 @@ TEST_CASE("CheckOrder handler if everything is in order") {
     REQUIRE(handler.max_relation_id() == 100);
 }
 
+TEST_CASE("CheckOrder handler: Same id twice is allowed when duplicate_handling is set to PRINT") {
+    osmium::memory::Buffer buffer{1024};
+
+    REQUIRE(osmium::opl_parse("n3", buffer));
+    REQUIRE(osmium::opl_parse("n3", buffer));
+
+    osmium::handler::CheckOrder handler = osmium::handler::CheckOrder(osmium::handler::duplicate_handling::PRINT);
+    osmium::apply(buffer, handler);
+    REQUIRE(handler.max_node_id()     == 3);
+}
+
 TEST_CASE("CheckOrder handler: Nodes must be in order") {
     osmium::memory::Buffer buffer{1024};
 
