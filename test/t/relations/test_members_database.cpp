@@ -187,6 +187,8 @@ TEST_CASE("Remove non-existing object from members database doesn't do anything"
         }
     }
 
+    mdb.prepare_for_lookup();
+
     REQUIRE(mdb.size() == 6);
     mdb.remove(100, 100);
     REQUIRE(mdb.size() == 6);

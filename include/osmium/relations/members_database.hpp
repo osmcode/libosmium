@@ -267,8 +267,11 @@ namespace osmium {
             /**
              * Remove the entry with the specified member_id and relation_id
              * from the database. If the entry doesn't exist, nothing happens.
+             *
+             * @pre You have to call prepare_for_lookup() before using this.
              */
             void remove(osmium::object_id_type member_id, osmium::object_id_type relation_id) {
+                assert(!m_init_phase && "Call MembersDatabase::prepare_for_lookup() before calling remove().");
                 const auto range = find(member_id);
 
                 if (range.empty()) {
@@ -293,6 +296,8 @@ namespace osmium {
              * Find the object with the specified id in the database and
              * return a pointer to it. Returns nullptr if there is no object
              * with that id in the database.
+             *
+             * @pre You have to call prepare_for_lookup() before using this.
              *
              * Complexity: Logarithmic in the number of members tracked (as
              *             returned by size()).
@@ -354,6 +359,7 @@ namespace osmium {
              *             as a parameter.
              * @returns true if the object was actually added, false if no
              *          relation needed this object.
+             * @pre You have to call prepare_for_lookup() before using this.
              */
             template <typename TFunc>
             bool add(const TObject& object, TFunc&& func) {
@@ -389,6 +395,8 @@ namespace osmium {
              * Find the object with the specified id in the database and
              * return a pointer to it. Returns nullptr if there is no object
              * with that id in the database.
+             *
+             * @pre You have to call prepare_for_lookup() before using this.
              *
              * Complexity: Logarithmic in the number of members tracked (as
              *             returned by size()).
