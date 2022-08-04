@@ -58,6 +58,8 @@ DEALINGS IN THE SOFTWARE.
 #include <string>
 #include <system_error>
 
+#include <fcntl.h>
+
 #ifndef _MSC_VER
 # include <unistd.h>
 #endif
@@ -112,6 +114,19 @@ namespace osmium {
 #ifdef _MSC_VER
                     osmium::detail::disable_invalid_parameter_handler diph;
 #endif
+
+                    // According to the POSIX spec, fdopen() *may* fail
+                    // with EBADF if the passed file descriptor is bad.
+                    // But this check is not required, and some C libraries
+                    // (specifically, musl) return no error. Therefore,
+                    // we check for valid file descriptors using a function
+                    // that is required to check its argument.
+                    // https://github.com/osmcode/libosmium/issues/353
+                    // https://www.openwall.com/lists/musl/2022/08/04/2
+                    if (fcntl(fd, F_GETFD) < 0) {
+                        throw std::system_error{errno, std::system_category(), "bad fd"};
+                    }
+
                     m_file = fdopen(fd, mode);
                     if (!m_file) {
 
