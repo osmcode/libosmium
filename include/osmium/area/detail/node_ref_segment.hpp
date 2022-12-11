@@ -327,7 +327,7 @@ namespace osmium {
 
                     if ((d > 0 && na >= 0 && na <= d && nb >= 0 && nb <= d) ||
                         (d < 0 && na <= 0 && na >= d && nb <= 0 && nb >= d)) {
-                        const double ua = double(na) / d;
+                        const double ua = double(na) / double(d);
                         const vec i = p0 + ua * (p1 - p0);
                         return osmium::Location{int32_t(i.x), int32_t(i.y)};
                     }
