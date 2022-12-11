@@ -68,7 +68,7 @@ namespace osmium {
                 std::string out;
                 out.reserve(str.size() * 2);
 
-                for (char c : str) {
+                for (const char c : str) {
                     out += lookup_hex[(static_cast<unsigned int>(c) >> 4U) & 0xfU];
                     out += lookup_hex[ static_cast<unsigned int>(c)        & 0xfU];
                 }

@@ -332,10 +332,10 @@ namespace osmium {
                             if (!way.nodes().empty() && way.is_closed() && !way.tags().empty()) {
                                 const auto d = std::count_if(way.tags().cbegin(), way.tags().cend(), std::cref(filter()));
                                 if (d > 0) {
-                                    osmium::tags::KeyFilter::iterator way_fi_begin(std::cref(filter()), way.tags().cbegin(), way.tags().cend());
-                                    osmium::tags::KeyFilter::iterator way_fi_end(std::cref(filter()), way.tags().cend(), way.tags().cend());
-                                    osmium::tags::KeyFilter::iterator area_fi_begin(std::cref(filter()), area_tags.cbegin(), area_tags.cend());
-                                    osmium::tags::KeyFilter::iterator area_fi_end(std::cref(filter()), area_tags.cend(), area_tags.cend());
+                                    const osmium::tags::KeyFilter::iterator way_fi_begin(std::cref(filter()), way.tags().cbegin(), way.tags().cend());
+                                    const osmium::tags::KeyFilter::iterator way_fi_end(std::cref(filter()), way.tags().cend(), way.tags().cend());
+                                    const osmium::tags::KeyFilter::iterator area_fi_begin(std::cref(filter()), area_tags.cbegin(), area_tags.cend());
+                                    const osmium::tags::KeyFilter::iterator area_fi_end(std::cref(filter()), area_tags.cend(), area_tags.cend());
 #ifdef __cpp_lib_robust_nonmodifying_seq_ops
                                     if (!std::equal(way_fi_begin, way_fi_end, area_fi_begin, area_fi_end)) {
 #else

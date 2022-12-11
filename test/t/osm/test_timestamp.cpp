@@ -110,7 +110,7 @@ TEST_CASE("Write four digit numbers") {
 }
 
 TEST_CASE("Valid timestamps") {
-    std::vector<std::string> test_cases = {
+    const std::vector<std::string> test_cases = {
         "1970-01-01T00:00:01Z",
         "2000-01-01T00:00:00Z",
         "2006-12-31T23:59:59Z",

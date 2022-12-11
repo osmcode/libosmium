@@ -259,7 +259,7 @@ namespace osmium {
 
                 while (data != end_ptr) {
                     const char* prev = data;
-                    uint32_t c = next_utf8_codepoint(&data, end_ptr);
+                    const uint32_t c = next_utf8_codepoint(&data, end_ptr);
 
                     // This is a list of Unicode code points that we let
                     // through instead of escaping them. It is incomplete

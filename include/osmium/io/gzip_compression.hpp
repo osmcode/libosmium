@@ -230,7 +230,7 @@ namespace osmium {
 #endif
                 std::string buffer(osmium::io::Decompressor::input_buffer_size, '\0');
                 assert(buffer.size() < std::numeric_limits<unsigned int>::max());
-                int nread = ::gzread(m_gzfile, &*buffer.begin(), static_cast<unsigned int>(buffer.size()));
+                const int nread = ::gzread(m_gzfile, &*buffer.begin(), static_cast<unsigned int>(buffer.size()));
                 if (nread < 0) {
                     detail::throw_gzip_error(m_gzfile, "read failed");
                 }

@@ -645,7 +645,7 @@ namespace osmium {
 
                     const std::string osmosis_replication_timestamp{header.get("osmosis_replication_timestamp")};
                     if (!osmosis_replication_timestamp.empty()) {
-                        osmium::Timestamp ts{osmosis_replication_timestamp.c_str()};
+                        const osmium::Timestamp ts{osmosis_replication_timestamp.c_str()};
                         pbf_header_block.add_int64(OSMFormat::HeaderBlock::optional_int64_osmosis_replication_timestamp, uint32_t(ts));
                     }
 

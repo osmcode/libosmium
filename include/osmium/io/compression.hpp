@@ -199,10 +199,10 @@ namespace osmium {
                 const create_decompressor_type_fd& create_decompressor_fd,
                 const create_decompressor_type_buffer& create_decompressor_buffer) {
 
-                compression_map_type::value_type cc{compression,
-                                                    std::make_tuple(create_compressor,
-                                                                    create_decompressor_fd,
-                                                                    create_decompressor_buffer)};
+                const compression_map_type::value_type cc{compression,
+                                                          std::make_tuple(create_compressor,
+                                                              create_decompressor_fd,
+                                                              create_decompressor_buffer)};
 
                 return m_callbacks.insert(cc).second;
             }

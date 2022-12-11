@@ -223,7 +223,7 @@ namespace osmium {
          * all inner rings.
          */
         osmium::memory::ItemIteratorRange<const osmium::InnerRing> inner_rings(const osmium::OuterRing& outer) const {
-            osmium::memory::ItemIteratorRange<const osmium::OuterRing> outer_range{outer.data(), next()};
+            const osmium::memory::ItemIteratorRange<const osmium::OuterRing> outer_range{outer.data(), next()};
             return osmium::memory::ItemIteratorRange<const osmium::InnerRing>{outer_range.cbegin().data(), std::next(outer_range.cbegin()).data()};
         }
 

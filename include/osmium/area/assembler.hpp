@@ -213,7 +213,7 @@ namespace osmium {
 
                 // Now create the Area object and add the attributes and tags
                 // from the relation.
-                bool okay = create_area(out_buffer, relation, members);
+                const bool okay = create_area(out_buffer, relation, members);
                 if (okay) {
                     out_buffer.commit();
                 } else {

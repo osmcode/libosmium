@@ -90,7 +90,7 @@ TEST_CASE("Test Reader using MockDecompressor") {
         fail_in = "constructor";
 
         try {
-            osmium::io::Reader reader{with_data_dir("t/io/data.osm.gz")};
+            const osmium::io::Reader reader{with_data_dir("t/io/data.osm.gz")};
             REQUIRE(false);
         } catch (const std::runtime_error& e) {
             REQUIRE(std::string{e.what()} == "error constructor");

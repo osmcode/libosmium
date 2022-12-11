@@ -241,7 +241,7 @@ namespace osmium {
                 void dump_as_array(const int fd) final {
                     constexpr const size_t value_size = sizeof(TValue);
                     constexpr const size_t buffer_size = (10L * 1024L * 1024L) / value_size;
-                    std::unique_ptr<TValue[]> output_buffer{new TValue[buffer_size]};
+                    const std::unique_ptr<TValue[]> output_buffer{new TValue[buffer_size]};
 
                     size_t buffer_start_id = 0;
                     for (auto it = cbegin(); it != cend();) {

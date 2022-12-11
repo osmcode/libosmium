@@ -333,7 +333,7 @@ namespace osmium {
                             }
 
                             if (y_range_overlap(s1, s2)) {
-                                osmium::Location intersection{calculate_intersection(s1, s2)};
+                                const osmium::Location intersection{calculate_intersection(s1, s2)};
                                 if (intersection) {
                                     ++found_intersections;
                                     if (m_debug) {

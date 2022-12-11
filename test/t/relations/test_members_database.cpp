@@ -61,7 +61,7 @@ TEST_CASE("Fill member database") {
     int n = 0;
     int match = 0;
     for (const auto& way : buffer.select<osmium::Way>()) {
-        bool added = mdb.add(way, [&](osmium::relations::RelationHandle& rel_handle) {
+        const bool added = mdb.add(way, [&](osmium::relations::RelationHandle& rel_handle) {
             ++match;
             switch (n) {
                 case 0: // added w10
