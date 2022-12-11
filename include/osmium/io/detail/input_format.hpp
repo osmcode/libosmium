@@ -77,7 +77,7 @@ namespace osmium {
                 queue_wrapper<std::string> m_input_queue;
                 osmium::osm_entity_bits::type m_read_which_entities;
                 osmium::io::read_meta m_read_metadata;
-                bool m_header_is_done;
+                bool m_header_is_done = false;
 
             protected:
 
@@ -130,8 +130,7 @@ namespace osmium {
                     m_header_promise(args.header_promise),
                     m_input_queue(args.input_queue),
                     m_read_which_entities(args.read_which_entities),
-                    m_read_metadata(args.read_metadata),
-                    m_header_is_done(false) {
+                    m_read_metadata(args.read_metadata) {
                 }
 
                 Parser(const Parser&) = delete;
