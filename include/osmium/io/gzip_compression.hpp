@@ -116,7 +116,7 @@ namespace osmium {
 #ifdef _MSC_VER
                 osmium::detail::disable_invalid_parameter_handler diph;
 #endif
-                m_gzfile = ::gzdopen(osmium::io::detail::reliable_dup(fd), "wb");
+                m_gzfile = ::gzdopen(osmium::io::detail::reliable_dup(fd), "wb"); // NOLINT(cppcoreguidelines-prefer-member-initializer)
                 if (!m_gzfile) {
                     throw gzip_error{"gzip error: write initialization failed"};
                 }
@@ -192,7 +192,7 @@ namespace osmium {
 #ifdef _MSC_VER
                 osmium::detail::disable_invalid_parameter_handler diph;
 #endif
-                m_gzfile = ::gzdopen(fd, "rb");
+                m_gzfile = ::gzdopen(fd, "rb"); // NOLINT(cppcoreguidelines-prefer-member-initializer)
                 if (!m_gzfile) {
                     try {
                         osmium::io::detail::reliable_close(fd);

@@ -236,6 +236,7 @@ namespace osmium {
 
             std::vector<std::string> map_types() const {
                 std::vector<std::string> result;
+                result.reserve(m_callbacks.size());
 
                 for (const auto& cb : m_callbacks) {
                     result.push_back(cb.first);
