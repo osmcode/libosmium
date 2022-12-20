@@ -503,26 +503,6 @@ namespace osmium {
 
         }; // class IdSetSmall
 
-        /// @deprecated Use nwr_array helper class instead.
-        template <template <typename> class IdSetType>
-        class NWRIdSet {
-
-            using id_set_type = IdSetType<osmium::unsigned_object_id_type>;
-
-            std::array<id_set_type, 3> m_sets;
-
-        public:
-
-            id_set_type& operator()(osmium::item_type type) noexcept {
-                return m_sets[osmium::item_type_to_nwr_index(type)];
-            }
-
-            const id_set_type& operator()(osmium::item_type type) const noexcept {
-                return m_sets[osmium::item_type_to_nwr_index(type)];
-            }
-
-        }; // class NWRIdSet
-
     } // namespace index
 
 } // namespace osmium
