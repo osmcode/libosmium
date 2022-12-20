@@ -124,15 +124,6 @@ namespace osmium {
 
             AssemblerConfig() noexcept = default;
 
-            /**
-             * Constructor
-             * @deprecated Use default constructor and set values afterwards.
-             */
-            explicit AssemblerConfig(ProblemReporter* pr, bool d = false) :
-                problem_reporter(pr),
-                debug_level(d) {
-            }
-
         }; // struct AssemblerConfig
 
     } // namespace area
