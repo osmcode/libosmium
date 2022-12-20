@@ -194,6 +194,30 @@ namespace osmium {
 
             /**
              * Find the given relation id in the index and call the given
+             * function with all parent relation ids.
+             *
+             * @code
+             * osmium::unsigned_object_id_type member_id = 17;
+             * index.for_each_parent(member_id, [](osmium::unsigned_object_id_type id) {
+             *   ...
+             * });
+             * @endcode
+             *
+             * @deprecated Use for_each() instead.
+             *
+             * Complexity: Logarithmic in the number of elements in the index.
+             *             (Lookup uses binary search.)
+             */
+            template <typename TFunc>
+            void for_each_parent(const osmium::unsigned_object_id_type member_id, TFunc&& func) const {
+                const auto parents = m_map.get(member_id);
+                for (auto it = parents.first; it != parents.second; ++it) {
+                    func(it->value);
+                }
+            }
+
+            /**
+             * Find the given relation id in the index and call the given
              * function with all related relation ids.
              *
              * @code
@@ -347,6 +371,23 @@ namespace osmium {
             std::size_t size() const noexcept {
                 assert(m_valid && "You can't use the RelationsMap any more after calling build_index()");
                 return m_map.size();
+            }
+
+            /**
+             * Build an index for member to parent lookups from the contents
+             * of this stash and return it.
+             *
+             * After you get the index you can not use the stash any more!
+             *
+             * @deprecated Use build_member_to_parent_index() instead.
+             */
+            RelationsMapIndex build_index() {
+                assert(m_valid && "You can't use the RelationsMap any more after calling build_index()");
+                m_map.sort_unique();
+#ifndef NDEBUG
+                m_valid = false;
+#endif
+                return RelationsMapIndex{std::move(m_map)};
             }
 
             /**
