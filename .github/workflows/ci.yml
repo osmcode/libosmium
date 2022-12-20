@@ -3,7 +3,6 @@ name: CI
 on: [ push, pull_request ]
 
 jobs:
-
   linux:
     runs-on: ubuntu-latest
     timeout-minutes: 40
@@ -198,41 +197,25 @@ jobs:
       - uses: ./.github/actions/ctest
 
   ubuntu-latest:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     timeout-minutes: 40
     env:
-      CC: clang-13
-      CXX: clang++-13
+      CC: clang-15
+      CXX: clang++-15
       BUILD_TYPE: Dev
       WITH_PROJ: ON
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: true
       - name: Install new clang
         run: |
-          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-          sudo add-apt-repository 'deb http://apt.llvm.org/focal/ llvm-toolchain-focal-13 main'
+          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo tee /etc/apt/trusted.gpg.d/llvm-snapshot.asc
+          sudo add-apt-repository 'deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-15 main'
+          sudo apt-get update -q
+          sudo apt-get install clang-15
         shell: bash
       - uses: ./.github/actions/install-ubuntu
-      - uses: ./.github/actions/install-protozero
-      - uses: ./.github/actions/cmake
-      - uses: ./.github/actions/build
-      - uses: ./.github/actions/ctest
-
-  macos10-dev:
-    runs-on: macos-10.15
-    timeout-minutes: 60
-    env:
-      CC: clang
-      CXX: clang++
-      BUILD_TYPE: Dev
-      WITH_PROJ: OFF
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: true
-      - uses: ./.github/actions/install-macos
       - uses: ./.github/actions/install-protozero
       - uses: ./.github/actions/cmake
       - uses: ./.github/actions/build
@@ -247,7 +230,7 @@ jobs:
       BUILD_TYPE: Dev
       WITH_PROJ: OFF
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: true
       - uses: ./.github/actions/install-macos
@@ -265,7 +248,7 @@ jobs:
       BUILD_TYPE: Release
       WITH_PROJ: OFF
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: true
       - uses: ./.github/actions/install-macos
@@ -278,7 +261,7 @@ jobs:
     runs-on: windows-2019
     timeout-minutes: 40
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: true
       - uses: ./.github/actions/install-windows
@@ -290,7 +273,7 @@ jobs:
   windows-2019-full:
     runs-on: windows-2019
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: true
       - uses: ./.github/actions/install-windows
@@ -306,7 +289,7 @@ jobs:
     runs-on: windows-2022
     timeout-minutes: 40
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: true
       - uses: ./.github/actions/install-windows
