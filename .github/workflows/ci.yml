@@ -128,13 +128,13 @@ jobs:
         CXX: ${{ matrix.cpp_compiler }}
         CPP_VERSION: ${{ matrix.cpp_version }}
         WITH_PROJ: ON
+        APT_LISTCHANGES_FRONTEND: none
+        DEBIAN_FRONTEND: noninteractive
     steps:
       - name: Prepare container (apt)
         run: |
-          export APT_LISTCHANGES_FRONTEND=none
-          export DEBIAN_FRONTEND=noninteractive
           apt-get update -qq
-          apt-get install -y \
+          apt-get install -yq \
             clang \
             cmake \
             doxygen \
@@ -158,10 +158,7 @@ jobs:
         if: matrix.installer == 'apt'
       - name: Install compiler
         shell: bash
-        run: |
-          export APT_LISTCHANGES_FRONTEND=none
-          export DEBIAN_FRONTEND=noninteractive
-          apt-get install -y clang-14
+        run: apt-get install -yq clang-14
         if: matrix.cpp_compiler == 'clang++-14'
       - name: Prepare container (dnf)
         run: |
@@ -187,7 +184,7 @@ jobs:
               zlib-devel
         shell: bash
         if: matrix.installer == 'dnf'
-      # Use v1 of checkout because v2 doesn't work with submodules
+      # Use v1 of checkout because v3 doesn't work with submodules
       - uses: actions/checkout@v1
         with:
           submodules: true
@@ -212,8 +209,8 @@ jobs:
         run: |
           wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo tee /etc/apt/trusted.gpg.d/llvm-snapshot.asc
           sudo add-apt-repository 'deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-15 main'
-          sudo apt-get update -q
-          sudo apt-get install clang-15
+          sudo apt-get update -qq
+          sudo apt-get install -yq clang-15
         shell: bash
       - uses: ./.github/actions/install-ubuntu
       - uses: ./.github/actions/install-protozero
