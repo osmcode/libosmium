@@ -57,7 +57,7 @@ jobs:
         shell: bash
         working-directory: build
       - name: Upload Log
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         if: always()
         with:
           name: clang-tidy-${{ matrix.clang }}-log
