@@ -10,8 +10,19 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+* Mark RapidJSON support as deprecated.
+* Update included Catch to v2.13.10.
+* Remove deprecated BoolVector class.
+* Remove deprecated NWRIdSet class.
+* Remove deprecated AssemblerConfig constructor.
+* Print start of offending string in overlong string exception.
+* Implement `set_thread_name()` on FreeBSD.
+
 ### Fixed
 
+* Fix return type in `MembersDatabaseCommon::count_not_removed()`.
+* Make bzip2 unit tests pass on musl-based systems.
+* Fix bug in members database test case.
 
 ## [2.18.0] - 2022-02-07
 
