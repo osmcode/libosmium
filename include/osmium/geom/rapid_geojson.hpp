@@ -47,6 +47,9 @@ namespace osmium {
             /**
              * A geometry factory implementation that can be used with the
              * RapidJSON (https://github.com/miloyip/rapidjson) JSON writer.
+             *
+             * @deprecated The RapidJSON support will be removed in a future
+             *             version of libosmium.
              */
             template <typename TWriter>
             class RapidGeoJSONFactoryImpl {
