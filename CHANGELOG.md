@@ -10,6 +10,12 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+### Fixed
+
+## [2.19.0] - 2023-01-19
+
+### Changed
+
 * Mark RapidJSON support as deprecated.
 * Update included Catch to v2.13.10.
 * Remove deprecated BoolVector class.
@@ -17,6 +23,7 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 * Remove deprecated AssemblerConfig constructor.
 * Print start of offending string in overlong string exception.
 * Implement `set_thread_name()` on FreeBSD.
+* Some small code cleanups.
 
 ### Fixed
 
@@ -1264,7 +1271,8 @@ long time. These will not be part of the next version of libosmium:
   Doxygen (up to version 1.8.8). This version contains a workaround to fix
   this.
 
-[unreleased]: https://github.com/osmcode/libosmium/compare/v2.18.0...HEAD
+[unreleased]: https://github.com/osmcode/libosmium/compare/v2.19.0...HEAD
+[2.19.0]: https://github.com/osmcode/libosmium/compare/v2.18.9...v2.19.0
 [2.18.0]: https://github.com/osmcode/libosmium/compare/v2.17.3...v2.18.0
 [2.17.3]: https://github.com/osmcode/libosmium/compare/v2.17.2...v2.17.3
 [2.17.2]: https://github.com/osmcode/libosmium/compare/v2.17.1...v2.17.2
