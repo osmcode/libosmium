@@ -809,37 +809,41 @@ namespace osmium {
                         case protozero::tag_and_type(FileFormat::Blob::optional_bytes_zstd_data, protozero::pbf_wire_type::length_delimited):
                             throw osmium::pbf_error{"zstd blobs not supported"};
                         default:
-                            throw osmium::pbf_error{"unknown compression"};
+                            pbf_blob.skip();
                     }
                 }
 
-                if (!compressed_data.empty() && raw_size != 0) {
-                    switch (use_compression) {
-                        case pbf_compression::none:
-                            break;
-                        case pbf_compression::zlib:
-                            return osmium::io::detail::zlib_uncompress_string(
-                                compressed_data.data(),
-                                static_cast<unsigned long>(compressed_data.size()), // NOLINT(google-runtime-int)
-                                static_cast<unsigned long>(raw_size), // NOLINT(google-runtime-int)
-                                output
-                            );
-                        case pbf_compression::lz4:
+                if (compressed_data.empty()) {
+                    throw osmium::pbf_error{"blob contains no data or unknown compression method"};
+                }
+
+                if (raw_size == 0) {
+                    throw osmium::pbf_error{"missing raw_size in compressed blob"};
+                }
+
+                switch (use_compression) {
+                    case pbf_compression::none:
+                        break;
+                    case pbf_compression::zlib:
+                        return osmium::io::detail::zlib_uncompress_string(
+                            compressed_data.data(),
+                            static_cast<unsigned long>(compressed_data.size()), // NOLINT(google-runtime-int)
+                            static_cast<unsigned long>(raw_size), // NOLINT(google-runtime-int)
+                            output
+                        );
+                    case pbf_compression::lz4:
 #ifdef OSMIUM_WITH_LZ4
-                            return osmium::io::detail::lz4_uncompress_string(
-                                compressed_data.data(),
-                                static_cast<unsigned long>(compressed_data.size()), // NOLINT(google-runtime-int)
-                                static_cast<unsigned long>(raw_size), // NOLINT(google-runtime-int)
-                                output
-                            );
+                        return osmium::io::detail::lz4_uncompress_string(
+                            compressed_data.data(),
+                            static_cast<unsigned long>(compressed_data.size()), // NOLINT(google-runtime-int)
+                            static_cast<unsigned long>(raw_size), // NOLINT(google-runtime-int)
+                            output
+                        );
 #else
-                            break;
+                        break;
 #endif
-                    }
-                    std::abort(); // should never be here
                 }
-
-                throw osmium::pbf_error{"blob contains no data"};
+                std::abort(); // should never be here
             }
 
             inline osmium::Box decode_header_bbox(const data_view& data) {
