@@ -27,9 +27,6 @@ jobs:
             image: "ubuntu:22.04"
             ubuntu: 22
             CXXFLAGS: -Wno-stringop-overread
-          - name: Debian-9
-            # Uses gcc 6.3.0, clang 3.8.1, cmake 3.7.2
-            image: "debian:stretch"
           - name: Debian-10
             # Uses gcc 8.3.0, clang 7.0.1, cmake 3.13.4
             image: "debian:buster"
