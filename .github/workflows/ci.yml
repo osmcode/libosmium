@@ -9,7 +9,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        name: [Ubuntu-18, Ubuntu-20, Ubuntu-22, Debian-10, Debian-11, Debian-12, Debian-Testing, Debian-Experimental, Fedora-35, Fedora-36]
+        name: [Ubuntu-18, Ubuntu-20, Ubuntu-22, Debian-10, Debian-11, Debian-12, Debian-Testing, Debian-Experimental, Fedora-35, Fedora-36, Fedora-37, Fedora-38]
         build_type: [Dev]
         cpp_compiler: [g++]
         cpp_version: [c++11]
@@ -23,7 +23,7 @@ jobs:
             image: "ubuntu:20.04"
             ubuntu: 20
           - name: Ubuntu-22
-            # Uses gcc 11.2.0, clang 14.0.0, cmake 3.22.1
+            # Uses gcc 12.2.0, clang 15.0.7, cmake 3.24.2
             image: "ubuntu:22.04"
             ubuntu: 22
             CXXFLAGS: -Wno-stringop-overread
@@ -34,36 +34,29 @@ jobs:
             # Uses gcc 10.2.1, clang 11.0.1, cmake 3.18.4
             image: "debian:bullseye"
           - name: Debian-11
-            # Uses gcc 10.2.1, clang 11.0.1, cmake 3.18.4
             image: "debian:bullseye"
             cpp_version: c++17
           - name: Debian-11
-            # Uses gcc 10.2.1, clang 11.0.1, cmake 3.18.4
             image: "debian:bullseye"
             cpp_version: c++20
           - name: Debian-11
-            # Uses gcc 10.2.1, clang 11.0.1, cmake 3.18.4
             image: "debian:bullseye"
             c_compiler: clang
             cpp_compiler: clang++
           - name: Debian-11
-            # Uses gcc 10.2.1, clang 11.0.1, cmake 3.18.4
             image: "debian:bullseye"
             c_compiler: clang
             cpp_compiler: clang++
             cpp_version: c++17
           - name: Debian-11
-            # Uses gcc 10.2.1, clang 11.0.1, cmake 3.18.4
             image: "debian:bullseye"
             c_compiler: clang
             cpp_compiler: clang++
             cpp_version: c++20
           - name: Debian-11
-            # Uses gcc 10.2.1, clang 11.0.1, cmake 3.18.4
             image: "debian:bullseye"
             build_type: RelWithDebInfo
           - name: Debian-11
-            # Uses gcc 10.2.1, clang 11.0.1, cmake 3.18.4
             image: "debian:bullseye"
             c_compiler: clang
             cpp_compiler: clang++
@@ -74,39 +67,32 @@ jobs:
             image: "debian:bookworm"
             CXXFLAGS: -Wno-stringop-overread
           - name: Debian-12
-            # Uses gcc 12.2.0, clang 15.0.6, cmake 3.25.1
             image: "debian:bookworm"
             cpp_version: c++17
             CXXFLAGS: -Wno-stringop-overread
           - name: Debian-12
-            # Uses gcc 12.2.0, clang 15.0.6, cmake 3.25.1
             image: "debian:bookworm"
             cpp_version: c++20
             CXXFLAGS: -Wno-stringop-overread
           - name: Debian-12
-            # Uses gcc 12.2.0, clang 15.0.6, cmake 3.25.1
             image: "debian:bookworm"
             c_compiler: clang
             cpp_compiler: clang++
           - name: Debian-12
-            # Uses gcc 12.2.0, clang 15.0.6, cmake 3.25.1
             image: "debian:bookworm"
             c_compiler: clang
             cpp_compiler: clang++
             cpp_version: c++17
           - name: Debian-12
-            # Uses gcc 12.2.0, clang 15.0.6, cmake 3.25.1
             image: "debian:bookworm"
             c_compiler: clang
             cpp_compiler: clang++
             cpp_version: c++20
           - name: Debian-12
-            # Uses gcc 12.2.0, clang 15.0.6, cmake 3.25.1
             image: "debian:bookworm"
             build_type: RelWithDebInfo
             CXXFLAGS: -Wno-stringop-overread
           - name: Debian-12
-            # Uses gcc 12.2.0, clang 15.0.6, cmake 3.25.1
             image: "debian:bookworm"
             c_compiler: clang
             cpp_compiler: clang++
@@ -124,8 +110,8 @@ jobs:
             CXXFLAGS: -Wno-stringop-overread
           - name: Debian-Experimental
             image: "debian:experimental"
-            c_compiler: clang-14
-            cpp_compiler: clang++-14
+            c_compiler: clang
+            cpp_compiler: clang++
           - name: Fedora-35
             # Uses gcc 11.2.1, clang 12.0.1, cmake 3.20.5
             image: "fedora:35"
