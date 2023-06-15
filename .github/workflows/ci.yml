@@ -9,7 +9,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        name: [Ubuntu-18, Ubuntu-20, Ubuntu-22, Debian-10, Debian-11, Debian-Testing, Debian-Experimental, Fedora-35, Fedora-36]
+        name: [Ubuntu-18, Ubuntu-20, Ubuntu-22, Debian-10, Debian-11, Debian-12, Debian-Testing, Debian-Experimental, Fedora-35, Fedora-36]
         build_type: [Dev]
         cpp_compiler: [g++]
         cpp_version: [c++11]
@@ -46,6 +46,11 @@ jobs:
             image: "debian:bullseye"
             c_compiler: clang
             cpp_compiler: clang++
+          - name: Debian-11
+            # Uses gcc 10.2.1, clang 11.0.1, cmake 3.18.4
+            image: "debian:bullseye"
+            c_compiler: clang
+            cpp_compiler: clang++
             cpp_version: c++17
           - name: Debian-11
             # Uses gcc 10.2.1, clang 11.0.1, cmake 3.18.4
@@ -62,28 +67,62 @@ jobs:
             image: "debian:bullseye"
             c_compiler: clang
             cpp_compiler: clang++
-          - name: Debian-11
-            # Uses gcc 10.2.1, clang 11.0.1, cmake 3.18.4
-            image: "debian:bullseye"
+            CXXFLAGS: -fsanitize=address,undefined,integer -fno-sanitize-recover=all -fno-omit-frame-pointer
+            LDFLAGS: -fsanitize=address,undefined,integer
+          - name: Debian-12
+            # Uses gcc 12.2.0, clang 15.0.6, cmake 3.25.1
+            image: "debian:bookworm"
+            CXXFLAGS: -Wno-stringop-overread
+          - name: Debian-12
+            # Uses gcc 12.2.0, clang 15.0.6, cmake 3.25.1
+            image: "debian:bookworm"
+            cpp_version: c++17
+            CXXFLAGS: -Wno-stringop-overread
+          - name: Debian-12
+            # Uses gcc 12.2.0, clang 15.0.6, cmake 3.25.1
+            image: "debian:bookworm"
+            cpp_version: c++20
+            CXXFLAGS: -Wno-stringop-overread
+          - name: Debian-12
+            # Uses gcc 12.2.0, clang 15.0.6, cmake 3.25.1
+            image: "debian:bookworm"
+            c_compiler: clang
+            cpp_compiler: clang++
+          - name: Debian-12
+            # Uses gcc 12.2.0, clang 15.0.6, cmake 3.25.1
+            image: "debian:bookworm"
+            c_compiler: clang
+            cpp_compiler: clang++
+            cpp_version: c++17
+          - name: Debian-12
+            # Uses gcc 12.2.0, clang 15.0.6, cmake 3.25.1
+            image: "debian:bookworm"
+            c_compiler: clang
+            cpp_compiler: clang++
+            cpp_version: c++20
+          - name: Debian-12
+            # Uses gcc 12.2.0, clang 15.0.6, cmake 3.25.1
+            image: "debian:bookworm"
+            build_type: RelWithDebInfo
+            CXXFLAGS: -Wno-stringop-overread
+          - name: Debian-12
+            # Uses gcc 12.2.0, clang 15.0.6, cmake 3.25.1
+            image: "debian:bookworm"
             c_compiler: clang
             cpp_compiler: clang++
             CXXFLAGS: -fsanitize=address,undefined,integer -fno-sanitize-recover=all -fno-omit-frame-pointer
             LDFLAGS: -fsanitize=address,undefined,integer
           - name: Debian-Testing
-            # Uses gcc 10.3.0, clang 11.1.0, cmake 3.21.3
             image: "debian:testing"
             CXXFLAGS: -Wno-stringop-overread
           - name: Debian-Testing
-            # Uses gcc 10.3.0, clang 11.1.0, cmake 3.21.3
             image: "debian:testing"
             c_compiler: clang
             cpp_compiler: clang++
           - name: Debian-Experimental
-            # Uses gcc 11, clang 14, cmake 3.21.3
             image: "debian:experimental"
             CXXFLAGS: -Wno-stringop-overread
           - name: Debian-Experimental
-            # Uses gcc 11, clang 14, cmake 3.21.3
             image: "debian:experimental"
             c_compiler: clang-14
             cpp_compiler: clang++-14
@@ -94,6 +133,14 @@ jobs:
           - name: Fedora-36
             # Uses gcc 12.2.0, clang 14.0.5, cmake 3.24.2
             image: "fedora:36"
+            CXXFLAGS: -Wno-stringop-overread
+          - name: Fedora-37
+            # Uses gcc 12.3.1, clang 15.0.7, cmake 3.26.4
+            image: "fedora:37"
+            CXXFLAGS: -Wno-stringop-overread
+          - name: Fedora-38
+            # Uses gcc 13.0.1, clang 16.0.5, cmake 3.26.4
+            image: "fedora:38"
             CXXFLAGS: -Wno-stringop-overread
     container:
       image: ${{ matrix.image }}
@@ -203,9 +250,11 @@ jobs:
       matrix:
         os:
           - "macos-11"
+          - "macos-12"
+          - "macos-13"
         build_type: [Dev]
         include:
-          - os: "macos-11"
+          - os: "macos-12"
             build_type: Release
     runs-on: ${{ matrix.os }}
     env:
