@@ -79,7 +79,7 @@ namespace osmium {
             out += static_cast<char>('0' + value);
         }
 
-        inline time_t parse_timestamp(const char* str) {
+        inline std::time_t parse_timestamp(const char* str) {
             static const std::array<int, 12> mon_lengths = {{
                 31, 29, 31, 30, 31, 30,
                 31, 31, 30, 31, 30, 31
@@ -149,7 +149,7 @@ namespace osmium {
 
         void to_iso_str(std::string& s) const {
             std::tm tm; // NOLINT(cppcoreguidelines-pro-type-member-init,hicpp-member-init)
-            time_t sse = seconds_since_epoch();
+            std::time_t sse = seconds_since_epoch();
 #ifndef NDEBUG
             auto result =
 #endif
@@ -193,7 +193,7 @@ namespace osmium {
          */
         template <typename T, typename std::enable_if<std::is_integral<T>::value, int>::type = 0>
         constexpr Timestamp(T timestamp) noexcept : // NOLINT(google-explicit-constructor, hicpp-explicit-conversions)
-            m_timestamp(uint32_t(timestamp)) {
+            m_timestamp(static_cast<uint32_t>(timestamp)) {
         }
 
         /**
@@ -230,18 +230,18 @@ namespace osmium {
         }
 
         /// Explicit conversion into time_t.
-        constexpr time_t seconds_since_epoch() const noexcept {
-            return time_t(m_timestamp);
+        constexpr std::time_t seconds_since_epoch() const noexcept {
+            return static_cast<std::time_t>(m_timestamp);
         }
 
         /// Explicit conversion into uint32_t.
         explicit constexpr operator uint32_t() const noexcept {
-            return uint32_t(m_timestamp);
+            return m_timestamp;
         }
 
         /// Explicit conversion into uint64_t.
         explicit constexpr operator uint64_t() const noexcept {
-            return uint64_t(m_timestamp);
+            return static_cast<uint64_t>(m_timestamp);
         }
 
         template <typename T>
@@ -307,7 +307,7 @@ namespace osmium {
     }
 
     inline bool operator==(const Timestamp& lhs, const Timestamp& rhs) noexcept {
-        return uint32_t(lhs) == uint32_t(rhs);
+        return static_cast<uint32_t>(lhs) == static_cast<uint32_t>(rhs);
     }
 
     inline bool operator!=(const Timestamp& lhs, const Timestamp& rhs) noexcept {
@@ -315,7 +315,7 @@ namespace osmium {
     }
 
     inline bool operator<(const Timestamp& lhs, const Timestamp& rhs) noexcept {
-        return uint32_t(lhs) < uint32_t(rhs);
+        return static_cast<uint32_t>(lhs) < static_cast<uint32_t>(rhs);
     }
 
     inline bool operator>(const Timestamp& lhs, const Timestamp& rhs) noexcept {

@@ -168,7 +168,7 @@ namespace osmium {
                             const std::string start_of_string(str_view.data(), 20);
                             throw osmium::pbf_error{"overlong string (" +  start_of_string + "...) in string table"};
                         }
-                        m_stringtable.emplace_back(str_view.data(), osmium::string_size_type(str_view.size()));
+                        m_stringtable.emplace_back(str_view.data(), static_cast<osmium::string_size_type>(str_view.size()));
                     }
                 }
 
@@ -314,11 +314,11 @@ namespace osmium {
                 }
 
                 int32_t convert_pbf_lon(const int64_t c) const noexcept {
-                    return int32_t((c * m_granularity + m_lon_offset) / resolution_convert);
+                    return static_cast<int32_t>((c * m_granularity + m_lon_offset) / resolution_convert);
                 }
 
                 int32_t convert_pbf_lat(const int64_t c) const noexcept {
-                    return int32_t((c * m_granularity + m_lat_offset) / resolution_convert);
+                    return static_cast<int32_t>((c * m_granularity + m_lat_offset) / resolution_convert);
                 }
 
                 void decode_node(const data_view& data) {
@@ -503,7 +503,7 @@ namespace osmium {
                                 throw osmium::pbf_error{"unknown relation member type"};
                             }
                             rml_builder.add_member(
-                                osmium::item_type(type + 1),
+                                static_cast<osmium::item_type>(type + 1),
                                 ref.update(refs.next_sint64()),
                                 r.first,
                                 r.second
@@ -788,7 +788,7 @@ namespace osmium {
                             }
                         case protozero::tag_and_type(FileFormat::Blob::optional_int32_raw_size, protozero::pbf_wire_type::varint):
                             raw_size = pbf_blob.get_int32();
-                            if (raw_size <= 0 || uint32_t(raw_size) > max_uncompressed_blob_size) {
+                            if (raw_size <= 0 || static_cast<uint32_t>(raw_size) > max_uncompressed_blob_size) {
                                 throw osmium::pbf_error{"illegal blob size"};
                             }
                             break;
