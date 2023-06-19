@@ -127,7 +127,7 @@ jobs:
           - name: Fedora-38
             # Uses gcc 13.0.1, clang 16.0.5, cmake 3.26.4
             image: "fedora:38"
-            CXXFLAGS: -Wno-stringop-overread
+            CXXFLAGS: -Wno-stringop-overread -Wno-dangling-reference
     container:
       image: ${{ matrix.image }}
       env:
