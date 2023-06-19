@@ -33,8 +33,13 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+// NOLINTNEXTLINE(modernize-macro-to-enum)
 #define LIBOSMIUM_VERSION_MAJOR 2
+
+// NOLINTNEXTLINE(modernize-macro-to-enum)
 #define LIBOSMIUM_VERSION_MINOR 19
+
+// NOLINTNEXTLINE(modernize-macro-to-enum)
 #define LIBOSMIUM_VERSION_PATCH 0
 
 #define LIBOSMIUM_VERSION_STRING "2.19.0"
