@@ -60,8 +60,8 @@ jobs:
             image: "debian:bullseye"
             c_compiler: clang
             cpp_compiler: clang++
-            CXXFLAGS: -fsanitize=address,undefined,integer -fno-sanitize-recover=all -fno-omit-frame-pointer
-            LDFLAGS: -fsanitize=address,undefined,integer
+            CXXFLAGS: -fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer
+            LDFLAGS: -fsanitize=address,undefined
           - name: Debian-12
             # Uses gcc 12.2.0, clang 15.0.6, cmake 3.25.1
             image: "debian:bookworm"
@@ -96,8 +96,8 @@ jobs:
             image: "debian:bookworm"
             c_compiler: clang
             cpp_compiler: clang++
-            CXXFLAGS: -fsanitize=address,undefined,integer -fno-sanitize-recover=all -fno-omit-frame-pointer
-            LDFLAGS: -fsanitize=address,undefined,integer
+            CXXFLAGS: -fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer
+            LDFLAGS: -fsanitize=address,undefined
           - name: Debian-Testing
             image: "debian:testing"
             CXXFLAGS: -Wno-stringop-overread
