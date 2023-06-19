@@ -106,9 +106,10 @@ namespace osmium {
                     return 0; // stdin
                 }
 
-                int flags = O_RDONLY;
 #ifdef _WIN32
-                flags |= O_BINARY;
+                const int flags = O_RDONLY | O_BINARY;
+#else
+                const int flags = O_RDONLY;
 #endif
                 const int fd = ::open(filename.c_str(), flags);
                 if (fd < 0) {

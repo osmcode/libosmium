@@ -553,7 +553,7 @@ TEST_CASE("Reading OSM XML 200: Using Reader asking for ways") {
     const osmium::io::Header header{reader.header()};
     REQUIRE(header.get("generator") == "testdata");
 
-    osmium::memory::Buffer buffer = reader.read();
+    const osmium::memory::Buffer buffer = reader.read();
     REQUIRE(0 == buffer.committed());
     REQUIRE_FALSE(buffer);
     reader.close();

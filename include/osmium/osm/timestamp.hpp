@@ -149,7 +149,7 @@ namespace osmium {
 
         void to_iso_str(std::string& s) const {
             std::tm tm; // NOLINT(cppcoreguidelines-pro-type-member-init,hicpp-member-init)
-            std::time_t sse = seconds_since_epoch();
+            const std::time_t sse = seconds_since_epoch();
 #ifndef NDEBUG
             auto result =
 #endif
