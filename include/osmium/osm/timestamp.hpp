@@ -79,7 +79,30 @@ namespace osmium {
             out += static_cast<char>('0' + value);
         }
 
-        inline std::time_t parse_timestamp(const char* str) {
+        inline bool fractional_seconds(const char** s) noexcept {
+            const char* str = *s;
+
+            if (*str != '.' && *str != ',') {
+                return false;
+            }
+
+            ++str;
+            if (*str < '0' || *str > '9') {
+                return false;
+            }
+
+            do {
+                ++str;
+            } while (*str >= '0' && *str <= '9');
+
+            *s = str;
+            return *str == 'Z';
+        }
+
+        inline std::time_t parse_timestamp(const char** s) {
+            const char* str = *s;
+            *s += 19;
+
             static const std::array<int, 12> mon_lengths = {{
                 31, 29, 31, 30, 31, 30,
                 31, 31, 30, 31, 30, 31
@@ -104,7 +127,8 @@ namespace osmium {
                 str[16] == ':' &&
                 str[17] >= '0' && str[17] <= '9' &&
                 str[18] >= '0' && str[18] <= '9' &&
-                str[19] == 'Z') {
+                (str[19] == 'Z' || fractional_seconds(s))) {
+                ++(*s);
                 std::tm tm; // NOLINT(cppcoreguidelines-pro-type-member-init,hicpp-member-init)
                 tm.tm_year = (str[ 0] - '0') * 1000 +
                              (str[ 1] - '0') *  100 +
@@ -132,6 +156,11 @@ namespace osmium {
                 }
             }
             throw std::invalid_argument{std::string{"can not parse timestamp: '"} + str + "'"};
+        }
+
+        inline std::time_t parse_timestamp(const char* s) {
+            const char** str = &s;
+            return parse_timestamp(str);
         }
 
     } // namespace detail
