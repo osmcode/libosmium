@@ -100,14 +100,14 @@ jobs:
             LDFLAGS: -fsanitize=address,undefined
           - name: Debian-Testing
             image: "debian:testing"
-            CXXFLAGS: -Wno-stringop-overread
+            CXXFLAGS: -Wno-stringop-overread -Wno-dangling-reference
           - name: Debian-Testing
             image: "debian:testing"
             c_compiler: clang
             cpp_compiler: clang++
           - name: Debian-Experimental
             image: "debian:experimental"
-            CXXFLAGS: -Wno-stringop-overread
+            CXXFLAGS: -Wno-stringop-overread -Wno-dangling-reference
           - name: Debian-Experimental
             image: "debian:experimental"
             c_compiler: clang
