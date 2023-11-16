@@ -223,6 +223,22 @@ namespace osmium {
         }
 
         /**
+         * Set current offset into file.
+         *
+         * @param fd Open file descriptor.
+         * @param offset Desired absolute offset into the file
+         */
+        inline void file_seek(int fd, size_t offset) noexcept {
+#ifdef _MSC_VER
+            osmium::detail::disable_invalid_parameter_handler diph;
+            // https://msdn.microsoft.com/en-us/library/1yee101t.aspx
+            _lseeki64(fd, offset, SEEK_SET);
+#else
+            ::lseek(fd, offset, SEEK_SET);
+#endif
+        }
+
+        /**
          * Check whether the file descriptor refers to a TTY.
          *
          * @param fd Open file descriptor.
