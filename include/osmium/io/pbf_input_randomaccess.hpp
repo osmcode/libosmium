@@ -174,6 +174,8 @@ namespace osmium {
 
                 const char* expected_type = should_index_block ? "OSMData" : "OSMHeader";
                 size_t blob_body_size = detail::decode_blob_header(protozero::data_view{buffer.data(), blob_header_size}, expected_type);
+                // TODO: Check for "Sort.Type_then_ID" in optional_features, if desired.
+                // (Planet has it, most extracts have it, but test data doesn't have it.)
                 if (blob_body_size > detail::max_block_size) {
                     throw osmium::pbf_error{"invalid Block size (> max_block_size)"};
                 }
@@ -235,8 +237,39 @@ namespace osmium {
                 return m_block_starts;
             }
 
-            // FIXME: get_parsed_block
+            /**
+             * Reads and parses a block into a given buffer. Note that this class does not cache
+             * recently-accessed blocks, and thus cannot be used in parallel.
+             *
+             * @pre block_index must be a valid index into m_block_starts.
+             * @returns The decoded block
+             */
+            osmium::memory::Buffer get_parsed_block(size_t block_index, const osmium::io::read_meta read_metadata) {
+                /* Because we might need to read the block to update m_block_starts, *all* item types must be decoded. This should not be a problem anyway, because the block likely only contains items of the desired type, as items should be sorted first by type, then by ID. */
+                const osmium::osm_entity_bits::type read_types = osmium::osm_entity_bits::all;
 
+                auto& block_start = m_block_starts[block_index];
+                /* Because of the write-access to m_block_starts and file seeking, this cannot be
+                 * easily parallelized. */
+                osmium::util::file_seek(m_fd, block_start.file_offset);
+
+                std::string input_buffer;
+                input_buffer.resize(block_start.datasize);
+                if (!osmium::io::detail::read_exactly(m_fd, &*input_buffer.begin(), block_start.datasize)) {
+                    throw osmium::pbf_error{"unexpected EOF"};
+                }
+                osmium::io::detail::PBFDataBlobDecoder data_blob_parser{std::move(input_buffer), read_types, read_metadata};
+
+                osmium::memory::Buffer buffer = data_blob_parser();
+                if (block_start.first_item_type_or_zero == osmium::item_type::undefined) {
+                    auto it = buffer.begin<osmium::OSMObject>();
+                    if (it != buffer.end<osmium::OSMObject>()) {
+                        block_start.first_item_id_or_zero = it->id();
+                        block_start.first_item_type_or_zero = it->type();
+                    }
+                }
+                return buffer;
+            }
         };
 
     } // namespace io
