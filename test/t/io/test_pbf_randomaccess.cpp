@@ -29,30 +29,65 @@ TEST_CASE("Read normal PBF files") {
         REQUIRE(last_block.file_offset == expect.last_block_offset);
         REQUIRE(last_block.datasize == expect.last_block_datasize);
         // Since no block has been decoded yet, this must still be zero:
+        REQUIRE(!last_block.is_populated());
         REQUIRE(last_block.first_item_type_or_zero == osmium::item_type::undefined);
         REQUIRE(last_block.first_item_id_or_zero == 0);
     }
 }
 
+static void require_binary_search_result(
+    const osmium::io::PbfBlockIndexTable& table,
+    osmium::item_type needle_item_type,
+    osmium::object_id_type needle_item_id,
+    size_t expected_begin_search,
+    size_t expected_end_search,
+    size_t expected_result
+) {
+    size_t begin_search = 0;
+    size_t end_search = table.block_starts().size();
+    size_t actual_result = table.binary_search_object_guess(needle_item_type, needle_item_id, begin_search, end_search);
+    REQUIRE(actual_result == expected_result);
+    REQUIRE(begin_search == expected_begin_search);
+    REQUIRE(end_search == expected_end_search);
+}
+
 /**
  * Can read and index some reasonable osm.pbf files.
  */
-TEST_CASE("Access only middle block of PBF files") {
+TEST_CASE("Access only middle block of PBF files, and check binary search") {
     osmium::io::PbfBlockIndexTable table {with_data_dir("t/io/data-n5w1r3.osm.pbf")};
     REQUIRE(table.block_starts().size() == 3);
+
+    /* Test without any loaded blocks: */
     REQUIRE(table.block_starts()[0].first_item_id_or_zero == 0);
     REQUIRE(table.block_starts()[0].first_item_type_or_zero == osmium::item_type::undefined);
     REQUIRE(table.block_starts()[1].first_item_id_or_zero == 0);
     REQUIRE(table.block_starts()[1].first_item_type_or_zero == osmium::item_type::undefined);
     REQUIRE(table.block_starts()[2].first_item_id_or_zero == 0);
     REQUIRE(table.block_starts()[2].first_item_type_or_zero == osmium::item_type::undefined);
+    require_binary_search_result(table, osmium::item_type::node, 5, 0, 3, 1);
+    require_binary_search_result(table, osmium::item_type::node, 10, 0, 3, 1);
+    require_binary_search_result(table, osmium::item_type::node, 12, 0, 3, 1);
+    require_binary_search_result(table, osmium::item_type::node, 25, 0, 3, 1);
+    require_binary_search_result(table, osmium::item_type::node, 40, 0, 3, 1);
+    require_binary_search_result(table, osmium::item_type::way, 4, 0, 3, 1);
+    require_binary_search_result(table, osmium::item_type::way, 20, 0, 3, 1);
+    require_binary_search_result(table, osmium::item_type::way, 40, 0, 3, 1);
+    require_binary_search_result(table, osmium::item_type::relation, 5, 0, 3, 1);
+    require_binary_search_result(table, osmium::item_type::relation, 20, 0, 3, 1);
+    require_binary_search_result(table, osmium::item_type::relation, 30, 0, 3, 1);
+    require_binary_search_result(table, osmium::item_type::relation, 35, 0, 3, 1);
+
+    /* Test with only the middle block loaded: */
     auto middle_block = table.get_parsed_block(1, osmium::io::read_meta::yes);
     REQUIRE(table.block_starts()[0].first_item_id_or_zero == 0);
     REQUIRE(table.block_starts()[0].first_item_type_or_zero == osmium::item_type::undefined);
     REQUIRE(table.block_starts()[1].first_item_id_or_zero == 20);
     REQUIRE(table.block_starts()[1].first_item_type_or_zero == osmium::item_type::way);
+    REQUIRE(table.block_starts()[1].is_populated());
     REQUIRE(table.block_starts()[2].first_item_id_or_zero == 0);
     REQUIRE(table.block_starts()[2].first_item_type_or_zero == osmium::item_type::undefined);
+    REQUIRE(!table.block_starts()[2].is_populated());
     {
         auto it = middle_block.begin<osmium::OSMObject>();
         REQUIRE(it->id() == 20);
@@ -60,6 +95,20 @@ TEST_CASE("Access only middle block of PBF files") {
         ++it;
         REQUIRE(it == middle_block.end<osmium::OSMObject>());
     }
+    require_binary_search_result(table, osmium::item_type::node, 5, 0, 1, 0);
+    require_binary_search_result(table, osmium::item_type::node, 10, 0, 1, 0);
+    require_binary_search_result(table, osmium::item_type::node, 12, 0, 1, 0);
+    require_binary_search_result(table, osmium::item_type::node, 25, 0, 1, 0);
+    require_binary_search_result(table, osmium::item_type::node, 40, 0, 1, 0);
+    require_binary_search_result(table, osmium::item_type::way, 4, 0, 1, 0);
+    require_binary_search_result(table, osmium::item_type::way, 20, 1, 3, 2);
+    require_binary_search_result(table, osmium::item_type::way, 40, 1, 3, 2);
+    require_binary_search_result(table, osmium::item_type::relation, 5, 1, 3, 2);
+    require_binary_search_result(table, osmium::item_type::relation, 20, 1, 3, 2);
+    require_binary_search_result(table, osmium::item_type::relation, 30, 1, 3, 2);
+    require_binary_search_result(table, osmium::item_type::relation, 35, 1, 3, 2);
+
+    /* Test with only the first two blocks loaded: */
     auto first_block = table.get_parsed_block(0, osmium::io::read_meta::no);
     REQUIRE(table.block_starts()[0].first_item_id_or_zero == 10);
     REQUIRE(table.block_starts()[0].first_item_type_or_zero == osmium::item_type::node);
@@ -86,4 +135,106 @@ TEST_CASE("Access only middle block of PBF files") {
         ++it;
         REQUIRE(it == first_block.end<osmium::OSMObject>());
     }
+    require_binary_search_result(table, osmium::item_type::node, 5, 0, 0, 3);
+    require_binary_search_result(table, osmium::item_type::node, 10, 0, 1, 0);
+    require_binary_search_result(table, osmium::item_type::node, 12, 0, 1, 0);
+    require_binary_search_result(table, osmium::item_type::node, 25, 0, 1, 0);
+    require_binary_search_result(table, osmium::item_type::node, 40, 0, 1, 0);
+    require_binary_search_result(table, osmium::item_type::way, 4, 0, 1, 0);
+    require_binary_search_result(table, osmium::item_type::way, 20, 1, 3, 2);
+    require_binary_search_result(table, osmium::item_type::way, 40, 1, 3, 2);
+    require_binary_search_result(table, osmium::item_type::relation, 5, 1, 3, 2);
+    require_binary_search_result(table, osmium::item_type::relation, 20, 1, 3, 2);
+    require_binary_search_result(table, osmium::item_type::relation, 30, 1, 3, 2);
+    require_binary_search_result(table, osmium::item_type::relation, 35, 1, 3, 2);
+
+    /* Test with all blocks loaded: */
+    auto last_block = table.get_parsed_block(2, osmium::io::read_meta::no);
+    REQUIRE(table.block_starts()[0].first_item_id_or_zero == 10);
+    REQUIRE(table.block_starts()[0].first_item_type_or_zero == osmium::item_type::node);
+    REQUIRE(table.block_starts()[1].first_item_id_or_zero == 20);
+    REQUIRE(table.block_starts()[1].first_item_type_or_zero == osmium::item_type::way);
+    REQUIRE(table.block_starts()[2].first_item_id_or_zero == 30);
+    REQUIRE(table.block_starts()[2].first_item_type_or_zero == osmium::item_type::relation);
+    {
+        auto it = last_block.begin<osmium::OSMObject>();
+        REQUIRE(it->id() == 30);
+        REQUIRE(it->type() == osmium::item_type::relation);
+        ++it;
+        REQUIRE(it->id() == 31);
+        REQUIRE(it->type() == osmium::item_type::relation);
+        ++it;
+        REQUIRE(it->id() == 32);
+        REQUIRE(it->type() == osmium::item_type::relation);
+        ++it;
+        REQUIRE(it == last_block.end<osmium::OSMObject>());
+    }
+    require_binary_search_result(table, osmium::item_type::node, 5, 0, 0, 3);
+    require_binary_search_result(table, osmium::item_type::node, 10, 0, 1, 0);
+    require_binary_search_result(table, osmium::item_type::node, 12, 0, 1, 0);
+    require_binary_search_result(table, osmium::item_type::node, 25, 0, 1, 0);
+    require_binary_search_result(table, osmium::item_type::node, 40, 0, 1, 0);
+    require_binary_search_result(table, osmium::item_type::way, 4, 0, 1, 0);
+    require_binary_search_result(table, osmium::item_type::way, 20, 1, 2, 1);
+    require_binary_search_result(table, osmium::item_type::way, 40, 1, 2, 1);
+    require_binary_search_result(table, osmium::item_type::relation, 5, 1, 2, 1);
+    require_binary_search_result(table, osmium::item_type::relation, 20, 1, 2, 1);
+    require_binary_search_result(table, osmium::item_type::relation, 30, 2, 3, 2);
+    require_binary_search_result(table, osmium::item_type::relation, 35, 2, 3, 2);
+}
+
+/**
+ * This test is mostly just paranoia.
+ */
+TEST_CASE("binsearch_middle actually returns the middle") {
+    /* Length 2 */
+    REQUIRE(osmium::io::detail::binsearch_middle(0, 2) == 1);
+    REQUIRE(osmium::io::detail::binsearch_middle(1, 3) == 2);
+    REQUIRE(osmium::io::detail::binsearch_middle(2, 4) == 3);
+    REQUIRE(osmium::io::detail::binsearch_middle(3, 5) == 4);
+    /* Length 3 */
+    REQUIRE(osmium::io::detail::binsearch_middle(0, 3) == 1);
+    REQUIRE(osmium::io::detail::binsearch_middle(1, 4) == 2);
+    REQUIRE(osmium::io::detail::binsearch_middle(2, 5) == 3);
+    /* Length 4 */
+    REQUIRE(osmium::io::detail::binsearch_middle(0, 4) == 2);
+    REQUIRE(osmium::io::detail::binsearch_middle(1, 5) == 3);
+    REQUIRE(osmium::io::detail::binsearch_middle(2, 6) == 4);
+    /* Length 5 */
+    REQUIRE(osmium::io::detail::binsearch_middle(0, 5) == 2);
+    REQUIRE(osmium::io::detail::binsearch_middle(1, 6) == 3);
+    REQUIRE(osmium::io::detail::binsearch_middle(2, 7) == 4);
+    /* Length 1000 */
+    REQUIRE(osmium::io::detail::binsearch_middle(0, 1000) == 500);
+    REQUIRE(osmium::io::detail::binsearch_middle(1, 1001) == 501);
+    REQUIRE(osmium::io::detail::binsearch_middle(2, 1002) == 502);
+    /* Length 2**30 */
+    REQUIRE(osmium::io::detail::binsearch_middle(0, 1073741824) == 536870912);
+    REQUIRE(osmium::io::detail::binsearch_middle(1, 1073741825) == 536870913);
+    REQUIRE(osmium::io::detail::binsearch_middle(2, 1073741826) == 536870914);
+    /* Length 2**31 */
+    REQUIRE(osmium::io::detail::binsearch_middle(0, 2147483648) == 1073741824);
+    REQUIRE(osmium::io::detail::binsearch_middle(1, 2147483649) == 1073741825);
+    REQUIRE(osmium::io::detail::binsearch_middle(2, 2147483650) == 1073741826);
+    /* Length 2**31 + 1 */
+    REQUIRE(osmium::io::detail::binsearch_middle(0, 2147483649) == 1073741824);
+    REQUIRE(osmium::io::detail::binsearch_middle(1, 2147483650) == 1073741825);
+    REQUIRE(osmium::io::detail::binsearch_middle(2, 2147483651) == 1073741826);
+    /* Length 2**31 + 2 */
+    REQUIRE(osmium::io::detail::binsearch_middle(0, 2147483650) == 1073741825);
+    REQUIRE(osmium::io::detail::binsearch_middle(1, 2147483651) == 1073741826);
+    REQUIRE(osmium::io::detail::binsearch_middle(2, 2147483652) == 1073741827);
+    /* Length 2**32 - 3 */
+    REQUIRE(osmium::io::detail::binsearch_middle(0, 4294967293) == 2147483646);
+    REQUIRE(osmium::io::detail::binsearch_middle(1, 4294967294) == 2147483647);
+    REQUIRE(osmium::io::detail::binsearch_middle(2, 4294967295) == 2147483648);
+    /* Length 2**32 - 2 */
+    REQUIRE(osmium::io::detail::binsearch_middle(0, 4294967294) == 2147483647);
+    REQUIRE(osmium::io::detail::binsearch_middle(1, 4294967295) == 2147483648);
+    /* Length 2**32 - 1 */
+    REQUIRE(osmium::io::detail::binsearch_middle(0, 4294967295) == 2147483647);
+    /* Length 2**64 - 2, if this is a 64-bit system, else 2**32 - 2 */
+    REQUIRE(osmium::io::detail::binsearch_middle(1, SIZE_MAX) == SIZE_MAX / 2 + 1);
+    /* Length 2**64 - 1, if this is a 64-bit system, else 2**32 - 1 */
+    REQUIRE(osmium::io::detail::binsearch_middle(0, SIZE_MAX) == SIZE_MAX / 2);
 }

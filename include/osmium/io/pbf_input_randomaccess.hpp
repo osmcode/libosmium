@@ -146,6 +146,18 @@ namespace osmium {
                 return blob_header_datasize;
             }
 
+            /**
+             * Given an interval of size at least two, return an index somewhere in the middle.
+             * This may seem trivial, but this is often enough a source of bugs, and this way it can be easily tested.
+             *
+             * @pre exclusive_end - inclusive_start >= 2
+             * @returns an index in the middle of the indicated interval
+             */
+            static size_t binsearch_middle(size_t inclusive_start, size_t exclusive_end) {
+                assert(exclusive_end - inclusive_start >= 2);
+                return inclusive_start + (exclusive_end - inclusive_start) / 2;
+            }
+
         } // namespace detail
 
         struct pbf_block_start {
@@ -155,7 +167,28 @@ namespace osmium {
             // "first_item_type_or_zero" and "first_item_id_or_zero" are zero if that block has never been read before.
             osmium::item_type first_item_type_or_zero;
             // The weird order avoids silly padding in the struct (2 bytes instead of 10).
-        };
+
+            bool is_populated() const {
+                return first_item_type_or_zero != osmium::item_type::undefined;
+            }
+
+            bool is_needle_definitely_before(osmium::item_type needle_item_type, osmium::object_id_type needle_item_id) const {
+                // No actual OSMObject available.
+                if (!is_populated()) {
+                    return false;
+                }
+                auto needle_item_type_nwr = osmium::item_type_to_nwr_index(needle_item_type);
+                auto first_item_type_nwr = osmium::item_type_to_nwr_index(first_item_type_or_zero);
+                if (needle_item_type_nwr < first_item_type_nwr) {
+                    return true;
+                }
+                if (needle_item_type_nwr > first_item_type_nwr) {
+                    return false;
+                }
+                return needle_item_id < first_item_id_or_zero;
+            }
+
+        }; // struct pbf_block_start
 
         class PbfBlockIndexTable {
             std::vector<pbf_block_start> m_block_starts;
@@ -261,7 +294,7 @@ namespace osmium {
                 osmium::io::detail::PBFDataBlobDecoder data_blob_parser{std::move(input_buffer), read_types, read_metadata};
 
                 osmium::memory::Buffer buffer = data_blob_parser();
-                if (block_start.first_item_type_or_zero == osmium::item_type::undefined) {
+                if (!block_start.is_populated()) {
                     auto it = buffer.begin<osmium::OSMObject>();
                     if (it != buffer.end<osmium::OSMObject>()) {
                         block_start.first_item_id_or_zero = it->id();
@@ -270,7 +303,92 @@ namespace osmium {
                 }
                 return buffer;
             }
-        };
+
+            /**
+             * Execute a binary search for the "needle" OSMObject, assuming that the data are sorted by type first, and ID second.
+             *
+             * This is a very low-level function that allows easily intercepting *all* decompressed buffers, even those that are just speculative. If you need a simpler interface, see FIXME.
+             *
+             * - begin_search and end_search are the inclusive and exclusive ends of the interval to be searched, and are updated by this method.
+             * - If we can conclusively prove that no such block exists (because the needle has a smaller type+ID than even the first block, or because begin_search == end_search), then the return value is this->block_starts().size().
+             * - Otherwise, the return value is the index of a block that might contain the needle. If the block has never been read before, it is possible that the needle exists in a different block.
+             *
+             * Proceed in three stages:
+             * 1. Do a binary search, hoping that all blocks we access have been read before, i.e. the fields first_item_type_or_zero and first_item_id_or_zero in the pbf_block_start struct are populated. Note that this is likely to hit the same few indices in the beginning, thus quickly populating key indices, and reducing the search space dramatically in the first few iterations. If an unpopulated block_start is encountered, proceed with the next stage. Otherwise, return a result as per above rules.
+             * 2. Scan the remaining search space linearly. Since this does not access the underlying file, and scans a std::vector, this should be reasonably quick. Whenever a populated block_start is encountered, update begin_search or end_search accordingly. If this reduces the search space to zero or one blocks, return a result as per above rules. Otherwise, proceed with the next stage.
+             * 3. At this point, the remaining search space must have length two or more and must contain only unpopulated block_starts. At this point, there is no way to make a good guess: Return the block index in the middle of the search space.
+             *
+             * @pre begin_search < end_search, i.e. the search space is non-empty.
+             * @pre end_search <= this->block_starts().size()
+             * @pre The data must be sorted by type first, and object id second
+             * @returns The decoded block
+             */
+            size_t binary_search_object_guess(
+                osmium::item_type needle_item_type,
+                osmium::object_id_type needle_item_id,
+                size_t& begin_search,
+                size_t& end_search
+            ) const {
+                assert(end_search <= m_block_starts.size());
+
+                /* Stage 1: Optimistic binary search
+                 * TODO: keep track of whether or not m_block_starts[begin_search] has already been checked
+                 * Note that such logic is bug-prone, and unlikely to make any difference. Hence it is not implemented (yet).
+                 */
+                while (true) {
+                    assert(begin_search < end_search);
+                    if (begin_search == end_search - 1) {
+                        /* Search space has length one. Note that it is possible that begin_search was never modified so far, so we need to check the corresponding block_start first: */
+                        if (m_block_starts[begin_search].is_needle_definitely_before(needle_item_type, needle_item_id)) {
+                            end_search = begin_search;
+                            return m_block_starts.size();
+                        }
+                        /* Don't care if the block is populated or not, since we cannot reliably tell whether it contains the needle anyway. */
+                        return begin_search;
+                    }
+                    /* Search space has length at least two, so try to halve it: */
+                    size_t middle_search = osmium::io::detail::binsearch_middle(begin_search, end_search);
+                    const auto& middle_block_start = m_block_starts[middle_search];
+                    if (!middle_block_start.is_populated()) {
+                        /* Give up, go to stage 2. */
+                        break;
+                    }
+                    if (middle_block_start.is_needle_definitely_before(needle_item_type, needle_item_id)) {
+                        /* Exclude the "middle" block: */
+                        end_search = middle_search;
+                    } else {
+                        /* Include the "middle" block: */
+                        begin_search = middle_search;
+                    }
+                }
+
+                /* Stage 2: Linear scan */
+                for (size_t middle_search = begin_search; middle_search < end_search; ++middle_search) {
+                    const auto& middle_block_start = m_block_starts[middle_search];
+                    if (!middle_block_start.is_populated()) {
+                        continue;
+                    }
+                    if (middle_block_start.is_needle_definitely_before(needle_item_type, needle_item_id)) {
+                        /* Exclude the "middle" block. Note that this also effectively exits the loop. */
+                        end_search = middle_search;
+                    } else {
+                        /* Include the "middle" block: */
+                        begin_search = middle_search;
+                    }
+                }
+                /* At this point, it is possible that the search space contains any number of indices, including just zero or one index. These must be handled separately, to indicate these speecial conditions: */
+                if (begin_search == end_search) {
+                    return m_block_starts.size();
+                }
+                if (begin_search == end_search - 1) {
+                    return begin_search;
+                }
+
+                /* Stage 3: Blindly guess */
+                return osmium::io::detail::binsearch_middle(begin_search, end_search);
+            }
+
+        }; // class PbfBlockIndexTable
 
     } // namespace io
 
