@@ -213,7 +213,7 @@ jobs:
       BUILD_TYPE: Dev
       WITH_PROJ: ON
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: true
       - name: Install new clang
@@ -235,7 +235,6 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - "macos-11"
           - "macos-12"
           - "macos-13"
         build_type: [Dev]
@@ -249,7 +248,7 @@ jobs:
       BUILD_TYPE: ${{ matrix.build_type }}
       WITH_PROJ: OFF
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: true
       - uses: ./.github/actions/install-macos
@@ -268,7 +267,7 @@ jobs:
           - windows-2022
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: true
       - uses: ./.github/actions/install-windows
@@ -280,7 +279,7 @@ jobs:
   windows-2019-full:
     runs-on: windows-2019
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: true
       - uses: ./.github/actions/install-windows
