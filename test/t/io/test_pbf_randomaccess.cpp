@@ -184,6 +184,20 @@ TEST_CASE("Access only middle block of PBF files, and check binary search") {
 }
 
 /**
+ * Sanity-check the sizes.
+ */
+TEST_CASE("check size of pbf_block_start") {
+    if (sizeof(size_t) == 4) {
+        REQUIRE(sizeof(osmium::io::pbf_block_start) == 16);
+    } else if (sizeof(size_t) == 8) {
+        REQUIRE(sizeof(osmium::io::pbf_block_start) == 24);
+    } else {
+        // Print a warning?
+        REQUIRE(sizeof(osmium::io::pbf_block_start) <= 24);
+    }
+}
+
+/**
  * This test is mostly just paranoia.
  */
 TEST_CASE("binsearch_middle actually returns the middle") {
