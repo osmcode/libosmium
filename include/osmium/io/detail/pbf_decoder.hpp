@@ -152,7 +152,7 @@ namespace osmium {
 
                 osmium::osm_entity_bits::type m_read_types;
 
-                osmium::memory::Buffer m_buffer{initial_buffer_size, osmium::memory::Buffer::auto_grow::internal};
+                osmium::memory::Buffer m_buffer;
 
                 osmium::io::read_meta m_read_metadata;
 
@@ -743,11 +743,13 @@ namespace osmium {
 
             public:
 
-                PBFPrimitiveBlockDecoder(const data_view& data, const osmium::osm_entity_bits::type read_types, const osmium::io::read_meta read_metadata) :
+                PBFPrimitiveBlockDecoder(const data_view& data, const osmium::osm_entity_bits::type read_types, const osmium::io::read_meta read_metadata, const osmium::memory::Buffer::auto_grow auto_grow_strategy=osmium::memory::Buffer::auto_grow::internal) :
                     m_data(data),
                     m_read_types(read_types),
+                    m_buffer(initial_buffer_size, auto_grow_strategy),
                     m_read_metadata(read_metadata) {
                 }
+
 
                 PBFPrimitiveBlockDecoder(const PBFPrimitiveBlockDecoder&) = delete;
                 PBFPrimitiveBlockDecoder& operator=(const PBFPrimitiveBlockDecoder&) = delete;
@@ -962,18 +964,20 @@ namespace osmium {
                 std::shared_ptr<std::string> m_input_buffer;
                 osmium::osm_entity_bits::type m_read_types;
                 osmium::io::read_meta m_read_metadata;
+                osmium::memory::Buffer::auto_grow m_auto_grow_strategy;
 
             public:
 
-                PBFDataBlobDecoder(std::string&& input_buffer, const osmium::osm_entity_bits::type read_types, const osmium::io::read_meta read_metadata) :
+                PBFDataBlobDecoder(std::string&& input_buffer, const osmium::osm_entity_bits::type read_types, const osmium::io::read_meta read_metadata, const osmium::memory::Buffer::auto_grow auto_grow_strategy=osmium::memory::Buffer::auto_grow::internal) :
                     m_input_buffer(std::make_shared<std::string>(std::move(input_buffer))),
                     m_read_types(read_types),
-                    m_read_metadata(read_metadata) {
+                    m_read_metadata(read_metadata),
+                    m_auto_grow_strategy(auto_grow_strategy) {
                 }
 
                 osmium::memory::Buffer operator()() {
                     std::string output;
-                    PBFPrimitiveBlockDecoder decoder{decode_blob(*m_input_buffer, output), m_read_types, m_read_metadata};
+                    PBFPrimitiveBlockDecoder decoder{decode_blob(*m_input_buffer, output), m_read_types, m_read_metadata, m_auto_grow_strategy};
                     return decoder();
                 }
 

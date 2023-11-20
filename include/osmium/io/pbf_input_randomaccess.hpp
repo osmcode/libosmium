@@ -291,7 +291,10 @@ namespace osmium {
                 if (!osmium::io::detail::read_exactly(m_fd, &*input_buffer.begin(), block_start.datasize)) {
                     throw osmium::pbf_error{"unexpected EOF"};
                 }
-                osmium::io::detail::PBFDataBlobDecoder data_blob_parser{std::move(input_buffer), read_types, read_metadata};
+                /* auto_grow::internal leads to linked lists, and iterating it will be "accidentally quadratic".
+                 * While this may be okay for linear scans, it makes it unnecessarily difficult to quickly check the first item in the buffer.
+                 * Thus, override it to auto_grow::yes, which results in a single, huge, but *contiguous* buffer. */
+                osmium::io::detail::PBFDataBlobDecoder data_blob_parser{std::move(input_buffer), read_types, read_metadata, osmium::memory::Buffer::auto_grow::yes};
 
                 osmium::memory::Buffer buffer = data_blob_parser();
                 if (!block_start.is_populated()) {
