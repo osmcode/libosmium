@@ -47,6 +47,7 @@ DEALINGS IN THE SOFTWARE.
 #include <memory>
 #include <stdexcept>
 #include <utility>
+#include <vector>
 
 namespace osmium {
 
@@ -416,6 +417,30 @@ namespace osmium {
                     buffer = buffer->m_next_buffer.get();
                 }
                 return std::move(buffer->m_next_buffer);
+            }
+
+            /**
+             * Return and remove all nested buffers in order, including this
+             * buffer. This avoids the "accidentally quadratic" overhead of
+             * get_last_nested(), at the cost of two allocations.
+             *
+             * Note that this means that the newest buffer is at the front,
+             * and the oldest buffer is at the back.
+             *
+             * @pre The buffer must be valid.
+             * @pre The buffer will be invalid.
+             */
+            std::vector<std::unique_ptr<Buffer>> extract_nested_buffers() {
+                assert(m_data && "This must be a valid buffer");
+                std::vector<std::unique_ptr<Buffer>> all_buffers;
+                Buffer* container = new Buffer(std::move(*this));
+                all_buffers.push_back(std::unique_ptr<Buffer>(container));
+                while (container->has_nested_buffers()) {
+                    Buffer* child = container->m_next_buffer.release();
+                    all_buffers.push_back(std::unique_ptr<Buffer>(child));
+                    container = child;
+                }
+                return all_buffers;
             }
 
             /**

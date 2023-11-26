@@ -294,7 +294,7 @@ namespace osmium {
              * @pre block_index must be a valid index into m_block_starts.
              * @returns The decoded block
              */
-            osmium::memory::Buffer get_parsed_block(size_t block_index, const osmium::io::read_meta read_metadata) {
+            std::vector<std::unique_ptr<osmium::memory::Buffer>> get_parsed_block(size_t block_index, const osmium::io::read_meta read_metadata) {
                 /* Because we might need to read the block to update m_block_starts, *all* item types must be decoded. This should not be a problem anyway, because the block likely only contains items of the desired type, as items should be sorted first by type, then by ID. */
                 const osmium::osm_entity_bits::type read_types = osmium::osm_entity_bits::all;
 
@@ -311,17 +311,19 @@ namespace osmium {
                 /* auto_grow::internal leads to linked lists, and iterating it will be "accidentally quadratic".
                  * While this may be okay for linear scans, it makes it unnecessarily difficult to quickly check the first item in the buffer.
                  * Thus, override it to auto_grow::yes, which results in a single, huge, but *contiguous* buffer. */
-                osmium::io::detail::PBFDataBlobDecoder data_blob_parser{std::move(input_buffer), read_types, read_metadata, osmium::memory::Buffer::auto_grow::yes};
+                osmium::io::detail::PBFDataBlobDecoder data_blob_parser{std::move(input_buffer), read_types, read_metadata, osmium::memory::Buffer::auto_grow::internal};
 
-                osmium::memory::Buffer buffer = data_blob_parser();
+                std::vector<std::unique_ptr<osmium::memory::Buffer>> buffers = data_blob_parser().extract_nested_buffers();
+
                 if (!block_start.is_populated()) {
+                    const osmium::memory::Buffer& buffer = *buffers.back();
                     auto it = buffer.begin<osmium::OSMObject>();
                     if (it != buffer.end<osmium::OSMObject>()) {
                         block_start.first_item_id_or_zero = it->id();
                         block_start.first_item_type_or_zero = it->type();
                     }
                 }
-                return buffer;
+                return buffers;
             }
 
             /**
@@ -424,7 +426,7 @@ namespace osmium {
              * @pre The data must be sorted by type first, and object id second
              * @returns The decoded block
              */
-            osmium::memory::Buffer binary_search_object(
+            std::vector<std::unique_ptr<osmium::memory::Buffer>> binary_search_object(
                     const osmium::item_type needle_item_type,
                     const osmium::object_id_type needle_item_id,
                     const osmium::io::read_meta read_metadata
@@ -437,7 +439,7 @@ namespace osmium {
                 while (end_search - begin_search >= 2) {
                     size_t middle_search = osmium::io::detail::binsearch_middle(begin_search, end_search);
                     assert(!m_block_starts[middle_search].is_populated());
-                    osmium::memory::Buffer buffer = get_parsed_block(middle_search, read_metadata);
+                    std::vector<std::unique_ptr<osmium::memory::Buffer>> buffers = get_parsed_block(middle_search, read_metadata);
                     assert(m_block_starts[middle_search].is_populated());
                     if (m_block_starts[middle_search].is_needle_definitely_before(needle_item_type, needle_item_id)) {
                         end_search = middle_search;
@@ -450,26 +452,35 @@ namespace osmium {
                      * TODO: Measure, and perhaps store also the *last* object type and ID in pbf_block_start.
                      * TODO: Measure, and perhaps discard the current block in favor of eager binary search.
                      * (This needs to be done in get_parsed_block.)
+                     * As a convenience, only search the last buffer of the block. This means that it cannot always be determined if this block contains the needle.
                      */
-                    for (auto it = buffer.begin<osmium::OSMObject>(); it != buffer.end<osmium::OSMObject>(); ++it) {
+                    const osmium::memory::Buffer& last_buffer = *buffers.front();
+                    bool saw_less_in_last_buffer = false;
+                    for (auto it = last_buffer.begin<osmium::OSMObject>(); it != last_buffer.end<osmium::OSMObject>(); ++it) {
                         int cmp = osmium::io::detail::compare_by_type_then_id(needle_item_type, needle_item_id, it->type(), it->id());
                         if (cmp == 0) {
                             /* Can abort the search here, since accidentally the answer was found.
                              * Note that because the last object ID is not cached, the next call for this exact type and ID  will actually be slower, as it will do a more naive binary search. See the to-do above. */
-                            return buffer;
+                            return buffers;
                         }
                         if (cmp < 0) {
-                            /* Can abort the search here, since the needle would have needed to appeared before the current item.
-                             * Note that because the last object ID is not cached, the next call for this exact type and ID  will actually be slower, as it will do a more naive binary search. See the to-do above. */
-                            return osmium::memory::Buffer();
+                            if (saw_less_in_last_buffer) {
+                                /* Can abort the search here, since the needle would have needed to appeared before the current item.
+                                 * Note that because the last object ID is not cached, the next call for this exact type and ID  will actually be slower, as it will do a more naive binary search. See the to-do above. */
+                                return {};
+                            } else {
+                                /* Can abort the search here, since the needle is greater-equal to the first object in the first buffer of this block, and smaller than the first object in the last buffer. This means the needle cannot be in any other block. */
+                                return buffers;
+                            }
                         }
+                        saw_less_in_last_buffer = true;
                     }
                     /* The buffer definitely does not contain the needle. */
                     begin_search = middle_search + 1;
                     assert(begin_search <= end_search);
                 }
                 if (begin_search == end_search) {
-                    return osmium::memory::Buffer();
+                    return {};
                 }
                 assert(begin_search == end_search - 1);
                 return get_parsed_block(begin_search, read_metadata);

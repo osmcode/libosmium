@@ -61,42 +61,48 @@ TEST_CASE("Can read planet quickly") {
 
     SECTION("Can 'randomly' access the first block") {
         auto middle_block = table.get_parsed_block(0, osmium::io::read_meta::no);
-        auto it = middle_block.begin<osmium::OSMObject>();
+        auto it = middle_block.front()->begin<osmium::OSMObject>();
         REQUIRE(it->type() == osmium::item_type::node);
         REQUIRE(it->id() == 1);
     }
 
     SECTION("Can randomly access some arbitrary block") {
         auto middle_block = table.get_parsed_block(1234, osmium::io::read_meta::no);
-        auto it = middle_block.begin<osmium::OSMObject>();
+        auto it = middle_block.front()->begin<osmium::OSMObject>();
         REQUIRE(it->type() == osmium::item_type::node);
         REQUIRE(it->id() >= 100000000);
     }
 
     SECTION("Find a late node") {
-        auto buffer = table.binary_search_object(osmium::item_type::node, 5301526002, osmium::io::read_meta::no);
-        REQUIRE(buffer);
+        auto buffers = table.binary_search_object(osmium::item_type::node, 5301526002, osmium::io::read_meta::no);
+        REQUIRE(!buffers.empty());
         bool found = false;
-        size_t num_seen = 0;
-        for (auto it = buffer.begin<osmium::OSMObject>(); it != buffer.end<osmium::OSMObject>(); ++it) {
-            num_seen += 1;
-            if (it->type() == osmium::item_type::node && it->id() == 5301526002) {
-                found = true;
-                break;
+        for (const auto& buffer : buffers) {
+            for (auto it = buffer->begin<osmium::OSMObject>(); it != buffer->end<osmium::OSMObject>(); ++it) {
+                if (it->type() == osmium::item_type::node && it->id() == 5301526002) {
+                    found = true;
+                    break;
+                }
             }
+            if (found)
+                break;
         }
         REQUIRE(found);
     }
 
     SECTION("Find an early node") {
-        auto buffer = table.binary_search_object(osmium::item_type::node, 123, osmium::io::read_meta::no);
-        REQUIRE(buffer);
+        auto buffers = table.binary_search_object(osmium::item_type::node, 123, osmium::io::read_meta::no);
+        REQUIRE(!buffers.empty());
         bool found = false;
-        for (auto it = buffer.begin<osmium::OSMObject>(); it != buffer.end<osmium::OSMObject>(); ++it) {
-            if (it->type() == osmium::item_type::node && it->id() == 123) {
-                found = true;
-                break;
+        for (const auto& buffer : buffers) {
+            for (auto it = buffer->begin<osmium::OSMObject>(); it != buffer->end<osmium::OSMObject>(); ++it) {
+                if (it->type() == osmium::item_type::node && it->id() == 123) {
+                    found = true;
+                    break;
+                }
             }
+            if (found)
+                break;
         }
         REQUIRE(found);
     }
@@ -140,11 +146,12 @@ TEST_CASE("Access only middle block of PBF files, and check binary search") {
     REQUIRE(table.block_starts()[2].first_item_type_or_zero == osmium::item_type::undefined);
     REQUIRE(!table.block_starts()[2].is_populated());
     {
-        auto it = middle_block.begin<osmium::OSMObject>();
+        REQUIRE(middle_block.size() == 1);
+        auto it = middle_block[0]->begin<osmium::OSMObject>();
         REQUIRE(it->id() == 20);
         REQUIRE(it->type() == osmium::item_type::way);
         ++it;
-        REQUIRE(it == middle_block.end<osmium::OSMObject>());
+        REQUIRE(it == middle_block[0]->end<osmium::OSMObject>());
     }
     require_binary_search_result(table, osmium::item_type::node, 5, 0, 1, 0);
     require_binary_search_result(table, osmium::item_type::node, 10, 0, 1, 0);
@@ -168,7 +175,8 @@ TEST_CASE("Access only middle block of PBF files, and check binary search") {
     REQUIRE(table.block_starts()[2].first_item_id_or_zero == 0);
     REQUIRE(table.block_starts()[2].first_item_type_or_zero == osmium::item_type::undefined);
     {
-        auto it = first_block.begin<osmium::OSMObject>();
+        REQUIRE(first_block.size() == 1);
+        auto it = first_block[0]->begin<osmium::OSMObject>();
         REQUIRE(it->id() == 10);
         REQUIRE(it->type() == osmium::item_type::node);
         ++it;
@@ -184,7 +192,7 @@ TEST_CASE("Access only middle block of PBF files, and check binary search") {
         REQUIRE(it->id() == 14);
         REQUIRE(it->type() == osmium::item_type::node);
         ++it;
-        REQUIRE(it == first_block.end<osmium::OSMObject>());
+        REQUIRE(it == first_block[0]->end<osmium::OSMObject>());
     }
     require_binary_search_result(table, osmium::item_type::node, 5, 0, 0, 3);
     require_binary_search_result(table, osmium::item_type::node, 10, 0, 1, 0);
@@ -208,7 +216,8 @@ TEST_CASE("Access only middle block of PBF files, and check binary search") {
     REQUIRE(table.block_starts()[2].first_item_id_or_zero == 30);
     REQUIRE(table.block_starts()[2].first_item_type_or_zero == osmium::item_type::relation);
     {
-        auto it = last_block.begin<osmium::OSMObject>();
+        REQUIRE(last_block.size() == 1);
+        auto it = last_block[0]->begin<osmium::OSMObject>();
         REQUIRE(it->id() == 30);
         REQUIRE(it->type() == osmium::item_type::relation);
         ++it;
@@ -218,7 +227,7 @@ TEST_CASE("Access only middle block of PBF files, and check binary search") {
         REQUIRE(it->id() == 32);
         REQUIRE(it->type() == osmium::item_type::relation);
         ++it;
-        REQUIRE(it == last_block.end<osmium::OSMObject>());
+        REQUIRE(it == last_block[0]->end<osmium::OSMObject>());
     }
     require_binary_search_result(table, osmium::item_type::node, 5, 0, 0, 3);
     require_binary_search_result(table, osmium::item_type::node, 10, 0, 1, 0);
