@@ -52,6 +52,57 @@ static void require_binary_search_result(
 }
 
 /**
+ * Can read and index planet.pbf.
+ */
+static const char* PLANET_FILENAME = "/scratch/osm/planet-231002.osm.pbf";
+TEST_CASE("Can read planet quickly") {
+    osmium::io::PbfBlockIndexTable table {PLANET_FILENAME};
+    REQUIRE(table.block_starts().size() >= 10000);
+
+    SECTION("Can 'randomly' access the first block") {
+        auto middle_block = table.get_parsed_block(0, osmium::io::read_meta::no);
+        auto it = middle_block.begin<osmium::OSMObject>();
+        REQUIRE(it->type() == osmium::item_type::node);
+        REQUIRE(it->id() == 1);
+    }
+
+    SECTION("Can randomly access some arbitrary block") {
+        auto middle_block = table.get_parsed_block(1234, osmium::io::read_meta::no);
+        auto it = middle_block.begin<osmium::OSMObject>();
+        REQUIRE(it->type() == osmium::item_type::node);
+        REQUIRE(it->id() >= 100000000);
+    }
+
+    SECTION("Find a late node") {
+        auto buffer = table.binary_search_object(osmium::item_type::node, 5301526002, osmium::io::read_meta::no);
+        REQUIRE(buffer);
+        bool found = false;
+        size_t num_seen = 0;
+        for (auto it = buffer.begin<osmium::OSMObject>(); it != buffer.end<osmium::OSMObject>(); ++it) {
+            num_seen += 1;
+            if (it->type() == osmium::item_type::node && it->id() == 5301526002) {
+                found = true;
+                break;
+            }
+        }
+        REQUIRE(found);
+    }
+
+    SECTION("Find an early node") {
+        auto buffer = table.binary_search_object(osmium::item_type::node, 123, osmium::io::read_meta::no);
+        REQUIRE(buffer);
+        bool found = false;
+        for (auto it = buffer.begin<osmium::OSMObject>(); it != buffer.end<osmium::OSMObject>(); ++it) {
+            if (it->type() == osmium::item_type::node && it->id() == 123) {
+                found = true;
+                break;
+            }
+        }
+        REQUIRE(found);
+    }
+}
+
+/**
  * Can read and index some reasonable osm.pbf files.
  */
 TEST_CASE("Access only middle block of PBF files, and check binary search") {

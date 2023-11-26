@@ -23,6 +23,7 @@ set(EXAMPLES
     location_cache_use
     pub_names
     read
+    read_pbf_randomaccess
     read_with_progress
     road_length
     tags_filter

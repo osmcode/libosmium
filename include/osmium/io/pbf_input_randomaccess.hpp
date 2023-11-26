@@ -411,6 +411,70 @@ namespace osmium {
                 return osmium::io::detail::binsearch_middle(begin_search, end_search);
             }
 
+            /**
+             * Execute a binary search for the "needle" OSMObject, assuming that the data are sorted by type first, and ID second.
+             *
+             * This is a simple high-level function that is easy to use: Either the needle is in the returned buffer, or it is definitely not in the data at all. This comes with a price: Speculatively decompressed buffers cannot be accessed by the caller, or cached in any capacity.
+             *
+             * - If the returned buffer is invalid, the search conclusively proved that the data definitely do not contain the needle.
+             * - If the returned buffer is valid, it may or may not contain the needle. Furthermore, all other blocks *definitely* do not contain it.
+             *
+             * This modifies the internal state, as it updates the index that backs block_starts().
+             *
+             * @pre The data must be sorted by type first, and object id second
+             * @returns The decoded block
+             */
+            osmium::memory::Buffer binary_search_object(
+                    const osmium::item_type needle_item_type,
+                    const osmium::object_id_type needle_item_id,
+                    const osmium::io::read_meta read_metadata
+            ) {
+                size_t begin_search = 0;
+                size_t end_search = m_block_starts.size();
+                /* Use binary search and a linear scan on the index to determine a contiguous interval of unpopulated blocks that might contain the needle. Note that the result is discarded intentionally. */
+                binary_search_object_guess(needle_item_type, needle_item_id, begin_search, end_search);
+
+                while (end_search - begin_search >= 2) {
+                    size_t middle_search = osmium::io::detail::binsearch_middle(begin_search, end_search);
+                    assert(!m_block_starts[middle_search].is_populated());
+                    osmium::memory::Buffer buffer = get_parsed_block(middle_search, read_metadata);
+                    assert(m_block_starts[middle_search].is_populated());
+                    if (m_block_starts[middle_search].is_needle_definitely_before(needle_item_type, needle_item_id)) {
+                        end_search = middle_search;
+                        continue;
+                    }
+                    /* At this point, the block *might* contain the needle, or the needle might be in a later block, but d.
+                     * The obvious approach is to discard 'buffer' and continue the recursive binary search until the search space has only length 0 or 1.
+                     * However, note that all the heavy work for the current block has already been done! Exploit that, and search the buffer before continue recursing.
+                     * Since buffers are contiguous chunks of memory, this might even be reasonably fast.
+                     * TODO: Measure, and perhaps store also the *last* object type and ID in pbf_block_start.
+                     * TODO: Measure, and perhaps discard the current block in favor of eager binary search.
+                     * (This needs to be done in get_parsed_block.)
+                     */
+                    for (auto it = buffer.begin<osmium::OSMObject>(); it != buffer.end<osmium::OSMObject>(); ++it) {
+                        int cmp = osmium::io::detail::compare_by_type_then_id(needle_item_type, needle_item_id, it->type(), it->id());
+                        if (cmp == 0) {
+                            /* Can abort the search here, since accidentally the answer was found.
+                             * Note that because the last object ID is not cached, the next call for this exact type and ID  will actually be slower, as it will do a more naive binary search. See the to-do above. */
+                            return buffer;
+                        }
+                        if (cmp < 0) {
+                            /* Can abort the search here, since the needle would have needed to appeared before the current item.
+                             * Note that because the last object ID is not cached, the next call for this exact type and ID  will actually be slower, as it will do a more naive binary search. See the to-do above. */
+                            return osmium::memory::Buffer();
+                        }
+                    }
+                    /* The buffer definitely does not contain the needle. */
+                    begin_search = middle_search + 1;
+                    assert(begin_search <= end_search);
+                }
+                if (begin_search == end_search) {
+                    return osmium::memory::Buffer();
+                }
+                assert(begin_search == end_search - 1);
+                return get_parsed_block(begin_search, read_metadata);
+            }
+
         }; // class PbfBlockIndexTable
 
     } // namespace io
