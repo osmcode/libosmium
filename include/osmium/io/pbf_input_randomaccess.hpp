@@ -158,6 +158,30 @@ namespace osmium {
                 return inclusive_start + (exclusive_end - inclusive_start) / 2;
             }
 
+            /* TODO: This should live somewhere else. */
+            static int compare_by_type_then_id(
+                    const osmium::item_type lhs_item_type,
+                    const osmium::object_id_type lhs_item_id,
+                    const osmium::item_type rhs_item_type,
+                    const osmium::object_id_type rhs_item_id
+            ) {
+                auto lhs_nwr = osmium::item_type_to_nwr_index(lhs_item_type);
+                auto rhs_nwr = osmium::item_type_to_nwr_index(rhs_item_type);
+                if (lhs_nwr < rhs_nwr) {
+                    return -1;
+                }
+                if (lhs_nwr > rhs_nwr) {
+                    return +1;
+                }
+                if (lhs_item_id < rhs_item_id) {
+                    return -1;
+                }
+                if (lhs_item_id > rhs_item_id) {
+                    return +1;
+                }
+                return 0;
+            }
+
         } // namespace detail
 
         struct pbf_block_start {
@@ -177,15 +201,8 @@ namespace osmium {
                 if (!is_populated()) {
                     return false;
                 }
-                auto needle_item_type_nwr = osmium::item_type_to_nwr_index(needle_item_type);
-                auto first_item_type_nwr = osmium::item_type_to_nwr_index(first_item_type_or_zero);
-                if (needle_item_type_nwr < first_item_type_nwr) {
-                    return true;
-                }
-                if (needle_item_type_nwr > first_item_type_nwr) {
-                    return false;
-                }
-                return needle_item_id < first_item_id_or_zero;
+                int cmp = osmium::io::detail::compare_by_type_then_id(needle_item_type, needle_item_id, first_item_type_or_zero, first_item_id_or_zero);
+                return cmp < 0;
             }
 
         }; // struct pbf_block_start
@@ -324,7 +341,10 @@ namespace osmium {
              * @pre begin_search < end_search, i.e. the search space is non-empty.
              * @pre end_search <= this->block_starts().size()
              * @pre The data must be sorted by type first, and object id second
-             * @returns The decoded block
+             * @returns The index of a block that seems promising
+             * @post begin_search <= end_search
+             * @post if begin_search < end_search, then begin_search <= return_value && return_value < end_search
+             * @post if begin_search == end_search, then return_value == this->block_starts().size()
              */
             size_t binary_search_object_guess(
                 osmium::item_type needle_item_type,
