@@ -115,36 +115,13 @@ namespace osmium {
                 }
 
                 /**
-                 * Read exactly size bytes from fd into buffer.
-                 *
-                 * @pre Value in size parameter must fit in unsigned int
-                 * @returns true if size bytes could be read
-                 *          false if EOF was encountered
-                 */
-                bool read_exactly(char* buffer, std::size_t size) {
-                    std::size_t to_read = size;
-
-                    while (to_read > 0) {
-                        auto const read_size = osmium::io::detail::reliable_read(m_fd, buffer + (size - to_read), static_cast<unsigned int>(to_read));
-                        if (read_size == 0) { // EOF
-                            return false;
-                        }
-                        to_read -= read_size;
-                    }
-
-                    *m_offset_ptr += size;
-
-                    return true;
-                }
-
-                /**
                  * Read 4 bytes in network byte order from file. They contain
                  * the length of the following BlobHeader.
                  */
                 uint32_t read_blob_header_size_from_file() {
                     if (m_fd != -1) {
                         std::array<char, sizeof(uint32_t)> buffer{};
-                        if (!read_exactly(buffer.data(), buffer.size())) {
+                        if (!osmium::io::detail::read_exactly(m_fd, buffer.data(), static_cast<unsigned int>(buffer.size()))) {
                             return 0; // EOF
                         }
                         return check_size(get_size_in_network_byte_order(buffer.data()));
@@ -230,7 +207,7 @@ namespace osmium {
                     if (m_fd != -1) {
                         buffer.resize(size);
 
-                        if (!read_exactly(&*buffer.begin(), size)) {
+                        if (!osmium::io::detail::read_exactly(m_fd, &*buffer.begin(), static_cast<unsigned int>(size))) {
                             throw osmium::pbf_error{"unexpected EOF"};
                         }
                     } else {
