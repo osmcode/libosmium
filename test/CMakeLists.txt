@@ -187,6 +187,7 @@ add_unit_test(io test_compression_factory)
 add_unit_test(io test_file_formats)
 add_unit_test(io test_nocompression)
 add_unit_test(io test_output_utils)
+add_unit_test(io test_file_seek)
 add_unit_test(io test_string_table)
 
 add_unit_test(io test_bzip2 ENABLE_IF ${BZIP2_FOUND} LIBS ${BZIP2_LIBRARIES})
