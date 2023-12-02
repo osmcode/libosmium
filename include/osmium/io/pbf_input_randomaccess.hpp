@@ -486,6 +486,19 @@ namespace osmium {
                 return get_parsed_block(begin_search, read_metadata);
             }
 
+            template<typename TBlockCache>
+            std::vector<std::unique_ptr<osmium::memory::Buffer>> binary_search_object(
+                    const osmium::item_type needle_item_type,
+                    const osmium::object_id_type needle_item_id,
+                    TBlockCache& block_cache,
+            ) {
+                BinarySearch binary_search_state{m_block_starts.size(), needle_item_type, needle_item_id};
+                while (binary_search_step(binary_search_state)) {
+                }
+                /* Use binary search and a linear scan on the index to determine a contiguous interval of unpopulated blocks that might contain the needle. Note that the result is discarded intentionally. */
+                binary_search_object_guess(needle_item_type, needle_item_id, begin_search, end_search
+            }
+
         }; // class PbfBlockIndexTable
 
     } // namespace io
