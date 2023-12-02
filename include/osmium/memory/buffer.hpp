@@ -103,6 +103,29 @@ namespace osmium {
 
         private:
 
+            /**
+             * The fields m_prev_buffer_or_end and m_next_buffer effectively are
+             * roughly a intrusive doubly-linked list, except that the head is
+             * never pointed-to. m_prev_buffer_or_end is necessary to quickly get
+             * access to the last buffer in a long chain, and prevent an
+             * accidentally-quadratic time. The head cannot be pointed-to, as it
+             * can be move-assigned to a different location in memory.
+             *
+             * Note that the caller never gains access to any of the nested buffers
+             * directly. In particular, get_last_nested() pops the last nested
+             * Buffer, meaning it is no longer present in this chain. This reduces
+             * the possible scenarios that need to be handled.
+             *
+             * - If this Buffer does not participate in any nesting,
+             *   then m_prev_buffer_or_end is nullptr.
+             * - If this Buffer is the head (or start) of the nested Buffer chain,
+             *   then m_prev_buffer_or_end points to the last nested Buffer.
+             * - If this Buffer is part of a nesting chain, but not the head of
+             *   the chain, then m_prev_buffer_or_end points to the previous
+             *   *nested* Buffer in the chain (or nullptr, if the previous Buffer
+             *   would be the head).
+             */
+            Buffer* m_prev_buffer_or_end = nullptr;
             std::unique_ptr<Buffer> m_next_buffer;
             std::unique_ptr<unsigned char[]> m_memory{};
             unsigned char* m_data = nullptr;
@@ -111,6 +134,7 @@ namespace osmium {
             std::size_t m_committed = 0;
 #ifndef NDEBUG
             uint8_t m_builder_count = 0;
+            bool m_this_is_nesting_list_head = true;
 #endif
             auto_grow m_auto_grow{auto_grow::no};
 
@@ -133,6 +157,10 @@ namespace osmium {
                 }
 
                 std::unique_ptr<Buffer> old{new Buffer{std::move(m_memory), m_capacity, m_committed}};
+#ifndef NDEBUG
+                assert(m_this_is_nesting_list_head);
+                old->m_this_is_nesting_list_head = false;
+#endif
                 m_memory = std::unique_ptr<unsigned char[]>{new unsigned char[m_capacity]};
                 m_data = m_memory.get();
 
@@ -140,8 +168,17 @@ namespace osmium {
                 std::copy_n(old->data() + m_committed, m_written, m_data);
                 m_committed = 0;
 
-                old->m_next_buffer = std::move(m_next_buffer);
+                if (m_next_buffer) {
+                    // Link "old" and "m_next_buffer":
+                    m_next_buffer->m_prev_buffer_or_end = old.get();
+                    old->m_next_buffer = std::move(m_next_buffer);
+                } else {
+                    m_prev_buffer_or_end = old.get();
+                }
+
+                // Link "this" and "old":
                 m_next_buffer = std::move(old);
+                // Intentionally don't write m_next_buffer->m_prev_buffer_or_end here!
             }
 
         public:
@@ -259,6 +296,7 @@ namespace osmium {
 
             // buffers can be moved
             Buffer(Buffer&& other) noexcept :
+                m_prev_buffer_or_end(std::move(other.m_prev_buffer_or_end)),
                 m_next_buffer(std::move(other.m_next_buffer)),
                 m_memory(std::move(other.m_memory)),
                 m_data(other.m_data),
@@ -279,6 +317,7 @@ namespace osmium {
             }
 
             Buffer& operator=(Buffer&& other) noexcept {
+                m_prev_buffer_or_end = std::move(other.m_prev_buffer_or_end);
                 m_next_buffer = std::move(other.m_next_buffer);
                 m_memory = std::move(other.m_memory);
                 m_data = other.m_data;
@@ -400,6 +439,9 @@ namespace osmium {
              * @returns Are there nested buffers or not?
              */
             bool has_nested_buffers() const noexcept {
+#ifndef NDEBUG
+                assert(m_this_is_nesting_list_head);
+#endif
                 return m_next_buffer != nullptr;
             }
 
@@ -411,11 +453,25 @@ namespace osmium {
              */
             std::unique_ptr<Buffer> get_last_nested() {
                 assert(has_nested_buffers());
-                Buffer* buffer = this;
-                while (buffer->m_next_buffer->has_nested_buffers()) {
-                    buffer = buffer->m_next_buffer.get();
+#ifndef NDEBUG
+                assert(m_this_is_nesting_list_head);
+#endif
+                Buffer* last_buffer = m_prev_buffer_or_end;
+                m_prev_buffer_or_end = last_buffer->m_prev_buffer_or_end;
+                std::unique_ptr<Buffer> last_buffer_owner;
+                if (Buffer* second_last_buffer = m_prev_buffer_or_end) {
+                    // Unlink second_last_buffer and last_buffer:
+                    last_buffer_owner = std::move(second_last_buffer->m_next_buffer);
+                    last_buffer->m_prev_buffer_or_end = nullptr;
+                } else {
+                    // Unlink "this" and last_buffer:
+                    last_buffer_owner = std::move(m_next_buffer);
+                    m_prev_buffer_or_end = nullptr;
                 }
-                return std::move(buffer->m_next_buffer);
+#ifndef NDEBUG
+                last_buffer->m_this_is_nesting_list_head = true;
+#endif
+                return last_buffer_owner;
             }
 
             /**

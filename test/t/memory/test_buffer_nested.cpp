@@ -59,7 +59,18 @@ TEST_CASE("Can populate and iterate auto_grow::yes") {
     buffer.select<osmium::Node>();
 }
 
-TEST_CASE("Can populate but NOT iterate nested auto_grow::internal") {
+static void require_movable(osmium::memory::Buffer& buffer) {
+    osmium::memory::Buffer move_construct_buffer{std::move(buffer)};
+    REQUIRE_FALSE(buffer);
+    REQUIRE(move_construct_buffer);
+    osmium::memory::Buffer move_assign_buffer;
+    move_assign_buffer = std::move(move_construct_buffer);
+    REQUIRE_FALSE(buffer);
+    REQUIRE_FALSE(move_construct_buffer);
+    REQUIRE(move_assign_buffer);
+}
+
+TEST_CASE("Can populate but NOT iterate nested auto_grow::internal, and de-nest it") {
     osmium::memory::Buffer buffer = make_populated_buffer(10, osmium::memory::Buffer::auto_grow::internal);
     REQUIRE(buffer);
     REQUIRE(buffer.is_aligned());
@@ -81,6 +92,35 @@ TEST_CASE("Can populate but NOT iterate nested auto_grow::internal") {
     // REQUIRE_ASSERT(buffer.get_iterator(0));
     // REQUIRE_ASSERT(buffer.get_iterator<osmium::Node>(0));
     // REQUIRE_ASSERT(buffer.select<osmium::Node>());
+
+    SECTION("Can move nested buffer") {
+        require_movable(buffer);
+    }
+    SECTION("Can de-nest buffer") {
+        REQUIRE(buffer.has_nested_buffers());
+        std::unique_ptr<osmium::memory::Buffer> first_buffer = buffer.get_last_nested();
+        REQUIRE(!first_buffer->has_nested_buffers());
+        REQUIRE(first_buffer->capacity() == 512);
+        REQUIRE(first_buffer->written() > 0);
+        REQUIRE(first_buffer->written() < 512);
+        REQUIRE(first_buffer->committed() == first_buffer->written());
+        first_buffer->begin();
+        require_movable(*first_buffer);
+        REQUIRE(buffer.has_nested_buffers());
+
+        SECTION("Can move partially de-nested buffer") {
+            require_movable(buffer);
+        }
+        SECTION("Can further de-nest buffer") {
+            std::unique_ptr<osmium::memory::Buffer> second_buffer = buffer.get_last_nested();
+            second_buffer->begin();
+            REQUIRE(buffer.has_nested_buffers());
+            std::unique_ptr<osmium::memory::Buffer> third_buffer = buffer.get_last_nested();
+            third_buffer->begin();
+            REQUIRE(!buffer.has_nested_buffers());
+            buffer.begin();
+        }
+    }
 }
 
 TEST_CASE("Can populate and iterate unnested auto_grow::internal") {
@@ -105,6 +145,9 @@ TEST_CASE("Can populate and iterate unnested auto_grow::internal") {
     buffer.get_iterator(0);
     buffer.get_iterator<osmium::Node>(0);
     buffer.select<osmium::Node>();
+
+    // REQUIRE that the buffer can be moved:
+    require_movable(buffer);
 }
 
 TEST_CASE("Can iterate empty auto_grow::internal") {
@@ -128,4 +171,26 @@ TEST_CASE("Can iterate empty auto_grow::internal") {
     buffer.get_iterator(0);
     buffer.get_iterator<osmium::Node>(0);
     buffer.select<osmium::Node>();
+
+    // REQUIRE that the buffer can be moved:
+    require_movable(buffer);
+}
+
+TEST_CASE("Can quickly handle deeply nested buffer") {
+    osmium::memory::Buffer buffer = make_populated_buffer(100000, osmium::memory::Buffer::auto_grow::internal);
+    REQUIRE(buffer);
+    REQUIRE(buffer.is_aligned());
+    REQUIRE(buffer.capacity() == 512);
+    REQUIRE(buffer.written() > 0);
+    REQUIRE(buffer.written() < 512);
+    REQUIRE(buffer.committed() == buffer.written());
+    REQUIRE(buffer.has_nested_buffers());
+
+    std::vector<std::unique_ptr<osmium::memory::Buffer>> sub_buffers;
+    while (buffer.has_nested_buffers()) {
+        sub_buffers.push_back(buffer.get_last_nested());
+    }
+    REQUIRE(sub_buffers.size() > 30000);
+    // If get_last_nested() runs in constant time, then this test case is lightning fast (< 0.01s).
+    // If get_last_nested() needs to walk the entire list, then the run time is really slow (~ 4s).
 }
