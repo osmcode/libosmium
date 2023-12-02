@@ -147,6 +147,7 @@ add_unit_test(osm test_types_from_string)
 add_unit_test(osm test_way ENABLE_IF ${ZLIB_FOUND} LIBS ${ZLIB_LIBRARIES})
 
 add_unit_test(memory test_buffer_basics)
+add_unit_test(memory test_buffer_nested)
 add_unit_test(memory test_buffer_node)
 add_unit_test(memory test_buffer_purge)
 add_unit_test(memory test_callback_buffer)

@@ -622,11 +622,13 @@ namespace osmium {
 
             template <typename T>
             ItemIteratorRange<T> select() {
+                assert(!m_next_buffer);
                 return ItemIteratorRange<T>{m_data, m_data + m_committed};
             }
 
             template <typename T>
             ItemIteratorRange<const T> select() const {
+                assert(!m_next_buffer);
                 return ItemIteratorRange<const T>{m_data, m_data + m_committed};
             }
 
@@ -634,13 +636,24 @@ namespace osmium {
              * Get iterator for iterating over all items of type T in the
              * buffer.
              *
+             * Note that trying to iterate over nested buffers is technically
+             * well-defined, but most definitely a bug. Iterating like this
+             * would only yield the last small slice of the data, and skip the
+             * nested buffers.
+             *
+             * Instead, iterate over the buffers returned by get_last_nested()
+             * until there are no nested buffers left, and finally iterate over
+             * this buffer.
+             *
              * @pre The buffer must be valid.
+             * @pre The buffer must not be nested.
              *
              * @returns Iterator to first item of type T in the buffer.
              */
             template <typename T>
             t_iterator<T> begin() {
                 assert(m_data && "This must be a valid buffer");
+                assert(!m_next_buffer);
                 return t_iterator<T>(m_data, m_data + m_committed);
             }
 
@@ -648,12 +661,23 @@ namespace osmium {
              * Get iterator for iterating over all objects of class OSMEntity
              * in the buffer.
              *
+             * Note that trying to iterate over nested buffers is technically
+             * well-defined, but most definitely a bug. Iterating like this
+             * would only yield the last small slice of the data, and skip the
+             * nested buffers.
+             *
+             * Instead, iterate over the buffers returned by get_last_nested()
+             * until there are no nested buffers left, and finally iterate over
+             * this buffer.
+             *
              * @pre The buffer must be valid.
+             * @pre The buffer must not be nested.
              *
              * @returns Iterator to first OSMEntity in the buffer.
              */
             iterator begin() {
                 assert(m_data && "This must be a valid buffer");
+                assert(!m_next_buffer);
                 return {m_data, m_data + m_committed};
             }
 
@@ -662,6 +686,7 @@ namespace osmium {
              * buffer.
              *
              * @pre The buffer must be valid.
+             * @pre The buffer must not be nested.
              *
              * @returns Iterator to first item of type T after given offset
              *          in the buffer.
@@ -670,6 +695,7 @@ namespace osmium {
             t_iterator<T> get_iterator(std::size_t offset) {
                 assert(m_data && "This must be a valid buffer");
                 assert(offset % alignof(T) == 0 && "Wrong alignment");
+                assert(!m_next_buffer);
                 return {m_data + offset, m_data + m_committed};
             }
 
@@ -678,6 +704,7 @@ namespace osmium {
              * in the buffer.
              *
              * @pre The buffer must be valid.
+             * @pre The buffer must not be nested.
              *
              * @returns Iterator to first OSMEntity after given offset in the
              *          buffer.
@@ -685,6 +712,7 @@ namespace osmium {
             iterator get_iterator(std::size_t offset) {
                 assert(m_data && "This must be a valid buffer");
                 assert(offset % alignof(OSMEntity) == 0 && "Wrong alignment");
+                assert(!m_next_buffer);
                 return {m_data + offset, m_data + m_committed};
             }
 
@@ -693,12 +721,14 @@ namespace osmium {
              * buffer.
              *
              * @pre The buffer must be valid.
+             * @pre The buffer must not be nested.
              *
              * @returns End iterator.
              */
             template <typename T>
             t_iterator<T> end() {
                 assert(m_data && "This must be a valid buffer");
+                assert(!m_next_buffer);
                 return {m_data + m_committed, m_data + m_committed};
             }
 
@@ -707,22 +737,26 @@ namespace osmium {
              * in the buffer.
              *
              * @pre The buffer must be valid.
+             * @pre The buffer must not be nested.
              *
              * @returns End iterator.
              */
             iterator end() {
                 assert(m_data && "This must be a valid buffer");
+                assert(!m_next_buffer);
                 return {m_data + m_committed, m_data + m_committed};
             }
 
             template <typename T>
             t_const_iterator<T> cbegin() const {
                 assert(m_data && "This must be a valid buffer");
+                assert(!m_next_buffer);
                 return {m_data, m_data + m_committed};
             }
 
             const_iterator cbegin() const {
                 assert(m_data && "This must be a valid buffer");
+                assert(!m_next_buffer);
                 return {m_data, m_data + m_committed};
             }
 
@@ -730,23 +764,27 @@ namespace osmium {
             t_const_iterator<T> get_iterator(std::size_t offset) const {
                 assert(m_data && "This must be a valid buffer");
                 assert(offset % alignof(T) == 0 && "Wrong alignment");
+                assert(!m_next_buffer);
                 return {m_data + offset, m_data + m_committed};
             }
 
             const_iterator get_iterator(std::size_t offset) const {
                 assert(m_data && "This must be a valid buffer");
                 assert(offset % alignof(OSMEntity) == 0 && "Wrong alignment");
+                assert(!m_next_buffer);
                 return {m_data + offset, m_data + m_committed};
             }
 
             template <typename T>
             t_const_iterator<T> cend() const {
                 assert(m_data && "This must be a valid buffer");
+                assert(!m_next_buffer);
                 return {m_data + m_committed, m_data + m_committed};
             }
 
             const_iterator cend() const {
                 assert(m_data && "This must be a valid buffer");
+                assert(!m_next_buffer);
                 return {m_data + m_committed, m_data + m_committed};
             }
 
@@ -802,6 +840,7 @@ namespace osmium {
              * indexes.
              *
              * @pre The buffer must be valid.
+             * @pre The buffer must not be nested.
              * @pre @code callback != nullptr @endptr
              */
             template <typename TCallbackClass>
