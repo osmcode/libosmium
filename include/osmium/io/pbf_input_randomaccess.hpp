@@ -298,6 +298,7 @@ namespace osmium {
              * @returns The decoded block
              */
             std::vector<std::unique_ptr<osmium::memory::Buffer>> get_parsed_block(size_t block_index, const osmium::io::read_meta read_metadata) {
+                printf("# LOADING block %lu\n", block_index);
                 /* Because we might need to read the block to update m_block_starts, *all* item types must be decoded. This should not be a problem anyway, because the block likely only contains items of the desired type, as items should be sorted first by type, then by ID. */
                 const osmium::osm_entity_bits::type read_types = osmium::osm_entity_bits::all;
 
@@ -499,7 +500,7 @@ namespace osmium {
 
             struct cache_entry {
                 size_t borrow_count {0};
-                std::vector<std::unique_ptr<osmium::memory::Buffer>> buffers;
+                std::vector<std::unique_ptr<osmium::memory::Buffer>> reverse_buffers;
             };
 
             struct borrow {
@@ -509,6 +510,12 @@ namespace osmium {
                 bool is_valid() const {
                     return object != nullptr;
                 }
+                // If the borrow is not valid, then `block_id` is not completely garbage:
+                // * "0" for "the needle should have been found, should definitely be in this block, and we have proof that it doesn't exist"
+                // * "1" for "the needle wasn't found, but it's still possible that it's in a later block"
+                // TODO: Pass this information in a more reasonable way.
+                static const size_t NEEDLE_DEFINITELY_MISSING = 0;
+                static const size_t NEEDLE_POSSIBLY_LATER = 1;
 
                 // FIXME: RAII reference counting?
             };
@@ -535,6 +542,7 @@ namespace osmium {
                     if (m_cache.size() <= IDEAL_CACHE_SIZE) {
                         return;
                     }
+                    printf("# DROPPING block %lu\n", block_id);
                     m_cache.erase(block_id);
                 }
             }
@@ -543,11 +551,36 @@ namespace osmium {
                 prune_to_ideal_size(block_id);
                 cache_entry& entry = m_cache[block_id];
                 // Can't prune after here, because we do not hold a borrow.
-                if (entry.buffers.empty()) {
+                if (entry.reverse_buffers.empty()) {
                     assert(entry.borrow_count == 0);
-                    entry.buffers = std::move(m_pbf_table.get_parsed_block(block_id, osmium::io::read_meta::no));
+                    entry.reverse_buffers = std::move(m_pbf_table.get_parsed_block(block_id, osmium::io::read_meta::no));
                 }
                 return entry;
+            }
+
+            borrow search_and_borrow_object_in_block(
+                    const osmium::item_type needle_item_type,
+                    const osmium::object_id_type needle_item_id,
+                    size_t block_index,
+                    cache_entry& entry
+            ) {
+                for (auto it = entry.reverse_buffers.rbegin(); it != entry.reverse_buffers.rend(); ++it) {
+                    auto& buffer = *it;
+                    for (auto it = buffer->begin<osmium::OSMObject>(); it != buffer->end<osmium::OSMObject>(); ++it) {
+                        int cmp = osmium::io::detail::compare_by_type_then_id(needle_item_type, needle_item_id, it->type(), it->id());
+                        if (cmp == 0) {
+                            // Found! Note that we return a pointer into the Buffer itself, which is held by a unique_ptr, and thus unaffected by any rehashing of m_cache, as long as it is not completely removed and destructed. Hence, increase the borrow count (or "reference count") first:
+                            entry.borrow_count += 1;
+                            return borrow{block_index, &*it};
+                        }
+                        if (cmp < 0) {
+                            // We're past the point where the needle should have been, so the needle does not exist.
+                            return borrow{borrow::NEEDLE_DEFINITELY_MISSING, nullptr};
+                        }
+                    }
+                }
+                // We never encountered the needle, so the needle does not exist in this block.
+                return borrow{borrow::NEEDLE_POSSIBLY_LATER, nullptr};
             }
 
             // FIXME: Code duplication with binary_search_object
@@ -563,7 +596,7 @@ namespace osmium {
                     size_t middle_search = osmium::io::detail::binsearch_middle(begin_search, end_search);
                     auto& middle_block_start = m_pbf_table.block_starts()[middle_search];
                     assert(!middle_block_start.is_populated());
-                    read_without_borrow(middle_search);
+                    cache_entry& entry = read_without_borrow(middle_search);
                     // Note that 'cache_entry' now points to a member of m_cache, so any modification of m_cache could invalidate the reference, or even remove the block entirely.
                     assert(middle_block_start.is_populated());
                     if (middle_block_start.is_needle_definitely_before(needle_item_type, needle_item_id)) {
@@ -572,16 +605,27 @@ namespace osmium {
                     }
                     /* At this point, the block *might* contain the needle, or the needle might be in a later block, but definitely doesn't exist before this block.
                      * The obvious approach is to discard 'buffer' and continue the recursive binary search until the search space has only length 0 or 1.
-                     * TODO: Note that all the heavy work for the current block has already been done! Exploit that, and search the buffer before continue recursing.
+                     * Note that all the heavy work for the current block has already been done! Exploit that, and search the buffer before continue recursing.
                      * Since buffers are contiguous chunks of memory, this might even be reasonably fast.
                      * TODO: Measure, and perhaps store also the *last* object type and ID in pbf_block_start.
                      * TODO: Measure, and perhaps discard the current block in favor of eager binary search.
                      * (This needs to be done in get_parsed_block.)
                      * As a convenience, only search the last buffer of the block. This means that it cannot always be determined if this block contains the needle.
                      */
-                    /* The buffer maybe contains the needle; let's hope it doesn't, and that we don't lose the block while doing the binary search. */
+                    auto item_borrow = search_and_borrow_object_in_block(needle_item_type, needle_item_id, middle_search, entry);
+                    if (item_borrow.is_valid()) {
+                        // Found! Note that we return a pointer into the Buffer itself, which is held by a unique_ptr,
+                        // and thus unaffected by any rehashing of m_cache, as long as it is not completely removed and
+                        // destructed. Hence, increase the borrow count (or "reference count") first:
+                        return item_borrow;
+                    }
+                    assert(item_borrow.block_id == borrow::NEEDLE_DEFINITELY_MISSING || item_borrow.block_id == borrow::NEEDLE_POSSIBLY_LATER);
+                    if (item_borrow.block_id == borrow::NEEDLE_DEFINITELY_MISSING) {
+                        /* The buffer doesn't contain the needle, and this is the only block where it could have been. */
+                        return borrow{0, nullptr};
+                    }
                     assert(middle_search > begin_search);
-                    begin_search = middle_search + 0; // Cannot exclude this block yet
+                    begin_search = middle_search + 1;
                     assert(begin_search <= end_search);
                 }
                 if (begin_search == end_search) {
@@ -590,27 +634,21 @@ namespace osmium {
                 assert(begin_search == end_search - 1);
                 auto& entry = read_without_borrow(begin_search);
                 // Note that 'cache_entry' now points to a member of m_cache, so any modification of m_cache could invalidate the reference, or even remove the block entirely.
-                for (auto& buffer : entry.buffers) {
-                    for (auto it = buffer->begin<osmium::OSMObject>(); it != buffer->end<osmium::OSMObject>(); ++it) {
-                        int cmp = osmium::io::detail::compare_by_type_then_id(needle_item_type, needle_item_id, it->type(), it->id());
-                        if (cmp == 0) {
-                            // Found! Note that we return a pointer into the Buffer itself, which is held by a unique_ptr, and thus unaffected by any rehashing of m_cache, as long as it is not completely removed and destructed. Hence, increase the borrow count (or "reference count") first:
-                            entry.borrow_count += 1;
-                            return borrow{begin_search, &*it};
-                        }
-                        if (cmp < 0) {
-                            // We're past the point where the needle should have been, so the needle does not exist.
-                            return borrow{0, nullptr};
-                        }
-                    }
+                auto item_borrow = search_and_borrow_object_in_block(needle_item_type, needle_item_id, begin_search, entry);
+                if (item_borrow.is_valid()) {
+                    // Found! Note that we return a pointer into the Buffer itself, which is held by a unique_ptr,
+                    // and thus unaffected by any rehashing of m_cache, as long as it is not completely removed and
+                    // destructed. Hence, increase the borrow count (or "reference count") first:
+                    return item_borrow;
                 }
-                // We never encountered the needle, so the needle does not exist.
+                assert(item_borrow.block_id == borrow::NEEDLE_DEFINITELY_MISSING || item_borrow.block_id == borrow::NEEDLE_POSSIBLY_LATER);
+                // Erase the location information, as the caller should not rely on it.
                 return borrow{0, nullptr};
             }
 
-            void return_borrow(borrow const& borrow) {
-                assert(borrow.is_valid());
-                auto& entry = m_cache[borrow.block_id];
+            void return_borrow(borrow const& item_borrow) {
+                assert(item_borrow.is_valid());
+                auto& entry = m_cache[item_borrow.block_id];
                 assert(entry.borrow_count > 0);
                 entry.borrow_count -= 1;
             }
@@ -622,19 +660,24 @@ namespace osmium {
             {
             }
 
+            osmium::OSMObject& first_in_block(size_t block_index) {
+                auto const& reverse_buffers = read_without_borrow(block_index).reverse_buffers;
+                return *reverse_buffers.back()->begin<osmium::OSMObject>();
+            }
+
             // TCallback must be of type "void fn(osmium::OSMObject const& obj)", or some other return type, or an object with "operator()(osmium::OSMObject const&)".
             template<typename TCallback>
             bool visit_object(
                     const osmium::item_type needle_item_type,
                     const osmium::object_id_type needle_item_id,
-                    TCallback& callback
+                    TCallback callback
             ) {
-                borrow borrow = search_and_borrow_object(needle_item_type, needle_item_id);
-                if (!borrow.is_valid()) {
+                borrow item_borrow = search_and_borrow_object(needle_item_type, needle_item_id);
+                if (!item_borrow.is_valid()) {
                     return false;
                 }
-                callback(*borrow.object);
-                return_borrow(borrow);
+                callback(*item_borrow.object);
+                return_borrow(item_borrow);
                 return true;
             }
 
@@ -642,27 +685,27 @@ namespace osmium {
             template<typename TCallback>
             bool visit_node(
                     const osmium::object_id_type needle_item_id,
-                    TCallback& callback
+                    TCallback callback
             ) {
-                return visit_object(osmium::item_type::node, [&](osmium::OSMObject const& obj){ callback(static_cast<osmium::Node const&>(obj)); });
+                return visit_object(osmium::item_type::node, needle_item_id, [&](osmium::OSMObject const& obj){ callback(static_cast<osmium::Node const&>(obj)); });
             }
 
             // TCallback must be of type "void fn(osmium::Way const& way)", or some other return type, or an object with "operator()(osmium::Way const&)".
             template<typename TCallback>
             bool visit_way(
                     const osmium::object_id_type needle_item_id,
-                    TCallback& callback
+                    TCallback callback
             ) {
-                return visit_object(osmium::item_type::way, [&](osmium::OSMObject const& obj){ callback(static_cast<osmium::Way const&>(obj)); });
+                return visit_object(osmium::item_type::way, needle_item_id, [&](osmium::OSMObject const& obj){ callback(static_cast<osmium::Way const&>(obj)); });
             }
 
             // TCallback must be of type "void fn(osmium::Relation const& relation)", or some other return type, or an object with "operator()(osmium::Relation const&)".
             template<typename TCallback>
             bool visit_relation(
                     const osmium::object_id_type needle_item_id,
-                    TCallback& callback
+                    TCallback callback
             ) {
-                return visit_object(osmium::item_type::relation, [&](osmium::OSMObject const& obj){ callback(static_cast<osmium::Relation const&>(obj)); });
+                return visit_object(osmium::item_type::relation, needle_item_id, [&](osmium::OSMObject const& obj){ callback(static_cast<osmium::Relation const&>(obj)); });
             }
 
         }; // class CachedRandomAccessPbf
