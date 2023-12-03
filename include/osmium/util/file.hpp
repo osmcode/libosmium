@@ -228,13 +228,13 @@ namespace osmium {
          * @param fd Open file descriptor.
          * @param offset Desired absolute offset into the file
          */
-        inline void file_seek(int fd, size_t offset) noexcept {
+        inline void file_seek(int fd, std::size_t offset) noexcept {
 #ifdef _MSC_VER
             osmium::detail::disable_invalid_parameter_handler diph;
             // https://msdn.microsoft.com/en-us/library/1yee101t.aspx
             _lseeki64(fd, static_cast<__int64>(offset), SEEK_SET);
 #else
-            ::lseek(fd, offset, SEEK_SET);
+            ::lseek(fd, static_cast<off_t>(offset), SEEK_SET);
 #endif
         }
 
