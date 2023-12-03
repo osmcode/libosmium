@@ -11,7 +11,7 @@
 TEST_CASE("Seek and read in files") {
     /* gzipped data contains very few repetitions in the binary file format,
      * which makes it easy to identify any problems. */
-    int fd = osmium::io::detail::open_for_reading(with_data_dir("t/io/data.osm.gz"));
+    const int fd = osmium::io::detail::open_for_reading(with_data_dir("t/io/data.osm.gz"));
     struct seek_expectation {
         size_t offset;
         unsigned char eight_bytes[8];
@@ -26,7 +26,7 @@ TEST_CASE("Seek and read in files") {
     for (const auto& expect : expectations) {
         char actual_eight_bytes[8] = {0, 0, 0, 0, 0, 0, 0, 0};
         osmium::util::file_seek(fd, expect.offset);
-        bool did_actually_read = osmium::io::detail::read_exactly(fd, &actual_eight_bytes[0], 8);
+        const bool did_actually_read = osmium::io::detail::read_exactly(fd, &actual_eight_bytes[0], 8);
         REQUIRE(did_actually_read);
         for (int i = 0; i < 8; ++i) {
             REQUIRE(expect.eight_bytes[i] == static_cast<unsigned char>(actual_eight_bytes[i]));
@@ -37,11 +37,11 @@ TEST_CASE("Seek and read in files") {
 TEST_CASE("Seek close to end of file") {
     /* gzipped data contains very few repetitions in the binary file format,
      * which makes it easy to identify any problems. */
-    int fd = osmium::io::detail::open_for_reading(with_data_dir("t/io/data.osm.gz"));
+    const int fd = osmium::io::detail::open_for_reading(with_data_dir("t/io/data.osm.gz"));
     REQUIRE(osmium::util::file_size(with_data_dir("t/io/data.osm.gz")) == 187);
     char actual_eight_bytes[8] = {1, 1, 1, 1, 1, 1, 1, 1};
     osmium::util::file_seek(fd, 186);
-    auto actually_read = osmium::io::detail::reliable_read(fd, &actual_eight_bytes[0], 8);
+    const auto actually_read = osmium::io::detail::reliable_read(fd, &actual_eight_bytes[0], 8);
     REQUIRE(actually_read == 1);
     REQUIRE(actual_eight_bytes[0] == 0);
     REQUIRE(actual_eight_bytes[1] == 1);
@@ -50,11 +50,11 @@ TEST_CASE("Seek close to end of file") {
 TEST_CASE("Seek to exact end of file") {
     /* gzipped data contains very few repetitions in the binary file format,
      * which makes it easy to identify any problems. */
-    int fd = osmium::io::detail::open_for_reading(with_data_dir("t/io/data.osm.gz"));
+    const int fd = osmium::io::detail::open_for_reading(with_data_dir("t/io/data.osm.gz"));
     REQUIRE(osmium::util::file_size(with_data_dir("t/io/data.osm.gz")) == 187);
     char actual_eight_bytes[8] = {1, 1, 1, 1, 1, 1, 1, 1};
     osmium::util::file_seek(fd, 187);
-    auto actually_read = osmium::io::detail::reliable_read(fd, &actual_eight_bytes[0], 8);
+    const auto actually_read = osmium::io::detail::reliable_read(fd, &actual_eight_bytes[0], 8);
     REQUIRE(actually_read == 0);
     REQUIRE(actual_eight_bytes[0] == 1);
     REQUIRE(actual_eight_bytes[1] == 1);
