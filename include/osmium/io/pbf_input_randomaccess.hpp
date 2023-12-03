@@ -49,7 +49,9 @@ DEALINGS IN THE SOFTWARE.
 #include <protozero/pbf_message.hpp>
 #include <protozero/types.hpp>
 
+#include <random>
 #include <string>
+#include <unordered_map>
 
 namespace osmium {
 
@@ -240,6 +242,7 @@ namespace osmium {
 
                 current_offset += blob_body_size;
                 osmium::util::file_seek(m_fd, current_offset);
+                assert(current_offset <= file_size);
                 return current_offset;
             }
 
@@ -445,7 +448,7 @@ namespace osmium {
                         end_search = middle_search;
                         continue;
                     }
-                    /* At this point, the block *might* contain the needle, or the needle might be in a later block, but d.
+                    /* At this point, the block *might* contain the needle, or the needle might be in a later block, but definitely doesn't exist before this block.
                      * The obvious approach is to discard 'buffer' and continue the recursive binary search until the search space has only length 0 or 1.
                      * However, note that all the heavy work for the current block has already been done! Exploit that, and search the buffer before continue recursing.
                      * Since buffers are contiguous chunks of memory, this might even be reasonably fast.
@@ -486,20 +489,183 @@ namespace osmium {
                 return get_parsed_block(begin_search, read_metadata);
             }
 
-            template<typename TBlockCache>
-            std::vector<std::unique_ptr<osmium::memory::Buffer>> binary_search_object(
-                    const osmium::item_type needle_item_type,
-                    const osmium::object_id_type needle_item_id,
-                    TBlockCache& block_cache,
-            ) {
-                BinarySearch binary_search_state{m_block_starts.size(), needle_item_type, needle_item_id};
-                while (binary_search_step(binary_search_state)) {
+        }; // class PbfBlockIndexTable
+
+        class CachedRandomAccessPbf {
+
+            // Each block is between 120 KiB and 8 MiB of data.
+            // TODO: This should be more easily configurable; but I have the RAM, so let's use it:
+            static const size_t IDEAL_CACHE_SIZE = 2048;
+
+            struct cache_entry {
+                size_t borrow_count {0};
+                std::vector<std::unique_ptr<osmium::memory::Buffer>> buffers;
+            };
+
+            struct borrow {
+                size_t block_id;
+                osmium::OSMObject* object;
+
+                bool is_valid() const {
+                    return object != nullptr;
                 }
-                /* Use binary search and a linear scan on the index to determine a contiguous interval of unpopulated blocks that might contain the needle. Note that the result is discarded intentionally. */
-                binary_search_object_guess(needle_item_type, needle_item_id, begin_search, end_search
+
+                // FIXME: RAII reference counting?
+            };
+
+            // FIXME: It would be nice to have some kind of feedback from a concurrent linear scan, which could initialize the table "for free".
+            PbfBlockIndexTable& m_pbf_table;
+            // FIXME: This level of nesting and pointer chasing is unnecessary. All Buffers should live in the same contiguous block of memory.
+            std::unordered_map<size_t, cache_entry> m_cache;
+            std::minstd_rand m_rng;
+
+            void prune_to_ideal_size(size_t avoid_block_id) {
+                if (m_cache.size() < IDEAL_CACHE_SIZE * 3 / 2) {
+                    // The effort does not justify the memory savings.
+                    return;
+                }
+                std::vector<size_t> block_ids;
+                for (auto const& pair : m_cache) {
+                    if (pair.second.borrow_count == 0 && pair.first != avoid_block_id) {
+                        block_ids.push_back(pair.first);
+                    }
+                }
+                std::shuffle(block_ids.begin(), block_ids.end(), m_rng); // TODO: Doesn't this move???
+                for (size_t block_id : block_ids) {
+                    if (m_cache.size() <= IDEAL_CACHE_SIZE) {
+                        return;
+                    }
+                    m_cache.erase(block_id);
+                }
             }
 
-        }; // class PbfBlockIndexTable
+            cache_entry& read_without_borrow(size_t block_id) {
+                prune_to_ideal_size(block_id);
+                cache_entry& entry = m_cache[block_id];
+                // Can't prune after here, because we do not hold a borrow.
+                if (entry.buffers.empty()) {
+                    assert(entry.borrow_count == 0);
+                    entry.buffers = std::move(m_pbf_table.get_parsed_block(block_id, osmium::io::read_meta::no));
+                }
+                return entry;
+            }
+
+            // FIXME: Code duplication with binary_search_object
+            borrow search_and_borrow_object(
+                    const osmium::item_type needle_item_type,
+                    const osmium::object_id_type needle_item_id
+            ) {
+                size_t begin_search = 0;
+                size_t end_search = m_pbf_table.block_starts().size();
+                m_pbf_table.binary_search_object_guess(needle_item_type, needle_item_id, begin_search, end_search);
+
+                while (end_search - begin_search >= 2) {
+                    size_t middle_search = osmium::io::detail::binsearch_middle(begin_search, end_search);
+                    auto& middle_block_start = m_pbf_table.block_starts()[middle_search];
+                    assert(!middle_block_start.is_populated());
+                    read_without_borrow(middle_search);
+                    // Note that 'cache_entry' now points to a member of m_cache, so any modification of m_cache could invalidate the reference, or even remove the block entirely.
+                    assert(middle_block_start.is_populated());
+                    if (middle_block_start.is_needle_definitely_before(needle_item_type, needle_item_id)) {
+                        end_search = middle_search;
+                        continue;
+                    }
+                    /* At this point, the block *might* contain the needle, or the needle might be in a later block, but definitely doesn't exist before this block.
+                     * The obvious approach is to discard 'buffer' and continue the recursive binary search until the search space has only length 0 or 1.
+                     * TODO: Note that all the heavy work for the current block has already been done! Exploit that, and search the buffer before continue recursing.
+                     * Since buffers are contiguous chunks of memory, this might even be reasonably fast.
+                     * TODO: Measure, and perhaps store also the *last* object type and ID in pbf_block_start.
+                     * TODO: Measure, and perhaps discard the current block in favor of eager binary search.
+                     * (This needs to be done in get_parsed_block.)
+                     * As a convenience, only search the last buffer of the block. This means that it cannot always be determined if this block contains the needle.
+                     */
+                    /* The buffer maybe contains the needle; let's hope it doesn't, and that we don't lose the block while doing the binary search. */
+                    assert(middle_search > begin_search);
+                    begin_search = middle_search + 0; // Cannot exclude this block yet
+                    assert(begin_search <= end_search);
+                }
+                if (begin_search == end_search) {
+                    return borrow{0, nullptr};
+                }
+                assert(begin_search == end_search - 1);
+                auto& entry = read_without_borrow(begin_search);
+                // Note that 'cache_entry' now points to a member of m_cache, so any modification of m_cache could invalidate the reference, or even remove the block entirely.
+                for (auto& buffer : entry.buffers) {
+                    for (auto it = buffer->begin<osmium::OSMObject>(); it != buffer->end<osmium::OSMObject>(); ++it) {
+                        int cmp = osmium::io::detail::compare_by_type_then_id(needle_item_type, needle_item_id, it->type(), it->id());
+                        if (cmp == 0) {
+                            // Found! Note that we return a pointer into the Buffer itself, which is held by a unique_ptr, and thus unaffected by any rehashing of m_cache, as long as it is not completely removed and destructed. Hence, increase the borrow count (or "reference count") first:
+                            entry.borrow_count += 1;
+                            return borrow{begin_search, &*it};
+                        }
+                        if (cmp < 0) {
+                            // We're past the point where the needle should have been, so the needle does not exist.
+                            return borrow{0, nullptr};
+                        }
+                    }
+                }
+                // We never encountered the needle, so the needle does not exist.
+                return borrow{0, nullptr};
+            }
+
+            void return_borrow(borrow const& borrow) {
+                assert(borrow.is_valid());
+                auto& entry = m_cache[borrow.block_id];
+                assert(entry.borrow_count > 0);
+                entry.borrow_count -= 1;
+            }
+
+        public:
+            explicit CachedRandomAccessPbf(PbfBlockIndexTable& table) :
+                m_pbf_table(table),
+                m_rng(static_cast<uint_fast32_t>(std::random_device()()))
+            {
+            }
+
+            // TCallback must be of type "void fn(osmium::OSMObject const& obj)", or some other return type, or an object with "operator()(osmium::OSMObject const&)".
+            template<typename TCallback>
+            bool visit_object(
+                    const osmium::item_type needle_item_type,
+                    const osmium::object_id_type needle_item_id,
+                    TCallback& callback
+            ) {
+                borrow borrow = search_and_borrow_object(needle_item_type, needle_item_id);
+                if (!borrow.is_valid()) {
+                    return false;
+                }
+                callback(*borrow.object);
+                return_borrow(borrow);
+                return true;
+            }
+
+            // TCallback must be of type "void fn(osmium::Node const& node)", or some other return type, or an object with "operator()(osmium::Node const&)".
+            template<typename TCallback>
+            bool visit_node(
+                    const osmium::object_id_type needle_item_id,
+                    TCallback& callback
+            ) {
+                return visit_object(osmium::item_type::node, [&](osmium::OSMObject const& obj){ callback(static_cast<osmium::Node const&>(obj)); });
+            }
+
+            // TCallback must be of type "void fn(osmium::Way const& way)", or some other return type, or an object with "operator()(osmium::Way const&)".
+            template<typename TCallback>
+            bool visit_way(
+                    const osmium::object_id_type needle_item_id,
+                    TCallback& callback
+            ) {
+                return visit_object(osmium::item_type::way, [&](osmium::OSMObject const& obj){ callback(static_cast<osmium::Way const&>(obj)); });
+            }
+
+            // TCallback must be of type "void fn(osmium::Relation const& relation)", or some other return type, or an object with "operator()(osmium::Relation const&)".
+            template<typename TCallback>
+            bool visit_relation(
+                    const osmium::object_id_type needle_item_id,
+                    TCallback& callback
+            ) {
+                return visit_object(osmium::item_type::relation, [&](osmium::OSMObject const& obj){ callback(static_cast<osmium::Relation const&>(obj)); });
+            }
+
+        }; // class CachedRandomAccessPbf
 
     } // namespace io
 
