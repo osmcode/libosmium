@@ -15,7 +15,7 @@ jobs:
           - image: "debian:testing"
             clang: 15
           - image: "debian:experimental"
-            clang: 15
+            clang: 19
     container:
       image: ${{ matrix.image }}
       env:
@@ -46,8 +46,7 @@ jobs:
                   make \
                   zlib1g-dev
         shell: bash
-      # Use v1 of checkout because v3 doesn't work with submodules
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v4
         with:
           submodules: true
       - uses: ./.github/actions/install-protozero
@@ -57,7 +56,7 @@ jobs:
         shell: bash
         working-directory: build
       - name: Upload Log
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: clang-tidy-${{ matrix.clang }}-log
