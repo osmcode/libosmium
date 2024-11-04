@@ -470,7 +470,7 @@ namespace osmium {
              * @pre @code strlen(user) < 2^16 - 1 @endcode
              */
             TDerived& set_user(const char* user) {
-                const auto len = std::strlen(user);
+                const auto len = (user == nullptr) ? 0 : std::strlen(user);
                 assert(len < std::numeric_limits<string_size_type>::max());
                 return set_user(user, static_cast<string_size_type>(len));
             }
