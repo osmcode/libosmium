@@ -122,10 +122,10 @@ jobs:
             image: "fedora:38"
             CXXFLAGS: -Wno-stringop-overread -Wno-dangling-reference
           - name: Fedora-39
-            image: "fedora:35"
+            image: "fedora:39"
             CXXFLAGS: -Wno-stringop-overread -Wno-dangling-reference
           - name: Fedora-40
-            image: "fedora:36"
+            image: "fedora:40"
             CXXFLAGS: -Wno-stringop-overread -Wno-dangling-reference
     container:
       image: ${{ matrix.image }}
