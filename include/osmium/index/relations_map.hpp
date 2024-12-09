@@ -171,8 +171,8 @@ namespace osmium {
             friend class RelationsMapStash;
             friend class RelationsMapIndexes;
 
-            using map_type = detail::flat_map<osmium::unsigned_object_id_type, uint32_t,
-                                              osmium::unsigned_object_id_type, uint32_t>;
+            using map_type = detail::flat_map<osmium::unsigned_object_id_type, uint64_t,
+                                              osmium::unsigned_object_id_type, uint64_t>;
 
             map_type m_map;
 
@@ -312,8 +312,8 @@ namespace osmium {
          */
         class RelationsMapStash {
 
-            using map_type = detail::flat_map<osmium::unsigned_object_id_type, uint32_t,
-                                              osmium::unsigned_object_id_type, uint32_t>;
+            using map_type = detail::flat_map<osmium::unsigned_object_id_type, uint64_t,
+                                              osmium::unsigned_object_id_type, uint64_t>;
 
             map_type m_map;
 
