@@ -165,7 +165,7 @@ TEST_CASE("Fill item stash until it garbage collects") {
     // trigger compaction
     stash.add_item(node);
 
-    REQUIRE(stash.size() == num_items / 10 + 1);
+    REQUIRE(stash.size() == (num_items / 10) + 1);
     REQUIRE(stash.count_removed() == 0);
 }
 
