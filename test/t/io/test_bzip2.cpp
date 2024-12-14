@@ -7,11 +7,21 @@
 
 #include <string>
 
-static void read_from_decompressor(int fd) {
+namespace {
+
+void read_from_decompressor(int fd) {
     osmium::io::Bzip2Decompressor decomp{fd};
     decomp.read();
     decomp.close();
 }
+
+void write_to_compressor(int fd) {
+    osmium::io::Bzip2Compressor comp{fd, osmium::io::fsync::yes};
+    comp.write("foo");
+    comp.close();
+}
+
+} // anonymous namespace
 
 TEST_CASE("Invalid file descriptor of bzip2-compressed file") {
     REQUIRE_THROWS(read_from_decompressor(-1));
@@ -97,12 +107,6 @@ TEST_CASE("Corrupted bzip2-compressed file") {
     decomp.close();
 
     REQUIRE(count == count_fds());
-}
-
-static void write_to_compressor(int fd) {
-    osmium::io::Bzip2Compressor comp{fd, osmium::io::fsync::yes};
-    comp.write("foo");
-    comp.close();
 }
 
 TEST_CASE("Compressor: Invalid file descriptor for bzip2-compressed file") {
