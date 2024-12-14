@@ -6,7 +6,7 @@
 
 struct Handler1 : public osmium::handler::Handler {
 
-    int& count;
+    int& count; // NOLINT(cppcoreguidelines-avoid-const-or-ref-data-members)
 
     explicit Handler1(int& c) :
         count(c) {
@@ -40,7 +40,7 @@ struct Handler1 : public osmium::handler::Handler {
 
 struct Handler2 : public osmium::handler::Handler {
 
-    int& count;
+    int& count; // NOLINT(cppcoreguidelines-avoid-const-or-ref-data-members)
 
     explicit Handler2(int& c) :
         count(c) {
