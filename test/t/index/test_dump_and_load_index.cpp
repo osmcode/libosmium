@@ -13,6 +13,8 @@
 using dense_file_array = osmium::index::map::DenseFileArray<osmium::unsigned_object_id_type, osmium::Location>;
 using sparse_file_array = osmium::index::map::SparseFileArray<osmium::unsigned_object_id_type, osmium::Location>;
 
+namespace {
+
 template <class TMemoryIndex, class TFileIndex>
 void test_index(std::function<void(TMemoryIndex&, const int)> dump_method) {
     const int fd = osmium::detail::create_tmp_file();
@@ -46,6 +48,8 @@ void test_index(std::function<void(TMemoryIndex&, const int)> dump_method) {
     REQUIRE_THROWS_AS(file_index.get(6), osmium::not_found);
     REQUIRE_THROWS_AS(file_index.get(200), osmium::not_found);
 }
+
+} // anonymous namespace
 
 #ifdef __linux__
 using dense_mmap_array = osmium::index::map::DenseMmapArray<osmium::unsigned_object_id_type, osmium::Location>;

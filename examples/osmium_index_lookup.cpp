@@ -320,6 +320,7 @@ public:
 
 }; // class Options
 
+namespace {
 
 // Factory function to create the right IndexAccess-derived class.
 template <typename TValue>
@@ -344,6 +345,8 @@ int run(const IndexAccess<TValue>& index, const Options& options) {
     }
     return index.search(options.search_keys()) ? 0 : 1;
 }
+
+} // anonymous namespace
 
 int main(int argc, char* argv[]) {
     // Parse command line options.

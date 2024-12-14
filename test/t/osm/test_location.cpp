@@ -173,6 +173,8 @@ TEST_CASE("Location hash") {
     }
 }
 
+namespace {
+
 void C(const char* s, int32_t v, const char* r = "") {
     std::string strm{"-"};
     strm += s;
@@ -198,6 +200,8 @@ void F(const char* s) {
     data = &x;
     REQUIRE_THROWS_AS(osmium::detail::string_to_location_coordinate(data), osmium::invalid_location);
 }
+
+} // anonymous namespace
 
 TEST_CASE("Parsing coordinates from strings") {
     F("x");
@@ -350,6 +354,8 @@ TEST_CASE("Writing zero coordinate into string") {
     REQUIRE(buffer == "0");
 }
 
+namespace {
+
 void CW(int32_t v, const char* s) {
     std::string buffer;
 
@@ -360,6 +366,8 @@ void CW(int32_t v, const char* s) {
     REQUIRE(buffer[0] == '-');
     REQUIRE_FALSE(std::strcmp(buffer.c_str() + 1, s));
 }
+
+} // anonymous namespace
 
 TEST_CASE("Writing coordinate into string") {
     CW(  10000000, "1");

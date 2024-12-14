@@ -14,6 +14,8 @@
 #include <utility>
 #include <vector>
 
+namespace {
+
 template <class TFilter>
 void check_filter(const osmium::TagList& tag_list,
                   const TFilter filter,
@@ -36,6 +38,7 @@ const osmium::TagList& make_tag_list(osmium::memory::Buffer& buffer,
     return buffer.get<osmium::TagList>(pos);
 }
 
+} // anonymous namespace
 
 TEST_CASE("KeyFilter") {
     osmium::memory::Buffer buffer{10240};

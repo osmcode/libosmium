@@ -33,6 +33,8 @@ TEST_CASE("RelationsMapStash lvalue") {
     REQUIRE(count == 1);
 }
 
+namespace {
+
 osmium::index::RelationsMapIndex func() {
     osmium::index::RelationsMapStash stash;
 
@@ -41,6 +43,8 @@ osmium::index::RelationsMapIndex func() {
 
     return stash.build_member_to_parent_index();
 }
+
+} // anonymous namespace
 
 TEST_CASE("RelationsMapStash rvalue") {
     const osmium::index::RelationsMapIndex index{func()};

@@ -81,6 +81,8 @@ public:
 
 }; // class WKTDump
 
+namespace {
+
 void print_help() {
     std::cout << "osmium_area_test [OPTIONS] OSMFILE\n\n"
               << "Read OSMFILE and build multipolygons from it.\n"
@@ -93,6 +95,8 @@ void print_help() {
 void print_usage(const char* prgname) {
     std::cerr << "Usage: " << prgname << " [OPTIONS] OSMFILE\n";
 }
+
+} // anonymous namespace
 
 int main(int argc, char* argv[]) {
     if (argc > 1 && (!std::strcmp(argv[1], "-h") ||

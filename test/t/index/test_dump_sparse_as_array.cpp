@@ -13,6 +13,8 @@
 
 using dense_file_array = osmium::index::map::DenseFileArray<osmium::unsigned_object_id_type, osmium::Location>;
 
+namespace {
+
 template <class TSparseIndex>
 void test_index() {
     const int fd = osmium::detail::create_tmp_file();
@@ -66,6 +68,7 @@ void test_index() {
     REQUIRE(invalid_count == max_id_in_refs - refs.size() + 1);
 }
 
+} // anonymous namespace
 
 #ifdef __linux__
 using sparse_mmap_array = osmium::index::map::SparseMmapArray<osmium::unsigned_object_id_type, osmium::Location>;

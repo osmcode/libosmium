@@ -28,6 +28,8 @@
 // Allow any format of output files (XML, PBF, ...)
 #include <osmium/io/any_output.hpp>
 
+namespace {
+
 void print_help() {
     std::cout << "osmium_convert [OPTIONS] [INFILE [OUTFILE]]\n\n" \
               << "If INFILE or OUTFILE is not given stdin/stdout is assumed.\n" \
@@ -53,6 +55,8 @@ void print_help() {
 void print_usage(const char* prgname) {
     std::cerr << "Usage: " << prgname << " [OPTIONS] [INFILE [OUTFILE]]\n";
 }
+
+} // anonymous namespace
 
 int main(int argc, char* argv[]) {
     if (argc == 1) {

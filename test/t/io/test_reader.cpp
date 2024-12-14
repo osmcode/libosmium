@@ -345,6 +345,8 @@ TEST_CASE("Can not read after close") {
 
 using object_counts = std::array<std::size_t, 3>;
 
+namespace {
+
 std::vector<object_counts> count_objects_per_buffer(const char* filename, osmium::io::buffers_type btype) {
     const osmium::io::File file{with_data_dir(filename)};
     osmium::io::Reader reader{file, btype};
@@ -369,6 +371,8 @@ void check_buffer_counts(const std::string& filename, const std::vector<object_c
         REQUIRE(counts == oc);
     }
 }
+
+} // anonymous namespace
 
 TEST_CASE("Reader with single object type per buffer") {
     check_buffer_counts("t/io/data-n5w1r3", {{5, 1, 3}}, osmium::io::buffers_type::any);

@@ -17,12 +17,16 @@ static_assert(std::is_move_constructible<osmium::StringMatcher>::value, "StringM
 static_assert(std::is_copy_assignable<osmium::StringMatcher>::value, "StringMatcher should be copyable");
 static_assert(std::is_move_assignable<osmium::StringMatcher>::value, "StringMatcher should be moveable");
 
+namespace {
+
 template <typename T>
 std::string print(const T& matcher) {
     std::stringstream ss;
     ss << matcher;
     return ss.str();
 }
+
+} // anonymous namespace
 
 TEST_CASE("String matcher: always false") {
     const osmium::StringMatcher::always_false m;
