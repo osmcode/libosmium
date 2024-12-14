@@ -187,15 +187,15 @@ include_directories(SYSTEM ${OSMIUM_INCLUDE_DIRS})
 
 #-----------------------------------------------------------------------------
 #
-#  Decide which C++ version to use (Minimum/default: C++11).
+#  Decide which C++ version to use (Minimum/default: C++14).
 #
 #-----------------------------------------------------------------------------
 if(NOT MSVC)
     if(NOT USE_CPP_VERSION)
         if(CYGWIN)
-            set(USE_CPP_VERSION gnu++11)
+            set(USE_CPP_VERSION gnu++14)
         else()
-            set(USE_CPP_VERSION c++11)
+            set(USE_CPP_VERSION c++14)
         endif()
     endif()
     message(STATUS "Use C++ version: ${USE_CPP_VERSION}")
@@ -355,7 +355,7 @@ if(CPPCHECK)
 
     add_custom_target(cppcheck
         ${CPPCHECK}
-        --std=c++11 ${CPPCHECK_OPTIONS}
+        --std=c++14 ${CPPCHECK_OPTIONS}
         -I ${CMAKE_SOURCE_DIR}/include
         ${CPPCHECK_FILES}
     )

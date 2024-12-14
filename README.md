@@ -15,8 +15,7 @@ for more details than this README can provide.
 
 ## Prerequisites
 
-You need a C++11 compiler and standard C++ library. Osmium needs at least GCC
-4.8 or clang (LLVM) 3.4. (Some parts may work with older versions.)
+You need a C++14 compiler and standard C++ library.
 
 Different parts of Libosmium (and the applications built on top of it) need
 different libraries. You DO NOT NEED to install all of them, just install those
