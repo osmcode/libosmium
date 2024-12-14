@@ -28,7 +28,7 @@ TEST_CASE("file_size(const char*) of known file") {
 }
 
 TEST_CASE("file_size() with illegal fd should throw") {
-    REQUIRE_THROWS_AS(osmium::file_size(-1), std::system_error);
+    REQUIRE_THROWS_AS(osmium::file_size(999), std::system_error);
 }
 
 TEST_CASE("file_size() with unused fd should throw") {

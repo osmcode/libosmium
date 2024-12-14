@@ -95,7 +95,7 @@ TEST_CASE("Corrupted gzip-compressed file") {
 }
 
 TEST_CASE("Compressor: Invalid file descriptor for gzip-compressed file") {
-    REQUIRE_THROWS_AS(osmium::io::GzipCompressor(-1, osmium::io::fsync::yes), std::system_error);
+    REQUIRE_THROWS_AS(osmium::io::GzipCompressor(999, osmium::io::fsync::yes), std::system_error);
 }
 
 TEST_CASE("Compressor: Non-open file descriptor for gzip-compressed file") {

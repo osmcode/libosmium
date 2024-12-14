@@ -24,7 +24,7 @@ void write_to_compressor(int fd) {
 } // anonymous namespace
 
 TEST_CASE("Invalid file descriptor of bzip2-compressed file") {
-    REQUIRE_THROWS(read_from_decompressor(-1));
+    REQUIRE_THROWS(read_from_decompressor(999));
 }
 
 TEST_CASE("Non-open file descriptor of bzip2-compressed file") {
