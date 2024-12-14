@@ -16,7 +16,7 @@ using sparse_file_array = osmium::index::map::SparseFileArray<osmium::unsigned_o
 namespace {
 
 template <class TMemoryIndex, class TFileIndex>
-void test_index(std::function<void(TMemoryIndex&, const int)> dump_method) {
+void test_index(const std::function<void(TMemoryIndex&, const int)>& dump_method) {
     const int fd = osmium::detail::create_tmp_file();
     REQUIRE(osmium::file_size(fd) == 0);
     const osmium::unsigned_object_id_type id1 = 12;

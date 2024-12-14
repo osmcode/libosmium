@@ -18,7 +18,7 @@ namespace {
 
 template <class TFilter>
 void check_filter(const osmium::TagList& tag_list,
-                  const TFilter filter,
+                  const TFilter& filter,
                   const std::vector<bool>& reference) {
     REQUIRE(tag_list.size() == reference.size());
     auto t_it = tag_list.begin();
