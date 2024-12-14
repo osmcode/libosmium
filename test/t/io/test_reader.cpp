@@ -28,9 +28,11 @@ struct ZeroPositionNodeCountHandler : public osmium::handler::Handler {
     // location.
     int count = 0;
     int total_count = 0; // total number of nodes seen
-    const osmium::Location zero = osmium::Location{static_cast<int32_t>(0), static_cast<int32_t>(0)};
 
     void node(const osmium::Node& node) {
+        static constexpr const osmium::Location zero =
+            osmium::Location{static_cast<int32_t>(0), static_cast<int32_t>(0)};
+
         // no nodes in the history file have a zero location, and
         // no visible nodes should have an undefined location.
         if ((node.location() == zero) ||
