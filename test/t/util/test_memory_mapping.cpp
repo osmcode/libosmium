@@ -3,6 +3,7 @@
 #include <osmium/util/file.hpp>
 #include <osmium/util/memory_mapping.hpp>
 
+#include <cstdint>
 #include <cstdlib>
 #include <limits>
 #include <utility>

@@ -2,7 +2,6 @@
 
 #include <osmium/geom/mercator_projection.hpp>
 #include <osmium/geom/projection.hpp>
-#include <osmium/geom/wkb.hpp>
 #include <osmium/geom/wkt.hpp>
 
 #include <string>

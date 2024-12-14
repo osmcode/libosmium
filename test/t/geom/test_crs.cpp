@@ -1,6 +1,8 @@
 #include "catch.hpp"
 
+#include <osmium/geom/coordinates.hpp>
 #include <osmium/geom/projection.hpp>
+#include <osmium/geom/util.hpp>
 
 TEST_CASE("CRS") {
     const osmium::geom::CRS wgs84{4326};

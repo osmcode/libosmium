@@ -2,6 +2,7 @@
 
 #include <osmium/osm/location.hpp>
 
+#include <cstdint>
 #include <cstdlib>
 #include <cstring>
 #include <iterator>

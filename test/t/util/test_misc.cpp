@@ -2,6 +2,8 @@
 
 #include <osmium/util/misc.hpp>
 
+#include <cstdint>
+
 namespace {
 
 template <typename T>
