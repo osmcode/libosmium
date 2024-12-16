@@ -80,8 +80,6 @@ option(INSTALL_GDALCPP   "also install gdalcpp headers" OFF)
 
 option(WITH_PROFILING    "add flags needed for profiling" OFF)
 
-option(WITH_PROJ         "build/test with proj" ON)
-
 
 #-----------------------------------------------------------------------------
 #
@@ -169,11 +167,7 @@ set(OSMIUM_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 include_directories(${OSMIUM_INCLUDE_DIR})
 
-if(WITH_PROJ)
-    find_package(Osmium COMPONENTS lz4 io gdal geos proj)
-else()
-    find_package(Osmium COMPONENTS lz4 io gdal geos)
-endif()
+find_package(Osmium COMPONENTS lz4 io gdal geos)
 
 # The find_package put the directory where it found the libosmium includes
 # into OSMIUM_INCLUDE_DIRS. We remove it again, because we want to make

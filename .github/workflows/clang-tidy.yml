@@ -11,19 +11,18 @@ jobs:
         image: ["debian:bullseye", "debian:testing", "debian:experimental"]
         include:
           - image: "debian:bullseye"
-            clang: 11
-          - image: "debian:testing"
             clang: 15
-          - image: "debian:experimental"
+          - image: "debian:testing"
             clang: 19
+          - image: "debian:experimental"
+            clang: 20
     container:
       image: ${{ matrix.image }}
       env:
         BUILD_TYPE: Dev
         CC: clang-${{ matrix.clang }}
         CXX: clang++-${{ matrix.clang }}
-        CPP_VERSION: c++11
-        WITH_PROJ: ON
+        CPP_VERSION: c++14
         APT_LISTCHANGES_FRONTEND: none
         DEBIAN_FRONTEND: noninteractive
     steps:
@@ -31,20 +30,19 @@ jobs:
         run: |
           apt-get update -qq
           apt-get install -yq \
-                  clang-${{ matrix.clang }} \
-                  clang-tidy-${{ matrix.clang }} \
-                  cmake \
-                  git \
-                  libboost-dev \
-                  libbz2-dev \
-                  libexpat1-dev \
-                  libgdal-dev \
-                  libgeos++-dev \
-                  liblz4-dev \
-                  libproj-dev \
-                  libsparsehash-dev \
-                  make \
-                  zlib1g-dev
+            clang-${{ matrix.clang }} \
+            clang-tidy-${{ matrix.clang }} \
+            cmake \
+            git \
+            libboost-dev \
+            libbz2-dev \
+            libexpat1-dev \
+            libgdal-dev \
+            libgeos++-dev \
+            liblz4-dev \
+            libsparsehash-dev \
+            make \
+            zlib1g-dev
         shell: bash
       - uses: actions/checkout@v4
         with:

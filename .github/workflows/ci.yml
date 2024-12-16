@@ -9,123 +9,96 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        name: [Ubuntu-20, Ubuntu-22, Ubuntu-24, Debian-10, Debian-11, Debian-12, Debian-Testing, Debian-Experimental, Fedora-37, Fedora-38, Fedora-39, Fedora-40]
+        image:
+          - "ubuntu:20.04"        # gcc  9.3.0, clang 10.0.0, cmake 3.16.3
+          - "ubuntu:22.04"        # gcc 12.2.0, clang 15.0.7, cmake 3.24.2
+          - "ubuntu:24.04"        # gcc 14.2.0, clang 18.1.3, cmake 3.28.3
+          - "debian:buster"       # gcc  8.3.0, clang  7.0.1, cmake 3.13.4
+          - "debian:bullseye"     # gcc 10.2.1, clang 11.0.1, cmake 3.18.4
+          - "debian:bookworm"     # gcc 12.2.0, clang 15.0.6, cmake 3.25.1
+          - "debian:testing"
+          - "debian:experimental"
+          - "fedora:37"
+          - "fedora:38"
+          - "fedora:39"
+          - "fedora:40"
+          - "fedora:41"
         build_type: [Dev]
         cpp_compiler: [g++]
-        cpp_version: [c++11]
+        cpp_version: [c++14]
         include:
-          - name: Ubuntu-20
-            # Uses gcc 9.3.0, clang 10.0.0, cmake 3.16.3
-            image: "ubuntu:20.04"
-            ubuntu: 20
-          - name: Ubuntu-22
-            # Uses gcc 12.2.0, clang 15.0.7, cmake 3.24.2
-            image: "ubuntu:22.04"
-            ubuntu: 22
+          - image: "ubuntu:22.04"
             CXXFLAGS: -Wno-stringop-overread
-          - name: Ubuntu-24
-            # Uses gcc 14.2.0, clang 18.1.3, cmake 3.28.3
-            image: "ubuntu:24.04"
-            ubuntu: 24
+          - image: "ubuntu:24.04"
             CXXFLAGS: -Wno-stringop-overread -Wno-dangling-reference
-          - name: Debian-10
-            # Uses gcc 8.3.0, clang 7.0.1, cmake 3.13.4
-            image: "debian:buster"
-          - name: Debian-11
-            # Uses gcc 10.2.1, clang 11.0.1, cmake 3.18.4
-            image: "debian:bullseye"
-          - name: Debian-11
-            image: "debian:bullseye"
+          - image: "debian:bullseye"
             cpp_version: c++17
-          - name: Debian-11
-            image: "debian:bullseye"
+          - image: "debian:bullseye"
             cpp_version: c++20
-          - name: Debian-11
-            image: "debian:bullseye"
+          - image: "debian:bullseye"
             c_compiler: clang
             cpp_compiler: clang++
-          - name: Debian-11
-            image: "debian:bullseye"
+          - image: "debian:bullseye"
             c_compiler: clang
             cpp_compiler: clang++
             cpp_version: c++17
-          - name: Debian-11
-            image: "debian:bullseye"
+          - image: "debian:bullseye"
             c_compiler: clang
             cpp_compiler: clang++
             cpp_version: c++20
-          - name: Debian-11
-            image: "debian:bullseye"
+          - image: "debian:bullseye"
             build_type: RelWithDebInfo
-          - name: Debian-11
-            image: "debian:bullseye"
+          - image: "debian:bullseye"
             c_compiler: clang
             cpp_compiler: clang++
             CXXFLAGS: -fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer
             LDFLAGS: -fsanitize=address,undefined
-          - name: Debian-12
-            # Uses gcc 12.2.0, clang 15.0.6, cmake 3.25.1
-            image: "debian:bookworm"
+          - image: "debian:bookworm"
             CXXFLAGS: -Wno-stringop-overread
-          - name: Debian-12
-            image: "debian:bookworm"
+          - image: "debian:bookworm"
             cpp_version: c++17
             CXXFLAGS: -Wno-stringop-overread
-          - name: Debian-12
-            image: "debian:bookworm"
+          - image: "debian:bookworm"
             cpp_version: c++20
             CXXFLAGS: -Wno-stringop-overread
-          - name: Debian-12
-            image: "debian:bookworm"
+          - image: "debian:bookworm"
             c_compiler: clang
             cpp_compiler: clang++
-          - name: Debian-12
-            image: "debian:bookworm"
+          - image: "debian:bookworm"
             c_compiler: clang
             cpp_compiler: clang++
             cpp_version: c++17
-          - name: Debian-12
-            image: "debian:bookworm"
+          - image: "debian:bookworm"
             c_compiler: clang
             cpp_compiler: clang++
             cpp_version: c++20
-          - name: Debian-12
-            image: "debian:bookworm"
+          - image: "debian:bookworm"
             build_type: RelWithDebInfo
             CXXFLAGS: -Wno-stringop-overread
-          - name: Debian-12
-            image: "debian:bookworm"
+          - image: "debian:bookworm"
             c_compiler: clang
             cpp_compiler: clang++
             CXXFLAGS: -fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer
             LDFLAGS: -fsanitize=address,undefined
-          - name: Debian-Testing
-            image: "debian:testing"
+          - image: "debian:testing"
             CXXFLAGS: -Wno-stringop-overread -Wno-dangling-reference
-          - name: Debian-Testing
-            image: "debian:testing"
+          - image: "debian:testing"
             c_compiler: clang
             cpp_compiler: clang++
-          - name: Debian-Experimental
-            image: "debian:experimental"
+          - image: "debian:experimental"
             CXXFLAGS: -Wno-stringop-overread -Wno-dangling-reference
-          - name: Debian-Experimental
-            image: "debian:experimental"
+          - image: "debian:experimental"
             c_compiler: clang
             cpp_compiler: clang++
-          - name: Fedora-37
-            # Uses gcc 12.3.1, clang 15.0.7, cmake 3.26.4
-            image: "fedora:37"
+          - image: "fedora:37"
             CXXFLAGS: -Wno-stringop-overread
-          - name: Fedora-38
-            # Uses gcc 13.0.1, clang 16.0.5, cmake 3.26.4
-            image: "fedora:38"
+          - image: "fedora:38"
             CXXFLAGS: -Wno-stringop-overread -Wno-dangling-reference
-          - name: Fedora-39
-            image: "fedora:39"
+          - image: "fedora:39"
             CXXFLAGS: -Wno-stringop-overread -Wno-dangling-reference
-          - name: Fedora-40
-            image: "fedora:40"
+          - image: "fedora:40"
+            CXXFLAGS: -Wno-stringop-overread -Wno-dangling-reference
+          - image: "fedora:41"
             CXXFLAGS: -Wno-stringop-overread -Wno-dangling-reference
     container:
       image: ${{ matrix.image }}
@@ -137,7 +110,6 @@ jobs:
         CXXFLAGS: ${{ matrix.CXXFLAGS }}
         LDFLAGS: ${{ matrix.LDFLAGS }}
         CPP_VERSION: ${{ matrix.cpp_version }}
-        WITH_PROJ: ON
         APT_LISTCHANGES_FRONTEND: none
         DEBIAN_FRONTEND: noninteractive
     steps:
@@ -159,7 +131,6 @@ jobs:
             libgdal-dev \
             libgeos++-dev \
             liblz4-dev \
-            libproj-dev \
             libsparsehash-dev \
             make \
             ruby \
@@ -175,25 +146,24 @@ jobs:
         if: startsWith(matrix.image, 'fedora:')
         run: |
           dnf install --quiet --assumeyes \
-              boost-devel \
-              bzip2-devel \
-              cmake \
-              doxygen \
-              expat-devel \
-              gcc-c++ \
-              gdal-devel \
-              gdalcpp-static \
-              geos-devel \
-              git \
-              graphviz \
-              lz4-devel \
-              make \
-              proj-devel \
-              ruby \
-              rubygem-json \
-              sparsehash-devel \
-              spatialite-tools \
-              zlib-devel
+            boost-devel \
+            bzip2-devel \
+            cmake \
+            doxygen \
+            expat-devel \
+            gcc-c++ \
+            gdal-devel \
+            gdalcpp-static \
+            geos-devel \
+            git \
+            graphviz \
+            lz4-devel \
+            make \
+            ruby \
+            rubygem-json \
+            sparsehash-devel \
+            spatialite-tools \
+            zlib-devel
       - uses: actions/checkout@v4
         with:
           submodules: true
@@ -209,7 +179,6 @@ jobs:
       CC: clang-18
       CXX: clang++-18
       BUILD_TYPE: Dev
-      WITH_PROJ: ON
     steps:
       - uses: actions/checkout@v4
         with:
@@ -226,18 +195,17 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - "macos-14"
-          - "macos-15"
+          - macos-14
+          - macos-15
         build_type: [Dev]
         include:
-          - os: "macos-14"
+          - os: macos-14
             build_type: Release
     runs-on: ${{ matrix.os }}
     env:
       CC: clang
       CXX: clang++
       BUILD_TYPE: ${{ matrix.build_type }}
-      WITH_PROJ: OFF
     steps:
       - uses: actions/checkout@v4
         with:
@@ -275,10 +243,9 @@ jobs:
           submodules: true
       - uses: ./.github/actions/install-windows
       - name: Install extra packages
-        run: vcpkg install geos:x64-windows gdal:x64-windows proj:x64-windows
+        run: vcpkg install geos:x64-windows gdal:x64-windows
         shell: bash
       - uses: ./.github/actions/install-protozero
       - uses: ./.github/actions/cmake-windows
       - uses: ./.github/actions/build-windows
       - uses: ./.github/actions/ctest-windows
-

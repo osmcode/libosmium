@@ -32,7 +32,6 @@
 #      io         - include libraries needed for any type of input/output
 #      geos       - include if you want to use any of the GEOS functions
 #      gdal       - include if you want to use any of the OGR functions
-#      proj       - include if you want to use any of the Proj.4 functions
 #      sparsehash - include if you use the sparsehash index (deprecated!)
 #      lz4        - include support for LZ4 compression of PBF files
 #
@@ -202,22 +201,6 @@ if(Osmium_USE_GDAL)
         list(APPEND OSMIUM_INCLUDE_DIRS ${GDAL_INCLUDE_DIRS})
     else()
         message(WARNING "Osmium: GDAL library is required but not found, please install it or configure the paths.")
-    endif()
-endif()
-
-#----------------------------------------------------------------------
-# Component 'proj'
-if(Osmium_USE_PROJ)
-    find_path(PROJ_INCLUDE_DIR proj_api.h)
-    find_library(PROJ_LIBRARY NAMES proj)
-
-    list(APPEND OSMIUM_EXTRA_FIND_VARS PROJ_INCLUDE_DIR PROJ_LIBRARY)
-    if(PROJ_INCLUDE_DIR AND PROJ_LIBRARY)
-        set(PROJ_FOUND 1)
-        list(APPEND OSMIUM_LIBRARIES ${PROJ_LIBRARY})
-        list(APPEND OSMIUM_INCLUDE_DIRS ${PROJ_INCLUDE_DIR})
-    else()
-        message(WARNING "Osmium: PROJ.4 library is required but not found, please install it or configure the paths.")
     endif()
 endif()
 
