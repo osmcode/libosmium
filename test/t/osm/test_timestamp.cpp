@@ -2,6 +2,8 @@
 
 #include <osmium/osm/timestamp.hpp>
 
+#include <cstdint>
+#include <ctime>
 #include <sstream>
 #include <stdexcept>
 #include <string>

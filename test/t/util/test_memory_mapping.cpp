@@ -5,11 +5,14 @@
 
 #include <cstdint>
 #include <cstdlib>
-#include <limits>
 #include <utility>
 
 #if defined(_MSC_VER) || (defined(__GNUC__) && defined(_WIN32))
 #include "win_mkstemp.hpp"
+#endif
+
+#ifndef _MSC_VER
+# include <unistd.h>
 #endif
 
 TEST_CASE("Anonymous mapping: simple memory mapping should work") {
@@ -142,8 +145,8 @@ TEST_CASE("File-based mapping: writing to a mapped file should work") {
         mapping.unmap();
     }
 
-    REQUIRE(0 == close(fd));
-    REQUIRE(0 == unlink(filename));
+    REQUIRE(0 == ::close(fd));
+    REQUIRE(0 == ::unlink(filename));
 }
 
 TEST_CASE("File-based mapping: Reading from a zero-sized mapped file should work") {
@@ -157,8 +160,8 @@ TEST_CASE("File-based mapping: Reading from a zero-sized mapped file should work
         mapping.unmap();
     }
 
-    REQUIRE(0 == close(fd));
-    REQUIRE(0 == unlink(filename));
+    REQUIRE(0 == ::close(fd));
+    REQUIRE(0 == ::unlink(filename));
 }
 
 TEST_CASE("File-based mapping: writing to a privately mapped file should work") {
@@ -193,8 +196,8 @@ TEST_CASE("File-based mapping: writing to a privately mapped file should work") 
         mapping.unmap();
     }
 
-    REQUIRE(0 == close(fd));
-    REQUIRE(0 == unlink(filename));
+    REQUIRE(0 == ::close(fd));
+    REQUIRE(0 == ::unlink(filename));
 }
 
 TEST_CASE("File-based mapping: remapping to larger size should work") {
@@ -218,8 +221,8 @@ TEST_CASE("File-based mapping: remapping to larger size should work") {
 
     mapping.unmap();
 
-    REQUIRE(0 == close(fd));
-    REQUIRE(0 == unlink(filename));
+    REQUIRE(0 == ::close(fd));
+    REQUIRE(0 == ::unlink(filename));
 }
 
 TEST_CASE("File-based mapping: remapping to smaller size should work") {
@@ -243,8 +246,8 @@ TEST_CASE("File-based mapping: remapping to smaller size should work") {
         REQUIRE(*addr2 == 42);
     }
 
-    REQUIRE(0 == close(fd));
-    REQUIRE(0 == unlink(filename));
+    REQUIRE(0 == ::close(fd));
+    REQUIRE(0 == ::unlink(filename));
 }
 
 TEST_CASE("Typed anonymous mapping: simple memory mapping should work") {
@@ -360,8 +363,8 @@ TEST_CASE("Typed file-based mapping: writing to a mapped file should work") {
         mapping.unmap();
     }
 
-    REQUIRE(0 == close(fd));
-    REQUIRE(0 == unlink(filename));
+    REQUIRE(0 == ::close(fd));
+    REQUIRE(0 == ::unlink(filename));
 }
 
 TEST_CASE("Anonymous memory mapping class: simple memory mapping should work") {

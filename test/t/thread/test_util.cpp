@@ -2,6 +2,7 @@
 
 #include <osmium/thread/util.hpp>
 
+#include <exception>
 #include <future>
 #include <stdexcept>
 #include <type_traits>
