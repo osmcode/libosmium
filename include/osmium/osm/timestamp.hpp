@@ -220,7 +220,7 @@ namespace osmium {
          * The constructor is not declared "explicit" so that conversions
          * like @code node.set_timestamp(123); @endcode work.
          */
-        template <typename T, typename std::enable_if<std::is_integral<T>::value, int>::type = 0>
+        template <typename T, typename std::enable_if_t<std::is_integral<T>::value, int> = 0>
         constexpr Timestamp(T timestamp) noexcept : // NOLINT(google-explicit-constructor, hicpp-explicit-conversions)
             m_timestamp(static_cast<uint32_t>(timestamp)) {
         }

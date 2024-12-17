@@ -63,7 +63,7 @@ namespace osmium {
             // This data_type is either 'unsigned char*' or 'const unsigned char*' depending
             // on whether TMember is const. This allows this class to be used as an iterator and
             // as a const_iterator.
-            using data_type = typename std::conditional<std::is_const<TMember>::value, const unsigned char*, unsigned char*>::type;
+            using data_type = std::conditional_t<std::is_const<TMember>::value, const unsigned char*, unsigned char*>;
 
             data_type m_data;
             data_type m_end;
@@ -179,7 +179,7 @@ namespace osmium {
 
             // This data_type is either 'unsigned char*' or
             // 'const unsigned char*' depending on whether T is const.
-            using data_type = typename std::conditional<std::is_const<T>::value, const unsigned char*, unsigned char*>::type;
+            using data_type = std::conditional_t<std::is_const<T>::value, const unsigned char*, unsigned char*>;
 
             data_type m_begin;
             data_type m_end;

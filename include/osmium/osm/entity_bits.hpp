@@ -115,7 +115,7 @@ namespace osmium {
          *      changeset.
          */
         inline type from_item_type(osmium::item_type item_type) noexcept {
-            const auto ut = static_cast<std::underlying_type<osmium::item_type>::type>(item_type);
+            const auto ut = static_cast<std::underlying_type_t<osmium::item_type>>(item_type);
             assert(ut <= 0x05);
             if (ut == 0) {
                 return nothing;

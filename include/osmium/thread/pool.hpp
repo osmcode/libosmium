@@ -225,7 +225,7 @@ namespace osmium {
 #else
             // For C++11 and C++14
             template <typename TFunction>
-            using submit_func_result_type = typename std::result_of<TFunction()>::type;
+            using submit_func_result_type = std::result_of_t<TFunction()>;
 #endif
 
             template <typename TFunction>

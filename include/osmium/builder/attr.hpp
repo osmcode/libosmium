@@ -182,7 +182,7 @@ namespace osmium {
 
 #define OSMIUM_ATTRIBUTE_WITH_CONSTRUCTOR(_handler, _name, _type) \
     OSMIUM_ATTRIBUTE(_handler, _name, _type) \
-        constexpr explicit _name(std::add_const<_type>::type& value) : \
+        constexpr explicit _name(std::add_const_t<_type>& value) : \
             type_wrapper(value) {} \
     }
 
@@ -658,7 +658,7 @@ namespace osmium {
             }
 
             template <typename TFirst, typename... TRest>
-            constexpr typename std::enable_if<!std::is_same<attr::_user, TFirst>::value, const char*>::type
+            constexpr std::enable_if_t<!std::is_same<attr::_user, TFirst>::value, const char*>
             get_user(const TFirst& /*first*/, const TRest&... args) noexcept {
                 return get_user(args...);
             }
@@ -802,12 +802,12 @@ namespace osmium {
             // ==============================================================
 
             template <typename TBuilder, typename THandler, typename... TArgs>
-            inline typename std::enable_if<!is_handled_by<THandler, TArgs...>::value>::type
+            inline std::enable_if_t<!is_handled_by<THandler, TArgs...>::value>
             add_list(osmium::builder::Builder& /*parent*/, const TArgs&... /*args*/) noexcept {
             }
 
             template <typename TBuilder, typename THandler, typename... TArgs>
-            inline typename std::enable_if<is_handled_by<THandler, TArgs...>::value>::type
+            inline std::enable_if_t<is_handled_by<THandler, TArgs...>::value>
             add_list(osmium::builder::Builder& parent, const TArgs&... args) {
                 TBuilder builder{parent.buffer(), &parent};
                 (void)std::initializer_list<int>{

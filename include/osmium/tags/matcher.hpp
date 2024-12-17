@@ -72,8 +72,8 @@ namespace osmium {
          *
          * @param key_matcher StringMatcher for matching the key.
          */
-        template <typename TKey, typename X = typename std::enable_if<
-            std::is_convertible<TKey, osmium::StringMatcher>::value, void>::type>
+        template <typename TKey, typename X = std::enable_if_t<
+            std::is_convertible<TKey, osmium::StringMatcher>::value, void>>
         explicit TagMatcher(TKey&& key_matcher) :
             m_key_matcher(std::forward<TKey>(key_matcher)),
             m_value_matcher(osmium::StringMatcher::always_true{}) {
@@ -88,8 +88,8 @@ namespace osmium {
          * @param invert If set to true, invert the result of the value_matcher.
          */
         template <typename TKey, typename TValue,
-            typename std::enable_if<std::is_convertible<TKey, osmium::StringMatcher>::value, int>::type = 0,
-            typename std::enable_if<std::is_convertible<TValue, osmium::StringMatcher>::value, int>::type = 0>
+            typename std::enable_if_t<std::is_convertible<TKey, osmium::StringMatcher>::value, int> = 0,
+            typename std::enable_if_t<std::is_convertible<TValue, osmium::StringMatcher>::value, int> = 0>
         TagMatcher(TKey&& key_matcher, TValue&& value_matcher, bool invert = false) :
             m_key_matcher(std::forward<TKey>(key_matcher)),
             m_value_matcher(std::forward<TValue>(value_matcher)),

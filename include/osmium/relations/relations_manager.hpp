@@ -304,7 +304,7 @@ namespace osmium {
         template <typename TManager, bool TNodes, bool TWays, bool TRelations, bool TCheckOrder = true>
         class RelationsManager : public RelationsManagerBase {
 
-            using check_order_handler = typename std::conditional<TCheckOrder, osmium::handler::CheckOrder, osmium::handler::Handler>::type;
+            using check_order_handler = std::conditional_t<TCheckOrder, osmium::handler::CheckOrder, osmium::handler::Handler>;
 
             check_order_handler m_check_order_handler;
 
