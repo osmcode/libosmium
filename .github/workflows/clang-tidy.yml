@@ -8,9 +8,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        image: ["debian:bullseye", "debian:testing", "debian:experimental"]
+        image: ["debian:bookworm", "debian:testing", "debian:experimental"]
         include:
-          - image: "debian:bullseye"
+          - image: "debian:bookworm"
             clang: 15
           - image: "debian:testing"
             clang: 19
@@ -49,14 +49,13 @@ jobs:
           submodules: true
       - uses: ./.github/actions/install-protozero
       - uses: ./.github/actions/cmake
-      - name: clang-tidy
-        run: make clang-tidy | tee clang-tidy-${{ matrix.clang }}.log
+      - name: Run clang-tidy
+        run: make clang-tidy | tee libosmium-clang-tidy-${{ matrix.clang }}.log
         shell: bash
         working-directory: build
-      - name: Upload Log
+      - name: Upload clang-tidy log
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: clang-tidy-${{ matrix.clang }}-log
-          path: build/clang-tidy-${{ matrix.clang }}.log
-
+          name: libosmium-clang-tidy-${{ matrix.clang }}-log
+          path: build/libosmium-clang-tidy-${{ matrix.clang }}.log
