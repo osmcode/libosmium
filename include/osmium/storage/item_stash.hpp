@@ -208,7 +208,7 @@ namespace osmium {
         std::size_t used_memory() const noexcept {
             return sizeof(ItemStash) +
                    m_buffer.capacity() +
-                   m_index.capacity() * sizeof(std::size_t);
+                   (m_index.capacity() * sizeof(std::size_t));
         }
 
         /**

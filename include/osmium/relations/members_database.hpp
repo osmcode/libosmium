@@ -185,7 +185,7 @@ namespace osmium {
              * in the stash. Used for debugging.
              */
             std::size_t used_memory() const noexcept {
-                return sizeof(element) * m_elements.capacity() +
+                return (sizeof(element) * m_elements.capacity()) +
                        sizeof(MembersDatabaseCommon);
             }
 

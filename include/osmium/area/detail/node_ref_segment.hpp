@@ -319,11 +319,11 @@ namespace osmium {
 
                     // intersection in a point
 
-                    const int64_t na = (q1.x - q0.x) * (p0.y - q0.y) -
-                                       (q1.y - q0.y) * (p0.x - q0.x);
+                    const int64_t na = ((q1.x - q0.x) * (p0.y - q0.y)) -
+                                       ((q1.y - q0.y) * (p0.x - q0.x));
 
-                    const int64_t nb = (p1.x - p0.x) * (p0.y - q0.y) -
-                                       (p1.y - p0.y) * (p0.x - q0.x);
+                    const int64_t nb = ((p1.x - p0.x) * (p0.y - q0.y)) -
+                                       ((p1.y - p0.y) * (p0.x - q0.x));
 
                     if ((d > 0 && na >= 0 && na <= d && nb >= 0 && nb <= d) ||
                         (d < 0 && na <= 0 && na >= d && nb <= 0 && nb >= d)) {

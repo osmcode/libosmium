@@ -326,7 +326,7 @@ namespace osmium {
                             const int64_t ay = a.y();
                             const int64_t by = b.y();
                             const int64_t ly = end_location.y();
-                            const auto z = (bx - ax) * (ly - ay) - (by - ay) * (lx - ax);
+                            const auto z = ((bx - ax) * (ly - ay)) - ((by - ay) * (lx - ax));
                             if (debug()) {
                                 std::cerr << "      Segment z=" << z << '\n';
                             }
@@ -353,7 +353,7 @@ namespace osmium {
                             const int64_t ay = a.y();
                             const int64_t by = b.y();
                             const int64_t ly = location.y();
-                            const auto z = (bx - ax) * (ly - ay) - (by - ay) * (lx - ax);
+                            const auto z = ((bx - ax) * (ly - ay)) - ((by - ay) * (lx - ax));
 
                             if (z >= 0) {
                                 nesting += segment->is_reverse() ? -1 : 1;
@@ -362,7 +362,7 @@ namespace osmium {
                                 }
                                 if (segment->ring()->is_outer()) {
                                     const double y = static_cast<double>(ay) +
-                                                     static_cast<double>((by - ay) * (lx - ax)) / static_cast<double>(bx - ax);
+                                                     (static_cast<double>((by - ay) * (lx - ax)) / static_cast<double>(bx - ax));
                                     if (debug()) {
                                         std::cerr << "        Segment belongs to outer ring (y=" << y << " ring=" << *segment->ring() << ")\n";
                                     }

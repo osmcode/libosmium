@@ -192,8 +192,8 @@ namespace osmium {
 
                 std::size_t used_memory() const noexcept final {
                     return sizeof(FlexMem) +
-                           m_sparse_entries.size() * sizeof(entry) +
-                           m_dense_blocks.size() * (block_size * sizeof(TValue) + sizeof(std::vector<TValue>));
+                           (m_sparse_entries.size() * sizeof(entry)) +
+                           (m_dense_blocks.size() * (block_size * sizeof(TValue) + sizeof(std::vector<TValue>)));
                 }
 
                 void set(const TId id, const TValue value) final {
