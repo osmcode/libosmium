@@ -86,15 +86,15 @@ namespace osmium {
 
         }; // enum type
 
-        inline constexpr type operator|(const type lhs, const type rhs) noexcept {
+        constexpr type operator|(const type lhs, const type rhs) noexcept {
             return static_cast<type>(static_cast<unsigned char>(lhs) | static_cast<unsigned char>(rhs));
         }
 
-        inline constexpr type operator&(const type lhs, const type rhs) noexcept {
+        constexpr type operator&(const type lhs, const type rhs) noexcept {
             return static_cast<type>(static_cast<unsigned char>(lhs) & static_cast<unsigned char>(rhs));
         }
 
-        inline constexpr type operator~(const type value) noexcept {
+        constexpr type operator~(const type value) noexcept {
             return all & static_cast<type>(~static_cast<unsigned char>(value));
         }
 

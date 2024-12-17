@@ -317,7 +317,7 @@ namespace osmium {
      * A special Timestamp guaranteed to be ordered before any other valid
      * Timestamp.
      */
-    inline constexpr Timestamp start_of_time() noexcept {
+    constexpr Timestamp start_of_time() noexcept {
         return {1};
     }
 
@@ -325,7 +325,7 @@ namespace osmium {
      * A special Timestamp guaranteed to be ordered after any other valid
      * Timestamp.
      */
-    inline constexpr Timestamp end_of_time() noexcept {
+    constexpr Timestamp end_of_time() noexcept {
         return {std::numeric_limits<uint32_t>::max()};
     }
 

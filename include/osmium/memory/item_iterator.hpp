@@ -49,7 +49,7 @@ namespace osmium {
         namespace detail {
 
             template <typename T>
-            constexpr inline bool type_is_compatible(const osmium::item_type t) noexcept {
+            constexpr bool type_is_compatible(const osmium::item_type t) noexcept {
                 return T::is_compatible_to(t);
             }
 

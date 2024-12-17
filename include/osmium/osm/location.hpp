@@ -490,11 +490,11 @@ namespace osmium {
     /**
      * Locations are equal if both coordinates are equal.
      */
-    inline constexpr bool operator==(const Location& lhs, const Location& rhs) noexcept {
+    constexpr bool operator==(const Location& lhs, const Location& rhs) noexcept {
         return lhs.x() == rhs.x() && lhs.y() == rhs.y();
     }
 
-    inline constexpr bool operator!=(const Location& lhs, const Location& rhs) noexcept {
+    constexpr bool operator!=(const Location& lhs, const Location& rhs) noexcept {
         return !(lhs == rhs);
     }
 
@@ -503,19 +503,19 @@ namespace osmium {
      * the y coordinate. If either of the locations is
      * undefined the result is undefined.
      */
-    inline constexpr bool operator<(const Location& lhs, const Location& rhs) noexcept {
+    constexpr bool operator<(const Location& lhs, const Location& rhs) noexcept {
         return (lhs.x() == rhs.x() && lhs.y() < rhs.y()) || lhs.x() < rhs.x();
     }
 
-    inline constexpr bool operator>(const Location& lhs, const Location& rhs) noexcept {
+    constexpr bool operator>(const Location& lhs, const Location& rhs) noexcept {
         return rhs < lhs;
     }
 
-    inline constexpr bool operator<=(const Location& lhs, const Location& rhs) noexcept {
+    constexpr bool operator<=(const Location& lhs, const Location& rhs) noexcept {
         return !(rhs < lhs);
     }
 
-    inline constexpr bool operator>=(const Location& lhs, const Location& rhs) noexcept {
+    constexpr bool operator>=(const Location& lhs, const Location& rhs) noexcept {
         return !(lhs < rhs);
     }
 

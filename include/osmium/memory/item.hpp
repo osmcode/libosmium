@@ -61,7 +61,7 @@ namespace osmium {
             align_bytes = 8UL
         };
 
-        inline constexpr std::size_t padded_length(std::size_t length) noexcept {
+        constexpr std::size_t padded_length(std::size_t length) noexcept {
             return (length + align_bytes - 1) & ~(align_bytes - 1);
         }
 

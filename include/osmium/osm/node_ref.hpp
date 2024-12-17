@@ -150,7 +150,7 @@ namespace osmium {
     /**
      * Compare two NodeRefs. They are equal if they reference the same Node ID.
      */
-    inline constexpr bool operator==(const NodeRef& lhs, const NodeRef& rhs) noexcept {
+    constexpr bool operator==(const NodeRef& lhs, const NodeRef& rhs) noexcept {
         return lhs.ref() == rhs.ref();
     }
 
@@ -158,7 +158,7 @@ namespace osmium {
      * Compare two NodeRefs. They are not equal if they reference different
      * Node IDs.
      */
-    inline constexpr bool operator!=(const NodeRef& lhs, const NodeRef& rhs) noexcept {
+    constexpr bool operator!=(const NodeRef& lhs, const NodeRef& rhs) noexcept {
         return !(lhs == rhs);
     }
 
@@ -166,7 +166,7 @@ namespace osmium {
      * Compare two NodeRefs. NodeRefs are ordered according to the Node ID
      * they reference.
      */
-    inline constexpr bool operator<(const NodeRef& lhs, const NodeRef& rhs) noexcept {
+    constexpr bool operator<(const NodeRef& lhs, const NodeRef& rhs) noexcept {
         return lhs.ref() < rhs.ref();
     }
 
@@ -174,7 +174,7 @@ namespace osmium {
      * Compare two NodeRefs. NodeRefs are ordered according to the Node ID
      * they reference.
      */
-    inline constexpr bool operator>(const NodeRef& lhs, const NodeRef& rhs) noexcept {
+    constexpr bool operator>(const NodeRef& lhs, const NodeRef& rhs) noexcept {
         return rhs < lhs;
     }
 
@@ -182,7 +182,7 @@ namespace osmium {
      * Compare two NodeRefs. NodeRefs are ordered according to the Node ID
      * they reference.
      */
-    inline constexpr bool operator<=(const NodeRef& lhs, const NodeRef& rhs) noexcept {
+    constexpr bool operator<=(const NodeRef& lhs, const NodeRef& rhs) noexcept {
         return !(rhs < lhs);
     }
 
@@ -190,7 +190,7 @@ namespace osmium {
      * Compare two NodeRefs. NodeRefs are ordered according to the Node ID
      * they reference.
      */
-    inline constexpr bool operator>=(const NodeRef& lhs, const NodeRef& rhs) noexcept {
+    constexpr bool operator>=(const NodeRef& lhs, const NodeRef& rhs) noexcept {
         return !(lhs < rhs);
     }
 

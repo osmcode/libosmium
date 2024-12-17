@@ -75,11 +75,11 @@ namespace osmium {
     }; // class Segment
 
     /// Segments are equal if both their locations are equal
-    inline constexpr bool operator==(const Segment& lhs, const Segment& rhs) noexcept {
+    constexpr bool operator==(const Segment& lhs, const Segment& rhs) noexcept {
         return lhs.first() == rhs.first() && lhs.second() == rhs.second();
     }
 
-    inline constexpr bool operator!=(const Segment& lhs, const Segment& rhs) noexcept {
+    constexpr bool operator!=(const Segment& lhs, const Segment& rhs) noexcept {
         return !(lhs == rhs);
     }
 

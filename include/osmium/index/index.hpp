@@ -76,7 +76,7 @@ namespace osmium {
          * object, but it can be specialized.
          */
         template <typename T>
-        inline constexpr T empty_value() {
+        constexpr T empty_value() {
             return T{};
         }
 
@@ -86,7 +86,7 @@ namespace osmium {
          * the full range, so the max value is a good "empty" value.
          */
         template <>
-        inline constexpr size_t empty_value<size_t>() {
+        constexpr size_t empty_value<size_t>() {
             return std::numeric_limits<size_t>::max();
         }
 

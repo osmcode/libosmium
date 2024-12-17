@@ -47,7 +47,7 @@ namespace osmium {
         namespace detail {
 
             template <typename T>
-            inline constexpr const T clamp(const T value, const T min, const T max) {
+            constexpr const T clamp(const T value, const T min, const T max) {
                 return value < min ? min : (max < value ? max : value);
             }
 
@@ -57,7 +57,7 @@ namespace osmium {
          * Returns the number of tiles (in each direction) for the given zoom
          * level.
          */
-        inline constexpr uint32_t num_tiles_in_zoom(uint32_t zoom) noexcept {
+        constexpr uint32_t num_tiles_in_zoom(uint32_t zoom) noexcept {
             return 1U << zoom;
         }
 
@@ -65,7 +65,7 @@ namespace osmium {
          * Returns the width or height of a tile in web mercator coordinates for
          * the given zoom level.
          */
-        inline constexpr double tile_extent_in_zoom(uint32_t zoom) noexcept {
+        constexpr double tile_extent_in_zoom(uint32_t zoom) noexcept {
             return detail::max_coordinate_epsg3857 * 2 / num_tiles_in_zoom(zoom);
         }
 
@@ -74,7 +74,7 @@ namespace osmium {
          * projection in the given zoom level. Tiles are numbered from left
          * to right.
          */
-        inline constexpr uint32_t mercx_to_tilex(uint32_t zoom, double x) noexcept {
+        constexpr uint32_t mercx_to_tilex(uint32_t zoom, double x) noexcept {
             return static_cast<uint32_t>(detail::clamp<int32_t>(
                 static_cast<int32_t>((x + detail::max_coordinate_epsg3857) / tile_extent_in_zoom(zoom)),
                 0, num_tiles_in_zoom(zoom) - 1));
@@ -85,7 +85,7 @@ namespace osmium {
          * projection in the given zoom level. Tiles are numbered from top
          * to bottom.
          */
-        inline constexpr uint32_t mercy_to_tiley(uint32_t zoom, double y) noexcept {
+        constexpr uint32_t mercy_to_tiley(uint32_t zoom, double y) noexcept {
             return static_cast<uint32_t>(detail::clamp<int32_t>(
                 static_cast<int32_t>((detail::max_coordinate_epsg3857 - y) / tile_extent_in_zoom(zoom)),
                 0, num_tiles_in_zoom(zoom) - 1));

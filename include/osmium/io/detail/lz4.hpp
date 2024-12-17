@@ -58,7 +58,7 @@ namespace osmium {
 
         namespace detail {
 
-            constexpr inline int lz4_default_compression_level() noexcept {
+            constexpr int lz4_default_compression_level() noexcept {
                 return 1; // LZ4_ACCELERATION_DEFAULT
             }
 

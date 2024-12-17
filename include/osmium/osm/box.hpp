@@ -248,7 +248,7 @@ namespace osmium {
      * Boxes are equal if both locations are equal. Undefined boxes will
      * compare equal.
      */
-    inline constexpr bool operator==(const Box& lhs, const Box& rhs) noexcept {
+    constexpr bool operator==(const Box& lhs, const Box& rhs) noexcept {
         return lhs.bottom_left() == rhs.bottom_left() &&
                lhs.top_right() == rhs.top_right();
     }

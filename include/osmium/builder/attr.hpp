@@ -381,7 +381,7 @@ namespace osmium {
             };
 
             template <typename TTagIterator>
-            inline constexpr detail::tags_from_iterator_pair<TTagIterator> _tags(TTagIterator first, TTagIterator last) {
+            constexpr detail::tags_from_iterator_pair<TTagIterator> _tags(TTagIterator first, TTagIterator last) {
                 return {first, last};
             }
 
@@ -409,7 +409,7 @@ namespace osmium {
             };
 
             template <typename TIdIterator>
-            inline constexpr detail::nodes_from_iterator_pair<TIdIterator> _nodes(TIdIterator first, TIdIterator last) {
+            constexpr detail::nodes_from_iterator_pair<TIdIterator> _nodes(TIdIterator first, TIdIterator last) {
                 return {first, last};
             }
 
@@ -449,7 +449,7 @@ namespace osmium {
             };
 
             template <typename TMemberIterator>
-            inline constexpr detail::members_from_iterator_pair<TMemberIterator> _members(TMemberIterator first, TMemberIterator last) {
+            constexpr detail::members_from_iterator_pair<TMemberIterator> _members(TMemberIterator first, TMemberIterator last) {
                 return {first, last};
             }
 
@@ -481,7 +481,7 @@ namespace osmium {
             };
 
             template <typename TCommentIterator>
-            inline constexpr detail::comments_from_iterator_pair<TCommentIterator> _comments(TCommentIterator first, TCommentIterator last) {
+            constexpr detail::comments_from_iterator_pair<TCommentIterator> _comments(TCommentIterator first, TCommentIterator last) {
                 return {first, last};
             }
 
@@ -501,7 +501,7 @@ namespace osmium {
 
 
             template <typename TIdIterator>
-            inline constexpr detail::outer_ring_from_iterator_pair<TIdIterator> _outer_ring(TIdIterator first, TIdIterator last) {
+            constexpr detail::outer_ring_from_iterator_pair<TIdIterator> _outer_ring(TIdIterator first, TIdIterator last) {
                 return {first, last};
             }
 
@@ -527,7 +527,7 @@ namespace osmium {
             }
 
             template <typename TIdIterator>
-            inline constexpr detail::inner_ring_from_iterator_pair<TIdIterator> _inner_ring(TIdIterator first, TIdIterator last) {
+            constexpr detail::inner_ring_from_iterator_pair<TIdIterator> _inner_ring(TIdIterator first, TIdIterator last) {
                 return {first, last};
             }
 
@@ -649,16 +649,16 @@ namespace osmium {
             // ==============================================================
 
             template <typename... TArgs>
-            inline constexpr const char* get_user(const attr::_user& user, const TArgs&... /*args*/) noexcept {
+            constexpr const char* get_user(const attr::_user& user, const TArgs&... /*args*/) noexcept {
                 return user.value;
             }
 
-            inline constexpr const char* get_user() noexcept {
+            constexpr const char* get_user() noexcept {
                 return "";
             }
 
             template <typename TFirst, typename... TRest>
-            inline constexpr typename std::enable_if<!std::is_same<attr::_user, TFirst>::value, const char*>::type
+            constexpr typename std::enable_if<!std::is_same<attr::_user, TFirst>::value, const char*>::type
             get_user(const TFirst& /*first*/, const TRest&... args) noexcept {
                 return get_user(args...);
             }

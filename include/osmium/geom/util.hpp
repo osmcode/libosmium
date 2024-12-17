@@ -61,12 +61,12 @@ namespace osmium {
         constexpr double PI = 3.14159265358979323846;
 
         /// Convert angle from degrees to radians.
-        inline constexpr double deg_to_rad(double degree) noexcept {
+        constexpr double deg_to_rad(double degree) noexcept {
             return degree * (PI / 180.0);
         }
 
         /// Convert angle from radians to degrees.
-        inline constexpr double rad_to_deg(double radians) noexcept {
+        constexpr double rad_to_deg(double radians) noexcept {
             return radians * (180.0 / PI);
         }
 
