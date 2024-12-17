@@ -296,13 +296,13 @@ namespace osmium {
                     if (bzerror == BZ_STREAM_END) {
                         if (!feof(m_file.file())) {
                             void* unused = nullptr;
-                            int nunused = 0;
-                            ::BZ2_bzReadGetUnused(&bzerror, m_bzfile, &unused, &nunused);
+                            int num_unused = 0;
+                            ::BZ2_bzReadGetUnused(&bzerror, m_bzfile, &unused, &num_unused);
                             if (bzerror != BZ_OK) {
                                 detail::throw_bzip2_error(m_bzfile, "get unused failed", bzerror);
                             }
-                            if (nunused != 0) {
-                                std::string unused_data{static_cast<const char*>(unused), static_cast<std::string::size_type>(nunused)};
+                            if (num_unused != 0) {
+                                std::string unused_data{static_cast<const char*>(unused), static_cast<std::string::size_type>(num_unused)};
                                 ::BZ2_bzReadClose(&bzerror, m_bzfile);
                                 if (bzerror != BZ_OK) {
                                     throw bzip2_error{"bzip2 error: read close failed", bzerror};
