@@ -553,7 +553,7 @@ namespace osmium {
                 void switch_primitive_block_type(OSMFormat::PrimitiveGroup type) {
                     if (!m_primitive_block || !m_primitive_block->can_add(type)) {
                         store_primitive_block();
-                        m_primitive_block.reset(new PrimitiveBlock{m_options, type, m_bucket_count});
+                        m_primitive_block = std::make_shared<PrimitiveBlock>(m_options, type, m_bucket_count);
                     }
                 }
 
