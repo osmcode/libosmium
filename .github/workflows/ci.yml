@@ -231,8 +231,8 @@ jobs:
       - uses: ./.github/actions/install-windows
       - uses: ./.github/actions/install-protozero
       - uses: ./.github/actions/cmake-windows
-      - uses: ./.github/actions/build-windows
-      - uses: ./.github/actions/ctest-windows
+      - uses: ./.github/actions/build
+      - uses: ./.github/actions/ctest
 
   windows-2019-full:
     runs-on: windows-2019
@@ -246,5 +246,5 @@ jobs:
         shell: bash
       - uses: ./.github/actions/install-protozero
       - uses: ./.github/actions/cmake-windows
-      - uses: ./.github/actions/build-windows
-      - uses: ./.github/actions/ctest-windows
+      - uses: ./.github/actions/build
+      - uses: ./.github/actions/ctest
