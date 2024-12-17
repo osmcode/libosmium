@@ -776,6 +776,9 @@ namespace osmium {
 
                     mark_header_as_done();
                     flush_final_buffer();
+
+                    // so we don't have a dangling link to local parser variable
+                    m_expat_xml_parser = nullptr;
                 }
 
             }; // class XMLParser
