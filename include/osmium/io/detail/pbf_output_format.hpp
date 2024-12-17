@@ -312,7 +312,7 @@ namespace osmium {
 
                 void add_dense_node(const osmium::Node& node) {
                     if (!m_dense_nodes) {
-                        m_dense_nodes.reset(new DenseNodes{&m_stringtable, &m_options});
+                        m_dense_nodes = std::make_unique<DenseNodes>(&m_stringtable, &m_options);
                     }
                     m_dense_nodes->add_node(node);
                     ++m_count;
