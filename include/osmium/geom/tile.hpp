@@ -47,7 +47,7 @@ namespace osmium {
         namespace detail {
 
             template <typename T>
-            inline constexpr const T& clamp(const T& value, const T& min, const T& max) {
+            inline constexpr const T clamp(const T value, const T min, const T max) {
                 return value < min ? min : (max < value ? max : value);
             }
 

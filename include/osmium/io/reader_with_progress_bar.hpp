@@ -91,7 +91,7 @@ namespace osmium {
         }
 
         inline InputIterator<ReaderWithProgressBar> end(ReaderWithProgressBar& /*reader*/) {
-            return InputIterator<ReaderWithProgressBar>();
+            return {};
         }
 
     } // namespace io

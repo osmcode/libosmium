@@ -6,7 +6,7 @@
 #include <string>
 
 TEST_CASE("Projection using MercatorProjection class to WKT") {
-    osmium::geom::WKTFactory<osmium::geom::MercatorProjection> factory{2};
+    const osmium::geom::WKTFactory<osmium::geom::MercatorProjection> factory{2};
 
     const std::string wkt{factory.create_point(osmium::Location{3.2, 4.2})};
     REQUIRE(wkt == "POINT(356222.37 467961.14)");

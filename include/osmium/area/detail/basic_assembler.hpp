@@ -217,7 +217,7 @@ namespace osmium {
                         }
                     }
 
-                    for (const osmium::Way* way : ways_in_multiple_rings) {
+                    for (const osmium::Way* way : ways_in_multiple_rings) { // NOLINT(bugprone-nondeterministic-pointer-iteration-order)
                         ++m_stats.ways_in_multiple_rings;
                         if (debug()) {
                             std::cerr << "      Way " << way->id() << " is in multiple rings\n";

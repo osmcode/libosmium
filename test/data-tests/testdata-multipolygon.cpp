@@ -31,6 +31,8 @@ struct less_charptr {
 
 using tagmap_type = std::map<const char*, const char*, less_charptr>;
 
+namespace {
+
 tagmap_type create_map(const osmium::TagList& taglist) {
     tagmap_type map;
 
@@ -40,6 +42,8 @@ tagmap_type create_map(const osmium::TagList& taglist) {
 
     return map;
 }
+
+} // anonymous namespace
 
 class TestHandler : public osmium::handler::Handler {
 

@@ -117,7 +117,7 @@ namespace osmium {
             }
 
             void close() {
-                return m_reader.close();
+                m_reader.close();
             }
 
             bool eof() const {
