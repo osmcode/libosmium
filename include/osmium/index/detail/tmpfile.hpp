@@ -37,22 +37,29 @@ DEALINGS IN THE SOFTWARE.
 #include <cstdio>
 #include <system_error>
 
+#ifndef _MSC_VER
+# include <unistd.h>
+#endif
+
 namespace osmium {
 
     namespace detail {
 
         /**
          * Create and open a temporary file. It is removed after opening.
+         * After use close the file by calling close().
          *
          * @returns File descriptor of temporary file.
          * @throws std::system_error if something went wrong.
          */
         inline int create_tmp_file() {
-            FILE* file = ::tmpfile();
+            FILE* file = std::tmpfile();
             if (!file) {
                 throw std::system_error{errno, std::system_category(), "tempfile failed"};
             }
-            return fileno(file);
+            const int fd = dup(fileno(file));
+            std::fclose(file);
+            return fd;
         }
 
     } // namespace detail
