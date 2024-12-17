@@ -33,15 +33,6 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-// [[deprecated]] is only available in C++14, use this for the time being
-#ifdef __GNUC__
-# define OSMIUM_DEPRECATED __attribute__((deprecated))
-#elif defined(_MSC_VER)
-# define OSMIUM_DEPRECATED __declspec(deprecated)
-#else
-# define OSMIUM_DEPRECATED
-#endif
-
 // Set OSMIUM_DEFINE_EXPORT before including any osmium headers to add
 // the special attributes to all exception classes.
 #ifdef OSMIUM_DEFINE_EXPORT
