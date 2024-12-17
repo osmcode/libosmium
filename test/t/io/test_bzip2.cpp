@@ -139,7 +139,7 @@ TEST_CASE("Write bzip2-compressed file with implicit close") {
 
     const std::string output_file = "test_gzip_out.txt.bz2";
     const int fd = osmium::io::detail::open_for_writing(output_file, osmium::io::overwrite::allow);
-    REQUIRE(fd > 0);
+    REQUIRE(fd > 1);
 
     {
         osmium::io::Bzip2Compressor comp{fd, osmium::io::fsync::yes};
