@@ -75,10 +75,10 @@ namespace osmium {
             class NodeRefSegment {
 
                 // First node in order described above.
-                osmium::NodeRef m_first{};
+                osmium::NodeRef m_first;
 
                 // Second node in order described above.
-                osmium::NodeRef m_second{};
+                osmium::NodeRef m_second;
 
                 // Way this segment was from.
                 const osmium::Way* m_way = nullptr;

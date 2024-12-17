@@ -69,7 +69,7 @@ namespace osmium {
         object_id_type      m_id = 0;
         bool                m_deleted : 1;
         object_version_type m_version : 31;
-        osmium::Timestamp   m_timestamp{};
+        osmium::Timestamp   m_timestamp;
         user_id_type        m_uid = 0;
         changeset_id_type   m_changeset = 0;
 

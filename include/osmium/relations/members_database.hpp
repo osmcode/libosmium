@@ -135,7 +135,7 @@ namespace osmium {
                 }
             };
 
-            std::vector<element> m_elements{};
+            std::vector<element> m_elements;
 
         protected:
 

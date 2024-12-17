@@ -70,7 +70,7 @@ namespace osmium {
 
             struct location_to_ring_map {
                 osmium::Location location;
-                open_ring_its_type::iterator ring_it{};
+                open_ring_its_type::iterator ring_it;
                 bool start{false};
 
                 location_to_ring_map(osmium::Location l, open_ring_its_type::iterator r, const bool s) noexcept :
@@ -703,7 +703,7 @@ namespace osmium {
 
                 struct candidate {
                     int64_t sum;
-                    std::vector<std::pair<location_to_ring_map, bool>> rings{};
+                    std::vector<std::pair<location_to_ring_map, bool>> rings;
                     osmium::Location start_location;
                     osmium::Location stop_location;
 

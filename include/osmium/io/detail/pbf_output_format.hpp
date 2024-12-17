@@ -275,7 +275,7 @@ namespace osmium {
                 protozero::pbf_builder<OSMFormat::PrimitiveGroup> m_pbf_primitive_group;
                 StringTable m_stringtable;
                 pbf_output_options m_options;
-                std::unique_ptr<DenseNodes> m_dense_nodes{};
+                std::unique_ptr<DenseNodes> m_dense_nodes;
                 OSMFormat::PrimitiveGroup m_type;
                 int m_count = 0;
 
@@ -366,7 +366,7 @@ namespace osmium {
 
             class SerializeBlob {
 
-                std::shared_ptr<PrimitiveBlock> m_block{};
+                std::shared_ptr<PrimitiveBlock> m_block;
 
                 std::string m_msg;
 
@@ -482,7 +482,7 @@ namespace osmium {
 
                 pbf_output_options m_options;
 
-                std::shared_ptr<PrimitiveBlock> m_primitive_block{};
+                std::shared_ptr<PrimitiveBlock> m_primitive_block;
 
                 std::size_t m_bucket_count = StringTable::min_bucket_count;
 

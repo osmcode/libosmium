@@ -68,7 +68,7 @@ namespace osmium {
         class Header : public osmium::Options {
 
             /// Bounding boxes
-            std::vector<osmium::Box> m_boxes{};
+            std::vector<osmium::Box> m_boxes;
 
             /**
              * Are there possibly multiple versions of the same object in

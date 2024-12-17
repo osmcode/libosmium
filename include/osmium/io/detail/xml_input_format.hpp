@@ -150,17 +150,17 @@ namespace osmium {
 
                 std::vector<context> m_context_stack;
 
-                osmium::io::Header m_header{};
+                osmium::io::Header m_header;
 
-                std::unique_ptr<osmium::builder::NodeBuilder>                m_node_builder{};
-                std::unique_ptr<osmium::builder::WayBuilder>                 m_way_builder{};
-                std::unique_ptr<osmium::builder::RelationBuilder>            m_relation_builder{};
-                std::unique_ptr<osmium::builder::ChangesetBuilder>           m_changeset_builder{};
-                std::unique_ptr<osmium::builder::ChangesetDiscussionBuilder> m_changeset_discussion_builder{};
+                std::unique_ptr<osmium::builder::NodeBuilder>                m_node_builder;
+                std::unique_ptr<osmium::builder::WayBuilder>                 m_way_builder;
+                std::unique_ptr<osmium::builder::RelationBuilder>            m_relation_builder;
+                std::unique_ptr<osmium::builder::ChangesetBuilder>           m_changeset_builder;
+                std::unique_ptr<osmium::builder::ChangesetDiscussionBuilder> m_changeset_discussion_builder;
 
-                std::unique_ptr<osmium::builder::TagListBuilder>             m_tl_builder{};
-                std::unique_ptr<osmium::builder::WayNodeListBuilder>         m_wnl_builder{};
-                std::unique_ptr<osmium::builder::RelationMemberListBuilder>  m_rml_builder{};
+                std::unique_ptr<osmium::builder::TagListBuilder>             m_tl_builder;
+                std::unique_ptr<osmium::builder::WayNodeListBuilder>         m_wnl_builder;
+                std::unique_ptr<osmium::builder::RelationMemberListBuilder>  m_rml_builder;
 
                 std::string m_comment_text;
 

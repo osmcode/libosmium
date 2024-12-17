@@ -48,8 +48,8 @@ namespace osmium {
      */
     class Box {
 
-        osmium::Location m_bottom_left{};
-        osmium::Location m_top_right{};
+        osmium::Location m_bottom_left;
+        osmium::Location m_top_right;
 
     public:
 

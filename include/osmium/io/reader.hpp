@@ -92,7 +92,7 @@ namespace osmium {
             // The Reader::read() function reads from a queue of buffers which
             // can contain nested buffers. These nested buffers will be in
             // here, because read() can only return a single unnested buffer.
-            osmium::memory::Buffer m_back_buffers{};
+            osmium::memory::Buffer m_back_buffers;
 
             osmium::io::File m_file;
 
@@ -124,10 +124,10 @@ namespace osmium {
             detail::future_buffer_queue_type m_osmdata_queue;
             detail::queue_wrapper<osmium::memory::Buffer> m_osmdata_queue_wrapper;
 
-            std::future<osmium::io::Header> m_header_future{};
-            osmium::io::Header m_header{};
+            std::future<osmium::io::Header> m_header_future;
+            osmium::io::Header m_header;
 
-            osmium::thread::thread_handler m_thread{};
+            osmium::thread::thread_handler m_thread;
 
             osmium::osm_entity_bits::type m_read_which_entities = osmium::osm_entity_bits::all;
             osmium::io::read_meta m_read_metadata = osmium::io::read_meta::yes;

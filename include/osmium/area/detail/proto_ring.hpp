@@ -64,11 +64,11 @@ namespace osmium {
             private:
 
                 // Segments in this ring.
-                segments_type m_segments{};
+                segments_type m_segments;
 
                 // If this is an outer ring, these point to it's inner rings
                 // (if any).
-                std::vector<ProtoRing*> m_inner{};
+                std::vector<ProtoRing*> m_inner;
 
                 // The smallest segment. Will be kept current whenever a new
                 // segment is added to the ring.

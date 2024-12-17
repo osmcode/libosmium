@@ -73,7 +73,7 @@ namespace osmium {
 
         private:
 
-            std::string m_filename{};
+            std::string m_filename;
 
             const char* m_buffer = nullptr;
             size_t m_buffer_size = 0;

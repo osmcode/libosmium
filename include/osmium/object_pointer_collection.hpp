@@ -90,7 +90,7 @@ namespace osmium {
      */
     class ObjectPointerCollection : public osmium::handler::Handler {
 
-        std::vector<osmium::OSMObject*> m_objects{};
+        std::vector<osmium::OSMObject*> m_objects;
 
     public:
 

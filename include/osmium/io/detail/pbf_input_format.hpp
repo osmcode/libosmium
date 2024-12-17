@@ -65,7 +65,7 @@ namespace osmium {
 
             class PBFParser final : public Parser {
 
-                std::string m_input_buffer{};
+                std::string m_input_buffer;
                 std::atomic<std::size_t>* m_offset_ptr;
                 int m_fd;
                 bool m_want_buffered_pages_removed;

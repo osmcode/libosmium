@@ -109,15 +109,15 @@ namespace osmium {
 
             std::unique_ptr<osmium::io::detail::OutputFormat> m_output{nullptr};
 
-            osmium::memory::Buffer m_buffer{};
+            osmium::memory::Buffer m_buffer;
 
             osmium::io::Header m_header;
 
             size_t m_buffer_size = default_buffer_size;
 
-            std::future<std::size_t> m_write_future{};
+            std::future<std::size_t> m_write_future;
 
-            osmium::thread::thread_handler m_thread{};
+            osmium::thread::thread_handler m_thread;
 
             // Checking the m_write_future is much more expensive then checking
             // one atomic bool, so we set this bool in the write_thread when

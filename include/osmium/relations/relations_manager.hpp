@@ -75,7 +75,7 @@ namespace osmium {
 
             // All relations and members we are interested in will be kept
             // in here.
-            osmium::ItemStash m_stash{};
+            osmium::ItemStash m_stash;
 
             /// Database of all relations we are interested in.
             relations::RelationsDatabase m_relations_db;
@@ -86,7 +86,7 @@ namespace osmium {
             relations::MembersDatabase<osmium::Relation> m_member_relations_db;
 
             /// Output buffer.
-            osmium::memory::CallbackBuffer m_output{};
+            osmium::memory::CallbackBuffer m_output;
 
         public:
 

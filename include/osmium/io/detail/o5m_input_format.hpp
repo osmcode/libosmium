@@ -153,9 +153,9 @@ namespace osmium {
 
             class O5mParser final : public ParserWithBuffer {
 
-                osmium::io::Header m_header{};
+                osmium::io::Header m_header;
 
-                std::string m_input{};
+                std::string m_input;
 
                 const char* m_data;
                 const char* m_end;

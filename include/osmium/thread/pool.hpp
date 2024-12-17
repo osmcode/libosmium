@@ -120,7 +120,7 @@ namespace osmium {
             }; // class thread_joiner
 
             osmium::thread::Queue<function_wrapper> m_work_queue;
-            std::vector<std::thread> m_threads{};
+            std::vector<std::thread> m_threads;
             thread_joiner m_joiner;
             int m_num_threads;
 
