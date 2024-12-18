@@ -40,7 +40,6 @@ jobs:
             libgdal-dev \
             libgeos++-dev \
             liblz4-dev \
-            libsparsehash-dev \
             make \
             zlib1g-dev
         shell: bash
