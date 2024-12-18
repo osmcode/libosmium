@@ -130,16 +130,11 @@ jobs:
             libgdal-dev \
             libgeos++-dev \
             liblz4-dev \
-            libsparsehash-dev \
             make \
             ruby \
             ruby-json \
             spatialite-bin \
             zlib1g-dev
-      - name: Install compiler
-        shell: bash
-        if: matrix.cpp_compiler == 'clang++-14'
-        run: apt-get install -yq clang-14
       - name: Prepare container (dnf)
         shell: bash
         if: startsWith(matrix.image, 'fedora:')
@@ -160,7 +155,6 @@ jobs:
             make \
             ruby \
             rubygem-json \
-            sparsehash-devel \
             spatialite-tools \
             zlib-devel
       - uses: actions/checkout@v4
