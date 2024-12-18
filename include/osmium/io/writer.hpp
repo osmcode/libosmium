@@ -277,6 +277,9 @@ namespace osmium {
 
                 m_header = options.header;
 
+                // Handle converting from .osc file into .pbf with HistoricalInformation(visible)
+                m_file.set_has_multiple_object_versions(m_header.has_multiple_object_versions());
+
                 m_output = osmium::io::detail::OutputFormatFactory::instance().create_output(*options.pool, m_file, m_output_queue);
 
                 std::unique_ptr<osmium::io::Compressor> compressor =
