@@ -10,6 +10,7 @@
 #include <cstring>
 #include <initializer_list>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace oid = osmium::io::detail;

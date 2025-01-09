@@ -30,8 +30,10 @@
 
 #include <cerrno>      // for errno
 #include <cstring>     // for std::strerror
+#include <exception>
 #include <iostream>    // for std::cout, std::cerr
 #include <string>      // for std::string
+#include <system_error>
 #include <sys/stat.h>  // for open
 #include <sys/types.h> // for open
 

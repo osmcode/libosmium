@@ -9,6 +9,7 @@
 #include <osmium/osm/types.hpp>
 #include <osmium/util/file.hpp>
 
+#include <algorithm>
 #include <vector>
 
 using dense_file_array = osmium::index::map::DenseFileArray<osmium::unsigned_object_id_type, osmium::Location>;

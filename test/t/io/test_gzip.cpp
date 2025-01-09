@@ -6,6 +6,7 @@
 #include <osmium/io/gzip_compression.hpp>
 
 #include <string>
+#include <system_error>
 
 TEST_CASE("Invalid file descriptor of gzip-compressed file") {
     REQUIRE_THROWS_AS(osmium::io::GzipDecompressor{-1}, osmium::gzip_error);

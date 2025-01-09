@@ -26,7 +26,9 @@
 */
 
 #include <cstring>  // for std::strcmp
+#include <exception>
 #include <iostream> // for std::cout, std::cerr
+#include <vector>
 
 // For assembling multipolygons
 #include <osmium/area/assembler.hpp>

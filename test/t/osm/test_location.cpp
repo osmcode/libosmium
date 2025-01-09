@@ -9,7 +9,6 @@
 #include <limits>
 #include <sstream>
 #include <string>
-#include <type_traits>
 
 // fails on MSVC and doesn't really matter
 // static_assert(std::is_literal_type<osmium::Location>::value, "osmium::Location not literal type");

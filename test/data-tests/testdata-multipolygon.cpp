@@ -13,6 +13,7 @@
 #include <gdalcpp.hpp>
 
 #include <cstring>
+#include <exception>
 #include <fstream>
 #include <iostream>
 #include <map>

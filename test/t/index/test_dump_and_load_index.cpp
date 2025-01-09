@@ -10,6 +10,8 @@
 #include <osmium/osm/location.hpp>
 #include <osmium/osm/types.hpp>
 
+#include <functional>
+
 using dense_file_array = osmium::index::map::DenseFileArray<osmium::unsigned_object_id_type, osmium::Location>;
 using sparse_file_array = osmium::index::map::SparseFileArray<osmium::unsigned_object_id_type, osmium::Location>;
 

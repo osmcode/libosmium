@@ -8,6 +8,7 @@
 #include <osmium/memory/buffer.hpp>
 #include <osmium/visitor.hpp>
 
+#include <array>
 #include <iterator>
 #include <stdexcept>
 #include <vector>

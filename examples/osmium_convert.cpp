@@ -21,6 +21,7 @@
 #include <exception> // for std::exception
 #include <iostream>  // for std::cout, std::cerr
 #include <string>    // for std::string
+#include <utility>
 
 // Allow any format of input files (XML, PBF, ...)
 #include <osmium/io/any_input.hpp>

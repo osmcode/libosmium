@@ -2,6 +2,8 @@
 
 #include <osmium/io/detail/string_util.hpp>
 
+#include <cctype>
+#include <cstring>
 #include <iterator>
 #include <locale>
 #include <stdexcept>

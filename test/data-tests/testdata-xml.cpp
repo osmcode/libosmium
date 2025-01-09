@@ -7,15 +7,16 @@
 #include <osmium/io/gzip_compression.hpp>
 #include <osmium/io/xml_input.hpp>
 #include <osmium/util/misc.hpp>
-#include <osmium/visitor.hpp>
 
+#include <atomic>
 #include <cassert>
 #include <cstdlib>
 #include <cstring>
 #include <future>
-#include <iostream>
 #include <iterator>
+#include <stdexcept>
 #include <string>
+#include <utility>
 
 namespace {
 

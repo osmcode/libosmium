@@ -25,12 +25,11 @@
 #include <algorithm>   // for std::all_of, std::equal_range
 #include <cstdlib>     // for std::exit
 #include <cstring>     // for std::strcmp
+#include <exception>
 #include <fcntl.h>     // for open
 #include <iostream>    // for std::cout, std::cerr
 #include <memory>      // for std::unique_ptr
 #include <string>      // for std::string
-#include <sys/stat.h>  // for open
-#include <sys/types.h> // for open
 #include <vector>      // for std::vector
 
 #ifdef _WIN32
