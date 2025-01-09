@@ -219,7 +219,7 @@ namespace osmium {
                         return false;
                     }
                     assert(read_size <= to_read);
-                    to_read -= read_size;
+                    to_read -= static_cast<unsigned int>(read_size);
                 }
 
                 return true;
