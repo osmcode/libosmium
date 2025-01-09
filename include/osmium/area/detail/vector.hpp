@@ -84,7 +84,7 @@ namespace osmium {
 
             // cross product
             constexpr int64_t operator*(const vec& lhs, const vec& rhs) noexcept {
-                return lhs.x * rhs.y - lhs.y * rhs.x;
+                return (lhs.x * rhs.y) - (lhs.y * rhs.x);
             }
 
             // scale vector
