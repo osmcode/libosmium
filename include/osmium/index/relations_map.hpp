@@ -260,8 +260,8 @@ namespace osmium {
 
         // defined outside the class on purpose
         // see https://akrzemi1.wordpress.com/2015/09/11/declaring-the-move-constructor/
-        inline RelationsMapIndex::RelationsMapIndex(RelationsMapIndex&&) noexcept(std::is_nothrow_move_constructible<map_type>::value) = default;
-        inline RelationsMapIndex& RelationsMapIndex::operator=(RelationsMapIndex&&) noexcept(std::is_nothrow_move_assignable<map_type>::value) = default;
+        inline RelationsMapIndex::RelationsMapIndex(RelationsMapIndex&&) noexcept(std::is_nothrow_move_constructible<map_type>::value) = default; // NOLINT(readability-redundant-inline-specifier)
+        inline RelationsMapIndex& RelationsMapIndex::operator=(RelationsMapIndex&&) noexcept(std::is_nothrow_move_assignable<map_type>::value) = default; // NOLINT(readability-redundant-inline-specifier)
 
         class RelationsMapIndexes {
 
@@ -442,8 +442,8 @@ namespace osmium {
 
         // defined outside the class on purpose
         // see https://akrzemi1.wordpress.com/2015/09/11/declaring-the-move-constructor/
-        inline RelationsMapStash::RelationsMapStash(RelationsMapStash&&) noexcept(std::is_nothrow_move_constructible<map_type>::value) = default;
-        inline RelationsMapStash& RelationsMapStash::operator=(RelationsMapStash&&) noexcept(std::is_nothrow_move_assignable<map_type>::value) = default;
+        inline RelationsMapStash::RelationsMapStash(RelationsMapStash&&) noexcept(std::is_nothrow_move_constructible<map_type>::value) = default; // NOLINT(readability-redundant-inline-specifier)
+        inline RelationsMapStash& RelationsMapStash::operator=(RelationsMapStash&&) noexcept(std::is_nothrow_move_assignable<map_type>::value) = default; // NOLINT(readability-redundant-inline-specifier)
 
     } // namespace index
 
