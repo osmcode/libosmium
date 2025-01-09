@@ -46,9 +46,11 @@ namespace osmium {
 
         namespace detail {
 
-            template <typename T>
-            constexpr const T clamp(const T value, const T min, const T max) {
-                return value < min ? min : (max < value ? max : value);
+            constexpr int32_t clamp(int32_t value, int32_t min, int32_t max) {
+                if (value < min) {
+                    return min;
+                }
+                return max < value ? max : value;
             }
 
         } // namespace detail
@@ -75,9 +77,10 @@ namespace osmium {
          * to right.
          */
         constexpr uint32_t mercx_to_tilex(uint32_t zoom, double x) noexcept {
-            return static_cast<uint32_t>(detail::clamp<int32_t>(
+            return static_cast<uint32_t>(detail::clamp(
                 static_cast<int32_t>((x + detail::max_coordinate_epsg3857) / tile_extent_in_zoom(zoom)),
-                0, num_tiles_in_zoom(zoom) - 1));
+                0,
+                static_cast<int32_t>(num_tiles_in_zoom(zoom) - 1)));
         }
 
         /**
@@ -86,9 +89,10 @@ namespace osmium {
          * to bottom.
          */
         constexpr uint32_t mercy_to_tiley(uint32_t zoom, double y) noexcept {
-            return static_cast<uint32_t>(detail::clamp<int32_t>(
+            return static_cast<uint32_t>(detail::clamp(
                 static_cast<int32_t>((detail::max_coordinate_epsg3857 - y) / tile_extent_in_zoom(zoom)),
-                0, num_tiles_in_zoom(zoom) - 1));
+                0,
+                static_cast<int32_t>(num_tiles_in_zoom(zoom) - 1)));
         }
 
         /**
