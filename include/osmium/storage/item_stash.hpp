@@ -102,7 +102,7 @@ namespace osmium {
              * be printed as a unique (for an ItemStash object) number.
              */
             template <typename TChar, typename TTraits>
-            friend inline std::basic_ostream<TChar, TTraits>& operator<<(std::basic_ostream<TChar, TTraits>& out, const ItemStash::handle_type& handle) {
+            friend std::basic_ostream<TChar, TTraits>& operator<<(std::basic_ostream<TChar, TTraits>& out, const ItemStash::handle_type& handle) {
                 if (handle.valid()) {
                     out << handle.value;
                 } else {
