@@ -115,7 +115,7 @@ namespace osmium {
                     using it_type = std::list<std::string>::const_iterator;
 
                     it_type m_it;
-                    const it_type m_last;
+                    it_type m_last;
                     const char* m_pos;
 
                 public:

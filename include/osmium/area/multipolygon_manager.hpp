@@ -76,7 +76,7 @@ namespace osmium {
         class MultipolygonManager : public osmium::relations::RelationsManager<MultipolygonManager<TAssembler>, false, true, false> {
 
             using assembler_config_type = typename TAssembler::config_type;
-            const assembler_config_type m_assembler_config;
+            assembler_config_type m_assembler_config;
 
             area_stats m_stats;
 

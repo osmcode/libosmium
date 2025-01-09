@@ -62,7 +62,7 @@ namespace osmium {
         TBasicIterator m_curr;
         TBasicIterator m_next;
 
-        const TBasicIterator m_end;
+        TBasicIterator m_end;
 
         mutable osmium::DiffObject m_diff;
 

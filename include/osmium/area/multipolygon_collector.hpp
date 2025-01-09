@@ -79,7 +79,7 @@ namespace osmium {
             using collector_type = osmium::relations::Collector<MultipolygonCollector<TAssembler>, false, true, false>;
 
             using assembler_config_type = typename TAssembler::config_type;
-            const assembler_config_type m_assembler_config;
+            assembler_config_type m_assembler_config;
 
             osmium::memory::Buffer m_output_buffer;
 
