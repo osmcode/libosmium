@@ -131,7 +131,7 @@ namespace osmium {
             ~GzipCompressor() noexcept override {
                 try {
                     close();
-                } catch (...) {
+                } catch (...) { // NOLINT(bugprone-empty-catch)
                     // Ignore any exceptions because destructor must not throw.
                 }
             }
@@ -196,7 +196,7 @@ namespace osmium {
                 if (!m_gzfile) {
                     try {
                         osmium::io::detail::reliable_close(fd);
-                    } catch (...) {
+                    } catch (...) { // NOLINT(bugprone-empty-catch)
                     }
                     throw gzip_error{"gzip error: read initialization failed"};
                 }
@@ -211,7 +211,7 @@ namespace osmium {
             ~GzipDecompressor() noexcept override {
                 try {
                     close();
-                } catch (...) {
+                } catch (...) { // NOLINT(bugprone-empty-catch)
                     // Ignore any exceptions because destructor must not throw.
                 }
             }
@@ -293,7 +293,7 @@ namespace osmium {
             ~GzipBufferDecompressor() noexcept override {
                 try {
                     close();
-                } catch (...) {
+                } catch (...) { // NOLINT(bugprone-empty-catch)
                     // Ignore any exceptions because destructor must not throw.
                 }
             }

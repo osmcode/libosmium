@@ -228,7 +228,7 @@ namespace osmium {
             ~MemoryMapping() noexcept {
                 try {
                     unmap();
-                } catch (const std::system_error&) {
+                } catch (const std::system_error&) { // NOLINT(bugprone-empty-catch)
                     // Ignore any exceptions because destructor must not throw.
                 }
             }
@@ -591,7 +591,7 @@ inline osmium::util::MemoryMapping::MemoryMapping(MemoryMapping&& other) noexcep
 inline osmium::util::MemoryMapping& osmium::util::MemoryMapping::operator=(osmium::util::MemoryMapping&& other) noexcept {
     try {
         unmap();
-    } catch (const std::system_error&) {
+    } catch (const std::system_error&) { // NOLINT(bugprone-empty-catch)
         // Ignore unmap error. It should never happen anyway and we can't do
         // anything about it here.
     }
@@ -761,7 +761,7 @@ inline osmium::util::MemoryMapping::MemoryMapping(MemoryMapping&& other) noexcep
 inline osmium::util::MemoryMapping& osmium::util::MemoryMapping::operator=(osmium::util::MemoryMapping&& other) noexcept {
     try {
         unmap();
-    } catch (const std::system_error&) {
+    } catch (const std::system_error&) { // NOLINT(bugprone-empty-catch)
         // Ignore unmap error. It should never happen anyway and we can't do
         // anything about it here.
     }

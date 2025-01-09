@@ -117,7 +117,8 @@ namespace osmium {
                 ~queue_wrapper() noexcept {
                     try {
                         shutdown();
-                    } catch (...) {
+                    } catch (...) { // NOLINT(bugprone-empty-catch)
+                        // Ignore any exceptions because destructor must not throw.
                     }
                 }
 

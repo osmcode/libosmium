@@ -246,7 +246,7 @@ namespace osmium {
             ~NoCompressor() noexcept override {
                 try {
                     close();
-                } catch (...) {
+                } catch (...) { // NOLINT(bugprone-empty-catch)
                     // Ignore any exceptions because destructor must not throw.
                 }
             }
@@ -337,7 +337,7 @@ namespace osmium {
             ~NoDecompressor() noexcept override {
                 try {
                     close();
-                } catch (...) {
+                } catch (...) { // NOLINT(bugprone-empty-catch)
                     // Ignore any exceptions because destructor must not throw.
                 }
             }

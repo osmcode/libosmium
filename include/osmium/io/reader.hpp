@@ -368,7 +368,7 @@ namespace osmium {
             ~Reader() noexcept {
                 try {
                     close();
-                } catch (...) {
+                } catch (...) { // NOLINT(bugprone-empty-catch)
                     // Ignore any exceptions because destructor must not throw.
                 }
             }

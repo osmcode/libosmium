@@ -195,7 +195,7 @@ namespace osmium {
             ~Bzip2Compressor() noexcept override {
                 try {
                     close();
-                } catch (...) {
+                } catch (...) { // NOLINT(bugprone-empty-catch)
                     // Ignore any exceptions because destructor must not throw.
                 }
             }
@@ -269,7 +269,7 @@ namespace osmium {
             ~Bzip2Decompressor() noexcept override {
                 try {
                     close();
-                } catch (...) {
+                } catch (...) { // NOLINT(bugprone-empty-catch)
                     // Ignore any exceptions because destructor must not throw.
                 }
             }
@@ -377,7 +377,7 @@ namespace osmium {
             ~Bzip2BufferDecompressor() noexcept override {
                 try {
                     close();
-                } catch (...) {
+                } catch (...) { // NOLINT(bugprone-empty-catch)
                     // Ignore any exceptions because destructor must not throw.
                 }
             }
