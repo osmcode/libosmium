@@ -17,7 +17,6 @@ jobs:
           - "debian:bookworm"     # gcc 12.2.0, clang 15.0.6, cmake 3.25.1
           - "debian:testing"
           - "debian:experimental"
-          - "fedora:37"
           - "fedora:38"
           - "fedora:39"
           - "fedora:40"
@@ -89,8 +88,6 @@ jobs:
           - image: "debian:experimental"
             c_compiler: clang
             cpp_compiler: clang++
-          - image: "fedora:37"
-            CXXFLAGS: -Wno-stringop-overread
           - image: "fedora:38"
             CXXFLAGS: -Wno-stringop-overread -Wno-dangling-reference
           - image: "fedora:39"
@@ -217,6 +214,7 @@ jobs:
         os:
           - windows-2019
           - windows-2022
+          - windows-2025
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -228,8 +226,8 @@ jobs:
       - uses: ./.github/actions/build
       - uses: ./.github/actions/ctest
 
-  windows-2019-full:
-    runs-on: windows-2019
+  windows-2022-full:
+    runs-on: windows-2022
     steps:
       - uses: actions/checkout@v4
         with:
