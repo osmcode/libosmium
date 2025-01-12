@@ -10,7 +10,18 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+* Switched to C++14 as minimum requirement
+* Removed suport for Google Sparsehash
+* Removed support for projection using the Proj library (which only worked
+  for very old versions of Proj)
+* Various refactoring and code cleanups
+
 ### Fixed
+
+* Fix problem where bz2 files were not read completely (#373)
+* Order deleted objects after visible ones in reverse id order. This fixes
+  a problem when merging diffs for different extracts.
+* Remove resource leak in temp file creation
 
 ## [2.20.0] - 2023-09-20
 
