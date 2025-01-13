@@ -10,6 +10,13 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+### Fixed
+
+
+## [2.21.0] - 2025-01-13
+
+### Changed
+
 * Switched to C++14 as minimum requirement
 * Removed suport for Google Sparsehash
 * Removed support for projection using the Proj library (which only worked
@@ -22,6 +29,7 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 * Order deleted objects after visible ones in reverse id order. This fixes
   a problem when merging diffs for different extracts.
 * Remove resource leak in temp file creation
+
 
 ## [2.20.0] - 2023-09-20
 
@@ -1296,7 +1304,8 @@ long time. These will not be part of the next version of libosmium:
   Doxygen (up to version 1.8.8). This version contains a workaround to fix
   this.
 
-[unreleased]: https://github.com/osmcode/libosmium/compare/v2.20.0...HEAD
+[unreleased]: https://github.com/osmcode/libosmium/compare/v2.21.0...HEAD
+[2.21.0]: https://github.com/osmcode/libosmium/compare/v2.20.0...v2.21.0
 [2.20.0]: https://github.com/osmcode/libosmium/compare/v2.19.0...v2.20.0
 [2.19.0]: https://github.com/osmcode/libosmium/compare/v2.18.9...v2.19.0
 [2.18.0]: https://github.com/osmcode/libosmium/compare/v2.17.3...v2.18.0
