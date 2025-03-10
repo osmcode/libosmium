@@ -92,17 +92,17 @@ TEST_CASE("RelationsMapStash both indexes") {
     REQUIRE_FALSE(stash.empty());
     REQUIRE(stash.size() == 2);
 
-    const auto index = stash.build_indexes();
+    const auto indexes = stash.build_indexes();
 
-    REQUIRE_FALSE(index.empty());
-    REQUIRE(index.size() == 2);
+    REQUIRE_FALSE(indexes.empty());
+    REQUIRE(indexes.size() == 2);
 
     int count = 0;
-    index.member_to_parent().for_each(2, [&](osmium::unsigned_object_id_type id) {
+    indexes.member_to_parent().for_each(2, [&](osmium::unsigned_object_id_type id) {
         REQUIRE(id == 3);
         ++count;
     });
-    index.parent_to_member().for_each(2, [&](osmium::unsigned_object_id_type id) {
+    indexes.parent_to_member().for_each(2, [&](osmium::unsigned_object_id_type id) {
         REQUIRE(id == 1);
         ++count;
     });
