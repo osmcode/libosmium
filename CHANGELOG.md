@@ -10,6 +10,13 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+### Fixed
+
+
+## [2.22.0] - 2025-03-17
+
+### Changed
+
 * Extend RelationsMapIndex to work with 64bit IDs. This should not change
   anything for typical OSM use (where relation IDs fit in 32bit), but help
   with users adding their own relations.
@@ -17,8 +24,6 @@ This project adheres to [Semantic Versioning](https://semver.org/).
   osmium::TagsFilter instead (`osmium/tags/regex_filter.hpp` removed).
 * Remove special cases disabling regex support for old C++ libs.
 * Various code cleanups.
-
-### Fixed
 
 
 ## [2.21.0] - 2025-01-13
@@ -1312,7 +1317,8 @@ long time. These will not be part of the next version of libosmium:
   Doxygen (up to version 1.8.8). This version contains a workaround to fix
   this.
 
-[unreleased]: https://github.com/osmcode/libosmium/compare/v2.21.0...HEAD
+[unreleased]: https://github.com/osmcode/libosmium/compare/v2.22.0...HEAD
+[2.22.0]: https://github.com/osmcode/libosmium/compare/v2.21.0...v2.22.0
 [2.21.0]: https://github.com/osmcode/libosmium/compare/v2.20.0...v2.21.0
 [2.20.0]: https://github.com/osmcode/libosmium/compare/v2.19.0...v2.20.0
 [2.19.0]: https://github.com/osmcode/libosmium/compare/v2.18.9...v2.19.0
