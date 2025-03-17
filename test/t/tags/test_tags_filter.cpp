@@ -99,7 +99,7 @@ struct result_type {
 
 }; // struct result_type
 
-bool operator==(const result_type& lhs, const result_type& rhs) noexcept {
+static bool operator==(const result_type& lhs, const result_type& rhs) noexcept {
     return lhs.v == rhs.v && lhs.b == rhs.b;
 }
 
