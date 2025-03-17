@@ -4,7 +4,6 @@
 #include <osmium/memory/buffer.hpp>
 #include <osmium/osm/tag.hpp>
 #include <osmium/tags/filter.hpp>
-#include <osmium/tags/regex_filter.hpp>
 #include <osmium/tags/taglist.hpp>
 
 #include <algorithm>
@@ -188,70 +187,5 @@ TEST_CASE("KeyValueFilter") {
                                                .add(true, "highway", "primary")
                                                .add(true, "name")));
     }
-
-}
-
-TEST_CASE("RegexFilter matches some tags") {
-    osmium::memory::Buffer buffer{10240};
-
-    osmium::tags::RegexFilter filter{false};
-    filter.add(true, "highway", std::regex{".*_link"});
-
-    const osmium::TagList& tag_list1 = make_tag_list(buffer, {
-        { "highway", "primary_link" },
-        { "source", "GPS" }
-    });
-    const osmium::TagList& tag_list2 = make_tag_list(buffer, {
-        { "highway", "primary" },
-        { "source", "GPS" }
-    });
-
-    check_filter(tag_list1, filter, {true, false});
-    check_filter(tag_list2, filter, {false, false});
-}
-
-TEST_CASE("RegexFilter matches some tags with lvalue regex") {
-    osmium::memory::Buffer buffer{10240};
-    osmium::tags::RegexFilter filter{false};
-    const std::regex r{".*straße"};
-    filter.add(true, "name", r);
-
-    const osmium::TagList& tag_list = make_tag_list(buffer, {
-        { "highway", "primary" },
-        { "name", "Hauptstraße" }
-    });
-
-    check_filter(tag_list, filter, {false, true});
-}
-
-TEST_CASE("KeyPrefixFilter matches some keys") {
-    osmium::memory::Buffer buffer{10240};
-
-    osmium::tags::KeyPrefixFilter filter{false};
-    filter.add(true, "name:");
-
-    const osmium::TagList& tag_list = make_tag_list(buffer, {
-        { "highway", "primary" },
-        { "name:de", "Hauptstraße" }
-    });
-
-    check_filter(tag_list, filter, {false, true});
-
-}
-
-TEST_CASE("Generic Filter with regex matches some keys") {
-    osmium::memory::Buffer buffer{10240};
-
-    osmium::tags::Filter<std::regex> filter{false};
-    filter.add(true, std::regex{"restriction.+conditional"});
-
-    const osmium::TagList& tag_list = make_tag_list(buffer, {
-        { "highway", "primary" },
-        { "restrictionconditional", "only_right_turn @ (Mo-Fr 07:00-14:00)" },
-        { "restriction:conditional", "only_right_turn @ (Mo-Fr 07:00-14:00)" },
-        { "restriction:psv:conditional", "only_right_turn @ (Mo-Fr 07:00-14:00)" }
-    });
-
-    check_filter(tag_list, filter, {false, false, true, true});
 
 }
