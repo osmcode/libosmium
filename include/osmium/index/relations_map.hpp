@@ -233,12 +233,12 @@ namespace osmium {
                 if (m_small) {
                     const auto parents = m_map32.get(id);
                     for (auto it = parents.first; it != parents.second; ++it) {
-                        func(it->value);
+                        std::forward<TFunc>(func)(it->value);
                     }
                 } else {
                     const auto parents = m_map64.get(id);
                     for (auto it = parents.first; it != parents.second; ++it) {
-                        func(it->value);
+                        std::forward<TFunc>(func)(it->value);
                     }
                 }
             }
