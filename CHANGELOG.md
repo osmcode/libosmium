@@ -10,6 +10,14 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+* Extend RelationsMapIndex to work with 64bit IDs. This should not change
+  anything for typical OSM use (where relation IDs fit in 32bit), but help
+  with users adding their own relations.
+* Removed deprecated support for regexes from osmium::tags::Filter, use
+  osmium::TagsFilter instead (`osmium/tags/regex_filter.hpp` removed).
+* Remove special cases disabling regex support for old C++ libs.
+* Various code cleanups.
+
 ### Fixed
 
 
