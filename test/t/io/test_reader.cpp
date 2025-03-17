@@ -266,7 +266,7 @@ TEST_CASE("Reader should work when there is an exception in main thread before g
         const osmium::io::Reader reader{with_data_dir("t/io/data.osm")};
         REQUIRE_FALSE(reader.eof());
         throw std::runtime_error{"foo"};
-    } catch (...) {
+    } catch (...) { // NOLINT(bugprone-empty-catch)
     }
 
     REQUIRE(count == count_fds());
@@ -280,7 +280,7 @@ TEST_CASE("Reader should work when there is an exception in main thread while re
         REQUIRE_FALSE(reader.eof());
         auto header = reader.header();
         throw std::runtime_error{"foo"};
-    } catch (...) {
+    } catch (...) { // NOLINT(bugprone-empty-catch)
     }
 
     REQUIRE(count == count_fds());

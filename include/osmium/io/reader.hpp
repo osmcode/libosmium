@@ -390,7 +390,7 @@ namespace osmium {
 
                 try {
                     m_read_thread_manager.close();
-                } catch (...) {
+                } catch (...) { // NOLINT(bugprone-empty-catch)
                     // Ignore any exceptions.
                 }
 
