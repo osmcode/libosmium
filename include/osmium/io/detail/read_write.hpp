@@ -104,6 +104,9 @@ namespace osmium {
 #endif
 
                 if (filename.empty() || filename == "-") {
+#ifdef _WIN32
+                    _setmode(0, _O_BINARY);
+#endif
                     return 0; // stdin
                 }
 
