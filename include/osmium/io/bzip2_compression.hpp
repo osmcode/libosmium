@@ -313,7 +313,18 @@ namespace osmium {
                                     throw bzip2_error{"bzip2 error: read open failed", bzerror};
                                 }
                             } else {
-                                m_stream_end = true;
+                                // Close current stream and try to open a new one for multi-stream files
+                                ::BZ2_bzReadClose(&bzerror, m_bzfile);
+                                if (bzerror != BZ_OK) {
+                                    throw bzip2_error{"bzip2 error: read close failed", bzerror};
+                                }
+                                // Try to open a new stream - there might be more bzip2 streams concatenated
+                                m_bzfile = ::BZ2_bzReadOpen(&bzerror, m_file.file(), 0, 0, nullptr, 0);
+                                if (!m_bzfile || bzerror != BZ_OK) {
+                                    // If we can't open a new stream, we've truly reached the end
+                                    m_stream_end = true;
+                                    m_bzfile = nullptr;
+                                }
                             }
                         } else {
                             m_stream_end = true;
