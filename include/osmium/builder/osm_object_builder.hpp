@@ -349,12 +349,11 @@ namespace osmium {
 
             // Get current comment pointer (recalculated each time to handle buffer reallocation)
             osmium::ChangesetComment* get_comment_ptr() {
-                if (!has_open_comment()) {
-                    return nullptr;
+                if (has_open_comment()) {
+                    return &buffer().get<osmium::ChangesetComment>(
+                        buffer().committed() + m_comment_offset);
                 }
-                return reinterpret_cast<osmium::ChangesetComment*>(
-                    buffer().data() + buffer().committed() + m_comment_offset
-                );
+                return nullptr;
             }
 
         public:
