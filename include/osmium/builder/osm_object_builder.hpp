@@ -382,38 +382,38 @@ namespace osmium {
 
             void add_comment(osmium::Timestamp date, osmium::user_id_type uid, const char* user) {
                 assert(!has_open_comment() && "You have to always call both add_comment() and then add_comment_text() in that order for each comment!");
-                
+
                 // Store offset instead of pointer to handle buffer reallocation
                 m_comment_offset = buffer().written() - buffer().committed();
-                
+
                 auto* comment = reserve_space_for<osmium::ChangesetComment>();
                 new (comment) osmium::ChangesetComment{date, uid};
                 add_size(sizeof(ChangesetComment));
-                
+
                 add_user(*comment, user, std::strlen(user));
             }
 
             void add_comment_text(const char* text) {
                 assert(has_open_comment() && "You have to always call both add_comment() and then add_comment_text() in that order for each comment!");
-                
+
                 // Get fresh pointer each time to handle buffer reallocation
                 auto* comment = get_comment_ptr();
-                
+
                 // Invalidate offset to ensure right adding order
                 m_comment_offset = std::numeric_limits<std::size_t>::max();
-                
+
                 add_text(*comment, text, std::strlen(text));
             }
 
             void add_comment_text(const std::string& text) {
                 assert(has_open_comment() && "You have to always call both add_comment() and then add_comment_text() in that order for each comment!");
-                
+
                 // Get fresh pointer each time to handle buffer reallocation
                 auto* comment = get_comment_ptr();
-                
+
                 // Invalidate offset to ensure right adding order
                 m_comment_offset = std::numeric_limits<std::size_t>::max();
-                
+
                 add_text(*comment, text.c_str(), text.size());
             }
         }; // class ChangesetDiscussionBuilder
