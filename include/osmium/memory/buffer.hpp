@@ -343,8 +343,8 @@ namespace osmium {
             }
 
             /**
-             * Returns the number of bytes currently filled in this buffer that
-             * are not yet committed.
+             * Returns the number of bytes currently filled in this buffer.
+             * This includes committed and not yet committed bytes.
              * Always returns 0 on invalid buffers.
              */
             std::size_t written() const noexcept {
