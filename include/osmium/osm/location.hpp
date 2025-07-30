@@ -273,6 +273,9 @@ namespace osmium {
         int32_t m_x; // NOLINT(modernize-use-default-member-init)
         int32_t m_y; // NOLINT(modernize-use-default-member-init)
 
+        // Use MSB of y-coordinate to store tag information
+        static constexpr int32_t TAG_BIT = 0x80000000;
+
         constexpr static double precision() noexcept {
             return static_cast<double>(detail::coordinate_precision);
         }
@@ -352,8 +355,8 @@ namespace osmium {
         constexpr bool valid() const noexcept {
             return m_x >= -180 * precision()
                 && m_x <=  180 * precision()
-                && m_y >=  -90 * precision()
-                && m_y <=   90 * precision();
+                && y() >=  -90 * precision()
+                && y() <=   90 * precision();
         }
 
         /**
@@ -379,7 +382,7 @@ namespace osmium {
         }
 
         constexpr int32_t y() const noexcept {
-            return m_y;
+            return m_y & ~TAG_BIT;
         }
 
         Location& set_x(const int32_t x) noexcept {
@@ -388,7 +391,26 @@ namespace osmium {
         }
 
         Location& set_y(const int32_t y) noexcept {
-            m_y = y;
+            m_y = (m_y & TAG_BIT) | (y & ~TAG_BIT);
+            return *this;
+        }
+
+        /**
+         * Check if the node is tagged
+         */
+        bool is_tagged() const noexcept {
+            return (m_y & TAG_BIT) != 0;
+        }
+
+        /**
+         * Set the tag status of the node
+         */
+        Location& set_tagged(bool tagged) noexcept {
+            if (tagged) {
+                m_y |= TAG_BIT;
+            } else {
+                m_y &= ~TAG_BIT;
+            }
             return *this;
         }
 
@@ -420,14 +442,14 @@ namespace osmium {
             if (!valid()) {
                 throw osmium::invalid_location{"invalid location"};
             }
-            return fix_to_double(m_y);
+            return fix_to_double(m_y & ~TAG_BIT);
         }
 
         /**
          * Get latitude without checking the validity.
          */
         double lat_without_check() const noexcept {
-            return fix_to_double(m_y);
+            return fix_to_double(m_y & ~TAG_BIT);
         }
 
         Location& set_lon(double lon) noexcept {
@@ -436,7 +458,7 @@ namespace osmium {
         }
 
         Location& set_lat(double lat) noexcept {
-            m_y = double_to_fix(lat);
+            m_y = (m_y & TAG_BIT) | (double_to_fix(lat) & ~TAG_BIT);
             return *this;
         }
 
