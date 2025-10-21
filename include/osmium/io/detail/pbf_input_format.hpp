@@ -124,6 +124,11 @@ namespace osmium {
                         if (!osmium::io::detail::read_exactly(m_fd, buffer.data(), static_cast<unsigned int>(buffer.size()))) {
                             return 0; // EOF
                         }
+
+                        if (m_offset_ptr) {
+                            *m_offset_ptr += buffer.size();
+                        }
+
                         return check_size(get_size_in_network_byte_order(buffer.data()));
                     }
 
@@ -209,6 +214,10 @@ namespace osmium {
 
                         if (!osmium::io::detail::read_exactly(m_fd, &*buffer.begin(), static_cast<unsigned int>(size))) {
                             throw osmium::pbf_error{"unexpected EOF"};
+                        }
+
+                        if (m_offset_ptr) {
+                            *m_offset_ptr += buffer.size();
                         }
                     } else {
                         ensure_available_in_input_queue(size);
