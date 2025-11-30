@@ -207,6 +207,10 @@ namespace osmium {
                 return m_callbacks.insert(cc).second;
             }
 
+            void clear_register() {
+                m_callbacks.clear();
+            }
+
             template <typename... TArgs>
             std::unique_ptr<osmium::io::Compressor> create_compressor(const osmium::io::file_compression compression, TArgs&&... args) const {
                 const auto callbacks = find_callbacks(compression);
