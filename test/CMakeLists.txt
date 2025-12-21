@@ -180,6 +180,7 @@ add_unit_test(io test_nocompression)
 add_unit_test(io test_output_utils)
 add_unit_test(io test_file_seek)
 add_unit_test(io test_string_table)
+add_unit_test(io test_print_width ENABLE_IF ${ZLIB_FOUND} LIBS ${ZLIB_LIBRARIES})
 
 add_unit_test(io test_bzip2 ENABLE_IF ${BZIP2_FOUND} LIBS ${BZIP2_LIBRARIES})
 add_unit_test(io test_gzip ENABLE_IF ${ZLIB_FOUND} LIBS ${ZLIB_LIBRARIES})
