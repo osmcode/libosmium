@@ -42,6 +42,8 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
+    // NOLINTBEGIN(clang-analyzer-optin.core.EnumCastOutOfRange)
+
     /**
      * Describes which metadata fields are available in an OSMObject. This is
      * most often used to describe which metadata fields are available in the
@@ -218,6 +220,8 @@ namespace osmium {
         }
 
     }; // class metadata_options
+
+    // NOLINTEND(clang-analyzer-optin.core.EnumCastOutOfRange)
 
     template <typename TChar, typename TTraits>
     inline std::basic_ostream<TChar, TTraits>& operator<<(std::basic_ostream<TChar, TTraits>& out, const metadata_options& options) {
