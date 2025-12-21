@@ -81,27 +81,31 @@ TEST_CASE("Tags filter") {
 
 }
 
-struct result_type {
+namespace {
 
-    int v = 0;
-    bool b = false;
+    struct result_type {
 
-    result_type() noexcept = default;
+        int v = 0;
+        bool b = false;
 
-    result_type(int v_, bool b_) noexcept :
-        v(v_),
-        b(b_) {
+        result_type() noexcept = default;
+
+        result_type(int v_, bool b_) noexcept :
+            v(v_),
+            b(b_) {
+        }
+
+        explicit operator bool() const noexcept {
+            return b;
+        }
+
+    }; // struct result_type
+
+    bool operator==(const result_type& lhs, const result_type& rhs) noexcept {
+        return lhs.v == rhs.v && lhs.b == rhs.b;
     }
 
-    explicit operator bool() const noexcept {
-        return b;
-    }
-
-}; // struct result_type
-
-static bool operator==(const result_type& lhs, const result_type& rhs) noexcept {
-    return lhs.v == rhs.v && lhs.b == rhs.b;
-}
+} // anonymous namespace
 
 TEST_CASE("TagsFilterBase") {
     osmium::memory::Buffer buffer{10240};
