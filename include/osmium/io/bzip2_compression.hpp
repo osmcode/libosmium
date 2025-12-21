@@ -109,6 +109,9 @@ namespace osmium {
                 file_wrapper() noexcept = default;
 
                 file_wrapper(const int fd, const char* mode) {
+                    if (fd < 0) {
+                        throw std::system_error{errno, std::system_category(), "file descriptor must be >= 0"};
+                    }
 #ifdef _MSC_VER
                     osmium::detail::disable_invalid_parameter_handler diph;
 #endif
