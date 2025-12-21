@@ -161,9 +161,9 @@ TEST_CASE("Location hash") {
     if (sizeof(size_t) == 8) {
         REQUIRE(std::hash<osmium::Location>{}({0, 0}) == 0);
         REQUIRE(std::hash<osmium::Location>{}({0, 1}) == 1);
-        const int64_t a = std::hash<osmium::Location>{}({1, 0});
+        const auto a = std::hash<osmium::Location>{}({1, 0});
         REQUIRE(a == 0x100000000);
-        const int64_t b = std::hash<osmium::Location>{}({1, 1});
+        const auto b = std::hash<osmium::Location>{}({1, 1});
         REQUIRE(b == 0x100000001);
     } else {
         REQUIRE(std::hash<osmium::Location>{}({0, 0}) == 0);
