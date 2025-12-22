@@ -107,7 +107,7 @@ namespace osmium {
             }; // struct debug_output_options
 
             // Space needed for printing numbers from 0 to num - 1
-            int print_width(std::size_t num) noexcept {
+            inline int print_width(std::size_t num) noexcept {
                 if (num <= 10) {
                     return 1;
                 }
