@@ -155,7 +155,7 @@ namespace osmium {
 
                         // Do not close stdout
                         if (fileno(wrapped_file) == 1) {
-                            return;
+                            return; // NOLINT(clang-analyzer-unix.Stream)
                         }
 
                         if (fclose(wrapped_file) != 0) {
