@@ -159,9 +159,9 @@ namespace osmium {
      * Tag lists must be ordered in a consistent way.
      * The filter must return "false" for all tags that should be ignored.
      */
-    [[nodiscard]] inline bool compare_tags(osmium::TagList const &tags1,
-                                           osmium::TagList const &tags2,
-                                           TagsFilter const &filter)
+    inline bool compare_tags(osmium::TagList const &tags1,
+                             osmium::TagList const &tags2,
+                             TagsFilter const &filter)
     {
         auto const end1 = tags1.cend();
         auto const end2 = tags2.cend();
