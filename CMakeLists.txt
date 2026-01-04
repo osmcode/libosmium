@@ -145,7 +145,7 @@ endif()
 #
 #-----------------------------------------------------------------------------
 
-find_package(Boost 1.38)
+find_package(Boost CONFIG 1.38)
 mark_as_advanced(CLEAR BOOST_ROOT)
 
 if(Boost_FOUND)
