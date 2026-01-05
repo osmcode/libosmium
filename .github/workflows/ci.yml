@@ -22,30 +22,30 @@ jobs:
           - "fedora:43"
         build_type: [Dev]
         cpp_compiler: [g++]
-        cpp_version: [c++14]
+        cpp_version: [14]
         include:
           - image: "ubuntu:22.04"
             CXXFLAGS: -Wno-stringop-overread
           - image: "ubuntu:24.04"
             CXXFLAGS: -Wno-stringop-overread -Wno-dangling-reference
           - image: "debian:bookworm"
-            cpp_version: c++14
+            cpp_version: 14
             CXXFLAGS: -Wno-stringop-overread
           - image: "debian:bookworm"
-            cpp_version: c++17
+            cpp_version: 17
           - image: "debian:bookworm"
-            cpp_version: c++20
-          - image: "debian:bookworm"
-            c_compiler: clang
-            cpp_compiler: clang++
+            cpp_version: 20
           - image: "debian:bookworm"
             c_compiler: clang
             cpp_compiler: clang++
-            cpp_version: c++17
           - image: "debian:bookworm"
             c_compiler: clang
             cpp_compiler: clang++
-            cpp_version: c++20
+            cpp_version: 17
+          - image: "debian:bookworm"
+            c_compiler: clang
+            cpp_compiler: clang++
+            cpp_version: 20
           - image: "debian:bookworm"
             build_type: RelWithDebInfo
           - image: "debian:bookworm"
@@ -56,10 +56,10 @@ jobs:
           - image: "debian:trixie"
             CXXFLAGS: -Wno-stringop-overread
           - image: "debian:trixie"
-            cpp_version: c++17
+            cpp_version: 17
             CXXFLAGS: -Wno-stringop-overread
           - image: "debian:trixie"
-            cpp_version: c++20
+            cpp_version: 20
             CXXFLAGS: -Wno-stringop-overread
           - image: "debian:trixie"
             c_compiler: clang
@@ -67,11 +67,11 @@ jobs:
           - image: "debian:trixie"
             c_compiler: clang
             cpp_compiler: clang++
-            cpp_version: c++17
+            cpp_version: 17
           - image: "debian:trixie"
             c_compiler: clang
             cpp_compiler: clang++
-            cpp_version: c++20
+            cpp_version: 20
           - image: "debian:trixie"
             build_type: RelWithDebInfo
             CXXFLAGS: -Wno-stringop-overread
