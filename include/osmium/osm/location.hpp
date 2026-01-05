@@ -350,10 +350,10 @@ namespace osmium {
          * See also is_defined() and is_undefined().
          */
         constexpr bool valid() const noexcept {
-            return m_x >= -180 * precision()
-                && m_x <=  180 * precision()
-                && m_y >=  -90 * precision()
-                && m_y <=   90 * precision();
+            return x() >= -180 * precision()
+                && x() <=  180 * precision()
+                && y() >=  -90 * precision()
+                && y() <=   90 * precision();
         }
 
         /**
@@ -401,14 +401,14 @@ namespace osmium {
             if (!valid()) {
                 throw osmium::invalid_location{"invalid location"};
             }
-            return fix_to_double(m_x);
+            return fix_to_double(x());
         }
 
         /**
          * Get longitude without checking the validity.
          */
         double lon_without_check() const noexcept {
-            return fix_to_double(m_x);
+            return fix_to_double(x());
         }
 
         /**
@@ -420,24 +420,22 @@ namespace osmium {
             if (!valid()) {
                 throw osmium::invalid_location{"invalid location"};
             }
-            return fix_to_double(m_y);
+            return fix_to_double(y());
         }
 
         /**
          * Get latitude without checking the validity.
          */
         double lat_without_check() const noexcept {
-            return fix_to_double(m_y);
+            return fix_to_double(y());
         }
 
         Location& set_lon(double lon) noexcept {
-            m_x = double_to_fix(lon);
-            return *this;
+            return set_x(double_to_fix(lon));
         }
 
         Location& set_lat(double lat) noexcept {
-            m_y = double_to_fix(lat);
-            return *this;
+            return set_y(double_to_fix(lat));
         }
 
         Location& set_lon(const char* str) {
@@ -446,8 +444,7 @@ namespace osmium {
             if (**data != '\0') {
                 throw invalid_location{std::string{"characters after coordinate: '"} + *data + "'"};
             }
-            m_x = value;
-            return *this;
+            return set_x(value);
         }
 
         Location& set_lat(const char* str) {
@@ -456,18 +453,15 @@ namespace osmium {
             if (**data != '\0') {
                 throw invalid_location{std::string{"characters after coordinate: '"} + *data + "'"};
             }
-            m_y = value;
-            return *this;
+            return set_y(value);
         }
 
         Location& set_lon_partial(const char** str) {
-            m_x = detail::string_to_location_coordinate(str);
-            return *this;
+            return set_x(detail::string_to_location_coordinate(str));
         }
 
         Location& set_lat_partial(const char** str) {
-            m_y = detail::string_to_location_coordinate(str);
-            return *this;
+            return set_y(detail::string_to_location_coordinate(str));
         }
 
         template <typename T>
