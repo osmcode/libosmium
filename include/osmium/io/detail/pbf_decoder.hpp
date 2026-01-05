@@ -81,10 +81,12 @@ namespace osmium {
 
             using protozero::data_view;
 
-            class varint_range {
+            class values_access {
 
                 const char* m_data = nullptr;
                 const char* m_end = nullptr;
+
+            protected:
 
                 std::uint64_t next() {
                     return protozero::decode_varint(&m_data, m_end);
@@ -92,9 +94,9 @@ namespace osmium {
 
             public:
 
-                varint_range() = default;
+                values_access() = default;
 
-                explicit varint_range(const data_view& data) :
+                explicit values_access(const data_view& data) :
                     m_data(data.data()),
                     m_end(data.data() + data.size()) {
                 }
@@ -116,23 +118,55 @@ namespace osmium {
                     });
                 }
 
-                std::int32_t next_int32() {
+            }; // class values_access
+
+            class values_access_int32 : public values_access {
+
+            public:
+
+                using values_access::values_access;
+
+                int32_t next_int32() {
                     return static_cast<int32_t>(next());
                 }
 
-                std::uint32_t next_uint32() {
+            }; // class values_access_int32
+
+            class values_access_uint32 : public values_access {
+
+            public:
+
+                using values_access::values_access;
+
+                uint32_t next_uint32() {
                     return static_cast<uint32_t>(next());
                 }
 
-                std::int32_t next_sint32() {
+            }; // class values_access_uint32
+
+            class values_access_sint32 : public values_access {
+
+            public:
+
+                using values_access::values_access;
+
+                int32_t next_sint32() {
                     return protozero::decode_zigzag32(static_cast<uint32_t>(next()));
                 }
 
-                std::int64_t next_sint64() {
+            }; // class values_access_sint32
+
+            class values_access_sint64 : public values_access {
+
+            public:
+
+                using values_access::values_access;
+
+                int64_t next_sint64() {
                     return protozero::decode_zigzag64(next());
                 }
 
-            }; // class varint_range
+            }; // class values_access_sint64
 
             using osm_string_len_type = std::pair<const char*, osmium::string_size_type>;
 
@@ -300,7 +334,7 @@ namespace osmium {
                     return user;
                 }
 
-                void build_tag_list(osmium::builder::Builder& parent, varint_range& keys, varint_range& vals) {
+                void build_tag_list(osmium::builder::Builder& parent, values_access_uint32& keys, values_access_uint32& vals) {
                     if (keys.empty() || vals.empty()) {
                         return;
                     }
@@ -325,8 +359,8 @@ namespace osmium {
                     osmium::builder::NodeBuilder builder{m_buffer};
                     osmium::Node& node = builder.object();
 
-                    varint_range keys;
-                    varint_range vals;
+                    values_access_uint32 keys;
+                    values_access_uint32 vals;
                     int64_t lon = std::numeric_limits<int64_t>::max();
                     int64_t lat = std::numeric_limits<int64_t>::max();
 
@@ -339,10 +373,10 @@ namespace osmium {
                                 node.set_id(pbf_node.get_sint64());
                                 break;
                             case protozero::tag_and_type(OSMFormat::Node::packed_uint32_keys, protozero::pbf_wire_type::length_delimited):
-                                keys = varint_range{pbf_node.get_view()};
+                                keys = values_access_uint32{pbf_node.get_view()};
                                 break;
                             case protozero::tag_and_type(OSMFormat::Node::packed_uint32_vals, protozero::pbf_wire_type::length_delimited):
-                                vals = varint_range{pbf_node.get_view()};
+                                vals = values_access_uint32{pbf_node.get_view()};
                                 break;
                             case protozero::tag_and_type(OSMFormat::Node::optional_Info_info, protozero::pbf_wire_type::length_delimited):
                                 if (m_read_metadata == osmium::io::read_meta::yes) {
@@ -381,11 +415,11 @@ namespace osmium {
                 void decode_way(const data_view& data) {
                     osmium::builder::WayBuilder builder{m_buffer};
 
-                    varint_range keys;
-                    varint_range vals;
-                    varint_range refs;
-                    varint_range lats;
-                    varint_range lons;
+                    values_access_uint32 keys;
+                    values_access_uint32 vals;
+                    values_access_sint64 refs;
+                    values_access_sint64 lats;
+                    values_access_sint64 lons;
 
                     osm_string_len_type user{"", 0};
 
@@ -396,10 +430,10 @@ namespace osmium {
                                 builder.object().set_id(pbf_way.get_int64());
                                 break;
                             case protozero::tag_and_type(OSMFormat::Way::packed_uint32_keys, protozero::pbf_wire_type::length_delimited):
-                                keys = varint_range{pbf_way.get_view()};
+                                keys = values_access_uint32{pbf_way.get_view()};
                                 break;
                             case protozero::tag_and_type(OSMFormat::Way::packed_uint32_vals, protozero::pbf_wire_type::length_delimited):
-                                vals = varint_range{pbf_way.get_view()};
+                                vals = values_access_uint32{pbf_way.get_view()};
                                 break;
                             case protozero::tag_and_type(OSMFormat::Way::optional_Info_info, protozero::pbf_wire_type::length_delimited):
                                 if (m_read_metadata == osmium::io::read_meta::yes) {
@@ -409,13 +443,13 @@ namespace osmium {
                                 }
                                 break;
                             case protozero::tag_and_type(OSMFormat::Way::packed_sint64_refs, protozero::pbf_wire_type::length_delimited):
-                                refs = varint_range{pbf_way.get_view()};
+                                refs = values_access_sint64{pbf_way.get_view()};
                                 break;
                             case protozero::tag_and_type(OSMFormat::Way::packed_sint64_lat, protozero::pbf_wire_type::length_delimited):
-                                lats = varint_range{pbf_way.get_view()};
+                                lats = values_access_sint64{pbf_way.get_view()};
                                 break;
                             case protozero::tag_and_type(OSMFormat::Way::packed_sint64_lon, protozero::pbf_wire_type::length_delimited):
-                                lons = varint_range{pbf_way.get_view()};
+                                lons = values_access_sint64{pbf_way.get_view()};
                                 break;
                             default:
                                 pbf_way.skip();
@@ -450,11 +484,11 @@ namespace osmium {
                 void decode_relation(const data_view& data) {
                     osmium::builder::RelationBuilder builder{m_buffer};
 
-                    varint_range keys;
-                    varint_range vals;
-                    varint_range roles;
-                    varint_range refs;
-                    varint_range types;
+                    values_access_uint32 keys;
+                    values_access_uint32 vals;
+                    values_access_int32 roles;
+                    values_access_sint64 refs;
+                    values_access_int32 types;
 
                     osm_string_len_type user{"", 0};
 
@@ -465,10 +499,10 @@ namespace osmium {
                                 builder.object().set_id(pbf_relation.get_int64());
                                 break;
                             case protozero::tag_and_type(OSMFormat::Relation::packed_uint32_keys, protozero::pbf_wire_type::length_delimited):
-                                keys = varint_range{pbf_relation.get_view()};
+                                keys = values_access_uint32{pbf_relation.get_view()};
                                 break;
                             case protozero::tag_and_type(OSMFormat::Relation::packed_uint32_vals, protozero::pbf_wire_type::length_delimited):
-                                vals = varint_range{pbf_relation.get_view()};
+                                vals = values_access_uint32{pbf_relation.get_view()};
                                 break;
                             case protozero::tag_and_type(OSMFormat::Relation::optional_Info_info, protozero::pbf_wire_type::length_delimited):
                                 if (m_read_metadata == osmium::io::read_meta::yes) {
@@ -478,13 +512,13 @@ namespace osmium {
                                 }
                                 break;
                             case protozero::tag_and_type(OSMFormat::Relation::packed_int32_roles_sid, protozero::pbf_wire_type::length_delimited):
-                                roles = varint_range{pbf_relation.get_view()};
+                                roles = values_access_int32{pbf_relation.get_view()};
                                 break;
                             case protozero::tag_and_type(OSMFormat::Relation::packed_sint64_memids, protozero::pbf_wire_type::length_delimited):
-                                refs = varint_range{pbf_relation.get_view()};
+                                refs = values_access_sint64{pbf_relation.get_view()};
                                 break;
                             case protozero::tag_and_type(OSMFormat::Relation::packed_MemberType_types, protozero::pbf_wire_type::length_delimited):
-                                types = varint_range{pbf_relation.get_view()};
+                                types = values_access_int32{pbf_relation.get_view()};
                                 break;
                             default:
                                 pbf_relation.skip();
@@ -514,7 +548,7 @@ namespace osmium {
                     build_tag_list(builder, keys, vals);
                 }
 
-                void build_tag_list_from_dense_nodes(osmium::builder::NodeBuilder& builder, varint_range& tags) {
+                void build_tag_list_from_dense_nodes(osmium::builder::NodeBuilder& builder, values_access_int32& tags) {
                     osmium::builder::TagListBuilder tl_builder{builder};
                     while (!tags.empty()) {
                         const auto idx = tags.next_int32();
@@ -531,25 +565,25 @@ namespace osmium {
                 }
 
                 void decode_dense_nodes_without_metadata(const data_view& data) {
-                    varint_range ids;
-                    varint_range lats;
-                    varint_range lons;
-                    varint_range tags;
+                    values_access_sint64 ids;
+                    values_access_sint64 lats;
+                    values_access_sint64 lons;
+                    values_access_int32 tags;
 
                     protozero::pbf_message<OSMFormat::DenseNodes> pbf_dense_nodes{data};
                     while (pbf_dense_nodes.next()) {
                         switch (pbf_dense_nodes.tag_and_type()) {
                             case protozero::tag_and_type(OSMFormat::DenseNodes::packed_sint64_id, protozero::pbf_wire_type::length_delimited):
-                                ids = varint_range{pbf_dense_nodes.get_view()};
+                                ids = values_access_sint64{pbf_dense_nodes.get_view()};
                                 break;
                             case protozero::tag_and_type(OSMFormat::DenseNodes::packed_sint64_lat, protozero::pbf_wire_type::length_delimited):
-                                lats = varint_range{pbf_dense_nodes.get_view()};
+                                lats = values_access_sint64{pbf_dense_nodes.get_view()};
                                 break;
                             case protozero::tag_and_type(OSMFormat::DenseNodes::packed_sint64_lon, protozero::pbf_wire_type::length_delimited):
-                                lons = varint_range{pbf_dense_nodes.get_view()};
+                                lons = values_access_sint64{pbf_dense_nodes.get_view()};
                                 break;
                             case protozero::tag_and_type(OSMFormat::DenseNodes::packed_int32_keys_vals, protozero::pbf_wire_type::length_delimited):
-                                tags = varint_range{pbf_dense_nodes.get_view()};
+                                tags = values_access_int32{pbf_dense_nodes.get_view()};
                                 break;
                             default:
                                 pbf_dense_nodes.skip();
@@ -592,22 +626,22 @@ namespace osmium {
                 void decode_dense_nodes(const data_view& data) {
                     bool has_info = false;
 
-                    varint_range ids;
-                    varint_range lats;
-                    varint_range lons;
-                    varint_range tags;
-                    varint_range versions;
-                    varint_range timestamps;
-                    varint_range changesets;
-                    varint_range uids;
-                    varint_range user_sids;
-                    varint_range visibles;
+                    values_access_sint64 ids;
+                    values_access_sint64 lats;
+                    values_access_sint64 lons;
+                    values_access_int32 tags;
+                    values_access_int32 versions;
+                    values_access_sint64 timestamps;
+                    values_access_sint64 changesets;
+                    values_access_sint32 uids;
+                    values_access_sint32 user_sids;
+                    values_access_int32 visibles;
 
                     protozero::pbf_message<OSMFormat::DenseNodes> pbf_dense_nodes{data};
                     while (pbf_dense_nodes.next()) {
                         switch (pbf_dense_nodes.tag_and_type()) {
                             case protozero::tag_and_type(OSMFormat::DenseNodes::packed_sint64_id, protozero::pbf_wire_type::length_delimited):
-                                ids = varint_range{pbf_dense_nodes.get_view()};
+                                ids = values_access_sint64{pbf_dense_nodes.get_view()};
                                 break;
                             case protozero::tag_and_type(OSMFormat::DenseNodes::optional_DenseInfo_denseinfo, protozero::pbf_wire_type::length_delimited):
                                 {
@@ -616,22 +650,22 @@ namespace osmium {
                                     while (pbf_dense_info.next()) {
                                         switch (pbf_dense_info.tag_and_type()) {
                                             case protozero::tag_and_type(OSMFormat::DenseInfo::packed_int32_version, protozero::pbf_wire_type::length_delimited):
-                                                versions = varint_range{pbf_dense_info.get_view()};
+                                                versions = values_access_int32{pbf_dense_info.get_view()};
                                                 break;
                                             case protozero::tag_and_type(OSMFormat::DenseInfo::packed_sint64_timestamp, protozero::pbf_wire_type::length_delimited):
-                                                timestamps = varint_range{pbf_dense_info.get_view()};
+                                                timestamps = values_access_sint64{pbf_dense_info.get_view()};
                                                 break;
                                             case protozero::tag_and_type(OSMFormat::DenseInfo::packed_sint64_changeset, protozero::pbf_wire_type::length_delimited):
-                                                changesets = varint_range{pbf_dense_info.get_view()};
+                                                changesets = values_access_sint64{pbf_dense_info.get_view()};
                                                 break;
                                             case protozero::tag_and_type(OSMFormat::DenseInfo::packed_sint32_uid, protozero::pbf_wire_type::length_delimited):
-                                                uids = varint_range{pbf_dense_info.get_view()};
+                                                uids = values_access_sint32{pbf_dense_info.get_view()};
                                                 break;
                                             case protozero::tag_and_type(OSMFormat::DenseInfo::packed_sint32_user_sid, protozero::pbf_wire_type::length_delimited):
-                                                user_sids = varint_range{pbf_dense_info.get_view()};
+                                                user_sids = values_access_sint32{pbf_dense_info.get_view()};
                                                 break;
                                             case protozero::tag_and_type(OSMFormat::DenseInfo::packed_bool_visible, protozero::pbf_wire_type::length_delimited):
-                                                visibles = varint_range{pbf_dense_info.get_view()};
+                                                visibles = values_access_int32{pbf_dense_info.get_view()};
                                                 break;
                                             default:
                                                 pbf_dense_info.skip();
@@ -640,13 +674,13 @@ namespace osmium {
                                 }
                                 break;
                             case protozero::tag_and_type(OSMFormat::DenseNodes::packed_sint64_lat, protozero::pbf_wire_type::length_delimited):
-                                lats = varint_range{pbf_dense_nodes.get_view()};
+                                lats = values_access_sint64{pbf_dense_nodes.get_view()};
                                 break;
                             case protozero::tag_and_type(OSMFormat::DenseNodes::packed_sint64_lon, protozero::pbf_wire_type::length_delimited):
-                                lons = varint_range{pbf_dense_nodes.get_view()};
+                                lons = values_access_sint64{pbf_dense_nodes.get_view()};
                                 break;
                             case protozero::tag_and_type(OSMFormat::DenseNodes::packed_int32_keys_vals, protozero::pbf_wire_type::length_delimited):
-                                tags = varint_range{pbf_dense_nodes.get_view()};
+                                tags = values_access_int32{pbf_dense_nodes.get_view()};
                                 break;
                             default:
                                 pbf_dense_nodes.skip();
