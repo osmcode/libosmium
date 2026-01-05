@@ -6,8 +6,27 @@
 #
 #-----------------------------------------------------------------------------
 
-cmake_minimum_required(VERSION 3.10.0 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.10)
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+
+
+#-----------------------------------------------------------------------------
+#
+#  Decide which C++ version to use (Minimum/default: C++14)
+#
+#-----------------------------------------------------------------------------
+
+if(NOT USE_CPP_VERSION)
+    set(USE_CPP_VERSION 14)
+endif()
+message(STATUS "Use C++ version: ${USE_CPP_VERSION}")
+
+set(CMAKE_CXX_STANDARD ${USE_CPP_VERSION})
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 
 #-----------------------------------------------------------------------------
@@ -170,27 +189,6 @@ list(REMOVE_AT OSMIUM_INCLUDE_DIRS ${_own_index})
 set(_own_index)
 
 include_directories(SYSTEM ${OSMIUM_INCLUDE_DIRS})
-
-
-#-----------------------------------------------------------------------------
-#
-#  Decide which C++ version to use (Minimum/default: C++14).
-#
-#-----------------------------------------------------------------------------
-if(NOT MSVC)
-    if(NOT USE_CPP_VERSION)
-        if(CYGWIN)
-            set(USE_CPP_VERSION gnu++14)
-        else()
-            set(USE_CPP_VERSION c++14)
-        endif()
-    endif()
-    message(STATUS "Use C++ version: ${USE_CPP_VERSION}")
-    # following only available from cmake 2.8.12:
-    #   add_compile_options(-std=${USE_CPP_VERSION})
-    # so using this instead:
-    add_definitions(-std=${USE_CPP_VERSION})
-endif()
 
 
 #-----------------------------------------------------------------------------
