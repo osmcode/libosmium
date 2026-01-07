@@ -24,43 +24,17 @@ jobs:
         cpp_compiler: [g++]
         cpp_version: [14]
         include:
-          - image: "ubuntu:22.04"
-            CXXFLAGS: -Wno-stringop-overread
-          - image: "ubuntu:24.04"
-            CXXFLAGS: -Wno-stringop-overread -Wno-dangling-reference
           - image: "debian:bookworm"
-            cpp_version: 14
-            CXXFLAGS: -Wno-stringop-overread
-          - image: "debian:bookworm"
-            cpp_version: 17
-          - image: "debian:bookworm"
-            cpp_version: 20
           - image: "debian:bookworm"
             c_compiler: clang
             cpp_compiler: clang++
-          - image: "debian:bookworm"
-            c_compiler: clang
-            cpp_compiler: clang++
-            cpp_version: 17
-          - image: "debian:bookworm"
-            c_compiler: clang
-            cpp_compiler: clang++
-            cpp_version: 20
-          - image: "debian:bookworm"
-            build_type: RelWithDebInfo
-          - image: "debian:bookworm"
-            c_compiler: clang
-            cpp_compiler: clang++
-            CXXFLAGS: -fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer
-            LDFLAGS: -fsanitize=address,undefined
           - image: "debian:trixie"
-            CXXFLAGS: -Wno-stringop-overread
           - image: "debian:trixie"
             cpp_version: 17
-            CXXFLAGS: -Wno-stringop-overread
           - image: "debian:trixie"
             cpp_version: 20
-            CXXFLAGS: -Wno-stringop-overread
+          - image: "debian:trixie"
+            cpp_version: 23
           - image: "debian:trixie"
             c_compiler: clang
             cpp_compiler: clang++
@@ -72,32 +46,25 @@ jobs:
             c_compiler: clang
             cpp_compiler: clang++
             cpp_version: 20
+          - image: "debian:trixie"
+            c_compiler: clang
+            cpp_compiler: clang++
+            cpp_version: 23
           - image: "debian:trixie"
             build_type: RelWithDebInfo
-            CXXFLAGS: -Wno-stringop-overread
           - image: "debian:trixie"
             c_compiler: clang
             cpp_compiler: clang++
             CXXFLAGS: -fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer
             LDFLAGS: -fsanitize=address,undefined
           - image: "debian:testing"
-            CXXFLAGS: -Wno-stringop-overread -Wno-dangling-reference
           - image: "debian:testing"
             c_compiler: clang
             cpp_compiler: clang++
           - image: "debian:experimental"
-            CXXFLAGS: -Wno-stringop-overread -Wno-dangling-reference
           - image: "debian:experimental"
             c_compiler: clang
             cpp_compiler: clang++
-          - image: "fedora:40"
-            CXXFLAGS: -Wno-stringop-overread -Wno-dangling-reference
-          - image: "fedora:41"
-            CXXFLAGS: -Wno-stringop-overread -Wno-dangling-reference
-          - image: "fedora:42"
-            CXXFLAGS: -Wno-stringop-overread -Wno-dangling-reference
-          - image: "fedora:43"
-            CXXFLAGS: -Wno-stringop-overread -Wno-dangling-reference
     container:
       image: ${{ matrix.image }}
       env:
