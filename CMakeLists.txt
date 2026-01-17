@@ -256,6 +256,10 @@ if(CMAKE_BUILD_TYPE STREQUAL "Dev")
 #    add_definitions(${OSMIUM_WARNING_OPTIONS} ${OSMIUM_DRACONIC_CLANG_OPTIONS} -Wno-documentation -Wno-format-nonliteral -Wno-deprecated -Wno-covered-switch-default -Wno-shadow)
 endif()
 
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    add_definitions(-Wno-stringop-overread -Wno-dangling-reference)
+endif()
+
 # Force RelWithDebInfo build type if none was given
 if(CMAKE_BUILD_TYPE)
     set(build_type ${CMAKE_BUILD_TYPE})
