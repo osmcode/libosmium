@@ -317,7 +317,9 @@ if(CPPCHECK)
         --quiet
         -j4
         --inline-suppr
-        --enable=warning,style,performance,portability,information,missingInclude
+        --suppress=duplInheritedMember
+        --enable=warning,style,performance,portability,information
+        --check-level=exhaustive
         --force
         -Uassert -DPROTOZERO_STRICT_API -DPROTOZERO_USE_BUILTIN_BSWAP -UPROTOZERO_USE_VIEW)
 
@@ -344,7 +346,7 @@ if(CPPCHECK)
 
     add_custom_target(cppcheck
         ${CPPCHECK}
-        --std=c++14 ${CPPCHECK_OPTIONS}
+        --std=c++${USE_CPP_VERSION} ${CPPCHECK_OPTIONS}
         -I ${CMAKE_SOURCE_DIR}/include
         ${CPPCHECK_FILES}
     )
