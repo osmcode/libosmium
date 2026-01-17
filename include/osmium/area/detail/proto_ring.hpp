@@ -195,7 +195,7 @@ namespace osmium {
                     }
                 }
 
-                void join_forward(ProtoRing& other) {
+                void join_forward(const ProtoRing& other) {
                     m_segments.reserve(m_segments.size() + other.m_segments.size());
                     for (NodeRefSegment* segment : other.m_segments) {
                         add_segment_back(segment);

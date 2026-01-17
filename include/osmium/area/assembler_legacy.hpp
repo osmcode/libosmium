@@ -72,7 +72,7 @@ namespace osmium {
          */
         class AssemblerLegacy : public detail::BasicAssemblerWithTags {
 
-            void add_common_tags(osmium::builder::TagListBuilder& tl_builder, std::set<const osmium::Way*>& ways) const {
+            void add_common_tags(osmium::builder::TagListBuilder& tl_builder, const std::set<const osmium::Way*>& ways) const {
                 std::map<std::string, std::size_t> counter;
                 for (const osmium::Way* way : ways) {
                     for (const auto& tag : way->tags()) {
