@@ -5,7 +5,7 @@ on: [ push, pull_request ]
 jobs:
   linux:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
@@ -129,7 +129,7 @@ jobs:
 
   ubuntu-latest:
     runs-on: ubuntu-24.04
-    timeout-minutes: 40
+    timeout-minutes: 30
     env:
       CC: clang-18
       CXX: clang++-18
@@ -146,7 +146,8 @@ jobs:
       - uses: ./.github/actions/ctest
 
   macos:
-    timeout-minutes: 60
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
@@ -155,9 +156,8 @@ jobs:
           - macos-15
         build_type: [Dev]
         include:
-          - os: macos-14
+          - os: macos-15
             build_type: Release
-    runs-on: ${{ matrix.os }}
     env:
       CC: clang
       CXX: clang++
@@ -174,14 +174,14 @@ jobs:
       - uses: ./.github/actions/ctest
 
   windows-minimal:
-    timeout-minutes: 40
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
         os:
           - windows-2022
           - windows-2025
-    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -193,6 +193,7 @@ jobs:
       - uses: ./.github/actions/ctest
 
   windows-2025-full:
+    timeout-minutes: 120
     runs-on: windows-2025
     steps:
       - uses: actions/checkout@v4
