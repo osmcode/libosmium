@@ -55,7 +55,7 @@ set(CMAKE_CONFIGURATION_TYPES "Debug;Release;RelWithDebInfo;MinSizeRel;Dev;Cover
 #
 #-----------------------------------------------------------------------------
 
-project(libosmium VERSION 2.22.0 LANGUAGES CXX C)
+project(libosmium VERSION 2.23.0 LANGUAGES CXX C)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 

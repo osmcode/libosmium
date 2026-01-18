@@ -8,6 +8,15 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+### Changed
+
+### Fixed
+
+
+## [2.23.0] - 2026-01-18
+
+### Added
+
 * Functions to store and retrieve extra bit in osmium::Location. This allows
   storing of one bit of information in a Location.
 * Function for comparing two TagLists.
@@ -1337,7 +1346,8 @@ long time. These will not be part of the next version of libosmium:
   Doxygen (up to version 1.8.8). This version contains a workaround to fix
   this.
 
-[unreleased]: https://github.com/osmcode/libosmium/compare/v2.22.0...HEAD
+[unreleased]: https://github.com/osmcode/libosmium/compare/v2.23.0...HEAD
+[2.23.0]: https://github.com/osmcode/libosmium/compare/v2.22.0...v2.23.0
 [2.22.0]: https://github.com/osmcode/libosmium/compare/v2.21.0...v2.22.0
 [2.21.0]: https://github.com/osmcode/libosmium/compare/v2.20.0...v2.21.0
 [2.20.0]: https://github.com/osmcode/libosmium/compare/v2.19.0...v2.20.0
