@@ -8,10 +8,30 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+* Functions to store and retrieve extra bit in osmium::Location. This allows
+  storing of one bit of information in a Location.
+* Function for comparing two TagLists.
+
 ### Changed
+
+* Requires CMake 3.10 now.
+* Various small changes and code cleanups.
 
 ### Fixed
 
+* Allow single varint encoded int instead of packed ints for tags and other
+  data in PBFs. (Fixes #389)
+* Regression: Report progress correctly when reading PBF files. Thanks to
+  victor.pavlychko@gmail.com.
+* Fix off-by-one error when printing numbers in debug output. Thanks to
+  @ginnyTheCat.
+* Fix i/o tests using mock (de)compression.
+* Fix error reading (large) bzip files that use concatenated bzip streams.
+  Thanks to yarray <08to09@gmail.com>.
+* Fix memory corruption error in ChangesetDiscussionBuilder. Thanks to
+  yarray <08to09@gmail.com>.
+* Fix for PBF reading from stdin: set binary mode. Thanks to Ildar
+  Khayrutdinov <ildarkhairutdin@gmail.com>.
 
 ## [2.22.0] - 2025-03-17
 
