@@ -160,11 +160,9 @@ namespace osmium {
 
         bool operator()(const osmium::OSMObject& lhs, const osmium::OSMObject& rhs) const noexcept {
             return const_tie(lhs.type(), lhs.id() > 0, lhs.positive_id(), rhs.version(),
-                        ((lhs.timestamp().valid() && rhs.timestamp().valid()) ? rhs.timestamp() : osmium::Timestamp()),
-                        rhs.visible()) <
+                        ((lhs.timestamp().valid() && rhs.timestamp().valid()) ? rhs.timestamp() : osmium::Timestamp())) <
                    const_tie(rhs.type(), rhs.id() > 0, rhs.positive_id(), lhs.version(),
-                        ((lhs.timestamp().valid() && rhs.timestamp().valid()) ? lhs.timestamp() : osmium::Timestamp()),
-                        lhs.visible());
+                        ((lhs.timestamp().valid() && rhs.timestamp().valid()) ? lhs.timestamp() : osmium::Timestamp()));
         }
 
         /// @pre lhs and rhs must not be nullptr
