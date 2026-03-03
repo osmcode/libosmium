@@ -195,6 +195,19 @@ TEST_CASE("Node comparisons") {
         REQUIRE(std::is_sorted(nodes.cbegin(), nodes.cend(), osmium::object_order_type_id_reverse_version{}));
     }
 
+    SECTION("reverse version ordering should keep order for deleted objects") {
+        nodes.emplace_back(buffer.get<osmium::Node>(osmium::builder::add_node(buffer, _id( 1), _version(2), _timestamp("2016-01-01T00:00:00Z"), _deleted(false))));
+        nodes.emplace_back(buffer.get<osmium::Node>(osmium::builder::add_node(buffer, _id( 1), _version(2), _timestamp("2016-01-01T00:00:00Z"), _deleted(true))));
+
+        REQUIRE(std::is_sorted(nodes.cbegin(), nodes.cend(), osmium::object_order_type_id_reverse_version{}));
+
+        nodes.clear();
+
+        nodes.emplace_back(buffer.get<osmium::Node>(osmium::builder::add_node(buffer, _id( 1), _version(2), _timestamp("2016-01-01T00:00:00Z"), _deleted(true))));
+        nodes.emplace_back(buffer.get<osmium::Node>(osmium::builder::add_node(buffer, _id( 1), _version(2), _timestamp("2016-01-01T00:00:00Z"), _deleted(false))));
+
+        REQUIRE(std::is_sorted(nodes.cbegin(), nodes.cend(), osmium::object_order_type_id_reverse_version{}));
+    }
 }
 
 TEST_CASE("Object comparisons: types are ordered nodes, then ways, then relations") {
