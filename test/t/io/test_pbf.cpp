@@ -3,8 +3,11 @@
 #include "utils.hpp"
 
 #include <osmium/io/pbf_input.hpp>
+#include <osmium/io/detail/pbf_input_format.hpp>
 #include <osmium/io/reader.hpp>
 #include <osmium/osm/object.hpp>
+
+#include <array>
 
 TEST_CASE("Get supported PBF compression types") {
     const auto types = osmium::io::supported_pbf_compression_types();
@@ -49,4 +52,18 @@ TEST_CASE("Read PBF file with version=-1 and changeset=-1 and DenseNodes (writte
     const osmium::OSMObject& object = *(buffer.cbegin<osmium::OSMObject>());
     REQUIRE(object.version() == 0);
     REQUIRE(object.changeset() == 0);
+}
+
+TEST_CASE("get size in network byte order") {
+    const std::array<char, 4> data1 = { 0, 0, 0, 1 };
+    REQUIRE(osmium::io::detail::PBFParser::get_size_in_network_byte_order(data1.data()) == 1);
+
+    const std::array<char, 4> data127 = { 0, 0, 0, 127 };
+    REQUIRE(osmium::io::detail::PBFParser::get_size_in_network_byte_order(data127.data()) == 127);
+
+    const std::array<char, 4> data128 = { 0, 0, 0, static_cast<char>(128) };
+    REQUIRE(osmium::io::detail::PBFParser::get_size_in_network_byte_order(data128.data()) == 128);
+
+    const std::array<char, 4> data65535 = { 0, 0, static_cast<char>(255), static_cast<char>(255) };
+    REQUIRE(osmium::io::detail::PBFParser::get_size_in_network_byte_order(data65535.data()) == 65535);
 }
