@@ -2,8 +2,8 @@
 
 #include "utils.hpp"
 
-#include <osmium/io/pbf_input.hpp>
 #include <osmium/io/detail/pbf_input_format.hpp>
+#include <osmium/io/pbf_input.hpp>
 #include <osmium/io/reader.hpp>
 #include <osmium/osm/object.hpp>
 
