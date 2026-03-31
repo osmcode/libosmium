@@ -231,3 +231,23 @@ TEST_CASE("incomplete Unicode codepoint") {
     }
 }
 
+TEST_CASE("utf-8 check for valid UTF-8") {
+    REQUIRE(osmium::io::detail::utf8_check("") == nullptr);
+    REQUIRE(osmium::io::detail::utf8_check("a") == nullptr);
+    REQUIRE(osmium::io::detail::utf8_check("abc") == nullptr);
+
+    const char* s = u8cast(u8"\n_\u01a2_\u30dc_\U0001d11e_\U0001f680");
+    REQUIRE(osmium::io::detail::utf8_check(s) == nullptr);
+}
+
+TEST_CASE("utf-8 check for illegal value") {
+    const char* s = "abc\xff";
+    REQUIRE(osmium::io::detail::utf8_check(s) != nullptr);
+}
+
+TEST_CASE("utf-8 check for incomplete Unicode codepoint") {
+    std::string s{u8cast(u8"\U0001f680")}; // rocket
+    s.resize(s.size() - 1);
+    REQUIRE(osmium::io::detail::utf8_check(s.c_str()) != nullptr);
+}
+
