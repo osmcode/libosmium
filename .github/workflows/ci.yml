@@ -119,7 +119,7 @@ jobs:
             rubygem-json \
             spatialite-tools \
             zlib-devel
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           submodules: true
       - uses: ./.github/actions/install-protozero
@@ -136,7 +136,7 @@ jobs:
       CXXFLAGS: -Werror
       BUILD_TYPE: Dev
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           submodules: true
       - uses: ./.github/actions/install-ubuntu
@@ -164,7 +164,7 @@ jobs:
       CXXFLAGS: -Werror
       BUILD_TYPE: ${{ matrix.build_type }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           submodules: true
       - uses: ./.github/actions/install-macos
@@ -183,7 +183,7 @@ jobs:
           - windows-2022
           - windows-2025
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           submodules: true
       - uses: ./.github/actions/install-windows
@@ -196,7 +196,7 @@ jobs:
     timeout-minutes: 120
     runs-on: windows-2025
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           submodules: true
       - uses: ./.github/actions/install-windows
