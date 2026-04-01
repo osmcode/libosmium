@@ -8,10 +8,16 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+* Helper function for checking string for invalid UTF-8 characters.
+
 ### Changed
+
+* Extend CheckOrder handler class: Optionally work with history files.
 
 ### Fixed
 
+* Reverted change in 2.21.0: Order deleted objects after visible ones in
+  reverse id order. Turns out this breaks updating of extracts.
 
 ## [2.23.0] - 2026-01-18
 
