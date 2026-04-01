@@ -160,9 +160,8 @@ namespace osmium {
                         /* 110XXXXx 10xxxxxx */
                         if ((s[1] & 0xc0) != 0x80 || (s[0] & 0xfe) == 0xc0) /* overlong? */ {
                             return reinterpret_cast<char const *>(s);
-                        } else {
-                            s += 2;
                         }
+                        s += 2;
                     } else if ((s[0] & 0xf0) == 0xe0) {
                         /* 1110XXXX 10Xxxxxx 10xxxxxx */
                         if ((s[1] & 0xc0) != 0x80 || (s[2] & 0xc0) != 0x80 ||
@@ -171,9 +170,8 @@ namespace osmium {
                             (s[0] == 0xef && s[1] == 0xbf &&
                             (s[2] & 0xfe) == 0xbe)) /* U+FFFE or U+FFFF? */ {
                             return reinterpret_cast<char const *>(s);
-                        } else {
-                            s += 3;
                         }
+                        s += 3;
                     } else if ((s[0] & 0xf8) == 0xf0) {
                         /* 11110XXX 10XXxxxx 10xxxxxx 10xxxxxx */
                         if ((s[1] & 0xc0) != 0x80 || (s[2] & 0xc0) != 0x80 ||
@@ -181,9 +179,8 @@ namespace osmium {
                             (s[0] == 0xf0 && (s[1] & 0xf0) == 0x80) ||    /* overlong? */
                             (s[0] == 0xf4 && s[1] > 0x8f) || s[0] > 0xf4) /* > U+10FFFF? */ {
                             return reinterpret_cast<char const *>(s);
-                        } else {
-                            s += 4;
                         }
+                        s += 4;
                     } else {
                         return reinterpret_cast<char const *>(s);
                     }
