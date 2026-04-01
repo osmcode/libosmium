@@ -5,7 +5,7 @@
 #include <osmium/opl.hpp>
 #include <osmium/visitor.hpp>
 
-TEST_CASE("CheckOrder handler if everything is in order") {
+TEST_CASE("CheckOrder handler: everything is in order") {
     osmium::memory::Buffer buffer{1024};
 
     REQUIRE(osmium::opl_parse("n-126", buffer));
@@ -123,6 +123,162 @@ TEST_CASE("CheckOrder handler: Ways after relations") {
     }
 
     osmium::handler::CheckOrder handler;
+    REQUIRE_THROWS_AS(osmium::apply(buffer, handler), osmium::out_of_order_error);
+}
+
+TEST_CASE("CheckOrder handler for history: everything is in order") {
+    osmium::memory::Buffer buffer{1024};
+
+    REQUIRE(osmium::opl_parse("n-126", buffer));
+    REQUIRE(osmium::opl_parse("n123", buffer));
+    REQUIRE(osmium::opl_parse("n124", buffer));
+    REQUIRE(osmium::opl_parse("n128", buffer));
+    REQUIRE(osmium::opl_parse("w-100", buffer));
+    REQUIRE(osmium::opl_parse("w100", buffer));
+    REQUIRE(osmium::opl_parse("w102", buffer));
+    REQUIRE(osmium::opl_parse("r-200", buffer));
+    REQUIRE(osmium::opl_parse("r100", buffer));
+
+    osmium::handler::CheckOrder handler{true};
+    osmium::apply(buffer, handler);
+    REQUIRE(handler.max_node_id()     == 128);
+    REQUIRE(handler.max_way_id()      == 102);
+    REQUIRE(handler.max_relation_id() == 100);
+}
+
+TEST_CASE("CheckOrder handler for history: versions in order") {
+    osmium::memory::Buffer buffer{1024};
+
+    REQUIRE(osmium::opl_parse("n1 v1", buffer));
+    REQUIRE(osmium::opl_parse("n1 v2", buffer));
+    REQUIRE(osmium::opl_parse("n2 v2", buffer));
+    REQUIRE(osmium::opl_parse("n3 v1", buffer));
+
+    REQUIRE(osmium::opl_parse("w1 v1", buffer));
+    REQUIRE(osmium::opl_parse("w1 v2", buffer));
+    REQUIRE(osmium::opl_parse("w2 v2", buffer));
+    REQUIRE(osmium::opl_parse("w3 v1", buffer));
+
+    REQUIRE(osmium::opl_parse("r1 v1", buffer));
+    REQUIRE(osmium::opl_parse("r1 v2", buffer));
+    REQUIRE(osmium::opl_parse("r2 v2", buffer));
+    REQUIRE(osmium::opl_parse("r3 v1", buffer));
+
+    osmium::handler::CheckOrder handler{true};
+    osmium::apply(buffer, handler);
+    REQUIRE(handler.max_node_id()     == 3);
+    REQUIRE(handler.max_way_id()      == 3);
+    REQUIRE(handler.max_relation_id() == 3);
+}
+
+TEST_CASE("CheckOrder handler for history: Nodes must be in order") {
+    osmium::memory::Buffer buffer{1024};
+
+    REQUIRE(osmium::opl_parse("n3", buffer));
+
+    SECTION("Positive ID") {
+        REQUIRE(osmium::opl_parse("n2", buffer));
+    }
+    SECTION("Negative ID") {
+        REQUIRE(osmium::opl_parse("n-2", buffer));
+    }
+
+    osmium::handler::CheckOrder handler{true};
+    REQUIRE_THROWS_AS(osmium::apply(buffer, handler), osmium::out_of_order_error);
+}
+
+TEST_CASE("CheckOrder handler for history: Ways must be in order") {
+    osmium::memory::Buffer buffer{1024};
+
+    REQUIRE(osmium::opl_parse("w3", buffer));
+    SECTION("Positive ID") {
+        REQUIRE(osmium::opl_parse("w2", buffer));
+    }
+    SECTION("Negative ID") {
+        REQUIRE(osmium::opl_parse("w-2", buffer));
+    }
+
+    osmium::handler::CheckOrder handler{true};
+    REQUIRE_THROWS_AS(osmium::apply(buffer, handler), osmium::out_of_order_error);
+}
+
+TEST_CASE("CheckOrder handler for history: Relations must be in order") {
+    osmium::memory::Buffer buffer{1024};
+
+    REQUIRE(osmium::opl_parse("r3", buffer));
+    SECTION("Positive ID") {
+        REQUIRE(osmium::opl_parse("r2", buffer));
+    }
+    SECTION("Negative ID") {
+        REQUIRE(osmium::opl_parse("r-2", buffer));
+    }
+
+    osmium::handler::CheckOrder handler{true};
+    REQUIRE_THROWS_AS(osmium::apply(buffer, handler), osmium::out_of_order_error);
+}
+
+TEST_CASE("CheckOrder handler for history: Same id/version twice is not allowed") {
+    osmium::memory::Buffer buffer{1024};
+
+    REQUIRE(osmium::opl_parse("n3 v1", buffer));
+    REQUIRE(osmium::opl_parse("n3 v1", buffer));
+
+    osmium::handler::CheckOrder handler{true};
+    REQUIRE_THROWS_AS(osmium::apply(buffer, handler), osmium::out_of_order_error);
+}
+
+TEST_CASE("CheckOrder handler for history: Versions must be ordered") {
+    osmium::memory::Buffer buffer{1024};
+
+    REQUIRE(osmium::opl_parse("n3 v2", buffer));
+    REQUIRE(osmium::opl_parse("n3 v1", buffer));
+
+    osmium::handler::CheckOrder handler{true};
+    REQUIRE_THROWS_AS(osmium::apply(buffer, handler), osmium::out_of_order_error);
+}
+
+TEST_CASE("CheckOrder handler for history: Nodes after ways") {
+    osmium::memory::Buffer buffer{1024};
+
+    REQUIRE(osmium::opl_parse("w50", buffer));
+    SECTION("Positive ID") {
+        REQUIRE(osmium::opl_parse("n30", buffer));
+    }
+    SECTION("Negative ID") {
+        REQUIRE(osmium::opl_parse("n-30", buffer));
+    }
+
+    osmium::handler::CheckOrder handler{true};
+    REQUIRE_THROWS_AS(osmium::apply(buffer, handler), osmium::out_of_order_error);
+}
+
+TEST_CASE("CheckOrder handler for history: Nodes after relations") {
+    osmium::memory::Buffer buffer{1024};
+
+    REQUIRE(osmium::opl_parse("r50", buffer));
+    SECTION("Positive ID") {
+        REQUIRE(osmium::opl_parse("n30", buffer));
+    }
+    SECTION("Negative ID") {
+        REQUIRE(osmium::opl_parse("n-30", buffer));
+    }
+
+    osmium::handler::CheckOrder handler{true};
+    REQUIRE_THROWS_AS(osmium::apply(buffer, handler), osmium::out_of_order_error);
+}
+
+TEST_CASE("CheckOrder handler for history: Ways after relations") {
+    osmium::memory::Buffer buffer{1024};
+
+    REQUIRE(osmium::opl_parse("r50", buffer));
+    SECTION("Positive ID") {
+        REQUIRE(osmium::opl_parse("w30", buffer));
+    }
+    SECTION("Negative ID") {
+        REQUIRE(osmium::opl_parse("w-30", buffer));
+    }
+
+    osmium::handler::CheckOrder handler{true};
     REQUIRE_THROWS_AS(osmium::apply(buffer, handler), osmium::out_of_order_error);
 }
 
