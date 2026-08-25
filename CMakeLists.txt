@@ -13,12 +13,12 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
 #-----------------------------------------------------------------------------
 #
-#  Decide which C++ version to use (Minimum/default: C++14)
+#  Decide which C++ version to use (Minimum/default: C++17)
 #
 #-----------------------------------------------------------------------------
 
 if(NOT USE_CPP_VERSION)
-    set(USE_CPP_VERSION 14)
+    set(USE_CPP_VERSION 17)
 endif()
 message(STATUS "Use C++ version: ${USE_CPP_VERSION}")
 

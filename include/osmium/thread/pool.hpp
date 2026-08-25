@@ -217,16 +217,8 @@ namespace osmium {
                 return m_work_queue.empty();
             }
 
-#if defined(__cpp_lib_is_invocable) && __cpp_lib_is_invocable >= 201703
-            // std::result_of is deprecated in C++17 and removed in C++20,
-            // so we use std::invoke_result_t.
             template <typename TFunction>
             using submit_func_result_type = std::invoke_result_t<TFunction>;
-#else
-            // For C++11 and C++14
-            template <typename TFunction>
-            using submit_func_result_type = std::result_of_t<TFunction()>;
-#endif
 
             template <typename TFunction>
             std::future<submit_func_result_type<TFunction>> submit(TFunction&& func) {

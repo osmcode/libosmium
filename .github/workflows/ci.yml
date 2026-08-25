@@ -22,7 +22,7 @@ jobs:
           - "fedora:43"
         build_type: [Dev]
         cpp_compiler: [g++]
-        cpp_version: [14]
+        cpp_version: [17]
         include:
           - image: "debian:bookworm"
             c_compiler: clang
@@ -33,9 +33,6 @@ jobs:
             cpp_version: 20
           - image: "debian:trixie"
             cpp_version: 23
-          - image: "debian:trixie"
-            c_compiler: clang
-            cpp_compiler: clang++
           - image: "debian:trixie"
             c_compiler: clang
             cpp_compiler: clang++

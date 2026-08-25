@@ -75,18 +75,6 @@ different.
 Keep to the indentation and other styles used in the code.
 
 
-## C++11
-
-Osmium uses C++11 and you can use its features such as auto, lambdas,
-threading, etc. There are a few features we do not use, because even modern
-compilers don't support them yet. This list might change as we get more data
-about which compilers support which feature and what operating system versions
-or distributions have which versions of these compilers installed.
-
-Use `include/osmium/util/compatibility.hpp` if there are compatibility problems
-between compilers due to different C++11 support.
-
-
 ## Operating systems
 
 Usually all code must work on Linux, macOS, and Windows. Execptions are allowed

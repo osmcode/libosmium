@@ -16,7 +16,7 @@ for more details than this README can provide.
 
 ## Prerequisites
 
-You need a C++14 compiler and standard C++ library.
+You need a C++17 compiler and standard C++ library.
 
 Different parts of Libosmium (and the applications built on top of it) need
 different libraries. You DO NOT NEED to install all of them, just install those

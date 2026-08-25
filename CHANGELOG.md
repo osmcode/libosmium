@@ -10,6 +10,8 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+* Switched to C++17 as minimum requirement
+
 ### Fixed
 
 
