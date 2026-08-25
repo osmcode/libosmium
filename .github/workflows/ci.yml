@@ -123,12 +123,13 @@ jobs:
       - uses: ./.github/actions/ctest
 
   ubuntu-latest:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 30
     env:
-      CC: clang-18
-      CXX: clang++-18
-      CXXFLAGS: -Werror
+      CC: clang-22
+      CXX: clang++-22
+      # -Wno-c2y-extensions needed because of Catch2 https://github.com/llvm/llvm-project/issues/189645
+      CXXFLAGS: -Werror -Wno-c2y-extensions
       BUILD_TYPE: Dev
     steps:
       - uses: actions/checkout@v7
