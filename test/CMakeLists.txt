@@ -101,10 +101,6 @@ endfunction()
 #
 #-----------------------------------------------------------------------------
 
-if(NOT GEOS_FOUND)
-    set(GEOS_FOUND FALSE)
-endif()
-
 if(NOT BZIP2_FOUND)
     set(BZIP2_FOUND FALSE)
 endif()
@@ -153,7 +149,6 @@ add_unit_test(geom test_coordinates)
 add_unit_test(geom test_exception)
 add_unit_test(geom test_factory_with_projection)
 add_unit_test(geom test_geojson)
-add_unit_test(geom test_geos ENABLE_IF ${GEOS_FOUND} LIBS ${GEOS_LIBRARY})
 add_unit_test(geom test_mercator)
 add_unit_test(geom test_ogr ENABLE_IF ${GDAL_FOUND} LIBS ${GDAL_LIBRARY})
 add_unit_test(geom test_ogr_wkb ENABLE_IF ${GDAL_FOUND} LIBS ${GDAL_LIBRARY})

@@ -11,6 +11,8 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 ### Changed
 
 * Switched to C++17 as minimum requirement
+* Removed GEOS support which has been deprecated for 10 years. It only worked
+  with very old versions of GEOS.
 
 ### Fixed
 
