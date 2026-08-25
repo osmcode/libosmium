@@ -38,7 +38,7 @@ DEALINGS IN THE SOFTWARE.
 #include <thread>
 #include <utility>
 
-#if defined(__linux__)
+#ifdef __linux__
 # include <sys/prctl.h>
 #elif defined(__FreeBSD__)
 # include <pthread.h>
@@ -74,7 +74,7 @@ namespace osmium {
         /**
          * Set name of current thread for debugging. This currently only works on Linux and FreeBSD.
          */
-#if defined(__linux__)
+#ifdef __linux__
         inline void set_thread_name(const char* name) noexcept {
             prctl(PR_SET_NAME, name, 0, 0, 0);
         }

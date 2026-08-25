@@ -368,7 +368,7 @@ namespace osmium {
                 std::sort(m_member_meta[2].begin(), m_member_meta[2].end());
             }
 
-            static typename iterator_range<mm_iterator>::iterator::difference_type count_not_removed(const iterator_range<mm_iterator>& range) {
+            static iterator_range<mm_iterator>::iterator::difference_type count_not_removed(const iterator_range<mm_iterator>& range) {
                 return std::count_if(range.begin(), range.end(), [](const MemberMeta& mm) {
                     return !mm.removed();
                 });

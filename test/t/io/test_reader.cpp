@@ -278,7 +278,7 @@ TEST_CASE("Reader should work when there is an exception in main thread while re
     try {
         osmium::io::Reader reader{with_data_dir("t/io/data.osm")};
         REQUIRE_FALSE(reader.eof());
-        const auto header = reader.header();
+        const auto header = reader.header(); // NOLINT(clang-analyzer-deadcode.DeadStores)
         throw std::runtime_error{"foo"};
     } catch (...) { // NOLINT(bugprone-empty-catch)
     }
