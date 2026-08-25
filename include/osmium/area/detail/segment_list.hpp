@@ -71,7 +71,7 @@ namespace osmium {
                 for (const osmium::RelationMember& member : relation.members()) {
                     if (member.type() == osmium::item_type::way) {
                         assert(way_it != ways.cend());
-                        std::forward<TFunc>(func)(member, **way_it);
+                        func(member, **way_it);
                         ++way_it;
                     }
                 }

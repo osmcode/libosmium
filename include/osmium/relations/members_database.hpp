@@ -385,7 +385,7 @@ namespace osmium {
                     rel_handle.decrement_members();
 
                     if (rel_handle.has_all_members()) {
-                        std::forward<TFunc>(func)(rel_handle);
+                        func(rel_handle);
                     }
                 }
 

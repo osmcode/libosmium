@@ -270,7 +270,7 @@ namespace osmium {
                 template <typename TFunc>
                 static void check_attributes(const XML_Char** attrs, TFunc&& check) {
                     while (*attrs) {
-                        std::forward<TFunc>(check)(attrs[0], attrs[1]);
+                        check(attrs[0], attrs[1]);
                         attrs += 2;
                     }
                 }
