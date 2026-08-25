@@ -1039,7 +1039,7 @@ namespace osmium {
                             break;
                         case protozero::tag_and_type(OSMFormat::HeaderBlock::repeated_string_required_features, protozero::pbf_wire_type::length_delimited):
                             {
-                                auto feature = pbf_header_block.get_view();
+                                const auto feature = pbf_header_block.get_view();
                                 if (!std::strncmp("OsmSchema-V0.6", feature.data(), feature.size())) {
                                     // intentionally left blank
                                 } else if (!std::strncmp("DenseNodes", feature.data(), feature.size())) {

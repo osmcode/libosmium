@@ -54,7 +54,7 @@ TEST_CASE("Item stash") {
 
     std::vector<osmium::ItemStash::handle_type> handles;
     for (const auto& item : buffer) {
-        auto handle = stash.add_item(item);
+        const auto handle = stash.add_item(item);
         handles.push_back(handle);
     }
 
@@ -92,7 +92,7 @@ TEST_CASE("Item stash") {
     id = 1;
     int count_valid   = 0;
     int count_invalid = 0;
-    for (auto handle : handles) {
+    for (const auto handle : handles) {
         if (handle.valid()) {
             ++count_valid;
             const auto& item = stash.get_item(handle);
@@ -116,7 +116,7 @@ TEST_CASE("Item stash") {
     REQUIRE(stash.count_removed() == 0);
 
     id = 1;
-    for (auto handle : handles) {
+    for (const auto handle : handles) {
         if (handle.valid()) {
             const auto& item = stash.get_item(handle);
             const bool correct_type = item.type() == osmium::item_type::node ||
@@ -146,7 +146,7 @@ TEST_CASE("Fill item stash until it garbage collects") {
     std::vector<osmium::ItemStash::handle_type> handles;
     const std::size_t num_items = 6UL * 1000UL * 1000UL;
     for (std::size_t i = 0; i < num_items; ++i) {
-        auto handle = stash.add_item(node);
+        const auto handle = stash.add_item(node);
         handles.push_back(handle);
     }
 

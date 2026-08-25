@@ -72,11 +72,11 @@ int main(int argc, char* argv[]) {
 
         // Create range of input iterators that will iterator over all changesets
         // delivered from input file through the "reader".
-        auto input_range = osmium::io::make_input_iterator_range<osmium::Changeset>(reader);
+        const auto input_range = osmium::io::make_input_iterator_range<osmium::Changeset>(reader);
 
         // Create an output iterator writing through the "writer" object to the
         // output file.
-        auto output_iterator = osmium::io::make_output_iterator(writer);
+        const auto output_iterator = osmium::io::make_output_iterator(writer);
 
         // Copy all changesets from input to output that have at least one comment.
         std::copy_if(input_range.begin(), input_range.end(), output_iterator, [](const osmium::Changeset& changeset) {

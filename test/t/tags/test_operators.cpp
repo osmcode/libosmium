@@ -27,7 +27,7 @@ TEST_CASE("Equality comparison of tags") {
     const auto& tl2 = buffer2.get<const osmium::TagList>(0);
 
     auto tagit1 = tl1.begin();
-    auto tagit2 = tl2.begin();
+    const auto tagit2 = tl2.begin();
     REQUIRE(*tagit1 == *tagit2);
     ++tagit1;
     REQUIRE_FALSE(*tagit1 == *tagit2);

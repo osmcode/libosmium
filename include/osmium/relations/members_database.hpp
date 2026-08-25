@@ -376,7 +376,7 @@ namespace osmium {
                 // "tell" all relations.
                 add_object(object, range);
 
-                for (auto& elem : range) {
+                for (const auto& elem : range) {
                     assert(!elem.is_removed());
                     assert(elem.member_id == object.id());
 

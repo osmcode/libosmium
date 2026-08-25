@@ -16,11 +16,11 @@ TEST_CASE("Callback buffer") {
     osmium::builder::add_node(cb.buffer(), _id(2));
     osmium::builder::add_node(cb.buffer(), _id(3));
 
-    auto c = cb.buffer().committed();
+    const auto c = cb.buffer().committed();
     REQUIRE(c > 0);
 
     REQUIRE(std::distance(cb.buffer().begin(), cb.buffer().end()) == 3);
-    auto buffer = cb.read();
+    const auto buffer = cb.read();
 
     REQUIRE(cb.buffer().committed() == 0);
     REQUIRE(buffer.committed() == c);

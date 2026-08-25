@@ -128,7 +128,7 @@ TEST_CASE("Writer: Successful writes using output iterator") {
 
     const std::string filename = "test-writer-out-iterator.osm";
     osmium::io::Writer writer{filename, osmium::io::overwrite::allow};
-    auto it = osmium::io::make_output_iterator(writer);
+    const auto it = osmium::io::make_output_iterator(writer);
     std::copy(buffer.cbegin(), buffer.cend(), it);
     writer.close();
 
@@ -145,7 +145,7 @@ TEST_CASE("Writer: Successful writes using output iterator") {
 TEST_CASE("Writer: Interrupted writer after open") {
     const int count = count_fds();
 
-    auto buffer = get_and_check_buffer();
+    const auto buffer = get_and_check_buffer();
 
     bool error = false;
     try {

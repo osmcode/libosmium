@@ -133,7 +133,7 @@ TEST_CASE("Copy and move tag matcher") {
     REQUIRE(c1("highway", "residential"));
     REQUIRE_FALSE(c1("name", "High Street"));
 
-    auto m3 = std::move(m2);
+    const auto m3 = std::move(m2);
 
     REQUIRE(m3("highway", "residential"));
     REQUIRE_FALSE(m3("name", "High Street"));

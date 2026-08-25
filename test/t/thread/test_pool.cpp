@@ -66,7 +66,7 @@ TEST_CASE("if outlier positive number of threads requested, threads configured")
 }
 
 TEST_CASE("can get access to default thread pool") {
-    auto& pool = osmium::thread::Pool::default_instance();
+    const auto& pool = osmium::thread::Pool::default_instance();
     REQUIRE(pool.queue_empty());
 }
 

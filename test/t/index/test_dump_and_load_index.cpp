@@ -57,7 +57,7 @@ void test_index(const std::function<void(TMemoryIndex&, const int)>& dump_method
 using dense_mmap_array = osmium::index::map::DenseMmapArray<osmium::unsigned_object_id_type, osmium::Location>;
 
 TEST_CASE("Dump DenseMmapArray, load as DenseFileArray") {
-    auto dump_method = [](dense_mmap_array& index, const int fd) { index.dump_as_array(fd);};
+    const auto dump_method = [](dense_mmap_array& index, const int fd) { index.dump_as_array(fd);};
     test_index<dense_mmap_array, dense_file_array>(dump_method);
 }
 #else
@@ -67,7 +67,7 @@ TEST_CASE("Dump DenseMmapArray, load as DenseFileArray") {
 using dense_mem_array = osmium::index::map::DenseMemArray<osmium::unsigned_object_id_type, osmium::Location>;
 
 TEST_CASE("Dump DenseMemArray, load as DenseFileArray") {
-    auto dump_method = [](dense_mem_array& index, const int fd) { index.dump_as_array(fd);};
+    const auto dump_method = [](dense_mem_array& index, const int fd) { index.dump_as_array(fd);};
     test_index<dense_mem_array, dense_file_array>(dump_method);
 }
 
@@ -75,7 +75,7 @@ TEST_CASE("Dump DenseMemArray, load as DenseFileArray") {
 using sparse_mmap_array = osmium::index::map::SparseMmapArray<osmium::unsigned_object_id_type, osmium::Location>;
 
 TEST_CASE("Dump SparseMmapArray, load as SparseFileArray") {
-    auto dump_method = [](sparse_mmap_array& index, const int fd) { index.dump_as_list(fd);};
+    const auto dump_method = [](sparse_mmap_array& index, const int fd) { index.dump_as_list(fd);};
     test_index<sparse_mmap_array, sparse_file_array>(dump_method);
 }
 #else
@@ -85,6 +85,6 @@ TEST_CASE("Dump SparseMmapArray, load as SparseFileArray") {
 using sparse_mem_array = osmium::index::map::SparseMemArray<osmium::unsigned_object_id_type, osmium::Location>;
 
 TEST_CASE("Dump SparseMemArray, load as SparseFileArray") {
-    auto dump_method = [](sparse_mem_array& index, const int fd) { index.dump_as_list(fd);};
+    const auto dump_method = [](sparse_mem_array& index, const int fd) { index.dump_as_list(fd);};
     test_index<sparse_mem_array, sparse_file_array>(dump_method);
 }

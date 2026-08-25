@@ -679,7 +679,7 @@ namespace osmium {
                         if (it == xrings.cend()) {
                             return false;
                         }
-                        auto after = std::next(it, 2);
+                        const auto after = std::next(it, 2);
                         if (after == xrings.cend() || after->location != it->location) {
                             if (debug()) {
                                 std::cerr << "      Merging two rings\n";
@@ -1093,7 +1093,7 @@ namespace osmium {
                         }
                         for (const auto& location : m_split_locations) {
                             if (m_config.problem_reporter) {
-                                auto it = std::lower_bound(m_locations.cbegin(), m_locations.cend(), slocation{}, [this, &location](const slocation& lhs, const slocation& rhs) {
+                                const auto it = std::lower_bound(m_locations.cbegin(), m_locations.cend(), slocation{}, [this, &location](const slocation& lhs, const slocation& rhs) {
                                     return lhs.location(m_segment_list, location) < rhs.location(m_segment_list, location);
                                 });
                                 assert(it != m_locations.cend());

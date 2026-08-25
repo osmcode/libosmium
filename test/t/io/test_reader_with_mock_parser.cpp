@@ -62,7 +62,7 @@ TEST_CASE("Test Reader using MockParser") {
     SECTION("no failure") {
         fail_in = "";
         osmium::io::Reader reader{with_data_dir("t/io/data.osm")};
-        auto header = reader.header();
+        const auto header = reader.header();
         REQUIRE(reader.read());
         REQUIRE_FALSE(reader.read());
         REQUIRE(reader.eof());

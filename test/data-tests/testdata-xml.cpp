@@ -467,7 +467,7 @@ TEST_CASE("Reading OSM XML 142: Using Reader to read relation") {
     const osmium::memory::Buffer buffer = reader.read();
     reader.close();
 
-    auto it = buffer.select<osmium::Relation>().begin();
+    const auto it = buffer.select<osmium::Relation>().begin();
     REQUIRE(it != buffer.select<osmium::Relation>().end());
     REQUIRE(it->id() == 21);
     const auto& members = it->members();

@@ -398,7 +398,7 @@ namespace osmium {
                     }
                 }
 
-                for (auto& member : range) {
+                for (const auto& member : range) {
                     if (member.removed()) {
                         break;
                     }

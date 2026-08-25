@@ -275,7 +275,7 @@ namespace osmium {
                  */
                 void erase_duplicate_segments(ProblemReporter* problem_reporter, uint64_t& duplicate_segments, uint64_t& overlapping_segments) {
                     while (true) {
-                        auto it = std::adjacent_find(m_segments.begin(), m_segments.end());
+                        const auto it = std::adjacent_find(m_segments.begin(), m_segments.end());
                         if (it == m_segments.end()) {
                             break;
                         }
