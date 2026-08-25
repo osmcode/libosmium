@@ -298,7 +298,7 @@ namespace osmium {
                 }
                 std::string msg{"expected '"};
                 msg += c;
-                msg += "'";
+                msg += '\'';
                 throw opl_error{msg, *data};
             }
 

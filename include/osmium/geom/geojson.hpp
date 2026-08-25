@@ -70,7 +70,7 @@ namespace osmium {
                 point_type make_point(const osmium::geom::Coordinates& xy) const {
                     std::string str{"{\"type\":\"Point\",\"coordinates\":"};
                     xy.append_to_string(str, '[', ',', ']', m_precision);
-                    str += "}";
+                    str += '}';
                     return str;
                 }
 
@@ -94,7 +94,7 @@ namespace osmium {
                     swap(str, m_str);
 
                     str.back() = ']';
-                    str += "}";
+                    str += '}';
                     return str;
                 }
 
@@ -165,7 +165,7 @@ namespace osmium {
                     swap(str, m_str);
 
                     str.back() = ']';
-                    str += "}";
+                    str += '}';
                     return str;
                 }
 

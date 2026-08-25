@@ -128,7 +128,7 @@ namespace osmium {
                     swap(str, m_str);
 
                     str.back() = ')';
-                    str += ")";
+                    str += ')';
                     return str;
                 }
 

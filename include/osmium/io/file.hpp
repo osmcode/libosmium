@@ -267,16 +267,16 @@ namespace osmium {
                     if (!m_format_string.empty()) {
                         msg += " from format string '";
                         msg += m_format_string;
-                        msg += "'";
+                        msg += '\'';
                     }
                     if (m_filename.empty()) {
                         msg += " for stdin/stdout";
                     } else {
                         msg += " for filename '";
                         msg += m_filename;
-                        msg += "'";
+                        msg += '\'';
                     }
-                    msg += ".";
+                    msg += '.';
                     throw io_error{msg};
                 }
                 return *this;

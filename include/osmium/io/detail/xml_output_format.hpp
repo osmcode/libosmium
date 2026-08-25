@@ -101,7 +101,7 @@ namespace osmium {
                     out += lon;
                     out += "=\"";
                     osmium::detail::append_location_coordinate_to_string(std::back_inserter(out), location.x());
-                    out += "\"";
+                    out += '"';
                 }
 
             } // namespace detail
@@ -153,7 +153,7 @@ namespace osmium {
                     if (m_options.add_metadata.timestamp() && object.timestamp()) {
                         *m_out += " timestamp=\"";
                         *m_out += object.timestamp().to_iso_all();
-                        *m_out += "\"";
+                        *m_out += '"';
                     }
 
                     if (m_options.add_metadata.uid() && object.uid()) {
@@ -163,7 +163,7 @@ namespace osmium {
                     if (m_options.add_metadata.user() && object.user()[0] != '\0') {
                         *m_out += " user=\"";
                         append_xml_encoded_string(*m_out, object.user());
-                        *m_out += "\"";
+                        *m_out += '"';
                     }
 
                     if (m_options.add_metadata.changeset() && object.changeset()) {
@@ -382,7 +382,7 @@ namespace osmium {
                     if (changeset.created_at()) {
                         *m_out += " created_at=\"";
                         *m_out += changeset.created_at().to_iso();
-                        *m_out += "\"";
+                        *m_out += '"';
                     }
 
                     if (changeset.closed_at()) {
@@ -455,7 +455,7 @@ namespace osmium {
                         if (xml_josm_upload == "true" || xml_josm_upload == "false") {
                             out += " upload=\"";
                             out += xml_josm_upload;
-                            out += "\"";
+                            out += '"';
                         }
                         out += " generator=\"";
                     }

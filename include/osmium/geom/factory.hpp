@@ -73,7 +73,7 @@ namespace osmium {
                 m_message += object_type;
                 m_message += "_id=";
                 m_message += std::to_string(m_id);
-                m_message += ")";
+                m_message += ')';
             }
         }
 
@@ -83,7 +83,7 @@ namespace osmium {
                 m_message += object_type;
                 m_message += "_id=";
                 m_message += std::to_string(id);
-                m_message += ")";
+                m_message += ')';
             }
             m_id = id;
         }

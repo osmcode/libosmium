@@ -39,7 +39,7 @@ std::string filename(const char* test_id, const char* suffix = "osm") {
 
     std::string f;
     f += testdir;
-    f += "/";
+    f += '/';
     f += test_id;
     f += "/data.";
     f += suffix;

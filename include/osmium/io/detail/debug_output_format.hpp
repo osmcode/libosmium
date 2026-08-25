@@ -289,7 +289,7 @@ namespace osmium {
                         write_string(tag.key());
                         auto spacing = max() - std::strlen(tag.key());
                         while (spacing > 0) {
-                            *m_out += " ";
+                            *m_out += ' ';
                             --spacing;
                         }
                         *m_out += " = ";
