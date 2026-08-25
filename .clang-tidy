@@ -1,5 +1,5 @@
 ---
-Checks: '*,-abseil-string-find-str-contains,-altera-*,-android-cloexec-*,-boost-use-ranges,-bugprone-branch-clone,-bugprone-chained-comparison,-bugprone-easily-swappable-parameters,-bugprone-macro-parentheses,-cert-dcl21-cpp,-cert-err58-cpp,-clang-analyzer-optin.cplusplus.VirtualCall,-cppcoreguidelines-avoid-c-arrays,-cppcoreguidelines-avoid-do-while,-cppcoreguidelines-avoid-magic-numbers,-cppcoreguidelines-macro-usage,-cppcoreguidelines-non-private-member-variables-in-classes,-cppcoreguidelines-owning-memory,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-cppcoreguidelines-pro-bounds-constant-array-index,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-pro-type-const-cast,-cppcoreguidelines-pro-type-reinterpret-cast,-cppcoreguidelines-pro-type-static-cast-downcast,-cppcoreguidelines-pro-type-vararg,-fuchsia-*,-google-runtime-references,-hicpp-avoid-c-arrays,-hicpp-invalid-access-moved,-hicpp-no-array-decay,-hicpp-no-assembler,-hicpp-vararg,-llvmlibc-*,-llvm-qualified-auto,-misc-include-cleaner,-misc-macro-parentheses,-misc-non-private-member-variables-in-classes,-misc-no-recursion,-misc-unused-parameters,-modernize-avoid-c-arrays,-modernize-raw-string-literal,-modernize-use-trailing-return-type,-portability-template-virtual-member-function,-readability-avoid-const-params-in-decls,-readability-convert-member-functions-to-static,-readability-function-cognitive-complexity,-readability-identifier-length,-readability-implicit-bool-cast,-readability-implicit-bool-conversion,-readability-magic-numbers,-readability-qualified-auto'
+Checks: '*,-abseil-string-find-str-contains,-altera-*,-android-cloexec-*,-boost-use-ranges,-bugprone-branch-clone,-bugprone-chained-comparison,-bugprone-easily-swappable-parameters,-bugprone-macro-parentheses,-cert-dcl21-cpp,-cert-err58-cpp,-clang-analyzer-optin.cplusplus.VirtualCall,-cppcoreguidelines-avoid-c-arrays,-cppcoreguidelines-avoid-do-while,-cppcoreguidelines-avoid-magic-numbers,-cppcoreguidelines-macro-usage,-cppcoreguidelines-non-private-member-variables-in-classes,-cppcoreguidelines-owning-memory,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-cppcoreguidelines-pro-bounds-constant-array-index,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-pro-type-const-cast,-cppcoreguidelines-pro-type-reinterpret-cast,-cppcoreguidelines-pro-type-static-cast-downcast,-cppcoreguidelines-pro-type-vararg,-fuchsia-*,-google-runtime-references,-hicpp-avoid-c-arrays,-hicpp-invalid-access-moved,-hicpp-no-array-decay,-hicpp-no-assembler,-hicpp-vararg,-llvmlibc-*,-llvm-prefer-static-over-anonymous-namespace,-llvm-qualified-auto,-misc-include-cleaner,-misc-macro-parentheses,-misc-non-private-member-variables-in-classes,-misc-no-recursion,-misc-unused-parameters,-modernize-avoid-c-arrays,-modernize-concat-nested-namespaces,-modernize-raw-string-literal,-modernize-use-nodiscard,-modernize-use-trailing-return-type,-portability-template-virtual-member-function,-readability-avoid-const-params-in-decls,-readability-convert-member-functions-to-static,-readability-function-cognitive-complexity,-readability-identifier-length,-readability-implicit-bool-cast,-readability-implicit-bool-conversion,-readability-magic-numbers,-readability-qualified-auto,-readability-redundant-lambda-parameter-list,-readability-trailing-comma'
 #
 #  For a list of check options, see:
 #  https://clang.llvm.org/extra/clang-tidy/checks/list.html
@@ -105,6 +105,9 @@ Checks: '*,-abseil-string-find-str-contains,-altera-*,-android-cloexec-*,-boost-
 #  hicpp-vararg
 #    Too strict, sometimes calling vararg functions is necessary.
 #
+#  llvm-prefer-static-over-anonymous-namespace
+#    Don't want that.
+#
 #  llvm-qualified-auto
 #  readability-qualified-auto
 #    This reports too many cases. Typical case is an iterator that might be
@@ -135,9 +138,15 @@ Checks: '*,-abseil-string-find-str-contains,-altera-*,-android-cloexec-*,-boost-
 #    Makes sense for some array, but especially for char arrays using
 #    std::array isn't a good solution.
 #
+#  modernize-concat-nested-namespaces
+#    Too many cases, disabled for the time being.
+#
 #  modernize-raw-string-literal
 #    Readability isn't that much better, arguably worse because of the new
 #    syntax.
+#
+#  modernize-use-nodiscard
+#    Too many cases, disabled for the time being.
 #
 #  modernize-use-trailing-return-type
 #    I am not quite that modern.
@@ -167,6 +176,12 @@ Checks: '*,-abseil-string-find-str-contains,-altera-*,-android-cloexec-*,-boost-
 #
 #  readability-magic-numbers
 #    Alias for cppcoreguidelines-avoid-magic-numbers.
+#
+#  readability-redundant-lambda-parameter-list
+#    Doesn't strike me as more readable.
+#
+#  readability-trailing-comma
+#    Questionable.
 #
 #WarningsAsErrors: '*'
 HeaderFilterRegex: '\/include\/osmium\/.*'
