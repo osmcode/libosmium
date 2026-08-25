@@ -49,7 +49,7 @@ namespace osmium {
      * osmium::CRC<osmium::CRC_zlib> crc32;
      * const osmium::Node& node = ...;
      * crc32.update(node);
-     * std::cout << crc32.checksum() << '\n';
+     * std::cout << crc32().checksum() << '\n';
      * @endcode
      */
     class CRC_zlib {
