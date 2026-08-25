@@ -49,7 +49,7 @@ namespace osmium {
     namespace detail {
 
         template <typename T, typename U>
-        using ConstIfConst = std::conditional_t<std::is_const<T>::value, std::add_const_t<U>, U>;
+        using ConstIfConst = std::conditional_t<std::is_const_v<T>, std::add_const_t<U>, U>;
 
         template <typename THandler, typename TItem>
         inline void apply_item_impl(TItem& item, THandler&& handler) {

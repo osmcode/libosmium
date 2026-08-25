@@ -96,7 +96,7 @@ namespace osmium {
                     m_map.emplace_back(key, value);
                 }
 
-                std::enable_if_t<std::is_same<TKey, TValue>::value> flip_in_place() {
+                std::enable_if_t<std::is_same_v<TKey, TValue>> flip_in_place() {
                     for (auto& p : m_map) {
                         using std::swap;
                         swap(p.key, p.value);

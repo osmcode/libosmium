@@ -117,7 +117,7 @@ namespace osmium {
         template <typename T, std::size_t chunk_bits>
         class IdSetDenseIterator {
 
-            static_assert(std::is_unsigned<T>::value, "Needs unsigned type");
+            static_assert(std::is_unsigned_v<T>, "Needs unsigned type");
             static_assert(sizeof(T) >= 4, "Needs at least 32bit type");
 
             using id_set = IdSetDense<T, chunk_bits>;
@@ -197,7 +197,7 @@ namespace osmium {
         template <typename T, std::size_t chunk_bits>
         class IdSetDense : public IdSet<T> {
 
-            static_assert(std::is_unsigned<T>::value, "Needs unsigned type");
+            static_assert(std::is_unsigned_v<T>, "Needs unsigned type");
             static_assert(sizeof(T) >= 4, "Needs at least 32bit type");
 
             friend class IdSetDenseIterator<T, chunk_bits>;

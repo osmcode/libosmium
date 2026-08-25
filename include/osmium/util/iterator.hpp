@@ -66,7 +66,7 @@ namespace osmium {
      */
     template <typename P, typename It = typename P::first_type>
     inline iterator_range<It> make_range(P&& p) noexcept {
-        static_assert(std::is_same<P, std::pair<It, It>>::value, "make_range needs pair of iterators as argument");
+        static_assert(std::is_same_v<P, std::pair<It, It>>, "make_range needs pair of iterators as argument");
         return iterator_range<It>{std::forward<P>(p)};
     }
 

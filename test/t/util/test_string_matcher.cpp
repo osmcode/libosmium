@@ -9,11 +9,11 @@
 #include <utility>
 #include <vector>
 
-static_assert(std::is_default_constructible<osmium::StringMatcher>::value, "StringMatcher should be default constructible");
-static_assert(std::is_copy_constructible<osmium::StringMatcher>::value, "StringMatcher should be copy constructible");
-static_assert(std::is_move_constructible<osmium::StringMatcher>::value, "StringMatcher should be move constructible");
-static_assert(std::is_copy_assignable<osmium::StringMatcher>::value, "StringMatcher should be copyable");
-static_assert(std::is_move_assignable<osmium::StringMatcher>::value, "StringMatcher should be moveable");
+static_assert(std::is_default_constructible_v<osmium::StringMatcher>, "StringMatcher should be default constructible");
+static_assert(std::is_copy_constructible_v<osmium::StringMatcher>, "StringMatcher should be copy constructible");
+static_assert(std::is_move_constructible_v<osmium::StringMatcher>, "StringMatcher should be move constructible");
+static_assert(std::is_copy_assignable_v<osmium::StringMatcher>, "StringMatcher should be copyable");
+static_assert(std::is_move_assignable_v<osmium::StringMatcher>, "StringMatcher should be moveable");
 
 namespace {
 

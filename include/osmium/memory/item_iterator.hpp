@@ -58,12 +58,12 @@ namespace osmium {
         template <typename TMember>
         class ItemIterator {
 
-            static_assert(std::is_base_of<osmium::memory::Item, TMember>::value, "TMember must derive from osmium::memory::Item");
+            static_assert(std::is_base_of_v<osmium::memory::Item, TMember>, "TMember must derive from osmium::memory::Item");
 
             // This data_type is either 'unsigned char*' or 'const unsigned char*' depending
             // on whether TMember is const. This allows this class to be used as an iterator and
             // as a const_iterator.
-            using data_type = std::conditional_t<std::is_const<TMember>::value, const unsigned char*, unsigned char*>;
+            using data_type = std::conditional_t<std::is_const_v<TMember>, const unsigned char*, unsigned char*>;
 
             data_type m_data;
             data_type m_end;
@@ -175,11 +175,11 @@ namespace osmium {
         template <typename T>
         class ItemIteratorRange {
 
-            static_assert(std::is_base_of<osmium::memory::Item, T>::value, "Template parameter must derive from osmium::memory::Item");
+            static_assert(std::is_base_of_v<osmium::memory::Item, T>, "Template parameter must derive from osmium::memory::Item");
 
             // This data_type is either 'unsigned char*' or
             // 'const unsigned char*' depending on whether T is const.
-            using data_type = std::conditional_t<std::is_const<T>::value, const unsigned char*, unsigned char*>;
+            using data_type = std::conditional_t<std::is_const_v<T>, const unsigned char*, unsigned char*>;
 
             data_type m_begin;
             data_type m_end;

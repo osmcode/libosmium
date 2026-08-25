@@ -333,7 +333,7 @@ namespace osmium {
         template <typename TObject>
         class MembersDatabase : public MembersDatabaseCommon {
 
-            static_assert(std::is_base_of<osmium::OSMObject, TObject>::value, "TObject must be osmium::Node, Way, or Relation.");
+            static_assert(std::is_base_of_v<osmium::OSMObject, TObject>, "TObject must be osmium::Node, Way, or Relation.");
 
         public:
 

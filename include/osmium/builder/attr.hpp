@@ -658,7 +658,7 @@ namespace osmium {
             }
 
             template <typename TFirst, typename... TRest>
-            constexpr std::enable_if_t<!std::is_same<attr::_user, TFirst>::value, const char*>
+            constexpr std::enable_if_t<!std::is_same_v<attr::_user, TFirst>, const char*>
             get_user(const TFirst& /*first*/, const TRest&... args) noexcept {
                 return get_user(args...);
             }

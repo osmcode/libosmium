@@ -4,15 +4,15 @@
 
 #include <type_traits>
 
-static_assert(!std::is_default_constructible<osmium::index::RelationsMapIndex>::value, "RelationsMapIndex should not be default constructible");
-static_assert(!std::is_copy_constructible<osmium::index::RelationsMapIndex>::value, "RelationsMapIndex should not be copy constructible");
-static_assert(!std::is_copy_constructible<osmium::index::RelationsMapStash>::value, "RelationsMapStash should not be copy constructible");
-static_assert(!std::is_copy_assignable<osmium::index::RelationsMapIndex>::value, "RelationsMapIndex should not be copy assignable");
-static_assert(!std::is_copy_assignable<osmium::index::RelationsMapStash>::value, "RelationsMapStash should not be copy assignable");
-static_assert(std::is_move_constructible<osmium::index::RelationsMapIndex>::value, "RelationsMapIndex should be move constructible");
-static_assert(std::is_move_constructible<osmium::index::RelationsMapStash>::value, "RelationsMapStash should be move constructible");
-static_assert(std::is_move_assignable<osmium::index::RelationsMapIndex>::value, "RelationsMapIndex should be move assignable");
-static_assert(std::is_move_assignable<osmium::index::RelationsMapStash>::value, "RelationsMapStash should be move assignable");
+static_assert(!std::is_default_constructible_v<osmium::index::RelationsMapIndex>, "RelationsMapIndex should not be default constructible");
+static_assert(!std::is_copy_constructible_v<osmium::index::RelationsMapIndex>, "RelationsMapIndex should not be copy constructible");
+static_assert(!std::is_copy_constructible_v<osmium::index::RelationsMapStash>, "RelationsMapStash should not be copy constructible");
+static_assert(!std::is_copy_assignable_v<osmium::index::RelationsMapIndex>, "RelationsMapIndex should not be copy assignable");
+static_assert(!std::is_copy_assignable_v<osmium::index::RelationsMapStash>, "RelationsMapStash should not be copy assignable");
+static_assert(std::is_move_constructible_v<osmium::index::RelationsMapIndex>, "RelationsMapIndex should be move constructible");
+static_assert(std::is_move_constructible_v<osmium::index::RelationsMapStash>, "RelationsMapStash should be move constructible");
+static_assert(std::is_move_assignable_v<osmium::index::RelationsMapIndex>, "RelationsMapIndex should be move assignable");
+static_assert(std::is_move_assignable_v<osmium::index::RelationsMapStash>, "RelationsMapStash should be move assignable");
 
 TEST_CASE("RelationsMapStash lvalue") {
     osmium::index::RelationsMapStash stash;

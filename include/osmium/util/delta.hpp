@@ -48,10 +48,10 @@ namespace osmium {
         template <typename TValue, typename TDelta = int64_t>
         class DeltaEncode {
 
-            static_assert(std::is_integral<TValue>::value,
+            static_assert(std::is_integral_v<TValue>,
                           "DeltaEncode value type must be some integer");
 
-            static_assert(std::is_integral<TDelta>::value && std::is_signed<TDelta>::value,
+            static_assert(std::is_integral_v<TDelta> && std::is_signed_v<TDelta>,
                           "DeltaEncode delta type must be some signed integer");
 
             // Not a perfect check, because of signed vs. unsigned, but
@@ -96,10 +96,10 @@ namespace osmium {
         template <typename TValue, typename TDelta = int64_t>
         class DeltaDecode {
 
-            static_assert(std::is_integral<TValue>::value,
+            static_assert(std::is_integral_v<TValue>,
                           "DeltaDecode value type must be some integer");
 
-            static_assert(std::is_integral<TDelta>::value && std::is_signed<TDelta>::value,
+            static_assert(std::is_integral_v<TDelta> && std::is_signed_v<TDelta>,
                           "DeltaDecode delta type must be some signed integer");
 
             TValue m_value;

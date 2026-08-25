@@ -54,7 +54,7 @@ namespace osmium {
         template <typename TSource, typename TItem = osmium::memory::Item>
         class InputIterator {
 
-            static_assert(std::is_base_of<osmium::memory::Item, TItem>::value, "TItem must derive from osmium::buffer::Item");
+            static_assert(std::is_base_of_v<osmium::memory::Item, TItem>, "TItem must derive from osmium::buffer::Item");
 
             using item_iterator = typename osmium::memory::Buffer::t_iterator<TItem>;
 

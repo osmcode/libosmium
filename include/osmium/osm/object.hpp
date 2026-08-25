@@ -413,7 +413,7 @@ namespace osmium {
          */
         template <typename T>
         osmium::memory::ItemIteratorRange<T> subitems() {
-            static_assert(std::is_base_of<osmium::memory::Item, T>::value, "T must be derived from osmium::memory::Item");
+            static_assert(std::is_base_of_v<osmium::memory::Item, T>, "T must be derived from osmium::memory::Item");
             return osmium::memory::ItemIteratorRange<T>{subitems_position(), next()};
         }
 
@@ -424,7 +424,7 @@ namespace osmium {
          */
         template <typename T>
         osmium::memory::ItemIteratorRange<const T> subitems() const {
-            static_assert(std::is_base_of<osmium::memory::Item, T>::value, "T must be derived from osmium::memory::Item");
+            static_assert(std::is_base_of_v<osmium::memory::Item, T>, "T must be derived from osmium::memory::Item");
             return osmium::memory::ItemIteratorRange<const T>{subitems_position(), next()};
         }
 

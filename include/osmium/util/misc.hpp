@@ -68,8 +68,8 @@ namespace osmium {
 
         template <typename TReturn>
         inline TReturn str_to_int(const char* str) {
-            static_assert(std::is_integral<TReturn>::value, "Must be integral type");
-            using r_type = std::conditional_t<std::is_unsigned<TReturn>::value, unsigned long long, long long>; // NOLINT(google-runtime-int)
+            static_assert(std::is_integral_v<TReturn>, "Must be integral type");
+            using r_type = std::conditional_t<std::is_unsigned_v<TReturn>, unsigned long long, long long>; // NOLINT(google-runtime-int)
             assert(str);
             char* end = nullptr;
             const auto value = std::strtoll(str, &end, 10);

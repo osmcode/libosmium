@@ -390,7 +390,7 @@ namespace osmium {
          */
         // cppcheck-suppress noExplicitConstructor
         template <typename TMatcher, typename X = std::enable_if_t<
-            std::is_base_of<matcher, TMatcher>::value, void>>
+            std::is_base_of_v<matcher, TMatcher>, void>>
         StringMatcher(TMatcher&& matcher) : // NOLINT(google-explicit-constructor, hicpp-explicit-conversions)
             m_matcher(std::forward<TMatcher>(matcher)) {
         }
