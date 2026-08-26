@@ -8,7 +8,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        image: ["debian:trixie", "debian:testing"]
         include:
           - image: "debian:trixie"
             clang: 19
