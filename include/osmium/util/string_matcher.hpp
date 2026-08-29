@@ -39,20 +39,8 @@ DEALINGS IN THE SOFTWARE.
 #include <regex>
 #include <string>
 #include <utility>
+#include <variant>
 #include <vector>
-
-#ifdef __has_include
-# if __has_include(<variant>)
-#  include <variant>
-#  ifdef __cpp_lib_variant
-#   define OSMIUM_USE_STD_VARIANT
-#  endif
-# endif
-#endif
-
-#ifndef OSMIUM_USE_STD_VARIANT
-# include <boost/variant.hpp>
-#endif
 
 namespace osmium {
 
@@ -257,11 +245,7 @@ namespace osmium {
     private:
 
         using matcher_type =
-#ifdef OSMIUM_USE_STD_VARIANT
             std::variant
-#else
-            boost::variant
-#endif
                 <always_false,
                  always_true,
                  equal,
@@ -272,11 +256,7 @@ namespace osmium {
 
         matcher_type m_matcher;
 
-        class match_visitor
-#ifndef OSMIUM_USE_STD_VARIANT
-        : public boost::static_visitor<bool>
-#endif
-        {
+        class match_visitor {
 
             const char* m_str;
 
@@ -294,11 +274,7 @@ namespace osmium {
         }; // class match_visitor
 
         template <typename TChar, typename TTraits>
-        class print_visitor
-#ifndef OSMIUM_USE_STD_VARIANT
-        : public boost::static_visitor<void>
-#endif
-        {
+        class print_visitor {
 
             std::basic_ostream<TChar, TTraits>* m_out;
 
@@ -399,11 +375,7 @@ namespace osmium {
          * Match the specified string.
          */
         bool operator()(const char* str) const noexcept {
-#ifdef OSMIUM_USE_STD_VARIANT
             return std::visit(match_visitor{str}, m_matcher);
-#else
-            return boost::apply_visitor(match_visitor{str}, m_matcher);
-#endif
         }
 
         /**
@@ -415,11 +387,7 @@ namespace osmium {
 
         template <typename TChar, typename TTraits>
         void print(std::basic_ostream<TChar, TTraits>& out) const {
-#ifdef OSMIUM_USE_STD_VARIANT
             std::visit(print_visitor<TChar, TTraits>{out}, m_matcher);
-#else
-            boost::apply_visitor(print_visitor<TChar, TTraits>{out}, m_matcher);
-#endif
         }
 
     }; // class StringMatcher
@@ -431,7 +399,5 @@ namespace osmium {
     }
 
 } // namespace osmium
-
-#undef OSMIUM_USE_STD_VARIANT
 
 #endif // OSMIUM_UTIL_STRING_MATCHER_HPP
