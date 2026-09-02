@@ -65,7 +65,7 @@ namespace osmium {
             void update_buffer() {
                 do {
                     m_buffer = std::make_shared<osmium::memory::Buffer>(std::move(m_source->read()));
-                    if (!m_buffer || !*m_buffer) { // end of input
+                    if (!*m_buffer) { // end of input
                         m_source = nullptr;
                         m_buffer.reset();
                         m_iter = item_iterator{};
