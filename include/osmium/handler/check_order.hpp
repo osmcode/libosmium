@@ -100,7 +100,7 @@ namespace osmium {
 
         public:
 
-            CheckOrder(bool with_history = false) : m_with_history(with_history) {
+            explicit CheckOrder(bool with_history = false) : m_with_history(with_history) {
             }
 
             void node(const osmium::Node& node) {
