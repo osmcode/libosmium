@@ -35,6 +35,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/handler.hpp>
 #include <osmium/handler/check_order.hpp>
+#include <osmium/index/nwr_array.hpp>
 #include <osmium/memory/buffer.hpp>
 #include <osmium/osm/item_type.hpp>
 #include <osmium/osm/object.hpp>
@@ -46,7 +47,6 @@ DEALINGS IN THE SOFTWARE.
 #include <osmium/visitor.hpp>
 
 #include <algorithm>
-#include <array>
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
@@ -186,7 +186,7 @@ namespace osmium {
              */
             using mm_vector_type = std::vector<MemberMeta>;
             using mm_iterator = mm_vector_type::iterator;
-            std::array<mm_vector_type, 3> m_member_meta;
+            osmium::nwr_array<mm_vector_type> m_member_meta;
 
             int m_count_complete = 0;
 
@@ -216,7 +216,7 @@ namespace osmium {
         protected:
 
             std::vector<MemberMeta>& member_meta(const item_type type) {
-                return m_member_meta[static_cast<uint16_t>(type) - 1];
+                return m_member_meta(type);
             }
 
             callback_func_type callback() {
@@ -363,9 +363,9 @@ namespace osmium {
              * search on them.
              */
             void sort_member_meta() {
-                std::sort(m_member_meta[0].begin(), m_member_meta[0].end());
-                std::sort(m_member_meta[1].begin(), m_member_meta[1].end());
-                std::sort(m_member_meta[2].begin(), m_member_meta[2].end());
+                std::sort(m_member_meta.nodes().begin(), m_member_meta.nodes().end());
+                std::sort(m_member_meta.ways().begin(), m_member_meta.ways().end());
+                std::sort(m_member_meta.relations().begin(), m_member_meta.relations().end());
             }
 
             static iterator_range<mm_iterator>::iterator::difference_type count_not_removed(const iterator_range<mm_iterator>& range) {
@@ -445,16 +445,16 @@ namespace osmium {
         public:
 
             uint64_t used_memory() const {
-                const uint64_t nmembers = m_member_meta[0].capacity() + m_member_meta[1].capacity() + m_member_meta[2].capacity();
+                const uint64_t nmembers = m_member_meta.nodes().capacity() + m_member_meta.ways().capacity() + m_member_meta.relations().capacity();
                 const uint64_t members = nmembers * sizeof(MemberMeta);
                 const uint64_t relations_size = m_relations.capacity() * sizeof(RelationMeta);
                 const uint64_t relations_buffer_capacity = m_relations_buffer.capacity();
                 const uint64_t members_buffer_capacity = m_members_buffer.capacity();
 
                 std::cerr << "  nR  = m_relations.capacity() ........... = " << std::setw(12) << m_relations.capacity() << "\n";
-                std::cerr << "  nMN = m_member_meta[NODE].capacity() ... = " << std::setw(12) << m_member_meta[0].capacity() << "\n";
-                std::cerr << "  nMW = m_member_meta[WAY].capacity() .... = " << std::setw(12) << m_member_meta[1].capacity() << "\n";
-                std::cerr << "  nMR = m_member_meta[RELATION].capacity() = " << std::setw(12) << m_member_meta[2].capacity() << "\n";
+                std::cerr << "  nMN = m_member_meta[NODE].capacity() ... = " << std::setw(12) << m_member_meta.nodes().capacity() << "\n";
+                std::cerr << "  nMW = m_member_meta[WAY].capacity() .... = " << std::setw(12) << m_member_meta.ways().capacity() << "\n";
+                std::cerr << "  nMR = m_member_meta[RELATION].capacity() = " << std::setw(12) << m_member_meta.relations().capacity() << "\n";
                 std::cerr << "  nM  = m_member_meta[*].capacity() ...... = " << std::setw(12) << nmembers << "\n";
 
                 std::cerr << "  sRM = sizeof(RelationMeta) ............. = " << std::setw(12) << sizeof(RelationMeta) << "\n";
