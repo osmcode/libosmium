@@ -267,11 +267,7 @@ if(MSVC)
 endif()
 
 if(APPLE AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-# following only available from cmake 2.8.12:
-#   add_compile_options(-stdlib=libc++)
-# so using this instead:
-    add_definitions(-stdlib=libc++)
-    set(LDFLAGS ${LDFLAGS} -stdlib=libc++)
+    add_compile_options(-stdlib=libc++)
 endif()
 
 #----------------------------------------------------------------------

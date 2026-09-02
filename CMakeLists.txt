@@ -88,9 +88,9 @@ option(BUILD_BENCHMARKS "compile benchmark programs" ${dev_build})
 
 option(BUILD_DATA_TESTS "compile data tests, please run them with ctest" ${data_test_build})
 
-option(INSTALL_GDALCPP   "also install gdalcpp headers" OFF)
+option(INSTALL_GDALCPP  "also install gdalcpp headers" OFF)
 
-option(WITH_PROFILING    "add flags needed for profiling" OFF)
+option(WITH_PROFILING   "add flags needed for profiling" OFF)
 
 
 #-----------------------------------------------------------------------------
@@ -379,7 +379,7 @@ add_subdirectory(doc)
 #
 #  This will try to compile include files on their own to detect missing
 #  include directives and other dependency-related problems. Note that if this
-#  work, it is not enough to be sure it will compile in production code.
+#  works, it is not enough to be sure it will compile in production code.
 #  But if it reports an error we know we are missing something.
 #
 #-----------------------------------------------------------------------------
@@ -403,10 +403,7 @@ if(BUILD_HEADERS)
 
             # There is no way in CMake to just compile but not link a C++ file,
             # so we pretend to build a library here.
-            add_library(${libname} STATIC ${DUMMYCPP} include/${hpp})
-
-            #### this is better but only supported from cmake 3.0:
-            ###add_library(${libname} OBJECT ${DUMMYCPP} include/${hpp})
+            add_library(${libname} OBJECT ${DUMMYCPP} include/${hpp})
         endif()
     endforeach()
 endif()
