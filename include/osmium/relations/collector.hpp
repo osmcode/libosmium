@@ -432,9 +432,9 @@ namespace osmium {
                             get_member(range.begin()->buffer_offset()).set_removed(true);
                         }
 
-                        for (auto& member_meta : range) {
-                            if (!member_meta.removed() && relation.id() == get_relation(member_meta).id()) {
-                                member_meta.remove();
+                        for (auto& a_member_meta : range) {
+                            if (!a_member_meta.removed() && relation.id() == get_relation(a_member_meta).id()) {
+                                a_member_meta.remove();
                                 break;
                             }
                         }
