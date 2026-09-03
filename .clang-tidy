@@ -23,7 +23,6 @@ Checks:
   - '-fuchsia-*'  # Much too strict.
   - '-google-runtime-references'  # Matter of preference, and we can't change the interfaces now anyway.
   - '-hicpp-avoid-c-arrays'  # Makes sense for some arrays, but especially for char arrays using std::array isn't a good solution.
-  - '-hicpp-invalid-access-moved'  # Creates false positives.
   - '-hicpp-no-array-decay'  # Limited use and many false positives including for all asserts.
   - '-hicpp-vararg'  # Too strict, sometimes calling vararg functions is necessary.
   - '-llvm-prefer-static-over-anonymous-namespace'  # Don't want that.

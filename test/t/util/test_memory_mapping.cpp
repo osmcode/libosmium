@@ -47,7 +47,7 @@ TEST_CASE("Anonymous mapping: moving a memory mapping should work") {
     REQUIRE(!!mapping1);
     osmium::MemoryMapping mapping2{std::move(mapping1)};
     REQUIRE(!!mapping2);
-    REQUIRE(!mapping1); // NOLINT(bugprone-use-after-move,misc-use-after-move) okay here, we are checking our own code
+    REQUIRE(!mapping1); // NOLINT(bugprone-use-after-move,misc-use-after-move,hicpp-invalid-access-moved) okay here, we are checking our own code
     mapping1.unmap(); // NOLINT(clang-analyzer-cplusplus.Move) okay here, we are checking our own code
 
     const auto* addr2 = mapping2.get_addr<int>();
@@ -70,7 +70,7 @@ TEST_CASE("Anonymous mapping: move assignment should work") {
     mapping2 = std::move(mapping1);
     REQUIRE(!!mapping2);
     // cppcheck-suppress accessMoved
-    REQUIRE(!mapping1); // NOLINT(bugprone-use-after-move,misc-use-after-move) okay here, we are checking our own code
+    REQUIRE(!mapping1); // NOLINT(bugprone-use-after-move,misc-use-after-move,hicpp-invalid-access-moved) okay here, we are checking our own code
 
     const auto* addr2 = mapping2.get_addr<int>();
     REQUIRE(*addr2 == 42);
@@ -273,7 +273,7 @@ TEST_CASE("Typed anonymous mapping: moving a memory mapping should work") {
     REQUIRE(!!mapping1);
     osmium::TypedMemoryMapping<uint32_t> mapping2{std::move(mapping1)};
     REQUIRE(!!mapping2);
-    REQUIRE(!mapping1); // NOLINT(bugprone-use-after-move,misc-use-after-move) okay here, we are checking our own code
+    REQUIRE(!mapping1); // NOLINT(bugprone-use-after-move,misc-use-after-move,hicpp-invalid-access-moved) okay here, we are checking our own code
     mapping1.unmap(); // NOLINT(clang-analyzer-cplusplus.Move) okay here, we are checking our own code
 
     const auto* const addr2 = mapping2.begin();
@@ -296,7 +296,7 @@ TEST_CASE("Typed anonymous mapping: move assignment should work") {
     mapping2 = std::move(mapping1);
     REQUIRE(!!mapping2);
     // cppcheck-suppress accessMoved
-    REQUIRE(!mapping1); // NOLINT(bugprone-use-after-move,misc-use-after-move) okay here, we are checking our own code
+    REQUIRE(!mapping1); // NOLINT(bugprone-use-after-move,misc-use-after-move,hicpp-invalid-access-moved) okay here, we are checking our own code
 
     const auto* const addr2 = mapping2.begin();
     REQUIRE(*addr2 == 42);
