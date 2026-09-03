@@ -210,7 +210,7 @@ class Options {
 
     static void print_usage(const char* prgname) {
         std::cout << "Usage: " << prgname << " [OPTIONS]\n\n";
-        std::exit(0);
+        std::exit(0); // NOLINT(concurrency-mt-unsafe)
     }
 
 public:
@@ -223,7 +223,7 @@ public:
         if (argc > 1 && (!std::strcmp(argv[1], "-h") ||
                          !std::strcmp(argv[1], "--help"))) {
             print_help();
-            std::exit(0);
+            std::exit(0); // NOLINT(concurrency-mt-unsafe)
         }
 
         for (int i = 1; i < argc; ++i) {
@@ -277,23 +277,23 @@ public:
 
         if (m_array_format == m_list_format) {
             std::cerr << "Need option --array or --list, but not both\n";
-            std::exit(2);
+            std::exit(2); // NOLINT(concurrency-mt-unsafe)
         }
 
         if (m_dump == !m_ids.empty()) {
             std::cerr << "Need option --dump or --search, but not both\n";
-            std::exit(2);
+            std::exit(2); // NOLINT(concurrency-mt-unsafe)
         }
 
         if (m_type.empty()) {
             std::cerr << "Need --type argument.\n";
-            std::exit(2);
+            std::exit(2); // NOLINT(concurrency-mt-unsafe)
         }
 
         if (m_type != "location" && m_type != "id" && m_type != "offset") {
             std::cerr << "Unknown type '" << m_type
                       << "'. Must be 'location', 'id', or 'offset'.\n";
-            std::exit(2);
+            std::exit(2); // NOLINT(concurrency-mt-unsafe)
         }
     }
 

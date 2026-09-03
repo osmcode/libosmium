@@ -32,7 +32,7 @@ std::string S_(const char8_t* s) {
 #endif
 
 std::string filename(const char* test_id, const char* suffix = "osm") {
-    const char* testdir = getenv("TESTDIR");
+    const char* testdir = std::getenv("TESTDIR"); // NOLINT(concurrency-mt-unsafe)
     if (!testdir) {
         throw std::runtime_error{"You have to set TESTDIR environment variable before running testdata-xml"};
     }

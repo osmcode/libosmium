@@ -10,7 +10,7 @@
 std::string dirname; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 
 int main(int argc, char* argv[]) {
-    const char* testcases_dir = getenv("TESTCASES_DIR");
+    const char* testcases_dir = std::getenv("TESTCASES_DIR"); // NOLINT(concurrency-mt-unsafe)
     if (testcases_dir) {
         dirname = testcases_dir;
         std::cerr << "Running tests from '" << dirname << "' (from TESTCASES_DIR environment variable)\n";
