@@ -377,8 +377,8 @@ namespace osmium {
         /**
          * Set named attribute.
          *
-         * @param attr Name of the attribute (must be one of "id", "version",
-         *             "changeset", "timestamp", "uid", "visible")
+         * @param attr Name of the attribute (must be one of "id", "num_changes",
+         *             "comments_count", "created_at", "closed_at", "uid")
          * @param value Value of the attribute
          */
         void set_attribute(const char* attr, const char* value) {
