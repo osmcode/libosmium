@@ -69,6 +69,24 @@ DEALINGS IN THE SOFTWARE.
 
 namespace osmium {
 
+    namespace detail {
+#if (XML_MAJOR_VERSION > 2) || (XML_MAJOR_VERSION == 2 && XML_MINOR_VERSION >= 9)
+        inline std::uint64_t get_current_line_number(const XML_Parser& parser) {
+            return XML_GetCurrentLineNumber64(parser);
+        }
+        inline std::uint64_t get_current_column_number(const XML_Parser& parser) {
+            return XML_GetCurrentColumnNumber64(parser);
+        }
+#else
+        inline std::uint64_t get_current_line_number(const XML_Parser& parser) {
+            return XML_GetCurrentLineNumber(parser);
+        }
+        inline std::uint64_t get_current_column_number(const XML_Parser& parser) {
+            return XML_GetCurrentColumnNumber(parser);
+        }
+#endif
+    } // namespace detail
+
     /**
      * Exception thrown when the XML parser failed. The exception contains
      * (if available) information about the place where the error happened
@@ -83,13 +101,13 @@ namespace osmium {
 
         explicit xml_error(const XML_Parser& parser) :
             io_error(std::string{"XML parsing error at line "}
-                    + std::to_string(XML_GetCurrentLineNumber(parser))
+                    + std::to_string(detail::get_current_line_number(parser))
                     + ", column "
-                    + std::to_string(XML_GetCurrentColumnNumber(parser))
+                    + std::to_string(detail::get_current_column_number(parser))
                     + ": "
                     + XML_ErrorString(XML_GetErrorCode(parser))),
-            line(XML_GetCurrentLineNumber(parser)),
-            column(XML_GetCurrentColumnNumber(parser)),
+            line(detail::get_current_line_number(parser)),
+            column(detail::get_current_column_number(parser)),
             error_code(XML_GetErrorCode(parser)),
             error_string(XML_ErrorString(error_code)) {
         }
