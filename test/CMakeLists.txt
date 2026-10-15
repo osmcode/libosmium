@@ -64,9 +64,6 @@ function(add_unit_test _tgroup _tname)
                 message("  Adding libs: ${_param_LIBS}")
             endif()
             target_link_libraries(${_testid} ${_param_LIBS})
-            if(_param_LIBS MATCHES "lpthread")
-                set_pthread_on_target(${_testid})
-            endif()
         endif()
 
         add_test(NAME ${_testid}
@@ -103,10 +100,6 @@ endfunction()
 
 if(NOT BZIP2_FOUND)
     set(BZIP2_FOUND FALSE)
-endif()
-
-if(NOT Threads_FOUND)
-    set(Threads_FOUND FALSE)
 endif()
 
 
@@ -180,21 +173,21 @@ add_unit_test(io test_print_width ENABLE_IF ${ZLIB_FOUND} LIBS ${ZLIB_LIBRARIES}
 
 add_unit_test(io test_bzip2 ENABLE_IF ${BZIP2_FOUND} LIBS ${BZIP2_LIBRARIES})
 add_unit_test(io test_gzip ENABLE_IF ${ZLIB_FOUND} LIBS ${ZLIB_LIBRARIES})
-add_unit_test(io test_opl_parser ENABLE_IF ${Threads_FOUND} LIBS ${CMAKE_THREAD_LIBS_INIT})
-add_unit_test(io test_output_iterator ENABLE_IF ${Threads_FOUND} LIBS ${CMAKE_THREAD_LIBS_INIT})
-add_unit_test(io test_pbf ENABLE_IF ${Threads_FOUND} LIBS ${OSMIUM_PBF_LIBRARIES})
+add_unit_test(io test_opl_parser LIBS ${CMAKE_THREAD_LIBS_INIT})
+add_unit_test(io test_output_iterator LIBS ${CMAKE_THREAD_LIBS_INIT})
+add_unit_test(io test_pbf LIBS ${OSMIUM_PBF_LIBRARIES})
 add_unit_test(io test_reader LIBS "${OSMIUM_XML_LIBRARIES};${OSMIUM_PBF_LIBRARIES}")
-add_unit_test(io test_reader_fileformat ENABLE_IF ${Threads_FOUND} LIBS ${CMAKE_THREAD_LIBS_INIT})
-add_unit_test(io test_reader_with_mock_decompression ENABLE_IF ${Threads_FOUND} LIBS ${OSMIUM_XML_LIBRARIES})
-add_unit_test(io test_reader_with_mock_parser ENABLE_IF ${Threads_FOUND} LIBS ${CMAKE_THREAD_LIBS_INIT})
-add_unit_test(io test_writer ENABLE_IF ${Threads_FOUND} LIBS ${OSMIUM_XML_LIBRARIES})
-add_unit_test(io test_writer_with_mock_compression ENABLE_IF ${Threads_FOUND} LIBS ${OSMIUM_XML_LIBRARIES})
-add_unit_test(io test_writer_with_mock_encoder ENABLE_IF ${Threads_FOUND} LIBS ${OSMIUM_XML_LIBRARIES})
+add_unit_test(io test_reader_fileformat LIBS ${CMAKE_THREAD_LIBS_INIT})
+add_unit_test(io test_reader_with_mock_decompression LIBS ${OSMIUM_XML_LIBRARIES})
+add_unit_test(io test_reader_with_mock_parser LIBS ${CMAKE_THREAD_LIBS_INIT})
+add_unit_test(io test_writer LIBS ${OSMIUM_XML_LIBRARIES})
+add_unit_test(io test_writer_with_mock_compression LIBS ${OSMIUM_XML_LIBRARIES})
+add_unit_test(io test_writer_with_mock_encoder LIBS ${OSMIUM_XML_LIBRARIES})
 
 add_unit_test(relations test_members_database)
-add_unit_test(relations test_read_relations ENABLE_IF ${Threads_FOUND} LIBS ${OSMIUM_XML_LIBRARIES})
+add_unit_test(relations test_read_relations LIBS ${OSMIUM_XML_LIBRARIES})
 add_unit_test(relations test_relations_database)
-add_unit_test(relations test_relations_manager ENABLE_IF ${Threads_FOUND} LIBS ${OSMIUM_XML_LIBRARIES})
+add_unit_test(relations test_relations_manager LIBS ${OSMIUM_XML_LIBRARIES})
 
 add_unit_test(storage test_item_stash)
 
@@ -204,9 +197,9 @@ add_unit_test(tags test_tag_list)
 add_unit_test(tags test_tag_matcher)
 add_unit_test(tags test_tags_filter)
 
-add_unit_test(thread test_pool ENABLE_IF ${Threads_FOUND} LIBS ${CMAKE_THREAD_LIBS_INIT})
-add_unit_test(thread test_queue ENABLE_IF ${Threads_FOUND} LIBS ${CMAKE_THREAD_LIBS_INIT})
-add_unit_test(thread test_util ENABLE_IF ${Threads_FOUND} LIBS ${CMAKE_THREAD_LIBS_INIT})
+add_unit_test(thread test_pool LIBS ${CMAKE_THREAD_LIBS_INIT})
+add_unit_test(thread test_queue LIBS ${CMAKE_THREAD_LIBS_INIT})
+add_unit_test(thread test_util LIBS ${CMAKE_THREAD_LIBS_INIT})
 
 add_unit_test(util test_config)
 add_unit_test(util test_delta)
