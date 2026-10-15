@@ -6,9 +6,9 @@ runs:
     - name: Install packages
       run: |
         vcpkg install \
-          boost-crc:x64-windows \
-          bzip2:x64-windows \
-          expat:x64-windows \
-          lz4:x64-windows \
-          zlib:x64-windows
+          boost-crc \
+          bzip2 \
+          expat \
+          lz4 \
+          zlib
       shell: bash
