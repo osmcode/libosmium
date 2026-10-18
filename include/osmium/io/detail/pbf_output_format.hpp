@@ -562,10 +562,6 @@ namespace osmium {
                 PBFOutputFormat(osmium::thread::Pool& pool, const osmium::io::File& file, future_string_queue_type& output_queue) :
                     OutputFormat(pool, output_queue) {
 
-                    if (!file.get("pbf_add_metadata").empty()) {
-                        throw std::invalid_argument{"The 'pbf_add_metadata' option is deprecated. Please use 'add_metadata' instead."};
-                    }
-
                     m_options.use_dense_nodes = file.is_not_false("pbf_dense_nodes");
                     m_options.use_compression = get_compression_type(file.get("pbf_compression"));
                     m_options.add_metadata = osmium::metadata_options{file.get("add_metadata")};
