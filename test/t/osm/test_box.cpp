@@ -11,7 +11,7 @@
 TEST_CASE("Default constructor creates invalid box") {
     const osmium::Box b{};
 
-    REQUIRE_FALSE(b);
+    REQUIRE_FALSE(b.is_defined());
     REQUIRE_FALSE(b.bottom_left());
     REQUIRE_FALSE(b.top_right());
     REQUIRE_THROWS_AS(b.size(), osmium::invalid_location);
@@ -20,9 +20,9 @@ TEST_CASE("Default constructor creates invalid box") {
 TEST_CASE("Extend box with undefined") {
     osmium::Box b{};
 
-    REQUIRE_FALSE(b);
+    REQUIRE_FALSE(b.is_defined());
     b.extend(osmium::Location{});
-    REQUIRE_FALSE(b);
+    REQUIRE_FALSE(b.is_defined());
     REQUIRE_FALSE(b.bottom_left());
     REQUIRE_FALSE(b.top_right());
 }
@@ -30,9 +30,9 @@ TEST_CASE("Extend box with undefined") {
 TEST_CASE("Extend box with invalid") {
     osmium::Box b{};
 
-    REQUIRE_FALSE(b);
+    REQUIRE_FALSE(b.is_defined());
     b.extend(osmium::Location{200.0, 100.0});
-    REQUIRE_FALSE(b);
+    REQUIRE_FALSE(b.is_defined());
     REQUIRE_FALSE(b.bottom_left());
     REQUIRE_FALSE(b.top_right());
 }
@@ -42,9 +42,9 @@ TEST_CASE("Extend box with valid") {
 
     const osmium::Location loc1{1.2, 3.4};
     b.extend(loc1);
-    REQUIRE(!!b);
-    REQUIRE(!!b.bottom_left());
-    REQUIRE(!!b.top_right());
+    REQUIRE(b.is_defined());
+    REQUIRE(b.bottom_left().is_defined());
+    REQUIRE(b.top_right().is_defined());
     REQUIRE(b.contains(loc1));
 
     const osmium::Location loc2{3.4, 4.5};
@@ -111,7 +111,7 @@ TEST_CASE("Output of undefined Box (top right)") {
 
 TEST_CASE("Create box from locations") {
     const osmium::Box b{osmium::Location{1.23, 2.34}, osmium::Location{3.45, 4.56}};
-    REQUIRE(!!b);
+    REQUIRE(b.is_defined());
     REQUIRE(b.bottom_left() == (osmium::Location{1.23, 2.34}));
     REQUIRE(b.top_right() == (osmium::Location{3.45, 4.56}));
     REQUIRE(b.top() == Approx(4.56));
@@ -122,7 +122,7 @@ TEST_CASE("Create box from locations") {
 
 TEST_CASE("Create box from doubles") {
     const osmium::Box b{1.23, 2.34, 3.45, 4.56};
-    REQUIRE(!!b);
+    REQUIRE(b.is_defined());
     REQUIRE(b.bottom_left() == (osmium::Location{1.23, 2.34}));
     REQUIRE(b.top_right() == (osmium::Location{3.45, 4.56}));
 }
@@ -174,3 +174,8 @@ TEST_CASE("Relationship between boxes: overlaps") {
     REQUIRE_FALSE(osmium::geom::overlaps(inner, outside));
 }
 
+TEST_CASE("Creating box from two undefined locations is okay") {
+    osmium::Box outer{osmium::Location{}, osmium::Location{}};
+
+    REQUIRE_FALSE(outer.is_defined());
+}

@@ -164,7 +164,7 @@ namespace osmium {
                 bool error = false;
                 for (auto& node_ref : way.nodes()) {
                     node_ref.set_location(get_node_location(node_ref.ref()));
-                    if (!node_ref.location()) {
+                    if (node_ref.location().is_undefined()) {
                         error = true;
                     }
                 }

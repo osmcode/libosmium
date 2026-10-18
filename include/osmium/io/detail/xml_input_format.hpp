@@ -314,7 +314,7 @@ namespace osmium {
                         }
                     });
 
-                    if (location && object.type() == osmium::item_type::node) {
+                    if (location.is_defined() && object.type() == osmium::item_type::node) {
                         static_cast<osmium::Node&>(object).set_location(location);
                     }
 

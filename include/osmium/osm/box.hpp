@@ -83,7 +83,7 @@ namespace osmium {
             m_bottom_left(bottom_left),
             m_top_right(top_right) {
             assert(
-                (!!bottom_left && !!top_right) ||
+                (bottom_left.is_undefined() && top_right.is_undefined()) ||
                 (bottom_left.x() <= top_right.x() && bottom_left.y() <= top_right.y()));
         }
 
@@ -98,7 +98,7 @@ namespace osmium {
          */
         Box& extend(const Location& location) noexcept {
             if (location.valid()) {
-                if (m_bottom_left) {
+                if (m_bottom_left.is_defined()) {
                     if (location.x() < m_bottom_left.x()) {
                         m_bottom_left.set_x(location.x());
                     }
@@ -136,7 +136,14 @@ namespace osmium {
          * Box is defined, ie. contains defined locations.
          */
         explicit constexpr operator bool() const noexcept {
-            return static_cast<bool>(m_bottom_left) && static_cast<bool>(m_top_right);
+            return m_bottom_left.is_defined() && m_top_right.is_defined();
+        }
+
+        /**
+         * Box is defined, ie. contains defined locations.
+         */
+        constexpr bool is_defined() const noexcept {
+            return m_bottom_left.is_defined() && m_top_right.is_defined();
         }
 
         /**
@@ -222,9 +229,9 @@ namespace osmium {
          * @pre Box must be defined.
          */
         bool contains(const osmium::Location& location) const noexcept {
-            assert(bottom_left());
-            assert(top_right());
-            assert(location);
+            assert(bottom_left().is_defined());
+            assert(top_right().is_defined());
+            assert(location.is_defined());
             return location.x() >= bottom_left().x() && location.y() >= bottom_left().y() &&
                    location.x() <= top_right().x() && location.y() <= top_right().y();
         }
@@ -261,7 +268,7 @@ namespace osmium {
      */
     template <typename TChar, typename TTraits>
     inline std::basic_ostream<TChar, TTraits>& operator<<(std::basic_ostream<TChar, TTraits>& out, const osmium::Box& box) {
-        if (box) {
+        if (box.is_defined()) {
             out << '(';
             box.bottom_left().as_string_without_check(std::ostream_iterator<char>(out));
             out << ',';

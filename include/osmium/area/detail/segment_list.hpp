@@ -126,7 +126,7 @@ namespace osmium {
                             }
                             continue;
                         }
-                        if (previous_nr.location()) {
+                        if (previous_nr.location().is_defined()) {
                             if (previous_nr.location() != nr.location()) {
                                 m_segments.emplace_back(previous_nr, nr, role, &way);
                             } else {
@@ -335,7 +335,7 @@ namespace osmium {
 
                             if (y_range_overlap(s1, s2)) {
                                 const osmium::Location intersection{calculate_intersection(s1, s2)};
-                                if (intersection) {
+                                if (intersection.is_defined()) {
                                     ++found_intersections;
                                     if (m_debug) {
                                         std::cerr << "  segments " << s1 << " and " << s2 << " intersecting at " << intersection << "\n";

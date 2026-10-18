@@ -283,7 +283,7 @@ namespace osmium {
 
                     write_meta(node);
 
-                    if (node.location()) {
+                    if (node.location().is_defined()) {
                         detail::append_lat_lon_attributes(*m_out, "lat", "lon", node.location());
                     }
 
@@ -321,7 +321,7 @@ namespace osmium {
                             write_prefix();
                             *m_out += "  <nd";
                             write_attribute("ref", node_ref.ref());
-                            if (node_ref.location()) {
+                            if (node_ref.location().is_defined()) {
                                 detail::append_lat_lon_attributes(*m_out, "lat", "lon", node_ref.location());
                             }
                             *m_out += "/>\n";

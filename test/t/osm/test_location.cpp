@@ -19,7 +19,6 @@
 
 TEST_CASE("Location instantiation with default parameters") {
     const osmium::Location loc;
-    REQUIRE_FALSE(loc);
     REQUIRE_FALSE(loc.is_defined());
     REQUIRE(loc.is_undefined());
     REQUIRE_THROWS_AS(loc.lon(), osmium::invalid_location);
@@ -28,7 +27,6 @@ TEST_CASE("Location instantiation with default parameters") {
 
 TEST_CASE("Location instantiation with double parameters") {
     const osmium::Location loc1{1.2, 4.5};
-    REQUIRE(bool(loc1));
     REQUIRE(loc1.is_defined());
     REQUIRE_FALSE(loc1.is_undefined());
     REQUIRE(12000000 == loc1.x());

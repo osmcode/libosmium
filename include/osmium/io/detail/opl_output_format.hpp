@@ -199,7 +199,7 @@ namespace osmium {
                 void write_field_ref(const osmium::NodeRef& node_ref) {
                     write_field_int('n', node_ref.ref());
                     *m_out += 'x';
-                    if (node_ref.location()) {
+                    if (node_ref.location().is_defined()) {
                         node_ref.location().as_string(std::back_inserter(*m_out), 'y');
                     } else {
                         *m_out += 'y';

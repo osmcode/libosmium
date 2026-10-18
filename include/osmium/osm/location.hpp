@@ -372,7 +372,7 @@ namespace osmium {
          * @deprecated Use is_defined() or is_undefined() or valid() which
          *             have all slightly different meanings.
          */
-        explicit constexpr operator bool() const noexcept {
+        [[deprecated("Use is_defined() instead")]] explicit constexpr operator bool() const noexcept {
             return m_x != undefined_coordinate && m_y != undefined_coordinate;
         }
 
@@ -623,7 +623,7 @@ namespace osmium {
      */
     template <typename TChar, typename TTraits>
     inline std::basic_ostream<TChar, TTraits>& operator<<(std::basic_ostream<TChar, TTraits>& out, const osmium::Location& location) {
-        if (location) {
+        if (location.is_defined()) {
             out << '(';
             location.as_string(std::ostream_iterator<char>(out), ',');
             out << ')';

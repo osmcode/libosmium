@@ -158,7 +158,7 @@ namespace osmium {
                 }
 
                 try {
-                    if (!way.nodes().front().location() || !way.nodes().back().location()) {
+                    if (way.nodes().front().location().is_undefined() || way.nodes().back().location().is_undefined()) {
                         throw osmium::invalid_location{"invalid location"};
                     }
                     if (way.ends_have_same_location()) {

@@ -115,7 +115,7 @@ namespace osmium {
             void print_location(const osmium::Node& node) {
                 const osmium::Location& location = node.location();
 
-                if (location) {
+                if (location.is_defined()) {
                     *m_out << m_prefix
                            << "  lon="
                            << std::fixed
@@ -161,7 +161,7 @@ namespace osmium {
                     *m_out << m_prefix
                            << "  ref="
                            << node_ref.ref();
-                    if (node_ref.location()) {
+                    if (node_ref.location().is_defined()) {
                         *m_out << " pos="
                                << node_ref.location();
                     }
@@ -193,7 +193,7 @@ namespace osmium {
                     *m_out << m_prefix
                            << "  ref="
                            << node_ref.ref();
-                    if (node_ref.location()) {
+                    if (node_ref.location().is_defined()) {
                         *m_out << " pos="
                                << node_ref.location();
                     }
@@ -207,7 +207,7 @@ namespace osmium {
                     *m_out << m_prefix
                            << "  ref="
                            << node_ref.ref();
-                    if (node_ref.location()) {
+                    if (node_ref.location().is_defined()) {
                         *m_out << " pos="
                                << node_ref.location();
                     }
@@ -265,7 +265,7 @@ namespace osmium {
                 *m_out << m_prefix
                        << "  bounds=";
 
-                if (changeset.bounds()) {
+                if (changeset.bounds().is_defined()) {
                     *m_out << '('
                            << changeset.bounds().bottom_left().lon_without_check()
                            << ','

@@ -177,7 +177,7 @@ namespace osmium {
          */
         bool ends_have_same_location() const {
             assert(!empty());
-            assert(front().location() && back().location());
+            assert(front().location().is_defined() && back().location().is_defined());
             return front().location() == back().location();
         }
 
