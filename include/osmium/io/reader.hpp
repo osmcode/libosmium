@@ -99,6 +99,7 @@ namespace osmium {
             osmium::thread::Pool* m_pool = nullptr;
 
             std::atomic<std::size_t> m_offset{0};
+            std::atomic<bool> m_done = false;
 
             detail::ParserFactory::create_parser_type m_creator;
 
@@ -165,7 +166,8 @@ namespace osmium {
                                       osmium::osm_entity_bits::type read_which_entities,
                                       osmium::io::read_meta read_metadata,
                                       osmium::io::buffers_type buffers_kind,
-                                      bool want_buffered_pages_removed) {
+                                      bool want_buffered_pages_removed,
+                                      std::atomic<bool> *done) {
                 std::promise<osmium::io::Header> promise{std::move(header_promise)};
                 osmium::io::detail::parser_arguments args = {
                     pool,
@@ -177,7 +179,8 @@ namespace osmium {
                     read_which_entities,
                     read_metadata,
                     buffers_kind,
-                    want_buffered_pages_removed};
+                    want_buffered_pages_removed,
+                    done};
                 creator(args)->parse();
             }
 
@@ -346,7 +349,8 @@ namespace osmium {
                                                           std::ref(m_input_queue), std::ref(m_osmdata_queue),
                                                           std::move(header_promise), &m_offset, m_read_which_entities,
                                                           m_read_metadata, m_buffers_kind,
-                                                          m_decompressor->want_buffered_pages_removed()};
+                                                          m_decompressor->want_buffered_pages_removed(),
+                                                          &m_done};
             }
 
             template <typename... TArgs>
@@ -384,6 +388,7 @@ namespace osmium {
             void close() {
                 m_status = status::closed;
 
+                m_done = true;
                 m_read_thread_manager.stop();
 
                 m_osmdata_queue_wrapper.shutdown();

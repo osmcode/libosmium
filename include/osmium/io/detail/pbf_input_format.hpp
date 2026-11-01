@@ -69,6 +69,7 @@ namespace osmium {
                 std::atomic<std::size_t>* m_offset_ptr;
                 int m_fd;
                 bool m_want_buffered_pages_removed;
+                std::atomic<bool>* m_done;
 
                 /**
                  * Make sure the input data contains at least the specified
@@ -230,7 +231,11 @@ namespace osmium {
 
                 void parse_data_blobs() {
                     const bool use_pool = osmium::config::use_pool_threads_for_pbf_parsing();
-                    while (const auto size = check_type_and_get_blob_size("OSMData")) {
+                    while (!*m_done) {
+                        const auto size = check_type_and_get_blob_size("OSMData");
+                        if (!size) {
+                            break;
+                        }
                         std::string input_buffer{read_from_input_queue_with_check(size)};
 
                         PBFDataBlobDecoder data_blob_parser{std::move(input_buffer), read_types(), read_metadata()};
@@ -260,7 +265,8 @@ namespace osmium {
                     Parser(args),
                     m_offset_ptr(args.offset_ptr),
                     m_fd(args.fd),
-                    m_want_buffered_pages_removed(args.want_buffered_pages_removed) {
+                    m_want_buffered_pages_removed(args.want_buffered_pages_removed),
+                    m_done(args.done) {
                 }
 
                 PBFParser(const PBFParser&) = delete;

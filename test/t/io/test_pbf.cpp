@@ -29,6 +29,7 @@ TEST_CASE("Get supported PBF compression types") {
  */
 TEST_CASE("Read PBF file with version=-1 and changeset=-1 (written by Osmosis)") {
     const osmium::memory::Buffer buffer = osmium::io::read_file(with_data_dir("t/io/data_pbf_version-1.osm.pbf"));
+    REQUIRE(buffer.committed() > 0);
     // one node should be in this buffer
     const osmium::OSMObject& object = *(buffer.cbegin<osmium::OSMObject>());
     REQUIRE(object.version() == 0);

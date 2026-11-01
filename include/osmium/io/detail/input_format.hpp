@@ -67,6 +67,7 @@ namespace osmium {
                 osmium::io::read_meta read_metadata;
                 osmium::io::buffers_type buffers_kind;
                 bool want_buffered_pages_removed;
+                std::atomic<bool>* done;
             };
 
             class Parser {
