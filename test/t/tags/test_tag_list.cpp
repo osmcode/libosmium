@@ -80,6 +80,17 @@ TEST_CASE("create tag list") {
         buffer.commit();
     }
 
+    SECTION("with TagListBuilder from std::string_view") {
+        {
+            osmium::builder::TagListBuilder builder(buffer);
+            builder.add_tag(std::string_view("highway"), std::string_view("primary"));
+            const std::string_view source = "name";
+            const std::string_view gps = "Main Street";
+            builder.add_tag(source, gps);
+        }
+        buffer.commit();
+    }
+
     SECTION("with add_tag_list from pair<const char*, const char*>") {
         osmium::builder::add_tag_list(buffer,
             _tag(std::pair<const char*, const char*>{"highway", "primary"}),

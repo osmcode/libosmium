@@ -59,6 +59,7 @@ DEALINGS IN THE SOFTWARE.
 #include <new>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <utility>
 
 namespace osmium {
@@ -144,6 +145,23 @@ namespace osmium {
                 }
                 add_size(append(key.data(),   static_cast<osmium::memory::item_size_type>(key.size())   + 1));
                 add_size(append(value.data(), static_cast<osmium::memory::item_size_type>(value.size()) + 1));
+            }
+
+            /**
+             * Add tag to buffer.
+             *
+             * @param key Tag key.
+             * @param value Tag value.
+             */
+            void add_tag(const std::string_view& key, const std::string_view& value) {
+                if (key.size() > osmium::max_osm_string_length) {
+                    throw std::length_error{"OSM tag key is too long"};
+                }
+                if (value.size() > osmium::max_osm_string_length) {
+                    throw std::length_error{"OSM tag value is too long"};
+                }
+                add_size(append_with_zero(key.data(),   static_cast<osmium::memory::item_size_type>(key.size())));
+                add_size(append_with_zero(value.data(), static_cast<osmium::memory::item_size_type>(value.size())));
             }
 
             /**
