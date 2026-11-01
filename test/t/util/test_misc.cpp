@@ -72,3 +72,11 @@ TEST_CASE("string to integer conversion") {
     REQUIRE(osmium::detail::str_to_int<uint64_t>("9223372036854775808") == 0);
 }
 
+TEST_CASE("sort container removing duplicates") {
+    std::vector<int> data = { 1, 7, 2, 3, 2, 5 };
+    const std::vector<int> expected = { 1, 2, 3, 5, 7 };
+
+    osmium::detail::sort_unique(&data);
+
+    REQUIRE(data == expected);
+}

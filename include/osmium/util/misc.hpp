@@ -33,6 +33,7 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+#include <algorithm>
 #include <cassert>
 #include <cerrno>
 #include <cstdlib>
@@ -78,6 +79,20 @@ namespace osmium {
             }
 
             return static_cast<TReturn>(value);
+        }
+
+        /**
+         * Sort contents of a container and remove duplicates. Work is done
+         * in-place.
+         *
+         * @tparam TContainer A mutable container with random access to
+         *                    its elements (such as a std::vector).
+         */
+        template <typename TContainer>
+        void sort_unique(TContainer* container) {
+            std::sort(container->begin(), container->end());
+            container->erase(std::unique(container->begin(), container->end()),
+                             container->end());
         }
 
     } // namespace detail

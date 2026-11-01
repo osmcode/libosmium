@@ -35,6 +35,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <osmium/osm/item_type.hpp>
 #include <osmium/osm/types.hpp>
+#include <osmium/util/misc.hpp>
 
 #include <algorithm>
 #include <array>
@@ -446,10 +447,7 @@ namespace osmium {
              * using an iterator.
              */
             void sort_unique() {
-                std::sort(m_data.begin(), m_data.end());
-                const auto last = std::unique(m_data.begin(), m_data.end());
-                m_data.erase(last, m_data.end());
-
+                osmium::detail::sort_unique(&m_data);
             }
 
             /**
