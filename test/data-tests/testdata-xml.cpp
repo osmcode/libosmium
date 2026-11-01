@@ -95,6 +95,7 @@ header_buffer_type parse_xml(std::string input) {
     osmium::io::detail::add_to_queue(input_queue, std::string{});
 
     std::atomic<std::size_t> offset{0};
+    std::atomic<bool> done{false};
 
     osmium::io::detail::parser_arguments args = {
         pool,
@@ -106,7 +107,8 @@ header_buffer_type parse_xml(std::string input) {
         osmium::osm_entity_bits::all,
         osmium::io::read_meta::yes,
         osmium::io::buffers_type::any,
-        false
+        false,
+        &done
     };
     osmium::io::detail::XMLParser parser{args};
     parser.parse();
