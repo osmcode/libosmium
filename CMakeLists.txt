@@ -417,7 +417,7 @@ endif()
 message(STATUS "Looking for clang-tidy")
 
 SET(CLANG_TIDY_PROGRAMS)
-foreach(_no RANGE 15 99)
+foreach(_no RANGE 15 50)
     LIST(APPEND CLANG_TIDY_PROGRAMS "clang-tidy-${_no}")
 endforeach()
 LIST(APPEND CLANG_TIDY_PROGRAMS "clang-tidy")
