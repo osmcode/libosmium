@@ -126,8 +126,13 @@ namespace osmium {
                 if (value_length > osmium::max_osm_string_length) {
                     throw std::length_error{"OSM tag value is too long"};
                 }
-                add_size(append_with_zero(key,   static_cast<osmium::memory::item_size_type>(key_length)));
-                add_size(append_with_zero(value, static_cast<osmium::memory::item_size_type>(value_length)));
+                const auto size = static_cast<osmium::memory::item_size_type>(key_length + value_length + 2);
+                unsigned char* target = reserve_space(size);
+                target = std::copy_n(reinterpret_cast<const unsigned char*>(key), key_length, target);
+                *target++ = '\0';
+                target = std::copy_n(reinterpret_cast<const unsigned char*>(value), value_length, target);
+                *target = '\0';
+                add_size(size);
             }
 
             /**
@@ -154,14 +159,7 @@ namespace osmium {
              * @param value Tag value.
              */
             void add_tag(const std::string_view& key, const std::string_view& value) {
-                if (key.size() > osmium::max_osm_string_length) {
-                    throw std::length_error{"OSM tag key is too long"};
-                }
-                if (value.size() > osmium::max_osm_string_length) {
-                    throw std::length_error{"OSM tag value is too long"};
-                }
-                add_size(append_with_zero(key.data(),   static_cast<osmium::memory::item_size_type>(key.size())));
-                add_size(append_with_zero(value.data(), static_cast<osmium::memory::item_size_type>(value.size())));
+                add_tag(key.data(), key.size(), value.data(), value.size());
             }
 
             /**
@@ -495,6 +493,9 @@ namespace osmium {
                 const auto size_of_object = sizeof(T) + sizeof(string_size_type);
                 assert(cobject().user_size() == 1 && (size() <= size_of_object + osmium::memory::padded_length(1))
                        && "set_user() must be called at most once and before any sub-builders");
+                if (length == 0) {
+                    return static_cast<TDerived&>(*this);
+                }
                 constexpr const auto available_space = min_size_for_user - sizeof(string_size_type) - 1;
                 if (length > available_space) {
                     const auto space_needed = osmium::memory::padded_length(length - available_space);
