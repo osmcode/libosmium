@@ -614,18 +614,26 @@ namespace osmium {
                 }
 
                 void build_tag_list_from_dense_nodes(osmium::builder::NodeBuilder& builder, values_access_int32& tags) {
+                    auto idx = tags.next_int32();
+                    if (idx == 0) {
+                        return;
+                    }
+
                     osmium::builder::TagListBuilder tl_builder{builder};
-                    while (!tags.empty()) {
-                        const auto idx = tags.next_int32();
-                        if (idx == 0) {
-                            return;
-                        }
+                    while (true) {
                         const auto& k = m_stringtable.at(idx);
                         if (tags.empty()) {
                             throw osmium::pbf_error{"PBF format error"}; // this is against the spec, keys/vals must come in pairs
                         }
                         const auto& v = m_stringtable.at(tags.next_int32());
                         tl_builder.add_tag(k.first, k.second, v.first, v.second);
+                        if (tags.empty()) {
+                            return;
+                        }
+                        idx = tags.next_int32();
+                        if (idx == 0) {
+                            return;
+                        }
                     }
                 }
 
